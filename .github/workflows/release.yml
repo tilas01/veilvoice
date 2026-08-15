@@ -190,6 +190,11 @@ jobs:
     name: publish
     needs: build
     runs-on: ubuntu-latest
+    # Evaluated at job level on purpose. A step's own `env:` block is not in
+    # scope for that step's `if:`, so gating on it there silently disables the
+    # step forever — which is exactly what v0.1.0 and v0.1.1 did.
+    env:
+      HAS_SIGNING_KEY: ${{ secrets.GPG_PRIVATE_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -211,12 +216,16 @@ jobs:
       # first-time contributors still get a complete, unsigned release.
       - name: Sign the checksums
         id: sign
-        if: ${{ env.GPG_PRIVATE_KEY != '' }}
+        if: env.HAS_SIGNING_KEY == 'true'
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
+          # The key is fed on stdin and never written to disk.
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          # Publish the public half so anyone can verify without trusting a
+          # keyserver. The private half never leaves the secret store.
+          gpg --armor --export > staging/veilvoice-signing-key.asc
           gpg --batch --yes --pinentry-mode loopback \
               --passphrase "$GPG_PASSPHRASE" \
               --detach-sign --armor staging/SHA256SUMS
@@ -236,9 +245,18 @@ jobs:
             echo '```'
             echo
             if [ -f staging/SHA256SUMS.asc ]; then
-              echo "\`SHA256SUMS.asc\` is a detached OpenPGP signature over the checksums."
+              echo "\`SHA256SUMS.asc\` is a detached OpenPGP signature over the checksums,"
+              echo "and \`veilvoice-signing-key.asc\` is the public key that made it:"
+              echo
+              echo '```bash'
+              echo "gpg --import veilvoice-signing-key.asc"
+              echo "gpg --verify SHA256SUMS.asc SHA256SUMS"
+              echo '```'
+              echo
+              echo "Check the fingerprint against the one published in the README before"
+              echo "trusting it — a signature only proves the same key signed every release."
             else
-              echo "> This build is **unsigned** — no signing key was configured."
+              echo "> This build is **unsigned** — no signing key is configured for this repository."
             fi
             echo
             echo "### Reproducibility"
