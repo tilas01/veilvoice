@@ -46,6 +46,10 @@ enum Command {
         /// Keep the speaker's accent and intonation intact.
         #[arg(long)]
         keep_accent: bool,
+        /// Seconds between rolls of the modulation seed. 0 keeps one stream
+        /// for the whole session.
+        #[arg(long, default_value_t = 2.0)]
+        reseed_secs: f32,
         /// Also strip metadata from the written file.
         #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
         clean_metadata: bool,
@@ -64,6 +68,10 @@ enum Command {
         /// Keep the speaker's accent and intonation intact.
         #[arg(long)]
         keep_accent: bool,
+        /// Seconds between rolls of the modulation seed. 0 keeps one stream
+        /// for the whole session.
+        #[arg(long, default_value_t = 2.0)]
+        reseed_secs: f32,
     },
     /// List the audio devices this machine offers.
     Devices,
@@ -145,14 +153,33 @@ fn run(command: Command) -> Result<(), String> {
             output,
             intensity,
             keep_accent,
+            reseed_secs,
             clean_metadata,
-        } => anonymise(input, output, intensity, keep_accent, clean_metadata),
+        } => anonymise(
+            input,
+            output,
+            Tuning {
+                intensity,
+                keep_accent,
+                reseed_secs,
+            },
+            clean_metadata,
+        ),
         Command::Live {
             input,
             output,
             intensity,
             keep_accent,
-        } => live(input, output, intensity, keep_accent),
+            reseed_secs,
+        } => live(
+            input,
+            output,
+            Tuning {
+                intensity,
+                keep_accent,
+                reseed_secs,
+            },
+        ),
         Command::Devices => list_devices(),
         Command::Clean { file, policy } => clean(file, policy.into()),
         Command::Encrypt { input, output, to } => encrypt(input, output, to),
@@ -165,22 +192,39 @@ fn run(command: Command) -> Result<(), String> {
     }
 }
 
-fn config(intensity: f32, keep_accent: bool) -> DeidConfig {
+/// The engine settings a user can reach from the command line.
+#[derive(Clone, Copy)]
+struct Tuning {
+    intensity: f32,
+    keep_accent: bool,
+    reseed_secs: f32,
+}
+
+fn config(t: Tuning) -> DeidConfig {
     DeidConfig {
-        intensity: intensity.clamp(0.0, 1.0),
+        intensity: t.intensity.clamp(0.0, 1.0),
         accent: AccentConfig {
-            enabled: !keep_accent,
+            enabled: !t.keep_accent,
             ..AccentConfig::default()
         },
+        reseed_secs: t.reseed_secs.max(0.0),
         ..DeidConfig::default()
+    }
+}
+
+/// How the seed-rolling setting reads in the output.
+fn describe_reseed(secs: f32) -> String {
+    if secs <= 0.0 {
+        "off — one stream for the whole session".to_string()
+    } else {
+        format!("every {secs}s")
     }
 }
 
 fn anonymise(
     input: PathBuf,
     output: Option<PathBuf>,
-    intensity: f32,
-    keep_accent: bool,
+    tuning: Tuning,
     clean_metadata: bool,
 ) -> Result<(), String> {
     let out_path = output.unwrap_or_else(|| {
@@ -202,8 +246,7 @@ fn anonymise(
     );
 
     let started = std::time::Instant::now();
-    let veiled = veilvoice_audio::deidentify(&audio, config(intensity, keep_accent))
-        .map_err(|e| e.to_string())?;
+    let veiled = veilvoice_audio::deidentify(&audio, config(tuning)).map_err(|e| e.to_string())?;
     let elapsed = started.elapsed().as_secs_f32();
 
     audio_io::save_wav(&out_path, &veiled).map_err(|e| e.to_string())?;
@@ -230,7 +273,18 @@ fn anonymise(
     );
     println!(
         "{}",
-        field("Accent", if keep_accent { "kept" } else { "neutralised" })
+        field(
+            "Accent",
+            if tuning.keep_accent {
+                "kept"
+            } else {
+                "neutralised"
+            }
+        )
+    );
+    println!(
+        "{}",
+        field("Seed rolls", &describe_reseed(tuning.reseed_secs))
     );
     println!();
     println!(
@@ -254,12 +308,7 @@ fn anonymise(
     Ok(())
 }
 
-fn live(
-    input: Option<String>,
-    output: Option<String>,
-    intensity: f32,
-    keep_accent: bool,
-) -> Result<(), String> {
+fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result<(), String> {
     let in_device =
         devices::open(devices::Direction::Input, input.as_deref()).map_err(|e| e.to_string())?;
 
@@ -277,7 +326,18 @@ fn live(
     println!("{}", field("Output", &devices::name_of(&out_device)));
     println!(
         "{}",
-        field("Accent", if keep_accent { "kept" } else { "neutralised" })
+        field(
+            "Accent",
+            if tuning.keep_accent {
+                "kept"
+            } else {
+                "neutralised"
+            }
+        )
+    );
+    println!(
+        "{}",
+        field("Seed rolls", &describe_reseed(tuning.reseed_secs))
     );
     if out_name.is_none() {
         println!(
@@ -300,12 +360,8 @@ fn live(
         );
     }
 
-    let session = veilvoice_audio::LiveSession::start(
-        &in_device,
-        &out_device,
-        config(intensity, keep_accent),
-    )
-    .map_err(|e| e.to_string())?;
+    let session = veilvoice_audio::LiveSession::start(&in_device, &out_device, config(tuning))
+        .map_err(|e| e.to_string())?;
 
     println!();
     println!("{}", paint(colour::MUTED, "  Ctrl-C to stop."));
@@ -597,17 +653,38 @@ mod tests {
         Cli::command().debug_assert();
     }
 
+    fn tuning(intensity: f32, keep_accent: bool, reseed_secs: f32) -> Tuning {
+        Tuning {
+            intensity,
+            keep_accent,
+            reseed_secs,
+        }
+    }
+
     #[test]
     fn intensity_is_clamped_into_range() {
-        assert_eq!(config(5.0, false).intensity, 1.0);
-        assert_eq!(config(-1.0, false).intensity, 0.0);
-        assert_eq!(config(0.5, false).intensity, 0.5);
+        assert_eq!(config(tuning(5.0, false, 2.0)).intensity, 1.0);
+        assert_eq!(config(tuning(-1.0, false, 2.0)).intensity, 0.0);
+        assert_eq!(config(tuning(0.5, false, 2.0)).intensity, 0.5);
     }
 
     #[test]
     fn keep_accent_disables_neutralisation() {
-        assert!(!config(1.0, true).accent.enabled);
-        assert!(config(1.0, false).accent.enabled);
+        assert!(!config(tuning(1.0, true, 2.0)).accent.enabled);
+        assert!(config(tuning(1.0, false, 2.0)).accent.enabled);
+    }
+
+    #[test]
+    fn reseed_interval_reaches_the_engine_and_cannot_go_negative() {
+        assert_eq!(config(tuning(1.0, false, 0.5)).reseed_secs, 0.5);
+        assert_eq!(config(tuning(1.0, false, 0.0)).reseed_secs, 0.0);
+        assert_eq!(config(tuning(1.0, false, -3.0)).reseed_secs, 0.0);
+    }
+
+    #[test]
+    fn reseed_setting_reads_clearly() {
+        assert!(describe_reseed(0.0).contains("off"));
+        assert!(describe_reseed(2.0).contains("2"));
     }
 
     #[test]

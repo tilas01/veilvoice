@@ -59,7 +59,7 @@
 use crate::accent::AccentNeutralizer;
 use crate::pitch::PitchEstimate;
 use realfft::num_complex::Complex;
-use std::f32::consts::TAU;
+use std::f32::consts::{PI, TAU};
 
 /// Persistent per-instance state for the spectral transform.
 pub struct SpectralState {
@@ -73,8 +73,10 @@ pub struct SpectralState {
     tmp: Vec<f32>,
     // unvoiced synthesis phase state (per bin)
     phase_acc: Vec<f32>,
-    phase_adv: Vec<f32>,    // per-bin centre-frequency advance per hop
-    phase_offset: Vec<f32>, // fixed random per-bin offset (decorrelation)
+    phase_adv: Vec<f32>,           // per-bin centre-frequency advance per hop
+    phase_offset: Vec<f32>,        // random per-bin offset (decorrelation)
+    phase_offset_target: Vec<f32>, // where it is gliding to after a reseed
+    offset_glide: f32,             // one-pole coefficient toward the target
     // envelope smoothing radius in bins
     env_radius: usize,
     // frequency mapping
@@ -105,9 +107,29 @@ impl SpectralState {
             phase_acc: rand_phase.to_vec(),
             phase_adv,
             phase_offset: rand_phase.to_vec(),
+            phase_offset_target: rand_phase.to_vec(),
+            // Roughly half a second to travel to a new offset. See
+            // `retarget_phase_offsets` for why it is a glide and not a jump.
+            offset_glide: (hop as f32 / (sample_rate * 0.5)).clamp(1e-4, 1.0),
             env_radius,
             bin_hz: sample_rate / n as f32,
         }
+    }
+
+    /// Aim the per-bin phase offsets at fresh values.
+    ///
+    /// Called when the modulation stream rolls onto a new seed. The offsets are
+    /// **glided** to, never assigned: they are added directly to each bin's
+    /// synthesis phase, so replacing them outright would step every partial's
+    /// phase at once — an audible click, every couple of seconds, forever.
+    ///
+    /// Gliding turns that step into a brief, tiny detune instead. The move is
+    /// taken the short way around the circle, so the worst case is half a turn
+    /// spread over about half a second: under one hertz of momentary shift,
+    /// which is inaudible.
+    pub fn retarget_phase_offsets(&mut self, offsets: &[f32]) {
+        debug_assert_eq!(offsets.len(), self.half);
+        self.phase_offset_target.copy_from_slice(offsets);
     }
 
     /// Rewrite `spec` (length n/2+1) in place, given the current modulation.
@@ -187,6 +209,18 @@ impl SpectralState {
         // phase and clicks.
         for k in 0..self.half {
             self.phase_acc[k] = (self.phase_acc[k] + self.phase_adv[k]).rem_euclid(TAU);
+
+            // Ease toward any newly drawn offset, the short way round.
+            let mut delta = self.phase_offset_target[k] - self.phase_offset[k];
+            if delta > PI {
+                delta -= TAU;
+            } else if delta < -PI {
+                delta += TAU;
+            }
+            if delta != 0.0 {
+                self.phase_offset[k] =
+                    (self.phase_offset[k] + delta * self.offset_glide).rem_euclid(TAU);
+            }
         }
 
         match comb_period {

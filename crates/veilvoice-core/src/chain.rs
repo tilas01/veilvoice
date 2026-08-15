@@ -39,6 +39,19 @@ pub struct DeidConfig {
     pub intensity: f32,
     /// Accent and speaker-trait neutralisation.
     pub accent: AccentConfig,
+    /// How often the modulation stream rolls onto a fresh seed, in seconds.
+    ///
+    /// Each roll permanently closes off the stream that drove the audio before
+    /// it: ChaCha20 cannot be run backwards, so an adversary who obtained the
+    /// current state could not reconstruct the modulation of any earlier
+    /// segment. A long recording therefore is not one key stream but a chain of
+    /// short, independently-sealed ones.
+    ///
+    /// Two seconds by default, which is frequent enough to keep each segment
+    /// small and far too slow to hear — the parameters glide across a roll and
+    /// the phase offsets ease to their new values over about half a second.
+    /// Set to `0.0` to keep a single stream for the whole session.
+    pub reseed_secs: f32,
 }
 
 impl Default for DeidConfig {
@@ -58,6 +71,7 @@ impl Default for DeidConfig {
             reverb_mix: 0.12,
             intensity: 1.0,
             accent: AccentConfig::default(),
+            reseed_secs: 2.0,
         }
     }
 }
@@ -86,6 +100,9 @@ impl DeidConfig {
         }
         if self.sample_rate < 8_000.0 {
             return Err("sample_rate too low".into());
+        }
+        if !self.reseed_secs.is_finite() || self.reseed_secs < 0.0 {
+            return Err("reseed_secs must be zero or a positive number of seconds".into());
         }
         self.intensity = self.intensity.clamp(0.0, 1.0);
         Ok(self)
@@ -156,6 +173,11 @@ pub struct Deidentifier {
     stats: ProcessStats,
     latency_samples: usize,
     hop: usize,
+    /// Frames between seed rolls; 0 disables rolling entirely.
+    reseed_frames: u32,
+    frames_until_reseed: u32,
+    /// Pre-allocated, so a roll never allocates inside an audio callback.
+    phase_scratch: Vec<f32>,
 }
 
 impl Deidentifier {
@@ -191,6 +213,15 @@ impl Deidentifier {
         let accent = AccentNeutralizer::new(config.accent, config.sample_rate, n, hop, half);
         let pitch = PitchTracker::new(config.sample_rate);
 
+        // Rolls are counted in frames so the audio thread never touches a clock.
+        let reseed_frames = if config.reseed_secs > 0.0 {
+            ((config.reseed_secs * config.sample_rate) / hop as f32)
+                .round()
+                .max(1.0) as u32
+        } else {
+            0
+        };
+
         let stats = ProcessStats {
             sample_rate: config.sample_rate,
             algorithmic_latency_ms: latency_samples as f64 / config.sample_rate as f64 * 1000.0,
@@ -209,6 +240,9 @@ impl Deidentifier {
             stats,
             latency_samples,
             hop,
+            reseed_frames,
+            frames_until_reseed: reseed_frames,
+            phase_scratch: phase,
         })
     }
 
@@ -240,7 +274,22 @@ impl Deidentifier {
         let accent = &mut self.accent;
         let tracker = &mut self.pitch;
         let hop = self.hop;
+        let reseed_frames = self.reseed_frames;
+        let countdown = &mut self.frames_until_reseed;
+        let phase_scratch = &mut self.phase_scratch;
         self.stft.process(input, output, |spec, frame| {
+            // Roll the stream forward. Cheap, allocation-free and syscall-free:
+            // the new seed is drawn from the stream it replaces.
+            if reseed_frames > 0 {
+                *countdown = countdown.saturating_sub(1);
+                if *countdown == 0 {
+                    modulator.reseed();
+                    modulator.fill_phase_offsets(phase_scratch);
+                    spectral.retarget_phase_offsets(phase_scratch);
+                    *countdown = reseed_frames;
+                }
+            }
+
             let m = modulator.next_frame();
             // f0 has to come from the time domain: the FFT resolution at usable
             // frame sizes cannot tell 100 Hz from 140 Hz. Only the newest `hop`
@@ -488,6 +537,124 @@ mod tests {
             rtf < 0.5,
             "realtime factor {rtf:.3} leaves too little headroom"
         );
+    }
+
+    /// The property that makes rolling usable at all: it must be inaudible.
+    /// A discontinuity in the phase offsets would show up as a sample-to-sample
+    /// jump far larger than the signal ever produces on its own.
+    #[test]
+    fn rolling_the_seed_introduces_no_clicks() {
+        let input = speaker(150.0, 1.0, 6.0);
+        let worst_jump = |cfg: DeidConfig| {
+            let out = Deidentifier::from_seed(cfg, [21u8; 32])
+                .unwrap()
+                .process_vec(&input);
+            out.windows(2)
+                .skip(4_800) // past the engine's warm-up
+                .fold(0.0f32, |m, w| m.max((w[1] - w[0]).abs()))
+        };
+
+        let steady = worst_jump(DeidConfig {
+            reseed_secs: 0.0,
+            ..Default::default()
+        });
+        // Fast enough to roll several times inside the test signal.
+        let rolling = worst_jump(DeidConfig {
+            reseed_secs: 0.25,
+            ..Default::default()
+        });
+
+        assert!(
+            rolling <= steady * 1.5 + 1e-3,
+            "rolling produced a discontinuity: worst jump {rolling:.4} vs {steady:.4} without"
+        );
+    }
+
+    #[test]
+    fn rolling_changes_the_audio_but_keeps_it_sane() {
+        let input = speaker(150.0, 1.0, 5.0);
+        let steady = Deidentifier::from_seed(
+            DeidConfig {
+                reseed_secs: 0.0,
+                ..Default::default()
+            },
+            [4u8; 32],
+        )
+        .unwrap()
+        .process_vec(&input);
+        let rolling = Deidentifier::from_seed(
+            DeidConfig {
+                reseed_secs: 0.5,
+                ..Default::default()
+            },
+            [4u8; 32],
+        )
+        .unwrap()
+        .process_vec(&input);
+
+        assert!(rolling.iter().all(|v| v.is_finite()));
+        let diff: f32 = steady
+            .iter()
+            .zip(&rolling)
+            .map(|(a, b)| (a - b).abs())
+            .sum();
+        assert!(
+            diff > 1.0,
+            "rolling should change the modulation (diff={diff})"
+        );
+
+        let rms = |x: &[f32]| (x.iter().map(|v| v * v).sum::<f32>() / x.len() as f32).sqrt();
+        let ratio = rms(&rolling) / rms(&steady);
+        assert!(
+            (0.5..2.0).contains(&ratio),
+            "rolling should not change the level ({ratio:.2}x)"
+        );
+    }
+
+    /// Rolling must not cost determinism — reproducible builds and the whole
+    /// test suite depend on `from_seed` being repeatable.
+    #[test]
+    fn rolling_stays_deterministic_for_a_given_seed() {
+        let input = speaker(180.0, 1.0, 3.0);
+        let cfg = DeidConfig {
+            reseed_secs: 0.3,
+            ..Default::default()
+        };
+        let a = Deidentifier::from_seed(cfg, [77u8; 32])
+            .unwrap()
+            .process_vec(&input);
+        let b = Deidentifier::from_seed(cfg, [77u8; 32])
+            .unwrap()
+            .process_vec(&input);
+        assert_eq!(a, b, "same seed must give the same audio, rolling or not");
+    }
+
+    #[test]
+    fn reseed_interval_is_validated() {
+        assert!(DeidConfig {
+            reseed_secs: -1.0,
+            ..Default::default()
+        }
+        .checked()
+        .is_err());
+        assert!(DeidConfig {
+            reseed_secs: f32::NAN,
+            ..Default::default()
+        }
+        .checked()
+        .is_err());
+        assert!(DeidConfig {
+            reseed_secs: 0.0,
+            ..Default::default()
+        }
+        .checked()
+        .is_ok());
+        assert!(DeidConfig {
+            reseed_secs: 2.0,
+            ..Default::default()
+        }
+        .checked()
+        .is_ok());
     }
 
     #[test]

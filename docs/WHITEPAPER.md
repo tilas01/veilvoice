@@ -103,6 +103,28 @@ is unknowable without the seed, which is never written anywhere.
 
 The per-bin synthesis phase offsets come from the same stream.
 
+### 3.4 The seed rolls forward
+
+The stream does not run for the whole session. Every two seconds by default,
+the modulator draws a fresh 32-byte seed **from its own output** and restarts on
+it. ChaCha20 cannot be run backwards, so this is a ratchet: an adversary who
+somehow obtained the current state could produce everything from that moment on
+and still could not reconstruct the modulation of any earlier segment. A long
+recording is therefore not one key stream but a chain of short ones, each sealed
+permanently once it has passed.
+
+The interval is configurable, including off. Rolling is inaudible by
+construction — the smoothed parameters are never reset, only their source of
+future targets, and the per-bin phase offsets ease to their new values over
+about half a second rather than stepping. Both properties are asserted in the
+test suite, one of them by comparing the worst sample-to-sample jump against a
+non-rolling run.
+
+The seed is deliberately *not* re-read from the OS CSPRNG on each roll. That
+would put a syscall inside an audio callback every couple of seconds, and it
+would make deterministic runs impossible — which the reproducible-build story
+depends on. The OS seeds the chain once; the ratchet carries it forward.
+
 ---
 
 ## 4. Accent: what is removed, and the limit
