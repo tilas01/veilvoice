@@ -198,10 +198,13 @@ Artwork is **generated, not committed as opaque blobs** —
 
 ## Status
 
-**v0.1.0 — early but real.** The engine, cryptography, audio path, metadata
-cleaning, CLI and GUI are implemented and tested. No independent security audit
-has been performed yet. Read the source before relying on it for anything that
-matters; it is written to be read.
+**v0.1.1 — early but real.** The engine, cryptography, audio path, metadata
+cleaning, CLI and GUI are implemented and tested (151 tests, clippy clean, no
+`unsafe`). Release binaries are verified bit-for-bit reproducible on Linux,
+Windows, macOS ARM and macOS Intel.
+
+**No independent security audit has been performed yet.** Read the source
+before relying on this for anything that matters; it is written to be read.
 
 Roadmap and open work: [`HANDOFF.md`](HANDOFF.md).
 
