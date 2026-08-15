@@ -27,3 +27,13 @@ desktop.ini
 
 # Bundled third-party installers are fetched at packaging time, not committed.
 /packaging/vendor/
+
+# Locally generated release-signing material. NEVER commit any of this.
+# `scripts/generate-signing-key.py` writes here; the private key and the
+# passphrase that protects it live only on the maintainer's machine and in
+# GitHub's encrypted secret store. Only the public key and fingerprint are
+# ever meant to leave this folder.
+/gpg_secrets/
+gpg_secrets/
+*.asc
+!**/public-key.asc
