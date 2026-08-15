@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Publish website/ to GitHub Pages.
+#
+# Deploying through Actions rather than a branch folder is not a preference:
+# "deploy from a branch" only ever offers the repository root or /docs, and
+# /docs already holds the whitepaper and the reproducible-build guide. Actions
+# can publish any directory, so the site lives in website/ where it belongs.
+
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'website/**'
+      - 'assets/**'
+      - 'README.md'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never cancel a running deploy: a half-published site is worse than an old one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The banner and icons are generated, and the site is the most visible
+      # place a stale copy would show. Regenerating and diffing here keeps the
+      # published artwork honest to the script that claims to produce it.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Artwork must match the generator
+        run: python assets/generate.py --check
+
+      - name: Sync generated artwork into the site
+        run: |
+          cp assets/banner.png assets/icon.png assets/icon-32.png website/assets/
+
+      # A privacy tool's website loading a CDN would undercut the whole claim,
+      # so the absence of third-party requests is enforced rather than asserted.
+      - name: No third-party requests
+        run: |
+          if grep -rniE '(src|href)="https?://(?!(github\.com|www\.audacityteam\.org|vb-audio\.com|creativecommons\.org|www\.gnu\.org))' \
+               --include='*.html' website/ -P; then
+            echo "::error::an external asset reference entered the site"
+            exit 1
+          fi
+          if grep -rniE '<script[^>]+src="https?://' --include='*.html' website/; then
+            echo "::error::a third-party script entered the site"
+            exit 1
+          fi
+          echo "no third-party assets found"
+
+      - name: Every page must reference the current signing key
+        run: |
+          want="$(tr -d ' \n' < website/assets/fingerprint.txt | tr 'a-f' 'A-F')"
+          missing=0
+          for page in website/index.html website/wiki.html website/nojs/index.html; do
+            got="$(tr -d ' \n' < "$page" | tr 'a-f' 'A-F')"
+            case "$got" in
+              *"$want"*) echo "  ok: $page" ;;
+              *) echo "::error::$page does not carry the signing-key fingerprint"; missing=1 ;;
+            esac
+          done
+          exit $missing
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: website
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

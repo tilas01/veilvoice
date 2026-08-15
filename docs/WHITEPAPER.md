@@ -207,5 +207,10 @@ This is a design and rationale document, not a peer-reviewed security proof.
 The de-identification argument rests on information destruction that is easy to
 verify by reading `spectral.rs` and `accent.rs`; the cryptography uses standard,
 well-reviewed primitives from the RustCrypto and dalek ecosystems rather than
-anything invented here. **No independent audit has been performed.** If you rely
-on this for something that matters, read the source — it is written to be read.
+anything invented here.
+
+The code has been **audited by tilas01**, who wrote and reviewed it. That is a
+maintainer audit and is worth exactly what a maintainer audit is worth: it
+catches what the author can see. **No external firm or independent researcher
+has reviewed this code**, and until one has, the strongest verification
+available to you is the source itself — which is why it is written to be read.

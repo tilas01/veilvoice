@@ -1,0 +1,85 @@
+THE LICENCE, IN PLAIN ENGLISH
+=============================
+
+Project:  VeilVoice
+Licence:  GNU General Public License, version 3 or later (GPL-3.0-or-later)
+Full text: LICENSE.txt in this folder, and
+          https://www.gnu.org/licenses/gpl-3.0.txt
+
+This file is a summary written for people, not a legal document. Where this
+summary and LICENSE.txt disagree, LICENSE.txt is the licence.
+
+
+WHAT YOU CAN DO, FREELY
+-----------------------
+
+  - Run it, for any purpose whatsoever. There is no restriction on who you are
+    or what you use it for.
+  - Read every line of it. Study how it works.
+  - Copy it, mirror it, keep an offline copy, put it on a USB stick.
+  - Change it. Fork it. Build something else out of it.
+  - Redistribute it, including selling it or using it commercially.
+  - Use it at work, in a newsroom, in a clinic, in a class, in a shelter.
+
+You do not need to ask permission for any of that. That is the point of
+publishing it.
+
+
+THE CONDITIONS
+--------------
+
+  Share the source   If you give someone the program, you must also make the
+                     corresponding source code available to them — including
+                     any changes you made.
+
+  Same licence       Derivative works are released under the GPL too, so the
+                     next person gets the same freedoms you got.
+
+  Keep the notices   Leave the copyright and licence notices in place.
+
+  State changes      If you modified it, say so, so nobody blames the original
+                     for your edits.
+
+
+WHY THIS LICENCE, AND NOT A NON-COMMERCIAL ONE
+----------------------------------------------
+
+A privacy tool is only as trustworthy as it is inspectable. If you cannot read
+the code, you are taking on faith that a program which processes your voice does
+what it claims — and "trust me" is exactly the thing this project exists to
+avoid needing.
+
+So the licence is deliberately a free-software one, with no NonCommercial clause
+and no field-of-use restriction. A "you may not use this commercially" rule
+would sound protective, but it would mean a newsroom could not use it in paid
+work, a security consultancy could not deploy it for a client, and no Linux
+distribution could package it. That is a lot of people locked out in exchange
+for very little.
+
+Copyleft does the protective work instead. Anyone may build a business on
+VeilVoice; nobody may take it, close the source, and hand users a version they
+can no longer inspect. The freedom travels with the code.
+
+
+WHAT THE LICENCE DOES NOT COVER
+-------------------------------
+
+The licence says what you may do with the work. It says nothing about whether
+the work is fit for your purpose, and it disclaims warranty entirely — see
+sections 15 and 16 of LICENSE.txt, restated in ordinary words in
+LEGAL-WAIVER.txt.
+
+In particular, read section 4 of the waiver, which sets out plainly what this
+software does *not* do. The most important line: it does not hide what you said,
+only who said it. That is a deliberate design choice, not a shortcoming, and
+misunderstanding it is the one mistake that could actually hurt someone.
+
+
+IF YOU WANT TO DO SOMETHING THE LICENCE DOES NOT ALLOW
+------------------------------------------------------
+
+Ask. Open an issue on the repository and explain what you have in mind. In
+practice the GPL already permits almost everything anyone reasonably wants; the
+usual reason to ask is wanting to distribute a modified version without
+publishing the modifications, and that is the one thing the licence is there to
+prevent.

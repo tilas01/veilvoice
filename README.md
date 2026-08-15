@@ -203,8 +203,10 @@ cleaning, CLI and GUI are implemented and tested (151 tests, clippy clean, no
 `unsafe`). Release binaries are verified bit-for-bit reproducible on Linux,
 Windows, macOS ARM and macOS Intel.
 
-**No independent security audit has been performed yet.** Read the source
-before relying on this for anything that matters; it is written to be read.
+**Audited by tilas01**, who wrote and reviewed it. Be clear about what that is
+worth: a maintainer audit catches what the author can see, and **no external
+firm or independent researcher has reviewed this code**. Read the source before
+relying on it for anything that matters — it is written to be read.
 
 Roadmap and open work: [`HANDOFF.md`](HANDOFF.md).
 
