@@ -34,7 +34,11 @@ appears in it.
    veiled voice instead of yours.
 3. **Encrypt recordings** at rest with post-quantum-hybrid cryptography.
 4. **Strip identifying metadata** from audio and images (EXIF, GPS, tags).
-5. **Work as a Rust library** in your own project — see below.
+5. **Watch what is listening** — see every application currently holding your
+   microphone or camera, with alerts the moment one starts.
+6. **Securely erase** a recording, with an honest account of what that is worth
+   on flash storage.
+7. **Work as a Rust library** in your own project — see below.
 
 > ### Honest scope
 >
@@ -94,9 +98,26 @@ veilvoice devices
 veilvoice clean photo.jpg
 veilvoice encrypt secret.wav
 veilvoice keygen
+veilvoice watch                        # who is using the mic and camera
+veilvoice shred secret.wav             # irreversible
 ```
 
 Every command takes `--help`.
+
+### Who is listening?
+
+De-identifying your voice on a call achieves little if a second program is
+recording the raw microphone at the same time. `veilvoice watch` names what is
+holding your microphone and camera, and alerts the moment something starts:
+
+```
+● veilvoice is now using your microphone
+```
+
+Windows reads the same records that drive the OS privacy indicator; Linux reads
+open handles under `/proc`. **macOS exposes no public interface for this**, so
+nothing is reported there rather than something guessed — the tool tells you it
+cannot see, because an empty list from a blind monitor is a false reassurance.
 
 ---
 
@@ -116,6 +137,7 @@ veilvoice-audio = { git = "https://github.com/tilas01/veilvoice" }
 | `veilvoice-audio` | Device enumeration, file decode/encode, live capture→process→playback. |
 | `veilvoice-crypto` | Argon2id, X25519+ML-KEM-768 hybrid, XChaCha20-Poly1305, page-locked secrets. |
 | `veilvoice-meta` | Metadata stripping for audio and images. |
+| `veilvoice-watch` | Microphone and camera use, by application. Zero dependencies. |
 
 The engine itself is small enough to drop into an audio callback:
 
@@ -199,6 +221,7 @@ writes with no extra work.
 | `veilvoice-crypto` | Argon2id, X25519+ML-KEM-768 hybrid, XChaCha20-Poly1305, amnesic secrets. |
 | `veilvoice-audio`  | Capture/playback (cpal), virtual-cable routing, file import/export. |
 | `veilvoice-meta`   | Metadata strip/spoof for audio and image EXIF/GPS. |
+| `veilvoice-watch`  | Which applications are using the microphone and camera, and alerts on change. |
 | `veilvoice-cli`    | The `veilvoice` command-line tool. |
 | `veilvoice-gui`    | The desktop app (egui, Tokyo Night). |
 

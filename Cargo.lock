@@ -3878,7 +3878,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-audio"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "cpal",
  "hound",
@@ -3890,7 +3890,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-cli"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "clap",
  "rpassword",
@@ -3898,11 +3898,12 @@ dependencies = [
  "veilvoice-core",
  "veilvoice-crypto",
  "veilvoice-meta",
+ "veilvoice-watch",
 ]
 
 [[package]]
 name = "veilvoice-core"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "getrandom 0.2.17",
  "rand 0.8.7",
@@ -3913,7 +3914,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-crypto"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "argon2",
  "chacha20poly1305",
@@ -3932,7 +3933,7 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-gui"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "eframe",
  "egui",
@@ -3940,17 +3941,22 @@ dependencies = [
  "veilvoice-audio",
  "veilvoice-core",
  "veilvoice-meta",
+ "veilvoice-watch",
 ]
 
 [[package]]
 name = "veilvoice-meta"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "hound",
  "img-parts",
  "lofty",
  "tempfile",
 ]
+
+[[package]]
+name = "veilvoice-watch"
+version = "0.1.4"
 
 [[package]]
 name = "version_check"
