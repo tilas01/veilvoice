@@ -1,0 +1,210 @@
+VEILVOICE — LEGAL DISCLAIMER AND LIABILITY WAIVER
+=================================================
+
+Project:  VeilVoice — irreversible voice de-identification
+Author:   tilas01
+Repo:     https://github.com/tilas01/veilvoice
+Site:     https://tilas01.github.io/veilvoice/
+Licence:  GPL-3.0-or-later
+Version:  1.0
+Updated:  2026-08-16
+
+This is the authoritative text of the notice shown in the welcome dialog on the
+website. It is kept here as plain text so that it can be read, quoted, diffed
+and archived without running any JavaScript, and so that the website has a
+stable thing to link to. If the dialog and this file ever disagree, this file is
+the one that is meant.
+
+VeilVoice was developed with AI assistance (Claude, by Anthropic) and has been
+reviewed and audited by tilas01. That review is a maintainer audit: it catches
+what the author can see. No external firm and no independent researcher has
+reviewed this code. If you are relying on it for something where being
+identified would cause you real harm, read the source before you trust it — it
+is written to be read, and every claim below is checkable against it.
+
+
+1. SCOPE
+--------
+
+This waiver covers all content, tools, binaries, documentation and source code
+provided on the website and within the GitHub repository tilas01/veilvoice.
+That includes, but is not limited to:
+
+  - the de-identification engine (veilvoice-core)
+  - the cryptography (veilvoice-crypto)
+  - the audio path (veilvoice-audio) and metadata cleaner (veilvoice-meta)
+  - the command-line tool (veilvoice) and desktop application (veilvoice-gui)
+  - the website, the wiki, the in-browser hash verifier
+  - every release binary and every generated artefact
+
+
+2. NO WARRANTY
+--------------
+
+Everything listed in section 1 is provided strictly "AS IS", without warranty of
+any kind, express or implied, including but not limited to the implied
+warranties of merchantability, fitness for a particular purpose and
+non-infringement. This restates, in ordinary words, sections 15 and 16 of the
+GNU General Public License version 3, which is the licence this software is
+distributed under.
+
+
+3. LIMITATION OF LIABILITY
+--------------------------
+
+The author (tilas01) expressly disclaims all liability for any direct, indirect,
+incidental, consequential or punitive damages of any nature, including but not
+limited to:
+
+  a. data loss or corruption;
+  b. loss of a recording, a key, or a passphrase, including through the
+     self-destruct and secure-erase features, which are irreversible by design;
+  c. failure of de-identification to prevent a particular person from being
+     recognised in a particular recording;
+  d. legal, professional, personal or physical consequences arising from being
+     identified despite using this software;
+  e. failure of encryption to protect a file against a particular adversary;
+  f. conflicts arising from third-party audio drivers, virtual cables or
+     proprietary software.
+
+
+4. WHAT THIS SOFTWARE DOES NOT DO
+---------------------------------
+
+This section exists because misunderstanding it is the way someone gets hurt.
+
+  - It does NOT hide what you said. Intelligibility is preserved deliberately.
+    The words are in the output and can be read, transcribed and searched. If
+    the message itself is sensitive, encrypt it, or do not send it.
+
+  - It does NOT remove a regional accent completely. The melody and colour of
+    an accent are destroyed. Which phonemes you actually produced cannot be
+    changed by any signal-level transform, so a strong accent may remain
+    audible.
+
+  - It does NOT sanitise the background. Room acoustics, other voices, a
+    doorbell, a passing siren — all of that passes through. Check what else is
+    in your recording.
+
+  - It does NOT protect you from an attacker already running code on your
+    machine, or one who can tap the microphone before VeilVoice receives it.
+
+  - It does NOT clean anything outside the file: filenames, filesystem
+    timestamps, and the channel you send it over are your responsibility.
+
+  - Page-locking keeps keys out of the swap file. It does not survive
+    hibernation, which writes memory to disk wholesale.
+
+
+5. INTENDED USE AND YOUR RESPONSIBILITY
+---------------------------------------
+
+VeilVoice is built for people who have a legitimate reason to not be identified
+by their voice: journalists and their sources, whistleblowers, survivors of
+abuse and stalking, activists, researchers publishing recorded interviews, and
+anyone who would simply rather a company not hold a biometric identifier of
+them.
+
+You assume full and sole responsibility for every use you make of it, and for
+determining whether that use is lawful where you are. Disguising your voice is
+legal in most places; using a disguised voice to commit fraud, to harass, to
+impersonate, or to evade a lawful obligation is not, and nothing in this project
+is intended to assist with any of that.
+
+Some features are destructive by design. Where a feature erases data or destroys
+a key, it is irreversible, it is opt-in, and it is gated behind an explicit
+confirmation. That gate is a safety net, not a substitute for understanding what
+the option does.
+
+
+6. AI ASSISTANCE AND SOURCE REVIEW
+----------------------------------
+
+As stated above, this project was developed with AI assistance (Claude, by
+Anthropic) and reviewed and audited by tilas01.
+
+This is disclosed because you are entitled to know how the software you rely on
+was produced, and because it should inform how much you verify before trusting
+it. AI assistance does not remove the author's responsibility for the result,
+and it is not offered as an excuse for any defect.
+
+The practical consequence for you: read the source. The whole project is
+published under the GPL precisely so that you can. The cryptography uses
+standard, well-reviewed primitives from established libraries rather than
+anything invented for this project, and the de-identification argument can be
+checked by reading two source files.
+
+
+7. PRIVACY
+----------
+
+The website is a static site on GitHub Pages. It sets no cookies, performs no
+session tracking, uses no analytics, loads no web fonts and pulls in no
+third-party scripts of any kind.
+
+Your colour-scheme choice and your acceptance of these terms are stored in your
+own browser, in localStorage and sessionStorage respectively. Neither leaves
+your device, and there is no server for them to be sent to. Clear them from your
+browser's own settings at any time.
+
+The in-browser hash verifier hashes files locally using the browser's built-in
+WebCrypto. The file you select never leaves your machine; there is no upload and
+no endpoint that could receive it.
+
+One optional feature makes a third-party request: the live repository panel
+fetches public data from api.github.com. It is behind a button, it is announced
+on the page, and nothing else depends on it.
+
+The application itself makes no network connections at all. This is enforced in
+continuous integration, which fails the build if an HTTP client enters the
+dependency graph.
+
+
+8. THIRD-PARTY SOFTWARE
+-----------------------
+
+VeilVoice links to and recommends software it does not own. Each is covered by
+its own licence and its own warranty position, and nothing here alters them.
+
+  - Virtual audio routing on Windows is commonly provided by VB-CABLE, which is
+    proprietary donationware from VB-Audio. It is NOT bundled, and installing it
+    is a separate decision you make.
+  - Audacity is recommended for recording and editing. It is free software under
+    the GPL, maintained independently of this project.
+  - All Rust dependencies are permissive-licensed (MIT, Apache-2.0, BSD, ISC)
+    and are listed in Cargo.lock.
+
+
+9. LICENCE
+----------
+
+VeilVoice is free software under the GNU General Public License, version 3 or
+(at your option) any later version.
+
+You may run it for any purpose, study how it works, change it, and redistribute
+it, including commercially. If you distribute a modified version you must
+release your changes under the same licence and make the corresponding source
+available. There is no NonCommercial restriction and no field-of-use
+restriction: a privacy tool that people are not free to inspect, modify and
+pass on is not one they can fully trust.
+
+Full text: LICENSE.txt in this folder.
+Plain-English summary: LICENCE-PLAIN-ENGLISH.txt in this folder.
+
+
+10. ACCEPTANCE
+--------------
+
+Using this website, the repository, the released binaries or any output they
+produce constitutes your binding agreement to these terms in full.
+
+The welcome dialog asks you to confirm two things before continuing:
+
+  (1) that you have read and understood this waiver, including section 4, which
+      sets out what this software does not do; and
+
+  (2) that you have read the licence and will comply with it.
+
+Your acceptance is recorded in your browser's sessionStorage and is discarded
+when you close the tab. It is not sent anywhere, because there is nowhere for it
+to be sent.
