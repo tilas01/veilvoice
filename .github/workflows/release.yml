@@ -74,7 +74,10 @@ jobs:
             label: linux-armv7-pi
             archive: tar.gz
             cli_only: true
-            cross_gcc: gcc-arm-linux-gnueabihf
+            # The libc package is named explicitly: apt would normally
+            # pull it in as a recommendation, and --no-install-recommends
+            # leaves the linker without Scrt1.o and crti.o.
+            cross_gcc: gcc-arm-linux-gnueabihf libc6-dev-armhf-cross
           # Statically linked musl builds. One binary, no libc version to
           # match, runs on any Linux including Alpine and old distributions.
           # CLI only, for the same reason as above.
