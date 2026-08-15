@@ -176,8 +176,11 @@ writes with no extra work.
   spectral tilt are each collapsed onto one canonical target, so a whole
   population of speakers maps to the same output. That destroys information
   rather than moving it.
-- **Cryptographically modulated.** The residual transform is driven every frame
-  by a ChaCha20 CSPRNG whose seed never leaves page-locked RAM.
+- **Cryptographically modulated, with a rolling seed.** The residual transform
+  is driven every frame by a ChaCha20 CSPRNG whose seed never leaves the
+  process — and that seed is ratcheted forward every couple of seconds, so each
+  stretch of audio is sealed off behind a one-way step rather than sharing one
+  stream with the whole recording. Configurable, and inaudible by construction.
 - **Post-quantum ready.** At-rest encryption is X25519 + ML-KEM-768 hybrid,
   because a recording stored today may be attacked decades from now.
 - **Amnesic.** Secrets are page-locked out of swap, zeroized on drop, compared
