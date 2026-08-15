@@ -8,12 +8,20 @@ authors.workspace = true
 repository.workspace = true
 description = "Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice."
 
+[features]
+default = ["live"]
+# Live capture and playback. Optional because `cpal` has no backend for the
+# BSDs, and everything else this crate does — decoding, encoding, and running
+# the engine over a buffer — is pure Rust and builds anywhere. Turning this off
+# keeps file processing available on platforms that cannot do live audio.
+live = ["dep:cpal", "dep:ringbuf"]
+
 [dependencies]
 veilvoice-core = { path = "../veilvoice-core" }
 # Cross-platform audio I/O: WASAPI, CoreAudio, ALSA/JACK.
-cpal = "0.15"
+cpal = { version = "0.15", optional = true }
 # Lock-free SPSC ring buffer between the audio callbacks and the DSP thread.
-ringbuf = "0.5"
+ringbuf = { version = "0.5", optional = true }
 # WAV read/write.
 hound = "3"
 # Decoding for everything else on import.

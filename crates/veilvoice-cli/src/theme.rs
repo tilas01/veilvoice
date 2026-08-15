@@ -10,6 +10,13 @@ use std::io::IsTerminal;
 use std::sync::OnceLock;
 
 /// Tokyo Night, as 24-bit foreground escape sequences.
+///
+/// The whole palette is defined even though a given build may not use every
+/// entry — the device listing is behind the `live` feature, so its colour goes
+/// unused on platforms without an audio backend. Keeping the set complete means
+/// it stays a straight mirror of the GUI's palette and of `css/themes.css`,
+/// which is what makes the three front-ends look like one program.
+#[allow(dead_code)]
 pub mod colour {
     /// Muted comment grey — secondary text.
     pub const MUTED: &str = "\x1b[38;2;86;95;137m";

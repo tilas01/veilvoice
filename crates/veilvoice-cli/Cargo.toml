@@ -12,10 +12,16 @@ description = "Command-line interface for VeilVoice: anonymise files, scramble a
 name = "veilvoice"
 path = "src/main.rs"
 
+[features]
+default = ["live"]
+# Live microphone scrambling. Off on platforms with no `cpal` backend (the
+# BSDs); file processing, encryption and metadata cleaning still work there.
+live = ["veilvoice-audio/live"]
+
 [dependencies]
 veilvoice-core = { path = "../veilvoice-core" }
 veilvoice-crypto = { path = "../veilvoice-crypto" }
-veilvoice-audio = { path = "../veilvoice-audio" }
+veilvoice-audio = { path = "../veilvoice-audio", default-features = false }
 veilvoice-meta = { path = "../veilvoice-meta" }
 clap = { version = "4", features = ["derive"] }
 rpassword = "7"
