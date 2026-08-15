@@ -1,0 +1,148 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Colour schemes. Every theme defines the same eleven tokens, so the rest of
+ * the stylesheet never names a colour directly and adding a theme is a matter
+ * of adding one block here.
+ *
+ * Tokyo Night is the default and is declared on :root so the page has correct
+ * colours before any JavaScript runs — including for readers who block it
+ * entirely. The others are opt-in via [data-theme] on <html>.
+ */
+
+:root,
+:root[data-theme="tokyo-night"] {
+  --bg:        #1a1b26;
+  --bg-soft:   #1f2335;
+  --bg-inset:  #16161e;
+  --border:    #2f3549;
+  --fg:        #c0caf5;
+  --muted:     #565f89;
+  --accent:    #7aa2f7;  /* primary   */
+  --accent-2:  #bb9af7;  /* secondary */
+  --cyan:      #7dcfff;
+  --ok:        #9ece6a;
+  --warn:      #e0af68;
+  --err:       #f7768e;
+}
+
+:root[data-theme="gruvbox"] {
+  --bg:        #282828;
+  --bg-soft:   #32302f;
+  --bg-inset:  #1d2021;
+  --border:    #504945;
+  --fg:        #ebdbb2;
+  --muted:     #928374;
+  --accent:    #83a598;
+  --accent-2:  #d3869b;
+  --cyan:      #8ec07c;
+  --ok:        #b8bb26;
+  --warn:      #fabd2f;
+  --err:       #fb4934;
+}
+
+:root[data-theme="dracula"] {
+  --bg:        #282a36;
+  --bg-soft:   #343746;
+  --bg-inset:  #21222c;
+  --border:    #44475a;
+  --fg:        #f8f8f2;
+  --muted:     #6272a4;
+  --accent:    #bd93f9;
+  --accent-2:  #ff79c6;
+  --cyan:      #8be9fd;
+  --ok:        #50fa7b;
+  --warn:      #f1fa8c;
+  --err:       #ff5555;
+}
+
+:root[data-theme="nord"] {
+  --bg:        #2e3440;
+  --bg-soft:   #3b4252;
+  --bg-inset:  #272c36;
+  --border:    #4c566a;
+  --fg:        #eceff4;
+  --muted:     #7b88a1;
+  --accent:    #88c0d0;
+  --accent-2:  #b48ead;
+  --cyan:      #8fbcbb;
+  --ok:        #a3be8c;
+  --warn:      #ebcb8b;
+  --err:       #bf616a;
+}
+
+:root[data-theme="catppuccin"] {
+  --bg:        #1e1e2e;
+  --bg-soft:   #313244;
+  --bg-inset:  #181825;
+  --border:    #45475a;
+  --fg:        #cdd6f4;
+  --muted:     #7f849c;
+  --accent:    #89b4fa;
+  --accent-2:  #cba6f7;
+  --cyan:      #94e2d5;
+  --ok:        #a6e3a1;
+  --warn:      #f9e2af;
+  --err:       #f38ba8;
+}
+
+:root[data-theme="everforest"] {
+  --bg:        #2d353b;
+  --bg-soft:   #343f44;
+  --bg-inset:  #272e33;
+  --border:    #475258;
+  --fg:        #d3c6aa;
+  --muted:     #859289;
+  --accent:    #a7c080;
+  --accent-2:  #d699b6;
+  --cyan:      #83c092;
+  --ok:        #a7c080;
+  --warn:      #dbbc7f;
+  --err:       #e67e80;
+}
+
+:root[data-theme="solarized"] {
+  --bg:        #002b36;
+  --bg-soft:   #073642;
+  --bg-inset:  #00212b;
+  --border:    #0f4b5c;
+  --fg:        #93a1a1;
+  --muted:     #586e75;
+  --accent:    #268bd2;
+  --accent-2:  #d33682;
+  --cyan:      #2aa198;
+  --ok:        #859900;
+  --warn:      #b58900;
+  --err:       #dc322f;
+}
+
+:root[data-theme="rose-pine"] {
+  --bg:        #191724;
+  --bg-soft:   #1f1d2e;
+  --bg-inset:  #14121f;
+  --border:    #33304a;
+  --fg:        #e0def4;
+  --muted:     #6e6a86;
+  --accent:    #9ccfd8;
+  --accent-2:  #c4a7e7;
+  --cyan:      #31748f;
+  --ok:        #a6da95;
+  --warn:      #f6c177;
+  --err:       #eb6f92;
+}
+
+/* A light option, because a dark-only site is unreadable in bright sun and
+ * some people simply prefer it. Same tokens, inverted relationships. */
+:root[data-theme="paper"] {
+  --bg:        #faf4ed;
+  --bg-soft:   #f2e9e1;
+  --bg-inset:  #fffaf3;
+  --border:    #dfd8d0;
+  --fg:        #575279;
+  --muted:     #797593;
+  --accent:    #286983;
+  --accent-2:  #907aa9;
+  --cyan:      #56949f;
+  --ok:        #618774;
+  --warn:      #ea9d34;
+  --err:       #b4637a;
+}

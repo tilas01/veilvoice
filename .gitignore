@@ -35,5 +35,9 @@ desktop.ini
 # ever meant to leave this folder.
 /gpg_secrets/
 gpg_secrets/
+# Armoured OpenPGP files are ignored by default so a private key can never be
+# committed by accident. The *public* key is meant to be published, so the two
+# places it legitimately lives are allowed back in explicitly.
 *.asc
+!website/assets/veilvoice-signing-key.asc
 !**/public-key.asc

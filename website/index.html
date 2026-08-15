@@ -1,0 +1,307 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<html lang="en" data-theme="tokyo-night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VeilVoice — irreversible voice de-identification</title>
+<meta name="description" content="VeilVoice destroys the biometric voiceprint — pitch, formants, timbre, accent — while keeping speech transcribable. Fully offline, no unsafe code, reproducible builds, GPL-3.0.">
+<link rel="icon" href="assets/icon-32.png" type="image/png">
+<meta property="og:title" content="VeilVoice — irreversible voice de-identification">
+<meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
+<meta property="og:image" content="assets/banner.png">
+<link rel="stylesheet" href="css/themes.css">
+<link rel="stylesheet" href="css/main.css">
+<script src="js/theme.js"></script>
+<script src="js/legal.js" defer></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <img src="assets/icon-32.png" alt="">
+      <a href="index.html">VEILVOICE</a>
+    </div>
+    <nav class="links">
+      <a href="#what">what</a>
+      <a href="#download">download</a>
+      <a href="#verify">verify</a>
+      <a href="#crypto">security</a>
+      <a href="wiki.html">wiki</a>
+      <a href="user-agreements/LEGAL-WAIVER.txt">legal</a>
+      <a href="nojs/index.html">no-js</a>
+      <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
+    </nav>
+    <label for="theme" style="position:absolute;left:-9999px">Colour scheme</label>
+    <select id="theme" class="theme-pick" title="Colour scheme"></select>
+  </div>
+</header>
+
+<main>
+
+<div class="wrap hero stagger">
+  <img class="banner" src="assets/banner.png" alt="VeilVoice — irreversible voice de-identification" style="--i:0">
+  <p class="tagline" style="--i:1">
+    VeilVoice destroys the <strong>biometric voiceprint</strong> of a speaker —
+    pitch, formants, timbre, micro-timing and the melody of an accent — so that
+    neither software nor a human can re-identify them or reconstruct the
+    original voice, <strong>while the words stay clean and transcribable</strong>.
+  </p>
+
+  <div class="veil" aria-hidden="true">
+    <span style="animation-delay:0ms"></span><span style="animation-delay:120ms"></span>
+    <span style="animation-delay:240ms"></span><span style="animation-delay:80ms"></span>
+    <span style="animation-delay:300ms"></span><span style="animation-delay:180ms"></span>
+    <span class="veiled" style="animation-delay:60ms"></span>
+    <span class="veiled" style="animation-delay:420ms"></span>
+    <span class="veiled" style="animation-delay:220ms"></span>
+    <span class="veiled" style="animation-delay:500ms"></span>
+    <span class="veiled" style="animation-delay:140ms"></span>
+    <span class="veiled" style="animation-delay:360ms"></span>
+  </div>
+
+  <div class="row" style="--i:2">
+    <a class="btn primary" href="#download">download</a>
+    <a class="btn" href="#verify">verify a download</a>
+    <a class="btn" href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a>
+  </div>
+
+  <noscript>
+    <div class="noscript-banner">
+      <strong>JavaScript is off.</strong> This page still reads fine, but the
+      hash verifier and the live repository panel need it. There is a
+      <a href="nojs/index.html">JavaScript-free version</a> built to work
+      without it at all.
+    </div>
+  </noscript>
+</div>
+
+<section id="what">
+  <div class="wrap">
+    <h2>WHAT IT ACTUALLY DOES</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Anonymise a recording</h3>
+        <p>wav, mp3, flac, ogg, m4a in — a clean WAV out, with metadata stripped. Roughly 90× faster than real time.</p>
+      </div>
+      <div class="card">
+        <h3>Scramble a microphone live</h3>
+        <p>Route the veiled voice into a virtual audio cable and every application on the machine — calls, streams, recorders — receives it instead of you.</p>
+      </div>
+      <div class="card">
+        <h3>Encrypt at rest</h3>
+        <p>X25519 + ML-KEM-768 hybrid, so a recording captured today is not readable by a quantum adversary tomorrow.</p>
+      </div>
+      <div class="card">
+        <h3>Strip metadata</h3>
+        <p>Audio tags, image EXIF and GPS. A de-identified voice is worthless if the file still says who recorded it, where, and on what.</p>
+      </div>
+      <div class="card">
+        <h3>Work as a Rust library</h3>
+        <p>Every crate is a normal dependency. The engine is allocation-free and safe to call from inside an audio callback.</p>
+      </div>
+      <div class="card">
+        <h3>Transcribe without giving up your voice</h3>
+        <p>Speech-to-text needs the words, not the voiceprint. Anonymise first and the service gets speech it can transcribe and a voice belonging to nobody.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>Honest scope.</strong> “Fill the spectrogram with noise” and
+      “stay understandable” are mutually exclusive — noise that covers the voice
+      covers the words. VeilVoice targets the achievable goal: irreversible
+      speaker de-identification with intelligibility preserved <em>on purpose</em>.
+      If the <em>message</em> must also be secret, encrypt it; that is a separate
+      problem with a separate answer.</p>
+      <p>The same applies to <strong>accent</strong>. Its melody and colour do not
+      survive. What no signal-level transform can change is <em>which phonemes you
+      produced</em> — at that level the accent and the words are the same thing, so
+      a strong regional accent may still be audible.</p>
+    </div>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <h2>DOWNLOAD</h2>
+    <p class="lede">
+      Latest release: <b id="latest-tag" style="color:var(--cyan)">see GitHub</b>.
+      Every binary is built twice in separate directories and verified
+      byte-identical before it ships.
+    </p>
+
+    <div class="row" style="justify-content:flex-start">
+      <a class="btn primary" href="https://github.com/tilas01/veilvoice/releases/latest" rel="noopener noreferrer">all releases</a>
+      <a class="btn" href="https://github.com/tilas01/veilvoice#install" rel="noopener noreferrer">build from source</a>
+    </div>
+
+    <h3>Files in the latest release</h3>
+    <ul id="asset-list">
+      <li class="lede">Load the live panel below, or open
+        <a href="https://github.com/tilas01/veilvoice/releases/latest" rel="noopener noreferrer">the releases page</a>.</li>
+    </ul>
+
+    <div class="note">
+      <p><strong>Always verify before you run it.</strong> A download can be
+      corrupted in transit or replaced entirely. Two independent checks are
+      published with every release: a SHA-256 for each file, and an OpenPGP
+      signature over that hash list. The <a href="#verify">verifier below</a>
+      does the first one in your browser.</p>
+    </div>
+  </div>
+</section>
+
+<section id="verify">
+  <div class="wrap">
+    <h2>VERIFY A DOWNLOAD</h2>
+    <p class="lede">
+      Drop the file you downloaded here. It is hashed <strong>locally, in your
+      browser</strong>, using the built-in WebCrypto API — there is no upload
+      and no server that could receive it. Read
+      <a href="js/verify.js">js/verify.js</a>; that file is the whole
+      implementation.
+    </p>
+
+    <div class="tool">
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a file to hash">
+        click or drop a release archive here
+      </div>
+      <input type="file" id="file" hidden>
+      <progress id="progress" value="0" max="1" style="display:none"></progress>
+      <div class="hash" id="digest">no file hashed yet</div>
+      <label for="expected" style="font-size:12.5px;color:var(--muted)">
+        Paste the expected hash, or a whole line from <code>SHA256SUMS</code>:
+      </label>
+      <input type="text" id="expected" placeholder="e.g. 6326e019…  veilvoice-v0.1.1-linux-x86_64.tar.gz" spellcheck="false">
+      <div class="verdict" id="verdict" style="display:none"></div>
+    </div>
+
+    <h3>The stronger check: the signature</h3>
+    <p class="lede">
+      A hash proves the file matches a list. The <em>signature</em> proves the
+      list came from the maintainer. Browsers cannot verify OpenPGP, so this
+      part runs on your machine:
+    </p>
+<pre><code>gpg --import veilvoice-signing-key.asc
+gpg --verify SHA256SUMS.asc SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing</code></pre>
+    <p class="lede">
+      Signing key fingerprint — check that <code>gpg --verify</code> names this
+      exact key, not merely “a good signature”:
+    </p>
+    <div class="hash fp">8101 FB3B B28D 02FB 239E&nbsp; 0CDF 9CC1 C7E7 A9B5 833A</div>
+    <p class="lede" style="margin-top:10px">
+      <a href="assets/veilvoice-signing-key.asc" download>download the public key</a> —
+      user ID is exactly <code>tilas01</code>, with no e-mail address attached.
+    </p>
+  </div>
+</section>
+
+<section id="crypto">
+  <div class="wrap">
+    <h2>SECURITY, IN FULL</h2>
+
+    <h3>Why the transform cannot be undone</h3>
+    <p>Three independent mechanisms, each individually lossy. Reversing the output means defeating all three.</p>
+    <table>
+      <thead><tr><th>Mechanism</th><th>What it destroys</th></tr></thead>
+      <tbody>
+        <tr><td>Phase discard</td><td>Every frame's measured phase is thrown away and a synthetic one generated. Phase encodes the exact waveform and the speaker's micro-timing. It is never stored, and infinitely many waveforms share any given magnitude spectrogram.</td></tr>
+        <tr><td>Many-to-one normalisation</td><td>Pitch register, vocal-tract length and long-term spectral tilt are each collapsed onto a single canonical value. A whole population of speakers maps to the same output, so there is nothing to invert.</td></tr>
+        <tr><td>CSPRNG modulation</td><td>The residual transform changes every frame from a ChaCha20 stream whose seed comes from the OS CSPRNG, lives only in page-locked RAM, and is zeroized on drop. There is no fixed transform to undo.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>At-rest encryption</h3>
+    <table>
+      <thead><tr><th>Layer</th><th>Primitive</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Password → key</td><td>Argon2id (RFC 9106)</td><td>Memory-hard, so GPU and ASIC cracking gains little. Cost parameters travel with the file so old files still open.</td></tr>
+        <tr><td>Public-key</td><td>X25519 + ML-KEM-768 hybrid</td><td>An attacker must break <em>both</em>. Guards against harvest-now-decrypt-later: a recording stored today may be attacked decades from now.</td></tr>
+        <tr><td>Payload</td><td>XChaCha20-Poly1305</td><td>192-bit random nonces remove the counter-management failure mode entirely.</td></tr>
+        <tr><td>Header</td><td>Authenticated as associated data</td><td>An attacker cannot downgrade the stored KDF cost to make cracking cheap — tampering makes decryption fail.</td></tr>
+        <tr><td>Keys in memory</td><td>Page-locked, zeroized, constant-time</td><td>Keys stay out of the swap file and are wiped on drop. Comparison leaks no timing.</td></tr>
+      </tbody>
+    </table>
+    <p class="lede">
+      Stated plainly: page-locking keeps keys off disk, <em>not</em> away from an
+      attacker who can already read this process's memory, and hibernation writes
+      RAM to disk wholesale and defeats it.
+    </p>
+
+    <h3>Libre, and what that buys you</h3>
+    <ul>
+      <li><strong>GPL-3.0-or-later.</strong> You may use, study, modify and redistribute it; derivatives stay free under the same terms.</li>
+      <li><strong>No <code>unsafe</code> anywhere.</strong> Every crate carries <code>#![forbid(unsafe_code)]</code>, including the page-locking path. Whole classes of memory-corruption bugs are impossible by construction.</li>
+      <li><strong>Offline by construction.</strong> No telemetry, no update check. CI fails the build if an HTTP client so much as enters the dependency graph.</li>
+      <li><strong>Reproducible.</strong> Pinned toolchain, committed lockfile, path-remapped builds. Rebuild a release and confirm it matches, byte for byte.</li>
+      <li><strong>Artwork generated from source.</strong> Every icon and the banner come out of a readable script, not a committed binary blob.</li>
+      <li><strong>This website too.</strong> No CDN, no web fonts, no analytics, no cookies. The only third-party request is the optional repository panel below, and it is a button you press.</li>
+    </ul>
+
+    <div class="note bad">
+      <p><strong>Audited by tilas01</strong> — the author, who wrote and
+      reviewed it. Be clear about what that is worth: a maintainer audit catches
+      what the author can see, and <strong>no external firm or independent
+      researcher has reviewed this code</strong>. The cryptography uses standard,
+      well-reviewed primitives rather than anything invented here, and the
+      de-identification argument is verifiable by reading two source files. Until
+      an independent review exists, the source is the strongest verification
+      available to you.</p>
+    </div>
+  </div>
+</section>
+
+<section id="repo">
+  <div class="wrap">
+    <h2>THE REPOSITORY, LIVE</h2>
+    <p class="lede">
+      This panel fetches from <code>api.github.com</code>, which learns your IP
+      address. GitHub already serves this page, so for most visitors that
+      changes nothing — but it is your call, so nothing loads until you ask.
+    </p>
+    <button class="btn" id="load-repo">load live repository data</button>
+    <p class="lede" id="repo-status" style="min-height:1.2em"></p>
+
+    <div class="stats">
+      <div class="stat"><b id="stars">—</b><span>stars</span></div>
+      <div class="stat"><b id="forks">—</b><span>forks</span></div>
+      <div class="stat"><b id="issues">—</b><span>open issues</span></div>
+      <div class="stat"><b id="repo-license">GPL-3.0</b><span>licence</span></div>
+    </div>
+    <p id="repo-desc" class="lede"></p>
+
+    <div class="readme" id="readme">
+      <p class="lede">The README renders here once loaded.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>
+      VeilVoice — GPL-3.0-or-later ·
+      <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
+      <a href="wiki.html">wiki</a>
+      <a href="user-agreements/LEGAL-WAIVER.txt">legal</a> ·
+      <a href="nojs/index.html">no-javascript version</a>
+    </p>
+    <p>
+      Signing key <span class="fp">8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A</span>
+    </p>
+    <p>
+      Virtual audio routing on Windows is usually provided by VB-CABLE, which is
+      proprietary donationware and is not bundled — install it separately if you
+      want it.
+    </p>
+  </div>
+</footer>
+
+<script src="js/markdown.js"></script>
+<script src="js/verify.js"></script>
+<script src="js/repo.js"></script>
+</body>
+</html>

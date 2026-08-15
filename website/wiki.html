@@ -1,0 +1,267 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<html lang="en" data-theme="tokyo-night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VeilVoice — wiki</title>
+<meta name="description" content="How VeilVoice works, how to use it, how to verify a download, and what it deliberately does not do.">
+<link rel="icon" href="assets/icon-32.png" type="image/png">
+<link rel="stylesheet" href="css/themes.css">
+<link rel="stylesheet" href="css/main.css">
+<script src="js/theme.js"></script>
+<script src="js/legal.js" defer></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <img src="assets/icon-32.png" alt="">
+      <a href="index.html">VEILVOICE</a>
+    </div>
+    <nav class="links">
+      <a href="index.html">home</a>
+      <a href="index.html#download">download</a>
+      <a href="index.html#verify">verify</a>
+      <a href="user-agreements/LEGAL-WAIVER.txt">legal</a>
+      <a href="nojs/index.html">no-js</a>
+      <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
+    </nav>
+    <label for="theme" style="position:absolute;left:-9999px">Colour scheme</label>
+    <select id="theme" class="theme-pick" title="Colour scheme"></select>
+  </div>
+</header>
+
+<main class="wrap" style="padding-top:30px">
+<h1>Wiki</h1>
+<p class="lede">Everything worth knowing, in the order you will want it.</p>
+
+<div class="wiki-layout">
+
+<nav class="toc" aria-label="Contents">
+  <a href="#start">Getting started</a>
+  <a href="#cli">Command line</a>
+  <a href="#live">Live scrambling</a>
+  <a href="#cable">Virtual audio cables</a>
+  <a href="#record">Recording — use Audacity</a>
+  <a href="#transcribe">Private transcription</a>
+  <a href="#encrypt">Encryption</a>
+  <a href="#destruct">Self-destruct</a>
+  <a href="#verify">Verifying a download</a>
+  <a href="#how">How it works</a>
+  <a href="#limits">What it will not do</a>
+  <a href="#build">Building from source</a>
+  <a href="#library">Using it as a library</a>
+  <a href="#faq">FAQ</a>
+</nav>
+
+<div>
+
+<section id="start" style="border-top:0;padding-top:0">
+  <h2>GETTING STARTED</h2>
+  <p>Download a build for your platform, or compile it — a fresh clone needs no secrets and no configuration.</p>
+  <ol>
+    <li>Get the archive from <a href="https://github.com/tilas01/veilvoice/releases/latest" rel="noopener noreferrer">the releases page</a>.</li>
+    <li><a href="index.html#verify">Verify it</a>. This takes ten seconds and is the difference between running the software and running whatever arrived.</li>
+    <li>Unpack it. There are two programs: <code>veilvoice</code> (command line) and <code>veilvoice-gui</code> (desktop app).</li>
+  </ol>
+  <p>Nothing installs a service, writes to a registry, or phones home. Delete the folder and it is gone.</p>
+</section>
+
+<section id="cli">
+  <h2>COMMAND LINE</h2>
+<pre><code>veilvoice anonymise recording.mp3 -o clean.wav
+veilvoice live --output "CABLE Input (VB-Audio Virtual Cable)"
+veilvoice devices
+veilvoice clean photo.jpg
+veilvoice encrypt secret.wav
+veilvoice decrypt secret.wav.veil -o secret.wav
+veilvoice keygen
+veilvoice info</code></pre>
+  <p>Every command takes <code>--help</code>. Useful flags on <code>anonymise</code> and <code>live</code>:</p>
+  <table>
+    <thead><tr><th>Flag</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>--intensity 0.0–1.0</code></td><td>How far pitch and formants move from the original. Default 1.0.</td></tr>
+      <tr><td><code>--keep-accent</code></td><td>Leaves intonation, accent and vocal tract intact. Weaker de-identification; use only if you know why.</td></tr>
+      <tr><td><code>--clean-metadata false</code></td><td>Keeps the tags on the written file. On by default.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="live">
+  <h2>LIVE SCRAMBLING</h2>
+  <p>Live mode reads a microphone, de-identifies in real time, and writes to an output device. Latency is about 21 ms of algorithmic delay plus your hardware buffers, and processing costs roughly 1 % of one core.</p>
+  <pre><code>veilvoice devices          # see what is available
+veilvoice live             # picks a virtual cable automatically if one exists</code></pre>
+  <p>Point another application at the same cable as its <em>microphone</em> and it receives the veiled voice.</p>
+  <div class="note">
+    <p>If you select your speakers as the output instead of a cable, you will hear yourself and so will nobody else. That is useful for testing and useless for a call.</p>
+  </div>
+</section>
+
+<section id="cable">
+  <h2>VIRTUAL AUDIO CABLES</h2>
+  <p>A virtual cable is a loopback device: what one program plays into it, another can record from. VeilVoice does not bundle one — they are separate projects with their own licences.</p>
+  <table>
+    <thead><tr><th>Platform</th><th>Usual choice</th><th>Licence</th></tr></thead>
+    <tbody>
+      <tr><td>Windows</td><td>VB-CABLE, from vb-audio.com</td><td>Proprietary donationware</td></tr>
+      <tr><td>macOS</td><td>BlackHole</td><td>GPL-3.0</td></tr>
+      <tr><td>Linux</td><td>PipeWire or a PulseAudio null sink — already installed</td><td>Free software</td></tr>
+    </tbody>
+  </table>
+  <p>On Linux nothing extra is needed:</p>
+  <pre><code>pactl load-module module-null-sink sink_name=veilvoice</code></pre>
+  <p>VeilVoice detects a cable by name and offers it first. If the installer ever offers to fetch VB-CABLE for you, it is an <strong>opt-in tick box</strong> that you must actively agree to, because it is proprietary software from a third party.</p>
+</section>
+
+<section id="record">
+  <h2>RECORDING — USE AUDACITY</h2>
+  <p>VeilVoice deliberately does not include a recording studio. Audacity already is one, it is free software, it is mature, and it is audited by far more people than this project will ever be. Writing a worse one would help nobody.</p>
+  <p>The workflow:</p>
+  <ol>
+    <li>Record and edit in <a href="https://www.audacityteam.org/" rel="noopener noreferrer">Audacity</a>. Export as WAV.</li>
+    <li>Run it through VeilVoice: <code>veilvoice anonymise take.wav -o safe.wav</code>.</li>
+    <li>Or record <em>through</em> VeilVoice live, by setting a virtual cable as Audacity's input.</li>
+  </ol>
+  <p>The installer may offer to fetch the current Audacity for your platform. Like the cable, it is an opt-in tick box — VeilVoice will not install third-party software you did not ask for.</p>
+  <div class="note">
+    <p><strong>A licensing note for contributors.</strong> Audacity is GPL-2.0-or-later, which is not compatible with this project's GPL-3.0-or-later in the direction of copying code <em>in</em>. Recommend it, integrate with it, do not lift source from it.</p>
+  </div>
+</section>
+
+<section id="transcribe">
+  <h2>PRIVATE TRANSCRIPTION</h2>
+  <p>Speech-to-text needs the words. It does not need your voiceprint — but every cloud transcription service receives one anyway, and a voiceprint is as durable an identifier as a fingerprint.</p>
+  <p>Anonymise first, then upload:</p>
+  <pre><code>veilvoice anonymise dictation.wav -o safe-to-upload.wav</code></pre>
+  <p>The service gets speech it can transcribe and a voice belonging to nobody.</p>
+  <div class="note">
+    <p><strong>Two caveats.</strong> Accuracy drops somewhat, because recognisers are trained on natural speech and the output is synthetic. And <em>the words still go to the provider</em> — this protects your identity, not the content. If the content is sensitive, transcribe locally instead; <code>whisper.cpp</code> reads the WAV VeilVoice writes with no extra work.</p>
+  </div>
+</section>
+
+<section id="encrypt">
+  <h2>ENCRYPTION</h2>
+  <p>De-identification and secrecy are different problems. VeilVoice hides who spoke; encryption hides what was said.</p>
+  <pre><code>veilvoice encrypt notes.wav            # password, Argon2id
+veilvoice keygen                       # hybrid post-quantum key pair
+veilvoice encrypt notes.wav --to recipient.pub
+veilvoice decrypt notes.wav.veil -o notes.wav --key veilvoice.key</code></pre>
+  <p>Private keys generated by <code>keygen</code> are themselves stored encrypted, under a passphrase, in the same container format — a stolen key file is worth nothing without it.</p>
+</section>
+
+<section id="destruct">
+  <h2>SELF-DESTRUCT</h2>
+  <p>For recordings that must not survive: a secure-erase that overwrites the file's contents before unlinking it, rather than just removing the directory entry.</p>
+  <div class="note bad">
+    <p><strong>This is irreversible and there is no undo.</strong> It is opt-in and gated behind an explicit confirmation for that reason.</p>
+    <p>Be aware of the honest limit: on an SSD, wear levelling means the drive may keep a copy of the old blocks where no software can reach them. Overwriting is effective on spinning disks and is best-effort everywhere else. <strong>Full-disk encryption is the real answer</strong> — if the volume is encrypted, destroying the key destroys everything on it at once.</p>
+  </div>
+</section>
+
+<section id="verify">
+  <h2>VERIFYING A DOWNLOAD</h2>
+  <p>Two independent checks ship with every release.</p>
+  <h3>1. The hash — is this the file that was published?</h3>
+  <pre><code>sha256sum -c SHA256SUMS --ignore-missing</code></pre>
+  <p>Or use the <a href="index.html#verify">in-browser verifier</a>, which hashes locally and uploads nothing.</p>
+  <h3>2. The signature — was that list published by the maintainer?</h3>
+  <pre><code>gpg --import veilvoice-signing-key.asc
+gpg --verify SHA256SUMS.asc SHA256SUMS</code></pre>
+  <p>Check the fingerprint is exactly:</p>
+  <div class="hash fp">8101 FB3B B28D 02FB 239E&nbsp; 0CDF 9CC1 C7E7 A9B5 833A</div>
+  <p>“Good signature” from an unexpected key means nothing. The fingerprint is the part that matters.</p>
+  <h3>3. The strongest check — rebuild it yourself</h3>
+  <p>Release binaries are reproducible: build the tagged commit and you get byte-identical output.</p>
+  <pre><code>git checkout v0.1.1
+export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+cargo build --release --locked
+sha256sum target/release/veilvoice</code></pre>
+</section>
+
+<section id="how">
+  <h2>HOW IT WORKS</h2>
+  <p>Three mechanisms, each individually lossy. Undoing the output means defeating all three.</p>
+  <h3>Phase is discarded, every frame</h3>
+  <p>Each analysis frame keeps only its magnitude spectrum; the measured phase — which encodes the exact waveform and the speaker's micro-timing — is thrown away and a synthetic one generated. This is deletion, not obfuscation: infinitely many waveforms share any magnitude spectrogram.</p>
+  <h3>Every speaker is collapsed onto one identity</h3>
+  <p>Pitch register, vocal-tract length and long-term spectral tilt are each mapped to a single canonical value. These mappings are <em>many-to-one</em>: a whole population lands on the same output, so there is nothing to invert.</p>
+  <p>Every correction is drawn from a multi-second average, never the current frame — per-frame spectral shape is what distinguishes /i/ from /u/, and normalising that would erase the vowels along with the accent. The test suite asserts vowel contrast survives.</p>
+  <h3>The remainder is CSPRNG-modulated</h3>
+  <p>The residual transform changes every frame from a ChaCha20 stream whose seed comes from the OS CSPRNG, lives only in page-locked memory, and is zeroized on drop. There is no fixed transform to undo.</p>
+  <p>Full argument, including the threat model: <a href="https://github.com/tilas01/veilvoice/blob/main/docs/WHITEPAPER.md" rel="noopener noreferrer">the whitepaper</a>.</p>
+</section>
+
+<section id="limits">
+  <h2>WHAT IT WILL NOT DO</h2>
+  <p>Read this part twice. Misunderstanding it is the only way this software gets someone hurt.</p>
+  <ul>
+    <li><strong>It does not hide what you said.</strong> The words are preserved on purpose and can be transcribed.</li>
+    <li><strong>It does not fully remove a strong accent.</strong> The melody goes; which phonemes you produced cannot be changed by any filter.</li>
+    <li><strong>It does not sanitise the background</strong> — room acoustics, other voices, a passing siren.</li>
+    <li><strong>It does not hide your speaking rate</strong> or rhythm. A weak biometric, but a real one.</li>
+    <li><strong>It does not help</strong> against an attacker already running code on your machine.</li>
+    <li><strong>It does not clean the filename</strong>, the filesystem timestamps, or the channel you send it over.</li>
+  </ul>
+</section>
+
+<section id="build">
+  <h2>BUILDING FROM SOURCE</h2>
+<pre><code>git clone https://github.com/tilas01/veilvoice &amp;&amp; cd veilvoice
+cargo build --release</code></pre>
+  <p>The toolchain is pinned by <code>rust-toolchain.toml</code> and rustup installs it automatically. On Debian or Ubuntu you will need the audio and windowing headers first:</p>
+  <pre><code>sudo apt install libasound2-dev libudev-dev pkg-config \
+                 libgtk-3-dev libxkbcommon-dev libwayland-dev</code></pre>
+</section>
+
+<section id="library">
+  <h2>USING IT AS A LIBRARY</h2>
+  <pre><code>[dependencies]
+veilvoice-core  = { git = "https://github.com/tilas01/veilvoice" }
+veilvoice-audio = { git = "https://github.com/tilas01/veilvoice" }</code></pre>
+  <p>The engine allocates nothing in <code>process()</code> and is safe to call from inside an audio callback:</p>
+<pre><code>use veilvoice_core::{DeidConfig, Deidentifier};
+
+let mut deid = Deidentifier::new(DeidConfig::default())?;
+let mut out = vec![0.0; block.len()];
+deid.process(&amp;block, &amp;mut out);</code></pre>
+</section>
+
+<section id="faq">
+  <h2>FAQ</h2>
+  <details><summary>Will it make me sound like a different specific person?</summary>
+    <p>No, and that is deliberate. It maps you onto a canonical, deliberately synthetic voice that belongs to nobody. Impersonating a real person is a different tool with different ethics.</p></details>
+  <details><summary>Why does it sound robotic?</summary>
+    <p>Because pitch is held constant by design — that steadiness is the sound of your pitch information being gone. Some of the metallic quality is the harmonic-comb resynthesis, and the whitepaper explains what would improve it.</p></details>
+  <details><summary>Can I get my original voice back?</summary>
+    <p>No. That is the point. Keep your own copy of the original if you need one; nothing in the output can reconstruct it.</p></details>
+  <details><summary>Does it work offline?</summary>
+    <p>Only offline. There is no network code, and continuous integration fails the build if an HTTP client so much as enters the dependency graph.</p></details>
+  <details><summary>Is it safe for a real source-protection situation?</summary>
+    <p>The de-identification is strong and the reasoning is published so you can check it. But no external firm has audited this code, and the limits above are real. For a situation where being identified would cause serious harm, treat it as one layer among several, not the whole plan.</p></details>
+  <details><summary>Why GPL and not something more permissive?</summary>
+    <p>So that a version you are handed can always be inspected. Anyone may build a business on it; nobody may close it and hand users something they can no longer read.</p></details>
+</section>
+
+</div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>
+      VeilVoice — GPL-3.0-or-later ·
+      <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
+      <a href="index.html">home</a> ·
+      <a href="user-agreements/LEGAL-WAIVER.txt">disclaimer</a> ·
+      <a href="user-agreements/LICENCE-PLAIN-ENGLISH.txt">licence</a>
+    </p>
+    <p>Signing key <span class="fp">8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A</span></p>
+  </div>
+</footer>
+
+</body>
+</html>
