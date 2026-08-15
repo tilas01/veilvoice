@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//! # veilvoice-gui
+//!
+//! The VeilVoice desktop application: an egui/eframe front-end in Tokyo Night,
+//! monospace throughout, with three modes — anonymise a file, scramble a
+//! microphone live, and an about panel that states the honest scope.
+//!
+//! The binary lives in `main.rs`; this library exists so the UI logic can be
+//! unit tested without opening a window.
+#![forbid(unsafe_code)]
+#![warn(missing_docs)]
+
+mod app;
+pub mod theme;
+
+pub use app::VeilVoiceApp;
+
+/// Crate version string, surfaced in the About panel.
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");

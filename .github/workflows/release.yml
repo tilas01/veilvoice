@@ -1,0 +1,202 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Build, verify and publish release artefacts for a v* tag.
+#
+# Two properties this workflow exists to guarantee:
+#   1. Every binary is built twice, in different directories, and the two must
+#      match byte for byte. A reproducibility regression fails the release.
+#   2. Signing is optional. The private key lives in a repository secret that is
+#      absent on forks, so a fork can still produce a complete (unsigned)
+#      release rather than a broken one.
+
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to build (for a dry run)
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            label: windows-x86_64
+            archive: zip
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            label: macos-arm64
+            archive: tar.gz
+          - os: macos-13
+            target: x86_64-apple-darwin
+            label: macos-x86_64
+            archive: tar.gz
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            label: linux-x86_64
+            archive: tar.gz
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux audio and windowing headers
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libudev-dev pkg-config \
+            libgtk-3-dev libxkbcommon-dev libwayland-dev
+
+      - name: Install the pinned toolchain
+        run: |
+          rustup show
+          rustup target add ${{ matrix.target }}
+
+      # Everything that would otherwise vary between two builds of the same
+      # source. See docs/REPRODUCIBLE_BUILDS.md.
+      - name: Pin the build environment
+        shell: bash
+        run: |
+          echo "SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)" >> "$GITHUB_ENV"
+          echo "RUSTFLAGS=--remap-path-prefix=$GITHUB_WORKSPACE=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo" >> "$GITHUB_ENV"
+
+      - name: Build
+        shell: bash
+        run: cargo build --release --locked --target ${{ matrix.target }}
+
+      - name: Build again, elsewhere, and require an identical result
+        shell: bash
+        run: |
+          cp -r "$GITHUB_WORKSPACE" /tmp/rebuild
+          cd /tmp/rebuild
+          # The remap makes the path difference invisible to the compiler; if it
+          # did not, this check would be meaningless.
+          export RUSTFLAGS="--remap-path-prefix=/tmp/rebuild=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
+          cargo build --release --locked --target ${{ matrix.target }}
+          fail=0
+          for name in veilvoice veilvoice-gui; do
+            for ext in "" ".exe"; do
+              a="$GITHUB_WORKSPACE/target/${{ matrix.target }}/release/$name$ext"
+              b="/tmp/rebuild/target/${{ matrix.target }}/release/$name$ext"
+              [ -f "$a" ] || continue
+              if cmp -s "$a" "$b"; then
+                echo "reproducible: $name$ext"
+              else
+                echo "::error::$name$ext is NOT reproducible"
+                fail=1
+              fi
+            done
+          done
+          exit $fail
+
+      - name: Stage the archive
+        shell: bash
+        run: |
+          out="veilvoice-${{ github.ref_name }}-${{ matrix.label }}"
+          mkdir -p "dist/$out"
+          bin="target/${{ matrix.target }}/release"
+          for name in veilvoice veilvoice-gui; do
+            for ext in "" ".exe"; do
+              [ -f "$bin/$name$ext" ] && cp "$bin/$name$ext" "dist/$out/"
+            done
+          done
+          cp README.md LICENSE "dist/$out/"
+          cp -r docs "dist/$out/docs"
+          cp assets/icon.png assets/icon.ico "dist/$out/" 2>/dev/null || true
+          echo "STAGE=$out" >> "$GITHUB_ENV"
+
+      - name: Archive (zip)
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        run: Compress-Archive -Path "dist/$env:STAGE" -DestinationPath "dist/$env:STAGE.zip"
+
+      - name: Archive (tar.gz)
+        if: matrix.archive == 'tar.gz'
+        shell: bash
+        run: tar -C dist -czf "dist/$STAGE.tar.gz" "$STAGE"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.label }}
+          path: dist/*.${{ matrix.archive }}
+          if-no-files-found: error
+
+  publish:
+    name: publish
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: staging
+          merge-multiple: true
+
+      - name: Checksums
+        run: |
+          cd staging
+          sha256sum * > SHA256SUMS
+          cat SHA256SUMS
+
+      # Optional: only runs when the maintainer has added the secret. Forks and
+      # first-time contributors still get a complete, unsigned release.
+      - name: Sign the checksums
+        id: sign
+        if: ${{ env.GPG_PRIVATE_KEY != '' }}
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --batch --yes --pinentry-mode loopback \
+              --passphrase "$GPG_PASSPHRASE" \
+              --detach-sign --armor staging/SHA256SUMS
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Release notes
+        run: |
+          {
+            echo "## VeilVoice ${{ github.ref_name }}"
+            echo
+            echo "Irreversible voice de-identification, fully offline."
+            echo
+            echo "### Verify what you downloaded"
+            echo
+            echo '```bash'
+            echo "sha256sum -c SHA256SUMS --ignore-missing"
+            echo '```'
+            echo
+            if [ -f staging/SHA256SUMS.asc ]; then
+              echo "\`SHA256SUMS.asc\` is a detached OpenPGP signature over the checksums."
+            else
+              echo "> This build is **unsigned** — no signing key was configured."
+            fi
+            echo
+            echo "Every binary was built twice in different directories and verified"
+            echo "byte-identical. See \`docs/REPRODUCIBLE_BUILDS.md\` to reproduce it yourself."
+            echo
+            echo "Built on: \`${{ runner.os }}\` runners, toolchain pinned by \`rust-toolchain.toml\`."
+          } > NOTES.md
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: staging/*
+          body_path: NOTES.md
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

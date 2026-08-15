@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# cargo-audit policy. Vulnerabilities always fail the build; the entries below
+# are *unmaintained* advisories, which are a maintenance signal rather than a
+# known exploit. Each one is accepted deliberately and reviewed at each release.
+
+[advisories]
+ignore = [
+    # paste 1.0.15 — proc-macro helper, pulled in transitively by the audio and
+    # GUI stacks. Compile-time only: it emits no code into the binary and has
+    # no runtime attack surface. No known vulnerability, author simply stepped
+    # away. Drops out when upstream crates migrate.
+    "RUSTSEC-2024-0436",
+
+    # ttf-parser 0.25.1 — transitive through egui's font rasteriser. It does
+    # parse untrusted input (font files), but the only fonts VeilVoice loads are
+    # egui's own embedded face and, optionally, a JetBrains Mono the user
+    # already installed system-wide. No attacker-supplied font ever reaches it.
+    # Revisit whenever egui updates its text stack.
+    "RUSTSEC-2026-0192",
+]
+
+# Unsound and yanked crates should still stop a release.
+informational_warnings = ["unsound", "notice"]

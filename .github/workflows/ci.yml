@@ -1,0 +1,105 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Build, lint and test on every supported platform. Windows first — it is the
+# primary target — then macOS and Linux.
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  # A fresh clone must build with no secrets. Nothing here reads one.
+  RUSTFLAGS: -D warnings
+
+jobs:
+  test:
+    name: test / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # cpal needs ALSA headers, and eframe needs the X11/Wayland stack.
+      - name: Install Linux audio and windowing headers
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libudev-dev pkg-config \
+            libgtk-3-dev libxkbcommon-dev libwayland-dev
+
+      - name: Install the pinned toolchain
+        run: rustup show   # rust-toolchain.toml selects and installs it
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Formatting
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked
+
+      - name: Tests
+        run: cargo test --workspace --locked
+
+      - name: Release build
+        run: cargo build --workspace --release --locked
+
+  # The generated artwork is committed, so it must match what the generator
+  # produces. Otherwise the two drift and the "verifiable from source" claim
+  # quietly stops being true.
+  assets:
+    name: generated assets are current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python assets/generate.py
+      - name: Assets must be byte-identical to the committed copies
+        run: |
+          if ! git diff --exit-code --stat -- assets/; then
+            echo "::error::assets/ is stale — run 'python assets/generate.py' and commit"
+            exit 1
+          fi
+
+  audit:
+    name: dependency advisories
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # A privacy tool that phones home is a broken privacy tool. This is a coarse
+  # check, not a proof, but it catches an accidental HTTP client landing in the
+  # dependency graph.
+  offline:
+    name: no network dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      - name: Fail if a networking crate appears in the tree
+        run: |
+          cargo tree --workspace --edges normal --prefix none --format '{p}' \
+            | sort -u > /tmp/deps.txt
+          # reqwest/hyper/curl/tungstenite have no business in this project.
+          if grep -Eiq '^(reqwest|hyper|curl|ureq|tungstenite|isahc|surf) ' /tmp/deps.txt; then
+            echo "::error::an HTTP or WebSocket client entered the dependency graph"
+            grep -Ei '^(reqwest|hyper|curl|ureq|tungstenite|isahc|surf) ' /tmp/deps.txt
+            exit 1
+          fi
+          echo "no networking crates found"

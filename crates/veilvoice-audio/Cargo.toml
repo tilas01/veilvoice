@@ -1,0 +1,23 @@
+[package]
+name = "veilvoice-audio"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice."
+
+[dependencies]
+veilvoice-core = { path = "../veilvoice-core" }
+# Cross-platform audio I/O: WASAPI, CoreAudio, ALSA/JACK.
+cpal = "0.15"
+# Lock-free SPSC ring buffer between the audio callbacks and the DSP thread.
+ringbuf = "0.5"
+# WAV read/write.
+hound = "3"
+# Decoding for everything else on import.
+symphonia = { version = "0.5", features = ["mp3", "isomp4", "aac", "flac", "vorbis", "ogg", "wav", "pcm"] }
+
+[dev-dependencies]
+tempfile = "3"

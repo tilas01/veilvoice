@@ -1,0 +1,125 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//! # veilvoice-crypto
+//!
+//! Key derivation, post-quantum-hybrid key agreement, authenticated encryption
+//! and amnesic secret storage for VeilVoice.
+//!
+//! ## What this crate is for
+//!
+//! [`veilvoice_core`](../veilvoice_core/index.html) makes a voice
+//! unrecognisable; it does not hide the *words*, and it is not meant to. When a
+//! recording needs to stay secret as well — at rest on disk, or in transit to
+//! someone else — that is this crate's job.
+//!
+//! - [`kdf`] — Argon2id, for turning a password into a key.
+//! - [`hybrid`] — X25519 + ML-KEM-768, so a recording captured today is not
+//!   readable by a quantum adversary tomorrow.
+//! - [`aead`] — XChaCha20-Poly1305, with random nonces and authenticated
+//!   associated data.
+//! - [`container`] — the `.veil` file format that ties the three together.
+//! - [`amnesia`] — page-locked, zeroizing, constant-time-comparable secrets.
+//!
+//! ## Threat model, stated plainly
+//!
+//! This crate protects data **at rest and in transit** against an attacker who
+//! later obtains the file, including one who stores it until quantum hardware
+//! exists. It does **not** protect against an attacker who is already running
+//! code as you, or who can read this process's memory: page-locking keeps keys
+//! out of the swap file, not out of a debugger. Hibernation writes RAM to disk
+//! wholesale and defeats locking entirely.
+//!
+//! ## Example
+//!
+//! ```
+//! use veilvoice_crypto::{container, kdf};
+//!
+//! # fn main() -> Result<(), veilvoice_crypto::Error> {
+//! // Cheap parameters so the doctest is fast; real callers use the default.
+//! let params = kdf::KdfParams::weak_for_tests();
+//! let sealed = container::seal_with_password(b"pass phrase", b"audio bytes", params)?;
+//! assert_eq!(container::open_with_password(b"pass phrase", &sealed)?, b"audio bytes");
+//! assert!(container::open_with_password(b"wrong", &sealed).is_err());
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! VeilVoice contains **no `unsafe` code at all** — including the page-locking
+//! in [`amnesia`], which goes through a safe wrapper.
+#![forbid(unsafe_code)]
+#![warn(missing_docs)]
+
+pub mod aead;
+pub mod amnesia;
+pub mod container;
+pub mod hybrid;
+pub mod kdf;
+
+pub use amnesia::Secret;
+
+/// Crate version string, surfaced in the About panel.
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Everything that can go wrong in this crate.
+///
+/// Decryption failures are deliberately coarse: [`Error::Decrypt`] does not say
+/// *why* authentication failed, because distinguishing a wrong password from a
+/// corrupt tag would hand an attacker an oracle.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum Error {
+    /// The OS random number generator was unavailable.
+    Random,
+    /// Argon2 rejected the cost parameters, or the salt was too short.
+    KdfParams,
+    /// Key derivation failed.
+    Kdf,
+    /// A key was not the expected length.
+    KeyLength,
+    /// Encryption failed.
+    Encrypt,
+    /// Decryption or authentication failed.
+    Decrypt,
+    /// KEM encapsulation failed.
+    Encapsulate,
+    /// KEM decapsulation failed.
+    Decapsulate,
+    /// A public key or encapsulation was malformed.
+    BadKeyEncoding,
+    /// The data does not start with the container magic.
+    BadMagic,
+    /// The container header is structurally invalid.
+    BadHeader,
+    /// The container ended sooner than its header promised.
+    Truncated,
+    /// The container uses a format version this build does not support.
+    UnsupportedVersion(u8),
+    /// The container uses an unknown locking mode.
+    UnsupportedMode(u8),
+    /// The container is locked a different way than the call assumed.
+    WrongMode,
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let msg = match self {
+            Self::Random => "the operating system random number generator is unavailable",
+            Self::KdfParams => "invalid key-derivation parameters",
+            Self::Kdf => "key derivation failed",
+            Self::KeyLength => "key has the wrong length",
+            Self::Encrypt => "encryption failed",
+            Self::Decrypt => "decryption failed: wrong key, or the data was altered",
+            Self::Encapsulate => "key encapsulation failed",
+            Self::Decapsulate => "key decapsulation failed",
+            Self::BadKeyEncoding => "malformed key or encapsulation",
+            Self::BadMagic => "not a VeilVoice container",
+            Self::BadHeader => "malformed container header",
+            Self::Truncated => "container is truncated",
+            Self::UnsupportedVersion(v) => return write!(f, "unsupported container version {v}"),
+            Self::UnsupportedMode(m) => return write!(f, "unsupported container mode {m}"),
+            Self::WrongMode => "container is locked with a different method",
+        };
+        f.write_str(msg)
+    }
+}
+
+impl std::error::Error for Error {}
