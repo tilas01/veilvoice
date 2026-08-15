@@ -118,6 +118,15 @@ enum Command {
         #[arg(long, default_value = "veilvoice.key")]
         secret: PathBuf,
     },
+    /// Show which applications are using the microphone and camera.
+    Watch {
+        /// Print a snapshot and exit instead of watching continuously.
+        #[arg(long)]
+        once: bool,
+        /// Seconds between checks.
+        #[arg(long, default_value_t = 2.0)]
+        interval: f32,
+    },
     /// Securely erase a file, then delete it. Irreversible.
     Shred {
         /// File to destroy.
@@ -203,6 +212,7 @@ fn run(command: Command) -> Result<(), String> {
         Command::Decrypt { input, output, key } => decrypt(input, output, key),
         Command::Keygen { public, secret } => keygen(public, secret),
         Command::Shred { file, passes, yes } => shred(file, passes, yes),
+        Command::Watch { once, interval } => watch(once, interval),
         Command::Info => {
             info();
             Ok(())
@@ -637,6 +647,93 @@ fn restrict_permissions(path: &std::path::Path) {
     let _ = path;
 }
 
+/// Report, and keep reporting, what is using the microphone and camera.
+fn watch(once: bool, interval: f32) -> Result<(), String> {
+    use veilvoice_watch::{Change, DeviceKind, Monitor};
+
+    let support = veilvoice_watch::support();
+    println!("{}", heading("Microphone and camera monitor"));
+    println!(
+        "{}",
+        field(
+            "Detection",
+            if support.microphone && support.camera {
+                "microphone and camera"
+            } else if support.microphone {
+                "microphone only"
+            } else {
+                "unavailable on this platform"
+            }
+        )
+    );
+    println!(
+        "{}",
+        paint(colour::MUTED, &format!("  {}", support.explanation))
+    );
+
+    // An empty list from a platform that cannot see is not good news, and must
+    // never be presented as though it were.
+    if !support.microphone && !support.camera {
+        println!();
+        return Err("nothing can be detected here, so nothing is reported".into());
+    }
+    println!();
+
+    let mut monitor = Monitor::new();
+    let sleep = std::time::Duration::from_secs_f32(interval.clamp(0.2, 60.0));
+
+    loop {
+        let changes = monitor.poll().map_err(|e| e.to_string())?;
+        for change in &changes {
+            let (mark, shade) = match change {
+                Change::Started(u) if u.kind == DeviceKind::Camera => ("●", colour::RED),
+                Change::Started(_) => ("●", colour::YELLOW),
+                Change::Stopped(_) => ("○", colour::GREEN),
+            };
+            println!("  {} {}", paint(shade, mark), change.alert());
+        }
+
+        if once {
+            let active = monitor.current();
+            if active.is_empty() {
+                println!("{}", ok("nothing is using the microphone or camera"));
+            } else {
+                for entry in active {
+                    println!(
+                        "{}",
+                        field(
+                            &entry.kind.to_string(),
+                            &format!(
+                                "{}{}",
+                                entry.describe(),
+                                entry
+                                    .device
+                                    .as_deref()
+                                    .map(|d| format!("  [{d}]"))
+                                    .unwrap_or_default()
+                            )
+                        )
+                    );
+                    if let Some(path) = &entry.path {
+                        println!("{}", paint(colour::MUTED, &format!("      {path}")));
+                    }
+                }
+            }
+            return Ok(());
+        }
+
+        if changes.is_empty() && monitor.current().is_empty() {
+            print!(
+                "\r  {}   ",
+                paint(colour::MUTED, "watching - nothing active")
+            );
+            use std::io::Write;
+            let _ = std::io::stdout().flush();
+        }
+        std::thread::sleep(sleep);
+    }
+}
+
 /// Destroy a file's contents, then delete it.
 ///
 /// Gated behind a typed confirmation rather than a y/n prompt. There is no
@@ -716,6 +813,7 @@ fn info() {
     println!("{}", field("Crypto", veilvoice_crypto::VERSION));
     println!("{}", field("Audio", veilvoice_audio::VERSION));
     println!("{}", field("Metadata", veilvoice_meta::VERSION));
+    println!("{}", field("Monitor", veilvoice_watch::VERSION));
     println!("{}", field("License", "GPL-3.0-or-later"));
     println!("{}", field("Network access", "none, by construction"));
     println!(
