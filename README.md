@@ -8,6 +8,12 @@
 
 **Irreversible voice de-identification — fully offline.**
 
+### → [tilas01.github.io/veilvoice](https://tilas01.github.io/veilvoice/)
+
+Website, wiki, and an in-browser hash verifier that never uploads your file.
+There is a [JavaScript-free edition](https://tilas01.github.io/veilvoice/nojs/)
+for readers who would rather not run scripts.
+
 VeilVoice destroys the *biometric voiceprint* of a speaker — pitch, formants,
 timbre, micro-timing and the melody of an accent — so that neither software nor
 a human listener can re-identify the speaker or reconstruct the original voice,
@@ -52,8 +58,10 @@ appears in it.
 
 ## Install
 
-Grab a build from [Releases](https://github.com/tilas01/veilvoice/releases), or
-build it yourself — a fresh clone needs **no secrets**:
+Grab a build from [Releases](https://github.com/tilas01/veilvoice/releases) —
+or verify one first with the
+[in-browser verifier](https://tilas01.github.io/veilvoice/#verify) — or build it
+yourself, since a fresh clone needs **no secrets**:
 
 ```bash
 git clone https://github.com/tilas01/veilvoice && cd veilvoice
@@ -209,6 +217,7 @@ firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters — it is written to be read.
 
 Roadmap and open work: [`HANDOFF.md`](HANDOFF.md).
+Documentation: [the wiki](https://tilas01.github.io/veilvoice/wiki.html).
 
 ## Licence
 
