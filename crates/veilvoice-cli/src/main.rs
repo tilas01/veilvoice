@@ -118,6 +118,17 @@ enum Command {
         #[arg(long, default_value = "veilvoice.key")]
         secret: PathBuf,
     },
+    /// Securely erase a file, then delete it. Irreversible.
+    Shred {
+        /// File to destroy.
+        file: PathBuf,
+        /// Overwrite passes (1-32).
+        #[arg(long, default_value_t = 3)]
+        passes: u8,
+        /// Skip the typed confirmation. For scripts that already mean it.
+        #[arg(long)]
+        yes: bool,
+    },
     /// Show version and build information.
     Info,
 }
@@ -191,6 +202,7 @@ fn run(command: Command) -> Result<(), String> {
         Command::Encrypt { input, output, to } => encrypt(input, output, to),
         Command::Decrypt { input, output, key } => decrypt(input, output, key),
         Command::Keygen { public, secret } => keygen(public, secret),
+        Command::Shred { file, passes, yes } => shred(file, passes, yes),
         Command::Info => {
             info();
             Ok(())
@@ -623,6 +635,78 @@ fn restrict_permissions(path: &std::path::Path) {
     // excludes other unprivileged users; there is no portable tightening to do.
     #[cfg(not(unix))]
     let _ = path;
+}
+
+/// Destroy a file's contents, then delete it.
+///
+/// Gated behind a typed confirmation rather than a y/n prompt. There is no
+/// undo, and a reflexive "y" is exactly the mistake this is guarding against.
+fn shred(file: PathBuf, passes: u8, yes: bool) -> Result<(), String> {
+    let metadata = std::fs::metadata(&file).map_err(|e| format!("{}: {e}", file.display()))?;
+    if !metadata.is_file() {
+        return Err(format!("{} is not a file", file.display()));
+    }
+
+    println!("{}", heading("Self-destruct"));
+    println!("{}", field("File", &file.display().to_string()));
+    println!(
+        "{}",
+        field(
+            "Size",
+            &format!("{:.1} KiB", metadata.len() as f64 / 1024.0)
+        )
+    );
+    println!("{}", field("Passes", &passes.to_string()));
+    println!();
+    println!("{}", err("THIS CANNOT BE UNDONE."));
+    println!(
+        "{}",
+        paint(
+            colour::MUTED,
+            "  On an SSD, SD card or USB stick, wear levelling may leave the
+               original blocks in flash where no software can reach them.
+               Full-disk encryption is the reliable answer — destroy the key
+               and the data goes with it, wherever the drive put it."
+        )
+    );
+    println!();
+
+    if !yes {
+        print!("  Type DESTROY to continue: ");
+        use std::io::Write;
+        std::io::stdout().flush().ok();
+        let mut answer = String::new();
+        std::io::stdin()
+            .read_line(&mut answer)
+            .map_err(|e| e.to_string())?;
+        if answer.trim() != "DESTROY" {
+            return Err("cancelled — nothing was touched".into());
+        }
+    }
+
+    let report = veilvoice_crypto::shred_file(&file, veilvoice_crypto::Passes::Custom(passes))
+        .map_err(|e| e.to_string())?;
+
+    println!();
+    println!(
+        "{}",
+        ok(&format!(
+            "overwrote {} bytes in {} passes, then deleted it",
+            report.bytes, report.passes
+        ))
+    );
+    if !report.synced {
+        println!(
+            "{}",
+            warn("the OS did not confirm the overwrite reached the device")
+        );
+    }
+    println!();
+    println!("{}", paint(colour::MUTED, "  What this does not cover:"));
+    for note in &report.caveats {
+        println!("{}", paint(colour::MUTED, &format!("   - {note}")));
+    }
+    Ok(())
 }
 
 fn info() {
