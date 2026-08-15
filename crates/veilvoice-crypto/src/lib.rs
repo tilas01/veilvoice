@@ -18,6 +18,8 @@
 //!   associated data.
 //! - [`container`] — the `.veil` file format that ties the three together.
 //! - [`amnesia`] — page-locked, zeroizing, constant-time-comparable secrets.
+//! - [`shred`] — secure erasure, and an honest account of what that is worth
+//!   on flash storage.
 //!
 //! ## Threat model, stated plainly
 //!
@@ -53,8 +55,10 @@ pub mod amnesia;
 pub mod container;
 pub mod hybrid;
 pub mod kdf;
+pub mod shred;
 
 pub use amnesia::Secret;
+pub use shred::{shred_file, Passes, ShredReport};
 
 /// Crate version string, surfaced in the About panel.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -97,6 +101,8 @@ pub enum Error {
     UnsupportedMode(u8),
     /// The container is locked a different way than the call assumed.
     WrongMode,
+    /// A file could not be securely erased.
+    Shred,
 }
 
 impl std::fmt::Display for Error {
@@ -117,6 +123,7 @@ impl std::fmt::Display for Error {
             Self::UnsupportedVersion(v) => return write!(f, "unsupported container version {v}"),
             Self::UnsupportedMode(m) => return write!(f, "unsupported container mode {m}"),
             Self::WrongMode => "container is locked with a different method",
+            Self::Shred => "could not securely erase the file",
         };
         f.write_str(msg)
     }
