@@ -85,13 +85,27 @@ jobs:
           # but canonicalises it to /private/tmp, and a remap that does not
           # match the canonical path silently does nothing.
           echo "SRC_A=$(pwd -P)" >> "$GITHUB_ENV"
-          # MSVC stamps a timestamp and a PDB signature into the PE header.
-          # /Brepro replaces them with a deterministic hash of the input.
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            echo "REPRO_LINK=-C link-arg=/Brepro" >> "$GITHUB_ENV"
-          else
-            echo "REPRO_LINK=" >> "$GITHUB_ENV"
-          fi
+          # Per-linker determinism flags.
+          case "${{ runner.os }}" in
+            Windows)
+              # MSVC stamps a timestamp and a PDB signature into the PE header;
+              # /Brepro replaces both with a hash of the input.
+              echo "REPRO_LINK=-C link-arg=/Brepro" >> "$GITHUB_ENV"
+              ;;
+            macOS)
+              # ld64 writes an LC_UUID load command that is not a pure function
+              # of the input, so two identical builds differ by 16 bytes.
+              # -no_uuid omits it. The cost is that crash reports cannot be
+              # matched to a dSYM, which these stripped release binaries have
+              # no dSYM for anyway.
+              echo "REPRO_LINK=-C link-arg=-Wl,-no_uuid" >> "$GITHUB_ENV"
+              # Stops `ar` writing timestamps into any static archive.
+              echo "ZERO_AR_DATE=1" >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "REPRO_LINK=" >> "$GITHUB_ENV"
+              ;;
+          esac
 
       - name: Build
         shell: bash
@@ -125,6 +139,10 @@ jobs:
                 echo "  identical: $name$ext"
               else
                 echo "::warning::$name$ext differs between two builds of the same source"
+                # Report enough to diagnose it next time rather than guess.
+                echo "    size A: $(wc -c < "$a")  size B: $(wc -c < "$b")"
+                echo "    first differing byte: $(cmp "$a" "$b" 2>&1 | head -1)"
+                echo "    differing byte count: $(cmp -l "$a" "$b" 2>/dev/null | wc -l)"
                 status=not-reproducible
               fi
             done
