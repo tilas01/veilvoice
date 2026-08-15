@@ -210,6 +210,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
         <tr><td>Phase discard</td><td>Every frame's measured phase is thrown away and a synthetic one generated. Phase encodes the exact waveform and the speaker's micro-timing. It is never stored, and infinitely many waveforms share any given magnitude spectrogram.</td></tr>
         <tr><td>Many-to-one normalisation</td><td>Pitch register, vocal-tract length and long-term spectral tilt are each collapsed onto a single canonical value. A whole population of speakers maps to the same output, so there is nothing to invert.</td></tr>
         <tr><td>CSPRNG modulation</td><td>The residual transform changes every frame from a ChaCha20 stream whose seed comes from the OS CSPRNG, lives only in page-locked RAM, and is zeroized on drop. There is no fixed transform to undo.</td></tr>
+        <tr><td>Rolling seed</td><td>Every two seconds by default the stream draws a fresh seed from its own output and restarts. ChaCha20 does not run backwards, so each roll permanently seals off the audio before it — a long recording is a chain of short streams, not one. Configurable, and inaudible: parameters glide across a roll and phase offsets ease over half a second.</td></tr>
       </tbody>
     </table>
 

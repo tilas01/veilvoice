@@ -8,8 +8,13 @@
 //! single fixed shift — there is no single shift to undo, and the target
 //! sequence is unknowable without the seed (which never leaves the process and
 //! is zeroized on drop).
+//!
+//! The seed does not stay put either. It is rolled forward every couple of
+//! seconds by default (see [`Modulator::reseed`]), so the stream driving any
+//! given stretch of audio is closed off permanently once that stretch is past.
 
 use rand::Rng;
+use rand::RngCore;
 use rand::SeedableRng;
 use rand_chacha::ChaCha20Rng;
 use zeroize::Zeroize;
@@ -111,6 +116,38 @@ impl Modulator {
         }
     }
 
+    /// Roll onto a fresh seed, drawn from the current stream.
+    ///
+    /// # Why a ratchet rather than fresh OS entropy
+    ///
+    /// The new seed is 32 bytes of ChaCha20 output from the stream being
+    /// replaced. That buys the property that matters — **forward secrecy**.
+    /// ChaCha20 is not invertible, so an adversary who somehow learned the
+    /// current seed could generate everything from this moment on but could not
+    /// walk backwards to recover any earlier one. Each roll permanently closes
+    /// off the segment before it.
+    ///
+    /// Reading fresh entropy from the OS instead would mean a syscall inside an
+    /// audio callback every couple of seconds, which is exactly the kind of
+    /// thing that causes a dropout, and it would make
+    /// [`crate::Deidentifier::from_seed`] non-deterministic — losing the
+    /// reproducibility the test suite depends on. The chain is seeded from the
+    /// OS CSPRNG once at construction; the ratchet carries that unpredictability
+    /// forward without ever going back to the kernel.
+    ///
+    /// The smoothed parameter values are deliberately **not** reset. Only the
+    /// source of future targets changes, so the glide continues through a roll
+    /// and there is no discontinuity to hear.
+    pub fn reseed(&mut self) {
+        let mut next = [0u8; 32];
+        self.rng.fill_bytes(&mut next);
+        self.rng = ChaCha20Rng::from_seed(next);
+        // Replace the retained copy, wiping the old one first.
+        self.seed.zeroize();
+        self.seed.copy_from_slice(&next);
+        next.zeroize();
+    }
+
     /// Advance one STFT frame and return the parameters to apply.
     pub fn next_frame(&mut self) -> ModValues {
         if self.frame_in_seg == 0 {
@@ -179,6 +216,73 @@ mod tests {
             }
         }
         assert!(differ, "distinct seeds should produce distinct streams");
+    }
+
+    #[test]
+    fn reseeding_changes_the_stream() {
+        let mut rolled = mk(11);
+        let mut steady = mk(11);
+        for _ in 0..50 {
+            rolled.next_frame();
+            steady.next_frame();
+        }
+        rolled.reseed();
+        let mut diverged = false;
+        for _ in 0..500 {
+            if (rolled.next_frame().formant_ratio - steady.next_frame().formant_ratio).abs() > 1e-6
+            {
+                diverged = true;
+                break;
+            }
+        }
+        assert!(diverged, "a roll should change what comes next");
+    }
+
+    /// The ratchet must stay deterministic, or `from_seed` stops being
+    /// reproducible and the reproducible-build story goes with it.
+    #[test]
+    fn the_ratchet_is_deterministic() {
+        let mut a = mk(5);
+        let mut b = mk(5);
+        for round in 0..4 {
+            for _ in 0..30 {
+                let (x, y) = (a.next_frame(), b.next_frame());
+                assert_eq!(
+                    x.formant_ratio.to_bits(),
+                    y.formant_ratio.to_bits(),
+                    "round {round}"
+                );
+            }
+            a.reseed();
+            b.reseed();
+        }
+    }
+
+    /// A roll must not jolt the smoothed values: the glide is what keeps the
+    /// transform inaudible at the seam.
+    #[test]
+    fn reseeding_does_not_jump_the_parameters() {
+        let mut m = mk(9);
+        for _ in 0..200 {
+            m.next_frame();
+        }
+        let before = m.next_frame();
+        m.reseed();
+        let after = m.next_frame();
+        assert!(
+            (after.formant_ratio - before.formant_ratio).abs() < 0.02,
+            "parameters jumped across a roll: {} -> {}",
+            before.formant_ratio,
+            after.formant_ratio
+        );
+    }
+
+    #[test]
+    fn a_roll_replaces_the_retained_seed() {
+        let mut m = mk(3);
+        let original = m.seed;
+        m.reseed();
+        assert_ne!(m.seed, original, "the old seed must not be kept around");
     }
 
     #[test]
