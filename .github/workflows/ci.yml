@@ -65,13 +65,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python assets/generate.py
-      - name: Assets must be byte-identical to the committed copies
-        run: |
-          if ! git diff --exit-code --stat -- assets/; then
-            echo "::error::assets/ is stale — run 'python assets/generate.py' and commit"
-            exit 1
-          fi
+      # Compares decoded pixels, not compressed bytes: zlib's output differs
+      # between Python builds, so a byte-for-byte diff would fail spuriously
+      # while telling us nothing about whether the artwork actually changed.
+      - name: Committed artwork must match the generator
+        run: python assets/generate.py --check
 
   audit:
     name: dependency advisories
