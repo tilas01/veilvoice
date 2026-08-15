@@ -30,3 +30,4 @@ rand_core = "0.6"
 
 [dev-dependencies]
 hex-literal = "0.4"
+tempfile = "3"

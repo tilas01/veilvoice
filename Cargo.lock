@@ -3925,6 +3925,7 @@ dependencies = [
  "region",
  "sha2",
  "subtle",
+ "tempfile",
  "x25519-dalek",
  "zeroize",
 ]
