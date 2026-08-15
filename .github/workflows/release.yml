@@ -45,7 +45,12 @@ jobs:
             target: aarch64-apple-darwin
             label: macos-arm64
             archive: tar.gz
-          - os: macos-13
+          # Intel macOS is cross-compiled from the Apple Silicon runner rather
+          # than built on a macos-13 one: those runners are being retired, and
+          # a release should not sit in a queue waiting for deprecated
+          # hardware. The Apple SDK ships both slices, so rustc cross-links
+          # this target natively.
+          - os: macos-latest
             target: x86_64-apple-darwin
             label: macos-x86_64
             archive: tar.gz
