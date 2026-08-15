@@ -15,6 +15,7 @@ Outputs icon.png, icon.ico and banner.png next to this script.
 
 import os
 import struct
+import sys
 import zlib
 
 # --- Tokyo Night ------------------------------------------------------------
@@ -31,6 +32,8 @@ NONE      = (0, 0, 0, 0)
 
 
 # --- PNG encoding -----------------------------------------------------------
+PNG_SIGNATURE = bytes((0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A))
+
 def write_png(path, pixels):
     """Write 8-bit RGBA rows (list of list of 4-tuples) as a PNG."""
     height = len(pixels)
@@ -318,8 +321,86 @@ def write_png_bytes(pixels):
     )
 
 
+def decode_png(blob):
+    """Decode the narrow PNG subset this script writes: 8-bit RGBA, filter 0.
+
+    Only needs to read our own output, so it skips the general cases. It exists
+    for `--check`: comparing decoded pixels rather than compressed bytes makes
+    the reproducibility test independent of the zlib version, which differs
+    between Python builds and would otherwise cause spurious CI failures.
+    """
+    if blob[:8] != PNG_SIGNATURE:
+        raise ValueError("not a PNG")
+    pos, width, height, idat = 8, None, None, b""
+    while pos < len(blob):
+        length = struct.unpack(">I", blob[pos:pos + 4])[0]
+        kind = blob[pos + 4:pos + 8]
+        data = blob[pos + 8:pos + 8 + length]
+        if kind == b"IHDR":
+            width, height, depth, colour = struct.unpack(">IIBB", data[:10])
+            if (depth, colour) != (8, 6):
+                raise ValueError("expected 8-bit RGBA")
+        elif kind == b"IDAT":
+            idat += data
+        elif kind == b"IEND":
+            break
+        pos += 12 + length
+
+    raw = zlib.decompress(idat)
+    stride = width * 4
+    rows = []
+    for y in range(height):
+        start = y * (stride + 1)
+        if raw[start] != 0:
+            raise ValueError("expected filter type 0")
+        line = raw[start + 1:start + 1 + stride]
+        rows.append([tuple(line[x * 4:x * 4 + 4]) for x in range(width)])
+    return rows
+
+
+def check(here):
+    """Verify the committed artwork still matches what this script produces."""
+    mark = icon_32()
+    expected = {
+        "icon.png": scale(mark, 8),
+        "icon-32.png": mark,
+        "banner.png": banner(),
+    }
+    problems = []
+    for name, pixels in expected.items():
+        path = os.path.join(here, name)
+        try:
+            with open(path, "rb") as f:
+                actual = decode_png(f.read())
+        except (OSError, ValueError) as exc:
+            problems.append(f"{name}: cannot read ({exc})")
+            continue
+        if actual != pixels:
+            problems.append(f"{name}: pixels differ from the generator output")
+
+    raw_path = os.path.join(here, "icon-32.rgba")
+    want = bytes(b for row in mark for px in row for b in px)
+    try:
+        with open(raw_path, "rb") as f:
+            if f.read() != want:
+                problems.append("icon-32.rgba: bytes differ")
+    except OSError as exc:
+        problems.append(f"icon-32.rgba: cannot read ({exc})")
+
+    if problems:
+        for line in problems:
+            print(f"  MISMATCH {line}")
+        print()
+        print("Run 'python assets/generate.py' and commit the result.")
+        return 1
+    print("  all generated assets match the generator")
+    return 0
+
+
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
+    if "--check" in sys.argv:
+        return check(here)
     mark = icon_32()
 
     write_png(os.path.join(here, "icon.png"), scale(mark, 8))       # 256x256
@@ -337,7 +418,8 @@ def main():
     for name in ("icon.png", "icon-32.png", "icon-32.rgba", "icon.ico", "banner.png"):
         size = os.path.getsize(os.path.join(here, name))
         print(f"  {name:<16} {size:>8,} bytes")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
