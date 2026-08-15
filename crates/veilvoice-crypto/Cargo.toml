@@ -1,0 +1,32 @@
+[package]
+name = "veilvoice-crypto"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice."
+
+[dependencies]
+# --- secret hygiene ---
+zeroize.workspace = true
+subtle = "2"
+# Page-locking wrapper. The one place this crate steps outside `forbid(unsafe)`;
+# see the `amnesia` module for why and how it is contained.
+region = "3"
+# --- key derivation ---
+argon2 = "0.5"
+hkdf = "0.12"
+sha2 = "0.10"
+# --- authenticated encryption ---
+chacha20poly1305 = "0.10"
+# --- hybrid key agreement ---
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+ml-kem = "0.2"
+# --- randomness ---
+getrandom.workspace = true
+rand_core = "0.6"
+
+[dev-dependencies]
+hex-literal = "0.4"
