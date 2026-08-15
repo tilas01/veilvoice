@@ -1,0 +1,15 @@
+[package]
+name = "veilvoice-watch"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Detect which applications are currently using the microphone and camera, with alerts on change."
+
+# Deliberately dependency-free. Windows is read through reg.exe, which ships
+# with the OS, and Linux through /proc, which is just files. Neither justifies
+# pulling in platform bindings, and a privacy monitor with no dependencies is
+# one less supply chain to trust.
+[dependencies]

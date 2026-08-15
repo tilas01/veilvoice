@@ -151,8 +151,13 @@ jobs:
         shell: bash
         run: |
           if [ "${{ matrix.cli_only }}" = "true" ]; then
-            # The CLI keeps live audio only where cpal has a backend.
-            echo "CARGO_ARGS=-p veilvoice-cli" >> "$GITHUB_ENV"
+            # No live audio on these. cpal needs ALSA headers built for the
+            # target architecture, which a cross or musl build does not have —
+            # and a statically linked binary cannot dlopen the system ALSA
+            # anyway. File processing, encryption and metadata cleaning are
+            # pure Rust and work fine, so the feature is switched off rather
+            # than the build failing.
+            echo "CARGO_ARGS=-p veilvoice-cli --no-default-features" >> "$GITHUB_ENV"
             echo "BINARIES=veilvoice" >> "$GITHUB_ENV"
           else
             echo "CARGO_ARGS=--workspace" >> "$GITHUB_ENV"
@@ -221,6 +226,20 @@ jobs:
           done
           cp README.md LICENSE "dist/$out/"
           cp "repro-${{ matrix.label }}.txt" dist/ 2>/dev/null || true
+          if [ "${{ matrix.cli_only }}" = "true" ]; then
+            {
+              echo "This build contains the command-line tool only, without live"
+              echo "microphone scrambling."
+              echo
+              echo "The desktop app needs the GTK and OpenGL stack for this"
+              echo "architecture, and live capture needs ALSA headers for it — neither"
+              echo "is available to a cross or statically linked build. Everything"
+              echo "else works: anonymise, clean, encrypt, decrypt, keygen, shred."
+              echo
+              echo "Run 'veilvoice info' to confirm what this binary supports."
+              echo "To get live scrambling, build natively on the target machine."
+            } > "dist/$out/NOTES.txt"
+          fi
           cp -r docs "dist/$out/docs"
           cp assets/icon.png assets/icon.ico "dist/$out/" 2>/dev/null || true
           echo "STAGE=$out" >> "$GITHUB_ENV"
