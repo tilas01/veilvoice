@@ -1,0 +1,19 @@
+[package]
+name = "veilvoice-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility."
+
+[dependencies]
+realfft.workspace = true
+getrandom.workspace = true
+rand.workspace = true
+rand_chacha.workspace = true
+zeroize.workspace = true
+
+[dev-dependencies]
+# std only for tests; no extra deps needed.

@@ -1,0 +1,7 @@
+# Pinned toolchain — a fixed compiler is a prerequisite for bit-for-bit
+# reproducible builds. CI uses this exact version; contributors get it
+# automatically via rustup.
+[toolchain]
+channel = "1.96.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

@@ -1,0 +1,21 @@
+[package]
+name = "veilvoice-gui"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes."
+
+[[bin]]
+name = "veilvoice-gui"
+path = "src/main.rs"
+
+[dependencies]
+veilvoice-core = { path = "../veilvoice-core" }
+veilvoice-audio = { path = "../veilvoice-audio" }
+veilvoice-meta = { path = "../veilvoice-meta" }
+eframe = { version = "0.29", default-features = false, features = ["glow", "default_fonts", "wayland", "x11"] }
+egui = "0.29"
+rfd = { version = "0.15", default-features = false, features = ["xdg-portal", "tokio"] }

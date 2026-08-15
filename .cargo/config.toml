@@ -1,0 +1,20 @@
+# Portable cargo configuration.
+#
+# IMPORTANT: nothing machine-specific or user-identifying is committed here.
+# Reproducibility depends on path remapping performed by the build ENVIRONMENT
+# (CI sets --remap-path-prefix from $GITHUB_WORKSPACE and $CARGO_HOME, plus
+# SOURCE_DATE_EPOCH), never on any one contributor's absolute paths — see
+# docs/REPRODUCIBLE_BUILDS.md.
+#
+# Local developers who build inside a cloud-synced folder (OneDrive/Dropbox)
+# should redirect the target directory to avoid sync churn and file locks:
+#     $env:CARGO_TARGET_DIR = "$env:LOCALAPPDATA\veilvoice\target"   (PowerShell)
+#     export CARGO_TARGET_DIR="$HOME/.cache/veilvoice/target"        (sh)
+
+[net]
+git-fetch-with-cli = true
+
+[build]
+# No target-cpu=native: keeping the default baseline is required for
+# reproducible, portable binaries that run on any x86-64 machine.
+rustflags = []

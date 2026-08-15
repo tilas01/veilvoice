@@ -1,0 +1,19 @@
+[package]
+name = "veilvoice-meta"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Strip or spoof identifying metadata: audio tags, and image EXIF/GPS."
+
+[dependencies]
+# Audio tag containers (ID3v1/v2, Vorbis comments, MP4 atoms, APE, ...).
+lofty = "0.25"
+# Container-level image surgery: drops EXIF/XMP without re-encoding pixels.
+img-parts = "0.4"
+
+[dev-dependencies]
+hound = "3"
+tempfile = "3"
