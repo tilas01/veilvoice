@@ -15,6 +15,8 @@ enum Tab {
     File,
     /// Scramble a microphone in real time.
     Live,
+    /// Who is using the microphone and camera.
+    Watch,
     /// Versions, licence and honest scope.
     About,
 }
@@ -57,6 +59,13 @@ pub struct VeilVoiceApp {
     live_error: Option<String>,
     meter_in: f32,
     meter_out: f32,
+
+    // Device monitor.
+    watch: veilvoice_watch::Monitor,
+    watch_support: veilvoice_watch::Support,
+    watch_error: Option<String>,
+    watch_log: Vec<String>,
+    watch_next_poll: f64,
 }
 
 impl Default for VeilVoiceApp {
@@ -96,6 +105,11 @@ impl Default for VeilVoiceApp {
             live_error: None,
             meter_in: 0.0,
             meter_out: 0.0,
+            watch: veilvoice_watch::Monitor::new(),
+            watch_support: veilvoice_watch::support(),
+            watch_error: None,
+            watch_log: Vec::new(),
+            watch_next_poll: 0.0,
         }
     }
 }
@@ -135,6 +149,9 @@ impl eframe::App for VeilVoiceApp {
                 ui.label(RichText::new(format!("v{}", env!("CARGO_PKG_VERSION"))).color(p::MUTED));
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     ui.label(RichText::new("offline").color(p::GREEN).small());
+                    // A monitor you have to go looking for is not doing its
+                    // job, so the warning rides the header on every tab.
+                    self.watch_indicator(ui);
                 });
             });
             ui.add_space(4.0);
@@ -142,6 +159,7 @@ impl eframe::App for VeilVoiceApp {
                 for (tab, label) in [
                     (Tab::File, "anonymise file"),
                     (Tab::Live, "live scramble"),
+                    (Tab::Watch, "monitor"),
                     (Tab::About, "about"),
                 ] {
                     let selected = self.tab == tab;
@@ -158,12 +176,18 @@ impl eframe::App for VeilVoiceApp {
         egui::CentralPanel::default().show(ctx, |ui| match self.tab {
             Tab::File => self.file_tab(ui),
             Tab::Live => self.live_tab(ui),
+            Tab::Watch => self.watch_tab(ui),
             Tab::About => self.about_tab(ui),
         });
 
-        // The live meters and counters only move if something repaints them.
+        self.poll_watch(ctx.input(|i| i.time));
+
+        // The live meters only move if something repaints them, and the
+        // monitor has to keep ticking even while the window is idle.
         if self.session.is_some() || self.job.is_some() {
             ctx.request_repaint_after(std::time::Duration::from_millis(50));
+        } else if self.watch_support.microphone || self.watch_support.camera {
+            ctx.request_repaint_after(std::time::Duration::from_millis(500));
         }
     }
 }
@@ -464,12 +488,139 @@ impl VeilVoiceApp {
         }
     }
 
+    /// Re-scan on a timer rather than every frame.
+    fn poll_watch(&mut self, now: f64) {
+        if !(self.watch_support.microphone || self.watch_support.camera) {
+            return;
+        }
+        if now < self.watch_next_poll {
+            return;
+        }
+        self.watch_next_poll = now + 2.0;
+
+        match self.watch.poll() {
+            Ok(changes) => {
+                self.watch_error = None;
+                for change in changes {
+                    self.watch_log.push(change.alert());
+                }
+                // A log that grows without bound is a memory leak with a UI.
+                let overflow = self.watch_log.len().saturating_sub(50);
+                self.watch_log.drain(..overflow);
+            }
+            Err(e) => self.watch_error = Some(e.to_string()),
+        }
+    }
+
+    /// The always-visible indicator.
+    fn watch_indicator(&mut self, ui: &mut egui::Ui) {
+        if !(self.watch_support.microphone || self.watch_support.camera) {
+            return;
+        }
+        let active = self.watch.current();
+        if active.is_empty() {
+            return;
+        }
+
+        let camera = active
+            .iter()
+            .any(|u| u.kind == veilvoice_watch::DeviceKind::Camera);
+        let colour = if camera { p::RED } else { p::YELLOW };
+        let names: Vec<&str> = active.iter().map(|u| u.app.as_str()).collect();
+        let label = format!(
+            "* {} IN USE - {}",
+            if camera { "CAMERA" } else { "MIC" },
+            names.join(", ")
+        );
+
+        if ui
+            .label(RichText::new(label).color(colour).small().strong())
+            .on_hover_text("Open the monitor tab for detail")
+            .clicked()
+        {
+            self.tab = Tab::Watch;
+        }
+    }
+
+    fn watch_tab(&mut self, ui: &mut egui::Ui) {
+        ui.add_space(4.0);
+        ui.label(RichText::new("WHAT IS LISTENING").color(p::BLUE).small());
+        ui.label(
+            RichText::new(self.watch_support.explanation)
+                .color(p::MUTED)
+                .small(),
+        );
+
+        // An empty list from a platform that cannot see is not good news, and
+        // must never be allowed to read like it.
+        if !(self.watch_support.microphone || self.watch_support.camera) {
+            ui.add_space(10.0);
+            ui.label(
+                RichText::new(
+                    "This platform exposes no way to tell which application is using \
+                     the microphone or camera, so nothing is shown. That is not the \
+                     same as nothing being active.",
+                )
+                .color(p::YELLOW),
+            );
+            return;
+        }
+
+        if let Some(e) = &self.watch_error {
+            ui.label(RichText::new(e).color(p::RED));
+        }
+
+        ui.add_space(10.0);
+        let active: Vec<_> = self.watch.current().to_vec();
+        if active.is_empty() {
+            ui.label(RichText::new("Nothing is using the microphone or camera.").color(p::GREEN));
+        } else {
+            for entry in &active {
+                let colour = if entry.kind == veilvoice_watch::DeviceKind::Camera {
+                    p::RED
+                } else {
+                    p::YELLOW
+                };
+                ui.horizontal(|ui| {
+                    ui.label(RichText::new("*").color(colour));
+                    ui.label(RichText::new(entry.describe()).color(p::FG).strong());
+                    ui.label(RichText::new(entry.kind.to_string()).color(colour).small());
+                });
+                if let Some(path) = &entry.path {
+                    ui.label(RichText::new(format!("    {path}")).color(p::MUTED).small());
+                }
+                if let Some(held) = entry.held_for() {
+                    ui.label(
+                        RichText::new(format!("    held for {}s", held.as_secs()))
+                            .color(p::MUTED)
+                            .small(),
+                    );
+                }
+                ui.add_space(6.0);
+            }
+        }
+
+        if !self.watch_log.is_empty() {
+            ui.add_space(14.0);
+            ui.separator();
+            ui.label(RichText::new("RECENT").color(p::BLUE).small());
+            egui::ScrollArea::vertical()
+                .max_height(160.0)
+                .show(ui, |ui| {
+                    for line in self.watch_log.iter().rev() {
+                        ui.label(RichText::new(line).color(p::MUTED).small());
+                    }
+                });
+        }
+    }
+
     fn about_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
         field(ui, "app", env!("CARGO_PKG_VERSION"));
         field(ui, "engine", veilvoice_core::VERSION);
         field(ui, "audio", veilvoice_audio::VERSION);
         field(ui, "metadata", veilvoice_meta::VERSION);
+        field(ui, "monitor", veilvoice_watch::VERSION);
         field(ui, "licence", "GPL-3.0-or-later");
         field(ui, "network access", "none, by construction");
         field(
