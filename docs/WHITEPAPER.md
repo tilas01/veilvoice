@@ -26,7 +26,7 @@ So VeilVoice targets the achievable and genuinely useful goal:
 The *voiceprint* — fundamental pitch, formant structure, timbre, micro-timing,
 and the melody of an accent — is destroyed. The *words* survive. If the message
 also needs to be secret, that is a different problem with a different solution:
-encrypt it (§7).
+encrypt it.
 
 ---
 
@@ -44,7 +44,8 @@ same speaker.
 
 **Explicitly out of scope.**
 
-- **The words.** Preserved deliberately. See §7.
+- **The words.** Preserved deliberately. See "If the message must be secret
+  too" below.
 - **Background content.** Room acoustics, a doorbell, a colleague's voice, a
   regional siren — VeilVoice processes the whole signal but does not attempt
   scene sanitisation. Check what else is in your recording.
@@ -110,7 +111,8 @@ Accent is carried by two different kinds of cue, and they get different answers.
 
 **Suprasegmental cues — removed.** Intonation contour, pitch range, voice
 quality, and the vocal-tract scale behind a speaker's vowel space. These are
-properties of the signal, and §3.2 collapses all of them.
+properties of the signal, and the normalisation described above collapses all
+of them.
 
 **Segmental cues — cannot be removed.** *Which phonemes the speaker actually
 produced*: rhoticity, vowel mergers, dental-fricative substitution, aspiration
@@ -190,8 +192,8 @@ cargo test --workspace          # the properties above are asserted in tests
 cargo run -p veilvoice-core --example spectrum_report
 ```
 
-`spectrum_report` prints where the output partials land, demonstrating §5
-directly. The engine's tests assert speaker convergence, vowel-contrast
+`spectrum_report` prints where the output partials land, demonstrating the
+synthesis behaviour directly. The engine's tests assert speaker convergence, vowel-contrast
 survival, gain neutrality and real-time performance. The crypto tests assert
 header-downgrade detection, tamper detection on each half of the hybrid, and
 that a wiped secret is actually wiped.
