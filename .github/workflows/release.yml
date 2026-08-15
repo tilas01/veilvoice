@@ -221,14 +221,26 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          # The key is fed on stdin and never written to disk.
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          # Publish the public half so anyone can verify without trusting a
-          # keyserver. The private half never leaves the secret store.
-          gpg --armor --export > staging/veilvoice-signing-key.asc
-          gpg --batch --yes --pinentry-mode loopback \
-              --passphrase "$GPG_PASSPHRASE" \
+          # printf '%s', not echo: echo appends a newline, and a passphrase
+          # with a trailing newline is simply the wrong passphrase.
+          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
+
+          # --passphrase-file, never --passphrase: an argument is visible to
+          # every other process through the process list.
+          pp="$(mktemp)"
+          printf '%s' "$GPG_PASSPHRASE" > "$pp"
+
+          # Detached, and over the hash file only. The binaries are never
+          # touched, so signing cannot disturb their reproducibility.
+          gpg --batch --yes --pinentry-mode loopback --passphrase-file "$pp" \
               --detach-sign --armor staging/SHA256SUMS
+          shred -u "$pp" 2>/dev/null || rm -f "$pp"
+
+          # Publish the public half so a verifier need not trust a keyserver.
+          gpg --armor --export > staging/veilvoice-signing-key.asc
+
+          # Verify here rather than let whoever downloads it find out first.
+          gpg --verify staging/SHA256SUMS.asc staging/SHA256SUMS
           echo "signed=true" >> "$GITHUB_OUTPUT"
 
       - name: Release notes
