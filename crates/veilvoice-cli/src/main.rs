@@ -12,7 +12,9 @@ use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 use std::process::ExitCode;
 use theme::{colour, err, field, heading, ok, paint, warn};
-use veilvoice_audio::{devices, io as audio_io};
+#[cfg(feature = "live")]
+use veilvoice_audio::devices;
+use veilvoice_audio::io as audio_io;
 use veilvoice_core::{AccentConfig, DeidConfig};
 use veilvoice_crypto::{container, hybrid, kdf};
 use veilvoice_meta::Policy;
@@ -55,6 +57,7 @@ enum Command {
         clean_metadata: bool,
     },
     /// Scramble a microphone live, into a device or a virtual cable.
+    #[cfg(feature = "live")]
     Live {
         /// Input device name. Defaults to the system default.
         #[arg(short, long)]
@@ -74,6 +77,7 @@ enum Command {
         reseed_secs: f32,
     },
     /// List the audio devices this machine offers.
+    #[cfg(feature = "live")]
     Devices,
     /// Strip identifying metadata from an audio or image file, in place.
     Clean {
@@ -165,6 +169,7 @@ fn run(command: Command) -> Result<(), String> {
             },
             clean_metadata,
         ),
+        #[cfg(feature = "live")]
         Command::Live {
             input,
             output,
@@ -180,6 +185,7 @@ fn run(command: Command) -> Result<(), String> {
                 reseed_secs,
             },
         ),
+        #[cfg(feature = "live")]
         Command::Devices => list_devices(),
         Command::Clean { file, policy } => clean(file, policy.into()),
         Command::Encrypt { input, output, to } => encrypt(input, output, to),
@@ -308,6 +314,7 @@ fn anonymise(
     Ok(())
 }
 
+#[cfg(feature = "live")]
 fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result<(), String> {
     let in_device =
         devices::open(devices::Direction::Input, input.as_deref()).map_err(|e| e.to_string())?;
@@ -393,6 +400,7 @@ fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result
 }
 
 /// A small textual level meter.
+#[cfg(feature = "live")]
 fn meter(peak: f32) -> String {
     const WIDTH: usize = 12;
     let filled = ((peak.clamp(0.0, 1.0)) * WIDTH as f32).round() as usize;
@@ -407,6 +415,7 @@ fn meter(peak: f32) -> String {
     paint(shade, &bar)
 }
 
+#[cfg(feature = "live")]
 fn list_devices() -> Result<(), String> {
     for (label, direction) in [
         ("Inputs", devices::Direction::Input),
@@ -625,6 +634,17 @@ fn info() {
     println!("{}", field("Metadata", veilvoice_meta::VERSION));
     println!("{}", field("License", "GPL-3.0-or-later"));
     println!("{}", field("Network access", "none, by construction"));
+    println!(
+        "{}",
+        field(
+            "Live audio",
+            if cfg!(feature = "live") {
+                "available"
+            } else {
+                "not built in (no device backend for this platform)"
+            }
+        )
+    );
     println!();
     println!(
         "{}",
@@ -687,6 +707,7 @@ mod tests {
         assert!(describe_reseed(2.0).contains("2"));
     }
 
+    #[cfg(feature = "live")]
     #[test]
     fn meter_scales_and_never_panics() {
         for peak in [-1.0f32, 0.0, 0.25, 0.5, 1.0, 4.0] {

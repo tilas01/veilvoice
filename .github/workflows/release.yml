@@ -58,17 +58,57 @@ jobs:
             target: x86_64-unknown-linux-gnu
             label: linux-x86_64
             archive: tar.gz
+          # Native ARM64 Linux. GitHub provides arm64 runners for public
+          # repositories, so this is a real build rather than a cross one and
+          # the GUI comes with it.
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            label: linux-arm64
+            archive: tar.gz
+          # Raspberry Pi OS 32-bit. Cross-compiled, and CLI only: the GUI would
+          # need the whole GTK/OpenGL stack for armhf on the build host, which
+          # is a great deal of machinery for a target where a headless box is
+          # the normal case anyway.
+          - os: ubuntu-24.04-arm
+            target: armv7-unknown-linux-gnueabihf
+            label: linux-armv7-pi
+            archive: tar.gz
+            cli_only: true
+            cross_gcc: gcc-arm-linux-gnueabihf
+          # Statically linked musl builds. One binary, no libc version to
+          # match, runs on any Linux including Alpine and old distributions.
+          # CLI only, for the same reason as above.
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            label: linux-x86_64-musl-static
+            archive: tar.gz
+            cli_only: true
+            cross_gcc: musl-tools
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            label: linux-arm64-musl-static
+            archive: tar.gz
+            cli_only: true
+            cross_gcc: musl-tools
 
     steps:
       - uses: actions/checkout@v4
 
+      # Only the GUI needs the windowing stack. A CLI-only target does not, and
+      # on a cross target these packages would be for the wrong architecture.
       - name: Install Linux audio and windowing headers
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && !matrix.cli_only
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             libasound2-dev libudev-dev pkg-config \
             libgtk-3-dev libxkbcommon-dev libwayland-dev
+
+      - name: Install the cross toolchain
+        if: matrix.cross_gcc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ${{ matrix.cross_gcc }}
 
       - name: Install the pinned toolchain
         run: |
@@ -107,11 +147,28 @@ jobs:
               ;;
           esac
 
+      - name: Select what to build
+        shell: bash
+        run: |
+          if [ "${{ matrix.cli_only }}" = "true" ]; then
+            # The CLI keeps live audio only where cpal has a backend.
+            echo "CARGO_ARGS=-p veilvoice-cli" >> "$GITHUB_ENV"
+            echo "BINARIES=veilvoice" >> "$GITHUB_ENV"
+          else
+            echo "CARGO_ARGS=--workspace" >> "$GITHUB_ENV"
+            echo "BINARIES=veilvoice veilvoice-gui" >> "$GITHUB_ENV"
+          fi
+          case "${{ matrix.target }}" in
+            armv7-unknown-linux-gnueabihf)
+              echo "CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc" >> "$GITHUB_ENV"
+              ;;
+          esac
+
       - name: Build
         shell: bash
         run: |
           export RUSTFLAGS="--remap-path-prefix=$SRC_A=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo $REPRO_LINK"
-          cargo build --release --locked --target ${{ matrix.target }}
+          cargo build --release --locked --target ${{ matrix.target }} $CARGO_ARGS
 
       # Reproducibility is the whole basis of "verify the binary matches the
       # source", so it is checked here rather than asserted in the docs.
@@ -127,10 +184,10 @@ jobs:
           cd "$rebuild"
           src_b="$(pwd -P)"
           export RUSTFLAGS="--remap-path-prefix=$src_b=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo $REPRO_LINK"
-          cargo build --release --locked --target ${{ matrix.target }}
+          cargo build --release --locked --target ${{ matrix.target }} $CARGO_ARGS
 
           status=reproducible
-          for name in veilvoice veilvoice-gui; do
+          for name in $BINARIES; do
             for ext in "" ".exe"; do
               a="$SRC_A/target/${{ matrix.target }}/release/$name$ext"
               b="$src_b/target/${{ matrix.target }}/release/$name$ext"
@@ -157,7 +214,7 @@ jobs:
           out="veilvoice-${{ github.ref_name }}-${{ matrix.label }}"
           mkdir -p "dist/$out"
           bin="target/${{ matrix.target }}/release"
-          for name in veilvoice veilvoice-gui; do
+          for name in $BINARIES; do
             for ext in "" ".exe"; do
               [ -f "$bin/$name$ext" ] && cp "$bin/$name$ext" "dist/$out/"
             done
@@ -186,9 +243,61 @@ jobs:
             dist/repro-*.txt
           if-no-files-found: error
 
+  # FreeBSD has no GitHub runner, so this builds inside a VM on a Linux one.
+  #
+  # It is CLI-only and deliberately so: `cpal` has no backend for the BSDs, so
+  # live capture cannot work there. Everything else — file de-identification,
+  # encryption, metadata cleaning — is pure Rust and runs fine, which is why the
+  # `live` feature exists to be turned off rather than the whole build failing.
+  #
+  # Marked continue-on-error: a third-party VM action failing should not hold up
+  # a release for the four first-class platforms. When it fails, the release
+  # simply ships without a FreeBSD archive and says so.
+  freebsd:
+    name: freebsd-x86_64
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the CLI in a FreeBSD VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          prepare: pkg install -y rust
+          run: |
+            set -e
+            cargo build --release --locked -p veilvoice-cli --no-default-features
+            ./target/release/veilvoice info
+      - name: Stage the archive
+        run: |
+          out="veilvoice-${{ github.ref_name }}-freebsd-x86_64"
+          mkdir -p "dist/$out"
+          cp target/release/veilvoice "dist/$out/"
+          cp README.md LICENSE "dist/$out/"
+          cp -r docs "dist/$out/docs"
+          {
+            echo "This FreeBSD build has no live microphone scrambling: cpal, the"
+            echo "audio device library, has no BSD backend. Everything else works —"
+            echo "anonymise, clean, encrypt, decrypt, keygen."
+            echo
+            echo "Run 'veilvoice info' to confirm what this binary supports."
+          } > "dist/$out/FREEBSD-NOTES.txt"
+          tar -C dist -czf "dist/$out.tar.gz" "$out"
+          echo "freebsd-x86_64: not-verified (built once, in a VM)" > dist/repro-freebsd-x86_64.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: freebsd-x86_64
+          path: |
+            dist/*.tar.gz
+            dist/repro-*.txt
+          if-no-files-found: error
+
   publish:
     name: publish
-    needs: build
+    needs: [build, freebsd]
+    # `build` must succeed; `freebsd` is allowed to fail without stopping a
+    # release, so this runs as long as the matrix itself did.
+    if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
     # Evaluated at job level on purpose. A step's own `env:` block is not in
     # scope for that step's `if:`, so gating on it there silently disables the

@@ -5,9 +5,18 @@
 //! [`veilvoice_core`](../veilvoice_core/index.html): device enumeration, file
 //! import and export, and the real-time capture → de-identify → playback path.
 //!
-//! - [`devices`] — enumerate inputs and outputs, and spot a virtual audio cable.
 //! - [`io`] — decode any common audio file to mono `f32`, write 16-bit WAV.
-//! - [`live`] — run the engine live between two devices.
+//! - `devices` — enumerate inputs and outputs, and spot a virtual audio cable.
+//! - `live` — run the engine live between two devices.
+//!
+//! ## The `live` feature
+//!
+//! `devices` and `live` sit behind the default-on `live` feature. They are the
+//! only part of this crate that needs `cpal`, and `cpal` has no backend for the
+//! BSDs. Everything else — decoding, encoding, and running the engine over a
+//! buffer — is pure Rust and builds anywhere, so turning the feature off keeps
+//! file processing working on platforms that cannot do live capture rather than
+//! failing to build at all.
 //!
 //! ## Routing, and why a virtual cable matters
 //!
@@ -19,12 +28,16 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+#[cfg(feature = "live")]
 pub mod devices;
 pub mod io;
+#[cfg(feature = "live")]
 pub mod live;
 
+#[cfg(feature = "live")]
 pub use devices::{DeviceInfo, Direction};
 pub use io::Audio;
+#[cfg(feature = "live")]
 pub use live::{LiveSession, LiveStats};
 
 /// Crate version string, surfaced in the About panel.
@@ -41,8 +54,10 @@ pub enum Error {
     /// A WAV file could not be written.
     Wav(hound::Error),
     /// A device could not be enumerated or opened.
+    #[cfg(feature = "live")]
     Device(String),
     /// An audio stream could not be built or started.
+    #[cfg(feature = "live")]
     Stream(String),
     /// The de-identification engine rejected its configuration.
     Engine(String),
@@ -66,7 +81,9 @@ impl std::fmt::Display for Error {
             Self::Io(e) => write!(f, "input/output error: {e}"),
             Self::Decode(m) => write!(f, "could not decode audio: {m}"),
             Self::Wav(e) => write!(f, "could not write WAV: {e}"),
+            #[cfg(feature = "live")]
             Self::Device(m) => write!(f, "audio device error: {m}"),
+            #[cfg(feature = "live")]
             Self::Stream(m) => write!(f, "audio stream error: {m}"),
             Self::Engine(m) => write!(f, "de-identification engine error: {m}"),
         }
