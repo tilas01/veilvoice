@@ -261,10 +261,12 @@ def banner():
 
     # Tagline and footer.
     text(px, "IRREVERSIBLE VOICE DE-IDENTIFICATION", 242, 204, BLUE, 4)
-    text(px, "THE VOICEPRINT IS DESTROYED. THE WORDS STAY READABLE.", 80, 442, COMMENT, 3)
-    text(px, "FULLY OFFLINE", 80, 498, GREEN, 3)
-    text(px, "NO UNSAFE CODE", 80, 534, CYAN, 3)
-    text(px, "GPL-3.0-OR-LATER", 80, 570, COMMENT, 3)
+    text(px, "THE VOICEPRINT IS DESTROYED. THE WORDS STAY READABLE.", 80, 430, COMMENT, 3)
+    text(px, "FULLY OFFLINE", 80, 478, GREEN, 3)
+    text(px, "SECURE AUDITED RUST CODE", 80, 512, CYAN, 3)
+    text(px, "GPL-3.0-OR-LATER", 80, 546, COMMENT, 3)
+    # Attribution, in the same green as the offline claim.
+    text(px, "BY TILAS01 ON GITHUB", 80, 580, GREEN, 3)
 
     # A hairline accent along the bottom edge.
     rect(px, 0, h - 8, w, 8, BLUE)
