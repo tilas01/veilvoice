@@ -1,0 +1,29 @@
+# Build output (also commonly redirected out of the source tree via
+# CARGO_TARGET_DIR — see .cargo/config.toml).
+/target
+target/
+**/*.rs.bk
+
+# Never commit private key material or captured audio.
+*.key
+*.pgp
+*.gpg
+!*.pub
+!*public*.asc
+/secrets/
+*.wav
+*.mp3
+*.flac
+*.ogg
+!assets/**            # curated demo/test assets are opted back in explicitly
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+
+# Bundled third-party installers are fetched at packaging time, not committed.
+/packaging/vendor/

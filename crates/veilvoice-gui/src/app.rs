@@ -1,0 +1,601 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//! The VeilVoice desktop application.
+
+use crate::theme::palette as p;
+use egui::{Color32, RichText};
+use std::path::PathBuf;
+use std::sync::mpsc;
+use veilvoice_audio::devices;
+use veilvoice_core::{AccentConfig, DeidConfig};
+
+/// The three things VeilVoice does.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Tab {
+    /// Process a file on disk.
+    File,
+    /// Scramble a microphone in real time.
+    Live,
+    /// Versions, licence and honest scope.
+    About,
+}
+
+/// Result of a background file job.
+enum JobDone {
+    Ok {
+        output: PathBuf,
+        secs: f32,
+        speed: f32,
+        metadata: Vec<String>,
+    },
+    Failed(String),
+}
+
+/// Application state.
+pub struct VeilVoiceApp {
+    tab: Tab,
+    jetbrains: bool,
+
+    // Shared engine settings.
+    intensity: f32,
+    neutralise_accent: bool,
+
+    // File mode.
+    input: Option<PathBuf>,
+    output: Option<PathBuf>,
+    clean_metadata: bool,
+    job: Option<mpsc::Receiver<JobDone>>,
+    status: Option<(String, Color32)>,
+    last_metadata: Vec<String>,
+
+    // Live mode.
+    inputs: Vec<devices::DeviceInfo>,
+    outputs: Vec<devices::DeviceInfo>,
+    chosen_input: Option<String>,
+    chosen_output: Option<String>,
+    session: Option<veilvoice_audio::LiveSession>,
+    live_error: Option<String>,
+    meter_in: f32,
+    meter_out: f32,
+}
+
+impl Default for VeilVoiceApp {
+    fn default() -> Self {
+        let inputs = devices::list(devices::Direction::Input).unwrap_or_default();
+        let outputs = devices::list(devices::Direction::Output).unwrap_or_default();
+        // Default the output to a virtual cable when one exists: routing there
+        // is what lets other applications hear the veiled voice at all.
+        let chosen_output = outputs
+            .iter()
+            .find(|d| d.is_virtual_cable)
+            .or_else(|| outputs.iter().find(|d| d.is_default))
+            .map(|d| d.name.clone());
+        let chosen_input = inputs
+            .iter()
+            .find(|d| d.is_default)
+            .or_else(|| inputs.first())
+            .map(|d| d.name.clone());
+
+        Self {
+            tab: Tab::File,
+            jetbrains: false,
+            intensity: 1.0,
+            neutralise_accent: true,
+            input: None,
+            output: None,
+            clean_metadata: true,
+            job: None,
+            status: None,
+            last_metadata: Vec::new(),
+            inputs,
+            outputs,
+            chosen_input,
+            chosen_output,
+            session: None,
+            live_error: None,
+            meter_in: 0.0,
+            meter_out: 0.0,
+        }
+    }
+}
+
+impl VeilVoiceApp {
+    /// Build the app, applying theme and fonts to `ctx`.
+    pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
+        let jetbrains = crate::theme::install_fonts(&cc.egui_ctx);
+        crate::theme::install(&cc.egui_ctx);
+        Self {
+            jetbrains,
+            ..Default::default()
+        }
+    }
+
+    fn config(&self) -> DeidConfig {
+        DeidConfig {
+            intensity: self.intensity,
+            accent: AccentConfig {
+                enabled: self.neutralise_accent,
+                ..AccentConfig::default()
+            },
+            ..DeidConfig::default()
+        }
+    }
+}
+
+impl eframe::App for VeilVoiceApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.poll_job();
+
+        egui::TopBottomPanel::top("header").show(ctx, |ui| {
+            ui.add_space(8.0);
+            ui.horizontal(|ui| {
+                ui.label(RichText::new("VEILVOICE").size(20.0).color(p::FG).strong());
+                ui.label(RichText::new(format!("v{}", env!("CARGO_PKG_VERSION"))).color(p::MUTED));
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    ui.label(RichText::new("offline").color(p::GREEN).small());
+                });
+            });
+            ui.add_space(4.0);
+            ui.horizontal(|ui| {
+                for (tab, label) in [
+                    (Tab::File, "anonymise file"),
+                    (Tab::Live, "live scramble"),
+                    (Tab::About, "about"),
+                ] {
+                    let selected = self.tab == tab;
+                    let text =
+                        RichText::new(label).color(if selected { p::BLUE } else { p::MUTED });
+                    if ui.selectable_label(selected, text).clicked() {
+                        self.tab = tab;
+                    }
+                }
+            });
+            ui.add_space(6.0);
+        });
+
+        egui::CentralPanel::default().show(ctx, |ui| match self.tab {
+            Tab::File => self.file_tab(ui),
+            Tab::Live => self.live_tab(ui),
+            Tab::About => self.about_tab(ui),
+        });
+
+        // The live meters and counters only move if something repaints them.
+        if self.session.is_some() || self.job.is_some() {
+            ctx.request_repaint_after(std::time::Duration::from_millis(50));
+        }
+    }
+}
+
+impl VeilVoiceApp {
+    fn poll_job(&mut self) {
+        let Some(rx) = &self.job else { return };
+        match rx.try_recv() {
+            Ok(JobDone::Ok {
+                output,
+                secs,
+                speed,
+                metadata,
+            }) => {
+                self.status = Some((
+                    format!(
+                        "done in {secs:.1}s ({speed:.0}x realtime) → {}",
+                        output.display()
+                    ),
+                    p::GREEN,
+                ));
+                self.last_metadata = metadata;
+                self.job = None;
+            }
+            Ok(JobDone::Failed(message)) => {
+                self.status = Some((message, p::RED));
+                self.job = None;
+            }
+            Err(mpsc::TryRecvError::Empty) => {}
+            Err(mpsc::TryRecvError::Disconnected) => {
+                self.status = Some(("the processing thread stopped unexpectedly".into(), p::RED));
+                self.job = None;
+            }
+        }
+    }
+
+    fn settings(&mut self, ui: &mut egui::Ui) {
+        ui.label(RichText::new("SETTINGS").color(p::BLUE).small());
+        ui.add(
+            egui::Slider::new(&mut self.intensity, 0.0..=1.0)
+                .text("intensity")
+                .fixed_decimals(2),
+        );
+        ui.checkbox(
+            &mut self.neutralise_accent,
+            "neutralise accent and intonation",
+        );
+        ui.label(
+            RichText::new(if self.neutralise_accent {
+                "every speaker is mapped onto one canonical register and vocal tract"
+            } else {
+                "the speaker's accent, intonation and vocal tract are left intact"
+            })
+            .color(p::MUTED)
+            .small(),
+        );
+    }
+
+    fn file_tab(&mut self, ui: &mut egui::Ui) {
+        ui.add_space(4.0);
+        ui.label(RichText::new("INPUT").color(p::BLUE).small());
+        ui.horizontal(|ui| {
+            if ui.button("choose file…").clicked() {
+                if let Some(path) = rfd::FileDialog::new()
+                    .add_filter(
+                        "audio",
+                        &["wav", "mp3", "flac", "ogg", "m4a", "aac", "opus"],
+                    )
+                    .pick_file()
+                {
+                    let mut out = path.clone();
+                    out.set_extension("veiled.wav");
+                    self.input = Some(path);
+                    self.output = Some(out);
+                    self.status = None;
+                }
+            }
+            match &self.input {
+                Some(path) => ui.label(RichText::new(path.display().to_string()).color(p::CYAN)),
+                None => ui.label(RichText::new("no file selected").color(p::MUTED)),
+            };
+        });
+
+        ui.add_space(8.0);
+        self.settings(ui);
+        ui.checkbox(&mut self.clean_metadata, "strip metadata from the result");
+
+        ui.add_space(12.0);
+        let busy = self.job.is_some();
+        let ready = self.input.is_some() && !busy;
+        if ui
+            .add_enabled(
+                ready,
+                egui::Button::new(RichText::new("  anonymise  ").strong()),
+            )
+            .clicked()
+        {
+            self.start_job();
+        }
+        if busy {
+            ui.horizontal(|ui| {
+                ui.spinner();
+                ui.label(RichText::new("processing…").color(p::MUTED));
+            });
+        }
+
+        if let Some((message, colour)) = &self.status {
+            ui.add_space(8.0);
+            ui.label(RichText::new(message).color(*colour));
+        }
+        if !self.last_metadata.is_empty() {
+            ui.label(
+                RichText::new(format!(
+                    "metadata removed: {}",
+                    self.last_metadata.join(", ")
+                ))
+                .color(p::MUTED)
+                .small(),
+            );
+        }
+
+        ui.add_space(16.0);
+        ui.separator();
+        ui.label(
+            RichText::new(
+                "The words survive on purpose — a scrambler you cannot understand is \
+                 useless. To hide the message too, encrypt the result with the CLI.",
+            )
+            .color(p::MUTED)
+            .small(),
+        );
+    }
+
+    fn start_job(&mut self) {
+        let Some(input) = self.input.clone() else {
+            return;
+        };
+        let output = self.output.clone().unwrap_or_else(|| {
+            let mut o = input.clone();
+            o.set_extension("veiled.wav");
+            o
+        });
+        let config = self.config();
+        let clean = self.clean_metadata;
+        let (tx, rx) = mpsc::channel();
+        self.job = Some(rx);
+        self.status = None;
+        self.last_metadata.clear();
+
+        // Off the UI thread: a long file would otherwise freeze the window.
+        std::thread::spawn(move || {
+            let started = std::time::Instant::now();
+            let result = (|| -> Result<(f32, Vec<String>), String> {
+                let audio = veilvoice_audio::io::load(&input).map_err(|e| e.to_string())?;
+                let veiled =
+                    veilvoice_audio::deidentify(&audio, config).map_err(|e| e.to_string())?;
+                veilvoice_audio::io::save_wav(&output, &veiled).map_err(|e| e.to_string())?;
+                let mut removed = Vec::new();
+                if clean {
+                    if let Ok(report) =
+                        veilvoice_meta::clean_audio_file(&output, veilvoice_meta::Policy::Strip)
+                    {
+                        removed = report.removed;
+                    }
+                }
+                Ok((audio.duration_secs(), removed))
+            })();
+
+            let secs = started.elapsed().as_secs_f32();
+            let _ = tx.send(match result {
+                Ok((duration, metadata)) => JobDone::Ok {
+                    output,
+                    secs,
+                    speed: duration / secs.max(1e-6),
+                    metadata,
+                },
+                Err(message) => JobDone::Failed(message),
+            });
+        });
+    }
+
+    fn live_tab(&mut self, ui: &mut egui::Ui) {
+        let running = self.session.is_some();
+
+        ui.add_space(4.0);
+        ui.label(RichText::new("DEVICES").color(p::BLUE).small());
+        ui.add_enabled_ui(!running, |ui| {
+            device_picker(ui, "input ", &self.inputs, &mut self.chosen_input);
+            device_picker(ui, "output", &self.outputs, &mut self.chosen_output);
+        });
+
+        let routed = self
+            .chosen_output
+            .as_ref()
+            .and_then(|name| self.outputs.iter().find(|d| &d.name == name))
+            .map(|d| d.is_virtual_cable)
+            .unwrap_or(false);
+        if !routed {
+            ui.label(
+                RichText::new(
+                    "no virtual cable selected — other applications will not receive this",
+                )
+                .color(p::YELLOW)
+                .small(),
+            );
+        }
+
+        ui.add_space(8.0);
+        ui.add_enabled_ui(!running, |ui| self.settings(ui));
+
+        ui.add_space(12.0);
+        ui.horizontal(|ui| {
+            if !running {
+                if ui.button(RichText::new("  start  ").strong()).clicked() {
+                    self.start_live();
+                }
+            } else if ui.button(RichText::new("  stop  ").strong()).clicked() {
+                self.session = None;
+                self.meter_in = 0.0;
+                self.meter_out = 0.0;
+            }
+            if running {
+                ui.label(RichText::new("● live").color(p::GREEN));
+            }
+        });
+
+        if let Some(message) = &self.live_error {
+            ui.add_space(8.0);
+            ui.label(RichText::new(message).color(p::RED));
+        }
+
+        if let Some(session) = &self.session {
+            let stats = session.stats();
+            // Meters fall smoothly rather than flickering with every frame.
+            self.meter_in = (self.meter_in * 0.7).max(stats.input_peak);
+            self.meter_out = (self.meter_out * 0.7).max(stats.output_peak);
+
+            ui.add_space(12.0);
+            ui.label(RichText::new("LEVELS").color(p::BLUE).small());
+            meter(ui, "in ", self.meter_in);
+            meter(ui, "out", self.meter_out);
+
+            ui.add_space(12.0);
+            ui.label(RichText::new("PERFORMANCE").color(p::BLUE).small());
+            field(
+                ui,
+                "processing",
+                &format!("{:.2} ms/block", stats.process.ema_block_ms()),
+            );
+            field(
+                ui,
+                "engine latency",
+                &format!("{:.1} ms", stats.process.algorithmic_latency_ms),
+            );
+            field(
+                ui,
+                "realtime factor",
+                &format!("{:.3}", stats.process.last_realtime_factor()),
+            );
+            if stats.dropped > 0 || stats.starved > 0 {
+                ui.label(
+                    RichText::new(format!(
+                        "glitches: {} dropped, {} starved",
+                        stats.dropped, stats.starved
+                    ))
+                    .color(p::YELLOW)
+                    .small(),
+                );
+            }
+        }
+    }
+
+    fn start_live(&mut self) {
+        self.live_error = None;
+        let result = (|| {
+            let input = devices::open(devices::Direction::Input, self.chosen_input.as_deref())?;
+            let output = devices::open(devices::Direction::Output, self.chosen_output.as_deref())?;
+            veilvoice_audio::LiveSession::start(&input, &output, self.config())
+        })();
+        match result {
+            Ok(session) => self.session = Some(session),
+            Err(e) => self.live_error = Some(e.to_string()),
+        }
+    }
+
+    fn about_tab(&mut self, ui: &mut egui::Ui) {
+        ui.add_space(4.0);
+        field(ui, "app", env!("CARGO_PKG_VERSION"));
+        field(ui, "engine", veilvoice_core::VERSION);
+        field(ui, "audio", veilvoice_audio::VERSION);
+        field(ui, "metadata", veilvoice_meta::VERSION);
+        field(ui, "licence", "GPL-3.0-or-later");
+        field(ui, "network access", "none, by construction");
+        field(
+            ui,
+            "typeface",
+            if self.jetbrains {
+                "JetBrains Mono"
+            } else {
+                "built-in monospace"
+            },
+        );
+
+        ui.add_space(16.0);
+        ui.label(RichText::new("WHAT THIS PROTECTS").color(p::BLUE).small());
+        ui.label(
+            RichText::new(
+                "The biometric voiceprint — pitch, formants, timbre, micro-timing and \
+                 the melody of an accent — is destroyed and cannot be recovered from the \
+                 output. Each frame's measured phase is discarded, and every speaker is \
+                 mapped onto one canonical register and vocal tract.",
+            )
+            .color(p::FG),
+        );
+
+        ui.add_space(12.0);
+        ui.label(RichText::new("WHAT IT DOES NOT").color(p::YELLOW).small());
+        ui.label(
+            RichText::new(
+                "The words are preserved on purpose, so the message is not secret — \
+                 encrypt the file if it needs to be. Nor can any signal-level transform \
+                 change which phonemes you produced, so a strong regional accent may \
+                 still be audible even though its melody is gone.",
+            )
+            .color(p::FG),
+        );
+    }
+}
+
+fn device_picker(
+    ui: &mut egui::Ui,
+    label: &str,
+    devices: &[devices::DeviceInfo],
+    chosen: &mut Option<String>,
+) {
+    ui.horizontal(|ui| {
+        ui.label(RichText::new(label).color(p::MUTED));
+        let current = chosen.clone().unwrap_or_else(|| "system default".into());
+        egui::ComboBox::from_id_salt(label)
+            .width(360.0)
+            .selected_text(RichText::new(current).color(p::CYAN))
+            .show_ui(ui, |ui| {
+                ui.selectable_value(chosen, None, "system default");
+                for device in devices {
+                    let mut text = device.name.clone();
+                    if device.is_virtual_cable {
+                        text.push_str("  ·  virtual cable");
+                    }
+                    ui.selectable_value(chosen, Some(device.name.clone()), text);
+                }
+            });
+    });
+}
+
+fn field(ui: &mut egui::Ui, label: &str, value: &str) {
+    ui.horizontal(|ui| {
+        ui.label(RichText::new(format!("{label:<18}")).color(p::MUTED));
+        ui.label(RichText::new(value).color(p::CYAN));
+    });
+}
+
+fn meter(ui: &mut egui::Ui, label: &str, peak: f32) {
+    ui.horizontal(|ui| {
+        ui.label(RichText::new(label).color(p::MUTED));
+        let (rect, _) = ui.allocate_exact_size(egui::vec2(280.0, 12.0), egui::Sense::hover());
+        let painter = ui.painter();
+        painter.rect_filled(rect, 2.0, p::BG_DARK);
+
+        let level = peak.clamp(0.0, 1.0);
+        let colour = if level > 0.95 {
+            p::RED
+        } else if level > 0.7 {
+            p::YELLOW
+        } else {
+            p::GREEN
+        };
+        let mut filled = rect;
+        filled.set_width(rect.width() * level);
+        painter.rect_filled(filled, 2.0, colour);
+        painter.rect_stroke(rect, 2.0, egui::Stroke::new(1.0, p::BORDER));
+
+        ui.label(
+            RichText::new(format!("{:>5.1} dB", 20.0 * level.max(1e-4).log10())).color(p::MUTED),
+        );
+    });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn defaults_are_the_safe_ones() {
+        let app = VeilVoiceApp::default();
+        assert!(
+            app.neutralise_accent,
+            "accent neutralisation should default on"
+        );
+        assert!(app.clean_metadata, "metadata stripping should default on");
+        assert_eq!(app.intensity, 1.0);
+        assert!(app.session.is_none());
+    }
+
+    #[test]
+    fn config_reflects_the_controls() {
+        let app = VeilVoiceApp {
+            intensity: 0.5,
+            neutralise_accent: false,
+            ..Default::default()
+        };
+        let cfg = app.config();
+        assert_eq!(cfg.intensity, 0.5);
+        assert!(!cfg.accent.enabled);
+    }
+
+    /// A virtual cable should be preselected when the machine has one, because
+    /// routing there is the whole point of live mode.
+    #[test]
+    fn output_defaults_to_a_virtual_cable_when_present() {
+        let app = VeilVoiceApp::default();
+        let cables: Vec<_> = app.outputs.iter().filter(|d| d.is_virtual_cable).collect();
+        if !cables.is_empty() {
+            let chosen = app
+                .chosen_output
+                .as_deref()
+                .expect("something should be chosen");
+            assert!(
+                cables.iter().any(|c| c.name == chosen),
+                "expected a virtual cable, got {chosen}"
+            );
+        }
+    }
+
+    #[test]
+    fn building_the_app_without_audio_hardware_does_not_panic() {
+        let _ = VeilVoiceApp::default();
+    }
+}

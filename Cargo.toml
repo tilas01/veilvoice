@@ -1,0 +1,56 @@
+# VeilVoice — cryptographically-modulated, irreversible voice de-identification.
+#
+# Workspace root. Every member crate is buildable by anyone with the pinned
+# stable toolchain (see rust-toolchain.toml) and NO secrets: `cargo build`
+# works on a fresh clone. Release signing / packaging secrets are optional and
+# only consumed by CI when present.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/veilvoice-core",
+    "crates/veilvoice-crypto",
+    "crates/veilvoice-audio",
+    "crates/veilvoice-meta",
+    "crates/veilvoice-gui",
+    "crates/veilvoice-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.96"
+license = "GPL-3.0-or-later"
+authors = ["tilas01"]
+repository = "https://github.com/tilas01/veilvoice"
+homepage = "https://github.com/tilas01/veilvoice"
+# Deliberately no e-mail / personal identifiers anywhere in this tree.
+
+[workspace.dependencies]
+# --- DSP / math ---
+realfft = "3"            # real-input FFT built on rustfft; re-exports num-complex
+rustfft = "6"
+# --- cryptographic randomness ---
+getrandom = "0.2"        # OS CSPRNG seed
+rand = "0.8"
+rand_chacha = "0.3"      # ChaCha20 CSPRNG for parameter modulation
+# --- secret hygiene ---
+zeroize = { version = "1", features = ["derive"] }
+
+# Reproducible-build friendly, maximally optimised release profile.
+# codegen-units=1 + fat LTO also removes cross-CU nondeterminism.
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+overflow-checks = false
+debug = false
+incremental = false
+
+# Faster iteration while developing the DSP without losing all optimisation.
+[profile.dev]
+opt-level = 1
