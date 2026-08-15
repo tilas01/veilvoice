@@ -257,16 +257,40 @@ jobs:
             echo '```'
             echo
             if [ -f staging/SHA256SUMS.asc ]; then
-              echo "\`SHA256SUMS.asc\` is a detached OpenPGP signature over the checksums,"
-              echo "and \`veilvoice-signing-key.asc\` is the public key that made it:"
+              fpr="$(gpg --show-keys --with-colons staging/veilvoice-signing-key.asc                      | awk -F: '/^fpr:/ {print $10; exit}')"
+              echo "### Verify the signature"
+              echo
+              echo "\`SHA256SUMS.asc\` is a detached OpenPGP signature over the hash list."
+              echo "No binary is signed in place, so signing cannot disturb the bit-for-bit"
+              echo "reproducibility above."
+              echo
+              echo "**1. Import the key** (also on the [website](https://tilas01.github.io/veilvoice/#verify)):"
               echo
               echo '```bash'
               echo "gpg --import veilvoice-signing-key.asc"
-              echo "gpg --verify SHA256SUMS.asc SHA256SUMS"
               echo '```'
               echo
-              echo "Check the fingerprint against the one published in the README before"
-              echo "trusting it — a signature only proves the same key signed every release."
+              echo "**2. Check the fingerprint is exactly this.** A \"Good signature\" from"
+              echo "some other key proves nothing — the fingerprint is the part that matters:"
+              echo
+              echo '```'
+              echo "$fpr"
+              echo '```'
+              echo
+              echo "**3. Verify the hash list, then the files against it:**"
+              echo
+              echo '```bash'
+              echo "gpg --verify SHA256SUMS.asc SHA256SUMS"
+              echo "sha256sum -c SHA256SUMS --ignore-missing"
+              echo '```'
+              echo
+              echo "Expect \`Good signature from \"tilas01\"\`. The key carries no e-mail"
+              echo "address by design. GnuPG will also warn that the key is not certified"
+              echo "with a trusted signature — that is normal and simply means you have not"
+              echo "personally signed it; the fingerprint check above is what establishes"
+              echo "that it is the right key."
+              echo
+              echo "On macOS use \`shasum -a 256 -c SHA256SUMS --ignore-missing\`."
             else
               echo "> This build is **unsigned** — no signing key is configured for this repository."
             fi

@@ -38,6 +38,7 @@ pub struct VeilVoiceApp {
     // Shared engine settings.
     intensity: f32,
     neutralise_accent: bool,
+    reseed_secs: f32,
 
     // File mode.
     input: Option<PathBuf>,
@@ -80,6 +81,7 @@ impl Default for VeilVoiceApp {
             jetbrains: false,
             intensity: 1.0,
             neutralise_accent: true,
+            reseed_secs: 2.0,
             input: None,
             output: None,
             clean_metadata: true,
@@ -116,6 +118,7 @@ impl VeilVoiceApp {
                 enabled: self.neutralise_accent,
                 ..AccentConfig::default()
             },
+            reseed_secs: self.reseed_secs,
             ..DeidConfig::default()
         }
     }
@@ -213,6 +216,21 @@ impl VeilVoiceApp {
                 "every speaker is mapped onto one canonical register and vocal tract"
             } else {
                 "the speaker's accent, intonation and vocal tract are left intact"
+            })
+            .color(p::MUTED)
+            .small(),
+        );
+
+        ui.add(
+            egui::Slider::new(&mut self.reseed_secs, 0.0..=30.0)
+                .text("seed roll (s)")
+                .fixed_decimals(1),
+        );
+        ui.label(
+            RichText::new(if self.reseed_secs <= 0.0 {
+                "one modulation stream for the whole session"
+            } else {
+                "the modulation stream rolls forward; earlier audio is sealed off behind it"
             })
             .color(p::MUTED)
             .small(),
@@ -561,6 +579,7 @@ mod tests {
         );
         assert!(app.clean_metadata, "metadata stripping should default on");
         assert_eq!(app.intensity, 1.0);
+        assert_eq!(app.reseed_secs, 2.0, "the seed should roll by default");
         assert!(app.session.is_none());
     }
 
@@ -569,11 +588,30 @@ mod tests {
         let app = VeilVoiceApp {
             intensity: 0.5,
             neutralise_accent: false,
+            reseed_secs: 5.0,
             ..Default::default()
         };
         let cfg = app.config();
         assert_eq!(cfg.intensity, 0.5);
         assert!(!cfg.accent.enabled);
+        assert_eq!(cfg.reseed_secs, 5.0);
+        cfg.checked()
+            .expect("every value the sliders can reach must be valid");
+    }
+
+    /// The slider's whole range must produce a configuration the engine
+    /// accepts, or a user could drag it into an error.
+    #[test]
+    fn every_reachable_reseed_setting_is_valid() {
+        for step in 0..=30 {
+            let app = VeilVoiceApp {
+                reseed_secs: step as f32,
+                ..Default::default()
+            };
+            app.config()
+                .checked()
+                .unwrap_or_else(|e| panic!("reseed_secs={step} rejected: {e}"));
+        }
     }
 
     /// A virtual cable should be preselected when the machine has one, because
