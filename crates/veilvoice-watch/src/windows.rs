@@ -199,22 +199,50 @@ mod tests {
         assert!(subkeys(r"HKEY_CURRENT_USER\SOFTWARE\ThisKeyDoesNotExistAnywhere12345").is_empty());
     }
 
-    /// Regression. `reg query` echoes subkey paths back under the full hive
-    /// name, so asking with the `HKCU` abbreviation matched nothing and the
-    /// monitor reported an empty machine no matter what was recording — the
-    /// worst possible failure for this feature, because it looks like good
-    /// news. Every Windows install has these keys; an empty result means the
-    /// parsing has broken again.
+    /// Regression, and the important one. `reg query` echoes subkey paths back
+    /// under the **full** hive name, so asking with the `HKCU` abbreviation
+    /// matched nothing and the monitor reported an empty machine no matter what
+    /// was recording — the worst possible failure for this feature, because it
+    /// looks like good news.
+    ///
+    /// Asked against a key every Windows installation has, rather than against
+    /// the consent store. The consent store is populated by *applications
+    /// having asked for the microphone*, and a headless CI runner with no audio
+    /// hardware has legitimately never had one ask — so an empty result there
+    /// means "nothing has used the microphone on this machine", which is not the
+    /// same claim at all. Conflating the two made CI fail on a machine where the
+    /// code was working perfectly, which is its own kind of silently wrong.
     #[test]
-    fn the_consent_store_is_actually_readable() {
-        let mic = subkeys(&format!(r"{CONSENT_STORE}\microphone"));
+    fn the_registry_parser_reads_a_key_that_always_exists() {
+        let keys = subkeys(r"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft");
         assert!(
-            !mic.is_empty(),
-            "no subkeys found under the microphone consent store — detection is silently dead"
+            !keys.is_empty(),
+            "no subkeys under HKLM\\SOFTWARE\\Microsoft — `reg query` parsing is broken, \
+             and the monitor will report an empty machine whatever is recording"
         );
         assert!(
+            keys.iter().all(|k| k.starts_with("HKEY_LOCAL_MACHINE\\")),
+            "subkeys should come back under the full hive name: {keys:?}"
+        );
+    }
+
+    /// The consent store itself, when this machine has one. Skipped rather than
+    /// failed where it is empty — see above for why that is a statement about
+    /// the machine and not about the code.
+    #[test]
+    fn the_consent_store_is_readable_when_this_machine_has_one() {
+        let mic = subkeys(&format!(r"{CONSENT_STORE}\microphone"));
+        if mic.is_empty() {
+            eprintln!(
+                "no microphone consent store on this machine — nothing has ever requested \
+                 the microphone here. The parser itself is covered by \
+                 `the_registry_parser_reads_a_key_that_always_exists`."
+            );
+            return;
+        }
+        assert!(
             mic.iter().any(|k| k.ends_with("NonPackaged")),
-            "expected a NonPackaged subkey for desktop applications"
+            "expected a NonPackaged subkey for desktop applications: {mic:?}"
         );
     }
 
