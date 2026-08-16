@@ -11,7 +11,7 @@
 //! one reason: a lock the user believes is stronger than it is has made them
 //! *less* safe, not more.
 
-use crate::atrest::read_new_password;
+use crate::atrest::{prompt_secret, read_new_password};
 use crate::theme::{colour, field, heading, ok, paint, warn};
 use clap::Subcommand;
 use std::path::{Path, PathBuf};
@@ -153,18 +153,19 @@ fn set(path: &Path) -> Result<(), String> {
             "  Deriving verifier (Argon2id, deliberately slow)..."
         )
     );
-    LockStore::create(path, &password, kdf::KdfParams::default()).map_err(|e| e.to_string())?;
+    LockStore::create(path, password.expose(), kdf::KdfParams::default())
+        .map_err(|e| e.to_string())?;
     println!("{}", ok("app lock set"));
     Ok(())
 }
 
 fn change(path: &Path) -> Result<(), String> {
     let mut store = open_or_explain(path)?;
-    let current = rpassword::prompt_password("Current password: ").map_err(|e| e.to_string())?;
+    let current = prompt_secret("Current password: ")?;
     println!("{}", paint(colour::MUTED, "  Now the new one."));
     let new = read_new_password()?;
     store
-        .change_password(current.as_bytes(), &new)
+        .change_password(current.expose(), new.expose())
         .map_err(|e| e.to_string())?;
     println!("{}", ok("app lock password changed"));
     Ok(())
@@ -172,10 +173,8 @@ fn change(path: &Path) -> Result<(), String> {
 
 fn remove(path: &Path) -> Result<(), String> {
     let store = open_or_explain(path)?;
-    let current = rpassword::prompt_password("Current password: ").map_err(|e| e.to_string())?;
-    store
-        .remove(current.as_bytes())
-        .map_err(|e| e.to_string())?;
+    let current = prompt_secret("Current password: ")?;
+    store.remove(current.expose()).map_err(|e| e.to_string())?;
     println!(
         "{}",
         ok("app lock removed — VeilVoice will open freely again")
