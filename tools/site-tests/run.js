@@ -13,6 +13,7 @@
 "use strict";
 
 const SUITES = [
+  require("./characters.test.js"),
   require("./html.test.js"),
   require("./markdown.render.test.js"),
   require("./markdown.hostile.test.js"),

@@ -46,13 +46,34 @@ so redirect the target directory first:
 ```powershell
 $env:CARGO_TARGET_DIR = "$env:LOCALAPPDATA\veilvoice\target"
 cargo test --workspace                    # 243 tests
-node tools/site-tests/run.js              # website: structure, renderer, reveal
+node tools/site-tests/run.js              # website: characters, structure, renderer, reveal
 cargo clippy --workspace --all-targets    # must be zero warnings
 cargo clippy -p veilvoice-cli --no-default-features   # the no-live build
 cargo audit                               # policy in .cargo/audit.toml
 cargo fmt --all
 python assets/generate.py --check         # artwork must match its generator
 ```
+
+### The website, locally
+
+The site is plain static files, so serving the folder is the whole of it:
+
+```powershell
+python -m http.server 8787 --bind 127.0.0.1 --directory website
+```
+
+`.claude/launch.json` declares the same thing as a named `website` config, so an
+editor or agent that reads it starts the identical server on port 8787. There is
+no build step, no bundler and no `package.json` — what is in `website/` is
+exactly what GitHub Pages serves, which is what makes "read the file yourself"
+a real invitation rather than a slogan.
+
+**Render it before believing it.** Three of the walkthrough's paragraphs were
+invisible on the live site — including the box stating the app lock is not
+tamper-proof — and every unit test passed the whole time, because the stub
+modelled the observer firing and the bug was the observer *not* firing. The
+site tests are much better now, and they are still not a substitute for looking
+at the page.
 
 ---
 
