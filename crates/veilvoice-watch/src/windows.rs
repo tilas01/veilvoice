@@ -226,24 +226,44 @@ mod tests {
         );
     }
 
-    /// The consent store itself, when this machine has one. Skipped rather than
-    /// failed where it is empty — see above for why that is a statement about
-    /// the machine and not about the code.
+    /// The consent store itself, when this machine has one.
+    ///
+    /// Asserts the *shape* of what comes back, never which applications are in
+    /// it. Both of those are facts about the machine rather than about the
+    /// code, and both have now failed CI for that reason: first the store was
+    /// empty on a runner where nothing had ever asked for a microphone, and
+    /// then — after that was allowed for — a runner had entries but no
+    /// `NonPackaged` subkey, which only appears once a *desktop* application
+    /// has asked. A test that fails depending on what software a machine has
+    /// happened to run is not testing this crate.
+    ///
+    /// What is worth asserting is that every entry is a real subkey path under
+    /// the full hive name, because that is what the parser is for. Whether the
+    /// parser works at all is covered without any of this ambiguity by
+    /// `the_registry_parser_reads_a_key_that_always_exists`.
     #[test]
-    fn the_consent_store_is_readable_when_this_machine_has_one() {
-        let mic = subkeys(&format!(r"{CONSENT_STORE}\microphone"));
+    fn the_consent_store_is_well_formed_when_this_machine_has_one() {
+        let key = format!(r"{CONSENT_STORE}\microphone");
+        let mic = subkeys(&key);
         if mic.is_empty() {
             eprintln!(
-                "no microphone consent store on this machine — nothing has ever requested \
-                 the microphone here. The parser itself is covered by \
-                 `the_registry_parser_reads_a_key_that_always_exists`."
+                "no microphone consent store on this machine - nothing has ever requested \
+                 the microphone here, which is a fact about the machine. The parser is \
+                 covered by `the_registry_parser_reads_a_key_that_always_exists`."
             );
             return;
         }
-        assert!(
-            mic.iter().any(|k| k.ends_with("NonPackaged")),
-            "expected a NonPackaged subkey for desktop applications: {mic:?}"
-        );
+        for entry in &mic {
+            assert!(
+                entry.starts_with(&key),
+                "subkey is not under the store it came from: {entry}"
+            );
+            assert!(
+                !entry.contains("REG_"),
+                "a value line leaked through: {entry}"
+            );
+            assert!(!entry.ends_with('\\'), "trailing separator on {entry}");
+        }
     }
 
     /// Value lines must never be mistaken for subkeys.
