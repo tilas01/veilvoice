@@ -84,7 +84,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Structure, rendering, hostile input, scroll reveal
+      - name: Characters, structure, rendering, hostile input, scroll reveal
         run: node tools/site-tests/run.js
       # A longer randomised campaign than the per-commit default. Still not a
       # coverage-guided fuzzer, and `docs/AUDIT.md` does not pretend otherwise.

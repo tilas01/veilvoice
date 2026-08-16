@@ -7,7 +7,7 @@
 // Hashing happens locally through WebCrypto (`crypto.subtle.digest`), which is
 // built into the browser. The file is read with FileReader, hashed in memory,
 // and discarded. There is no upload, no fetch, no XHR, and no server that
-// could receive it — you can confirm that by reading this file, which is the
+// could receive it -- you can confirm that by reading this file, which is the
 // whole of the implementation.
 //
 // # Why it streams
@@ -84,11 +84,11 @@
       verdict.style.display = "block";
       if (want === got) {
         verdict.classList.add("match");
-        verdict.textContent = "MATCH — this file is byte-for-byte what the hash describes.";
+        verdict.textContent = "MATCH -- this file is byte-for-byte what the hash describes.";
       } else {
         verdict.classList.add("fail");
         verdict.textContent =
-          "NO MATCH — do not run this file. It is not the release it claims to be, " +
+          "NO MATCH -- do not run this file. It is not the release it claims to be, " +
           "or the download was corrupted.";
       }
     }
@@ -97,13 +97,13 @@
       if (!file) { return; }
       verdict.style.display = "none";
       output.dataset.hash = "";
-      output.textContent = "reading " + file.name + " …";
+      output.textContent = "reading " + file.name + " ...";
       bar.style.display = "block";
       bar.value = 0;
 
       readFile(file, function (fraction) { bar.value = fraction * 0.8; })
         .then(function (bytes) {
-          output.textContent = "hashing …";
+          output.textContent = "hashing ...";
           bar.value = 0.9;
           return crypto.subtle.digest("SHA-256", bytes);
         })
