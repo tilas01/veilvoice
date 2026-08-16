@@ -20,6 +20,9 @@
 //! - [`amnesia`] — page-locked, zeroizing, constant-time-comparable secrets.
 //! - [`shred`] — secure erasure, and an honest account of what that is worth
 //!   on flash storage.
+//! - [`lock`] — the application lock: an Argon2id verifier with a rate limit,
+//!   which protects against casual access and says so rather than pretending to
+//!   be tamper-proof.
 //!
 //! ## Threat model, stated plainly
 //!
@@ -55,9 +58,11 @@ pub mod amnesia;
 pub mod container;
 pub mod hybrid;
 pub mod kdf;
+pub mod lock;
 pub mod shred;
 
 pub use amnesia::Secret;
+pub use lock::{AppLock, LockStore};
 pub use shred::{shred_file, Passes, ShredReport};
 
 /// Crate version string, surfaced in the About panel.
@@ -103,6 +108,13 @@ pub enum Error {
     WrongMode,
     /// A file could not be securely erased.
     Shred,
+    /// The app-lock password was wrong.
+    AppLockRejected,
+    /// Too many wrong app-lock attempts. The payload is the number of seconds
+    /// still to wait before another attempt will be considered.
+    AppLockCooldown(u64),
+    /// The app-lock file could not be read, written or removed.
+    AppLockStore,
 }
 
 impl std::fmt::Display for Error {
@@ -124,6 +136,11 @@ impl std::fmt::Display for Error {
             Self::UnsupportedMode(m) => return write!(f, "unsupported container mode {m}"),
             Self::WrongMode => "container is locked with a different method",
             Self::Shred => "could not securely erase the file",
+            Self::AppLockRejected => "wrong app-lock password",
+            Self::AppLockCooldown(secs) => {
+                return write!(f, "too many attempts — wait {secs}s before trying again")
+            }
+            Self::AppLockStore => "could not read or write the app-lock file",
         };
         f.write_str(msg)
     }
