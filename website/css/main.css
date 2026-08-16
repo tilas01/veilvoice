@@ -132,6 +132,86 @@ nav.links a:hover { color: var(--accent); }
   50%      { height: 82%; }
 }
 
+/* ---------- reveal on scroll ---------- */
+/* Scoped to html.js, which theme.js sets from a blocking head script. Without
+ * JavaScript these rules never apply and the content is simply visible — the
+ * one failure mode a reveal effect must not have.
+ *
+ * Only opacity and transform are animated, so the compositor handles it
+ * without a layout pass. `prefers-reduced-motion` is already neutralised
+ * globally at the top of this file, and reveal.js additionally skips the
+ * observer entirely in that case. */
+
+.js .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.js .reveal.in { opacity: 1; transform: none; }
+
+/* ---------- the walkthrough ---------- */
+
+.steps { counter-reset: step; list-style: none; padding: 0; margin: 18px 0 0; }
+
+.step {
+  counter-increment: step;
+  position: relative;
+  padding: 0 0 22px 46px;
+  margin: 0;
+}
+/* The connecting rail, drawn once per step rather than as a separate element. */
+.step::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 26px;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.step:last-child { padding-bottom: 0; }
+.step:last-child::before { display: none; }
+
+.step::after {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: var(--bg-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.step h3 { margin: 2px 0 6px; color: var(--fg); }
+.step p  { margin: 0; color: var(--muted); font-size: 13.5px; }
+.step pre { margin: 10px 0 0; }
+
+/* Two panels side by side: what the window shows, what the shell does. */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+
+/* A key/value strip for the "two passwords" comparison. */
+.compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 16px 0; }
+.compare > div {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+}
+.compare .lock  { border-left-color: var(--accent); }
+.compare .vault { border-left-color: var(--accent-2); }
+.compare h4 { margin: 0 0 6px; font-size: 13.5px; color: var(--fg); letter-spacing: 0.03em; }
+.compare p  { margin: 0; font-size: 13px; color: var(--muted); }
+
 /* ---------- buttons ---------- */
 
 .row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 26px; }
@@ -159,10 +239,11 @@ nav.links a:hover { color: var(--accent); }
 section { padding: 40px 0; border-top: 1px solid var(--border); }
 section:first-of-type { border-top: 0; }
 
-h1, h2, h3 { line-height: 1.3; }
+h1, h2, h3, h4 { line-height: 1.3; }
 h1 { font-size: 30px; letter-spacing: 0.04em; margin: 0 0 8px; }
 h2 { font-size: 20px; color: var(--accent); margin: 0 0 16px; letter-spacing: 0.03em; }
 h3 { font-size: 15px; color: var(--accent-2); margin: 22px 0 8px; }
+h4 { font-size: 13.5px; color: var(--cyan); margin: 16px 0 6px; letter-spacing: 0.02em; }
 
 .lede { color: var(--muted); }
 

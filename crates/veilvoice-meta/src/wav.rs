@@ -51,7 +51,15 @@ pub fn clean_wav_bytes(bytes: &[u8], policy: Policy) -> Result<(Vec<u8>, Report)
     let declared = u32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]) as usize;
     // Trust the file's actual length over the header, which is routinely wrong
     // in streamed or truncated recordings.
-    let end = (declared + 8).min(bytes.len());
+    //
+    // `saturating_add` rather than `+`: on a 32-bit target — and VeilVoice
+    // ships an ARMv7 build — `declared` can be `u32::MAX`, where `declared + 8`
+    // overflows `usize` and panics under overflow checks. A 64-bit host cannot
+    // reach it, which is exactly why the fuzzer in `tests/wav_fuzz.rs` never
+    // will either; this one had to be found by reading. Saturating is also the
+    // right answer semantically, since the value is immediately clamped to the
+    // real length anyway.
+    let end = declared.saturating_add(8).min(bytes.len());
 
     let mut report = Report::default();
     let mut body: Vec<u8> = Vec::with_capacity(bytes.len());

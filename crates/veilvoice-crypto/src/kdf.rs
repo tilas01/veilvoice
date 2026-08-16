@@ -49,9 +49,70 @@ impl KdfParams {
         }
     }
 
+    /// Argon2's own documented ceiling on parallelism: 2^24 - 1.
+    const MAX_P_COST: u32 = 0x00ff_ffff;
+
+    /// The largest memory cost this build will attempt, in KiB — 4 GiB.
+    ///
+    /// A ceiling is necessary because `m_cost` arrives from the file. Argon2
+    /// allocates that much memory before it does anything else, so a header
+    /// claiming `u32::MAX` asks for four *terabytes*: the allocation fails, and
+    /// a failed allocation in Rust aborts the process. Merely *attempting to
+    /// open* a hostile `.veil` would kill the program, and for the app lock it
+    /// is worse — that file is read before anyone has authenticated, so
+    /// anything that can write it can stop VeilVoice from starting at all.
+    ///
+    /// 4 GiB is chosen to sit well above every parameter set anyone would
+    /// deliberately pick: RFC 9106's *first* recommended profile is 2 GiB and
+    /// this crate's default is 256 MiB. A file declaring more than this is
+    /// refused with [`Error::KdfParams`] rather than obeyed.
+    ///
+    /// The honest residual: a file whose declared cost is legitimate but larger
+    /// than *this machine's* memory still cannot be opened, and that failure
+    /// comes from the allocator rather than from here. A cap cannot fix a
+    /// small machine; it can stop an absurd number from being taken seriously.
+    pub const MAX_M_COST: u32 = 4 * 1024 * 1024;
+
+    /// Check the costs are ones Argon2 can accept, **before** handing them to
+    /// it.
+    ///
+    /// This is not belt-and-braces, it is a fix. `argon2` 0.5.3 validates in
+    /// the wrong order: `Params::new` evaluates `m_cost < p_cost * 8` before it
+    /// checks `p_cost > MAX_P_COST`, so a `p_cost` above `u32::MAX / 8`
+    /// overflows the multiplication. With overflow checks on — every debug
+    /// build, and any consumer of this crate as a library — that is a **panic
+    /// on attacker-controlled input**, since `p_cost` is read verbatim from a
+    /// `.veil` header or an app-lock file. Found by the campaign in
+    /// `tests/parser_fuzz.rs`.
+    ///
+    /// VeilVoice's own release profile disables overflow checks, where the
+    /// multiplication wraps and the `MAX_P_COST` test then rejects it anyway —
+    /// but "our release profile happens to make the panic unreachable" is not a
+    /// property to rely on, and it is not true for anyone building against
+    /// these crates. So the bound is enforced here, in the one place every
+    /// derivation passes through, in arithmetic that cannot overflow.
+    pub fn checked(&self) -> Result<(), Error> {
+        if self.p_cost == 0 || self.p_cost > Self::MAX_P_COST {
+            return Err(Error::KdfParams);
+        }
+        if self.t_cost == 0 {
+            return Err(Error::KdfParams);
+        }
+        if self.m_cost > Self::MAX_M_COST {
+            return Err(Error::KdfParams);
+        }
+        // Widened to u64 deliberately: this is the multiplication that
+        // overflows upstream.
+        if u64::from(self.m_cost) < u64::from(self.p_cost) * 8 {
+            return Err(Error::KdfParams);
+        }
+        Ok(())
+    }
+
     /// Reject values Argon2 cannot accept, so a corrupt header fails loudly
     /// rather than panicking deep inside the KDF.
     fn build(&self, out_len: usize) -> Result<Argon2<'static>, Error> {
+        self.checked()?;
         let params = Params::new(self.m_cost, self.t_cost, self.p_cost, Some(out_len))
             .map_err(|_| Error::KdfParams)?;
         Ok(Argon2::new(Algorithm::Argon2id, Version::V0x13, params))
@@ -158,6 +219,86 @@ mod tests {
             derive_key(P, &[0u8; SALT_LEN], bad),
             Err(Error::KdfParams)
         ));
+    }
+
+    /// Regression for the panic the parser campaign found: `argon2` 0.5.3
+    /// computes `p_cost * 8` before checking `p_cost`'s ceiling, so a `p_cost`
+    /// above `u32::MAX / 8` overflows. `p_cost` comes straight out of a `.veil`
+    /// header or an app-lock file, so this is attacker-controlled.
+    #[test]
+    fn an_absurd_parallelism_is_rejected_rather_than_overflowing() {
+        for p_cost in [
+            u32::MAX,
+            u32::MAX / 8 + 1,
+            0x2000_0000,
+            KdfParams::MAX_P_COST + 1,
+        ] {
+            let bad = KdfParams {
+                m_cost: 1 << 20,
+                t_cost: 3,
+                p_cost,
+            };
+            assert!(bad.checked().is_err(), "p_cost {p_cost} accepted");
+            assert!(
+                matches!(derive_key(P, &[0u8; SALT_LEN], bad), Err(Error::KdfParams)),
+                "p_cost {p_cost} reached Argon2"
+            );
+        }
+    }
+
+    /// The other half of the same finding: `m_cost` is the number of KiB
+    /// Argon2 allocates up front, so `u32::MAX` asks for 4 TiB. The allocation
+    /// fails, and a failed allocation aborts the process — so simply *trying to
+    /// open* a hostile file would kill the program.
+    #[test]
+    fn an_absurd_memory_cost_is_rejected_rather_than_allocated() {
+        for m_cost in [u32::MAX, u32::MAX - 1, KdfParams::MAX_M_COST + 1] {
+            let bad = KdfParams {
+                m_cost,
+                t_cost: 3,
+                p_cost: 4,
+            };
+            assert!(bad.checked().is_err(), "m_cost {m_cost} accepted");
+            assert!(
+                matches!(derive_key(P, &[0u8; SALT_LEN], bad), Err(Error::KdfParams)),
+                "m_cost {m_cost} reached Argon2"
+            );
+        }
+        // The ceiling itself is allowed, and comfortably exceeds both RFC
+        // 9106 recommendations.
+        assert!(KdfParams {
+            m_cost: KdfParams::MAX_M_COST,
+            t_cost: 1,
+            p_cost: 4
+        }
+        .checked()
+        .is_ok());
+    }
+
+    /// Checked at compile time: the ceiling must never be tightened below the
+    /// largest profile RFC 9106 actually recommends, or the cap would start
+    /// refusing legitimate files rather than absurd ones.
+    const _: () = assert!(KdfParams::MAX_M_COST >= 2 * 1024 * 1024);
+
+    #[test]
+    fn sane_parameters_still_pass_the_check() {
+        KdfParams::default().checked().unwrap();
+        KdfParams::weak_for_tests().checked().unwrap();
+        assert!(KdfParams {
+            m_cost: 8,
+            t_cost: 1,
+            p_cost: 1
+        }
+        .checked()
+        .is_ok());
+        // m_cost must still cover 8 blocks per lane.
+        assert!(KdfParams {
+            m_cost: 8,
+            t_cost: 1,
+            p_cost: 2
+        }
+        .checked()
+        .is_err());
     }
 
     #[test]
