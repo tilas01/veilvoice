@@ -260,14 +260,25 @@ other's memory.
 `Secret::is_locked()` reports whether locking actually succeeded rather than
 assuming. Locking does not survive hibernation, which is stated in the docs.
 
-**A-5 — Typed passphrases are not page-locked while being typed.** An egui text
-field owns a `String`, and `rpassword` returns one; both are ordinary heap
-allocations that could reach swap in the moments before the passphrase is
-consumed. They are zeroized on use and when the app locks, and everything
-downstream is a `Secret`. Accepted rather than fixed: closing it needs a custom
-text widget, which would be far more code and far less reviewed than the gap it
-closes. Stated in the whitepaper and in the `security` module rather than left
-for someone to discover.
+**A-5 — Typed passphrases exist as ordinary bytes while being typed.**
+*Narrowed since first recorded; the residue is accepted.*
+
+An egui text field owns a `String` and `rpassword` returns one, so a passphrase
+is ordinary heap memory for as long as something is receiving keystrokes. That
+window cannot be removed without a custom text widget, which would be far more
+code and far less reviewed than the gap it closes.
+
+What **was** fixed is the part that had no excuse: the GUI used to keep the
+confirmed session passphrase as a plain `String` for the *entire session*, and
+the CLI passed `Vec<u8>` and `String` copies around after the prompt. Both now
+move the passphrase into a page-locked, zeroizing `Secret` the moment it is
+confirmed, and wipe the buffer it came from. The window went from "until the app
+closes" to "while the user is typing".
+
+The remainder is accepted and stated rather than papered over: for those
+moments the bytes are swappable, and none of this helps against an attacker who
+can read the process's memory — who has already won, as `WHITEPAPER.md` §7
+says.
 
 ---
 
