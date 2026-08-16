@@ -6,6 +6,36 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## v0.1.7
+
+### Added
+
+- **Tamper detection** (`veilvoice-guard`, `veilvoice guard`). Records a
+  SHA-256 manifest of VeilVoice's own files and reports what was modified,
+  removed or added since. `--sealed` encrypts the record under a passphrase, so
+  rewriting it to match a tampered file needs the passphrase as well as write
+  access -- keep that passphrase somewhere other than beside the record.
+  - It is **detection, not prevention**, and never says otherwise. Nothing that
+    runs as an ordinary program can stop another program with the same rights.
+  - Attribution is best-effort and usually unavailable: naming the responsible
+    program needs the Linux audit subsystem or Windows object-access auditing,
+    both normally switched off. It reports that it does not know, and prints
+    what an administrator would have to enable, rather than guessing.
+  - `veilvoice guard check` exits non-zero when anything changed, so a script
+    can act on it.
+
+### Security
+
+- **Typed passphrases are moved into page-locked memory immediately.** The GUI
+  used to keep the confirmed session passphrase as a plain `String` for the
+  whole session, and the CLI passed copies around after the prompt. Both now
+  convert to a zeroizing `Secret` the moment the passphrase is confirmed and
+  wipe the buffer it arrived in, narrowing the exposure from "until the app
+  closes" to "while the user is typing". Audit A-5 is updated to separate the
+  part that was fixed from the part that remains accepted: the typing window
+  itself cannot be removed, and none of this helps against an attacker who can
+  read the process's memory.
+
 ## v0.1.6
 
 ### Breaking
