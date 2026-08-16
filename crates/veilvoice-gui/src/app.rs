@@ -74,23 +74,41 @@ pub struct VeilVoiceApp {
     watch_next_poll: f64,
 }
 
-impl Default for VeilVoiceApp {
-    fn default() -> Self {
-        let inputs = devices::list(devices::Direction::Input).unwrap_or_default();
-        let outputs = devices::list(devices::Direction::Output).unwrap_or_default();
-        // Default the output to a virtual cable when one exists: routing there
-        // is what lets other applications hear the veiled voice at all.
-        let chosen_output = outputs
-            .iter()
-            .find(|d| d.is_virtual_cable)
-            .or_else(|| outputs.iter().find(|d| d.is_default))
-            .map(|d| d.name.clone());
-        let chosen_input = inputs
-            .iter()
-            .find(|d| d.is_default)
-            .or_else(|| inputs.first())
-            .map(|d| d.name.clone());
+/// Pick the output to start on: a virtual cable if the machine has one,
+/// because routing there is what lets other applications hear the veiled voice
+/// at all; otherwise the system default.
+///
+/// A free function over a device list rather than a step inside `Default`, so
+/// the choice can be tested against every arrangement of devices without
+/// touching the machine's audio stack. That matters more than it looks:
+/// building the app enumerates devices through `cpal`, and several tests doing
+/// that at once on a headless runner is a good way to find out what WASAPI does
+/// when there are no endpoints and COM is being initialised from four threads
+/// at once. The answer was an access violation.
+fn preferred_output(outputs: &[devices::DeviceInfo]) -> Option<String> {
+    outputs
+        .iter()
+        .find(|d| d.is_virtual_cable)
+        .or_else(|| outputs.iter().find(|d| d.is_default))
+        .map(|d| d.name.clone())
+}
 
+/// Pick the input to start on: the system default, else whatever is first.
+fn preferred_input(inputs: &[devices::DeviceInfo]) -> Option<String> {
+    inputs
+        .iter()
+        .find(|d| d.is_default)
+        .or_else(|| inputs.first())
+        .map(|d| d.name.clone())
+}
+
+impl VeilVoiceApp {
+    /// The application with no devices enumerated.
+    ///
+    /// `Default` calls this after asking the system what it has. Tests that are
+    /// not about device selection use it directly, so the suite touches the
+    /// platform's audio stack exactly once instead of once per test.
+    fn without_devices() -> Self {
         Self {
             tab: Tab::File,
             jetbrains: false,
@@ -103,10 +121,10 @@ impl Default for VeilVoiceApp {
             job: None,
             status: None,
             last_metadata: Vec::new(),
-            inputs,
-            outputs,
-            chosen_input,
-            chosen_output,
+            inputs: Vec::new(),
+            outputs: Vec::new(),
+            chosen_input: None,
+            chosen_output: None,
             session: None,
             live_error: None,
             meter_in: 0.0,
@@ -117,6 +135,20 @@ impl Default for VeilVoiceApp {
             watch_error: None,
             watch_log: Vec::new(),
             watch_next_poll: 0.0,
+        }
+    }
+}
+
+impl Default for VeilVoiceApp {
+    fn default() -> Self {
+        let inputs = devices::list(devices::Direction::Input).unwrap_or_default();
+        let outputs = devices::list(devices::Direction::Output).unwrap_or_default();
+        Self {
+            chosen_input: preferred_input(&inputs),
+            chosen_output: preferred_output(&outputs),
+            inputs,
+            outputs,
+            ..Self::without_devices()
         }
     }
 }
@@ -777,9 +809,19 @@ fn meter(ui: &mut egui::Ui, label: &str, peak: f32) {
 mod tests {
     use super::*;
 
+    /// Device selection is tested against synthetic lists, never the machine.
+    /// See `preferred_output` for why that is not merely tidier.
+    fn device(name: &str, default: bool, cable: bool) -> devices::DeviceInfo {
+        devices::DeviceInfo {
+            name: name.to_string(),
+            is_default: default,
+            is_virtual_cable: cable,
+        }
+    }
+
     #[test]
     fn defaults_are_the_safe_ones() {
-        let app = VeilVoiceApp::default();
+        let app = VeilVoiceApp::without_devices();
         assert!(
             app.neutralise_accent,
             "accent neutralisation should default on"
@@ -798,7 +840,7 @@ mod tests {
     /// encryption on and nothing to encrypt with, a job must not start.
     #[test]
     fn a_job_cannot_start_before_the_at_rest_choice_is_made() {
-        let app = VeilVoiceApp::default();
+        let app = VeilVoiceApp::without_devices();
         assert!(!app.security.ready_to_write());
         assert!(app.security.blocked_reason().is_some());
     }
@@ -809,7 +851,7 @@ mod tests {
             intensity: 0.5,
             neutralise_accent: false,
             reseed_secs: 5.0,
-            ..Default::default()
+            ..VeilVoiceApp::without_devices()
         };
         let cfg = app.config();
         assert_eq!(cfg.intensity, 0.5);
@@ -821,15 +863,9 @@ mod tests {
 
     /// The slider's whole range must produce a configuration the engine
     /// accepts, or a user could drag it into an error.
-    ///
-    /// One app, mutated, rather than thirty-one built from scratch: every
-    /// `VeilVoiceApp::default()` enumerates the machine's audio devices through
-    /// `cpal`, and doing that thirty-one times in a loop is a slow way to test
-    /// arithmetic — and on a headless CI runner, an unnecessary way to lean on
-    /// the platform's audio stack.
     #[test]
     fn every_reachable_reseed_setting_is_valid() {
-        let mut app = VeilVoiceApp::default();
+        let mut app = VeilVoiceApp::without_devices();
         for step in 0..=30 {
             app.reseed_secs = step as f32;
             app.config()
@@ -838,26 +874,69 @@ mod tests {
         }
     }
 
-    /// A virtual cable should be preselected when the machine has one, because
-    /// routing there is the whole point of live mode.
+    /// A virtual cable must win, because routing there is the whole point of
+    /// live mode. Every arrangement, none of them involving real hardware.
     #[test]
-    fn output_defaults_to_a_virtual_cable_when_present() {
-        let app = VeilVoiceApp::default();
-        let cables: Vec<_> = app.outputs.iter().filter(|d| d.is_virtual_cable).collect();
-        if !cables.is_empty() {
-            let chosen = app
-                .chosen_output
-                .as_deref()
-                .expect("something should be chosen");
-            assert!(
-                cables.iter().any(|c| c.name == chosen),
-                "expected a virtual cable, got {chosen}"
-            );
-        }
+    fn a_virtual_cable_is_preferred_over_the_system_default() {
+        let cable = device("CABLE Input (VB-Audio Virtual Cable)", false, true);
+        let speakers = device("Speakers", true, false);
+        let other = device("HDMI", false, false);
+
+        assert_eq!(
+            preferred_output(&[speakers.clone(), cable.clone(), other.clone()]).as_deref(),
+            Some(cable.name.as_str()),
+            "a cable must beat the system default"
+        );
+        assert_eq!(
+            preferred_output(&[other.clone(), speakers.clone()]).as_deref(),
+            Some("Speakers"),
+            "with no cable, the default"
+        );
+        // With neither a cable nor a default, the picker stays on "system
+        // default" rather than seizing on an arbitrary device. Output is not
+        // input here, and deliberately so: guessing an input wrong means the
+        // user hears nothing and fixes it, while guessing an *output* wrong
+        // means the veiled voice is quietly playing out of the wrong device.
+        assert_eq!(
+            preferred_output(std::slice::from_ref(&other)),
+            None,
+            "an arbitrary output must not be seized on"
+        );
+        assert_eq!(
+            preferred_output(&[]),
+            None,
+            "an empty machine chooses nothing"
+        );
     }
 
     #[test]
-    fn building_the_app_without_audio_hardware_does_not_panic() {
-        let _ = VeilVoiceApp::default();
+    fn the_default_input_is_preferred_then_the_first() {
+        let default = device("Microphone", true, false);
+        let first = device("Line In", false, false);
+        assert_eq!(
+            preferred_input(&[first.clone(), default.clone()]).as_deref(),
+            Some("Microphone")
+        );
+        assert_eq!(
+            preferred_input(std::slice::from_ref(&first)).as_deref(),
+            Some("Line In"),
+            "with no default, the first is better than nothing"
+        );
+        assert_eq!(preferred_input(&[]), None);
+    }
+
+    /// The one test that talks to the machine's audio stack. Kept single, and
+    /// last: enumerating devices from several test threads at once on a
+    /// headless runner is what produced an access violation in CI.
+    #[test]
+    fn building_the_app_with_real_device_enumeration_does_not_panic() {
+        let app = VeilVoiceApp::default();
+        // Whatever the machine has, the choice must be one of its own devices.
+        if let Some(chosen) = app.chosen_output.as_deref() {
+            assert!(app.outputs.iter().any(|d| d.name == chosen));
+        }
+        if let Some(chosen) = app.chosen_input.as_deref() {
+            assert!(app.inputs.iter().any(|d| d.name == chosen));
+        }
     }
 }
