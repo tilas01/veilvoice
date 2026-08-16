@@ -82,6 +82,36 @@ const CASES = [
   { name: "an image renders", source: '![alt](assets/x.png)',
     want: ['<img src="assets/x.png" alt="alt">'] },
 
+  // --- nested placeholders --------------------------------------------------
+  // A link whose label is inline code parks the code, then parks an anchor
+  // whose label *is* that placeholder. One un-parking pass left the inner one
+  // in the output as a private-use character, which browsers draw as nothing:
+  // every such link in the README rendered as an empty link, so
+  // "see [`docs/AUDIT.md`](docs/AUDIT.md)." came out as "see .".
+  {
+    name: "a link whose label is inline code keeps its label",
+    source: 'See [`docs/AUDIT.md`](docs/AUDIT.md).',
+    want: ['<a href="docs/AUDIT.md"><code>docs/AUDIT.md</code></a>'],
+    // The broken output was `<a href="docs/AUDIT.md"></a>`, so the quote has to
+    // be part of the pattern — `></a>` alone also matches `</code></a>`.
+    reject: ['"></a>']
+  },
+  {
+    name: "an image nested in a link keeps both",
+    source: '[![alt](a.png)](https://example.com)',
+    want: ['<img src="a.png" alt="alt">', '<a href="https://example.com"']
+  },
+  {
+    name: "inline code in a heading and a list item survives",
+    source: '## The `veilvoice` binary\n- run `veilvoice lock set`',
+    want: ['<code>veilvoice</code>', '<code>veilvoice lock set</code>']
+  },
+  {
+    name: "bold around an inline-code link keeps everything",
+    source: '**[`HANDOFF.md`](HANDOFF.md)**',
+    want: ['<strong>', '<code>HANDOFF.md</code>', 'href="HANDOFF.md"']
+  },
+
   // A protocol-relative target looks relative and behaves external, so it is
   // refused outright rather than emitted without rel="noopener noreferrer".
   { name: "a protocol-relative link is refused", source: '[label](//evil.example)',
@@ -122,6 +152,20 @@ function run() {
   // back with its contents intact.
   const readme = fs.readFileSync(path.join(ROOT, "README.md"), "utf8");
   const html = MD.render(readme);
+
+  // Nothing internal may survive into the page, and no link may come out with
+  // no text in it. Both were true of the deployed site.
+  const stray = [...html].filter(c => c.charCodeAt(0) >= 0xe000 && c.charCodeAt(0) <= 0xf8ff);
+  if (stray.length) {
+    failures++;
+    console.log(`FAIL the README leaves ${stray.length} placeholder character(s) in the output`);
+  }
+  const empty = html.match(/<a [^>]*><\/a>/g) || [];
+  if (empty.length) {
+    failures++;
+    console.log(`FAIL the README renders ${empty.length} link(s) with no text: ${empty[0]}`);
+  }
+
   const fences = readme.match(/```[\s\S]*?```/g) || [];
   let lost = 0;
   for (const fence of fences) {

@@ -4,7 +4,7 @@
 //
 // The choice is kept in localStorage, which never leaves the browser. No
 // cookie, so nothing is attached to a request and there is nothing to consent
-// to — a preference the server never sees is not tracking.
+// to -- a preference the server never sees is not tracking.
 
 (function () {
   "use strict";
@@ -17,7 +17,11 @@
     ["catppuccin", "Catppuccin Mocha"],
     ["everforest", "Everforest"],
     ["solarized", "Solarized Dark"],
-    ["rose-pine", "Rosé Pine"],
+    // Written as an escape, not a literal: this file is source the site
+    // explicitly invites people to open and read, and a reader whose viewer
+    // guesses the wrong encoding would see mojibake instead of a theme name.
+    // The escape is ASCII on disk and the correct character on screen.
+    ["rose-pine", "Ros\u00e9 Pine"],
     ["paper", "Paper (light)"]
   ];
 
