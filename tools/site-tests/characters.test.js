@@ -98,20 +98,30 @@ const RULES = [
 /**
  * Files that must be pure ASCII, and why.
  *
- * The site tells readers to open `js/verify.js` and check for themselves that
- * nothing is uploaded. Someone doing that may open the raw file in an editor or
- * a viewer that guesses the encoding, and a prose em dash then renders as
- * mojibake in the middle of the sentence making the promise. GitHub Pages does
- * send `charset=utf-8`, so the *page* is fine - this is about the file read on
- * its own terms, which is the whole point of publishing it.
+ * These are the files the site hands over **raw**, to be read on their own
+ * terms rather than rendered inside a page:
  *
- * Non-ASCII that has to survive is written as a `\\uXXXX` escape: ASCII on
- * disk, correct on screen. See the theme name in `theme.js`.
+ *   - `website/js/*.js`, because the site tells readers to open `verify.js` and
+ *     confirm for themselves that nothing is uploaded.
+ *   - `website/user-agreements/*.txt`, the licence and the liability waiver,
+ *     which are linked directly and are the documents someone reads before
+ *     deciding whether to trust any of this.
  *
- * Markdown and HTML are deliberately exempt: they are prose, they declare their
- * encoding, and em dashes there are wanted.
+ * GitHub Pages sends `charset=utf-8` for all of them, so a browser following
+ * the header is fine. The trouble is everything that does not: an editor, a
+ * downloaded copy, a terminal with a CP1252 locale. There, one prose em dash
+ * becomes "a-hat, euro, quote" in the middle of the sentence making the
+ * promise - which was reported twice, from two different files, before this
+ * rule existed.
+ *
+ * ASCII removes the question. Non-ASCII that genuinely has to survive is
+ * written as a `\\uXXXX` escape: ASCII on disk, correct on screen. See the
+ * theme name in `theme.js`.
+ *
+ * Markdown and HTML are deliberately exempt. They are prose, they declare their
+ * own encoding, and em dashes in them are wanted.
  */
-const ASCII_ONLY = /^website[/\\]js[/\\].*\.js$/;
+const ASCII_ONLY = /^website[/\\](js[/\\].*\.js|user-agreements[/\\].*\.txt)$/;
 
 function describe(ch) {
   return "U+" + ch.codePointAt(0).toString(16).toUpperCase().padStart(4, "0");
@@ -158,7 +168,8 @@ function run() {
         if (text.charCodeAt(i) > 127) {
           problems.push(
             "non-ASCII " + describe(text[i]) + " at " + positionOf(text, i) +
-            " - shipped JavaScript must be ASCII; use a \\uXXXX escape"
+            " - this file is served raw and must be ASCII, so no viewer can" +
+            " mis-decode it; use a \\uXXXX escape if the character must survive"
           );
           break;
         }
