@@ -5,7 +5,9 @@
 //! [`veilvoice_core`](../veilvoice_core/index.html): device enumeration, file
 //! import and export, and the real-time capture → de-identify → playback path.
 //!
-//! - [`io`] — decode any common audio file to mono `f32`, write 16-bit WAV.
+//! - [`io`] — decode any common audio file to mono `f32`, write 16-bit WAV, or
+//!   encode one in memory so it can be encrypted without ever landing on disk
+//!   in the clear.
 //! - `devices` — enumerate inputs and outputs, and spot a virtual audio cable.
 //! - `live` — run the engine live between two devices.
 //!

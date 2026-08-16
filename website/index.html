@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="css/main.css">
 <script src="js/theme.js"></script>
 <script src="js/legal.js" defer></script>
+<script src="js/reveal.js" defer></script>
 </head>
 <body>
 
@@ -26,6 +27,7 @@
     <nav class="links">
       <a href="#what">what</a>
       <a href="#download">download</a>
+      <a href="#guide">guide</a>
       <a href="#verify">verify</a>
       <a href="#crypto">security</a>
       <a href="wiki.html">wiki</a>
@@ -90,8 +92,12 @@
         <p>Route the veiled voice into a virtual audio cable and every application on the machine — calls, streams, recorders — receives it instead of you.</p>
       </div>
       <div class="card">
-        <h3>Encrypt at rest</h3>
-        <p>X25519 + ML-KEM-768 hybrid, so a recording captured today is not readable by a quantum adversary tomorrow.</p>
+        <h3>Encrypt at rest, by default</h3>
+        <p>Every recording is sealed as it is written — X25519 + ML-KEM-768 hybrid, so one captured today is not readable by a quantum adversary tomorrow. Turning that off makes you read why first.</p>
+      </div>
+      <div class="card">
+        <h3>Lock the app</h3>
+        <p>A separate password gates the desktop app, rate limited and Argon2id-derived. It stops someone who picks up your unlocked computer. It is not tamper-proof, and the unlock screen says so.</p>
       </div>
       <div class="card">
         <h3>Strip metadata</h3>
@@ -148,6 +154,120 @@
       published with every release: a SHA-256 for each file, and an OpenPGP
       signature over that hash list. The <a href="#verify">verifier below</a>
       does the first one in your browser.</p>
+    </div>
+  </div>
+</section>
+
+<section id="guide">
+  <div class="wrap">
+    <h2 class="reveal">SO YOU HAVE DOWNLOADED IT — NOW WHAT</h2>
+    <p class="lede reveal" style="--i:1">
+      There are two programs in the archive: <code>veilvoice-gui</code>, the
+      desktop app, and <code>veilvoice</code>, the command line. They share one
+      engine, so anything one can do the other can. Nothing installs a service,
+      writes to a registry, or phones home — delete the folder and it is gone.
+    </p>
+
+    <ol class="steps">
+      <li class="step reveal">
+        <h3>Give it a recording</h3>
+        <p>
+          wav, mp3, flac, ogg, m4a and friends. Open the desktop app on the
+          <b>anonymise file</b> tab and choose one, or point the command line at
+          it. Roughly 90× faster than real time, so an hour of audio takes well
+          under a minute.
+        </p>
+<pre><code>veilvoice anonymise interview.mp3 -o clean.wav</code></pre>
+      </li>
+
+      <li class="step reveal">
+        <h3>The voiceprint is destroyed, the words are kept</h3>
+        <p>
+          Each frame's measured phase is thrown away and resynthesised, and
+          pitch register, vocal-tract length and spectral tilt are each
+          collapsed onto one canonical value — so a whole population of speakers
+          lands on the same output and there is nothing left to invert. What
+          comes out is understandable, transcribable, and belongs to nobody.
+        </p>
+      </li>
+
+      <li class="step reveal">
+        <h3>It is encrypted before it reaches the disk</h3>
+        <p>
+          The result is sealed into a <code>.veil</code> container as it is
+          written, so <code>-o clean.wav</code> produces
+          <code>clean.wav.veil</code>. The WAV is built in memory and encrypted
+          there — the plaintext never exists on disk, not even for a moment,
+          because a file that is written and then deleted cannot be reliably
+          taken back on flash storage.
+        </p>
+<pre><code>veilvoice decrypt clean.wav.veil -o clean.wav   # when you want it back</code></pre>
+      </li>
+
+      <li class="step reveal">
+        <h3>Or scramble your microphone as you speak</h3>
+        <p>
+          The <b>live scramble</b> tab routes your veiled voice into a virtual
+          audio cable. Every application on the machine — a call, a stream, a
+          recorder — then receives that instead of you, with no per-app setup.
+        </p>
+      </li>
+
+      <li class="step reveal">
+        <h3>Check nothing else is listening</h3>
+        <p>
+          De-identifying your voice on a call achieves little if a second
+          program is recording the raw microphone at the same time. The
+          <b>monitor</b> tab names what is holding your microphone and camera
+          and warns the moment something starts.
+        </p>
+      </li>
+
+      <li class="step reveal">
+        <h3>Lock the app behind you</h3>
+        <p>
+          Set a password on the <b>lock</b> tab and VeilVoice will not open
+          without it. The <b>lock</b> button in the header locks it immediately
+          and clears the session passphrase with it.
+        </p>
+      </li>
+    </ol>
+
+    <h3 class="reveal">The two passwords, and why there are two</h3>
+    <div class="compare">
+      <div class="lock reveal">
+        <h4>The app lock</h4>
+        <p>Decides whether VeilVoice opens at all. Argon2id verifier, rate limited, three attempts free and then a doubling wait.</p>
+      </div>
+      <div class="vault reveal" style="--i:1">
+        <h4>The recording passphrase</h4>
+        <p>Encrypts the files it writes. Argon2id at 256 MiB, or seal to a post-quantum hybrid public key instead.</p>
+      </div>
+    </div>
+    <p class="lede reveal">
+      They are deliberately different secrets. If one password did both, then
+      opening the app would be the same act as unsealing everything it had ever
+      written — the opposite of what a lock is for. VeilVoice keeps the two
+      derivations domain-separated, so typing the same passphrase in both places
+      still does not produce two copies of one value. Use two anyway: one guess
+      that opens both defeats the point regardless of the maths.
+    </p>
+
+    <div class="note bad reveal">
+      <p><strong>The app lock is not tamper-proof, and cannot be.</strong> A
+      program running on your computer has nowhere to hide a secret from that
+      computer: anyone who can write to your files can delete the lock, and
+      anyone holding the disk can attack the stored password hash offline. It
+      protects against <em>casual access</em> — the person who sits down at your
+      unlocked session — which is a real and common threat, and is exactly what
+      the unlock screen says it is for. If someone taking your disk is the
+      threat, encrypt the whole volume.</p>
+    </div>
+
+    <div class="row reveal" style="justify-content:flex-start">
+      <a class="btn primary" href="wiki.html">read the wiki</a>
+      <a class="btn" href="wiki.html#applock">the app lock in detail</a>
+      <a class="btn" href="#crypto">how it works</a>
     </div>
   </div>
 </section>
@@ -228,8 +348,39 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
     <p class="lede">
       Stated plainly: page-locking keeps keys off disk, <em>not</em> away from an
       attacker who can already read this process's memory, and hibernation writes
-      RAM to disk wholesale and defeats it.
+      RAM to disk wholesale and defeats it. A passphrase still sitting in a text
+      field has not reached that protection yet, which is why it is wiped the
+      moment it is used.
     </p>
+    <p class="lede">
+      Recordings are sealed <em>in memory</em> and written once. An encrypted
+      recording never exists on disk in the clear, because a plaintext file that
+      is written and then deleted cannot be reliably taken back on flash storage.
+    </p>
+
+    <h3>The app lock, and exactly what it is worth</h3>
+    <p>
+      VeilVoice can sit behind a password of its own — separate from the one that
+      encrypts recordings, so that opening the app is not the same act as
+      unsealing everything it has written.
+    </p>
+    <table>
+      <thead><tr><th>What it is</th><th>What that means</th></tr></thead>
+      <tbody>
+        <tr><td>An Argon2id verifier, not a key</td><td>A password hash is stored and compared in constant time. It encrypts nothing, because there is nothing local it could usefully encrypt.</td></tr>
+        <tr><td>Rate limited, and the limit persists</td><td>Three attempts are free; then the wait doubles from 5 s to a 15-minute cap. The count is written to disk after every attempt, so killing the app does not hand an attacker a fresh budget.</td></tr>
+        <tr><td>Domain separated</td><td>Type the same passphrase in both places and you still do not end up with two copies of one value.</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <p><strong>Not tamper-proof, and it cannot be.</strong> A local application
+      has nowhere to hide a secret from the machine it runs on. Anyone who can
+      write to your files can delete the lock; anyone holding the disk can edit
+      the attempt counter, move the clock, or attack the stored hash offline.
+      This protects against <em>casual access</em> — the person who sits down at
+      your unlocked session. If the disk is the threat, the answers are full-volume
+      encryption and the at-rest encryption above, not this.</p>
+    </div>
 
     <h3>Libre, and what that buys you</h3>
     <ul>

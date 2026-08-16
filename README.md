@@ -32,13 +32,17 @@ appears in it.
 2. **Scramble your microphone live** and route the result to a virtual audio
    cable, so any application — a call, a stream, a recorder — receives the
    veiled voice instead of yours.
-3. **Encrypt recordings** at rest with post-quantum-hybrid cryptography.
-4. **Strip identifying metadata** from audio and images (EXIF, GPS, tags).
-5. **Watch what is listening** — see every application currently holding your
+3. **Encrypt recordings at rest, by default** — every file VeilVoice writes is
+   sealed with post-quantum-hybrid cryptography unless you explicitly turn that
+   off, and turning it off makes you read why first.
+4. **Lock the app** behind a separate password, so someone who picks up your
+   unlocked computer cannot open it. See the honest limits below.
+5. **Strip identifying metadata** from audio and images (EXIF, GPS, tags).
+6. **Watch what is listening** — see every application currently holding your
    microphone or camera, with alerts the moment one starts.
-6. **Securely erase** a recording, with an honest account of what that is worth
+7. **Securely erase** a recording, with an honest account of what that is worth
    on flash storage.
-7. **Work as a Rust library** in your own project — see below.
+8. **Work as a Rust library** in your own project — see below.
 
 > ### Honest scope
 >
@@ -54,6 +58,14 @@ appears in it.
 > melody and colour do not survive. What no signal-level transform can change is
 > *which phonemes you actually produced* — at that level the accent and the words
 > are the same thing.
+>
+> And to the **app lock**. It is an Argon2id password verifier with a rate
+> limit, and it protects against *casual access* — the person who picks up your
+> unlocked laptop. It is not tamper-proof and it is not disk encryption: anyone
+> who can write to your files can delete the lock, and anyone holding the drive
+> can attack the stored hash offline. VeilVoice says this on the unlock screen
+> itself rather than in a footnote. If the disk is the threat, encrypt the
+> volume.
 >
 > The full argument, and everything an attacker can still learn, is in
 > [`docs/WHITEPAPER.md`](docs/WHITEPAPER.md).
@@ -92,17 +104,38 @@ the scope. Tokyo Night, monospace, dark.
 ### Command line
 
 ```bash
-veilvoice anonymise recording.mp3 -o clean.wav
+veilvoice anonymise recording.mp3 -o clean.wav   # writes clean.wav.veil, sealed
+veilvoice anonymise recording.mp3 --encrypt-to friend.pub
+veilvoice anonymise recording.mp3 --encrypt false   # warns first
 veilvoice live --output "CABLE Input (VB-Audio Virtual Cable)"
 veilvoice devices
 veilvoice clean photo.jpg
 veilvoice encrypt secret.wav
+veilvoice decrypt clean.wav.veil -o clean.wav
 veilvoice keygen
+veilvoice lock set                     # password-gate the desktop app
+veilvoice lock status
 veilvoice watch                        # who is using the mic and camera
 veilvoice shred secret.wav             # irreversible
 ```
 
 Every command takes `--help`.
+
+### Encrypted by default
+
+`anonymise` seals its result into a `.veil` container rather than writing a bare
+WAV, because de-identification and confidentiality are different problems and
+only the first one is solved by the engine: **the words survive on purpose**, so
+an unencrypted result is still a recording of everything that was said.
+
+The WAV is encoded in memory and sealed there — a recording that is going to be
+encrypted never touches the disk in the clear, not even for a moment, because a
+plaintext file that is written and then deleted is exactly what
+[`veilvoice shred`](crates/veilvoice-crypto/src/shred.rs) explains cannot be
+reliably taken back on flash storage.
+
+Passing `--encrypt false` still works. It prints what you are giving up and, on
+a terminal, waits for you to type `UNENCRYPTED`.
 
 ### Who is listening?
 
@@ -135,7 +168,7 @@ veilvoice-audio = { git = "https://github.com/tilas01/veilvoice" }
 |---|---|
 | `veilvoice-core` | The de-identification engine. No I/O, no threads, allocation-free `process()`. |
 | `veilvoice-audio` | Device enumeration, file decode/encode, live capture→process→playback. |
-| `veilvoice-crypto` | Argon2id, X25519+ML-KEM-768 hybrid, XChaCha20-Poly1305, page-locked secrets. |
+| `veilvoice-crypto` | Argon2id, X25519+ML-KEM-768 hybrid, XChaCha20-Poly1305, page-locked secrets, the app-lock verifier. |
 | `veilvoice-meta` | Metadata stripping for audio and images. |
 | `veilvoice-watch` | Microphone and camera use, by application. Zero dependencies. |
 
@@ -203,8 +236,9 @@ writes with no extra work.
   process — and that seed is ratcheted forward every couple of seconds, so each
   stretch of audio is sealed off behind a one-way step rather than sharing one
   stream with the whole recording. Configurable, and inaudible by construction.
-- **Post-quantum ready.** At-rest encryption is X25519 + ML-KEM-768 hybrid,
-  because a recording stored today may be attacked decades from now.
+- **Post-quantum ready, and on by default.** At-rest encryption is X25519 +
+  ML-KEM-768 hybrid, because a recording stored today may be attacked decades
+  from now — and it is what `anonymise` does unless you say otherwise.
 - **Amnesic.** Secrets are page-locked out of swap, zeroized on drop, compared
   in constant time, and opaque to `Debug`.
 - **Reproducible & verifiable.** Pinned toolchain, committed lockfile,
@@ -232,18 +266,29 @@ Artwork is **generated, not committed as opaque blobs** —
 
 ## Status
 
-**v0.1.1 — early but real.** The engine, cryptography, audio path, metadata
-cleaning, CLI and GUI are implemented and tested (151 tests, clippy clean, no
-`unsafe`). Release binaries are verified bit-for-bit reproducible on Linux,
-Windows, macOS ARM and macOS Intel.
+**v0.1.5 — early but real.** The engine, cryptography, audio path, metadata
+cleaning, at-rest encryption, app lock, CLI and GUI are implemented and tested
+(243 tests, clippy clean, no `unsafe`), with randomised campaigns against every
+parser that reads untrusted input and against the website's Markdown renderer.
+Release binaries are built for nine targets and verified bit-for-bit
+reproducible on eight of them; the FreeBSD build is made once in a VM and is
+reported as `not-verified` rather than claimed.
 
 **Audited by tilas01**, who wrote and reviewed it. Be clear about what that is
 worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters — it is written to be read.
 
+The most recent round found and fixed **seven defects**, four of them reachable
+from a file somebody sends you: two that aborted the process, one that silently
+turned every processed recording into garbage, and three in the website's
+Markdown renderer. None was a confidentiality failure. They are written up
+individually — including the ones the previous audit had already declared clean —
+in [`docs/AUDIT.md`](docs/AUDIT.md).
+
+Using it: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), or
+[the wiki](https://tilas01.github.io/veilvoice/wiki.html).
 Roadmap and open work: [`HANDOFF.md`](HANDOFF.md).
-Documentation: [the wiki](https://tilas01.github.io/veilvoice/wiki.html).
 
 ## Licence
 
