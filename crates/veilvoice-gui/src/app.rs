@@ -416,7 +416,8 @@ impl VeilVoiceApp {
                         removed = report.removed;
                     }
                 }
-                let written = plan.write(&output, &wav)?;
+                let written =
+                    plan.write(&output, &wav, veilvoice_crypto::kdf::KdfParams::default())?;
                 Ok((written, audio.duration_secs(), removed))
             })();
 
@@ -820,13 +821,17 @@ mod tests {
 
     /// The slider's whole range must produce a configuration the engine
     /// accepts, or a user could drag it into an error.
+    ///
+    /// One app, mutated, rather than thirty-one built from scratch: every
+    /// `VeilVoiceApp::default()` enumerates the machine's audio devices through
+    /// `cpal`, and doing that thirty-one times in a loop is a slow way to test
+    /// arithmetic — and on a headless CI runner, an unnecessary way to lean on
+    /// the platform's audio stack.
     #[test]
     fn every_reachable_reseed_setting_is_valid() {
+        let mut app = VeilVoiceApp::default();
         for step in 0..=30 {
-            let app = VeilVoiceApp {
-                reseed_secs: step as f32,
-                ..Default::default()
-            };
+            app.reseed_secs = step as f32;
             app.config()
                 .checked()
                 .unwrap_or_else(|e| panic!("reseed_secs={step} rejected: {e}"));
