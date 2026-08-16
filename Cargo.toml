@@ -17,6 +17,7 @@ members = [
     "crates/veilvoice-gui",
     "crates/veilvoice-cli",
     "crates/veilvoice-watch",
+    "crates/veilvoice-guard",
 ]
 
 [workspace.package]

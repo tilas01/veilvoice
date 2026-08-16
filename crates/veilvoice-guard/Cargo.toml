@@ -1,0 +1,16 @@
+[package]
+name = "veilvoice-guard"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them."
+
+[dependencies]
+veilvoice-crypto = { path = "../veilvoice-crypto" }
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"
