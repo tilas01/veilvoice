@@ -7,7 +7,7 @@
 //
 // Everything else here is served from the same origin. This module talks to
 // api.github.com, which learns your IP address and that you looked at this
-// project. GitHub already knows both — it is serving the page you are reading —
+// project. GitHub already knows both -- it is serving the page you are reading --
 // so the marginal cost is nil for most visitors. But someone reading over Tor
 // or a mirror is in a different position, so the fetch is announced in the page
 // and can be skipped: the panel degrades to static text and a plain link, and
@@ -30,7 +30,7 @@
   }
 
   function number(value) {
-    return typeof value === "number" ? value.toLocaleString() : "—";
+    return typeof value === "number" ? value.toLocaleString() : "--";
   }
 
   function loadMeta() {
@@ -55,7 +55,7 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (!data) { return; }
-        text("latest-tag", data.tag_name || "—");
+        text("latest-tag", data.tag_name || "--");
         var list = document.getElementById("asset-list");
         if (!list || !data.assets) { return; }
         list.innerHTML = "";
@@ -113,14 +113,14 @@
 
   function start() {
     var status = document.getElementById("repo-status");
-    if (status) { status.textContent = "loading from api.github.com …"; }
+    if (status) { status.textContent = "loading from api.github.com ..."; }
 
     Promise.allSettled([loadMeta(), loadRelease(), loadReadme()]).then(function (results) {
       var failed = results.filter(function (r) { return r.status === "rejected"; });
       if (!status) { return; }
       if (failed.length === results.length) {
         status.textContent =
-          "could not reach api.github.com — the project page on GitHub has the same information.";
+          "could not reach api.github.com -- the project page on GitHub has the same information.";
       } else {
         status.textContent = "";
       }
@@ -132,7 +132,7 @@
     if (button) {
       button.addEventListener("click", function () {
         button.disabled = true;
-        button.textContent = "loading …";
+        button.textContent = "loading ...";
         start();
       });
     }

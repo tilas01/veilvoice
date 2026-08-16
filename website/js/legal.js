@@ -9,7 +9,7 @@
 // pages of this site and is gone when the tab closes. It is not a cookie, so it
 // is never attached to a request; there is no server here to receive it and no
 // analytics to correlate it with. That is also why there is no "remember me
-// forever" option — a permanent record would be more data about you than this
+// forever" option -- a permanent record would be more data about you than this
 // site has any business keeping.
 //
 // # Why it is a real gate and not a banner
@@ -19,8 +19,8 @@
 // opposite could send a recording believing its contents are protected. A
 // dismissible strip at the bottom of the page does not carry that.
 //
-// The page underneath is inert while the dialog is open — focus is trapped, and
-// the content is hidden from assistive technology — so the gate cannot be
+// The page underneath is inert while the dialog is open -- focus is trapped, and
+// the content is hidden from assistive technology -- so the gate cannot be
 // stepped around by tabbing past it.
 
 (function () {
@@ -49,28 +49,28 @@
 
       // Deliberately not the AI notice: the first thing a reader sees is the
       // one misunderstanding that could actually harm them.
-      '  <p>VeilVoice destroys the <b>biometric voiceprint</b> in a recording —',
-      '  pitch, formants, timbre, and the melody of an accent — so the speaker',
+      '  <p>VeilVoice destroys the <b>biometric voiceprint</b> in a recording --',
+      '  pitch, formants, timbre, and the melody of an accent -- so the speaker',
       '  cannot be identified or reconstructed. It is free software under the',
       '  <b>GNU General Public License v3 or later</b>, and it is provided with',
       '  <b>absolutely no warranty</b>.</p>',
 
       '  <p class="legal-warn"><b>It does not hide what you said.</b>',
-      '  Intelligibility is preserved on purpose — the words remain in the output',
+      '  Intelligibility is preserved on purpose -- the words remain in the output',
       '  and can be transcribed. If the message itself is sensitive, encrypt it.</p>',
 
       '  <p>This project was developed with <b>AI assistance (Claude, by',
       '  Anthropic)</b> and has been reviewed and audited by <b>tilas01</b>. That',
       '  is a maintainer audit: no external firm or independent researcher has',
       '  reviewed this code. It is disclosed so you can judge for yourself how',
-      '  much to verify before relying on it — the whole project is published',
+      '  much to verify before relying on it -- the whole project is published',
       '  under the GPL precisely so that you can read it.</p>',
 
       '  <details>',
       '    <summary>The rest of the terms, in short</summary>',
       '    <ul>',
       '      <li><b>You may</b> run it for any purpose, study it, change it,',
-      '      and redistribute it — including commercially. There is no',
+      '      and redistribute it -- including commercially. There is no',
       '      NonCommercial clause.</li>',
       '      <li><b>You must</b> pass on the source, keep the licence notices,',
       '      state your changes, and license derivatives under the GPL too.</li>',

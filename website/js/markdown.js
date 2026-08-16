@@ -24,11 +24,37 @@ window.MD = (function () {
   // `parker` below for why, and why the source is stripped of them first.
   var PARK_BASE = 0xe000;
   var PARK_LIMIT = 0xf8ff;
-  var PARK_RE = /[-]/g;
+  var PARK_RE = new RegExp("[\uE000-\uF8FF]", "g");
+
+  /**
+   * Characters that are stripped outright rather than escaped, because they
+   * have no legitimate place in rendered prose and are invisible when they go
+   * wrong:
+   *
+   * - **C0 and C1 control characters**, apart from tab, newline and carriage
+   *   return. A NUL reaching the output is not exploitable -- the HTML parser
+   *   turns it into U+FFFD -- but it is a stray invisible character in a
+   *   document, which is its own kind of wrong.
+   * - **Bidirectional overrides and isolates** (U+202A-U+202E, U+2066-U+2069).
+   *   These reorder how text is *displayed* without changing what it says, so
+   *   a README could be made to read differently on the page than in the
+   *   repository. That is the Trojan Source class of trick, and a site whose
+   *   whole argument is "the rendered README is the real README" has a
+   *   specific reason to care.
+   *
+   * Ordinary right-to-left text is untouched: it does not need these controls
+   * to display correctly, only to be *overridden*.
+   */
+  var STRIP_RE = new RegExp(
+    "[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F" +
+      "\u202A-\u202E\u2066-\u2069]",
+    "g"
+  );
 
   function escapeHtml(text) {
     return String(text)
       .replace(PARK_RE, "")
+      .replace(STRIP_RE, "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -39,7 +65,7 @@ window.MD = (function () {
    * Set finished markup aside so later passes cannot chew on it.
    *
    * The placeholder has to satisfy three things at once, and the obvious
-   * choice — `" " + index + " "` — satisfies none of them:
+   * choice -- `" " + index + " "` -- satisfies none of them:
    *
    *   1. **Later passes must not match it.** The number highlighter
    *      (`\b\d+\b`) matched the index inside a space-delimited placeholder and
@@ -52,7 +78,7 @@ window.MD = (function () {
    *      private-use range before anything else runs, so a placeholder in the
    *      working string can only be one this code put there.
    *   3. **Adjacent placeholders must both survive.** The old form ate its own
-   *      delimiters — the space closing one placeholder was the space opening
+   *      delimiters -- the space closing one placeholder was the space opening
    *      the next, so alternate items silently failed to come back. A single
    *      character has no delimiters to share.
    */
@@ -64,11 +90,32 @@ window.MD = (function () {
         parked.push(markup);
         return String.fromCharCode(PARK_BASE + parked.length - 1);
       },
+      /**
+       * Put every parked fragment back, including the ones nested inside
+       * others.
+       *
+       * Parked markup can itself contain a placeholder: `[`code`](url)` parks
+       * the inline code first, and then parks an anchor whose label *is* that
+       * placeholder. `String.replace` does not rescan its own replacement
+       * text, so a single pass emitted `<a href="url">` wrapped around a bare
+       * private-use character -- which browsers draw as nothing. Every link in
+       * the README whose label was inline code rendered as an empty link, so
+       * "see [`docs/AUDIT.md`](docs/AUDIT.md)." came out as "see .".
+       *
+       * Looping until the string stops changing fixes it. The bound is a
+       * guard, not a limit: nesting here is two deep at most, and comparing
+       * the result is a more honest termination condition than trusting that.
+       */
       unpark: function (html) {
-        return html.replace(PARK_RE, function (ch) {
-          var index = ch.charCodeAt(0) - PARK_BASE;
-          return index < parked.length ? parked[index] : "";
-        });
+        for (var depth = 0; depth < 8; depth++) {
+          var next = html.replace(PARK_RE, function (ch) {
+            var index = ch.charCodeAt(0) - PARK_BASE;
+            return index < parked.length ? parked[index] : "";
+          });
+          if (next === html) { return next; }
+          html = next;
+        }
+        return html;
       }
     };
   }
@@ -124,7 +171,7 @@ window.MD = (function () {
    *
    * The rule is: if the target names a scheme, it must be http or https;
    * if it names no scheme, it is a relative path and is fine. That is an
-   * allowlist over schemes — `javascript:`, `data:`, `vbscript:` and anything
+   * allowlist over schemes -- `javascript:`, `data:`, `vbscript:` and anything
    * invented after this was written are all refused by default, because they
    * are not on the list rather than because someone remembered to name them.
    *
@@ -133,13 +180,13 @@ window.MD = (function () {
    * - `//host/path`, which is protocol-relative and goes off-site. Treating it
    *   as internal is exactly how a link ends up without
    *   `rel="noopener noreferrer"` and leaks a referrer.
-   * - a leading backslash, which several browsers normalise to `/` — so
+   * - a leading backslash, which several browsers normalise to `/` -- so
    *   `\\host` becomes protocol-relative by the back door.
    *
    * The previous version tested `^(?:https?:|[./#])`, which refused any path
    * not starting with `.`, `/` or `#`. That is most ordinary Markdown links:
    * `[whitepaper](docs/WHITEPAPER.md)` silently rendered as plain text. Safe,
-   * but wrong, and quietly wrong — the worst combination for a page whose
+   * but wrong, and quietly wrong -- the worst combination for a page whose
    * whole argument is "go and read the source".
    */
   function safeUrl(url) {
@@ -216,7 +263,7 @@ window.MD = (function () {
         continue;
       }
 
-      // headings — h1 is skipped because the page supplies its own title
+      // headings -- h1 is skipped because the page supplies its own title
       var heading = line.match(/^(#{1,6})\s+(.*)$/);
       if (heading) {
         var level = heading[1].length;
