@@ -2,7 +2,8 @@
 
 # VeilVoice — internal audit
 
-**Auditor:** tilas01 (maintainer). **Date:** 2026-08-16. **Version:** 0.1.4.
+**Auditor:** tilas01 (maintainer). **Date:** 2026-08-16. **Version:** 0.1.5,
+plus the at-rest-by-default and app-lock work that landed after it.
 
 This is a *maintainer* audit. It catches what the author can see, which is not
 the same as what an adversary can. **No external firm or independent researcher
@@ -23,7 +24,7 @@ whoever picks it up knows exactly where the line is.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **0 vulnerabilities.** Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 186 tests across 7 crates, plus doctests. |
+| Test suite | 223 tests across 7 crates, plus doctests. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
 | Secrets in the repository | None. `gpg_secrets/` is gitignored; `*.asc` ignored by default with only the public key allowed back explicitly. |
@@ -81,7 +82,45 @@ is readable by the owner and root. This is a kernel permission boundary, and
 | Header integrity | Authenticated as AEAD associated data | Prevents KDF-cost downgrade. Verified by test. |
 | Modulation stream | ChaCha20, OS-seeded, ratcheted every 2 s | Forward-secure: ChaCha20 is not invertible, so a compromised current state cannot recover earlier segments. |
 
-### 3.2 Post-quantum posture
+### 3.2 The app lock
+
+Reviewed as it was written, and the review is short because the design refuses
+to be clever:
+
+| Property | Assessment |
+|---|---|
+| Verifier, not a key | Correct choice. It encrypts nothing because there is nothing local it could usefully encrypt, and a key that protected nothing would only invite the belief that it did. |
+| Domain separation | `Argon2id("veilvoice/app-lock/v1\0" ‖ password, salt)`. Asserted by test to differ from a container key over the same passphrase and salt. |
+| Comparison | Constant time, through `Secret`'s `subtle::ConstantTimeEq`. |
+| Rate limit | Three free attempts, then doubling from 5 s to a 15-minute cap. Persisted after every attempt, so a process restart does not reset it. The shift is guarded against overflow and asserted at `u32::MAX`. |
+| Clock handling | A clock that moves backwards yields no credit against the wait rather than a negative elapsed time. |
+| Lock file | Unauthenticated **on purpose**. Any key that could authenticate it would have to sit beside it in the same file; a MAC would look like tamper-proofing without being any. Parse errors are errors, never "no lock". |
+| Failure modes | A wrong password on `remove` reopens the store so the recorded failure is not lost with it. |
+
+**The honest limit, recorded here as clearly as in the UI:** this defends
+against casual access, not against an attacker with the disk. The file can be
+deleted, the counter edited, the clock moved, and the hash attacked offline.
+`lock::SCOPE` states all four, is shown on the unlock screen itself, and a test
+fails the build if it is ever softened into a boast.
+
+### 3.3 Encryption at rest, by default
+
+The `anonymise` path now encodes the WAV in memory and seals it there, so a
+recording that is going to be encrypted never lands on disk in the clear. That
+closes a real hole rather than a theoretical one: on flash storage, a plaintext
+file that is written and then deleted is not recoverable *by the user* and may
+well still be recoverable by someone else.
+
+Both front-ends refuse to start a job with encryption on and no passphrase or
+recipient key set, rather than quietly falling back to plaintext. The GUI's
+`Plan::Missing` exists solely to make that fallback impossible to write by
+accident, and is tested.
+
+Opting out is preserved and gated behind a warning that has to be answered.
+Tests assert both that the default is on and that the warning still contains the
+uncomfortable sentences.
+
+### 3.4 Post-quantum posture
 
 **Sound.** ML-KEM-768 (FIPS 203) is NIST-standardised and targets category 3.
 The hybrid is the right call: ML-KEM is young, lattice schemes have had
@@ -95,7 +134,7 @@ forgery until the release is superseded, and no PQ signature scheme has the
 verifier tooling to make it practical today. It is recorded here so nobody
 mistakes "post-quantum encryption" for "post-quantum everything".
 
-### 3.3 Key handling
+### 3.5 Key handling
 
 Page-locked out of swap, zeroized on drop, constant-time comparison, `Debug`
 redacted. Each `Secret` owns whole pages exclusively — a bug found and fixed
@@ -104,6 +143,15 @@ other's memory.
 
 `Secret::is_locked()` reports whether locking actually succeeded rather than
 assuming. Locking does not survive hibernation, which is stated in the docs.
+
+**A-5 — Typed passphrases are not page-locked while being typed.** An egui text
+field owns a `String`, and `rpassword` returns one; both are ordinary heap
+allocations that could reach swap in the moments before the passphrase is
+consumed. They are zeroized on use and when the app locks, and everything
+downstream is a `Secret`. Accepted rather than fixed: closing it needs a custom
+text widget, which would be far more code and far less reviewed than the gap it
+closes. Stated in the whitepaper and in the `security` module rather than left
+for someone to discover.
 
 ---
 
@@ -115,12 +163,19 @@ Not yet done. Whoever continues should treat this list as the definition of
 1. **Line-by-line review of `spectral.rs` and `accent.rs`** against the
    irreversibility claim. The argument is sound and tested, but the code has not
    been read adversarially end to end.
-2. **Fuzzing the container parser** (`container::Header::parse`) and the WAV
-   chunk walker (`wav::clean_wav_bytes`). Both parse untrusted input. `cargo
-   fuzz` targets should be added; the WAV walker already survives a
-   lying-chunk-size test but that is one case, not a campaign.
+2. **Fuzzing the parsers** — `container::Header::parse`, the WAV chunk walker
+   (`wav::clean_wav_bytes`), and now `lock::AppLock::parse`. All three read
+   untrusted input; the lock file is the weakest case of the three, since it is
+   read before the user has authenticated anything. `cargo fuzz` targets should
+   be added. The WAV walker already survives a lying-chunk-size test and the
+   lock parser has a malformed-input test, but those are cases, not campaigns.
 3. **Timing analysis** of the password path. Argon2id is inherently constant-ish
-   but the surrounding container code has not been measured.
+   but the surrounding container code has not been measured. The app-lock
+   verify path should be measured too: the comparison is constant time, but the
+   *cooldown* branch returns before touching the KDF, so a wrong password and a
+   rate-limited attempt are trivially distinguishable by timing. That is
+   deliberate — refusing to spend the CPU is the point of a rate limit — and is
+   recorded here so it is a decision rather than an oversight.
 4. **Review of the website's JavaScript** for DOM-injection paths. The markdown
    renderer escapes first and only emits its own tags, but it has not been
    fuzzed with hostile markdown.
@@ -135,6 +190,11 @@ No vulnerabilities found. One genuine defect fixed (F-1). The cryptography uses
 standard, well-reviewed primitives correctly, and the composition — particularly
 the hybrid combiner and the authenticated container header — is done properly
 rather than approximately.
+
+The app lock adds a control whose value is real but bounded, and the bound is
+stated everywhere it appears rather than only here. A lock a user over-trusts
+makes them less safe, not more; that is the failure mode this design was written
+to avoid, and it is the one to keep watching for in any future change to it.
 
 The project's main security asset is not any single control but the fact that
 **every claim it makes is checkable**: no `unsafe`, no network, reproducible
