@@ -5,21 +5,22 @@
 **Read this first.** It is written to be lossless: a new session should be able
 to continue from here without the previous conversation.
 
-**State as of 2026-08-16:** v0.1.5 released, nine platforms, signed and
+**State as of 2026-08-16:** **v0.1.6 released** — nine platforms, GPG-signed,
 reproducible on eight (FreeBSD built once and honestly marked `not-verified`).
-Live site. **243 tests**, clippy clean, no `unsafe`.
+Live site. **247 tests** plus five website suites, clippy clean, no `unsafe`.
 
-Unreleased in the tree on top of v0.1.5:
+What v0.1.6 contains is in `CHANGELOG.md`, which the release notes are generated
+from. In short:
 
 1. **At-rest encryption by default** and the **app lock** (§7 item 1, done).
-2. **The audit is finished** (§7 item 3, done) except the one item that cannot be
-   done from inside — an independent review. It found **seven defects**, all
-   fixed; see `docs/AUDIT.md` §2. Read that before touching a parser.
-3. **A walkthrough section on the site** below the download, plus
-   `docs/USER_GUIDE.md`, a desktop-app section in the wiki, and
-   `tools/site-tests/`.
-
-The next tag should be `v0.1.6`.
+2. **The audit scope is finished** (§7 item 3, done) except the one item that
+   cannot be done from inside — an independent review. It found **seven
+   defects**, all fixed; see `docs/AUDIT.md` §2. Read that before touching a
+   parser.
+3. **A walkthrough on the site** below the download, `docs/USER_GUIDE.md`, a
+   desktop-app section in the wiki, and `tools/site-tests/`.
+4. Rendering the site found three more defects that every unit test had missed,
+   including content that was invisible on the published page. See §8.
 
 ---
 
@@ -206,9 +207,40 @@ unreleased in the tree. What landed, and what deliberately did not:
 
 Remaining, in order:
 
-1. **Release v0.1.6.** Bump the root `Cargo.toml`, and mention in the notes that
-   `anonymise` now writes `.veil` — this is the one user-visible break.
-2. **Audacity + VB-CABLE opt-in installer.** Tick-box, never silent. Both are
+1. **Tamper detection with a privileged helper.** *(newest request, NOT started)*
+   The ask: a Linux service or a Windows admin startup process that enforces
+   protection of VeilVoice's own files, alerts on tampering, and names the
+   application that did it.
+
+   Do not start this without reading the following, because the obvious version
+   of it is worse than nothing:
+
+   - **A helper running as the user protects nothing from that user**, and
+     anything running as them can kill it. To mean anything it must run as
+     root/SYSTEM, which brings an installer, a privileged service, and a much
+     larger attack surface into a project that currently needs no privileges at
+     all.
+   - Even as root it can **detect and alert, not prevent** — another root
+     process can do as it likes. "Tamper-proof" is the same overclaim the app
+     lock already refuses to make, and the same honesty rule applies (§4.11).
+   - **Attribution is genuinely achievable**, and is the valuable half:
+     - Linux: `fanotify` with `FAN_OPEN_PERM` can block *and* attribute; an
+       `auditd` watch (`-w <path> -p wa -k veilvoice`) records the writing PID
+       and comm without needing a daemon of our own.
+     - Windows: a SACL on the watched files plus Security event 4663, which
+       carries the process name. Sysmon does it better but is third-party.
+   - A **signed integrity manifest** of the binary, the lock file and the
+     config — verified at start-up — is platform-independent, needs no
+     privileges, is testable, and delivers most of the detection value. That is
+     where to begin, and it can ship on its own.
+2. **Keep typed passphrases out of process memory for longer.** Audit A-5: the
+   GUI holds the session passphrase in an ordinary `String` because that is what
+   the text widget requires, and `rpassword` returns one too. Converting the
+   confirmed passphrase to a `Secret` and wiping the `String` immediately would
+   shrink the window to the moments between keystrokes. It cannot be closed
+   entirely — anyone who can read this process's memory has already won, which
+   `WHITEPAPER.md` §7 states — so do not let the change imply otherwise.
+3. **Audacity + VB-CABLE opt-in installer.** Tick-box, never silent. Both are
    third-party; VB-CABLE is proprietary donationware.
 3. **The audit's own remaining list** — `docs/AUDIT.md` §5. Short version: an
    independent review (the one that matters), a coverage-guided `cargo fuzz`
@@ -271,6 +303,33 @@ Remaining, in order:
 - **The lock file is read before anyone has authenticated.** Treat it as hostile
   input: a file that will not parse is an error and keeps the app locked, never
   a missing lock. `LockStore::open` returns `Ok(None)` only for `NotFound`.
+- **Render the site before believing it.** Three paragraphs were invisible on
+  the published page — one of them the box saying the app lock is not
+  tamper-proof — and every unit test passed throughout, because the stub
+  modelled the observer firing and the bug was the observer *not* firing.
+  `python -m http.server 8787 --directory website`, then look at it.
+- **An IntersectionObserver does not fire when the viewport jumps.** An anchor
+  link, a restored scroll position or find-in-page can carry an element from
+  below the fold to above it between two frames; the ratio never leaves zero, so
+  no callback runs. `reveal.js` therefore has a sweep alongside the observer.
+  Any reveal effect needs one.
+- **A test double must model the platform, not the happy path.** The reveal stub
+  only knew how to fire the observer, so it could not express the bug. It now
+  models a viewport with a position.
+- **Placeholders must be un-parked recursively.** `String.replace` does not
+  rescan its own replacement, so a link whose label is inline code emitted an
+  anchor around a bare placeholder — an invisible character, so the link looked
+  empty. Loop until the string stops changing.
+- **Files served raw must be ASCII.** `website/js/*.js` and the licence texts are
+  opened directly by readers, and a viewer that guesses CP1252 turns an em dash
+  into mojibake in the middle of the sentence promising the code is honest.
+  Enforced by `tools/site-tests/characters.test.js`; use `\uXXXX` where a
+  character must survive.
+- **A test that depends on what software a machine has run is not a test of this
+  crate.** The Windows consent-store test failed CI twice for that reason —
+  first requiring the store to be non-empty, then requiring a `NonPackaged`
+  subkey. Assert the shape of the reply; assert the parser against a key every
+  installation has.
 - **Argon2 cost parameters come from the file, and `argon2` 0.5.3 validates them
   in the wrong order.** It computes `m_cost < p_cost * 8` before checking
   `p_cost`'s ceiling, so a large `p_cost` overflows. And `m_cost` is allocated
