@@ -6,8 +6,11 @@
 //! engine backs both this and the graphical app.
 #![forbid(unsafe_code)]
 
+mod atrest;
+mod lock;
 mod theme;
 
+use atrest::read_new_password;
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -55,6 +58,17 @@ enum Command {
         /// Also strip metadata from the written file.
         #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
         clean_metadata: bool,
+        /// Encrypt the result at rest. On by default: the words survive
+        /// de-identification on purpose, so an unencrypted result is still a
+        /// recording of everything that was said.
+        #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
+        encrypt: bool,
+        /// Seal to a recipient's public key file instead of a passphrase.
+        #[arg(long, value_name = "PUBKEY")]
+        encrypt_to: Option<PathBuf>,
+        /// Skip the confirmation when writing an unencrypted recording.
+        #[arg(long)]
+        yes: bool,
     },
     /// Scramble a microphone live, into a device or a virtual cable.
     #[cfg(feature = "live")]
@@ -118,6 +132,15 @@ enum Command {
         #[arg(long, default_value = "veilvoice.key")]
         secret: PathBuf,
     },
+    /// Manage the application lock that guards the desktop app.
+    Lock {
+        #[command(subcommand)]
+        action: lock::Action,
+        /// Lock file to operate on. Defaults to this platform's config
+        /// directory. Global, so it reads naturally either side of the action.
+        #[arg(long, global = true)]
+        path: Option<PathBuf>,
+    },
     /// Show which applications are using the microphone and camera.
     Watch {
         /// Print a snapshot and exit instead of watching continuously.
@@ -179,6 +202,9 @@ fn run(command: Command) -> Result<(), String> {
             keep_accent,
             reseed_secs,
             clean_metadata,
+            encrypt,
+            encrypt_to,
+            yes,
         } => anonymise(
             input,
             output,
@@ -188,6 +214,11 @@ fn run(command: Command) -> Result<(), String> {
                 reseed_secs,
             },
             clean_metadata,
+            AtRest {
+                encrypt,
+                to: encrypt_to,
+                yes,
+            },
         ),
         #[cfg(feature = "live")]
         Command::Live {
@@ -211,6 +242,7 @@ fn run(command: Command) -> Result<(), String> {
         Command::Encrypt { input, output, to } => encrypt(input, output, to),
         Command::Decrypt { input, output, key } => decrypt(input, output, key),
         Command::Keygen { public, secret } => keygen(public, secret),
+        Command::Lock { action, path } => lock::run(action, path),
         Command::Shred { file, passes, yes } => shred(file, passes, yes),
         Command::Watch { once, interval } => watch(once, interval),
         Command::Info => {
@@ -249,12 +281,27 @@ fn describe_reseed(secs: f32) -> String {
     }
 }
 
+/// What to do with the result once it exists.
+struct AtRest {
+    /// Seal the recording rather than writing it in the clear. Default on.
+    encrypt: bool,
+    /// Seal to this public key instead of a passphrase.
+    to: Option<PathBuf>,
+    /// Do not stop to confirm an unencrypted write.
+    yes: bool,
+}
+
 fn anonymise(
     input: PathBuf,
     output: Option<PathBuf>,
     tuning: Tuning,
     clean_metadata: bool,
+    at_rest: AtRest,
 ) -> Result<(), String> {
+    if at_rest.to.is_some() && !at_rest.encrypt {
+        return Err("--encrypt-to and --encrypt false ask for opposite things".into());
+    }
+
     let out_path = output.unwrap_or_else(|| {
         let mut p = input.clone();
         p.set_extension("veiled.wav");
@@ -277,21 +324,39 @@ fn anonymise(
     let veiled = veilvoice_audio::deidentify(&audio, config(tuning)).map_err(|e| e.to_string())?;
     let elapsed = started.elapsed().as_secs_f32();
 
-    audio_io::save_wav(&out_path, &veiled).map_err(|e| e.to_string())?;
-
+    // Encoded in memory, so an encrypted result never exists on disk in the
+    // clear even for a moment.
+    let mut wav = audio_io::wav_bytes(&veiled).map_err(|e| e.to_string())?;
+    let mut removed = Vec::new();
     if clean_metadata {
-        match veilvoice_meta::clean_audio_file(&out_path, Policy::Strip) {
-            Ok(report) if report.changed => {
-                println!("{}", field("Metadata removed", &report.removed.join(", ")));
+        match veilvoice_meta::clean_wav_bytes(&wav, Policy::Strip) {
+            Ok((cleaned, report)) => {
+                wav = cleaned;
+                removed = report.removed;
             }
-            Ok(_) => {}
             Err(e) => println!("{}", warn(&format!("could not clean metadata: {e}"))),
         }
     }
+    if !removed.is_empty() {
+        println!("{}", field("Metadata removed", &removed.join(", ")));
+    }
+
+    let written = if at_rest.encrypt {
+        println!();
+        let recipient = match at_rest.to.as_deref() {
+            Some(key) => atrest::Recipient::PublicKey(key),
+            None => atrest::Recipient::Password,
+        };
+        atrest::seal_to_disk(&out_path, &wav, recipient)?
+    } else {
+        atrest::confirm_plaintext(at_rest.yes)?;
+        std::fs::write(&out_path, &wav).map_err(|e| format!("{}: {e}", out_path.display()))?;
+        out_path.clone()
+    };
 
     println!();
     println!("{}", heading("Result"));
-    println!("{}", field("Written", &out_path.display().to_string()));
+    println!("{}", field("Written", &written.display().to_string()));
     println!(
         "{}",
         field(
@@ -314,25 +379,46 @@ fn anonymise(
         "{}",
         field("Seed rolls", &describe_reseed(tuning.reseed_secs))
     );
+    println!(
+        "{}",
+        field(
+            "At rest",
+            &match (at_rest.encrypt, at_rest.to.is_some()) {
+                (true, true) => "sealed to a public key (X25519 + ML-KEM-768)".to_string(),
+                (true, false) => "sealed with a passphrase (Argon2id)".to_string(),
+                (false, _) => "UNENCRYPTED".to_string(),
+            }
+        )
+    );
     println!();
     println!(
         "{}",
         ok("done — the voiceprint in this file is not recoverable")
     );
-    println!(
-        "{}",
-        paint(
-            colour::MUTED,
-            "  The words are still there; that is deliberate. To hide the"
-        )
-    );
-    println!(
-        "{}",
-        paint(
-            colour::MUTED,
-            "  message as well, encrypt it: veilvoice encrypt"
-        )
-    );
+    if at_rest.encrypt {
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  Open it again with: veilvoice decrypt <file> -o out.wav"
+            )
+        );
+    } else {
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  The words are still there; that is deliberate. To hide the"
+            )
+        );
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  message as well, encrypt it: veilvoice encrypt"
+            )
+        );
+    }
     Ok(())
 }
 
@@ -487,34 +573,8 @@ fn clean(file: PathBuf, policy: Policy) -> Result<(), String> {
     Ok(())
 }
 
-/// Read a password twice, without echoing it, and check the two agree.
-fn read_new_password() -> Result<Vec<u8>, String> {
-    let first = rpassword::prompt_password("Passphrase: ").map_err(|e| e.to_string())?;
-    if first.is_empty() {
-        return Err("passphrase must not be empty".into());
-    }
-    let again = rpassword::prompt_password("Repeat: ").map_err(|e| e.to_string())?;
-    if first != again {
-        return Err("passphrases do not match".into());
-    }
-    Ok(first.into_bytes())
-}
-
 fn encrypt(input: PathBuf, output: Option<PathBuf>, to: Option<PathBuf>) -> Result<(), String> {
-    let out_path = output.unwrap_or_else(|| {
-        let mut p = input.clone();
-        let ext = p
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("")
-            .to_string();
-        p.set_extension(if ext.is_empty() {
-            "veil".into()
-        } else {
-            format!("{ext}.veil")
-        });
-        p
-    });
+    let out_path = output.unwrap_or_else(|| container::veil_path(&input));
     let plaintext = std::fs::read(&input).map_err(|e| e.to_string())?;
 
     let sealed = match to {
@@ -881,6 +941,50 @@ mod tests {
         assert_eq!(config(tuning(1.0, false, 0.5)).reseed_secs, 0.5);
         assert_eq!(config(tuning(1.0, false, 0.0)).reseed_secs, 0.0);
         assert_eq!(config(tuning(1.0, false, -3.0)).reseed_secs, 0.0);
+    }
+
+    /// Encryption at rest is a *default*, not a flag the careful user has to
+    /// find. If someone ever flips this, this test is what stops it shipping.
+    #[test]
+    fn recordings_are_encrypted_at_rest_by_default() {
+        let cli = Cli::try_parse_from(["veilvoice", "anonymise", "in.wav"]).unwrap();
+        let Command::Anonymise {
+            encrypt,
+            encrypt_to,
+            yes,
+            ..
+        } = cli.command
+        else {
+            panic!("expected anonymise");
+        };
+        assert!(encrypt, "at-rest encryption must default on");
+        assert!(encrypt_to.is_none());
+        assert!(!yes, "the confirmation must not be pre-answered");
+
+        let off = Cli::try_parse_from(["veilvoice", "anonymise", "in.wav", "--encrypt", "false"])
+            .unwrap();
+        let Command::Anonymise { encrypt, .. } = off.command else {
+            panic!("expected anonymise");
+        };
+        assert!(!encrypt, "it must still be possible to opt out");
+    }
+
+    /// Refused before anything is read or written, so a contradictory command
+    /// line cannot half-happen.
+    #[test]
+    fn asking_for_a_recipient_and_for_plaintext_at_once_is_refused() {
+        let result = anonymise(
+            PathBuf::from("does-not-need-to-exist.wav"),
+            None,
+            tuning(1.0, false, 2.0),
+            true,
+            AtRest {
+                encrypt: false,
+                to: Some(PathBuf::from("someone.pub")),
+                yes: true,
+            },
+        );
+        assert!(result.is_err());
     }
 
     #[test]

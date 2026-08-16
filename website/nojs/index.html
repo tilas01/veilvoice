@@ -89,6 +89,7 @@ footer{margin-top:40px;border-top:1px solid var(--border);padding-top:18px;color
 <nav class="top">
   <a href="#what">what</a>
   <a href="#get">download</a>
+  <a href="#guide">guide</a>
   <a href="#verify">verify</a>
   <a href="#security">security</a>
   <a href="#limits">limits</a>
@@ -145,7 +146,8 @@ it, you keep Tokyo Night and nothing else changes.</p>
 <table>
 <tr><th>Anonymise a recording</th><td>wav, mp3, flac, ogg, m4a in — a clean WAV out, metadata stripped. Around 90× faster than real time.</td></tr>
 <tr><th>Scramble live</th><td>Route the veiled voice into a virtual audio cable; every application on the machine receives it instead of you.</td></tr>
-<tr><th>Encrypt at rest</th><td>X25519 + ML-KEM-768 hybrid, so a recording captured today is not readable by a quantum adversary tomorrow.</td></tr>
+<tr><th>Encrypt at rest, by default</th><td>Every recording is sealed as it is written — X25519 + ML-KEM-768 hybrid, so one captured today is not readable by a quantum adversary tomorrow. Turning it off makes you read why first.</td></tr>
+<tr><th>Lock the app</th><td>A separate, rate-limited password gates the desktop app. It stops someone who picks up your unlocked computer; it is not tamper-proof, and the unlock screen says so.</td></tr>
 <tr><th>Strip metadata</th><td>Audio tags, image EXIF and GPS.</td></tr>
 <tr><th>Rust library</th><td>Every crate is a normal dependency; the engine is allocation-free and callback-safe.</td></tr>
 </table>
@@ -157,6 +159,50 @@ builds for Windows, macOS (Apple Silicon and Intel) and Linux.</p>
 <pre><code>git clone https://github.com/tilas01/veilvoice
 cd veilvoice
 cargo build --release</code></pre>
+
+<h2 id="guide">SO YOU HAVE DOWNLOADED IT — NOW WHAT</h2>
+<p>Two programs are in the archive: <code>veilvoice-gui</code>, the desktop app,
+and <code>veilvoice</code>, the command line. They share one engine, so anything
+one can do the other can. Nothing installs a service, writes to a registry, or
+phones home — delete the folder and it is gone.</p>
+<ol>
+<li><strong>Give it a recording.</strong> wav, mp3, flac, ogg, m4a and friends.
+Around 90× faster than real time, so an hour of audio takes well under a minute.
+<pre><code>veilvoice anonymise interview.mp3 -o clean.wav</code></pre></li>
+<li><strong>The voiceprint is destroyed, the words are kept.</strong> Phase is
+discarded and resynthesised; pitch register, vocal-tract length and spectral
+tilt are each collapsed onto one canonical value, so a whole population of
+speakers lands on the same output and there is nothing left to invert.</li>
+<li><strong>It is encrypted before it reaches the disk.</strong> The result is
+sealed as it is written, so <code>-o clean.wav</code> produces
+<code>clean.wav.veil</code>. The WAV is built in memory and encrypted there —
+the plaintext never exists on disk, because a file that is written and then
+deleted cannot be reliably taken back on flash storage.
+<pre><code>veilvoice decrypt clean.wav.veil -o clean.wav</code></pre></li>
+<li><strong>Or scramble your microphone as you speak</strong>, routed into a
+virtual audio cable so every application on the machine receives that instead of
+you.</li>
+<li><strong>Check nothing else is listening.</strong> The monitor names what is
+holding your microphone and camera and warns the moment something starts.</li>
+<li><strong>Lock the app behind you.</strong> <code>veilvoice lock set</code>, or
+the lock tab in the desktop app.</li>
+</ol>
+
+<h3>The two passwords, and why there are two</h3>
+<table>
+<tr><th>The app lock</th><td>Decides whether VeilVoice opens at all. Argon2id verifier, rate limited: three attempts free, then a doubling wait.</td></tr>
+<tr><th>The recording passphrase</th><td>Encrypts the files it writes. Argon2id at 256 MiB, or seal to a post-quantum hybrid public key instead.</td></tr>
+</table>
+<p>They are deliberately different secrets. If one password did both, opening the
+app would be the same act as unsealing everything it had ever written — the
+opposite of what a lock is for. The two derivations are domain separated, so
+typing the same passphrase in both places still does not produce two copies of
+one value. Use two anyway: one guess that opens both defeats the point
+regardless of the maths.</p>
+<p><strong>The app lock is not tamper-proof, and cannot be.</strong> A program
+running on your computer has nowhere to hide a secret from that computer. It
+protects against casual access — the person who sits down at your unlocked
+session. If someone taking your disk is the threat, encrypt the whole volume.</p>
 
 <h2 id="verify">VERIFY WHAT YOU DOWNLOADED</h2>
 <p>Do this. A download can be corrupted in transit or replaced entirely.</p>
@@ -178,7 +224,7 @@ e-mail address attached. <a href="../assets/veilvoice-signing-key.asc">Public ke
 
 <h3>3. Rebuild it yourself — the strongest check</h3>
 <p>Releases are bit-for-bit reproducible. Build the tagged commit and compare:</p>
-<pre><code>git checkout v0.1.1
+<pre><code>git checkout v0.1.5
 export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
 cargo build --release --locked
 sha256sum target/release/veilvoice</code></pre>
@@ -201,6 +247,15 @@ binary is ever modified by signing, which is what lets it stay reproducible.</p>
 <tr><th>XChaCha20-Poly1305</th><td>192-bit random nonces remove the counter-management failure mode entirely.</td></tr>
 <tr><th>Authenticated header</th><td>The stored KDF cost cannot be downgraded to make cracking cheap.</td></tr>
 <tr><th>Amnesic memory</th><td>Keys are page-locked out of swap, zeroized on drop, compared in constant time.</td></tr>
+<tr><th>Sealed in memory</th><td>A recording that is going to be encrypted is never written to disk in the clear first — on flash storage, a plaintext file that is written and then deleted cannot be reliably taken back.</td></tr>
+</table>
+
+<h3>The app lock, and what it is worth</h3>
+<table>
+<tr><th>An Argon2id verifier</th><td>A password hash, stored and compared in constant time. It is not a key and encrypts nothing, because there is nothing local it could usefully encrypt.</td></tr>
+<tr><th>Rate limited</th><td>Three attempts free, then the wait doubles from 5 s to a 15-minute cap. The count is persisted after every attempt, so restarting the app does not reset it.</td></tr>
+<tr><th>A separate password</th><td>Different from the recording passphrase, and domain separated, so unlocking the app is not the same act as unsealing everything it has written.</td></tr>
+<tr><th>Not tamper-proof</th><td>Anyone who can write to your files can delete the lock; anyone holding the disk can edit the counter, move the clock, or attack the hash offline. This protects against casual access, not against the disk. Encrypt the volume if that is the threat.</td></tr>
 </table>
 
 <h3>Libre</h3>

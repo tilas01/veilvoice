@@ -5,8 +5,21 @@
 **Read this first.** It is written to be lossless: a new session should be able
 to continue from here without the previous conversation.
 
-**State as of 2026-08-16:** v0.1.4 released, nine platforms, signed and
-reproducible. Live site. 186 tests, clippy clean, no `unsafe`.
+**State as of 2026-08-16:** v0.1.5 released, nine platforms, signed and
+reproducible on eight (FreeBSD built once and honestly marked `not-verified`).
+Live site. **243 tests**, clippy clean, no `unsafe`.
+
+Unreleased in the tree on top of v0.1.5:
+
+1. **At-rest encryption by default** and the **app lock** (§7 item 1, done).
+2. **The audit is finished** (§7 item 3, done) except the one item that cannot be
+   done from inside — an independent review. It found **seven defects**, all
+   fixed; see `docs/AUDIT.md` §2. Read that before touching a parser.
+3. **A walkthrough section on the site** below the download, plus
+   `docs/USER_GUIDE.md`, a desktop-app section in the wiki, and
+   `tools/site-tests/`.
+
+The next tag should be `v0.1.6`.
 
 ---
 
@@ -14,6 +27,7 @@ reproducible. Live site. 186 tests, clippy clean, no `unsafe`.
 
 | # | File | Why |
 |---|---|---|
+| 0 | `docs/USER_GUIDE.md` | What it is like to *use*. Skim it — knowing the user-facing behaviour first makes the rest read faster. |
 | 1 | `README.md` | What the project is and claims. |
 | 2 | `docs/WHITEPAPER.md` | The de-identification argument, threat model, and the limits that must never be overclaimed. |
 | 3 | `docs/AUDIT.md` | Audit status, findings, and **exactly what audit work remains**. |
@@ -31,7 +45,8 @@ so redirect the target directory first:
 
 ```powershell
 $env:CARGO_TARGET_DIR = "$env:LOCALAPPDATA\veilvoice\target"
-cargo test --workspace                    # 186 tests
+cargo test --workspace                    # 243 tests
+node tools/site-tests/run.js              # website: structure, renderer, reveal
 cargo clippy --workspace --all-targets    # must be zero warnings
 cargo clippy -p veilvoice-cli --no-default-features   # the no-live build
 cargo audit                               # policy in .cargo/audit.toml
@@ -47,14 +62,19 @@ python assets/generate.py --check         # artwork must match its generator
 crates/
   veilvoice-core     DSP engine. spectral.rs + accent.rs are the heart.
   veilvoice-crypto   Argon2id, X25519+ML-KEM-768, XChaCha20-Poly1305,
-                     amnesia.rs (page-locked secrets), shred.rs (self-destruct)
+                     amnesia.rs (page-locked secrets), shred.rs (self-destruct),
+                     lock.rs (app-lock verifier + persisted rate limit)
   veilvoice-audio    cpal devices + live path, symphonia decode, hound WAV.
                      `live` is a DEFAULT-ON FEATURE — off where cpal has no backend.
   veilvoice-meta     lofty tags, wav.rs (chunk-level RIFF cleaner), img-parts EXIF
   veilvoice-watch    mic/camera monitor. linux.rs + windows.rs, zero dependencies
-  veilvoice-cli      the `veilvoice` binary
-  veilvoice-gui      egui desktop app, Tokyo Night
+  veilvoice-cli      the `veilvoice` binary. atrest.rs (seal-by-default policy
+                     + passphrase prompts), lock.rs (`veilvoice lock` subcommand)
+  veilvoice-gui      egui desktop app, Tokyo Night. security.rs (unlock screen,
+                     lock tab, at-rest controls, the write Plan)
 website/             the published site (GitHub Pages, deployed via Actions)
+tools/site-tests/    node, no dependencies. Hostile-markdown and structure
+                     tests for the site; `node tools/site-tests/run.js`
 assets/generate.py   generates every icon and the banner; --check verifies
 gpg_secrets/         GITIGNORED. signing key, passphrase, generator script
 .github/workflows/   ci.yml, release.yml, pages.yml
@@ -93,6 +113,18 @@ this for any new platform work — it is what makes the codebase contributable.
 9. **Audacity is recommended, not embedded.** It is GPL-2.0-or-later, which is
    *incompatible* with this project's GPL-3.0-or-later for copying code **in**.
    Recommend and integrate; never lift its source.
+10. **Recordings are encrypted at rest by default**, and `anonymise` therefore
+    writes `<out>.veil`, not a bare WAV. Opting out stays possible and is gated
+    behind a warning that must be answered. Do not quietly restore the old
+    default because it surprised someone — the surprise is the point, and the
+    wiki explains where the WAV went.
+11. **The app lock is a verifier, never a key, and is never called
+    tamper-proof.** It is Argon2id + a persisted rate limit, and every surface
+    that shows it also shows `lock::SCOPE`. Tests fail the build if that text is
+    softened. A lock a user over-trusts leaves them worse off than no lock.
+12. **The two passwords stay separate.** App lock and recording passphrase are
+    different secrets, domain-separated in the KDF. Never derive one from the
+    other, and never make unlocking the app unseal recordings.
 
 ---
 
@@ -119,6 +151,12 @@ tag. The workflow builds nine targets, double-builds each and compares, signs
   inaudible), harmonic-comb voiced resynthesis, decimated-YIN pitch tracker.
 - **Crypto** — Argon2id, X25519+ML-KEM-768 hybrid, XChaCha20-Poly1305, `.veil`
   container with authenticated header, page-locked zeroizing secrets, secure erase.
+- **At rest** — every recording sealed by default, encoded in memory so the
+  plaintext never touches the disk; both front-ends refuse to run with
+  encryption on and nothing to encrypt with rather than falling back.
+- **App lock** — Argon2id verifier, constant-time compare, domain separated,
+  three free attempts then a doubling wait to a 15-minute cap, persisted across
+  restarts. GUI unlock screen and lock tab, `veilvoice lock` subcommand.
 - **Audio** — device enumeration with virtual-cable detection, live path over a
   lock-free ring, symphonia decode, WAV write.
 - **Metadata** — tags, EXIF/GPS, chunk-level RIFF cleaner.
@@ -128,19 +166,34 @@ tag. The workflow builds nine targets, double-builds each and compares, signs
 
 ## 7. Next work, in order
 
-1. **Post-quantum recording encryption + app lock.** *(newest request)*
-   - Encrypt recordings at rest by default with the existing hybrid container;
-     **warn clearly before allowing it to be disabled**.
-   - App lock behind a *separate* password from the recording-encryption one.
-     "Tamper-proof" cannot mean literally unbreakable — implement it as an
-     Argon2id-derived verifier with a rate limit, and say plainly in the UI that
-     it protects against casual access, not against someone with the disk.
-   - Reuse `veilvoice-crypto`; do not invent anything.
+**Item 1 (post-quantum recording encryption + app lock) is done** and sits
+unreleased in the tree. What landed, and what deliberately did not:
+
+- `veilvoice-crypto/src/lock.rs` — the verifier, the persisted rate limit, the
+  84-byte lock file, `default_path()` resolved from environment variables (no
+  new dependency), and `SCOPE`, the single-sourced honesty note.
+- `container::veil_path`, `io::wav_bytes` — the two small primitives that let a
+  recording be sealed without ever being written in the clear.
+- CLI: `anonymise --encrypt` (default true) / `--encrypt-to` / `--yes`, and
+  `veilvoice lock set|status|change|remove [--path]`.
+- GUI: a `lock` tab, a full-window unlock screen, a header `lock` button, at-rest
+  controls in the file tab, and a modal that must be answered before encryption
+  can be switched off.
+- **Not done on purpose:** the lock file is not authenticated (any key would sit
+  beside it — see the note in `lock.rs`), and typed passphrases are not
+  page-locked while they are in a text field (audit A-5).
+
+Remaining, in order:
+
+1. **Release v0.1.6.** Bump the root `Cargo.toml`, and mention in the notes that
+   `anonymise` now writes `.veil` — this is the one user-visible break.
 2. **Audacity + VB-CABLE opt-in installer.** Tick-box, never silent. Both are
    third-party; VB-CABLE is proprietary donationware.
-3. **Finish the audit** — see `docs/AUDIT.md` §4 for the exact remaining scope
-   (fuzzing the container and WAV parsers, adversarial read of the DSP,
-   timing analysis, hostile-markdown testing of the site).
+3. **The audit's own remaining list** — `docs/AUDIT.md` §5. Short version: an
+   independent review (the one that matters), a coverage-guided `cargo fuzz`
+   campaign, a scheme check on `repo.js`'s asset links, a lower KDF cost ceiling
+   for unattended callers, and **32-bit targets in CI** — F-4 existed only on
+   ARMv7 and nothing in the matrix would have caught it.
 4. **Move `gpg_secrets/` out of OneDrive.**
 5. **Text-to-speech mode** — type text, an AI voice speaks it. The strongest
    anonymity, since the original voice is never captured. Weights and training
@@ -179,3 +232,48 @@ tag. The workflow builds nine targets, double-builds each and compares, signs
   compressed bytes.
 - **Test that detection actually detects.** The registry bug looked exactly like
   good news. Verify against a real consumer.
+- **Struct-update syntax cannot be used on a type that implements `Drop`.**
+  `Security` wipes its passphrases on drop, so `Self { path, ..Default::default() }`
+  fails to compile with six separate "cannot move out of" errors. Assign the
+  fields instead; the comment in `Security::load` says why.
+- **A clap argument declared next to `#[command(subcommand)]` must precede the
+  subcommand on the command line** — `veilvoice lock --path X status`, not
+  `... status --path X` — unless it is marked `global = true`, which is what
+  `--path` now does.
+- **`rpassword` needs a real console.** Piping a passphrase in does not work; it
+  blocks on `CONIN$`. Anything that prompts cannot be smoke-tested from a
+  non-interactive shell, so test the layer beneath the prompt instead (which is
+  what `atrest.rs` and `cli/lock.rs` do).
+- **`hound::WavWriter::finalize` consumes the writer**, so an in-memory encode
+  has to borrow the cursor — `WavWriter::new(&mut cursor, spec)` — and read it
+  back through `cursor.into_inner()` after the writer is dropped.
+- **The lock file is read before anyone has authenticated.** Treat it as hostile
+  input: a file that will not parse is an error and keeps the app locked, never
+  a missing lock. `LockStore::open` returns `Ok(None)` only for `NotFound`.
+- **Argon2 cost parameters come from the file, and `argon2` 0.5.3 validates them
+  in the wrong order.** It computes `m_cost < p_cost * 8` before checking
+  `p_cost`'s ceiling, so a large `p_cost` overflows. And `m_cost` is allocated
+  before anything else, so `u32::MAX` asks for 4 TiB and aborts. Both are now
+  bounded in `KdfParams::checked()` — never bypass that funnel.
+- **Run the parser campaigns in DEBUG, not release.** The release profile sets
+  `overflow-checks = false`, so an arithmetic overflow — one of the two bugs —
+  is invisible there. CI runs them in debug on purpose.
+- **A green fuzzer is not a read.** F-4 was a 32-bit-only overflow that no
+  campaign on an x86-64 machine could ever reach; it was found by reading. Do
+  both.
+- **The engine keeps persistent state, so one bad sample is forever.** The
+  accent neutraliser's long-term spectrum is an EMA: a single NaN in, and every
+  output sample afterwards was NaN, silently. Input is now sanitised in
+  `StftEngine::process`. A 32-bit-float WAV can legally contain NaN.
+- **`x.clamp(-16.0, 16.0)` in the STFT broke a test that feeds a 0..2048 ramp.**
+  The gate is for impossible values, not a limiter — keep the bound enormous
+  (±1e6) so it never touches anything a real signal or a test probe produces.
+- **Timing tests must use the minimum, not the median.** Noise is one-sided.
+  A first pass using medians on Windows reported a 1.49× "leak" that was pure
+  scheduler jitter; the minimum gave 0.996 and was stable across runs.
+- **A hostile-input checker has to parse like a browser.** Scanning the raw
+  string for `onerror=` calls `&lt;script&gt;` an attack — that is the renderer
+  *working*. Five of the first six "findings" were the checker, not the code.
+- **`website/js/markdown.js` contains literal NUL bytes** (it did, as parking
+  sentinels). String-matching editors cannot target them; patch such files with
+  a script. They are gone now, replaced by private-use characters.
