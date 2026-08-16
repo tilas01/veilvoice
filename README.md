@@ -37,12 +37,14 @@ appears in it.
    off, and turning it off makes you read why first.
 4. **Lock the app** behind a separate password, so someone who picks up your
    unlocked computer cannot open it. See the honest limits below.
-5. **Strip identifying metadata** from audio and images (EXIF, GPS, tags).
-6. **Watch what is listening** — see every application currently holding your
+5. **Detect tampering** with VeilVoice's own files, and say plainly when it
+   cannot tell you which program did it.
+6. **Strip identifying metadata** from audio and images (EXIF, GPS, tags).
+7. **Watch what is listening** — see every application currently holding your
    microphone or camera, with alerts the moment one starts.
-7. **Securely erase** a recording, with an honest account of what that is worth
+8. **Securely erase** a recording, with an honest account of what that is worth
    on flash storage.
-8. **Work as a Rust library** in your own project — see below.
+9. **Work as a Rust library** in your own project — see below.
 
 > ### Honest scope
 >
@@ -115,6 +117,8 @@ veilvoice decrypt clean.wav.veil -o clean.wav
 veilvoice keygen
 veilvoice lock set                     # password-gate the desktop app
 veilvoice lock status
+veilvoice guard init --sealed          # record what the files should be
+veilvoice guard check                  # and see whether they still are
 veilvoice watch                        # who is using the mic and camera
 veilvoice shred secret.wav             # irreversible
 ```
@@ -171,6 +175,7 @@ veilvoice-audio = { git = "https://github.com/tilas01/veilvoice" }
 | `veilvoice-crypto` | Argon2id, X25519+ML-KEM-768 hybrid, XChaCha20-Poly1305, page-locked secrets, the app-lock verifier. |
 | `veilvoice-meta` | Metadata stripping for audio and images. |
 | `veilvoice-watch` | Microphone and camera use, by application. Zero dependencies. |
+| `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files. |
 
 The engine itself is small enough to drop into an audio callback:
 

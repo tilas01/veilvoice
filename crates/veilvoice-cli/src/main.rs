@@ -7,6 +7,7 @@
 #![forbid(unsafe_code)]
 
 mod atrest;
+mod guard;
 mod lock;
 mod theme;
 
@@ -132,6 +133,15 @@ enum Command {
         #[arg(long, default_value = "veilvoice.key")]
         secret: PathBuf,
     },
+    /// Record and check the integrity of VeilVoice's own files.
+    Guard {
+        #[command(subcommand)]
+        action: guard::Action,
+        /// Where the record is kept. Defaults to this platform's config
+        /// directory, beside the app lock.
+        #[arg(long, global = true)]
+        path: Option<PathBuf>,
+    },
     /// Manage the application lock that guards the desktop app.
     Lock {
         #[command(subcommand)]
@@ -242,6 +252,7 @@ fn run(command: Command) -> Result<(), String> {
         Command::Encrypt { input, output, to } => encrypt(input, output, to),
         Command::Decrypt { input, output, key } => decrypt(input, output, key),
         Command::Keygen { public, secret } => keygen(public, secret),
+        Command::Guard { action, path } => guard::run(action, path),
         Command::Lock { action, path } => lock::run(action, path),
         Command::Shred { file, passes, yes } => shred(file, passes, yes),
         Command::Watch { once, interval } => watch(once, interval),
