@@ -29,11 +29,11 @@ practice, and it is the argument for the item that is still open.
 
 | Check | Result |
 |---|---|
-| `unsafe` code | **None.** All 7 crates carry `#![forbid(unsafe_code)]`, enforced at compile time. |
+| `unsafe` code | **None.** All 8 crates carry `#![forbid(unsafe_code)]`, enforced at compile time. |
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **0 vulnerabilities.** Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 243 tests across 7 crates, plus doctests and 4 site-test suites in `tools/site-tests`. |
+| Test suite | 269 tests across 8 crates, plus doctests and 5 site-test suites in `tools/site-tests`. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
 | Secrets in the repository | None. `gpg_secrets/` is gitignored; `*.asc` ignored by default with only the public key allowed back explicitly. |

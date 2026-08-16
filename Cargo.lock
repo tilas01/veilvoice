@@ -3898,6 +3898,7 @@ dependencies = [
  "veilvoice-audio",
  "veilvoice-core",
  "veilvoice-crypto",
+ "veilvoice-guard",
  "veilvoice-meta",
  "veilvoice-watch",
  "zeroize",
@@ -3931,6 +3932,15 @@ dependencies = [
  "tempfile",
  "x25519-dalek",
  "zeroize",
+]
+
+[[package]]
+name = "veilvoice-guard"
+version = "0.1.6"
+dependencies = [
+ "sha2",
+ "tempfile",
+ "veilvoice-crypto",
 ]
 
 [[package]]

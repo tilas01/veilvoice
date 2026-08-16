@@ -5,9 +5,10 @@
 **Read this first.** It is written to be lossless: a new session should be able
 to continue from here without the previous conversation.
 
-**State as of 2026-08-16:** **v0.1.6 released** — nine platforms, GPG-signed,
+**State as of 2026-08-16:** **v0.1.6 released**, with tamper detection and the
+passphrase hardening on `main` for v0.1.7. — nine platforms, GPG-signed,
 reproducible on eight (FreeBSD built once and honestly marked `not-verified`).
-Live site. **247 tests** plus five website suites, clippy clean, no `unsafe`.
+Live site. **269 tests** plus five website suites, clippy clean, no `unsafe`.
 
 What v0.1.6 contains is in `CHANGELOG.md`, which the release notes are generated
 from. In short:
@@ -21,6 +22,9 @@ from. In short:
    desktop-app section in the wiki, and `tools/site-tests/`.
 4. Rendering the site found three more defects that every unit test had missed,
    including content that was invisible on the published page. See §8.
+5. **Unreleased, for v0.1.7:** `veilvoice-guard` (integrity manifest, tamper
+   detection, honest attribution) and typed passphrases moved into page-locked
+   memory at once rather than held as `String`s.
 
 ---
 
@@ -46,7 +50,7 @@ so redirect the target directory first:
 
 ```powershell
 $env:CARGO_TARGET_DIR = "$env:LOCALAPPDATA\veilvoice\target"
-cargo test --workspace                    # 243 tests
+cargo test --workspace                    # 269 tests
 node tools/site-tests/run.js              # website: characters, structure, renderer, reveal
 cargo clippy --workspace --all-targets    # must be zero warnings
 cargo clippy -p veilvoice-cli --no-default-features   # the no-live build
@@ -90,6 +94,8 @@ crates/
                      `live` is a DEFAULT-ON FEATURE — off where cpal has no backend.
   veilvoice-meta     lofty tags, wav.rs (chunk-level RIFF cleaner), img-parts EXIF
   veilvoice-watch    mic/camera monitor. linux.rs + windows.rs, zero dependencies
+  veilvoice-guard    integrity manifest + tamper detection. blame.rs attributes
+                     a change where system auditing allows, and says so when not
   veilvoice-cli      the `veilvoice` binary. atrest.rs (seal-by-default policy
                      + passphrase prompts), lock.rs (`veilvoice lock` subcommand)
   veilvoice-gui      egui desktop app, Tokyo Night. security.rs (unlock screen,
@@ -207,40 +213,35 @@ unreleased in the tree. What landed, and what deliberately did not:
 
 Remaining, in order:
 
-1. **Tamper detection with a privileged helper.** *(newest request, NOT started)*
-   The ask: a Linux service or a Windows admin startup process that enforces
-   protection of VeilVoice's own files, alerts on tampering, and names the
-   application that did it.
+1. **The privileged half of tamper detection.** *(the unprivileged half shipped
+   in v0.1.7 as `veilvoice-guard`)*
 
-   Do not start this without reading the following, because the obvious version
-   of it is worse than nothing:
+   What exists now: a SHA-256 manifest, a check that reports modified, removed
+   and added files, an optional passphrase-sealed record, and best-effort
+   attribution that reports honestly that it cannot see. No privileges needed.
+
+   What a privileged helper would add, and the reasons not to rush it:
 
    - **A helper running as the user protects nothing from that user**, and
      anything running as them can kill it. To mean anything it must run as
-     root/SYSTEM, which brings an installer, a privileged service, and a much
-     larger attack surface into a project that currently needs no privileges at
-     all.
+     root/SYSTEM, which brings an installer, a privileged service and a much
+     larger attack surface into a project that currently needs no privileges.
    - Even as root it can **detect and alert, not prevent** — another root
-     process can do as it likes. "Tamper-proof" is the same overclaim the app
-     lock already refuses to make, and the same honesty rule applies (§4.11).
-   - **Attribution is genuinely achievable**, and is the valuable half:
+     process can do as it likes. "Tamper-proof" stays the overclaim this
+     project refuses to make (§4.11); `guard::SCOPE` is the wording, and a test
+     fails the build if it softens.
+   - **Attribution is the valuable half, and is achievable**:
      - Linux: `fanotify` with `FAN_OPEN_PERM` can block *and* attribute; an
-       `auditd` watch (`-w <path> -p wa -k veilvoice`) records the writing PID
-       and comm without needing a daemon of our own.
-     - Windows: a SACL on the watched files plus Security event 4663, which
-       carries the process name. Sysmon does it better but is third-party.
-   - A **signed integrity manifest** of the binary, the lock file and the
-     config — verified at start-up — is platform-independent, needs no
-     privileges, is testable, and delivers most of the detection value. That is
-     where to begin, and it can ship on its own.
-2. **Keep typed passphrases out of process memory for longer.** Audit A-5: the
-   GUI holds the session passphrase in an ordinary `String` because that is what
-   the text widget requires, and `rpassword` returns one too. Converting the
-   confirmed passphrase to a `Secret` and wiping the `String` immediately would
-   shrink the window to the moments between keystrokes. It cannot be closed
-   entirely — anyone who can read this process's memory has already won, which
-   `WHITEPAPER.md` §7 states — so do not let the change imply otherwise.
-3. **Audacity + VB-CABLE opt-in installer.** Tick-box, never silent. Both are
+       `auditd` watch (`-w <path> -p wa -k veilvoice`) attributes without a
+       daemon of our own. `blame.rs` already reads `ausearch` when it is there.
+     - Windows: a SACL plus Security event 4663, which carries the process
+       name. `blame.rs` already queries it with `wevtutil`; it needs elevation
+       and the audit policy enabled, and reports exactly that when it fails.
+   - So the remaining work is **configuration and privilege**, not detection
+     logic: an opt-in installer that sets the audit rule, and a service that
+     watches and alerts. Both are outward-facing and should not be silent.
+
+2. **Audacity + VB-CABLE opt-in installer.** Tick-box, never silent. Both are
    third-party; VB-CABLE is proprietary donationware.
 3. **The audit's own remaining list** — `docs/AUDIT.md` §5. Short version: an
    independent review (the one that matters), a coverage-guided `cargo fuzz`

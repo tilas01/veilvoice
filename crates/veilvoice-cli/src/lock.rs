@@ -51,7 +51,7 @@ fn print_scope() {
 
 /// Greedy word wrap. The scope note is single-sourced from the crypto crate, so
 /// it arrives as one long string and has to be broken here rather than there.
-fn wrap(text: &str, width: usize) -> Vec<String> {
+pub fn wrap(text: &str, width: usize) -> Vec<String> {
     let mut lines = Vec::new();
     let mut current = String::new();
     for word in text.split_whitespace() {
