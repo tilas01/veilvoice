@@ -225,11 +225,13 @@ The primitives:
   already read process memory; `Secret::is_locked` reports whether it actually
   succeeded rather than assuming.
 
-One caveat that is stated rather than engineered around: a passphrase **typed
-into a text field or a terminal prompt** lives in an ordinary string until it is
-consumed, and could in principle reach swap during those moments. Everything
-downstream of the prompt is a page-locked `Secret`. Closing the gap entirely
-would need a custom text widget nobody would audit, which is a worse trade than
+One caveat that is stated rather than engineered around: a passphrase **being
+typed** into a text field or a terminal prompt lives in an ordinary string,
+because something has to receive the keystrokes. It is moved into a page-locked
+`Secret` the moment it is confirmed and the buffer is wiped, so the exposure
+lasts as long as the typing rather than as long as the session — but for those
+moments it is ordinary memory and could reach swap. Closing the gap entirely
+needs a custom text widget nobody would audit, which is a worse trade than
 saying so here.
 
 ---

@@ -26,6 +26,7 @@ veilvoice-meta = { path = "../veilvoice-meta" }
 veilvoice-watch = { path = "../veilvoice-watch" }
 clap = { version = "4", features = ["derive"] }
 rpassword = "7"
+zeroize.workspace = true
 
 [dev-dependencies]
 tempfile = "3"

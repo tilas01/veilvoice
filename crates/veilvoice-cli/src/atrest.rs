@@ -25,7 +25,8 @@
 use crate::theme::{colour, err, paint, warn};
 use std::io::IsTerminal;
 use std::path::{Path, PathBuf};
-use veilvoice_crypto::{container, hybrid, kdf};
+use veilvoice_crypto::{container, hybrid, kdf, Secret};
+use zeroize::Zeroize;
 
 /// What the user is told before a recording is written in the clear.
 ///
@@ -87,7 +88,7 @@ pub fn seal_to_disk(
                     "  Deriving key (Argon2id, this is meant to be slow)..."
                 )
             );
-            container::seal_with_password(&password, plaintext, kdf::KdfParams::default())
+            container::seal_with_password(password.expose(), plaintext, kdf::KdfParams::default())
                 .map_err(|e| e.to_string())?
         }
     };
@@ -132,17 +133,49 @@ pub fn confirm_plaintext(assume_yes: bool) -> Result<(), String> {
     Ok(())
 }
 
+/// Move a typed password into page-locked, zeroizing storage, wiping the
+/// `String` it arrived in.
+///
+/// `rpassword` hands back an ordinary `String`, which is an ordinary heap
+/// allocation that can be paged out and is not wiped when it is dropped. That
+/// is a window this crate cannot remove — something has to receive the
+/// keystrokes — but it can be made as short as possible, which is what this
+/// does: copy into a [`Secret`], wipe the copy, wipe the original, and hand
+/// back the only remaining version.
+///
+/// No `unsafe`, so the intermediate `Vec` is a real second copy for a moment.
+/// It is wiped by `Secret::new` before this returns. Writing through
+/// `String::as_bytes_mut` would avoid it and is not worth an `unsafe` block in
+/// a crate that has none.
+fn into_secret(mut typed: String) -> Secret {
+    let mut bytes = typed.as_bytes().to_vec();
+    let secret = Secret::new(&mut bytes);
+    typed.zeroize();
+    secret
+}
+
+/// Prompt once, without echoing, and keep the answer in a [`Secret`].
+pub fn prompt_secret(prompt: &str) -> Result<Secret, String> {
+    let typed = rpassword::prompt_password(prompt).map_err(|e| e.to_string())?;
+    Ok(into_secret(typed))
+}
+
 /// Read a password twice, without echoing it, and check the two agree.
-pub fn read_new_password() -> Result<Vec<u8>, String> {
+pub fn read_new_password() -> Result<Secret, String> {
     let first = rpassword::prompt_password("Passphrase: ").map_err(|e| e.to_string())?;
     if first.is_empty() {
         return Err("passphrase must not be empty".into());
     }
     let again = rpassword::prompt_password("Repeat: ").map_err(|e| e.to_string())?;
-    if first != again {
+    // Compared before either is moved into a `Secret`, then both are wiped
+    // whichever way the comparison went.
+    let matched = first == again;
+    let first = into_secret(first);
+    let _ = into_secret(again);
+    if !matched {
         return Err("passphrases do not match".into());
     }
-    Ok(first.into_bytes())
+    Ok(first)
 }
 
 #[cfg(test)]
