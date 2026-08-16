@@ -376,11 +376,33 @@ jobs:
 
       - name: Release notes
         run: |
+          # The changelog lives in the repository, so what a release claims to
+          # contain is reviewable in the same commit that contains it, rather
+          # than being written from memory at tag time.
+          tag="${{ github.ref_name }}"
+          changes=""
+          if [ -f CHANGELOG.md ]; then
+            changes="$(awk -v want="## $tag" '
+              $0 == want { taking = 1; next }
+              taking && /^## / { exit }
+              taking { print }
+            ' CHANGELOG.md)"
+          fi
+
           {
             echo "## VeilVoice ${{ github.ref_name }}"
             echo
             echo "Irreversible voice de-identification, fully offline."
             echo
+            if [ -n "$changes" ]; then
+              echo "$changes"
+              echo
+              echo "---"
+              echo
+            else
+              echo "> No changelog section found for \`$tag\` in \`CHANGELOG.md\`."
+              echo
+            fi
             echo "### Verify what you downloaded"
             echo
             echo '```bash'

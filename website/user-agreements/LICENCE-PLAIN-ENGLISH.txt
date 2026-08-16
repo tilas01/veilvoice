@@ -29,7 +29,7 @@ THE CONDITIONS
 --------------
 
   Share the source   If you give someone the program, you must also make the
-                     corresponding source code available to them — including
+                     corresponding source code available to them -- including
                      any changes you made.
 
   Same licence       Derivative works are released under the GPL too, so the
@@ -46,7 +46,7 @@ WHY THIS LICENCE, AND NOT A NON-COMMERCIAL ONE
 
 A privacy tool is only as trustworthy as it is inspectable. If you cannot read
 the code, you are taking on faith that a program which processes your voice does
-what it claims — and "trust me" is exactly the thing this project exists to
+what it claims -- and "trust me" is exactly the thing this project exists to
 avoid needing.
 
 So the licence is deliberately a free-software one, with no NonCommercial clause
@@ -65,7 +65,7 @@ WHAT THE LICENCE DOES NOT COVER
 -------------------------------
 
 The licence says what you may do with the work. It says nothing about whether
-the work is fit for your purpose, and it disclaims warranty entirely — see
+the work is fit for your purpose, and it disclaims warranty entirely -- see
 sections 15 and 16 of LICENSE.txt, restated in ordinary words in
 LEGAL-WAIVER.txt.
 
