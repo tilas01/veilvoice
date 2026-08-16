@@ -87,27 +87,6 @@ impl Modulator {
         }
     }
 
-    /// Build from the operating-system CSPRNG (fresh, unpredictable per run).
-    pub fn from_os_rng(
-        pitch_bounds: (f32, f32),
-        formant_bounds: (f32, f32),
-        frames_per_target: u32,
-        smooth: f32,
-    ) -> Self {
-        let mut seed = [0u8; 32];
-        getrandom::getrandom(&mut seed).expect("OS CSPRNG unavailable");
-        let m = Self::from_seed(
-            seed,
-            pitch_bounds,
-            formant_bounds,
-            frames_per_target,
-            smooth,
-        );
-        // The seed lives inside the Modulator (zeroized on drop); wipe our copy.
-        seed.zeroize();
-        m
-    }
-
     /// The 32 fixed per-bin phase offsets consumer needs are derived from the
     /// same stream; expose a helper that fills `out` with values in [0, 2π).
     pub fn fill_phase_offsets(&mut self, out: &mut [f32]) {
