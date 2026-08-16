@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! The VeilVoice desktop application.
 
+use crate::security::Security;
 use crate::theme::palette as p;
 use egui::{Color32, RichText};
 use std::path::PathBuf;
@@ -8,7 +9,7 @@ use std::sync::mpsc;
 use veilvoice_audio::devices;
 use veilvoice_core::{AccentConfig, DeidConfig};
 
-/// The three things VeilVoice does.
+/// The things VeilVoice does.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Tab {
     /// Process a file on disk.
@@ -17,6 +18,8 @@ enum Tab {
     Live,
     /// Who is using the microphone and camera.
     Watch,
+    /// The app lock, and what it is worth.
+    Security,
     /// Versions, licence and honest scope.
     About,
 }
@@ -60,6 +63,9 @@ pub struct VeilVoiceApp {
     meter_in: f32,
     meter_out: f32,
 
+    // The app lock, and at-rest encryption of what jobs write.
+    security: Security,
+
     // Device monitor.
     watch: veilvoice_watch::Monitor,
     watch_support: veilvoice_watch::Support,
@@ -68,23 +74,41 @@ pub struct VeilVoiceApp {
     watch_next_poll: f64,
 }
 
-impl Default for VeilVoiceApp {
-    fn default() -> Self {
-        let inputs = devices::list(devices::Direction::Input).unwrap_or_default();
-        let outputs = devices::list(devices::Direction::Output).unwrap_or_default();
-        // Default the output to a virtual cable when one exists: routing there
-        // is what lets other applications hear the veiled voice at all.
-        let chosen_output = outputs
-            .iter()
-            .find(|d| d.is_virtual_cable)
-            .or_else(|| outputs.iter().find(|d| d.is_default))
-            .map(|d| d.name.clone());
-        let chosen_input = inputs
-            .iter()
-            .find(|d| d.is_default)
-            .or_else(|| inputs.first())
-            .map(|d| d.name.clone());
+/// Pick the output to start on: a virtual cable if the machine has one,
+/// because routing there is what lets other applications hear the veiled voice
+/// at all; otherwise the system default.
+///
+/// A free function over a device list rather than a step inside `Default`, so
+/// the choice can be tested against every arrangement of devices without
+/// touching the machine's audio stack. That matters more than it looks:
+/// building the app enumerates devices through `cpal`, and several tests doing
+/// that at once on a headless runner is a good way to find out what WASAPI does
+/// when there are no endpoints and COM is being initialised from four threads
+/// at once. The answer was an access violation.
+fn preferred_output(outputs: &[devices::DeviceInfo]) -> Option<String> {
+    outputs
+        .iter()
+        .find(|d| d.is_virtual_cable)
+        .or_else(|| outputs.iter().find(|d| d.is_default))
+        .map(|d| d.name.clone())
+}
 
+/// Pick the input to start on: the system default, else whatever is first.
+fn preferred_input(inputs: &[devices::DeviceInfo]) -> Option<String> {
+    inputs
+        .iter()
+        .find(|d| d.is_default)
+        .or_else(|| inputs.first())
+        .map(|d| d.name.clone())
+}
+
+impl VeilVoiceApp {
+    /// The application with no devices enumerated.
+    ///
+    /// `Default` calls this after asking the system what it has. Tests that are
+    /// not about device selection use it directly, so the suite touches the
+    /// platform's audio stack exactly once instead of once per test.
+    fn without_devices() -> Self {
         Self {
             tab: Tab::File,
             jetbrains: false,
@@ -97,14 +121,15 @@ impl Default for VeilVoiceApp {
             job: None,
             status: None,
             last_metadata: Vec::new(),
-            inputs,
-            outputs,
-            chosen_input,
-            chosen_output,
+            inputs: Vec::new(),
+            outputs: Vec::new(),
+            chosen_input: None,
+            chosen_output: None,
             session: None,
             live_error: None,
             meter_in: 0.0,
             meter_out: 0.0,
+            security: Security::default(),
             watch: veilvoice_watch::Monitor::new(),
             watch_support: veilvoice_watch::support(),
             watch_error: None,
@@ -114,13 +139,31 @@ impl Default for VeilVoiceApp {
     }
 }
 
+impl Default for VeilVoiceApp {
+    fn default() -> Self {
+        let inputs = devices::list(devices::Direction::Input).unwrap_or_default();
+        let outputs = devices::list(devices::Direction::Output).unwrap_or_default();
+        Self {
+            chosen_input: preferred_input(&inputs),
+            chosen_output: preferred_output(&outputs),
+            inputs,
+            outputs,
+            ..Self::without_devices()
+        }
+    }
+}
+
 impl VeilVoiceApp {
     /// Build the app, applying theme and fonts to `ctx`.
+    ///
+    /// This is where the lock file is read, rather than in `Default`: tests and
+    /// anything else constructing the app must not touch the real one.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         let jetbrains = crate::theme::install_fonts(&cc.egui_ctx);
         crate::theme::install(&cc.egui_ctx);
         Self {
             jetbrains,
+            security: Security::load(),
             ..Default::default()
         }
     }
@@ -142,6 +185,18 @@ impl eframe::App for VeilVoiceApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.poll_job();
 
+        // The gate comes before everything: while locked, no device list, no
+        // file names and no live session are reachable or even drawn.
+        if self.security.is_locked() {
+            self.session = None;
+            egui::CentralPanel::default().show(ctx, |ui| self.security.unlock_screen(ui));
+            // The rate limit counts down whether or not anything else moves.
+            ctx.request_repaint_after(std::time::Duration::from_millis(500));
+            return;
+        }
+
+        let dialogue_open = self.security.disable_dialogue(ctx);
+
         egui::TopBottomPanel::top("header").show(ctx, |ui| {
             ui.add_space(8.0);
             ui.horizontal(|ui| {
@@ -149,6 +204,14 @@ impl eframe::App for VeilVoiceApp {
                 ui.label(RichText::new(format!("v{}", env!("CARGO_PKG_VERSION"))).color(p::MUTED));
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     ui.label(RichText::new("offline").color(p::GREEN).small());
+                    if self.security.has_lock()
+                        && ui
+                            .button(RichText::new("lock").color(p::YELLOW).small())
+                            .on_hover_text("Lock the app and clear the session passphrase")
+                            .clicked()
+                    {
+                        self.security.lock_now();
+                    }
                     // A monitor you have to go looking for is not doing its
                     // job, so the warning rides the header on every tab.
                     self.watch_indicator(ui);
@@ -160,6 +223,7 @@ impl eframe::App for VeilVoiceApp {
                     (Tab::File, "anonymise file"),
                     (Tab::Live, "live scramble"),
                     (Tab::Watch, "monitor"),
+                    (Tab::Security, "lock"),
                     (Tab::About, "about"),
                 ] {
                     let selected = self.tab == tab;
@@ -173,18 +237,23 @@ impl eframe::App for VeilVoiceApp {
             ui.add_space(6.0);
         });
 
-        egui::CentralPanel::default().show(ctx, |ui| match self.tab {
-            Tab::File => self.file_tab(ui),
-            Tab::Live => self.live_tab(ui),
-            Tab::Watch => self.watch_tab(ui),
-            Tab::About => self.about_tab(ui),
+        egui::CentralPanel::default().show(ctx, |ui| {
+            // While the "unencrypted?" question is open, clicks must not land
+            // on the window behind it.
+            ui.add_enabled_ui(!dialogue_open, |ui| match self.tab {
+                Tab::File => self.file_tab(ui),
+                Tab::Live => self.live_tab(ui),
+                Tab::Watch => self.watch_tab(ui),
+                Tab::Security => self.security.tab(ui),
+                Tab::About => self.about_tab(ui),
+            });
         });
 
         self.poll_watch(ctx.input(|i| i.time));
 
         // The live meters only move if something repaints them, and the
         // monitor has to keep ticking even while the window is idle.
-        if self.session.is_some() || self.job.is_some() {
+        if self.session.is_some() || self.job.is_some() || self.security.is_busy() {
             ctx.request_repaint_after(std::time::Duration::from_millis(50));
         } else if self.watch_support.microphone || self.watch_support.camera {
             ctx.request_repaint_after(std::time::Duration::from_millis(500));
@@ -291,16 +360,20 @@ impl VeilVoiceApp {
         ui.checkbox(&mut self.clean_metadata, "strip metadata from the result");
 
         ui.add_space(12.0);
+        self.security.recording_controls(ui);
+
+        ui.add_space(12.0);
         let busy = self.job.is_some();
-        let ready = self.input.is_some() && !busy;
-        if ui
-            .add_enabled(
-                ready,
-                egui::Button::new(RichText::new("  anonymise  ").strong()),
-            )
-            .clicked()
-        {
+        let ready = self.input.is_some() && !busy && self.security.ready_to_write();
+        let button = ui.add_enabled(
+            ready,
+            egui::Button::new(RichText::new("  anonymise  ").strong()),
+        );
+        if button.clicked() {
             self.start_job();
+        }
+        if let Some(reason) = self.security.blocked_reason() {
+            ui.label(RichText::new(reason).color(p::YELLOW).small());
         }
         if busy {
             ui.horizontal(|ui| {
@@ -329,7 +402,8 @@ impl VeilVoiceApp {
         ui.label(
             RichText::new(
                 "The words survive on purpose — a scrambler you cannot understand is \
-                 useless. To hide the message too, encrypt the result with the CLI.",
+                 useless. Encrypting the result at rest is what keeps them from being \
+                 read off the disk afterwards, which is why it is on by default.",
             )
             .color(p::MUTED)
             .small(),
@@ -347,33 +421,41 @@ impl VeilVoiceApp {
         });
         let config = self.config();
         let clean = self.clean_metadata;
+        let plan = self.security.plan();
         let (tx, rx) = mpsc::channel();
         self.job = Some(rx);
         self.status = None;
         self.last_metadata.clear();
 
-        // Off the UI thread: a long file would otherwise freeze the window.
+        // Off the UI thread: a long file would otherwise freeze the window, and
+        // Argon2id at 256 MiB is deliberately slow on top of that.
         std::thread::spawn(move || {
             let started = std::time::Instant::now();
-            let result = (|| -> Result<(f32, Vec<String>), String> {
+            let result = (|| -> Result<(PathBuf, f32, Vec<String>), String> {
                 let audio = veilvoice_audio::io::load(&input).map_err(|e| e.to_string())?;
                 let veiled =
                     veilvoice_audio::deidentify(&audio, config).map_err(|e| e.to_string())?;
-                veilvoice_audio::io::save_wav(&output, &veiled).map_err(|e| e.to_string())?;
+
+                // Encoded in memory, so a recording that is going to be sealed
+                // never lands on the disk in the clear even briefly.
+                let mut wav = veilvoice_audio::io::wav_bytes(&veiled).map_err(|e| e.to_string())?;
                 let mut removed = Vec::new();
                 if clean {
-                    if let Ok(report) =
-                        veilvoice_meta::clean_audio_file(&output, veilvoice_meta::Policy::Strip)
+                    if let Ok((cleaned, report)) =
+                        veilvoice_meta::clean_wav_bytes(&wav, veilvoice_meta::Policy::Strip)
                     {
+                        wav = cleaned;
                         removed = report.removed;
                     }
                 }
-                Ok((audio.duration_secs(), removed))
+                let written =
+                    plan.write(&output, &wav, veilvoice_crypto::kdf::KdfParams::default())?;
+                Ok((written, audio.duration_secs(), removed))
             })();
 
             let secs = started.elapsed().as_secs_f32();
             let _ = tx.send(match result {
-                Ok((duration, metadata)) => JobDone::Ok {
+                Ok((output, duration, metadata)) => JobDone::Ok {
                     output,
                     secs,
                     speed: duration / secs.max(1e-6),
@@ -621,6 +703,7 @@ impl VeilVoiceApp {
         field(ui, "audio", veilvoice_audio::VERSION);
         field(ui, "metadata", veilvoice_meta::VERSION);
         field(ui, "monitor", veilvoice_watch::VERSION);
+        field(ui, "crypto", veilvoice_crypto::VERSION);
         field(ui, "licence", "GPL-3.0-or-later");
         field(ui, "network access", "none, by construction");
         field(
@@ -649,13 +732,18 @@ impl VeilVoiceApp {
         ui.label(RichText::new("WHAT IT DOES NOT").color(p::YELLOW).small());
         ui.label(
             RichText::new(
-                "The words are preserved on purpose, so the message is not secret — \
-                 encrypt the file if it needs to be. Nor can any signal-level transform \
-                 change which phonemes you produced, so a strong regional accent may \
-                 still be audible even though its melody is gone.",
+                "The words are preserved on purpose, so de-identification alone does \
+                 not keep the message secret — which is why the result is encrypted at \
+                 rest by default. Nor can any signal-level transform change which \
+                 phonemes you produced, so a strong regional accent may still be \
+                 audible even though its melody is gone.",
             )
             .color(p::FG),
         );
+
+        ui.add_space(12.0);
+        ui.label(RichText::new("THE APP LOCK").color(p::YELLOW).small());
+        ui.label(RichText::new(veilvoice_crypto::lock::SCOPE).color(p::FG));
     }
 }
 
@@ -721,9 +809,19 @@ fn meter(ui: &mut egui::Ui, label: &str, peak: f32) {
 mod tests {
     use super::*;
 
+    /// Device selection is tested against synthetic lists, never the machine.
+    /// See `preferred_output` for why that is not merely tidier.
+    fn device(name: &str, default: bool, cable: bool) -> devices::DeviceInfo {
+        devices::DeviceInfo {
+            name: name.to_string(),
+            is_default: default,
+            is_virtual_cable: cable,
+        }
+    }
+
     #[test]
     fn defaults_are_the_safe_ones() {
-        let app = VeilVoiceApp::default();
+        let app = VeilVoiceApp::without_devices();
         assert!(
             app.neutralise_accent,
             "accent neutralisation should default on"
@@ -732,6 +830,19 @@ mod tests {
         assert_eq!(app.intensity, 1.0);
         assert_eq!(app.reseed_secs, 2.0, "the seed should roll by default");
         assert!(app.session.is_none());
+        assert!(
+            app.security.encrypt_recordings,
+            "recordings should be encrypted at rest by default"
+        );
+    }
+
+    /// The default is only worth anything if the button honours it: with
+    /// encryption on and nothing to encrypt with, a job must not start.
+    #[test]
+    fn a_job_cannot_start_before_the_at_rest_choice_is_made() {
+        let app = VeilVoiceApp::without_devices();
+        assert!(!app.security.ready_to_write());
+        assert!(app.security.blocked_reason().is_some());
     }
 
     #[test]
@@ -740,7 +851,7 @@ mod tests {
             intensity: 0.5,
             neutralise_accent: false,
             reseed_secs: 5.0,
-            ..Default::default()
+            ..VeilVoiceApp::without_devices()
         };
         let cfg = app.config();
         assert_eq!(cfg.intensity, 0.5);
@@ -754,37 +865,78 @@ mod tests {
     /// accepts, or a user could drag it into an error.
     #[test]
     fn every_reachable_reseed_setting_is_valid() {
+        let mut app = VeilVoiceApp::without_devices();
         for step in 0..=30 {
-            let app = VeilVoiceApp {
-                reseed_secs: step as f32,
-                ..Default::default()
-            };
+            app.reseed_secs = step as f32;
             app.config()
                 .checked()
                 .unwrap_or_else(|e| panic!("reseed_secs={step} rejected: {e}"));
         }
     }
 
-    /// A virtual cable should be preselected when the machine has one, because
-    /// routing there is the whole point of live mode.
+    /// A virtual cable must win, because routing there is the whole point of
+    /// live mode. Every arrangement, none of them involving real hardware.
     #[test]
-    fn output_defaults_to_a_virtual_cable_when_present() {
-        let app = VeilVoiceApp::default();
-        let cables: Vec<_> = app.outputs.iter().filter(|d| d.is_virtual_cable).collect();
-        if !cables.is_empty() {
-            let chosen = app
-                .chosen_output
-                .as_deref()
-                .expect("something should be chosen");
-            assert!(
-                cables.iter().any(|c| c.name == chosen),
-                "expected a virtual cable, got {chosen}"
-            );
-        }
+    fn a_virtual_cable_is_preferred_over_the_system_default() {
+        let cable = device("CABLE Input (VB-Audio Virtual Cable)", false, true);
+        let speakers = device("Speakers", true, false);
+        let other = device("HDMI", false, false);
+
+        assert_eq!(
+            preferred_output(&[speakers.clone(), cable.clone(), other.clone()]).as_deref(),
+            Some(cable.name.as_str()),
+            "a cable must beat the system default"
+        );
+        assert_eq!(
+            preferred_output(&[other.clone(), speakers.clone()]).as_deref(),
+            Some("Speakers"),
+            "with no cable, the default"
+        );
+        // With neither a cable nor a default, the picker stays on "system
+        // default" rather than seizing on an arbitrary device. Output is not
+        // input here, and deliberately so: guessing an input wrong means the
+        // user hears nothing and fixes it, while guessing an *output* wrong
+        // means the veiled voice is quietly playing out of the wrong device.
+        assert_eq!(
+            preferred_output(std::slice::from_ref(&other)),
+            None,
+            "an arbitrary output must not be seized on"
+        );
+        assert_eq!(
+            preferred_output(&[]),
+            None,
+            "an empty machine chooses nothing"
+        );
     }
 
     #[test]
-    fn building_the_app_without_audio_hardware_does_not_panic() {
-        let _ = VeilVoiceApp::default();
+    fn the_default_input_is_preferred_then_the_first() {
+        let default = device("Microphone", true, false);
+        let first = device("Line In", false, false);
+        assert_eq!(
+            preferred_input(&[first.clone(), default.clone()]).as_deref(),
+            Some("Microphone")
+        );
+        assert_eq!(
+            preferred_input(std::slice::from_ref(&first)).as_deref(),
+            Some("Line In"),
+            "with no default, the first is better than nothing"
+        );
+        assert_eq!(preferred_input(&[]), None);
+    }
+
+    /// The one test that talks to the machine's audio stack. Kept single, and
+    /// last: enumerating devices from several test threads at once on a
+    /// headless runner is what produced an access violation in CI.
+    #[test]
+    fn building_the_app_with_real_device_enumeration_does_not_panic() {
+        let app = VeilVoiceApp::default();
+        // Whatever the machine has, the choice must be one of its own devices.
+        if let Some(chosen) = app.chosen_output.as_deref() {
+            assert!(app.outputs.iter().any(|d| d.name == chosen));
+        }
+        if let Some(chosen) = app.chosen_input.as_deref() {
+            assert!(app.inputs.iter().any(|d| d.name == chosen));
+        }
     }
 }

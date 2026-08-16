@@ -125,23 +125,38 @@ pub fn load(path: &Path) -> Result<Audio, Error> {
     })
 }
 
-/// Write mono `f32` audio to a 16-bit PCM WAV.
+/// Encode mono `f32` audio as a 16-bit PCM WAV, in memory.
+///
+/// The in-memory form is what makes encrypt-at-rest honest: a recording that is
+/// going to be sealed must never touch the disk in the clear first, because a
+/// plaintext file that is written and then deleted is exactly the thing
+/// [`veilvoice_crypto::shred`](../../veilvoice_crypto/shred/index.html) explains
+/// cannot be reliably taken back on flash storage.
 ///
 /// Samples are clamped rather than allowed to wrap: a sample past full scale
 /// would otherwise flip sign and produce a loud click.
-pub fn save_wav(path: &Path, audio: &Audio) -> Result<(), Error> {
+pub fn wav_bytes(audio: &Audio) -> Result<Vec<u8>, Error> {
     let spec = hound::WavSpec {
         channels: 1,
         sample_rate: audio.sample_rate,
         bits_per_sample: 16,
         sample_format: hound::SampleFormat::Int,
     };
-    let mut writer = hound::WavWriter::create(path, spec)?;
-    for &s in &audio.samples {
-        let v = (s.clamp(-1.0, 1.0) * i16::MAX as f32).round() as i16;
-        writer.write_sample(v)?;
+    let mut cursor = std::io::Cursor::new(Vec::new());
+    {
+        let mut writer = hound::WavWriter::new(&mut cursor, spec)?;
+        for &s in &audio.samples {
+            let v = (s.clamp(-1.0, 1.0) * i16::MAX as f32).round() as i16;
+            writer.write_sample(v)?;
+        }
+        writer.finalize()?;
     }
-    writer.finalize()?;
+    Ok(cursor.into_inner())
+}
+
+/// Write mono `f32` audio to a 16-bit PCM WAV file.
+pub fn save_wav(path: &Path, audio: &Audio) -> Result<(), Error> {
+    std::fs::write(path, wav_bytes(audio)?)?;
     Ok(())
 }
 
@@ -177,6 +192,22 @@ mod tests {
             .zip(&loaded.samples)
             .fold(0.0f32, |m, (a, b)| m.max((a - b).abs()));
         assert!(worst < 1e-3, "round trip error {worst}");
+    }
+
+    /// The in-memory encoder is what the encrypt-at-rest path uses, so it must
+    /// produce exactly the file the on-disk one would.
+    #[test]
+    fn the_in_memory_encoder_matches_the_file_it_would_have_written() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("tone.wav");
+        let original = tone(44_100, 0.2, 330.0);
+
+        save_wav(&path, &original).unwrap();
+        let on_disk = std::fs::read(&path).unwrap();
+        let in_memory = wav_bytes(&original).unwrap();
+
+        assert_eq!(&in_memory[..4], b"RIFF");
+        assert_eq!(in_memory, on_disk);
     }
 
     #[test]

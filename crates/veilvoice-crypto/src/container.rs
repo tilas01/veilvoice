@@ -144,6 +144,17 @@ impl Header {
     }
 }
 
+/// The conventional path of the sealed form of `path`.
+///
+/// `.veil` is *appended* rather than substituted, so `recording.veiled.wav`
+/// becomes `recording.veiled.wav.veil` and the original name — including what
+/// kind of file it is — survives decryption without being guessed at.
+pub fn veil_path(path: &std::path::Path) -> std::path::PathBuf {
+    let mut name = path.as_os_str().to_os_string();
+    name.push(".veil");
+    std::path::PathBuf::from(name)
+}
+
 /// Encrypt `plaintext` under a password.
 pub fn seal_with_password(
     password: &[u8],
@@ -371,6 +382,22 @@ mod tests {
     fn empty_payload_round_trips() {
         let ct = seal_with_password(b"pw", b"", weak()).unwrap();
         assert_eq!(open_with_password(b"pw", &ct).unwrap(), b"");
+    }
+
+    /// Appending rather than replacing keeps the original extension, so an
+    /// opened container is still recognisably a WAV.
+    #[test]
+    fn veil_paths_append_and_keep_the_original_extension() {
+        use std::path::Path;
+        assert_eq!(
+            veil_path(Path::new("clip.veiled.wav")),
+            Path::new("clip.veiled.wav.veil")
+        );
+        assert_eq!(veil_path(Path::new("notes")), Path::new("notes.veil"));
+        assert_eq!(
+            veil_path(Path::new("a.b/c.wav")),
+            Path::new("a.b/c.wav.veil")
+        );
     }
 
     #[test]

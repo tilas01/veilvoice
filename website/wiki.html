@@ -41,12 +41,14 @@
 
 <nav class="toc" aria-label="Contents">
   <a href="#start">Getting started</a>
+  <a href="#app">The desktop app</a>
   <a href="#cli">Command line</a>
   <a href="#live">Live scrambling</a>
   <a href="#cable">Virtual audio cables</a>
   <a href="#record">Recording — use Audacity</a>
   <a href="#transcribe">Private transcription</a>
   <a href="#encrypt">Encryption</a>
+  <a href="#applock">The app lock</a>
   <a href="#destruct">Self-destruct</a>
   <a href="#verify">Verifying a download</a>
   <a href="#how">How it works</a>
@@ -69,15 +71,58 @@
   <p>Nothing installs a service, writes to a registry, or phones home. Delete the folder and it is gone.</p>
 </section>
 
+<section id="app">
+  <h2>THE DESKTOP APP</h2>
+  <p><code>veilvoice-gui</code> is the whole tool in a window. Five tabs, no menus, no settings file to find.</p>
+
+  <h3>anonymise file</h3>
+  <p>Choose a recording and press <b>anonymise</b>. Everything on this tab is a choice you can see:</p>
+  <table>
+    <thead><tr><th>Control</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><b>intensity</b></td><td>How far pitch and formants are pushed from the original, 0.0–1.0. Default 1.0, which is full normalisation.</td></tr>
+      <tr><td><b>neutralise accent and intonation</b></td><td>On by default. Maps every speaker onto one canonical register and vocal tract. Turning it off is weaker de-identification — do it only if you know why.</td></tr>
+      <tr><td><b>seed roll (s)</b></td><td>How often the modulation stream ratchets forward. Default 2 s; 0 keeps one stream for the whole session. Inaudible by construction.</td></tr>
+      <tr><td><b>strip metadata from the result</b></td><td>On by default. Removes tags from the written file.</td></tr>
+      <tr><td><b>encrypt the result at rest</b></td><td>On by default — see below.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>At-rest encryption</h4>
+  <p>The result is sealed as it is written, so a file you name <code>clean.wav</code> lands as <code>clean.wav.veil</code>. Two ways to seal it:</p>
+  <ul>
+    <li><b>passphrase</b> — Argon2id at 256 MiB. Set it once and it is held for the session; the <b>change</b> button clears it. Locking the app clears it too.</li>
+    <li><b>public key</b> — X25519 + ML-KEM-768 hybrid, to a <code>.pub</code> file from <code>veilvoice keygen</code>. No passphrase to type and nothing to forget; only the matching private key opens it.</li>
+  </ul>
+  <p>The <b>anonymise</b> button stays disabled until there is something to encrypt with. That is deliberate: a tool that quietly wrote plaintext because you had not filled a field in yet would make the default worthless.</p>
+  <div class="note">
+    <p>Unticking the box opens a dialogue that has to be answered before anything changes. The result is still a recording of every word that was said, and on flash storage deleting it afterwards is not a reliable fix — so the question is asked once, plainly, rather than hidden behind a preference.</p>
+  </div>
+
+  <h3>live scramble</h3>
+  <p>Pick an input and an output device and press <b>start</b>. A virtual audio cable is preselected as the output when one is installed, because routing there is what lets other applications hear the veiled voice at all; if none is found the page warns you rather than silently sending it to your speakers. Level meters, processing time per block, engine latency and a glitch counter are shown live.</p>
+
+  <h3>monitor</h3>
+  <p>Which applications are holding your microphone and camera, with a running log of starts and stops. The indicator rides the header on every tab, because a warning you have to go looking for is not doing its job.</p>
+  <p>On a platform that cannot see this — macOS exposes no public interface — the tab says so explicitly. An empty list from a blind monitor is a false reassurance, and is never presented as good news.</p>
+
+  <h3>lock</h3>
+  <p>Set, change or remove the app lock, and lock the app immediately. See <a href="#applock">the app lock</a> below for what it is worth. The header also carries a <b>lock</b> button, which locks and clears the session passphrase in one action.</p>
+
+  <h3>about</h3>
+  <p>Version of every crate, the licence, the typeface actually in use, and two short paragraphs stating what VeilVoice protects and what it does not. The limits are in the app, not only in the documentation.</p>
+</section>
+
 <section id="cli">
   <h2>COMMAND LINE</h2>
-<pre><code>veilvoice anonymise recording.mp3 -o clean.wav
+<pre><code>veilvoice anonymise recording.mp3 -o clean.wav   # writes clean.wav.veil, sealed
 veilvoice live --output "CABLE Input (VB-Audio Virtual Cable)"
 veilvoice devices
 veilvoice clean photo.jpg
 veilvoice encrypt secret.wav
 veilvoice decrypt secret.wav.veil -o secret.wav
 veilvoice keygen
+veilvoice lock set
 veilvoice info</code></pre>
   <p>Every command takes <code>--help</code>. Useful flags on <code>anonymise</code> and <code>live</code>:</p>
   <table>
@@ -86,8 +131,13 @@ veilvoice info</code></pre>
       <tr><td><code>--intensity 0.0–1.0</code></td><td>How far pitch and formants move from the original. Default 1.0.</td></tr>
       <tr><td><code>--keep-accent</code></td><td>Leaves intonation, accent and vocal tract intact. Weaker de-identification; use only if you know why.</td></tr>
       <tr><td><code>--clean-metadata false</code></td><td>Keeps the tags on the written file. On by default.</td></tr>
+      <tr><td><code>--encrypt false</code></td><td>Writes the recording in the clear. On by default; turning it off prints what you are giving up and waits for you to type <code>UNENCRYPTED</code>.</td></tr>
+      <tr><td><code>--encrypt-to key.pub</code></td><td>Seals to a recipient's hybrid public key instead of a passphrase.</td></tr>
     </tbody>
   </table>
+  <div class="note">
+    <p><strong>Where did my WAV go?</strong> <code>anonymise</code> seals its result, so <code>-o clean.wav</code> produces <code>clean.wav.veil</code>. Open it with <code>veilvoice decrypt clean.wav.veil -o clean.wav</code>. The words survive de-identification on purpose, so an unencrypted result is still a recording of everything that was said — which is why this is the default rather than an option you have to find.</p>
+  </div>
 </section>
 
 <section id="live">
@@ -151,6 +201,23 @@ veilvoice keygen                       # hybrid post-quantum key pair
 veilvoice encrypt notes.wav --to recipient.pub
 veilvoice decrypt notes.wav.veil -o notes.wav --key veilvoice.key</code></pre>
   <p>Private keys generated by <code>keygen</code> are themselves stored encrypted, under a passphrase, in the same container format — a stolen key file is worth nothing without it.</p>
+  <p>Since <code>anonymise</code> now seals its own output, <code>encrypt</code> is for everything else: a file you already have, a note, a key you want to move.</p>
+</section>
+
+<section id="applock">
+  <h2>THE APP LOCK</h2>
+  <p>VeilVoice can sit behind a password of its own, so that someone who picks up your unlocked computer cannot open it, see which files you have processed, or start a live scramble.</p>
+<pre><code>veilvoice lock set        # choose a password
+veilvoice lock status     # is one set, and is it rate limited right now?
+veilvoice lock change
+veilvoice lock remove</code></pre>
+  <p>The desktop app has the same controls under its <strong>lock</strong> tab, and a <strong>lock</strong> button in the header that locks it immediately and clears the session passphrase with it.</p>
+  <p><strong>Use a different password from the one you use for recordings.</strong> They are separate on purpose: opening the app should not be the same act as unsealing everything it has written. VeilVoice domain-separates the two derivations, so even typing the same string in both places does not produce two copies of one value — but it does mean one guess opens both, so do not.</p>
+  <div class="note bad">
+    <p><strong>This is not tamper-proof, and cannot be.</strong> A local application has nowhere to hide a secret from the machine it runs on. Anyone who can write to your files can delete the lock file; anyone holding the disk can edit the attempt counter, move the clock to defeat the wait, or attack the stored password hash offline.</p>
+    <p>What it does buy is real: it stops <em>casual access</em>. Three attempts are free, then the wait doubles — 5 s, 10 s, 20 s, up to fifteen minutes — and the count is written to disk, so killing the app does not reset it. Argon2id at 256 MiB makes each offline guess expensive, which helps a good passphrase and does not save a bad one.</p>
+    <p>If the threat is someone with your disk, the answers are full-volume encryption (LUKS, BitLocker, FileVault) and the at-rest encryption above. Not this.</p>
+  </div>
 </section>
 
 <section id="destruct">
@@ -205,6 +272,7 @@ sha256sum target/release/veilvoice</code></pre>
     <li><strong>It does not hide your speaking rate</strong> or rhythm. A weak biometric, but a real one.</li>
     <li><strong>It does not help</strong> against an attacker already running code on your machine.</li>
     <li><strong>It does not clean the filename</strong>, the filesystem timestamps, or the channel you send it over.</li>
+    <li><strong>The app lock is not tamper-proof.</strong> It stops someone who sits down at your unlocked session. It does not stop someone holding the disk, who can delete the lock file or attack the stored hash offline.</li>
   </ul>
 </section>
 
