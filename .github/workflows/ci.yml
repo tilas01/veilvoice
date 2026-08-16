@@ -71,6 +71,49 @@ jobs:
       - name: Committed artwork must match the generator
         run: python assets/generate.py --check
 
+  # The site's Markdown renderer decides what `js/repo.js` is allowed to put
+  # into the page via `innerHTML`, so it is a security boundary and is tested
+  # like one. No framework and no package.json: a test suite that pulls a
+  # hundred packages off a registry is a supply chain nobody has read, which is
+  # the same argument the site itself makes for not loading a CDN.
+  site:
+    name: website tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Structure, rendering, hostile input, scroll reveal
+        run: node tools/site-tests/run.js
+      # A longer randomised campaign than the per-commit default. Still not a
+      # coverage-guided fuzzer, and `docs/AUDIT.md` does not pretend otherwise.
+      - name: Extended hostile-markdown campaign
+        run: MD_FUZZ_ROUNDS=200000 node tools/site-tests/markdown.hostile.test.js
+
+  # The container header, the app-lock file and the RIFF chunk walker all parse
+  # input an attacker chooses. The per-commit `cargo test` runs a short campaign
+  # against each; this runs a long one, because the bugs these found — an
+  # Argon2 parallelism overflow and an unbounded memory cost — were both
+  # reachable from a file somebody sends you.
+  fuzz:
+    name: parser campaigns
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      # Debug, not release: the release profile disables overflow checks, and
+      # an arithmetic overflow on hostile input is exactly what is being looked
+      # for here.
+      - name: Container, app-lock and WAV parsers
+        env:
+          VEILVOICE_FUZZ_ROUNDS: 1000000
+        run: |
+          cargo test -p veilvoice-crypto --test parser_fuzz --locked
+          cargo test -p veilvoice-meta --test wav_fuzz --locked
+          cargo test -p veilvoice-core --test hostile_audio --locked
+
   audit:
     name: dependency advisories
     runs-on: ubuntu-latest
