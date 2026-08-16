@@ -59,6 +59,12 @@
   // palette before switching to the reader's choice.
   apply(stored());
 
+  // Marks the document as scripted, from a *blocking* head script, so the
+  // class is set before the first paint. Scroll reveals hide themselves only
+  // under `html.js`: without JavaScript the content is simply visible, rather
+  // than transparent for ever waiting for an observer that will never run.
+  document.documentElement.classList.add("js");
+
   document.addEventListener("DOMContentLoaded", function () {
     var select = document.getElementById("theme");
     if (select) { build(select); }

@@ -268,18 +268,27 @@ Artwork is **generated, not committed as opaque blobs** —
 
 **v0.1.5 — early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, CLI and GUI are implemented and tested
-(223 tests, clippy clean, no `unsafe`). Release binaries are built for nine
-targets and verified bit-for-bit reproducible on eight of them; the FreeBSD
-build is made once in a VM and is reported as `not-verified` rather than
-claimed.
+(243 tests, clippy clean, no `unsafe`), with randomised campaigns against every
+parser that reads untrusted input and against the website's Markdown renderer.
+Release binaries are built for nine targets and verified bit-for-bit
+reproducible on eight of them; the FreeBSD build is made once in a VM and is
+reported as `not-verified` rather than claimed.
 
 **Audited by tilas01**, who wrote and reviewed it. Be clear about what that is
 worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters — it is written to be read.
 
+The most recent round found and fixed **seven defects**, four of them reachable
+from a file somebody sends you: two that aborted the process, one that silently
+turned every processed recording into garbage, and three in the website's
+Markdown renderer. None was a confidentiality failure. They are written up
+individually — including the ones the previous audit had already declared clean —
+in [`docs/AUDIT.md`](docs/AUDIT.md).
+
+Using it: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), or
+[the wiki](https://tilas01.github.io/veilvoice/wiki.html).
 Roadmap and open work: [`HANDOFF.md`](HANDOFF.md).
-Documentation: [the wiki](https://tilas01.github.io/veilvoice/wiki.html).
 
 ## Licence
 

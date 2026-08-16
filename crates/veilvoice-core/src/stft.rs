@@ -100,7 +100,34 @@ impl StftEngine {
             if self.rover == 0 {
                 self.rover = self.latency;
             }
-            self.in_fifo[self.rover] = x;
+            // Non-finite input is replaced with silence *here*, at the one gate
+            // every sample passes through, because the engine downstream keeps
+            // persistent state and a single bad sample poisons it permanently.
+            //
+            // Found by the audit: one NaN — which a 32-bit-float WAV can
+            // legally contain, and which `symphonia` faithfully decodes —
+            // reached the accent neutraliser's long-term average, which is an
+            // exponential moving average and therefore never recovers. Every
+            // subsequent output sample was NaN, for the rest of the session,
+            // with nothing reported. A file someone sent you is a realistic
+            // source, and "the veiled recording came out silent and nobody said
+            // why" is a bad way to find out.
+            //
+            // The magnitude bound is separate, and deliberately enormous. A
+            // sample near `f32::MAX` produces an FFT bin near infinity, whose
+            // square then *is* infinity, and the resulting NaN gets into the
+            // same persistent averages by a different door. ±1e6 cannot
+            // overflow the sums (1e6² × 1024 bins is ~1e15, against a float
+            // ceiling of 3.4e38) while sitting six orders of magnitude above
+            // any real audio, which is nominally ±1. It is a guard against
+            // impossible values, not a limiter: nothing a microphone or a
+            // decoder legitimately produces comes near it, and the engine's own
+            // output is soft-clipped downstream regardless.
+            self.in_fifo[self.rover] = if x.is_finite() {
+                x.clamp(-1e6, 1e6)
+            } else {
+                0.0
+            };
             *out = self.out_fifo[self.rover - self.latency];
             self.rover += 1;
 
