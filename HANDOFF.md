@@ -7,10 +7,19 @@ to continue from here without the previous conversation.
 
 **State as of 2026-08-16:** v0.1.5 released, nine platforms, signed and
 reproducible on eight (FreeBSD built once and honestly marked `not-verified`).
-Live site. **223 tests**, clippy clean, no `unsafe`.
+Live site. **243 tests**, clippy clean, no `unsafe`.
 
-Unreleased in the tree on top of v0.1.5: **at-rest encryption by default** and
-the **app lock** (§7 item 1, done). The next tag should be `v0.1.6`.
+Unreleased in the tree on top of v0.1.5:
+
+1. **At-rest encryption by default** and the **app lock** (§7 item 1, done).
+2. **The audit is finished** (§7 item 3, done) except the one item that cannot be
+   done from inside — an independent review. It found **seven defects**, all
+   fixed; see `docs/AUDIT.md` §2. Read that before touching a parser.
+3. **A walkthrough section on the site** below the download, plus
+   `docs/USER_GUIDE.md`, a desktop-app section in the wiki, and
+   `tools/site-tests/`.
+
+The next tag should be `v0.1.6`.
 
 ---
 
@@ -18,6 +27,7 @@ the **app lock** (§7 item 1, done). The next tag should be `v0.1.6`.
 
 | # | File | Why |
 |---|---|---|
+| 0 | `docs/USER_GUIDE.md` | What it is like to *use*. Skim it — knowing the user-facing behaviour first makes the rest read faster. |
 | 1 | `README.md` | What the project is and claims. |
 | 2 | `docs/WHITEPAPER.md` | The de-identification argument, threat model, and the limits that must never be overclaimed. |
 | 3 | `docs/AUDIT.md` | Audit status, findings, and **exactly what audit work remains**. |
@@ -35,7 +45,8 @@ so redirect the target directory first:
 
 ```powershell
 $env:CARGO_TARGET_DIR = "$env:LOCALAPPDATA\veilvoice\target"
-cargo test --workspace                    # 223 tests
+cargo test --workspace                    # 243 tests
+node tools/site-tests/run.js              # website: structure, renderer, reveal
 cargo clippy --workspace --all-targets    # must be zero warnings
 cargo clippy -p veilvoice-cli --no-default-features   # the no-live build
 cargo audit                               # policy in .cargo/audit.toml
@@ -62,6 +73,8 @@ crates/
   veilvoice-gui      egui desktop app, Tokyo Night. security.rs (unlock screen,
                      lock tab, at-rest controls, the write Plan)
 website/             the published site (GitHub Pages, deployed via Actions)
+tools/site-tests/    node, no dependencies. Hostile-markdown and structure
+                     tests for the site; `node tools/site-tests/run.js`
 assets/generate.py   generates every icon and the banner; --check verifies
 gpg_secrets/         GITIGNORED. signing key, passphrase, generator script
 .github/workflows/   ci.yml, release.yml, pages.yml
@@ -176,9 +189,11 @@ Remaining, in order:
    `anonymise` now writes `.veil` — this is the one user-visible break.
 2. **Audacity + VB-CABLE opt-in installer.** Tick-box, never silent. Both are
    third-party; VB-CABLE is proprietary donationware.
-3. **Finish the audit** — see `docs/AUDIT.md` §4 for the exact remaining scope
-   (fuzzing the container, WAV **and lock** parsers, adversarial read of the DSP,
-   timing analysis, hostile-markdown testing of the site).
+3. **The audit's own remaining list** — `docs/AUDIT.md` §5. Short version: an
+   independent review (the one that matters), a coverage-guided `cargo fuzz`
+   campaign, a scheme check on `repo.js`'s asset links, a lower KDF cost ceiling
+   for unattended callers, and **32-bit targets in CI** — F-4 existed only on
+   ARMv7 and nothing in the matrix would have caught it.
 4. **Move `gpg_secrets/` out of OneDrive.**
 5. **Text-to-speech mode** — type text, an AI voice speaks it. The strongest
    anonymity, since the original voice is never captured. Weights and training
@@ -235,3 +250,30 @@ Remaining, in order:
 - **The lock file is read before anyone has authenticated.** Treat it as hostile
   input: a file that will not parse is an error and keeps the app locked, never
   a missing lock. `LockStore::open` returns `Ok(None)` only for `NotFound`.
+- **Argon2 cost parameters come from the file, and `argon2` 0.5.3 validates them
+  in the wrong order.** It computes `m_cost < p_cost * 8` before checking
+  `p_cost`'s ceiling, so a large `p_cost` overflows. And `m_cost` is allocated
+  before anything else, so `u32::MAX` asks for 4 TiB and aborts. Both are now
+  bounded in `KdfParams::checked()` — never bypass that funnel.
+- **Run the parser campaigns in DEBUG, not release.** The release profile sets
+  `overflow-checks = false`, so an arithmetic overflow — one of the two bugs —
+  is invisible there. CI runs them in debug on purpose.
+- **A green fuzzer is not a read.** F-4 was a 32-bit-only overflow that no
+  campaign on an x86-64 machine could ever reach; it was found by reading. Do
+  both.
+- **The engine keeps persistent state, so one bad sample is forever.** The
+  accent neutraliser's long-term spectrum is an EMA: a single NaN in, and every
+  output sample afterwards was NaN, silently. Input is now sanitised in
+  `StftEngine::process`. A 32-bit-float WAV can legally contain NaN.
+- **`x.clamp(-16.0, 16.0)` in the STFT broke a test that feeds a 0..2048 ramp.**
+  The gate is for impossible values, not a limiter — keep the bound enormous
+  (±1e6) so it never touches anything a real signal or a test probe produces.
+- **Timing tests must use the minimum, not the median.** Noise is one-sided.
+  A first pass using medians on Windows reported a 1.49× "leak" that was pure
+  scheduler jitter; the minimum gave 0.996 and was stable across runs.
+- **A hostile-input checker has to parse like a browser.** Scanning the raw
+  string for `onerror=` calls `&lt;script&gt;` an attack — that is the renderer
+  *working*. Five of the first six "findings" were the checker, not the code.
+- **`website/js/markdown.js` contains literal NUL bytes** (it did, as parking
+  sentinels). String-matching editors cannot target them; patch such files with
+  a script. They are gone now, replaced by private-use characters.

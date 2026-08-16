@@ -41,6 +41,7 @@
 
 <nav class="toc" aria-label="Contents">
   <a href="#start">Getting started</a>
+  <a href="#app">The desktop app</a>
   <a href="#cli">Command line</a>
   <a href="#live">Live scrambling</a>
   <a href="#cable">Virtual audio cables</a>
@@ -68,6 +69,48 @@
     <li>Unpack it. There are two programs: <code>veilvoice</code> (command line) and <code>veilvoice-gui</code> (desktop app).</li>
   </ol>
   <p>Nothing installs a service, writes to a registry, or phones home. Delete the folder and it is gone.</p>
+</section>
+
+<section id="app">
+  <h2>THE DESKTOP APP</h2>
+  <p><code>veilvoice-gui</code> is the whole tool in a window. Five tabs, no menus, no settings file to find.</p>
+
+  <h3>anonymise file</h3>
+  <p>Choose a recording and press <b>anonymise</b>. Everything on this tab is a choice you can see:</p>
+  <table>
+    <thead><tr><th>Control</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><b>intensity</b></td><td>How far pitch and formants are pushed from the original, 0.0–1.0. Default 1.0, which is full normalisation.</td></tr>
+      <tr><td><b>neutralise accent and intonation</b></td><td>On by default. Maps every speaker onto one canonical register and vocal tract. Turning it off is weaker de-identification — do it only if you know why.</td></tr>
+      <tr><td><b>seed roll (s)</b></td><td>How often the modulation stream ratchets forward. Default 2 s; 0 keeps one stream for the whole session. Inaudible by construction.</td></tr>
+      <tr><td><b>strip metadata from the result</b></td><td>On by default. Removes tags from the written file.</td></tr>
+      <tr><td><b>encrypt the result at rest</b></td><td>On by default — see below.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>At-rest encryption</h4>
+  <p>The result is sealed as it is written, so a file you name <code>clean.wav</code> lands as <code>clean.wav.veil</code>. Two ways to seal it:</p>
+  <ul>
+    <li><b>passphrase</b> — Argon2id at 256 MiB. Set it once and it is held for the session; the <b>change</b> button clears it. Locking the app clears it too.</li>
+    <li><b>public key</b> — X25519 + ML-KEM-768 hybrid, to a <code>.pub</code> file from <code>veilvoice keygen</code>. No passphrase to type and nothing to forget; only the matching private key opens it.</li>
+  </ul>
+  <p>The <b>anonymise</b> button stays disabled until there is something to encrypt with. That is deliberate: a tool that quietly wrote plaintext because you had not filled a field in yet would make the default worthless.</p>
+  <div class="note">
+    <p>Unticking the box opens a dialogue that has to be answered before anything changes. The result is still a recording of every word that was said, and on flash storage deleting it afterwards is not a reliable fix — so the question is asked once, plainly, rather than hidden behind a preference.</p>
+  </div>
+
+  <h3>live scramble</h3>
+  <p>Pick an input and an output device and press <b>start</b>. A virtual audio cable is preselected as the output when one is installed, because routing there is what lets other applications hear the veiled voice at all; if none is found the page warns you rather than silently sending it to your speakers. Level meters, processing time per block, engine latency and a glitch counter are shown live.</p>
+
+  <h3>monitor</h3>
+  <p>Which applications are holding your microphone and camera, with a running log of starts and stops. The indicator rides the header on every tab, because a warning you have to go looking for is not doing its job.</p>
+  <p>On a platform that cannot see this — macOS exposes no public interface — the tab says so explicitly. An empty list from a blind monitor is a false reassurance, and is never presented as good news.</p>
+
+  <h3>lock</h3>
+  <p>Set, change or remove the app lock, and lock the app immediately. See <a href="#applock">the app lock</a> below for what it is worth. The header also carries a <b>lock</b> button, which locks and clears the session passphrase in one action.</p>
+
+  <h3>about</h3>
+  <p>Version of every crate, the licence, the typeface actually in use, and two short paragraphs stating what VeilVoice protects and what it does not. The limits are in the app, not only in the documentation.</p>
 </section>
 
 <section id="cli">

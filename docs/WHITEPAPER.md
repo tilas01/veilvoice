@@ -313,3 +313,13 @@ maintainer audit and is worth exactly what a maintainer audit is worth: it
 catches what the author can see. **No external firm or independent researcher
 has reviewed this code**, and until one has, the strongest verification
 available to you is the source itself — which is why it is written to be read.
+
+How much that caveat is worth is now a measured quantity rather than a modest
+noise. The latest audit round — parser fuzzing, timing measurement, an
+adversarial read of the DSP, and hostile-input testing of the website — found
+**seven defects in code the previous round had called clean**. None broke
+confidentiality; two aborted the process on a crafted file and one silently
+turned every subsequent recording into noise. All are fixed and written up in
+`docs/AUDIT.md`, including the ones that make the earlier "no vulnerabilities
+found" look complacent. Better tools found what careful reading had not, which
+is the argument for someone outside the project looking next.
