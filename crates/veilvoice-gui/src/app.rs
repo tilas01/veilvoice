@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! The VeilVoice desktop application.
 
+use crate::security::Security;
 use crate::theme::palette as p;
 use egui::{Color32, RichText};
 use std::path::PathBuf;
@@ -8,7 +9,7 @@ use std::sync::mpsc;
 use veilvoice_audio::devices;
 use veilvoice_core::{AccentConfig, DeidConfig};
 
-/// The three things VeilVoice does.
+/// The things VeilVoice does.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Tab {
     /// Process a file on disk.
@@ -17,6 +18,8 @@ enum Tab {
     Live,
     /// Who is using the microphone and camera.
     Watch,
+    /// The app lock, and what it is worth.
+    Security,
     /// Versions, licence and honest scope.
     About,
 }
@@ -59,6 +62,9 @@ pub struct VeilVoiceApp {
     live_error: Option<String>,
     meter_in: f32,
     meter_out: f32,
+
+    // The app lock, and at-rest encryption of what jobs write.
+    security: Security,
 
     // Device monitor.
     watch: veilvoice_watch::Monitor,
@@ -105,6 +111,7 @@ impl Default for VeilVoiceApp {
             live_error: None,
             meter_in: 0.0,
             meter_out: 0.0,
+            security: Security::default(),
             watch: veilvoice_watch::Monitor::new(),
             watch_support: veilvoice_watch::support(),
             watch_error: None,
@@ -116,11 +123,15 @@ impl Default for VeilVoiceApp {
 
 impl VeilVoiceApp {
     /// Build the app, applying theme and fonts to `ctx`.
+    ///
+    /// This is where the lock file is read, rather than in `Default`: tests and
+    /// anything else constructing the app must not touch the real one.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         let jetbrains = crate::theme::install_fonts(&cc.egui_ctx);
         crate::theme::install(&cc.egui_ctx);
         Self {
             jetbrains,
+            security: Security::load(),
             ..Default::default()
         }
     }
@@ -142,6 +153,18 @@ impl eframe::App for VeilVoiceApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.poll_job();
 
+        // The gate comes before everything: while locked, no device list, no
+        // file names and no live session are reachable or even drawn.
+        if self.security.is_locked() {
+            self.session = None;
+            egui::CentralPanel::default().show(ctx, |ui| self.security.unlock_screen(ui));
+            // The rate limit counts down whether or not anything else moves.
+            ctx.request_repaint_after(std::time::Duration::from_millis(500));
+            return;
+        }
+
+        let dialogue_open = self.security.disable_dialogue(ctx);
+
         egui::TopBottomPanel::top("header").show(ctx, |ui| {
             ui.add_space(8.0);
             ui.horizontal(|ui| {
@@ -149,6 +172,14 @@ impl eframe::App for VeilVoiceApp {
                 ui.label(RichText::new(format!("v{}", env!("CARGO_PKG_VERSION"))).color(p::MUTED));
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     ui.label(RichText::new("offline").color(p::GREEN).small());
+                    if self.security.has_lock()
+                        && ui
+                            .button(RichText::new("lock").color(p::YELLOW).small())
+                            .on_hover_text("Lock the app and clear the session passphrase")
+                            .clicked()
+                    {
+                        self.security.lock_now();
+                    }
                     // A monitor you have to go looking for is not doing its
                     // job, so the warning rides the header on every tab.
                     self.watch_indicator(ui);
@@ -160,6 +191,7 @@ impl eframe::App for VeilVoiceApp {
                     (Tab::File, "anonymise file"),
                     (Tab::Live, "live scramble"),
                     (Tab::Watch, "monitor"),
+                    (Tab::Security, "lock"),
                     (Tab::About, "about"),
                 ] {
                     let selected = self.tab == tab;
@@ -173,18 +205,23 @@ impl eframe::App for VeilVoiceApp {
             ui.add_space(6.0);
         });
 
-        egui::CentralPanel::default().show(ctx, |ui| match self.tab {
-            Tab::File => self.file_tab(ui),
-            Tab::Live => self.live_tab(ui),
-            Tab::Watch => self.watch_tab(ui),
-            Tab::About => self.about_tab(ui),
+        egui::CentralPanel::default().show(ctx, |ui| {
+            // While the "unencrypted?" question is open, clicks must not land
+            // on the window behind it.
+            ui.add_enabled_ui(!dialogue_open, |ui| match self.tab {
+                Tab::File => self.file_tab(ui),
+                Tab::Live => self.live_tab(ui),
+                Tab::Watch => self.watch_tab(ui),
+                Tab::Security => self.security.tab(ui),
+                Tab::About => self.about_tab(ui),
+            });
         });
 
         self.poll_watch(ctx.input(|i| i.time));
 
         // The live meters only move if something repaints them, and the
         // monitor has to keep ticking even while the window is idle.
-        if self.session.is_some() || self.job.is_some() {
+        if self.session.is_some() || self.job.is_some() || self.security.is_busy() {
             ctx.request_repaint_after(std::time::Duration::from_millis(50));
         } else if self.watch_support.microphone || self.watch_support.camera {
             ctx.request_repaint_after(std::time::Duration::from_millis(500));
@@ -291,16 +328,20 @@ impl VeilVoiceApp {
         ui.checkbox(&mut self.clean_metadata, "strip metadata from the result");
 
         ui.add_space(12.0);
+        self.security.recording_controls(ui);
+
+        ui.add_space(12.0);
         let busy = self.job.is_some();
-        let ready = self.input.is_some() && !busy;
-        if ui
-            .add_enabled(
-                ready,
-                egui::Button::new(RichText::new("  anonymise  ").strong()),
-            )
-            .clicked()
-        {
+        let ready = self.input.is_some() && !busy && self.security.ready_to_write();
+        let button = ui.add_enabled(
+            ready,
+            egui::Button::new(RichText::new("  anonymise  ").strong()),
+        );
+        if button.clicked() {
             self.start_job();
+        }
+        if let Some(reason) = self.security.blocked_reason() {
+            ui.label(RichText::new(reason).color(p::YELLOW).small());
         }
         if busy {
             ui.horizontal(|ui| {
@@ -329,7 +370,8 @@ impl VeilVoiceApp {
         ui.label(
             RichText::new(
                 "The words survive on purpose — a scrambler you cannot understand is \
-                 useless. To hide the message too, encrypt the result with the CLI.",
+                 useless. Encrypting the result at rest is what keeps them from being \
+                 read off the disk afterwards, which is why it is on by default.",
             )
             .color(p::MUTED)
             .small(),
@@ -347,33 +389,40 @@ impl VeilVoiceApp {
         });
         let config = self.config();
         let clean = self.clean_metadata;
+        let plan = self.security.plan();
         let (tx, rx) = mpsc::channel();
         self.job = Some(rx);
         self.status = None;
         self.last_metadata.clear();
 
-        // Off the UI thread: a long file would otherwise freeze the window.
+        // Off the UI thread: a long file would otherwise freeze the window, and
+        // Argon2id at 256 MiB is deliberately slow on top of that.
         std::thread::spawn(move || {
             let started = std::time::Instant::now();
-            let result = (|| -> Result<(f32, Vec<String>), String> {
+            let result = (|| -> Result<(PathBuf, f32, Vec<String>), String> {
                 let audio = veilvoice_audio::io::load(&input).map_err(|e| e.to_string())?;
                 let veiled =
                     veilvoice_audio::deidentify(&audio, config).map_err(|e| e.to_string())?;
-                veilvoice_audio::io::save_wav(&output, &veiled).map_err(|e| e.to_string())?;
+
+                // Encoded in memory, so a recording that is going to be sealed
+                // never lands on the disk in the clear even briefly.
+                let mut wav = veilvoice_audio::io::wav_bytes(&veiled).map_err(|e| e.to_string())?;
                 let mut removed = Vec::new();
                 if clean {
-                    if let Ok(report) =
-                        veilvoice_meta::clean_audio_file(&output, veilvoice_meta::Policy::Strip)
+                    if let Ok((cleaned, report)) =
+                        veilvoice_meta::clean_wav_bytes(&wav, veilvoice_meta::Policy::Strip)
                     {
+                        wav = cleaned;
                         removed = report.removed;
                     }
                 }
-                Ok((audio.duration_secs(), removed))
+                let written = plan.write(&output, &wav)?;
+                Ok((written, audio.duration_secs(), removed))
             })();
 
             let secs = started.elapsed().as_secs_f32();
             let _ = tx.send(match result {
-                Ok((duration, metadata)) => JobDone::Ok {
+                Ok((output, duration, metadata)) => JobDone::Ok {
                     output,
                     secs,
                     speed: duration / secs.max(1e-6),
@@ -621,6 +670,7 @@ impl VeilVoiceApp {
         field(ui, "audio", veilvoice_audio::VERSION);
         field(ui, "metadata", veilvoice_meta::VERSION);
         field(ui, "monitor", veilvoice_watch::VERSION);
+        field(ui, "crypto", veilvoice_crypto::VERSION);
         field(ui, "licence", "GPL-3.0-or-later");
         field(ui, "network access", "none, by construction");
         field(
@@ -649,13 +699,18 @@ impl VeilVoiceApp {
         ui.label(RichText::new("WHAT IT DOES NOT").color(p::YELLOW).small());
         ui.label(
             RichText::new(
-                "The words are preserved on purpose, so the message is not secret — \
-                 encrypt the file if it needs to be. Nor can any signal-level transform \
-                 change which phonemes you produced, so a strong regional accent may \
-                 still be audible even though its melody is gone.",
+                "The words are preserved on purpose, so de-identification alone does \
+                 not keep the message secret — which is why the result is encrypted at \
+                 rest by default. Nor can any signal-level transform change which \
+                 phonemes you produced, so a strong regional accent may still be \
+                 audible even though its melody is gone.",
             )
             .color(p::FG),
         );
+
+        ui.add_space(12.0);
+        ui.label(RichText::new("THE APP LOCK").color(p::YELLOW).small());
+        ui.label(RichText::new(veilvoice_crypto::lock::SCOPE).color(p::FG));
     }
 }
 
@@ -732,6 +787,19 @@ mod tests {
         assert_eq!(app.intensity, 1.0);
         assert_eq!(app.reseed_secs, 2.0, "the seed should roll by default");
         assert!(app.session.is_none());
+        assert!(
+            app.security.encrypt_recordings,
+            "recordings should be encrypted at rest by default"
+        );
+    }
+
+    /// The default is only worth anything if the button honours it: with
+    /// encryption on and nothing to encrypt with, a job must not start.
+    #[test]
+    fn a_job_cannot_start_before_the_at_rest_choice_is_made() {
+        let app = VeilVoiceApp::default();
+        assert!(!app.security.ready_to_write());
+        assert!(app.security.blocked_reason().is_some());
     }
 
     #[test]

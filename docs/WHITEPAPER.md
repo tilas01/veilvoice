@@ -2,7 +2,9 @@
 
 # VeilVoice — what it destroys, what it keeps, and why
 
-**Version 0.1.0.** This document is the honest version of the pitch. It states
+**Updated 2026-08-16**, covering the tree as it stands including at-rest
+encryption by default and the app lock. This document is the honest version of
+the pitch. It states
 what VeilVoice guarantees, how, and — at least as importantly — what it does
 not. A privacy tool that overstates its reach is worse than none, because
 someone will rely on the part that was never true.
@@ -50,7 +52,10 @@ same speaker.
   regional siren — VeilVoice processes the whole signal but does not attempt
   scene sanitisation. Check what else is in your recording.
 - **An attacker already on your machine.** If they can read process memory or
-  tap the microphone before VeilVoice does, nothing here helps.
+  tap the microphone before VeilVoice does, nothing here helps. The app lock
+  (§8) raises the bar against someone who merely sits down at an unlocked
+  session; it does nothing against someone running code as you, and does not
+  claim to.
 - **Metadata outside the file.** Filenames, filesystem timestamps and the
   channel you send it over. `veilvoice-meta` cleans metadata *inside* the file
   only.
@@ -184,10 +189,27 @@ Stated so nobody is surprised:
 
 ---
 
-## 7. If the message must be secret too
+## 7. The message, and why it is encrypted by default
 
-Use `veilvoice-crypto`. De-identification and confidentiality are separate
-problems and are solved separately:
+De-identification and confidentiality are separate problems. The engine solves
+only the first: the words survive on purpose, so a veiled recording sitting on a
+disk is still a recording of everything that was said. Writing it in the clear by
+default would leave the second problem silently unsolved for everyone who did not
+think to ask.
+
+So **`veilvoice anonymise` seals its output** into a `.veil` container, and the
+desktop app does the same. Turning that off is possible and prints what is being
+given up first — the CLI waits for the word `UNENCRYPTED` on a terminal; the GUI
+opens a dialogue that must be answered before the tick box changes.
+
+The WAV is encoded **in memory** and sealed there. An encrypted recording never
+exists on disk in the clear, not even briefly. This matters more than it sounds:
+a plaintext file that is written and then deleted cannot be reliably taken back
+on flash storage, because wear levelling leaves the original blocks in cells no
+write can reach — the argument is set out in full in `veilvoice-crypto`'s
+`shred` module.
+
+The primitives:
 
 - **Argon2id** (RFC 9106 profile) for password-derived keys.
 - **X25519 + ML-KEM-768 hybrid** for public-key encryption. Hybrid because
@@ -203,9 +225,55 @@ problems and are solved separately:
   already read process memory; `Secret::is_locked` reports whether it actually
   succeeded rather than assuming.
 
+One caveat that is stated rather than engineered around: a passphrase **typed
+into a text field or a terminal prompt** lives in an ordinary string until it is
+consumed, and could in principle reach swap during those moments. Everything
+downstream of the prompt is a page-locked `Secret`. Closing the gap entirely
+would need a custom text widget nobody would audit, which is a worse trade than
+saying so here.
+
 ---
 
-## 8. Verifying these claims yourself
+## 8. The app lock, and exactly what it is worth
+
+VeilVoice can be put behind a password of its own, so that someone who picks up
+your unlocked computer cannot open it, see which files you have processed, or
+start a live scramble.
+
+**This is not tamper-proof, and cannot be.** A local application has nowhere to
+hide a secret from the machine it runs on. Whoever can read the lock file can
+also delete it, and deleting it removes the lock. That is not a gap in the
+implementation; it is what a local lock *is*. The unlock screen says so on the
+screen itself rather than in a footnote.
+
+What it is, concretely:
+
+- **An Argon2id verifier**, not a key. `Argon2id(domain ‖ password, salt)` is
+  stored and compared in constant time. It deliberately encrypts nothing,
+  because there is nothing here it could usefully encrypt — and implying
+  otherwise would be the overclaim this document exists to avoid.
+- **Rate limited, and the limit is persisted.** Three attempts are free; after
+  that the wait doubles — 5 s, 10 s, 20 s … capped at fifteen minutes. The count
+  is written to disk after every attempt, so killing the process does not hand
+  an attacker a fresh budget.
+- **A separate password from the recording one.** Unlocking the app is not the
+  same act as unsealing everything it has ever written. The verifier is
+  domain-separated, so a user who types the same passphrase in both places still
+  does not end up with two copies of one value.
+
+What it is not:
+
+- **Not a defence against someone holding the disk.** They can delete the lock
+  file, edit the attempt counter, move the clock to defeat the wait, or attack
+  the stored hash offline. Argon2id at 256 MiB makes each offline guess
+  expensive, which helps a good passphrase and does not save a bad one.
+- **Not disk encryption.** If the disk is the threat, use LUKS, BitLocker or
+  FileVault, and encrypt the recordings themselves — which VeilVoice now does by
+  default.
+
+---
+
+## 9. Verifying these claims yourself
 
 Nothing here asks for trust:
 
@@ -220,12 +288,19 @@ survival, gain neutrality and real-time performance. The crypto tests assert
 header-downgrade detection, tamper detection on each half of the hybrid, and
 that a wiped secret is actually wiped.
 
+The honest statements above are asserted too, not merely written down: tests
+check that at-rest encryption is still the default, that a job refuses to start
+with encryption on and nothing to encrypt with, that the app lock's rate limit
+has the shape claimed here and survives a reload, and that the warning texts
+still say the uncomfortable part rather than having been softened into
+reassurance.
+
 **VeilVoice contains no `unsafe` code.** Every crate carries
 `#![forbid(unsafe_code)]`, including the page-locking path.
 
 ---
 
-## 9. Status of this document
+## 10. Status of this document
 
 This is a design and rationale document, not a peer-reviewed security proof.
 The de-identification argument rests on information destruction that is easy to
