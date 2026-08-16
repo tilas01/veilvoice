@@ -145,7 +145,8 @@ it, you keep Tokyo Night and nothing else changes.</p>
 <table>
 <tr><th>Anonymise a recording</th><td>wav, mp3, flac, ogg, m4a in — a clean WAV out, metadata stripped. Around 90× faster than real time.</td></tr>
 <tr><th>Scramble live</th><td>Route the veiled voice into a virtual audio cable; every application on the machine receives it instead of you.</td></tr>
-<tr><th>Encrypt at rest</th><td>X25519 + ML-KEM-768 hybrid, so a recording captured today is not readable by a quantum adversary tomorrow.</td></tr>
+<tr><th>Encrypt at rest, by default</th><td>Every recording is sealed as it is written — X25519 + ML-KEM-768 hybrid, so one captured today is not readable by a quantum adversary tomorrow. Turning it off makes you read why first.</td></tr>
+<tr><th>Lock the app</th><td>A separate, rate-limited password gates the desktop app. It stops someone who picks up your unlocked computer; it is not tamper-proof, and the unlock screen says so.</td></tr>
 <tr><th>Strip metadata</th><td>Audio tags, image EXIF and GPS.</td></tr>
 <tr><th>Rust library</th><td>Every crate is a normal dependency; the engine is allocation-free and callback-safe.</td></tr>
 </table>
@@ -178,7 +179,7 @@ e-mail address attached. <a href="../assets/veilvoice-signing-key.asc">Public ke
 
 <h3>3. Rebuild it yourself — the strongest check</h3>
 <p>Releases are bit-for-bit reproducible. Build the tagged commit and compare:</p>
-<pre><code>git checkout v0.1.1
+<pre><code>git checkout v0.1.5
 export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
 cargo build --release --locked
 sha256sum target/release/veilvoice</code></pre>
@@ -201,6 +202,15 @@ binary is ever modified by signing, which is what lets it stay reproducible.</p>
 <tr><th>XChaCha20-Poly1305</th><td>192-bit random nonces remove the counter-management failure mode entirely.</td></tr>
 <tr><th>Authenticated header</th><td>The stored KDF cost cannot be downgraded to make cracking cheap.</td></tr>
 <tr><th>Amnesic memory</th><td>Keys are page-locked out of swap, zeroized on drop, compared in constant time.</td></tr>
+<tr><th>Sealed in memory</th><td>A recording that is going to be encrypted is never written to disk in the clear first — on flash storage, a plaintext file that is written and then deleted cannot be reliably taken back.</td></tr>
+</table>
+
+<h3>The app lock, and what it is worth</h3>
+<table>
+<tr><th>An Argon2id verifier</th><td>A password hash, stored and compared in constant time. It is not a key and encrypts nothing, because there is nothing local it could usefully encrypt.</td></tr>
+<tr><th>Rate limited</th><td>Three attempts free, then the wait doubles from 5 s to a 15-minute cap. The count is persisted after every attempt, so restarting the app does not reset it.</td></tr>
+<tr><th>A separate password</th><td>Different from the recording passphrase, and domain separated, so unlocking the app is not the same act as unsealing everything it has written.</td></tr>
+<tr><th>Not tamper-proof</th><td>Anyone who can write to your files can delete the lock; anyone holding the disk can edit the counter, move the clock, or attack the hash offline. This protects against casual access, not against the disk. Encrypt the volume if that is the threat.</td></tr>
 </table>
 
 <h3>Libre</h3>
