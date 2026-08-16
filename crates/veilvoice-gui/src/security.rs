@@ -702,7 +702,19 @@ impl Plan {
     /// Runs on the job thread, never the UI thread: Argon2id is meant to be
     /// slow. `wav` is the in-memory encoding, so an encrypted recording never
     /// exists on disk in the clear.
-    pub fn write(&self, path: &std::path::Path, wav: &[u8]) -> Result<PathBuf, String> {
+    ///
+    /// `params` is the caller's, rather than being read from
+    /// [`kdf::KdfParams::default`] in here. The app passes the default; the
+    /// tests pass a cheap profile, because a unit test that allocates 256 MiB
+    /// and runs three passes of Argon2 is not testing the thing it claims to —
+    /// it is testing the runner's memory, and on a CI machine running several
+    /// such tests at once it stops being a test at all.
+    pub fn write(
+        &self,
+        path: &std::path::Path,
+        wav: &[u8],
+        params: kdf::KdfParams,
+    ) -> Result<PathBuf, String> {
         let sealed = match self {
             Plan::Plaintext => {
                 std::fs::write(path, wav).map_err(|e| format!("{}: {e}", path.display()))?;
@@ -712,7 +724,7 @@ impl Plan {
                 return Err("encryption was requested but no key or passphrase was set".into())
             }
             Plan::Password(passphrase) => {
-                container::seal_with_password(passphrase.as_bytes(), wav, kdf::KdfParams::default())
+                container::seal_with_password(passphrase.as_bytes(), wav, params)
                     .map_err(|e| e.to_string())?
             }
             Plan::PublicKey(key_path) => {
@@ -818,6 +830,11 @@ fn password_row(ui: &mut egui::Ui, label: &str, value: &mut String) {
 mod tests {
     use super::*;
 
+    /// Cheap on purpose: these tests exercise the plan, not Argon2.
+    fn weak() -> kdf::KdfParams {
+        kdf::KdfParams::weak_for_tests()
+    }
+
     #[test]
     fn encryption_at_rest_is_the_default() {
         let s = Security::default();
@@ -885,7 +902,7 @@ mod tests {
     fn a_plan_with_nothing_set_refuses_rather_than_writing_plaintext() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("clip.wav");
-        assert!(Plan::Missing.write(&path, b"audio").is_err());
+        assert!(Plan::Missing.write(&path, b"audio", weak()).is_err());
         assert!(!path.exists(), "nothing may be written on refusal");
     }
 
@@ -896,7 +913,7 @@ mod tests {
         let wav = b"RIFF....WAVEfake but recognisable".to_vec();
 
         let out = Plan::Password("a recording passphrase".into())
-            .write(&path, &wav)
+            .write(&path, &wav, weak())
             .unwrap();
         assert_eq!(out, container::veil_path(&path));
         assert!(!path.exists(), "the plaintext must never reach the disk");
@@ -913,7 +930,9 @@ mod tests {
     fn a_plaintext_plan_writes_the_file_as_asked() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("clip.wav");
-        let out = Plan::Plaintext.write(&path, b"audio bytes").unwrap();
+        let out = Plan::Plaintext
+            .write(&path, b"audio bytes", weak())
+            .unwrap();
         assert_eq!(out, path);
         assert_eq!(std::fs::read(&path).unwrap(), b"audio bytes");
     }

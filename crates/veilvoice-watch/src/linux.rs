@@ -83,7 +83,7 @@ pub fn scan() -> Result<Vec<DeviceUse>, Error> {
         }
     }
 
-    found.sort_by(|a, b| (a.kind, a.pid).cmp(&(b.kind, b.pid)));
+    found.sort_by_key(|u| (u.kind, u.pid));
     Ok(found)
 }
 
