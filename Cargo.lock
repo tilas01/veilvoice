@@ -3900,6 +3900,7 @@ dependencies = [
  "veilvoice-crypto",
  "veilvoice-meta",
  "veilvoice-watch",
+ "zeroize",
 ]
 
 [[package]]

@@ -23,20 +23,44 @@
 //!
 //! # A limitation of typing a password into a window
 //!
-//! Passphrases typed here live in an ordinary `String` for as long as the text
-//! field owns them, because that is what the widget requires. They are zeroized
-//! the moment they are consumed or the app locks, but while they are on screen
-//! they are not page-locked and could reach swap. The derived key never is:
-//! everything past this module is a [`veilvoice_crypto::Secret`]. The same
-//! caveat applies to the CLI's prompt, and is stated rather than engineered
-//! around, because the alternative is a custom text widget nobody would audit.
+//! A text field owns a `String`, so a passphrase exists as ordinary heap bytes
+//! while it is being typed. That window cannot be removed — something has to
+//! receive the keystrokes — but it can be kept short, and it is:
+//!
+//! - the typing buffer is wiped the moment the passphrase is confirmed;
+//! - the confirmed passphrase is held only as a [`veilvoice_crypto::Secret`],
+//!   page-locked and zeroized on drop, for the rest of the session;
+//! - locking the app, or changing the passphrase, wipes both.
+//!
+//! It used to be kept as a plain `String` for the whole session, which was a
+//! much larger window for no benefit.
+//!
+//! None of this defends against someone who can read this process's memory. If
+//! they can, they have already won, and `docs/WHITEPAPER.md` §7 says so rather
+//! than implying otherwise. What it does is stop a passphrase lingering in a
+//! heap allocation long after it was needed, where a core dump or a swapped
+//! page could pick it up.
 
 use crate::theme::palette as p;
 use egui::{Color32, RichText};
 use std::path::PathBuf;
 use std::sync::mpsc;
-use veilvoice_crypto::{container, kdf, lock, LockStore};
+use veilvoice_crypto::{container, kdf, lock, LockStore, Secret};
 use zeroize::Zeroize;
+
+/// Move a typed passphrase out of its `String` and into page-locked storage,
+/// wiping the buffer it came from.
+///
+/// No `unsafe`, so the intermediate `Vec` is a genuine second copy for a
+/// moment; `Secret::new` wipes it before returning. Writing through
+/// `String::as_bytes_mut` would avoid the copy and is not worth an `unsafe`
+/// block in a crate that has none.
+fn into_secret(typed: &mut String) -> Secret {
+    let mut bytes = typed.as_bytes().to_vec();
+    let secret = Secret::new(&mut bytes);
+    typed.zeroize();
+    secret
+}
 
 /// How the recording that comes out of a job is protected.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -87,8 +111,16 @@ pub struct Security {
     pub sealing: Sealing,
     /// Recipient public key, for [`Sealing::PublicKey`].
     pub public_key: Option<PathBuf>,
-    /// The session passphrase, once confirmed.
+    /// The typing buffer. Held in a `String` only because that is what the
+    /// text widget requires, and wiped the moment it is confirmed.
     passphrase: String,
+    /// The confirmed session passphrase, in page-locked storage.
+    ///
+    /// Kept here rather than as the `String` above so that the plaintext
+    /// version exists only while it is being typed, instead of for the
+    /// whole session. That does not make it safe against someone who can
+    /// read this process's memory -- nothing can -- it shortens the window.
+    held: Option<Secret>,
     /// Whether `passphrase` has been confirmed against `passphrase_repeat`.
     passphrase_set: bool,
     passphrase_repeat: String,
@@ -116,6 +148,7 @@ impl Default for Security {
             sealing: Sealing::Password,
             public_key: None,
             passphrase: String::new(),
+            held: None,
             passphrase_set: false,
             passphrase_repeat: String::new(),
             confirm_disable: false,
@@ -188,6 +221,7 @@ impl Security {
         ] {
             field.zeroize();
         }
+        self.held = None;
         self.passphrase_set = false;
     }
 
@@ -198,7 +232,7 @@ impl Security {
             return true;
         }
         match self.sealing {
-            Sealing::Password => self.passphrase_set,
+            Sealing::Password => self.held.is_some(),
             Sealing::PublicKey => self.public_key.is_some(),
         }
     }
@@ -223,7 +257,10 @@ impl Security {
             return Plan::Plaintext;
         }
         match self.sealing {
-            Sealing::Password => Plan::Password(self.passphrase.clone()),
+            Sealing::Password => match &self.held {
+                Some(secret) => Plan::Password(secret.clone()),
+                None => Plan::Missing,
+            },
             Sealing::PublicKey => match &self.public_key {
                 Some(path) => Plan::PublicKey(path.clone()),
                 // Unreachable through the UI, which gates on `ready_to_write`,
@@ -561,11 +598,12 @@ impl Security {
         });
 
         match self.sealing {
-            Sealing::Password if self.passphrase_set => {
+            Sealing::Password if self.held.is_some() => {
                 ui.horizontal(|ui| {
                     ui.label(RichText::new("passphrase set for this session").color(p::GREEN));
                     if ui.button("change").clicked() {
                         self.passphrase.zeroize();
+                        self.held = None;
                         self.passphrase_set = false;
                     }
                 });
@@ -579,6 +617,7 @@ impl Security {
                     .add_enabled(matched, egui::Button::new("use this passphrase"))
                     .clicked()
                 {
+                    self.held = Some(into_secret(&mut self.passphrase));
                     self.passphrase_repeat.zeroize();
                     self.passphrase_set = true;
                 }
@@ -686,7 +725,7 @@ pub const DISABLE_WARNING: &[&str] = &[
 #[derive(Clone, PartialEq, Eq)]
 pub enum Plan {
     /// Seal with Argon2id over this passphrase.
-    Password(String),
+    Password(Secret),
     /// Seal to the hybrid public key in this file.
     PublicKey(PathBuf),
     /// Write in the clear, as explicitly chosen.
@@ -724,7 +763,7 @@ impl Plan {
                 return Err("encryption was requested but no key or passphrase was set".into())
             }
             Plan::Password(passphrase) => {
-                container::seal_with_password(passphrase.as_bytes(), wav, params)
+                container::seal_with_password(passphrase.expose(), wav, params)
                     .map_err(|e| e.to_string())?
             }
             Plan::PublicKey(key_path) => {
@@ -738,14 +777,6 @@ impl Plan {
         let out = container::veil_path(path);
         std::fs::write(&out, &sealed).map_err(|e| format!("{}: {e}", out.display()))?;
         Ok(out)
-    }
-}
-
-impl Drop for Plan {
-    fn drop(&mut self) {
-        if let Plan::Password(passphrase) = self {
-            passphrase.zeroize();
-        }
     }
 }
 
@@ -912,9 +943,11 @@ mod tests {
         let path = dir.path().join("clip.veiled.wav");
         let wav = b"RIFF....WAVEfake but recognisable".to_vec();
 
-        let out = Plan::Password("a recording passphrase".into())
+        let mut typed = String::from("a recording passphrase");
+        let out = Plan::Password(into_secret(&mut typed))
             .write(&path, &wav, weak())
             .unwrap();
+        assert!(typed.is_empty(), "the typing buffer must be wiped");
         assert_eq!(out, container::veil_path(&path));
         assert!(!path.exists(), "the plaintext must never reach the disk");
 
@@ -935,6 +968,39 @@ mod tests {
             .unwrap();
         assert_eq!(out, path);
         assert_eq!(std::fs::read(&path).unwrap(), b"audio bytes");
+    }
+
+    /// The confirmed passphrase must not linger as ordinary heap bytes. It used
+    /// to be kept as a `String` for the whole session; it is now moved into a
+    /// page-locked `Secret` the moment it is confirmed, and the typing buffer
+    /// is wiped.
+    #[test]
+    fn the_confirmed_passphrase_leaves_no_plaintext_buffer_behind() {
+        let mut typed = String::from("a recording passphrase");
+        let secret = into_secret(&mut typed);
+
+        assert!(typed.is_empty(), "the typing buffer must be wiped");
+        assert_eq!(secret.expose(), b"a recording passphrase");
+        assert!(
+            format!("{secret:?}").contains("redacted"),
+            "a secret must not be printable"
+        );
+    }
+
+    /// And the plan handed to the worker thread carries the `Secret`, not a
+    /// copy of the text.
+    #[test]
+    fn the_plan_carries_page_locked_material_not_a_string() {
+        let mut s = Security::default();
+        let mut typed = String::from("session passphrase");
+        s.held = Some(into_secret(&mut typed));
+        s.passphrase_set = true;
+
+        assert!(s.ready_to_write());
+        match s.plan() {
+            Plan::Password(secret) => assert_eq!(secret.expose(), b"session passphrase"),
+            other => panic!("expected a password plan, got {other:?}"),
+        }
     }
 
     /// Locking must take the session passphrase with it, or "locked" would be

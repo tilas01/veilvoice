@@ -10,7 +10,7 @@ mod atrest;
 mod lock;
 mod theme;
 
-use atrest::read_new_password;
+use atrest::{prompt_secret, read_new_password};
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -592,7 +592,7 @@ fn encrypt(input: PathBuf, output: Option<PathBuf>, to: Option<PathBuf>) -> Resu
                     "  Deriving key (Argon2id, this is meant to be slow)..."
                 )
             );
-            container::seal_with_password(&password, &plaintext, kdf::KdfParams::default())
+            container::seal_with_password(password.expose(), &plaintext, kdf::KdfParams::default())
                 .map_err(|e| e.to_string())?
         }
     };
@@ -611,9 +611,8 @@ fn decrypt(input: PathBuf, output: PathBuf, key: Option<PathBuf>) -> Result<(), 
             container::open_with_secret_key(&sk, &sealed).map_err(|e| e.to_string())?
         }
         None => {
-            let password = rpassword::prompt_password("Passphrase: ").map_err(|e| e.to_string())?;
-            container::open_with_password(password.as_bytes(), &sealed)
-                .map_err(|e| e.to_string())?
+            let password = prompt_secret("Passphrase: ")?;
+            container::open_with_password(password.expose(), &sealed).map_err(|e| e.to_string())?
         }
     };
 
@@ -625,9 +624,9 @@ fn decrypt(input: PathBuf, output: PathBuf, key: Option<PathBuf>) -> Result<(), 
 /// Load a private key file, which is itself a password-locked container.
 fn load_secret_key(path: &std::path::Path) -> Result<hybrid::SecretKey, String> {
     let sealed = std::fs::read(path).map_err(|e| e.to_string())?;
-    let password = rpassword::prompt_password("Key passphrase: ").map_err(|e| e.to_string())?;
+    let password = prompt_secret("Key passphrase: ")?;
     let encoded =
-        container::open_with_password(password.as_bytes(), &sealed).map_err(|e| e.to_string())?;
+        container::open_with_password(password.expose(), &sealed).map_err(|e| e.to_string())?;
     hybrid::SecretKey::from_bytes(&encoded).map_err(|e| e.to_string())
 }
 
@@ -662,9 +661,12 @@ fn keygen(public: PathBuf, secret: PathBuf) -> Result<(), String> {
         )
     );
     let encoded = sk.to_bytes();
-    let sealed =
-        container::seal_with_password(&password, encoded.expose(), kdf::KdfParams::default())
-            .map_err(|e| e.to_string())?;
+    let sealed = container::seal_with_password(
+        password.expose(),
+        encoded.expose(),
+        kdf::KdfParams::default(),
+    )
+    .map_err(|e| e.to_string())?;
 
     std::fs::write(&public, pk.to_bytes()).map_err(|e| e.to_string())?;
     std::fs::write(&secret, &sealed).map_err(|e| e.to_string())?;
