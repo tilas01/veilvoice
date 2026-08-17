@@ -6,6 +6,116 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## v0.1.8
+
+A security release. A third audit round, run against the *classes* of defect
+rather than against a list of things that seemed worth checking, found and fixed
+**twenty-eight** of them -- thirteen in the Rust, fifteen in the website.
+
+Nothing here is a confidentiality failure: no finding let anyone recover a
+voiceprint, read a sealed recording or bypass a password. Several are worse than
+that sounds anyway, because they are failures of the thing being relied on. Full
+write-ups, one per finding, are in [`docs/AUDIT.md`](docs/AUDIT.md).
+
+### Security fixes -- the engine and the tools
+
+- **A four-kilobyte WAV killed the process (F-9).** A file declaring a sample
+  rate of zero made the decoder panic inside its own probe, before VeilVoice saw
+  anything it could check -- and the release profile sets `panic = "abort"`, so
+  that was the program ending rather than an error. `veilvoice anonymise` on a
+  file somebody sent you was the whole of it. Now pre-flighted and refused with
+  an explanation.
+- **A configuration value made every output sample silent (F-10).** `NaN`
+  passed validation, because `NaN` compares false against every bound. The
+  engine built happily and produced `NaN` for the rest of the session with
+  nothing reported. The same shape as the v0.1.6 finding about a single bad
+  *sample*, reached through the configuration instead. An absurd sample rate --
+  which a WAV header can carry, as a `u32` -- also asked for about two gigabytes
+  of delay lines from a four-kilobyte file.
+- **Secure erase destroyed the wrong file (F-12).** It followed symbolic links,
+  so erasing a link filled its *target* with random data, unlinked only the
+  link, and reported success. It now refuses a link and says why.
+- **Secure erase never finished on 32-bit builds (F-11).** A 4 GiB file
+  truncated a length to zero and the overwrite loop ran for ever, leaving the
+  file intact. Reachable only on the ARMv7 build; found by reading.
+- **A planted executable in the working directory was run (F-13).** On Windows
+  the program-search order includes the current directory, so
+  `Command::new("reg")` in the monitor and `wevtutil` in the tamper detector
+  could execute a file that happened to be sitting beside you. Both now resolve
+  to absolute paths under the system directory.
+- **Secrets were created world-readable and tightened afterwards (F-14, F-15).**
+  The app-lock verifier -- rewritten after *every failed unlock attempt* -- plus
+  `keygen`'s private key, `decrypt`'s plaintext output and an unencrypted
+  recording. All now created owner-only in the first place, through a new
+  `veilvoice_crypto::privatefile` module.
+- **The post-quantum shared secret was not zeroized (F-18).**
+- Plus: an unbounded decode that a compressed file could turn into an
+  out-of-memory abort (F-17); a corrupt WAV the metadata cleaner could hand back
+  as clean (F-19); app-lock cost parameters validated too late (F-20); a
+  manifest that reported every recorded file as new (F-21); and a Windows
+  attribution query whose escaping was wrong, so it told the user the wrong
+  reason it could not see (F-16).
+
+### Security fixes -- the website
+
+- **The Markdown renderer could freeze the reader's tab.** Two independent
+  quadratics, measured rather than guessed: 128 000 characters on one line took
+  **eight seconds**, and a second shape took **fourteen**. That is on the main
+  thread, on text the page fetches over the network. Both are now linear
+  (F-22, F-23).
+- **A deeply nested blockquote crashed the render** and the reader was told the
+  network had failed (F-24).
+- **Download links from the GitHub API were assigned with no scheme check**
+  (F-26) -- the item the previous audit listed as open. A refused asset is still
+  named, just not clickable.
+- **The legal gate was an invisible modal** on any engine older than Chrome 111,
+  Safari 16.2 or Firefox 113: `color-mix()` with no fallback left it with no
+  background while it still locked scrolling (F-30). And it **could not be
+  dismissed at all on an iPhone**, because `88vh` put the continue button below
+  the visible area while the page behind was scroll-locked (F-33).
+- **No focus ring at all on Safari before 15.4** (F-31), **no header blur on
+  iOS 17 and earlier** (F-29), and **native controls drawn light on a dark
+  page** (F-32).
+- **The mobile header took a fifth of the screen** -- 165 px of an iPhone's
+  812 px, at every scroll position -- and its links were below the minimum
+  touch-target size. Now 79 px with a single scrolling row (F-34).
+- A code fence could reach `Object.prototype` (F-25); a malformed API response
+  was reported as a network failure (F-27); repo-relative links resolved
+  somewhere other than where they pointed (F-28); the in-browser verifier gave
+  an unusable error on an insecure origin (F-35) and used twice the memory it
+  needed (F-36).
+
+### Added
+
+- **`fuzz/`** -- six coverage-guided libFuzzer targets, one per parser that
+  reads bytes somebody else produced, with overflow checks deliberately left
+  **on** in an otherwise optimised profile, because two of this project's shipped
+  defects were arithmetic overflows that a release-profile fuzzer cannot see.
+  Built and type-checked against the real APIs; **not yet run to convergence**,
+  and `fuzz/README.md` says so plainly rather than implying otherwise.
+- **A KDF cost ceiling for unattended callers** --
+  `container::open_with_password_within` and `KdfParams::UNATTENDED_MAX_M_COST`.
+  A hostile container can declare a legal-but-expensive cost; a service
+  processing files it did not choose can now decline instead of spending the
+  memory. The other item the previous audit listed as open.
+
+### Testing
+
+- 269 tests to **285**, and five website suites to **seven**.
+- **`tools/site-tests/markdown.complexity.test.js`** asserts the renderer stays
+  *linear*, by measuring the same shape at two sizes and comparing the ratio.
+  Each measurement runs in a child process with a timeout, because a regular
+  expression cannot be interrupted once it starts backtracking -- an in-process
+  version would hang instead of failing, and a hung CI job gets retried while a
+  failing one gets read.
+- **`tools/site-tests/repo.test.js`** drives the repository panel against
+  scripted hostile API responses through the real DOM path.
+- **`tools/site-tests/css.test.js`** checks the cross-engine invariants that
+  have no build step to enforce them: a `-webkit-` prefix beside every
+  `backdrop-filter`, a plain colour before every `color-mix()`, a `:focus`
+  fallback beside every `:focus-visible`, a `color-scheme` on every theme
+  matching its own background, and a `dvh` upgrade after every `vh`.
+
 ## v0.1.7
 
 ### Added

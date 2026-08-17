@@ -87,10 +87,49 @@ impl DeidConfig {
         (1.0 + (bounds.0 - 1.0) * s, 1.0 + (bounds.1 - 1.0) * s)
     }
 
+    /// The largest sample rate this engine will build for, in Hz.
+    ///
+    /// Every value in here is reachable from a file: a WAV's `fmt ` chunk
+    /// carries a **`u32`** sample rate, and `symphonia` passes whatever it
+    /// finds straight through. That number then sizes the delay lines in
+    /// `effects.rs` — `Reverb`'s comb is `0.0297 × sample_rate` samples and the
+    /// chorus voices are similar — so a four-kilobyte file declaring
+    /// `u32::MAX` asks for roughly two gigabytes of buffers before a single
+    /// sample is processed. A failed allocation in Rust aborts the process,
+    /// which is the same shape as F-3: opening a hostile file kills the
+    /// program.
+    ///
+    /// 768 kHz is chosen well above anything real. Professional converters top
+    /// out at 384 kHz and DSD-rate PCM at 705.6 kHz; nothing legitimate asks
+    /// for more, and the largest buffer this permits is a few megabytes.
+    pub const MAX_SAMPLE_RATE: f32 = 768_000.0;
+
+    /// The largest FFT size this engine will build for.
+    ///
+    /// Bounded for the same reason as the sample rate: `frame_size` sizes every
+    /// internal buffer and the FFT plan, and there was previously no upper
+    /// limit at all, so a caller could ask for a `usize::MAX / 2` transform.
+    /// 65536 is eight times the largest size anyone uses for speech.
+    pub const MAX_FRAME_SIZE: usize = 1 << 16;
+
     /// Validate and normalise; returns an error string on impossible values.
+    ///
+    /// Every float is checked for finiteness, not merely for range. A `NaN`
+    /// compares false against every bound, so a bare `self.sample_rate <
+    /// 8_000.0` test *passes* `NaN` — and an engine built at a `NaN` sample
+    /// rate produced `NaN` for every output sample, for the whole session,
+    /// with nothing reported. That is F-5 arriving through a second door: F-5
+    /// sanitised the samples, and nothing sanitised the configuration they were
+    /// processed under.
     pub fn checked(mut self) -> Result<Self, String> {
         if self.frame_size < 64 || !self.frame_size.is_multiple_of(2) {
             return Err("frame_size must be even and >= 64".into());
+        }
+        if self.frame_size > Self::MAX_FRAME_SIZE {
+            return Err(format!(
+                "frame_size must be at most {}",
+                Self::MAX_FRAME_SIZE
+            ));
         }
         if !(2..=16).contains(&self.overlap) {
             return Err("overlap must be in 2..=16".into());
@@ -98,14 +137,69 @@ impl DeidConfig {
         if !self.frame_size.is_multiple_of(self.overlap) {
             return Err("frame_size must be divisible by overlap".into());
         }
+        // `is_finite` first: `NaN < 8_000.0` is false, so a range test alone
+        // lets it through.
+        if !self.sample_rate.is_finite() {
+            return Err("sample_rate must be a real number".into());
+        }
         if self.sample_rate < 8_000.0 {
             return Err("sample_rate too low".into());
+        }
+        if self.sample_rate > Self::MAX_SAMPLE_RATE {
+            return Err(format!(
+                "sample_rate {} Hz is above the {} Hz this engine will build for",
+                self.sample_rate,
+                Self::MAX_SAMPLE_RATE
+            ));
         }
         if !self.reseed_secs.is_finite() || self.reseed_secs < 0.0 {
             return Err("reseed_secs must be zero or a positive number of seconds".into());
         }
+        // The remaining floats are all clamped rather than refused, because
+        // every one of them has a meaningful nearest legal value — but a `NaN`
+        // does not clamp, it propagates, so it is refused by name.
+        for (name, value) in [
+            ("intensity", self.intensity),
+            ("mod_smooth", self.mod_smooth),
+            ("distortion_drive", self.distortion_drive),
+            ("distortion_mix", self.distortion_mix),
+            ("chorus_mix", self.chorus_mix),
+            ("reverb_mix", self.reverb_mix),
+            ("pitch_bounds.0", self.pitch_bounds.0),
+            ("pitch_bounds.1", self.pitch_bounds.1),
+            ("formant_bounds.0", self.formant_bounds.0),
+            ("formant_bounds.1", self.formant_bounds.1),
+        ] {
+            if !value.is_finite() {
+                return Err(format!("{name} must be a real number"));
+            }
+        }
         self.intensity = self.intensity.clamp(0.0, 1.0);
+        self.mod_smooth = self.mod_smooth.clamp(1e-6, 1.0);
+        self.distortion_mix = self.distortion_mix.clamp(0.0, 1.0);
+        self.chorus_mix = self.chorus_mix.clamp(0.0, 1.0);
+        self.reverb_mix = self.reverb_mix.clamp(0.0, 1.0);
+        self.distortion_drive = self.distortion_drive.clamp(0.01, 64.0);
+        // Ratios outside this are not a transform, they are a resampler with a
+        // pathological factor; `resample_linear` already substitutes 1.0 for
+        // anything non-finite, and this stops the merely absurd as well.
+        self.pitch_bounds = clamp_ratio_bounds(self.pitch_bounds);
+        self.formant_bounds = clamp_ratio_bounds(self.formant_bounds);
         Ok(self)
+    }
+}
+
+/// Keep a `(lo, hi)` ratio pair inside a range a resampler can act on, and in
+/// the right order.
+fn clamp_ratio_bounds((lo, hi): (f32, f32)) -> (f32, f32) {
+    const MIN: f32 = 0.05;
+    const MAX: f32 = 20.0;
+    let lo = lo.clamp(MIN, MAX);
+    let hi = hi.clamp(MIN, MAX);
+    if lo <= hi {
+        (lo, hi)
+    } else {
+        (hi, lo)
     }
 }
 

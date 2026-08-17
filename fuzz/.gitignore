@@ -1,0 +1,8 @@
+# cargo-fuzz working directories. Corpora and crash artefacts are local
+# findings, not source: a crash worth keeping becomes a test in the crate it
+# belongs to, which is where it will actually keep being run.
+target/
+corpus/
+artifacts/
+coverage/
+Cargo.lock
