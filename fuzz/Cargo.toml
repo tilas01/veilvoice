@@ -1,0 +1,79 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Coverage-guided fuzzing for every parser in VeilVoice that reads bytes
+# somebody else produced.
+#
+# Deliberately OUTSIDE the workspace (see `exclude` in the root Cargo.toml).
+# `cargo fuzz` needs a nightly toolchain and libFuzzer, and the workspace pins
+# stable so that everything else can be run by anyone who cloned the repository.
+# Keeping this separate means the pinned toolchain is not disturbed by a tool
+# most people will never run, and `cargo build` on a fresh clone does not
+# suddenly demand nightly.
+#
+# See fuzz/README.md for how to run it and what it has found.
+
+[package]
+name = "veilvoice-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+license = "GPL-3.0-or-later"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+veilvoice-crypto = { path = "../crates/veilvoice-crypto" }
+veilvoice-meta = { path = "../crates/veilvoice-meta" }
+veilvoice-guard = { path = "../crates/veilvoice-guard" }
+# `default-features = false` drops cpal: the fuzzers touch decoding and header
+# checking only, and there is no reason to link an audio backend into them.
+veilvoice-audio = { path = "../crates/veilvoice-audio", default-features = false }
+
+[[bin]]
+name = "container_header"
+path = "fuzz_targets/container_header.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "lock_file"
+path = "fuzz_targets/lock_file.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "wav_chunks"
+path = "fuzz_targets/wav_chunks.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "wav_preflight"
+path = "fuzz_targets/wav_preflight.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "guard_manifest"
+path = "fuzz_targets/guard_manifest.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "hybrid_keys"
+path = "fuzz_targets/hybrid_keys.rs"
+test = false
+doc = false
+
+# Overflow checks ON, deliberately, in a profile that is otherwise optimised.
+#
+# This is the whole reason the release profile's setting is not simply
+# inherited: `overflow-checks = false` is what hid F-2 and F-4 from every
+# release-mode run. A fuzzer that cannot see an arithmetic overflow cannot find
+# the two bugs of that shape this project has already shipped.
+[profile.release]
+debug = 1
+overflow-checks = true
+debug-assertions = true

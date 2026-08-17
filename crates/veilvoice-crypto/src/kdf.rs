@@ -73,6 +73,43 @@ impl KdfParams {
     /// small machine; it can stop an absurd number from being taken seriously.
     pub const MAX_M_COST: u32 = 4 * 1024 * 1024;
 
+    /// A ceiling for a caller with nobody watching.
+    ///
+    /// [`MAX_M_COST`](Self::MAX_M_COST) exists to stop an *absurd* value; it is
+    /// deliberately generous, so a container may still declare a legitimate but
+    /// expensive cost and make itself slow to open. That is fine when a person
+    /// chose to open that file and can decide to stop waiting. It is not fine
+    /// for a service processing whatever arrives, which is why
+    /// [`KdfParams::within`] exists and this is the value to pass it: 1 GiB is
+    /// four times this crate's default and still opens in a few seconds, while
+    /// refusing a header that asks for four gigabytes of someone else's memory.
+    ///
+    /// This is a *policy*, not a security boundary — the honest framing is that
+    /// it bounds the cost of being handed a hostile file, not that it makes one
+    /// safe.
+    pub const UNATTENDED_MAX_M_COST: u32 = 1024 * 1024;
+
+    /// Check the costs against a caller-chosen memory ceiling as well as the
+    /// built-in one.
+    ///
+    /// Opening a container whose declared cost is legitimate but large is slow
+    /// by design, and that is the price of shipping the cost with the file so
+    /// old files keep opening. A caller running without a human present — a
+    /// batch job, a service, anything processing files it did not choose — can
+    /// use this to decline instead of spending the memory. Pass
+    /// [`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) unless there is a
+    /// reason for something else.
+    pub fn within(&self, max_m_cost: u32) -> Result<(), Error> {
+        self.checked()?;
+        if self.m_cost > max_m_cost {
+            return Err(Error::KdfCostRefused {
+                requested: self.m_cost,
+                ceiling: max_m_cost,
+            });
+        }
+        Ok(())
+    }
+
     /// Check the costs are ones Argon2 can accept, **before** handing them to
     /// it.
     ///

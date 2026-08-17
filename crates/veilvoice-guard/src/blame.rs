@@ -31,6 +31,36 @@
 
 use std::path::Path;
 
+/// Resolve a system tool to an absolute path, rather than letting the operating
+/// system search for it.
+///
+/// `Command::new("wevtutil")` does **not** mean "the Windows tool". Rust's
+/// `Command` resolves a bare name through the platform's search order, and on
+/// Windows that order includes the **current working directory** before most of
+/// `PATH`. Running `veilvoice guard check` inside a directory that happens to
+/// contain a file called `wevtutil.exe` therefore ran that file — as the user,
+/// with no prompt. A downloads folder is enough. The same applies to `reg.exe`
+/// in `veilvoice-watch`, and to `ausearch` on a Unix box with a writable
+/// directory early in `PATH`.
+///
+/// Naming the absolute path removes the search entirely. Returning `None` when
+/// the tool is not where it should be is the right answer too: this module's
+/// whole design is to say "I cannot tell you" rather than to guess, and running
+/// *something else called `wevtutil`* is the worst possible guess.
+#[cfg_attr(not(any(target_os = "linux", windows)), allow(dead_code))]
+fn system_tool(name: &str, directories: &[&str]) -> Option<std::path::PathBuf> {
+    for directory in directories {
+        if directory.is_empty() {
+            continue;
+        }
+        let candidate = Path::new(directory).join(name);
+        if candidate.is_file() {
+            return Some(candidate);
+        }
+    }
+    None
+}
+
 /// What, if anything, is known about who changed a file.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Blame {
@@ -112,14 +142,21 @@ mod linux {
     use std::path::Path;
     use std::process::Command;
 
+    /// Where a distribution puts `ausearch`. Searched in order, and nowhere
+    /// else — see [`super::system_tool`] for why `PATH` is not consulted.
+    const AUSEARCH_DIRS: &[&str] = &["/sbin", "/usr/sbin", "/bin", "/usr/bin", "/usr/local/sbin"];
+
     /// Ask `ausearch` what touched the path, if the audit tools are present at
     /// all and this process is allowed to read the records.
     pub fn who_touched(path: &Path) -> Blame {
-        let Ok(output) = Command::new("ausearch")
+        let Some(ausearch) = super::system_tool("ausearch", AUSEARCH_DIRS) else {
+            return unconfigured("the audit tools (ausearch) are not installed");
+        };
+        let Ok(output) = Command::new(ausearch)
             .args(["-f", &path.to_string_lossy(), "-i", "-m", "PATH"])
             .output()
         else {
-            return unconfigured("the audit tools (ausearch) are not installed");
+            return unconfigured("the audit tools (ausearch) could not be run");
         };
         if !output.status.success() {
             return unconfigured(
@@ -189,17 +226,49 @@ mod windows {
     /// process name. It is only written if a SACL is on the object *and* the
     /// audit policy is on, which is off by default; and reading the Security
     /// log needs elevation. All three are ordinary reasons to get nothing.
+    /// `wevtutil.exe` lives in the system directory and nowhere else. Resolved
+    /// absolutely rather than searched — see [`super::system_tool`].
+    fn wevtutil() -> Option<std::path::PathBuf> {
+        let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".to_string());
+        super::system_tool(
+            "wevtutil.exe",
+            &[&format!(r"{root}\System32"), &format!(r"{root}\Sysnative")],
+        )
+    }
+
     pub fn who_touched(path: &Path) -> Blame {
+        let target = path.to_string_lossy();
+
+        // XPath 1.0 — which is what `wevtutil`'s structured queries speak — has
+        // **no escape at all** for a quote inside a string literal. The
+        // previous code doubled the apostrophe, which is the SQL and XQuery
+        // rule, not this one; the result was a syntactically broken query that
+        // failed and was then reported to the user as "object-access auditing
+        // is off". A wrong explanation is worse than none here, because the
+        // whole module exists to be honest about what it cannot see. Since the
+        // character cannot be escaped, the only correct answer is to decline
+        // the query and say exactly why.
+        if target.contains('\'') {
+            return Blame::Unknown {
+                why: "this path contains an apostrophe, which the Windows event-log query \
+                      language cannot express — so the Security log cannot be searched for it"
+                    .to_string(),
+                remedy: "read Security event 4663 for this path directly in Event Viewer",
+            };
+        }
+
         let query = format!(
-            "*[System[(EventID=4663)]] and *[EventData[Data[@Name='ObjectName']='{}']]",
-            path.to_string_lossy().replace('\'', "''")
+            "*[System[(EventID=4663)]] and *[EventData[Data[@Name='ObjectName']='{target}']]"
         );
-        let Ok(output) = Command::new("wevtutil")
+        let Some(wevtutil) = wevtutil() else {
+            return unconfigured("wevtutil is not available");
+        };
+        let Ok(output) = Command::new(wevtutil)
             .args(["qe", "Security", "/f:text", "/c:1", "/rd:true"])
             .arg(format!("/q:{query}"))
             .output()
         else {
-            return unconfigured("wevtutil is not available");
+            return unconfigured("wevtutil could not be run");
         };
         if !output.status.success() {
             return unconfigured(

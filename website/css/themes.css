@@ -7,10 +7,18 @@
  * Tokyo Night is the default and is declared on :root so the page has correct
  * colours before any JavaScript runs — including for readers who block it
  * entirely. The others are opt-in via [data-theme] on <html>.
+ *
+ * Each block also declares `color-scheme`, beside the colours it has to agree
+ * with. That is the one thing CSS custom properties cannot reach: the browser's
+ * *native* controls -- the theme `<select>`'s dropdown list, the verifier's
+ * `<progress>` bar, the file picker -- are drawn by the platform, and without
+ * this they are drawn light on a near-black page. Keeping it in the same block
+ * as the palette means a new theme cannot be added with the wrong one.
  */
 
 :root,
 :root[data-theme="tokyo-night"] {
+  color-scheme: dark;
   --bg:        #1a1b26;
   --bg-soft:   #1f2335;
   --bg-inset:  #16161e;
@@ -26,6 +34,7 @@
 }
 
 :root[data-theme="gruvbox"] {
+  color-scheme: dark;
   --bg:        #282828;
   --bg-soft:   #32302f;
   --bg-inset:  #1d2021;
@@ -41,6 +50,7 @@
 }
 
 :root[data-theme="dracula"] {
+  color-scheme: dark;
   --bg:        #282a36;
   --bg-soft:   #343746;
   --bg-inset:  #21222c;
@@ -56,6 +66,7 @@
 }
 
 :root[data-theme="nord"] {
+  color-scheme: dark;
   --bg:        #2e3440;
   --bg-soft:   #3b4252;
   --bg-inset:  #272c36;
@@ -71,6 +82,7 @@
 }
 
 :root[data-theme="catppuccin"] {
+  color-scheme: dark;
   --bg:        #1e1e2e;
   --bg-soft:   #313244;
   --bg-inset:  #181825;
@@ -86,6 +98,7 @@
 }
 
 :root[data-theme="everforest"] {
+  color-scheme: dark;
   --bg:        #2d353b;
   --bg-soft:   #343f44;
   --bg-inset:  #272e33;
@@ -101,6 +114,7 @@
 }
 
 :root[data-theme="solarized"] {
+  color-scheme: dark;
   --bg:        #002b36;
   --bg-soft:   #073642;
   --bg-inset:  #00212b;
@@ -116,6 +130,7 @@
 }
 
 :root[data-theme="rose-pine"] {
+  color-scheme: dark;
   --bg:        #191724;
   --bg-soft:   #1f1d2e;
   --bg-inset:  #14121f;
@@ -133,6 +148,7 @@
 /* A light option, because a dark-only site is unreadable in bright sun and
  * some people simply prefer it. Same tokens, inverted relationships. */
 :root[data-theme="paper"] {
+  color-scheme: light;
   --bg:        #faf4ed;
   --bg-soft:   #f2e9e1;
   --bg-inset:  #fffaf3;

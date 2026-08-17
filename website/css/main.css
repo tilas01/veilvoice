@@ -11,7 +11,27 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+
+  /* Tell the browser this page is dark, so *native* controls follow.
+   *
+   * Without it, the `<select>` for the colour scheme, the `<progress>` bar in
+   * the verifier and the file input all render in the platform's light styling
+   * on a dark page -- a white dropdown list on a near-black background. It is
+   * the one part of the page CSS cannot reach, and one declaration fixes it on
+   * every engine. The value is set per theme in themes.css, beside the colours
+   * it has to agree with, so the two cannot drift apart; this is the default
+   * for the moment before a theme is applied.
+   */
+  color-scheme: dark;
+
+  /* iOS inflates font sizes in landscape unless told not to. On a monospace
+   * layout with fixed column widths that silently breaks the alignment the
+   * whole design depends on. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -35,6 +55,29 @@ body {
 
 a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
 a:hover { border-bottom-color: var(--accent); }
+
+/* `:focus-visible` arrived in Safari 15.4. Before that this selector is invalid
+ * and the *whole rule* is dropped, so a keyboard user on an older iPhone got no
+ * focus ring at all -- the page became unnavigable without a pointer. The plain
+ * `:focus` rule below is the fallback, and is written first so that
+ * `:focus-visible` overrides it where it is understood. They are separate rules
+ * on purpose: one invalid selector must not take the other down with it. */
+a:focus,
+button:focus,
+select:focus,
+input:focus,
+summary:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* Where `:focus-visible` is supported, drop the ring for pointer clicks only. */
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+summary:focus:not(:focus-visible) {
+  outline: none;
+}
 a:focus-visible,
 button:focus-visible,
 select:focus-visible,
@@ -52,9 +95,31 @@ header.top {
   position: sticky;
   top: 0;
   z-index: 20;
+  /* Two declarations, and the order matters.
+   *
+   * `color-mix` arrived in Safari 16.2, Firefox 113 and Chrome 111 -- all 2023.
+   * An engine older than that treats the whole declaration as invalid and
+   * *drops it*, and with nothing before it the header had no background at all:
+   * a sticky bar with the page scrolling visibly through the text. The solid
+   * colour below is the fallback, and browsers that understand `color-mix`
+   * simply take the second declaration. */
+  background: var(--bg);
   background: color-mix(in srgb, var(--bg) 88%, transparent);
+
+  /* Safari only unprefixed `backdrop-filter` in version 18 (late 2024). Every
+   * iPhone on iOS 17 or earlier needs the `-webkit-` form, and without it the
+   * translucent header simply has no blur -- which, combined with the
+   * `color-mix` fallback above, is why that fallback is opaque rather than
+   * translucent. */
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
+
+  /* On a notched iPhone in landscape the header would otherwise run under the
+   * rounded corner and the sensor housing. `env()` is zero everywhere it does
+   * not apply, so this costs nothing on a desktop. */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 .top .wrap {
@@ -71,8 +136,89 @@ header.top {
 .brand a { color: var(--fg); border: 0; }
 
 nav.links { display: flex; gap: 14px; margin-left: auto; flex-wrap: wrap; }
-nav.links a { color: var(--muted); font-size: 13px; }
+nav.links a {
+  color: var(--muted);
+  font-size: 13px;
+  /* WCAG 2.5.8 asks for a 24 by 24 CSS pixel target. These links were 22 px
+   * tall, which is small enough to mis-tap on a phone -- and mis-tapping in a
+   * nine-item row means landing on the wrong section rather than nothing. The
+   * padding is vertical only, so the row's visual rhythm is unchanged. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
 nav.links a:hover { color: var(--accent); }
+
+/* ---------- header on a phone ---------- */
+/*
+ * Nine navigation links at 375 px wrap onto four rows, and because the header
+ * is `position: sticky` that cost 165 px -- a fifth of an iPhone screen,
+ * permanently, on every scroll position. Measured, not guessed.
+ *
+ * The answer is to stop wrapping and scroll the row sideways instead: one line,
+ * every link still reachable, and the header back to a single row. The
+ * scrollbar is hidden because on a touch device there is nothing to grab
+ * anyway, and `-webkit-overflow-scrolling` keeps the momentum that iOS
+ * otherwise drops on a nested scroller.
+ */
+@media (max-width: 760px) {
+  .top .wrap {
+    /* Two rows, deliberately. The brand and the theme picker alone are about
+     * 290 px of a 375 px screen, so trying to fit the navigation beside them
+     * left it 43 px wide -- a scroller showing most of one link, which is worse
+     * than either wrapping or scrolling. Row one is the identity and the
+     * control; row two is the navigation, at full width. */
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .brand { flex: none; }
+  .brand a { font-size: 14px; }
+  .theme-pick { flex: none; margin-left: auto; max-width: 46vw; }
+
+  nav.links {
+    /* Force the row break, then fill it.
+     *
+     * `order` is needed as well as the `100%` basis: the navigation comes
+     * *before* the theme picker in the source (which is the right reading
+     * order), so a full-width nav in source order pushed the picker onto a
+     * third row and the header back up to 113 px. Ordering it last puts the
+     * brand and the picker together on row one and the nav alone on row two,
+     * without changing the document order a screen reader follows. */
+    order: 3;
+    flex: 1 0 100%;
+    margin-left: 0;
+    flex-wrap: nowrap;
+    /* `min-width: 0` is what lets a flex item become a scroll container at
+     * all: the default `min-width: auto` makes it refuse to be narrower than
+     * its own contents, so it would push the page sideways instead. */
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    /* No visible scrollbar: there is nothing to grab on a touch screen, and a
+     * bar under a 24 px row of links costs more than it explains. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 2px;
+  }
+  nav.links::-webkit-scrollbar { display: none; }
+  nav.links a { white-space: nowrap; }
+}
+
+/*
+ * Anchor targets must clear the sticky header.
+ *
+ * Without this, following `#download` from the navigation scrolls the heading
+ * to y=0 -- which is *underneath* the header, so the reader lands on a section
+ * whose title they cannot see. `scroll-margin-top` is the property that exists
+ * for exactly this and needs no JavaScript.
+ */
+:target,
+section[id],
+h2[id],
+h3[id] { scroll-margin-top: 90px; }
 
 .theme-pick {
   background: var(--bg-soft);
@@ -339,8 +485,12 @@ input[type="text"] {
 }
 
 .verdict { margin-top: 12px; padding: 12px 14px; border-radius: 8px; font-weight: 700; }
-.verdict.match { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); border: 1px solid var(--ok); }
-.verdict.fail  { background: color-mix(in srgb, var(--err) 16%, transparent); color: var(--err); border: 1px solid var(--err); }
+/* `background: var(--bg-soft)` first, as the fallback for engines that drop the
+ * `color-mix` line -- see the header rule for the full reasoning. The verdict
+ * is the single most important thing this page ever says, so it must not be
+ * unreadable anywhere. */
+.verdict.match { background: var(--bg-soft); background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); border: 1px solid var(--ok); }
+.verdict.fail  { background: var(--bg-soft); background: color-mix(in srgb, var(--err) 16%, transparent); color: var(--err); border: 1px solid var(--err); }
 
 progress { width: 100%; height: 6px; margin-top: 12px; }
 
@@ -424,7 +574,10 @@ summary { cursor: pointer; color: var(--accent); }
 
 footer {
   border-top: 1px solid var(--border);
-  padding: 28px 0 46px;
+  /* The extra bottom padding clears the iOS home indicator, which otherwise
+   * sits over the last line of the footer. `env()` is zero where it does not
+   * apply, so `max()` keeps the desktop spacing unchanged. */
+  padding: 28px 0 max(46px, calc(28px + env(safe-area-inset-bottom)));
   color: var(--muted);
   font-size: 12.5px;
 }
@@ -454,16 +607,49 @@ body.legal-locked { overflow: hidden; }
   align-items: center;
   justify-content: center;
   padding: 20px;
+
+  /* The most important fallback on the page.
+   *
+   * This overlay is shown with `body.legal-locked { overflow: hidden }`, so if
+   * its background is missing the reader gets a page that has stopped
+   * scrolling with nothing visible to explain why -- an invisible modal, which
+   * is indistinguishable from the site being broken. That is what an engine
+   * older than Safari 16.2 or Firefox 113 got, because a declaration it cannot
+   * parse is a declaration it discards. The opaque colour goes first so there
+   * is always *something* there.
+   */
+  background: var(--bg-inset);
   background: color-mix(in srgb, var(--bg-inset) 82%, transparent);
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   animation: fade 0.25s ease both;
+
+  /* Keep the dialogue clear of the notch and the home indicator. */
+  padding-top: max(20px, env(safe-area-inset-top));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
 }
 
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
 .legal-box {
   width: min(680px, 100%);
+
+  /* `dvh`, with `vh` as the fallback, and the distinction is not cosmetic.
+   *
+   * On iOS Safari `100vh` is the viewport height with the browser chrome
+   * *collapsed*, which is taller than what you can actually see while the URL
+   * bar is expanded. So `88vh` could put the bottom of this box -- which is
+   * where the **continue** button is -- below the visible area. And the page
+   * behind is deliberately scroll-locked (`body.legal-locked`), so there was
+   * no way to scroll down to it: the gate could not be dismissed, on a phone,
+   * on first load, which is exactly when everyone meets it.
+   *
+   * `dvh` is the unit that means "the height you can currently see". Engines
+   * without it (Safari before 15.4) take the `vh` line, which is the behaviour
+   * as it was -- no worse, and better everywhere else.
+   */
   max-height: 88vh;
+  max-height: 88dvh;
   overflow-y: auto;
   background: var(--bg);
   border: 1px solid var(--border);
