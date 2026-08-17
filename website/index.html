@@ -43,7 +43,16 @@
 <main>
 
 <div class="wrap hero stagger">
-  <img class="banner" src="assets/banner.png" alt="VeilVoice — irreversible voice de-identification" style="--i:0">
+  <!-- An animated image does not obey `prefers-reduced-motion` by itself, and
+       the CSS at the top of main.css cannot reach inside a PNG. The media query
+       on <source> is what honours the preference: someone who asked for less
+       motion is served the still banner, and everyone else the APNG. A browser
+       without APNG support draws its first frame, which *is* the still banner,
+       so there is no path here that ends with no image. -->
+  <picture class="banner-pic" style="--i:0">
+    <source srcset="assets/banner-animated.png" media="(prefers-reduced-motion: no-preference)">
+    <img class="banner" src="assets/banner.png" alt="VeilVoice — irreversible voice de-identification">
+  </picture>
   <p class="tagline" style="--i:1">
     VeilVoice destroys the <strong>biometric voiceprint</strong> of a speaker —
     pitch, formants, timbre, micro-timing and the melody of an accent — so that
