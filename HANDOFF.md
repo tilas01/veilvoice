@@ -5,26 +5,30 @@
 **Read this first.** It is written to be lossless: a new session should be able
 to continue from here without the previous conversation.
 
-**State as of 2026-08-16:** **v0.1.6 released**, with tamper detection and the
-passphrase hardening on `main` for v0.1.7. — nine platforms, GPG-signed,
-reproducible on eight (FreeBSD built once and honestly marked `not-verified`).
-Live site. **269 tests** plus five website suites, clippy clean, no `unsafe`.
+**State as of 2026-08-17:** **v0.1.8 on `main`, unreleased.** Nine platforms,
+GPG-signed, reproducible on eight (FreeBSD built once and honestly marked
+`not-verified`). Live site. **285 tests** plus seven website suites, clippy
+clean, no `unsafe`.
 
-What v0.1.6 contains is in `CHANGELOG.md`, which the release notes are generated
-from. In short:
+v0.1.8 is a **security release**. A third audit round -- run against the
+*classes* of defect rather than a list of things that seemed worth checking --
+found and fixed **twenty-eight** (F-9 to F-36), thirteen in the Rust and fifteen
+in the website. None was a confidentiality failure; several were failures of the
+thing being relied on, which is worse in a different way. `CHANGELOG.md` has the
+summary and `docs/AUDIT.md` has one write-up per finding.
 
-1. **At-rest encryption by default** and the **app lock** (§7 item 1, done).
-2. **The audit scope is finished** (§7 item 3, done) except the one item that
-   cannot be done from inside — an independent review. It found **seven
-   defects**, all fixed; see `docs/AUDIT.md` §2. Read that before touching a
-   parser.
-3. **A walkthrough on the site** below the download, `docs/USER_GUIDE.md`, a
-   desktop-app section in the wiki, and `tools/site-tests/`.
-4. Rendering the site found three more defects that every unit test had missed,
-   including content that was invisible on the published page. See §8.
-5. **Unreleased, for v0.1.7:** `veilvoice-guard` (integrity manifest, tamper
-   detection, honest attribution) and typed passphrases moved into page-locked
-   memory at once rather than held as `String`s.
+Two things changed in how this project describes itself, and both matter:
+
+1. **`docs/AUDIT.md` no longer names "an independent audit" as the outstanding
+   item.** That framing let a great deal of unexamined code sit behind a single
+   caveat. The standard is now stated positively and is about the code: every
+   vulnerability class, walked across the whole tree, with a section saying what
+   was found -- including the classes that found nothing. The absence of an
+   outside reviewer is still recorded, as a fact rather than as a task.
+2. **`fuzz/` exists but has not been run to convergence.** Six libFuzzer
+   targets, built and type-checked; libFuzzer needs a clang toolchain the
+   Windows host does not have. "We have a fuzzing setup" and "we have fuzzed
+   this" are different claims and the docs only make the first.
 
 ---
 
@@ -241,26 +245,93 @@ Remaining, in order:
      logic: an opt-in installer that sets the audit rule, and a service that
      watches and alerts. Both are outward-facing and should not be silent.
 
-2. **Audacity + VB-CABLE opt-in installer.** Tick-box, never silent. Both are
-   third-party; VB-CABLE is proprietary donationware.
-3. **The audit's own remaining list** — `docs/AUDIT.md` §5. Short version: an
-   independent review (the one that matters), a coverage-guided `cargo fuzz`
-   campaign, a scheme check on `repo.js`'s asset links, a lower KDF cost ceiling
-   for unattended callers, and **32-bit targets in CI** — F-4 existed only on
-   ARMv7 and nothing in the matrix would have caught it.
-4. **Move `gpg_secrets/` out of OneDrive.**
-5. **Text-to-speech mode** — type text, an AI voice speaks it. The strongest
+2. **Distribution: an installer, a portable verifier, and wider platforms.**
+   *Requested in full detail; recorded here so the shape is not lost. None of
+   it is built yet.*
+
+   The goal is that somebody who has never used a terminal can get a genuine,
+   verified VeilVoice, and that somebody who has can check every step by hand.
+
+   - **An install script per platform** -- `install.bat` / `install.ps1` for
+     Windows, `install.sh` for Linux and macOS. Each one:
+     1. downloads the binary, `SHA256SUMS`, `SHA256SUMS.asc` and the public key;
+     2. checks the key's fingerprint against
+        `8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A`, **hardcoded in the script**,
+        and refuses on any mismatch;
+     3. verifies the detached signature over `SHA256SUMS`;
+     4. verifies the binary's SHA-256 against that list;
+     5. offers -- as a **tick box, never silently, never by default** -- to
+        install VB-CABLE (Windows, proprietary donationware), Audacity, and GPG
+        itself where it is missing.
+
+     Every download must be refused rather than continued on any failed check,
+     and the script must say which check failed.
+
+   - **A portable mini-verifier**, one small cross-platform binary that embeds
+     the fingerprint and the public key and does the same verification without
+     needing GPG installed. It **cannot** embed the expected hash of the file it
+     is checking -- a file cannot contain its own digest -- so it takes the hash
+     two ways: typed in by hand, or fetched from the published `SHA256SUMS`.
+     A match against a published hash proves the download is intact; a match
+     against a hash somebody else independently produced from their own build is
+     what proves the build is reproducible, and the tool should explain that
+     difference rather than blur it.
+
+   - **A WiX installer for Windows** offering the same optional components, and
+     the platform-appropriate equivalents elsewhere: a `.pkg` or a Homebrew cask
+     on macOS, a `.deb`/`.rpm` and a Flatpak on Linux.
+
+   - **Wider platform coverage** -- macOS Intel and Apple Silicon as separate
+     builds, a single Windows executable (Windows 10 and 11 do not need separate
+     binaries; only split them if a measurement says otherwise), OpenBSD and
+     NetBSD alongside the existing FreeBSD build, and a **Gentoo ebuild** that
+     builds from this repository the way every other Gentoo package does.
+
+   - **A documented reproducible build environment** so a third party can
+     produce a byte-identical binary and compare hashes -- which is the only
+     thing that makes the verifier's stronger claim checkable.
+
+   All of it belongs in `docs/`, and none of it should be described as finished
+   until somebody other than the author has run it on a machine that did not
+   build it.
+
+3. **Presentation.** *Also requested; also not built.*
+
+   - An animated soundbar banner for the README (a GIF or an APNG generated by
+     `assets/generate.py`, so it stays reproducible from source like every other
+     asset -- it must not become a committed opaque blob).
+   - A pass over the website and wiki for typography, spacing and motion, so the
+     animation already there reads as designed rather than as decoration.
+   - A proofreading pass across the whole repository -- prose, comments and
+     user-facing strings -- for punctuation, grammar and capitalisation.
+     `tools/site-tests/characters.test.js` already fails the build on stray
+     control, private-use, zero-width, bidi and mojibake characters across every
+     tracked text file; that is the mechanical half and it is done. The
+     editorial half is not, and cannot be mechanised.
+
+4. **Audacity + VB-CABLE opt-in installer.** Subsumed by item 2 above; kept
+   here because the tick-box-never-silent rule applies wherever it lands.
+5. **The audit's own remaining list** -- `docs/AUDIT.md` section 5. Short
+   version: an outside reviewer (absent, not a task); running the `fuzz/`
+   targets to convergence on a machine with clang; **32-bit targets in CI**,
+   which is now the source of *two* shipped defects rather than one (F-4 and
+   F-11, both 32-bit-only, both found by reading); and a decoder crash in a
+   format VeilVoice does not itself parse, which nothing in-process can catch
+   under `panic = "abort"`.
+
+6. **Move `gpg_secrets/` out of OneDrive.**
+7. **Text-to-speech mode** — type text, an AI voice speaks it. The strongest
    anonymity, since the original voice is never captured. Weights and training
    corpus must both be GPL-3-compatible; keep it fully offline; ship weights
    outside the reproducible-build hash. Piper is the first candidate.
-6. **Local transcription** (whisper.cpp / whisper-rs) so audio never leaves the
+8. **Local transcription** (whisper.cpp / whisper-rs) so audio never leaves the
    machine.
-7. **Non-cryptographic voice-changer mode** — masculine/feminine sliders,
+9. **Non-cryptographic voice-changer mode** — masculine/feminine sliders,
    monitor toggle. **Must be visually and textually distinct** from
    de-identification so nobody mistakes a fun filter for protection.
-8. **Window-kernel spectral synthesis** to lift the bin-grid pitch quantisation
+10. **Window-kernel spectral synthesis** to lift the bin-grid pitch quantisation
    (see `spectral.rs`).
-9. **Publish to crates.io**; per-crate `examples/`.
+11. **Publish to crates.io**; per-crate `examples/`.
 
 ---
 

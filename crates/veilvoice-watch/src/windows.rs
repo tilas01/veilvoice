@@ -41,6 +41,35 @@ const FILETIME_TO_UNIX_SECS: u64 = 11_644_473_600;
 /// The registry path separator, as a byte.
 const BACKSLASH: u8 = b'\\';
 
+/// The absolute path of `reg.exe`, or `None` if it is not where it should be.
+///
+/// **Never `Command::new("reg")`.** Rust's `Command` resolves a bare program
+/// name through the platform search order, and on Windows that order includes
+/// the **current working directory** ahead of most of `PATH`. Running
+/// `veilvoice watch` from a directory containing a file named `reg.exe` would
+/// have executed it, as the user, with no prompt — a downloads folder is
+/// enough. Naming the system directory removes the search.
+///
+/// Returning `None` rather than falling back to a search is deliberate: this
+/// module's failure mode is already "report nothing", and the crate says
+/// plainly that an empty list from a blind monitor is not good news. Running an
+/// unknown `reg.exe` would be a far worse answer than no answer.
+fn reg_exe() -> Option<std::path::PathBuf> {
+    let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".to_string());
+    for directory in [
+        format!(r"{root}\System32"),
+        // A 32-bit process on 64-bit Windows is redirected away from the real
+        // System32; `Sysnative` is the way back to it.
+        format!(r"{root}\Sysnative"),
+    ] {
+        let candidate = std::path::Path::new(&directory).join("reg.exe");
+        if candidate.is_file() {
+            return Some(candidate);
+        }
+    }
+    None
+}
+
 pub fn scan() -> Result<Vec<DeviceUse>, Error> {
     let mut found = Vec::new();
     // "webcam" is what the registry calls it, even though the UI says camera.
@@ -74,7 +103,10 @@ fn collect(kind: DeviceKind, root: &str, out: &mut Vec<DeviceUse>) {
 /// install, keeps this crate dependency-free, and reading two well-known keys
 /// does not justify pulling in the Win32 bindings.
 fn subkeys(key: &str) -> Vec<String> {
-    let Ok(output) = Command::new("reg").args(["query", key]).output() else {
+    let Some(reg) = reg_exe() else {
+        return Vec::new();
+    };
+    let Ok(output) = Command::new(reg).args(["query", key]).output() else {
         return Vec::new();
     };
     if !output.status.success() {
@@ -122,7 +154,7 @@ fn read_entry(kind: DeviceKind, key: &str) -> Option<DeviceUse> {
 }
 
 fn read_u64(key: &str, value: &str) -> Option<u64> {
-    let output = Command::new("reg")
+    let output = Command::new(reg_exe()?)
         .args(["query", key, "/v", value])
         .output()
         .ok()?;
@@ -192,6 +224,42 @@ mod tests {
         assert!(filetime_to_system(0).is_none());
         assert!(filetime_to_system(1).is_none());
         assert!(filetime_to_system(u64::MAX).is_none());
+    }
+
+    /// Regression: the registry tool must be an absolute path in the system
+    /// directory, never a bare name the OS searches for — the Windows search
+    /// order includes the current working directory, so a planted `reg.exe`
+    /// would have been run as the user.
+    #[test]
+    fn the_registry_tool_is_resolved_absolutely_not_searched_for() {
+        let path = reg_exe().expect("reg.exe should exist on Windows");
+        assert!(path.is_absolute(), "{} is not absolute", path.display());
+        assert!(path.is_file());
+        let shown = path.to_string_lossy().to_lowercase();
+        assert!(
+            shown.contains("system32") || shown.contains("sysnative"),
+            "resolved outside the system directory: {shown}"
+        );
+    }
+
+    /// And a decoy named `reg.exe` in the working directory must never become
+    /// the tool we run. Written without a temp-directory crate so this crate
+    /// stays dependency-free, dev-dependencies included.
+    #[test]
+    fn a_decoy_in_the_working_directory_is_not_picked_up() {
+        let scratch = std::env::temp_dir().join("veilvoice-watch-decoy-test");
+        std::fs::create_dir_all(&scratch).unwrap();
+        let decoy = scratch.join("reg.exe");
+        std::fs::write(&decoy, b"not really reg").unwrap();
+
+        let resolved = reg_exe().expect("reg.exe should exist on Windows");
+        assert_ne!(resolved, decoy, "a planted reg.exe was selected");
+        assert!(
+            !resolved.starts_with(&scratch),
+            "resolution reached a writable scratch directory: {}",
+            resolved.display()
+        );
+        let _ = std::fs::remove_file(&decoy);
     }
 
     #[test]
