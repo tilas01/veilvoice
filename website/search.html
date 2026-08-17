@@ -1,0 +1,177 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<html lang="en" data-theme="tokyo-night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search — VeilVoice</title>
+<meta name="description" content="Search every file, document and section in VeilVoice — the Rust source, the documentation, the website and the build. Works without JavaScript too.">
+<link rel="icon" href="assets/icon-32.png" type="image/png">
+<meta property="og:title" content="Search — VeilVoice">
+<meta property="og:description" content="Search the whole repository and website. Sort, filter, and a complete static index for readers without JavaScript.">
+<meta property="og:image" content="assets/banner.png">
+<link rel="stylesheet" href="css/themes.css">
+<link rel="stylesheet" href="css/main.css">
+<script src="js/theme.js"></script>
+<script src="js/legal.js" defer></script>
+<script src="js/search.js" defer></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <img src="assets/icon-32.png" alt="">
+      <a href="index.html">VEILVOICE</a>
+    </div>
+    <nav class="links">
+      <a href="index.html#what">what</a>
+      <a href="index.html#download">download</a>
+      <a href="index.html#guide">guide</a>
+      <a href="index.html#verify">verify</a>
+      <a href="index.html#crypto">security</a>
+      <a href="wiki.html">wiki</a>
+      <a href="search.html" aria-current="page">search</a>
+      <a href="nojs/index.html">no-js</a>
+      <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
+    </nav>
+    <label for="theme" style="position:absolute;left:-9999px">Colour scheme</label>
+    <select id="theme" class="theme-pick" title="Colour scheme"></select>
+  </div>
+</header>
+
+<main>
+
+<div class="wrap search-page">
+
+  <h1 id="search">Search everything</h1>
+  <p class="lead">
+    Every file this repository tracks — the Rust source and its doc comments,
+    the documentation, this website, the tests, the build and the licence texts
+    — split into sections and indexed. Results link to the exact line on GitHub
+    or the exact section on this site.
+  </p>
+
+  <form id="search-form" class="search-controls" role="search" action="search.html" method="get">
+    <div class="search-box">
+      <label for="q" class="visually-hidden">Search VeilVoice</label>
+      <input id="q" name="q" type="search" autocomplete="off" spellcheck="false"
+             placeholder="loading the index…" disabled>
+    </div>
+    <div class="search-filters">
+      <label for="sort" class="visually-hidden">Sort results</label>
+      <select id="sort" name="sort" title="Sort">
+        <option value="relevance">by relevance</option>
+        <option value="path">by path</option>
+        <option value="title">by file name</option>
+        <option value="size">by file length</option>
+      </select>
+      <label for="kind" class="visually-hidden">Filter by kind</label>
+      <select id="kind" name="kind" title="Kind"></select>
+      <label for="area" class="visually-hidden">Filter by area</label>
+      <select id="area" name="area" title="Area"></select>
+    </div>
+  </form>
+
+  <p class="search-count" id="result-count" aria-live="polite">Loading the index…</p>
+
+  <ul class="search-results" id="results"></ul>
+
+  <p class="search-empty" id="no-results" hidden>
+    Nothing matched. Try a shorter word, or clear the filters — the index holds
+    headings, doc comments and section text, so a phrase from the middle of a
+    paragraph usually finds it.
+  </p>
+
+  <noscript>
+    <div class="note">
+      <p><strong>This page's live search needs JavaScript, and you do not have it.</strong>
+      That is a supported way to read this site, so the search is not simply
+      missing: the
+      <a href="nojs/search.html">complete static index</a> lists every file and
+      every section in the project, in full, on one page. Nothing loads and
+      nothing runs — your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac)
+      searches it.</p>
+      <p>It is generated from the same walk of the repository as the index this
+      page would have used, by
+      <code>tools/search-index/generate.py</code>, so the two cannot disagree
+      about what is in the project.</p>
+    </div>
+  </noscript>
+
+  <h2 id="static">Without JavaScript, and why it is a real answer</h2>
+  <p>
+    The <a href="nojs/search.html">complete static index</a> carries the same
+    entries as this page, rendered as ordinary HTML: every file, grouped by
+    kind, with each file's sections and the opening text of each one. It is the
+    same index, not a summary of it — both come out of
+    <code>tools/search-index/generate.py</code> in the same pass, which is what
+    stops them drifting apart.
+  </p>
+  <p>
+    A search box that quietly does nothing without JavaScript is the kind of
+    silent degradation this project audits itself against, so it is worth being
+    plain about the trade: the static page cannot rank or filter, and it is a
+    large page because the whole corpus is in it. What it can do is find things,
+    with no code running at all.
+  </p>
+
+  <h2 id="coverage">What is actually indexed</h2>
+  <p>
+    Worth stating precisely rather than rounding up to "everything", because a
+    search box that quietly does not look at most of the corpus answers "no
+    results" with exactly the same confidence as one that does.
+  </p>
+  <ul>
+    <li><strong>Documentation and this website</strong> — every heading, and
+    all of the prose under it. Complete.</li>
+    <li><strong>JavaScript, CSS, the build files and the licence texts</strong>
+    — the whole file. Complete.</li>
+    <li><strong>Rust</strong> — every item (<code>fn</code>,
+    <code>struct</code>, <code>enum</code>, <code>trait</code>,
+    <code>mod</code>…) by name, together with its doc comment.
+    <strong>Not the function bodies.</strong> The doc comments in this codebase
+    are the argument for the code, and are the part worth searching; searching
+    for a local variable will not find it. This is the one deliberate gap.</li>
+  </ul>
+  <p>
+    Where a section is longer than one result can show, it is split into
+    several sections rather than cut short — the limit is on how much a result
+    <em>displays</em>, not on how much is searched.
+  </p>
+
+  <h2 id="how">How the ranking works</h2>
+  <p>
+    Deliberately simple enough to describe in a sentence, because a search that
+    cannot be explained cannot be checked. Every term you type has to appear
+    somewhere in a section for it to be a result at all — there are no partial
+    matches that quietly rank low. Beyond that, a match in a heading counts for
+    more than one in the body, a match in the file's own name counts for more
+    than one in a directory along its path, and documentation gets a small nudge
+    above tests. Ties break on path and line, so the list does not reshuffle
+    itself between keystrokes.
+  </p>
+  <p>
+    The index is committed to the repository and regenerated in CI, which
+    compares the result byte for byte. An index that has drifted away from the
+    tree fails the build rather than shipping and answering questions about code
+    that no longer looks like that.
+  </p>
+
+</div>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>
+      VeilVoice — GPL-3.0-or-later — by tilas01 on
+      <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">GitHub</a>.
+      <a href="index.html">home</a> · <a href="wiki.html">wiki</a> ·
+      <a href="nojs/search.html">static index</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
