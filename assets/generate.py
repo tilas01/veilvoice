@@ -13,6 +13,7 @@ Pure standard library — no Pillow, no build step:
 Outputs icon.png, icon.ico and banner.png next to this script.
 """
 
+import math
 import os
 import struct
 import sys
@@ -219,6 +220,93 @@ def text_width(string, scale_factor=1, spacing=1):
 
 
 # --- Banner -----------------------------------------------------------------
+# --- the waveform band ------------------------------------------------------
+#
+# The band sits below the tagline; overlapping the two turns the hyphen in
+# "DE-IDENTIFICATION" into a plus sign and makes both harder to read.
+#
+# # What the picture is saying, and why no bar is missing any more
+#
+# The left half is a voice: a smooth travelling wave, every bar in step with
+# its neighbours. The right half is the same voice after VeilVoice: the same
+# bars, the same energy, but the phase relationship between them is gone.
+#
+# An earlier version expressed that by *deleting* one bar in five. It read as a
+# broken image rather than as a design -- the first thing anyone said about it
+# was that bars were missing -- and it was also the wrong idea. VeilVoice does
+# not remove parts of the signal; it keeps the words and destroys the structure
+# that identifies the speaker. Gaps say "data lost". Incoherence says
+# "voiceprint destroyed, words intact", which is the actual claim.
+#
+# Animated, this reads immediately: the left marches, the right seethes.
+
+BAND_MID = 336          # vertical centre of the waveform
+BAND_TOP = 258          # the animated rectangle, kept a little generous so
+BAND_HEIGHT = 156       # no frame can clip a tall bar
+BAR_STEP = 12
+BAR_WIDTH = 6
+BAR_LEFT = 80
+BAR_MAX = 62
+
+
+def _wave(i, phase, coherent):
+    """Half-height of bar `i` at animation `phase` (0.0 to 1.0).
+
+    Deterministic in both arguments, so every frame is reproducible and the
+    loop closes exactly: `phase` enters only through `sin`, and the integer
+    hash below does not depend on it.
+    """
+    if coherent:
+        # A travelling wave: neighbouring bars differ by a fixed phase step, so
+        # the crest walks along the band.
+        angle = 2.0 * math.pi * (phase - i * 0.085)
+        shape = 0.5 + 0.5 * math.sin(angle)
+        # A gentle envelope so the band is not a perfect rectangle of equal peaks.
+        envelope = 0.62 + 0.38 * abs(((i * 7) % 23) / 23.0 - 0.5) * 2.0
+        return int(BAR_MAX * (0.20 + 0.80 * shape) * envelope)
+
+    # Incoherent: each bar keeps its own pseudo-random phase and rate, so the
+    # bars never line up. Same energy, no shared structure.
+    h = (i * 2654435761) & 0xFFFFFFFF
+    offset = ((h >> 7) % 1000) / 1000.0
+    rate = 1.0 + ((h >> 17) % 3)
+    angle = 2.0 * math.pi * (phase * rate + offset)
+    shape = 0.5 + 0.5 * math.sin(angle)
+    envelope = 0.55 + 0.45 * (((h >> 3) % 100) / 100.0)
+    return int(BAR_MAX * (0.18 + 0.82 * shape) * envelope)
+
+
+def draw_band(px, phase, width=None, y_offset=0):
+    """Draw the waveform band into `px` at the given animation phase.
+
+    `y_offset` shifts the drawing up by that many rows, so the same routine can
+    fill the whole banner (offset 0) or just the strip an APNG frame replaces
+    (offset BAND_TOP). One drawing routine, one coordinate convention: the
+    alternative is two, and the second one is where the bug goes.
+    """
+    if width is None:
+        width = len(px[0])
+    for i, x in enumerate(range(BAR_LEFT, width - BAR_LEFT, BAR_STEP)):
+        progress = (x - BAR_LEFT) / float(width - 2 * BAR_LEFT)
+        coherent = progress < 0.45
+        height = max(4, _wave(i, phase, coherent))
+        colour = BLUE if coherent else PURPLE
+        rect(px, x, BAND_MID - height - y_offset, BAR_WIDTH, height * 2, colour)
+
+
+def band_strip(phase, background):
+    """Just the animated rectangle, for one APNG frame.
+
+    Drawn onto a copy of the *static banner's* own rows for that region, so the
+    faint grid behind the bars is preserved and each frame replaces the region
+    outright. That is why the frames declare `blend_op = SOURCE`: there is
+    nothing to blend against, the strip is already complete.
+    """
+    rows = [list(background[y]) for y in range(BAND_TOP, BAND_TOP + BAND_HEIGHT)]
+    draw_band(rows, phase, width=len(background[0]), y_offset=BAND_TOP)
+    return rows
+
+
 def banner():
     """GitHub's social-preview card is 1280x640."""
     w, h = 1280, 640
@@ -233,24 +321,7 @@ def banner():
         for y in range(h):
             px[y][x] = grid
 
-    # A full-width waveform band, clean on the left and veiled on the right,
-    # echoing the icon at banner scale.
-    # The band sits below the tagline; overlapping the two turns the hyphen in
-    # "DE-IDENTIFICATION" into a plus sign and makes both harder to read.
-    mid = 336
-    seed = 0x5EED
-    for i, x in enumerate(range(80, w - 80, 12)):
-        seed = (seed * 1103515245 + 12345) & 0x7FFFFFFF
-        progress = (x - 80) / (w - 160)
-        base = 14 + int(48 * abs(((i * 7) % 23) / 23 - 0.5) * 2)
-        if progress < 0.45:
-            height, colour = base, BLUE
-        else:
-            wobble = (seed >> 7) % 44
-            height, colour = max(5, base - 22 + wobble), PURPLE
-            if (seed >> 3) % 5 == 0:
-                continue  # a dropped bar: the signal coming apart
-        rect(px, x, mid - height, 6, height * 2, colour)
+    draw_band(px, 0.0)
 
     # Icon badge, top left.
     blit(px, scale(icon_32(), 4), 80, 80)
@@ -323,6 +394,173 @@ def write_png_bytes(pixels):
     )
 
 
+# --- APNG -------------------------------------------------------------------
+#
+# An animated banner, in the same spirit as everything else here: generated
+# from source, not a committed blob somebody has to trust.
+#
+# APNG rather than GIF, for three reasons that all matter to this project:
+#
+#   * It is a PNG. The encoder above already writes PNG chunks, so this is an
+#     extension of code that is already here and already reviewed, not a second
+#     image format with its own quantiser.
+#   * GIF is limited to 256 colours, so the palette would have to be quantised
+#     -- a lossy step whose output depends on the quantiser, which is exactly
+#     the kind of thing that stops a build being reproducible.
+#   * A browser that does not understand APNG shows the first frame, which is
+#     the static banner. The failure mode is "no animation", never "no image".
+#
+# Only the waveform band is animated. Frame 0 is the whole banner; every later
+# frame declares a sub-rectangle covering the band alone, which is why the file
+# is a fraction of the size of a full-frame animation.
+
+APNG_DISPOSE_NONE = 0
+APNG_BLEND_SOURCE = 0
+
+
+def _chunk(kind, data):
+    return (
+        struct.pack(">I", len(data))
+        + kind
+        + data
+        + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
+    )
+
+
+def _raw_rows(pixels):
+    raw = bytearray()
+    for row in pixels:
+        raw.append(0)  # filter 0 (None), for deterministic output
+        for r, g, b, a in row:
+            raw += bytes((r, g, b, a))
+    return bytes(raw)
+
+
+def write_apng(path, frames, delay_ms):
+    """Write an APNG.
+
+    `frames` is a list of `(x, y, pixels)`. The first must be the full image and
+    sit at the origin; the rest are sub-rectangles that replace what is under
+    them. `delay_ms` is the delay on every frame.
+    """
+    first_x, first_y, first = frames[0]
+    if (first_x, first_y) != (0, 0):
+        raise ValueError("the first APNG frame must be the whole image")
+    width = len(first[0])
+    height = len(first)
+
+    out = [PNG_SIGNATURE]
+    out.append(_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)))
+    # num_plays 0 means loop for ever.
+    out.append(_chunk(b"acTL", struct.pack(">II", len(frames), 0)))
+
+    def fctl(sequence, x, y, pixels):
+        return _chunk(b"fcTL", struct.pack(
+            ">IIIIIHHBB",
+            sequence,
+            len(pixels[0]), len(pixels),
+            x, y,
+            delay_ms, 1000,          # delay as a fraction of a second
+            APNG_DISPOSE_NONE, APNG_BLEND_SOURCE,
+        ))
+
+    sequence = 0
+    out.append(fctl(sequence, 0, 0, first))
+    sequence += 1
+    out.append(_chunk(b"IDAT", zlib.compress(_raw_rows(first), 9)))
+
+    for x, y, pixels in frames[1:]:
+        out.append(fctl(sequence, x, y, pixels))
+        sequence += 1
+        out.append(_chunk(
+            b"fdAT",
+            struct.pack(">I", sequence) + zlib.compress(_raw_rows(pixels), 9),
+        ))
+        sequence += 1
+
+    out.append(_chunk(b"IEND", b""))
+    blob = b"".join(out)
+    with open(path, "wb") as handle:
+        handle.write(blob)
+    return blob
+
+
+def decode_apng(blob):
+    """Decode our own APNG back to `(x, y, pixels)` frames.
+
+    Exists for `--check`, and for the same reason `decode_png` does: zlib's
+    output differs between Python builds, so comparing compressed bytes would
+    fail spuriously while saying nothing about whether the picture changed.
+    Frames are compared as pixels.
+    """
+    if blob[:8] != PNG_SIGNATURE:
+        raise ValueError("not a PNG")
+
+    pos = 8
+    width = height = None
+    frames = []
+    pending = None      # (x, y, w, h) from the most recent fcTL
+    data = b""
+
+    def flush():
+        if pending is None:
+            return
+        x, y, w, h = pending
+        raw = zlib.decompress(data)
+        stride = w * 4
+        rows = []
+        for row_index in range(h):
+            start = row_index * (stride + 1)
+            if raw[start] != 0:
+                raise ValueError("expected filter type 0")
+            line = raw[start + 1:start + 1 + stride]
+            rows.append([tuple(line[i * 4:i * 4 + 4]) for i in range(w)])
+        frames.append((x, y, rows))
+
+    while pos < len(blob):
+        length = struct.unpack(">I", blob[pos:pos + 4])[0]
+        kind = blob[pos + 4:pos + 8]
+        payload = blob[pos + 8:pos + 8 + length]
+
+        if kind == b"IHDR":
+            width, height, depth, colour = struct.unpack(">IIBB", payload[:10])
+            if (depth, colour) != (8, 6):
+                raise ValueError("expected 8-bit RGBA")
+        elif kind == b"fcTL":
+            flush()
+            _, w, h, x, y = struct.unpack(">IIIII", payload[:20])
+            pending = (x, y, w, h)
+            data = b""
+        elif kind == b"IDAT":
+            data += payload
+        elif kind == b"fdAT":
+            data += payload[4:]     # skip the sequence number
+        elif kind == b"IEND":
+            flush()
+            break
+        pos += 12 + length
+
+    return frames
+
+
+# How the animation is shaped. 24 frames at 70 ms is a 1.68 s loop -- long
+# enough not to read as a flicker, short enough that a reader sees the whole
+# idea without waiting. The phase of frame `i` is `i / FRAMES`, so the last
+# frame lands exactly one cycle from the first and the loop is seamless.
+BANNER_FRAMES = 24
+BANNER_DELAY_MS = 70
+
+
+def banner_frames():
+    """The animated banner: frame 0 whole, the rest just the waveform band."""
+    base = banner()
+    frames = [(0, 0, base)]
+    for index in range(1, BANNER_FRAMES):
+        phase = index / float(BANNER_FRAMES)
+        frames.append((0, BAND_TOP, band_strip(phase, base)))
+    return frames
+
+
 def decode_png(blob):
     """Decode the narrow PNG subset this script writes: 8-bit RGBA, filter 0.
 
@@ -360,6 +598,19 @@ def decode_png(blob):
     return rows
 
 
+# The website serves its own copies of the artwork rather than reaching up out
+# of `website/`, which keeps that directory exactly what GitHub Pages publishes.
+# The copies were previously kept in step by hand, and `--check` only ever
+# looked at `assets/` -- so `website/assets/banner.png` could drift from its
+# generator and nothing would notice. It had. The generator now writes both
+# and checks both, which is the only version of this that stays true.
+WEB_COPIES = ("icon.png", "icon-32.png", "banner.png", "banner-animated.png")
+
+
+def website_assets(here):
+    return os.path.join(os.path.dirname(here), "website", "assets")
+
+
 def check(here):
     """Verify the committed artwork still matches what this script produces."""
     mark = icon_32()
@@ -368,17 +619,46 @@ def check(here):
         "icon-32.png": mark,
         "banner.png": banner(),
     }
+    web = website_assets(here)
     problems = []
-    for name, pixels in expected.items():
-        path = os.path.join(here, name)
+
+    def check_png(path, label, pixels):
         try:
-            with open(path, "rb") as f:
-                actual = decode_png(f.read())
+            with open(path, "rb") as handle:
+                actual = decode_png(handle.read())
         except (OSError, ValueError) as exc:
-            problems.append(f"{name}: cannot read ({exc})")
-            continue
+            problems.append(f"{label}: cannot read ({exc})")
+            return
         if actual != pixels:
-            problems.append(f"{name}: pixels differ from the generator output")
+            problems.append(f"{label}: pixels differ from the generator output")
+
+    def check_apng(path, label, want_frames):
+        try:
+            with open(path, "rb") as handle:
+                actual_frames = decode_apng(handle.read())
+        except (OSError, ValueError) as exc:
+            problems.append(f"{label}: cannot read ({exc})")
+            return
+        if len(actual_frames) != len(want_frames):
+            problems.append("%s: %d frames, generator produces %d"
+                            % (label, len(actual_frames), len(want_frames)))
+            return
+        for index, (want, got) in enumerate(zip(want_frames, actual_frames)):
+            if (want[0], want[1]) != (got[0], got[1]) or want[2] != got[2]:
+                problems.append("%s: frame %d differs from the generator"
+                                % (label, index))
+                return
+
+    for name, pixels in expected.items():
+        check_png(os.path.join(here, name), name, pixels)
+        if name in WEB_COPIES:
+            check_png(os.path.join(web, name), "website/assets/" + name, pixels)
+
+    frames = banner_frames()
+    check_apng(os.path.join(here, "banner-animated.png"),
+               "banner-animated.png", frames)
+    check_apng(os.path.join(web, "banner-animated.png"),
+               "website/assets/banner-animated.png", frames)
 
     raw_path = os.path.join(here, "icon-32.rgba")
     want = bytes(b for row in mark for px in row for b in px)
@@ -417,9 +697,28 @@ def main():
     write_ico(os.path.join(here, "icon.ico"), [16, 32, 48, 64, 128, 256], mark)
     write_png(os.path.join(here, "banner.png"), banner())
 
-    for name in ("icon.png", "icon-32.png", "icon-32.rgba", "icon.ico", "banner.png"):
+    # The animated banner. Frame 0 is byte-for-byte the picture above, so a
+    # viewer with no APNG support shows the static banner rather than nothing.
+    write_apng(
+        os.path.join(here, "banner-animated.png"),
+        banner_frames(),
+        BANNER_DELAY_MS,
+    )
+
+    # And the website's own copies, from the same run rather than by hand.
+    web = website_assets(here)
+    os.makedirs(web, exist_ok=True)
+    for name in WEB_COPIES:
+        with open(os.path.join(here, name), "rb") as source:
+            blob = source.read()
+        with open(os.path.join(web, name), "wb") as target:
+            target.write(blob)
+
+    for name in ("icon.png", "icon-32.png", "icon-32.rgba", "icon.ico",
+                 "banner.png", "banner-animated.png"):
         size = os.path.getsize(os.path.join(here, name))
-        print(f"  {name:<16} {size:>8,} bytes")
+        print(f"  {name:<20} {size:>9,} bytes")
+    print(f"  copied {len(WEB_COPIES)} of them into website/assets/")
     return 0
 
 
