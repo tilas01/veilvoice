@@ -19,9 +19,14 @@ members = [
     "crates/veilvoice-watch",
     "crates/veilvoice-guard",
 ]
+# `fuzz/` is a cargo-fuzz package and needs nightly plus libFuzzer. Excluding it
+# keeps the pinned stable toolchain sufficient for everything else, so a fresh
+# clone still builds with `cargo build` and nothing demands nightly. See
+# fuzz/README.md.
+exclude = ["fuzz"]
 
 [workspace.package]
-version = "0.1.7"
+version = "0.1.8"
 edition = "2021"
 rust-version = "1.96"
 license = "GPL-3.0-or-later"

@@ -274,8 +274,16 @@ impl Manifest {
             if path.is_empty() {
                 return Err(Error::Malformed(format!("line {}: no path", number + 2)));
             }
+            // Normalised on the way in, exactly as `Manifest::of` normalises on
+            // the way out. Without this, a manifest written by hand (or by an
+            // older build) with backslashes produced entries keyed differently
+            // from the ones `check`'s `extra` argument is keyed by, so every
+            // recorded file was *also* reported as newly added. A tamper report
+            // full of false positives is one nobody reads, which defeats the
+            // only thing this module does.
+            let path = path.replace('\\', "/");
             entries.insert(
-                path.to_string(),
+                path,
                 Entry {
                     size,
                     digest: digest.to_ascii_lowercase(),
@@ -464,6 +472,21 @@ mod tests {
         assert!(Manifest::parse(&format!("{MAGIC}\n{}  12  \n", "a".repeat(64))).is_err());
         // A blank line in the middle is tolerated, not an error.
         assert!(Manifest::parse(&format!("{MAGIC}\n\n")).is_ok());
+    }
+
+    /// A hand-written manifest using backslashes must key the same way one this
+    /// crate wrote does, or every recorded file also reports as newly added and
+    /// the report becomes noise.
+    #[test]
+    fn a_manifest_written_with_backslashes_keys_the_same_way() {
+        let digest = "a".repeat(64);
+        let back = Manifest::parse(&format!("{MAGIC}\n{digest}  1  C:\\dir\\thing.exe\n")).unwrap();
+        let forward =
+            Manifest::parse(&format!("{MAGIC}\n{digest}  1  C:/dir/thing.exe\n")).unwrap();
+        assert_eq!(back, forward);
+        assert_eq!(back.paths().collect::<Vec<_>>(), ["C:/dir/thing.exe"]);
+        // And it survives a second round trip unchanged.
+        assert_eq!(Manifest::parse(&back.to_text()).unwrap(), back);
     }
 
     #[test]

@@ -110,35 +110,97 @@
       });
   }
 
+  /**
+   * The most release assets that will be turned into DOM nodes.
+   *
+   * The count comes from the API response rather than from this page, and a
+   * release currently has nine binaries plus their checksums. A hundred is far
+   * past that and stops a malformed or hostile response from being turned into
+   * an unbounded number of elements.
+   */
+  var MAX_ASSETS = 100;
+
+  /**
+   * Whether a download URL may be put in an `href` at all.
+   *
+   * The rule is the renderer's own `safeUrl`, deliberately shared rather than
+   * re-implemented, plus a requirement that the scheme actually be present and
+   * `https:` -- a release asset is always an absolute GitHub URL, so anything
+   * else is wrong whatever else it might be.
+   *
+   * This value comes from the GitHub API for this repository, so it is not a
+   * live route today; the audit recorded it as "trusted by omission", which is
+   * a different thing from trusted. A response is a response: an API that
+   * returned `javascript:...` here would have had it assigned straight into a
+   * clickable link on a page whose entire subject is not trusting remote code.
+   * The fallback when a URL is refused is to show the asset name as plain text,
+   * so a reader still learns the file exists and can find it on GitHub.
+   */
+  function safeAssetUrl(url) {
+    if (typeof url !== "string" || url === "") { return false; }
+    if (window.MD && typeof window.MD.safeUrl === "function" && !window.MD.safeUrl(url)) {
+      return false;
+    }
+    return /^https:\/\//i.test(url);
+  }
+
   function loadRelease() {
     return fetch(API + "/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (!data) { return; }
-        text("latest-tag", data.tag_name || "--");
+        text("latest-tag", typeof data.tag_name === "string" ? data.tag_name : "--");
         var list = document.getElementById("asset-list");
-        if (!list || !data.assets) { return; }
+        if (!list || !Array.isArray(data.assets)) { return; }
         list.innerHTML = "";
         data.assets
-          .slice()
-          .sort(function (a, b) { return a.name.localeCompare(b.name); })
+          .slice(0, MAX_ASSETS)
+          // `String(...)` before comparing: `localeCompare` on a value that is
+          // not a string throws, and one bad entry would reject the whole
+          // promise and be reported to the reader as a network failure.
+          .sort(function (a, b) {
+            return String(a && a.name).localeCompare(String(b && b.name));
+          })
           .forEach(function (asset) {
+            if (!asset || typeof asset.name !== "string") { return; }
             var li = document.createElement("li");
-            var link = document.createElement("a");
-            link.href = asset.browser_download_url;
-            link.textContent = asset.name;
-            link.rel = "noopener noreferrer";
+            var label;
+            if (safeAssetUrl(asset.browser_download_url)) {
+              label = document.createElement("a");
+              label.href = asset.browser_download_url;
+              label.rel = "noopener noreferrer";
+            } else {
+              // Named, but not made clickable.
+              label = document.createElement("span");
+              label.title = "this download URL was not an https link and is not linked";
+            }
+            label.textContent = asset.name;
             var size = document.createElement("span");
             size.style.color = "var(--muted)";
-            size.textContent = asset.size
+            size.textContent = typeof asset.size === "number" && isFinite(asset.size)
               ? "  (" + (asset.size / 1048576).toFixed(1) + " MB)"
               : "";
-            li.appendChild(link);
+            li.appendChild(label);
             li.appendChild(size);
             list.appendChild(li);
           });
       });
   }
+
+  /**
+   * The largest README this page will render, in characters.
+   *
+   * This project's own is about thirteen kilobytes. A megabyte is seventy times
+   * that and still renders in well under a frame; past it the document is not
+   * a README, and rendering happens on the main thread, so the honest answer is
+   * to say so and link to GitHub rather than to spend an unbounded amount of
+   * the reader's time on it.
+   *
+   * The renderer itself is linear in its input now -- see the two quadratics
+   * fixed in `markdown.js` -- so this is defence in depth against the next one
+   * rather than the mitigation for those.
+   */
+  var MAX_README_CHARS = 1024 * 1024;
 
   function loadReadme() {
     return fetch(RAW)
@@ -149,6 +211,14 @@
       .then(function (markdown) {
         var target = document.getElementById("readme");
         if (!target) { return; }
+        if (typeof markdown !== "string") { return; }
+        if (markdown.length > MAX_README_CHARS) {
+          target.textContent =
+            "The README is unusually large (" +
+            Math.round(markdown.length / 1024) +
+            " KB) and has not been rendered here. Read it on GitHub.";
+          return;
+        }
         target.innerHTML = window.MD.render(markdown);
         // The README's own banner is already the page hero; showing it twice
         // just pushes the content down.
@@ -157,16 +227,37 @@
           first.remove();
         }
         // Repo-relative links must resolve against GitHub, not this site.
-        target.querySelectorAll("a[href]").forEach(function (a) {
+        //
+        // Built through `URL` against a fixed base rather than by pasting
+        // strings together. String concatenation left `..` segments in the
+        // result for the browser to resolve afterwards, so a link written as
+        // `[x](../../../elsewhere)` produced a URL that normalised to a
+        // different part of github.com than the one it appeared to point at.
+        // The host was never in doubt, so this was misdirection rather than
+        // escape -- but a page asking people to click through to source they
+        // are being told to read should send them where the link says.
+        //
+        // `Array.prototype.slice.call` rather than `NodeList.forEach`: the
+        // latter is missing on older WebKit, and this file has to run there.
+        var base = "https://github.com/" + OWNER + "/" + REPO + "/blob/main/";
+        var anchors = Array.prototype.slice.call(target.querySelectorAll("a[href]"));
+        anchors.forEach(function (a) {
           var href = a.getAttribute("href");
-          if (href && !/^https?:/i.test(href) && href.charAt(0) !== "#") {
-            a.setAttribute(
-              "href",
-              "https://github.com/" + OWNER + "/" + REPO + "/blob/main/" +
-                href.replace(/^\.?\//, "")
-            );
-            a.setAttribute("rel", "noopener noreferrer");
+          if (!href || /^https?:/i.test(href) || href.charAt(0) === "#") { return; }
+          var resolved;
+          try {
+            resolved = new URL(href.replace(/^\.?\//, ""), base);
+          } catch (e) {
+            return; // Not resolvable: leave it exactly as the renderer emitted it.
           }
+          // Refuse anything that climbed out of the repository, or that a
+          // scheme in the target steered off github.com altogether.
+          if (resolved.origin !== "https://github.com" ||
+              resolved.href.indexOf(base) !== 0) {
+            return;
+          }
+          a.setAttribute("href", resolved.href);
+          a.setAttribute("rel", "noopener noreferrer");
         });
         arrive(target, 0);
       });
