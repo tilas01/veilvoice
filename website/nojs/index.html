@@ -44,7 +44,10 @@ a:hover{text-decoration:underline}
 h1{font-size:26px;margin:26px 0 6px;letter-spacing:.04em}
 h2{font-size:18px;color:var(--accent);margin:34px 0 10px;border-bottom:1px solid var(--border);padding-bottom:6px}
 h3{font-size:14px;color:var(--accent-2);margin:20px 0 6px}
-img{max-width:100%;height:auto;image-rendering:pixelated;border:1px solid var(--border);border-radius:8px}
+/* No pixelated rendering: images here are capped to the column width, i.e.
+   shrunk, and nearest-neighbour shrinking deletes rows rather than blending
+   them -- which made the banner's own text unreadable. */
+img{max-width:100%;height:auto;border:1px solid var(--border);border-radius:8px}
 pre{background:var(--bg-inset);border:1px solid var(--border);border-radius:6px;padding:12px 14px;overflow-x:auto;font-size:13px}
 code{color:var(--cyan)}
 pre code{color:inherit}

@@ -132,7 +132,11 @@ header.top {
 }
 
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: 0.06em; }
-.brand img { width: 26px; height: 26px; image-rendering: pixelated; }
+/* `image-rendering: pixelated` is for pixel art being *enlarged*. Every image
+ * on this site is shrunk instead -- the icon is a 32 px source drawn at 26 px --
+ * and nearest-neighbour shrinking does not blend rows, it deletes them. See the
+ * note on `.hero img.banner`, where deleting rows made the claims unreadable. */
+.brand img { width: 26px; height: 26px; }
 .brand a { color: var(--fg); border: 0; }
 
 nav.links { display: flex; gap: 14px; margin-left: auto; flex-wrap: wrap; }
@@ -239,7 +243,16 @@ h3[id] { scroll-margin-top: 90px; }
   width: 100%;
   max-width: 860px;
   height: auto;
-  image-rendering: pixelated;
+  /* No `image-rendering: pixelated` here, deliberately. banner.png is 1280 px
+   * wide and is never drawn larger than 860 -- and on a phone it is drawn at
+   * about 343, a 3.7x reduction. Nearest-neighbour sampling keeps roughly one
+   * row in four and drops the rest, so the one- and two-pixel strokes of the
+   * banner's own text lost more than half their rows: "THE VOICEPRINT IS
+   * DESTROYED. THE WORDS STAY READABLE." rendered as "TIE VOICEPRIN IS
+   * DESTOYED. THE WORDS STAY EDGRE.", and the licence and authorship lines with
+   * it. The first thing a phone reader saw was this project's own claims,
+   * illegible. Smooth resampling averages those rows instead of discarding
+   * them, and every line is readable at every width. */
   border: 1px solid var(--border);
   border-radius: 10px;
   animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -535,7 +548,9 @@ progress { width: 100%; height: 6px; margin-top: 12px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .readme { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; padding: 6px 20px 20px; }
-.readme img { max-width: 100%; height: auto; image-rendering: pixelated; border-radius: 8px; }
+/* Rendered from README.md, so the sizes are whatever the file uses and are
+ * capped at the column width -- i.e. shrunk. Same reason as the banner. */
+.readme img { max-width: 100%; height: auto; border-radius: 8px; }
 .readme h1 { font-size: 22px; } .readme h2 { font-size: 17px; } .readme h3 { font-size: 14px; }
 .readme blockquote {
   margin: 14px 0; padding: 10px 16px;
