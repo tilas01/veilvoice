@@ -704,3 +704,166 @@ body.legal-locked { overflow: hidden; }
 
 #legal-go { width: 100%; justify-content: center; }
 #legal-go:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* ---------- search ---------- */
+/* The motion here is deliberately small. `prefers-reduced-motion` is already
+ * neutralised globally at the top of this file, and everything animated below
+ * is `opacity` or `transform` only, so the compositor handles it without
+ * laying the page out again. */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.lead { color: var(--muted); max-width: 68ch; }
+
+.search-page { padding: 30px 0 60px; }
+.search-page h1 { margin-bottom: 6px; }
+
+.search-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0 10px;
+  position: sticky;
+  top: var(--header-h, 64px);
+  z-index: 5;
+  background: var(--bg);
+  padding: 8px 0;
+}
+
+.search-box { flex: 1 1 320px; display: flex; }
+
+.search-box input {
+  width: 100%;
+  font: inherit;
+  font-size: 15px;
+  color: var(--fg);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  /* Only the border and the ring move: no layout, no reflow, no jump. */
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.search-box input::placeholder { color: var(--muted); }
+.search-box input:focus {
+  outline: none;
+  border-color: var(--accent);
+  /* Plain colour first: an engine older than 2023 drops a `color-mix`
+   * declaration whole, and with nothing before it the focused input would lose
+   * its ring entirely (F-30). */
+  box-shadow: 0 0 0 3px rgba(122, 162, 247, 0.22);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.search-box input:disabled { opacity: 0.55; cursor: progress; }
+
+.search-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.search-filters select {
+  font: inherit;
+  font-size: 13px;
+  color: var(--fg);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 10px;
+  cursor: pointer;
+  transition: border-color 0.16s ease;
+}
+.search-filters select:hover { border-color: var(--accent); }
+
+.search-count { color: var(--muted); font-size: 13px; margin: 6px 0 14px; }
+
+.search-results { list-style: none; margin: 0; padding: 0; }
+
+.search-results .sr {
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 8px;
+  background: var(--bg-soft);
+  padding: 12px 14px;
+  margin: 0 0 8px;
+  transition: border-left-color 0.16s ease, transform 0.16s ease;
+}
+.search-results .sr:hover {
+  border-left-color: var(--accent);
+  transform: translateX(2px);
+}
+
+/* The entrance. 150ms and 5px -- enough to show the list changed, short
+ * enough that it is finished before the eye settles on the first result.
+ * `search.js` adds `.sr-stagger` only when the shape of the answer changes
+ * (a sort, a filter, or the first results after an empty box), never on an
+ * ordinary keystroke: replaying a cascade per character reads as flicker. */
+.sr-stagger .sr {
+  animation: sr-in 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 14ms);
+}
+
+@keyframes sr-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.sr-head {
+  display: inline-block;
+  color: var(--fg);
+  font-weight: 700;
+  border: 0;
+  margin-bottom: 3px;
+}
+.sr-head:hover { color: var(--accent); }
+
+.sr-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+.sr-path { word-break: break-all; }
+.sr-line { flex: none; }
+
+.sr-kind {
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--accent-2);
+}
+.sr-kind-doc   { color: var(--ok); }
+.sr-kind-rust  { color: var(--accent); }
+.sr-kind-test  { color: var(--accent-2); }
+.sr-kind-web   { color: var(--cyan, var(--accent)); }
+.sr-kind-legal { color: var(--muted); }
+
+.sr-x { color: var(--muted); font-size: 13px; margin: 7px 0 0; }
+
+.search-results mark {
+  /* Fallback first, then the theme-aware form -- the order matters, and the
+   * reverse silently means the themed colour never applies. */
+  background: rgba(122, 162, 247, 0.26);
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  color: var(--fg);
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.search-empty { color: var(--muted); }
+
+/* 760px is the header's own breakpoint, not a round number: below it the header
+ * becomes two rows and grows past the offset these controls stick at, so a
+ * sticky bar here would sit underneath it. Static is the honest answer on a
+ * phone, where a second sticky row would cost screen the page needs (F-34). */
+@media (max-width: 760px) {
+  .search-controls { position: static; }
+  .search-filters select { flex: 1 1 45%; }
+}
