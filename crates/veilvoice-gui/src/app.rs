@@ -20,6 +20,8 @@ enum Tab {
     Watch,
     /// The app lock, and what it is worth.
     Security,
+    /// Colour scheme, animation, and where those choices are kept.
+    Preferences,
     /// Versions, licence and honest scope.
     About,
 }
@@ -65,6 +67,11 @@ pub struct VeilVoiceApp {
 
     // The app lock, and at-rest encryption of what jobs write.
     security: Security,
+
+    // Colour scheme and animation. Named `preferences` rather than `settings`
+    // because this type already has a `settings` method, which is the engine's
+    // intensity and accent controls -- a different thing entirely.
+    preferences: crate::settings::Settings,
 
     // Device monitor.
     watch: veilvoice_watch::Monitor,
@@ -130,6 +137,7 @@ impl VeilVoiceApp {
             meter_in: 0.0,
             meter_out: 0.0,
             security: Security::default(),
+            preferences: crate::settings::Settings::default(),
             watch: veilvoice_watch::Monitor::new(),
             watch_support: veilvoice_watch::support(),
             watch_error: None,
@@ -160,10 +168,15 @@ impl VeilVoiceApp {
     /// anything else constructing the app must not touch the real one.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         let jetbrains = crate::theme::install_fonts(&cc.egui_ctx);
+        // Preferences first: `Settings::load` applies the chosen colour scheme,
+        // so the window opens in it rather than flashing the default for a
+        // frame and then switching.
+        let preferences = crate::settings::Settings::load(&cc.egui_ctx);
         crate::theme::install(&cc.egui_ctx);
         Self {
             jetbrains,
             security: Security::load(),
+            preferences,
             ..Default::default()
         }
     }
@@ -199,14 +212,28 @@ impl eframe::App for VeilVoiceApp {
 
         egui::TopBottomPanel::top("header").show(ctx, |ui| {
             ui.add_space(8.0);
+            let motion = self.preferences.motion(ctx);
+            let time = ui.input(|i| i.time) as f32;
             ui.horizontal(|ui| {
-                ui.label(RichText::new("VEILVOICE").size(20.0).color(p::FG).strong());
-                ui.label(RichText::new(format!("v{}", env!("CARGO_PKG_VERSION"))).color(p::MUTED));
+                // The mark, animated as on the website unless it has been
+                // stilled. `draw` requests no repaint when it is still, so the
+                // toggle saves the work as well as the movement.
+                crate::soundbar::draw(ui, egui::vec2(46.0, 22.0), motion, time)
+                    .on_hover_text("VeilVoice");
+                ui.label(
+                    RichText::new("VEILVOICE")
+                        .size(20.0)
+                        .color(p::fg())
+                        .strong(),
+                );
+                ui.label(
+                    RichText::new(format!("v{}", env!("CARGO_PKG_VERSION"))).color(p::muted()),
+                );
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    ui.label(RichText::new("offline").color(p::GREEN).small());
+                    ui.label(RichText::new("offline").color(p::green()).small());
                     if self.security.has_lock()
                         && ui
-                            .button(RichText::new("lock").color(p::YELLOW).small())
+                            .button(RichText::new("lock").color(p::yellow()).small())
                             .on_hover_text("Lock the app and clear the session passphrase")
                             .clicked()
                     {
@@ -224,11 +251,12 @@ impl eframe::App for VeilVoiceApp {
                     (Tab::Live, "live scramble"),
                     (Tab::Watch, "monitor"),
                     (Tab::Security, "lock"),
+                    (Tab::Preferences, "settings"),
                     (Tab::About, "about"),
                 ] {
                     let selected = self.tab == tab;
                     let text =
-                        RichText::new(label).color(if selected { p::BLUE } else { p::MUTED });
+                        RichText::new(label).color(if selected { p::blue() } else { p::muted() });
                     if ui.selectable_label(selected, text).clicked() {
                         self.tab = tab;
                     }
@@ -240,12 +268,21 @@ impl eframe::App for VeilVoiceApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             // While the "unencrypted?" question is open, clicks must not land
             // on the window behind it.
-            ui.add_enabled_ui(!dialogue_open, |ui| match self.tab {
-                Tab::File => self.file_tab(ui),
-                Tab::Live => self.live_tab(ui),
-                Tab::Watch => self.watch_tab(ui),
-                Tab::Security => self.security.tab(ui),
-                Tab::About => self.about_tab(ui),
+            ui.add_enabled_ui(!dialogue_open, |ui| {
+                // Offered once, and only once: two choices with sensible
+                // defaults, so it is a courtesy rather than a gate.
+                if self.preferences.needs_first_run() {
+                    self.preferences.first_run_panel(ui);
+                    return;
+                }
+                match self.tab {
+                    Tab::File => self.file_tab(ui),
+                    Tab::Live => self.live_tab(ui),
+                    Tab::Watch => self.watch_tab(ui),
+                    Tab::Security => self.security.tab(ui),
+                    Tab::Preferences => self.preferences.tab(ui, ctx),
+                    Tab::About => self.about_tab(ui),
+                }
             });
         });
 
@@ -276,25 +313,28 @@ impl VeilVoiceApp {
                         "done in {secs:.1}s ({speed:.0}x realtime) → {}",
                         output.display()
                     ),
-                    p::GREEN,
+                    p::green(),
                 ));
                 self.last_metadata = metadata;
                 self.job = None;
             }
             Ok(JobDone::Failed(message)) => {
-                self.status = Some((message, p::RED));
+                self.status = Some((message, p::red()));
                 self.job = None;
             }
             Err(mpsc::TryRecvError::Empty) => {}
             Err(mpsc::TryRecvError::Disconnected) => {
-                self.status = Some(("the processing thread stopped unexpectedly".into(), p::RED));
+                self.status = Some((
+                    "the processing thread stopped unexpectedly".into(),
+                    p::red(),
+                ));
                 self.job = None;
             }
         }
     }
 
     fn settings(&mut self, ui: &mut egui::Ui) {
-        ui.label(RichText::new("SETTINGS").color(p::BLUE).small());
+        ui.label(RichText::new("SETTINGS").color(p::blue()).small());
         ui.add(
             egui::Slider::new(&mut self.intensity, 0.0..=1.0)
                 .text("intensity")
@@ -310,7 +350,7 @@ impl VeilVoiceApp {
             } else {
                 "the speaker's accent, intonation and vocal tract are left intact"
             })
-            .color(p::MUTED)
+            .color(p::muted())
             .small(),
         );
 
@@ -325,14 +365,14 @@ impl VeilVoiceApp {
             } else {
                 "the modulation stream rolls forward; earlier audio is sealed off behind it"
             })
-            .color(p::MUTED)
+            .color(p::muted())
             .small(),
         );
     }
 
     fn file_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
-        ui.label(RichText::new("INPUT").color(p::BLUE).small());
+        ui.label(RichText::new("INPUT").color(p::blue()).small());
         ui.horizontal(|ui| {
             if ui.button("choose file…").clicked() {
                 if let Some(path) = rfd::FileDialog::new()
@@ -350,8 +390,8 @@ impl VeilVoiceApp {
                 }
             }
             match &self.input {
-                Some(path) => ui.label(RichText::new(path.display().to_string()).color(p::CYAN)),
-                None => ui.label(RichText::new("no file selected").color(p::MUTED)),
+                Some(path) => ui.label(RichText::new(path.display().to_string()).color(p::cyan())),
+                None => ui.label(RichText::new("no file selected").color(p::muted())),
             };
         });
 
@@ -373,12 +413,12 @@ impl VeilVoiceApp {
             self.start_job();
         }
         if let Some(reason) = self.security.blocked_reason() {
-            ui.label(RichText::new(reason).color(p::YELLOW).small());
+            ui.label(RichText::new(reason).color(p::yellow()).small());
         }
         if busy {
             ui.horizontal(|ui| {
                 ui.spinner();
-                ui.label(RichText::new("processing…").color(p::MUTED));
+                ui.label(RichText::new("processing…").color(p::muted()));
             });
         }
 
@@ -392,7 +432,7 @@ impl VeilVoiceApp {
                     "metadata removed: {}",
                     self.last_metadata.join(", ")
                 ))
-                .color(p::MUTED)
+                .color(p::muted())
                 .small(),
             );
         }
@@ -405,7 +445,7 @@ impl VeilVoiceApp {
                  useless. Encrypting the result at rest is what keeps them from being \
                  read off the disk afterwards, which is why it is on by default.",
             )
-            .color(p::MUTED)
+            .color(p::muted())
             .small(),
         );
     }
@@ -470,7 +510,7 @@ impl VeilVoiceApp {
         let running = self.session.is_some();
 
         ui.add_space(4.0);
-        ui.label(RichText::new("DEVICES").color(p::BLUE).small());
+        ui.label(RichText::new("DEVICES").color(p::blue()).small());
         ui.add_enabled_ui(!running, |ui| {
             device_picker(ui, "input ", &self.inputs, &mut self.chosen_input);
             device_picker(ui, "output", &self.outputs, &mut self.chosen_output);
@@ -487,7 +527,7 @@ impl VeilVoiceApp {
                 RichText::new(
                     "no virtual cable selected — other applications will not receive this",
                 )
-                .color(p::YELLOW)
+                .color(p::yellow())
                 .small(),
             );
         }
@@ -507,13 +547,13 @@ impl VeilVoiceApp {
                 self.meter_out = 0.0;
             }
             if running {
-                ui.label(RichText::new("● live").color(p::GREEN));
+                ui.label(RichText::new("● live").color(p::green()));
             }
         });
 
         if let Some(message) = &self.live_error {
             ui.add_space(8.0);
-            ui.label(RichText::new(message).color(p::RED));
+            ui.label(RichText::new(message).color(p::red()));
         }
 
         if let Some(session) = &self.session {
@@ -523,12 +563,12 @@ impl VeilVoiceApp {
             self.meter_out = (self.meter_out * 0.7).max(stats.output_peak);
 
             ui.add_space(12.0);
-            ui.label(RichText::new("LEVELS").color(p::BLUE).small());
+            ui.label(RichText::new("LEVELS").color(p::blue()).small());
             meter(ui, "in ", self.meter_in);
             meter(ui, "out", self.meter_out);
 
             ui.add_space(12.0);
-            ui.label(RichText::new("PERFORMANCE").color(p::BLUE).small());
+            ui.label(RichText::new("PERFORMANCE").color(p::blue()).small());
             field(
                 ui,
                 "processing",
@@ -550,7 +590,7 @@ impl VeilVoiceApp {
                         "glitches: {} dropped, {} starved",
                         stats.dropped, stats.starved
                     ))
-                    .color(p::YELLOW)
+                    .color(p::yellow())
                     .small(),
                 );
             }
@@ -607,7 +647,7 @@ impl VeilVoiceApp {
         let camera = active
             .iter()
             .any(|u| u.kind == veilvoice_watch::DeviceKind::Camera);
-        let colour = if camera { p::RED } else { p::YELLOW };
+        let colour = if camera { p::red() } else { p::yellow() };
         let names: Vec<&str> = active.iter().map(|u| u.app.as_str()).collect();
         let label = format!(
             "* {} IN USE - {}",
@@ -626,10 +666,10 @@ impl VeilVoiceApp {
 
     fn watch_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
-        ui.label(RichText::new("WHAT IS LISTENING").color(p::BLUE).small());
+        ui.label(RichText::new("WHAT IS LISTENING").color(p::blue()).small());
         ui.label(
             RichText::new(self.watch_support.explanation)
-                .color(p::MUTED)
+                .color(p::muted())
                 .small(),
         );
 
@@ -643,38 +683,42 @@ impl VeilVoiceApp {
                      the microphone or camera, so nothing is shown. That is not the \
                      same as nothing being active.",
                 )
-                .color(p::YELLOW),
+                .color(p::yellow()),
             );
             return;
         }
 
         if let Some(e) = &self.watch_error {
-            ui.label(RichText::new(e).color(p::RED));
+            ui.label(RichText::new(e).color(p::red()));
         }
 
         ui.add_space(10.0);
         let active: Vec<_> = self.watch.current().to_vec();
         if active.is_empty() {
-            ui.label(RichText::new("Nothing is using the microphone or camera.").color(p::GREEN));
+            ui.label(RichText::new("Nothing is using the microphone or camera.").color(p::green()));
         } else {
             for entry in &active {
                 let colour = if entry.kind == veilvoice_watch::DeviceKind::Camera {
-                    p::RED
+                    p::red()
                 } else {
-                    p::YELLOW
+                    p::yellow()
                 };
                 ui.horizontal(|ui| {
                     ui.label(RichText::new("*").color(colour));
-                    ui.label(RichText::new(entry.describe()).color(p::FG).strong());
+                    ui.label(RichText::new(entry.describe()).color(p::fg()).strong());
                     ui.label(RichText::new(entry.kind.to_string()).color(colour).small());
                 });
                 if let Some(path) = &entry.path {
-                    ui.label(RichText::new(format!("    {path}")).color(p::MUTED).small());
+                    ui.label(
+                        RichText::new(format!("    {path}"))
+                            .color(p::muted())
+                            .small(),
+                    );
                 }
                 if let Some(held) = entry.held_for() {
                     ui.label(
                         RichText::new(format!("    held for {}s", held.as_secs()))
-                            .color(p::MUTED)
+                            .color(p::muted())
                             .small(),
                     );
                 }
@@ -685,12 +729,12 @@ impl VeilVoiceApp {
         if !self.watch_log.is_empty() {
             ui.add_space(14.0);
             ui.separator();
-            ui.label(RichText::new("RECENT").color(p::BLUE).small());
+            ui.label(RichText::new("RECENT").color(p::blue()).small());
             egui::ScrollArea::vertical()
                 .max_height(160.0)
                 .show(ui, |ui| {
                     for line in self.watch_log.iter().rev() {
-                        ui.label(RichText::new(line).color(p::MUTED).small());
+                        ui.label(RichText::new(line).color(p::muted()).small());
                     }
                 });
         }
@@ -717,7 +761,7 @@ impl VeilVoiceApp {
         );
 
         ui.add_space(16.0);
-        ui.label(RichText::new("WHAT THIS PROTECTS").color(p::BLUE).small());
+        ui.label(RichText::new("WHAT THIS PROTECTS").color(p::blue()).small());
         ui.label(
             RichText::new(
                 "The biometric voiceprint — pitch, formants, timbre, micro-timing and \
@@ -725,11 +769,11 @@ impl VeilVoiceApp {
                  output. Each frame's measured phase is discarded, and every speaker is \
                  mapped onto one canonical register and vocal tract.",
             )
-            .color(p::FG),
+            .color(p::fg()),
         );
 
         ui.add_space(12.0);
-        ui.label(RichText::new("WHAT IT DOES NOT").color(p::YELLOW).small());
+        ui.label(RichText::new("WHAT IT DOES NOT").color(p::yellow()).small());
         ui.label(
             RichText::new(
                 "The words are preserved on purpose, so de-identification alone does \
@@ -738,12 +782,12 @@ impl VeilVoiceApp {
                  phonemes you produced, so a strong regional accent may still be \
                  audible even though its melody is gone.",
             )
-            .color(p::FG),
+            .color(p::fg()),
         );
 
         ui.add_space(12.0);
-        ui.label(RichText::new("THE APP LOCK").color(p::YELLOW).small());
-        ui.label(RichText::new(veilvoice_crypto::lock::SCOPE).color(p::FG));
+        ui.label(RichText::new("THE APP LOCK").color(p::yellow()).small());
+        ui.label(RichText::new(veilvoice_crypto::lock::SCOPE).color(p::fg()));
     }
 }
 
@@ -754,11 +798,11 @@ fn device_picker(
     chosen: &mut Option<String>,
 ) {
     ui.horizontal(|ui| {
-        ui.label(RichText::new(label).color(p::MUTED));
+        ui.label(RichText::new(label).color(p::muted()));
         let current = chosen.clone().unwrap_or_else(|| "system default".into());
         egui::ComboBox::from_id_salt(label)
             .width(360.0)
-            .selected_text(RichText::new(current).color(p::CYAN))
+            .selected_text(RichText::new(current).color(p::cyan()))
             .show_ui(ui, |ui| {
                 ui.selectable_value(chosen, None, "system default");
                 for device in devices {
@@ -774,33 +818,33 @@ fn device_picker(
 
 fn field(ui: &mut egui::Ui, label: &str, value: &str) {
     ui.horizontal(|ui| {
-        ui.label(RichText::new(format!("{label:<18}")).color(p::MUTED));
-        ui.label(RichText::new(value).color(p::CYAN));
+        ui.label(RichText::new(format!("{label:<18}")).color(p::muted()));
+        ui.label(RichText::new(value).color(p::cyan()));
     });
 }
 
 fn meter(ui: &mut egui::Ui, label: &str, peak: f32) {
     ui.horizontal(|ui| {
-        ui.label(RichText::new(label).color(p::MUTED));
+        ui.label(RichText::new(label).color(p::muted()));
         let (rect, _) = ui.allocate_exact_size(egui::vec2(280.0, 12.0), egui::Sense::hover());
         let painter = ui.painter();
-        painter.rect_filled(rect, 2.0, p::BG_DARK);
+        painter.rect_filled(rect, 2.0, p::bg_dark());
 
         let level = peak.clamp(0.0, 1.0);
         let colour = if level > 0.95 {
-            p::RED
+            p::red()
         } else if level > 0.7 {
-            p::YELLOW
+            p::yellow()
         } else {
-            p::GREEN
+            p::green()
         };
         let mut filled = rect;
         filled.set_width(rect.width() * level);
         painter.rect_filled(filled, 2.0, colour);
-        painter.rect_stroke(rect, 2.0, egui::Stroke::new(1.0, p::BORDER));
+        painter.rect_stroke(rect, 2.0, egui::Stroke::new(1.0, p::border()));
 
         ui.label(
-            RichText::new(format!("{:>5.1} dB", 20.0 * level.max(1e-4).log10())).color(p::MUTED),
+            RichText::new(format!("{:>5.1} dB", 20.0 * level.max(1e-4).log10())).color(p::muted()),
         );
     });
 }
