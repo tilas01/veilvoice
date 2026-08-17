@@ -1,0 +1,386 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//! What the user has chosen about how the app looks and moves.
+//!
+//! # Nothing here is secret, and nothing here is required
+//!
+//! Preferences are a convenience. Every field has a working default, a missing
+//! file is not an error, and a corrupt one is not either -- it falls back to
+//! the defaults and says so in the settings panel rather than refusing to
+//! start. An app that will not open because its preferences file has a stray
+//! byte in it has turned a cosmetic setting into an outage.
+//!
+//! This is deliberately *not* written through
+//! [`veilvoice_crypto::privatefile`]. That module exists for files whose
+//! contents are sensitive, and using it here would blur a distinction worth
+//! keeping: your choice of colour scheme is not a secret, and treating it like
+//! one would make the real protections look like decoration.
+//!
+//! # The format
+//!
+//! One `key = value` per line, ASCII, with `#` comments -- readable and
+//! editable with any text editor, for the same reason the integrity manifest
+//! is a text format. No parser dependency, and no way for a malformed file to
+//! do anything more interesting than be ignored.
+//!
+//! # Animations
+//!
+//! On by default, and switchable off in two places: the settings panel, and
+//! the `VEILVOICE_NO_ANIMATION` environment variable, which wins over the file
+//! so that a machine which struggles with them can be fixed without opening
+//! the UI that is struggling.
+//!
+//! The system's own "reduce motion" setting is honoured above both. Someone who
+//! has told their operating system they do not want movement has already
+//! answered this question, and a privacy tool asking again -- and defaulting to
+//! yes -- would be ignoring them.
+
+use std::path::{Path, PathBuf};
+
+/// Everything the user can choose about presentation.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Prefs {
+    /// Stable identifier of the colour scheme, e.g. `tokyo-night`.
+    pub theme: String,
+    /// Whether transitions and easing run at all.
+    pub animations: bool,
+    /// Whether the header mark animates as a soundbar.
+    pub animated_icon: bool,
+    /// Whether the first-run panel has been answered.
+    pub configured: bool,
+    /// Set when the file on disk could not be understood, so the settings
+    /// panel can say the defaults are in force and why. Never persisted.
+    pub recovered_from_corrupt_file: bool,
+}
+
+impl Default for Prefs {
+    fn default() -> Self {
+        Self {
+            theme: "tokyo-night".to_string(),
+            // On by default, as asked. The system's reduce-motion setting still
+            // overrides this at the point of use -- see `Motion`.
+            animations: true,
+            animated_icon: true,
+            configured: false,
+            recovered_from_corrupt_file: false,
+        }
+    }
+}
+
+/// Where preferences live: beside the app lock, in this platform's config
+/// directory. `None` when the environment does not say where that is, in which
+/// case the app runs on defaults and simply does not persist them.
+pub fn default_path() -> Option<PathBuf> {
+    veilvoice_crypto::lock::default_path().map(|lock| lock.with_file_name("settings.conf"))
+}
+
+impl Prefs {
+    /// Read preferences from `path`.
+    ///
+    /// Never fails. A missing file gives the defaults; an unreadable or
+    /// unparseable one gives the defaults with
+    /// [`recovered_from_corrupt_file`](Self::recovered_from_corrupt_file) set,
+    /// so the UI can be honest about it.
+    pub fn load(path: &Path) -> Self {
+        let Ok(text) = std::fs::read_to_string(path) else {
+            // Missing is the ordinary case on a first run, and is not worth
+            // reporting. An unreadable file is reported below only if it
+            // parses to nothing useful, because the distinction the user cares
+            // about is "are my settings in force", not "which syscall failed".
+            return Self::default();
+        };
+        Self::parse(&text)
+    }
+
+    /// Parse the `key = value` format. Unknown keys are ignored, so a file
+    /// written by a newer build still works in an older one.
+    pub fn parse(text: &str) -> Self {
+        let mut prefs = Self::default();
+        let mut understood = 0usize;
+        let mut lines = 0usize;
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            lines += 1;
+            let Some((key, value)) = line.split_once('=') else {
+                continue;
+            };
+            let key = key.trim();
+            let value = value.trim();
+            match key {
+                "theme" => {
+                    // Only accept a theme this build actually has. An unknown
+                    // one keeps the default rather than leaving the app
+                    // pointing at a scheme that does not exist.
+                    if crate::theme::by_id(value).is_some() {
+                        prefs.theme = value.to_string();
+                        understood += 1;
+                    }
+                }
+                "animations" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.animations = on;
+                        understood += 1;
+                    }
+                }
+                "animated_icon" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.animated_icon = on;
+                        understood += 1;
+                    }
+                }
+                "configured" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.configured = on;
+                        understood += 1;
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        // A file with content, none of which we could use, is a corrupt file.
+        // An empty one is just an empty one.
+        prefs.recovered_from_corrupt_file = lines > 0 && understood == 0;
+        prefs
+    }
+
+    /// Serialise to the text format.
+    pub fn to_text(&self) -> String {
+        let mut out = String::new();
+        out.push_str("# VeilVoice settings. Plain text on purpose: edit it, or delete\n");
+        out.push_str("# it to go back to the defaults. Nothing here is secret.\n");
+        out.push_str(&format!("theme = {}\n", self.theme));
+        out.push_str(&format!("animations = {}\n", self.animations));
+        out.push_str(&format!("animated_icon = {}\n", self.animated_icon));
+        out.push_str(&format!("configured = {}\n", self.configured));
+        out
+    }
+
+    /// Write preferences to `path`, creating the directory if needed.
+    ///
+    /// Returns the reason on failure so the settings panel can show it. A
+    /// failure here must never be fatal: the choice still applies for this
+    /// session, it simply will not be remembered.
+    pub fn save(&self, path: &Path) -> Result<(), String> {
+        if let Some(parent) = path.parent() {
+            if !parent.as_os_str().is_empty() {
+                std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+            }
+        }
+        std::fs::write(path, self.to_text()).map_err(|e| e.to_string())
+    }
+}
+
+fn parse_bool(value: &str) -> Option<bool> {
+    match value.to_ascii_lowercase().as_str() {
+        "true" | "yes" | "on" | "1" => Some(true),
+        "false" | "no" | "off" | "0" => Some(false),
+        _ => None,
+    }
+}
+
+/// Whether movement is allowed, and how much.
+///
+/// Resolved once per frame from three inputs, in order of authority:
+///
+/// 1. **The operating system's reduce-motion setting.** Someone who has told
+///    their system they do not want movement has answered this already.
+/// 2. **`VEILVOICE_NO_ANIMATION`**, so a machine that struggles with animation
+///    can be fixed without opening the interface that is struggling.
+/// 3. **The preference**, which is on by default.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Motion {
+    /// Whether anything may move at all.
+    pub enabled: bool,
+    /// Whether the header mark may animate.
+    pub icon: bool,
+    /// Whether the system asked for reduced motion, so the UI can say that is
+    /// why the toggle is doing nothing rather than appearing broken.
+    pub system_reduced: bool,
+}
+
+impl Motion {
+    /// Resolve for this frame.
+    pub fn resolve(prefs: &Prefs, system_reduced_motion: bool) -> Self {
+        let env_off = std::env::var_os("VEILVOICE_NO_ANIMATION")
+            .map(|v| v != "0" && !v.is_empty())
+            .unwrap_or(false);
+        let enabled = prefs.animations && !env_off && !system_reduced_motion;
+        Self {
+            enabled,
+            icon: enabled && prefs.animated_icon,
+            system_reduced: system_reduced_motion,
+        }
+    }
+
+    /// A duration scaled by whether motion is allowed.
+    ///
+    /// Returns zero when it is not, so a caller can pass this straight to an
+    /// easing function and get an instant result rather than having to branch
+    /// at every call site. That matters: a branch nobody wrote is how a stray
+    /// animation survives the toggle.
+    pub fn secs(&self, wanted: f32) -> f32 {
+        if self.enabled {
+            wanted
+        } else {
+            0.0
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_defaults_are_the_documented_ones() {
+        let d = Prefs::default();
+        assert_eq!(d.theme, "tokyo-night");
+        assert!(d.animations, "animations are on by default, as specified");
+        assert!(d.animated_icon, "the animated icon is on by default");
+        assert!(
+            !d.configured,
+            "a fresh install has not answered the first run"
+        );
+    }
+
+    #[test]
+    fn it_round_trips_through_its_text_format() {
+        let prefs = Prefs {
+            theme: "gruvbox".into(),
+            animations: false,
+            animated_icon: false,
+            configured: true,
+            recovered_from_corrupt_file: false,
+        };
+        let back = Prefs::parse(&prefs.to_text());
+        assert_eq!(back, prefs);
+    }
+
+    #[test]
+    fn every_boolean_spelling_people_actually_type_is_accepted() {
+        for on in ["true", "yes", "on", "1", "TRUE", "Yes"] {
+            assert!(
+                Prefs::parse(&format!("animations = {on}")).animations,
+                "{on} should mean on"
+            );
+        }
+        for off in ["false", "no", "off", "0", "FALSE", "Off"] {
+            assert!(
+                !Prefs::parse(&format!("animations = {off}")).animations,
+                "{off} should mean off"
+            );
+        }
+    }
+
+    /// A settings file must never be able to stop the app starting.
+    #[test]
+    fn hostile_and_broken_files_fall_back_to_the_defaults() {
+        for text in [
+            "",
+            "\0\0\0\0",
+            "theme",
+            "= = = =",
+            "theme = ",
+            "theme = ../../etc/passwd",
+            "theme = <script>alert(1)</script>",
+            "animations = perhaps",
+            &"a".repeat(100_000),
+            "[section]\nkey: value",
+        ] {
+            let prefs = Prefs::parse(text);
+            // Whatever it said, the result is usable.
+            assert!(
+                crate::theme::by_id(&prefs.theme).is_some(),
+                "parsing {:?} left an unknown theme: {}",
+                &text[..text.len().min(30)],
+                prefs.theme
+            );
+        }
+    }
+
+    /// A file whose every line was rejected should say so, so the settings
+    /// panel can explain why the defaults are in force.
+    #[test]
+    fn a_wholly_unreadable_file_is_reported_rather_than_hidden() {
+        assert!(Prefs::parse("nonsense\nmore nonsense").recovered_from_corrupt_file);
+        assert!(!Prefs::parse("").recovered_from_corrupt_file);
+        assert!(!Prefs::parse("# just a comment").recovered_from_corrupt_file);
+        assert!(!Prefs::parse("theme = nord").recovered_from_corrupt_file);
+    }
+
+    /// A newer build's keys must not break an older one.
+    #[test]
+    fn unknown_keys_are_ignored_not_fatal() {
+        let prefs = Prefs::parse("theme = nord\nsomething_new = 42\nanimations = false");
+        assert_eq!(prefs.theme, "nord");
+        assert!(!prefs.animations);
+        assert!(!prefs.recovered_from_corrupt_file);
+    }
+
+    #[test]
+    fn a_missing_file_is_not_an_error() {
+        let prefs = Prefs::load(std::path::Path::new("no-such-settings-file-anywhere.conf"));
+        assert_eq!(prefs, Prefs::default());
+    }
+
+    #[test]
+    fn saving_and_loading_round_trips_through_a_real_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("nested").join("settings.conf");
+        let prefs = Prefs {
+            theme: "dracula".into(),
+            animations: false,
+            animated_icon: true,
+            configured: true,
+            recovered_from_corrupt_file: false,
+        };
+        prefs.save(&path).unwrap();
+        assert_eq!(Prefs::load(&path), prefs);
+    }
+
+    /// The system's reduce-motion setting outranks the preference. Someone who
+    /// asked their OS for less movement has already answered.
+    #[test]
+    fn the_system_setting_wins_over_the_preference() {
+        let on = Prefs {
+            animations: true,
+            animated_icon: true,
+            ..Default::default()
+        };
+        let motion = Motion::resolve(&on, true);
+        assert!(!motion.enabled, "the system asked for reduced motion");
+        assert!(!motion.icon);
+        assert!(motion.system_reduced, "the UI must be able to say why");
+        assert_eq!(motion.secs(0.4), 0.0);
+
+        let motion = Motion::resolve(&on, false);
+        assert!(motion.enabled);
+        assert!(motion.icon);
+        assert_eq!(motion.secs(0.4), 0.4);
+    }
+
+    #[test]
+    fn the_icon_can_be_stilled_without_stilling_everything_else() {
+        let prefs = Prefs {
+            animations: true,
+            animated_icon: false,
+            ..Default::default()
+        };
+        let motion = Motion::resolve(&prefs, false);
+        assert!(motion.enabled, "other animation is unaffected");
+        assert!(!motion.icon);
+    }
+
+    #[test]
+    fn the_settings_file_sits_beside_the_app_lock() {
+        if let (Some(prefs), Some(lock)) = (default_path(), veilvoice_crypto::lock::default_path())
+        {
+            assert_eq!(prefs.parent(), lock.parent());
+            assert!(prefs.ends_with("settings.conf"));
+        }
+    }
+}

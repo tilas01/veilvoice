@@ -309,20 +309,20 @@ impl Security {
             }
             Ok(Op::Set) => {
                 self.wipe_form();
-                self.message = Some(("app lock set".into(), p::GREEN));
+                self.message = Some(("app lock set".into(), p::green()));
             }
             Ok(Op::Change) => {
                 self.wipe_form();
-                self.message = Some(("app lock password changed".into(), p::GREEN));
+                self.message = Some(("app lock password changed".into(), p::green()));
             }
             Ok(Op::Remove) => {
                 self.wipe_form();
                 self.locked = false;
-                self.message = Some(("app lock removed".into(), p::YELLOW));
+                self.message = Some(("app lock removed".into(), p::yellow()));
             }
             Err(e) => {
                 self.entry.zeroize();
-                self.message = Some((e, p::RED));
+                self.message = Some((e, p::red()));
             }
         }
         true
@@ -350,25 +350,30 @@ impl Security {
 
         ui.add_space(40.0);
         ui.vertical_centered(|ui| {
-            ui.label(RichText::new("VEILVOICE").size(24.0).color(p::FG).strong());
-            ui.label(RichText::new("locked").color(p::YELLOW));
+            ui.label(
+                RichText::new("VEILVOICE")
+                    .size(24.0)
+                    .color(p::fg())
+                    .strong(),
+            );
+            ui.label(RichText::new("locked").color(p::yellow()));
         });
         ui.add_space(24.0);
 
         if let Some(e) = &self.load_error {
-            ui.label(RichText::new(e).color(p::RED));
+            ui.label(RichText::new(e).color(p::red()));
             ui.label(
                 RichText::new(
                     "Delete the lock file to start over. Doing so is not a bypass: \
                      anyone who can reach the file could always have done it.",
                 )
-                .color(p::MUTED)
+                .color(p::muted())
                 .small(),
             );
             if let Some(path) = &self.path {
                 ui.label(
                     RichText::new(path.display().to_string())
-                        .color(p::MUTED)
+                        .color(p::muted())
                         .small(),
                 );
             }
@@ -379,7 +384,7 @@ impl Security {
         let busy = self.busy();
 
         ui.horizontal(|ui| {
-            ui.label(RichText::new("password").color(p::MUTED));
+            ui.label(RichText::new("password").color(p::muted()));
             let field = ui.add_enabled(
                 !busy && cooldown.is_none(),
                 egui::TextEdit::singleline(&mut self.entry)
@@ -402,7 +407,7 @@ impl Security {
         if busy {
             ui.horizontal(|ui| {
                 ui.spinner();
-                ui.label(RichText::new("deriving key…").color(p::MUTED));
+                ui.label(RichText::new("deriving key…").color(p::muted()));
             });
         }
 
@@ -412,7 +417,7 @@ impl Security {
                     "too many attempts — {} s before the next one",
                     wait.as_secs()
                 ))
-                .color(p::YELLOW),
+                .color(p::yellow()),
             );
         } else if let Some((text, colour)) = &self.message {
             ui.label(RichText::new(text).color(*colour));
@@ -422,7 +427,7 @@ impl Security {
             if store.failures() > 0 && cooldown.is_none() {
                 ui.label(
                     RichText::new(format!("{} failed attempt(s) recorded", store.failures()))
-                        .color(p::MUTED)
+                        .color(p::muted())
                         .small(),
                 );
             }
@@ -432,10 +437,10 @@ impl Security {
         ui.separator();
         ui.label(
             RichText::new("WHAT THIS LOCK IS WORTH")
-                .color(p::YELLOW)
+                .color(p::yellow())
                 .small(),
         );
-        ui.label(RichText::new(lock::SCOPE).color(p::FG));
+        ui.label(RichText::new(lock::SCOPE).color(p::fg()));
     }
 
     /// The security tab: manage the lock, and see what it is worth.
@@ -443,12 +448,12 @@ impl Security {
         self.poll();
 
         ui.add_space(4.0);
-        ui.label(RichText::new("APP LOCK").color(p::BLUE).small());
+        ui.label(RichText::new("APP LOCK").color(p::blue()).small());
         match &self.path {
             Some(path) => {
                 ui.label(
                     RichText::new(path.display().to_string())
-                        .color(p::MUTED)
+                        .color(p::muted())
                         .small(),
                 );
             }
@@ -459,7 +464,7 @@ impl Security {
                          a lock cannot be stored. The CLI's `veilvoice lock --path` can \
                          put one wherever you choose.",
                     )
-                    .color(p::YELLOW),
+                    .color(p::yellow()),
                 );
                 return;
             }
@@ -467,7 +472,7 @@ impl Security {
 
         let busy = self.busy();
         if self.has_lock() {
-            ui.label(RichText::new("a lock is set").color(p::GREEN));
+            ui.label(RichText::new("a lock is set").color(p::green()));
             ui.add_space(8.0);
 
             ui.add_enabled_ui(!busy, |ui| {
@@ -495,7 +500,7 @@ impl Security {
                 if ui
                     .add_enabled(
                         !busy && !self.current.is_empty(),
-                        egui::Button::new(RichText::new("remove lock").color(p::RED)),
+                        egui::Button::new(RichText::new("remove lock").color(p::red())),
                     )
                     .clicked()
                 {
@@ -510,7 +515,7 @@ impl Security {
                 }
             });
         } else {
-            ui.label(RichText::new("no lock is set").color(p::MUTED));
+            ui.label(RichText::new("no lock is set").color(p::muted()));
             ui.add_space(8.0);
             ui.label(
                 RichText::new(
@@ -518,7 +523,7 @@ impl Security {
                      recordings. They are separate on purpose, so that opening the app \
                      is not the same act as unsealing everything it has written.",
                 )
-                .color(p::MUTED)
+                .color(p::muted())
                 .small(),
             );
             ui.add_enabled_ui(!busy, |ui| {
@@ -537,7 +542,7 @@ impl Security {
             if !self.fresh.is_empty() && !matched {
                 ui.label(
                     RichText::new("the two entries differ")
-                        .color(p::YELLOW)
+                        .color(p::yellow())
                         .small(),
                 );
             }
@@ -546,7 +551,7 @@ impl Security {
         if busy {
             ui.horizontal(|ui| {
                 ui.spinner();
-                ui.label(RichText::new("deriving key…").color(p::MUTED));
+                ui.label(RichText::new("deriving key…").color(p::muted()));
             });
         }
         if let Some((text, colour)) = &self.message {
@@ -557,15 +562,15 @@ impl Security {
         ui.separator();
         ui.label(
             RichText::new("WHAT THIS LOCK IS WORTH")
-                .color(p::YELLOW)
+                .color(p::yellow())
                 .small(),
         );
-        ui.label(RichText::new(lock::SCOPE).color(p::FG));
+        ui.label(RichText::new(lock::SCOPE).color(p::fg()));
     }
 
     /// The at-rest controls that sit inside the file tab.
     pub fn recording_controls(&mut self, ui: &mut egui::Ui) {
-        ui.label(RichText::new("AT REST").color(p::BLUE).small());
+        ui.label(RichText::new("AT REST").color(p::blue()).small());
 
         let mut wanted = self.encrypt_recordings;
         if ui
@@ -586,7 +591,7 @@ impl Security {
                     "the recording will be written unencrypted — anyone who reads the \
                      file can still hear every word",
                 )
-                .color(p::RED)
+                .color(p::red())
                 .small(),
             );
             return;
@@ -600,7 +605,7 @@ impl Security {
         match self.sealing {
             Sealing::Password if self.held.is_some() => {
                 ui.horizontal(|ui| {
-                    ui.label(RichText::new("passphrase set for this session").color(p::GREEN));
+                    ui.label(RichText::new("passphrase set for this session").color(p::green()));
                     if ui.button("change").clicked() {
                         self.passphrase.zeroize();
                         self.held = None;
@@ -624,7 +629,7 @@ impl Security {
                 if !self.passphrase.is_empty() && !matched {
                     ui.label(
                         RichText::new("the two entries differ")
-                            .color(p::YELLOW)
+                            .color(p::yellow())
                             .small(),
                     );
                 }
@@ -633,7 +638,7 @@ impl Security {
                         "Argon2id, 256 MiB. Separate from the app-lock password, and \
                          there is no way to recover it.",
                     )
-                    .color(p::MUTED)
+                    .color(p::muted())
                     .small(),
                 );
             }
@@ -649,9 +654,9 @@ impl Security {
                     }
                     match &self.public_key {
                         Some(path) => {
-                            ui.label(RichText::new(path.display().to_string()).color(p::CYAN))
+                            ui.label(RichText::new(path.display().to_string()).color(p::cyan()))
                         }
-                        None => ui.label(RichText::new("no key chosen").color(p::MUTED)),
+                        None => ui.label(RichText::new("no key chosen").color(p::muted())),
                     };
                 });
                 ui.label(
@@ -660,7 +665,7 @@ impl Security {
                          so a recording stored today survives a quantum adversary later. \
                          Generate a pair with `veilvoice keygen`.",
                     )
-                    .color(p::MUTED)
+                    .color(p::muted())
                     .small(),
                 );
             }
@@ -675,14 +680,14 @@ impl Security {
         if !self.confirm_disable {
             return false;
         }
-        egui::Window::new(RichText::new("Write recordings unencrypted?").color(p::RED))
+        egui::Window::new(RichText::new("Write recordings unencrypted?").color(p::red()))
             .collapsible(false)
             .resizable(false)
             .anchor(egui::Align2::CENTER_CENTER, egui::vec2(0.0, 0.0))
             .show(ctx, |ui| {
                 ui.set_max_width(460.0);
                 for paragraph in DISABLE_WARNING {
-                    ui.label(RichText::new(*paragraph).color(p::FG));
+                    ui.label(RichText::new(*paragraph).color(p::fg()));
                     ui.add_space(6.0);
                 }
                 ui.add_space(6.0);
@@ -694,7 +699,7 @@ impl Security {
                         self.confirm_disable = false;
                     }
                     if ui
-                        .button(RichText::new("write it unencrypted").color(p::RED))
+                        .button(RichText::new("write it unencrypted").color(p::red()))
                         .clicked()
                     {
                         self.encrypt_recordings = false;
@@ -848,7 +853,7 @@ fn reopen(path: Option<&std::path::Path>) -> Option<LockStore> {
 
 fn password_row(ui: &mut egui::Ui, label: &str, value: &mut String) {
     ui.horizontal(|ui| {
-        ui.label(RichText::new(label).color(p::MUTED));
+        ui.label(RichText::new(label).color(p::muted()));
         ui.add(
             egui::TextEdit::singleline(value)
                 .password(true)
