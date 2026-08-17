@@ -902,7 +902,10 @@ fn info() {
     println!("{}", field("Audio", veilvoice_audio::VERSION));
     println!("{}", field("Metadata", veilvoice_meta::VERSION));
     println!("{}", field("Monitor", veilvoice_watch::VERSION));
-    println!("{}", field("License", "GPL-3.0-or-later"));
+    // "Licence" the noun, to match the desktop app and the website. "License"
+    // stays only where it is part of the proper name "GNU General Public
+    // License" or an SPDX identifier.
+    println!("{}", field("Licence", "GPL-3.0-or-later"));
     println!("{}", field("Network access", "none, by construction"));
     println!(
         "{}",
