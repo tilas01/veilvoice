@@ -41,3 +41,10 @@ gpg_secrets/
 *.asc
 !website/assets/veilvoice-signing-key.asc
 !**/public-key.asc
+
+# Python bytecode. Importing `assets/generate.py` from a check script -- which
+# is a reasonable thing to do -- drops a .pyc next to it. A compiled blob is
+# precisely what this repository must not contain: the whole claim about the
+# artwork is that it comes from a script you can read.
+__pycache__/
+*.pyc
