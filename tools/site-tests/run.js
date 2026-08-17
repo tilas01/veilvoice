@@ -20,7 +20,8 @@ const SUITES = [
   require("./markdown.hostile.test.js"),
   require("./markdown.complexity.test.js"),
   require("./repo.test.js"),
-  require("./reveal.test.js")
+  require("./reveal.test.js"),
+  require("./search.test.js")
 ];
 
 // `run` may be synchronous or return a promise: the repository-panel suite

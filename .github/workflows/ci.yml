@@ -71,6 +71,18 @@ jobs:
       - name: Committed artwork must match the generator
         run: python assets/generate.py --check
 
+      # The search index is committed for the same reason and carries the same
+      # risk in a sharper form: a stale index does not look broken, it answers
+      # questions confidently about code that no longer looks like that. The
+      # generator is deterministic, so this is a byte comparison.
+      #
+      # `fetch-depth` matters here -- the generator walks `git ls-files`, so a
+      # checkout missing files would produce a smaller index and "fail" for a
+      # reason that has nothing to do with the index. actions/checkout@v4 gives
+      # a complete working tree, which is what this needs.
+      - name: Committed search index must match the repository
+        run: python tools/search-index/generate.py --check
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a
