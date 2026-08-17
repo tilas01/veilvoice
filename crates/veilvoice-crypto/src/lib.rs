@@ -20,6 +20,8 @@
 //! - [`amnesia`] — page-locked, zeroizing, constant-time-comparable secrets.
 //! - [`shred`] — secure erasure, and an honest account of what that is worth
 //!   on flash storage.
+//! - [`privatefile`] — writing a file that is owner-only from the moment it
+//!   exists, rather than world-readable until a second syscall tightens it.
 //! - [`lock`] — the application lock: an Argon2id verifier with a rate limit,
 //!   which protects against casual access and says so rather than pretending to
 //!   be tamper-proof.
@@ -59,6 +61,7 @@ pub mod container;
 pub mod hybrid;
 pub mod kdf;
 pub mod lock;
+pub mod privatefile;
 pub mod shred;
 
 pub use amnesia::Secret;
@@ -80,6 +83,14 @@ pub enum Error {
     Random,
     /// Argon2 rejected the cost parameters, or the salt was too short.
     KdfParams,
+    /// The declared memory cost is legal but above the ceiling this caller set.
+    /// See [`kdf::KdfParams::within`].
+    KdfCostRefused {
+        /// The memory cost the file asked for, in KiB.
+        requested: u32,
+        /// The ceiling the caller allowed, in KiB.
+        ceiling: u32,
+    },
     /// Key derivation failed.
     Kdf,
     /// A key was not the expected length.
@@ -108,6 +119,10 @@ pub enum Error {
     WrongMode,
     /// A file could not be securely erased.
     Shred,
+    /// The path named for erasure is a symbolic link. Following it would
+    /// overwrite whatever it points at while deleting only the link, so it is
+    /// refused rather than obeyed.
+    ShredSymlink,
     /// The app-lock password was wrong.
     AppLockRejected,
     /// Too many wrong app-lock attempts. The payload is the number of seconds
@@ -122,6 +137,13 @@ impl std::fmt::Display for Error {
         let msg = match self {
             Self::Random => "the operating system random number generator is unavailable",
             Self::KdfParams => "invalid key-derivation parameters",
+            Self::KdfCostRefused { requested, ceiling } => {
+                return write!(
+                    f,
+                    "this file asks for {requested} KiB of memory to open, above the \
+                     {ceiling} KiB ceiling this caller allows"
+                )
+            }
             Self::Kdf => "key derivation failed",
             Self::KeyLength => "key has the wrong length",
             Self::Encrypt => "encryption failed",
@@ -136,6 +158,10 @@ impl std::fmt::Display for Error {
             Self::UnsupportedMode(m) => return write!(f, "unsupported container mode {m}"),
             Self::WrongMode => "container is locked with a different method",
             Self::Shred => "could not securely erase the file",
+            Self::ShredSymlink => {
+                "that path is a symbolic link — erasing it would destroy whatever it points at \
+                 and delete only the link; name the real file instead"
+            }
             Self::AppLockRejected => "wrong app-lock password",
             Self::AppLockCooldown(secs) => {
                 return write!(f, "too many attempts — wait {secs}s before trying again")

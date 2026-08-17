@@ -176,3 +176,178 @@ fn hostile_input_is_survived_with_accent_neutralisation_off() {
     assert!(deid.process_vec(&bad).iter().all(|v| v.is_finite()));
     assert!(deid.process_vec(&clean).iter().all(|v| v.is_finite()));
 }
+
+// ---------------------------------------------------------------------------
+// Hostile *configuration*, as opposed to hostile samples.
+//
+// The section above covers a bad sample reaching the engine. These cover the
+// second door onto the same failure, which the audit found still open: the
+// engine was built from a configuration nobody had validated, and a `NaN`
+// sample rate produced `NaN` output for every sample without a sample ever
+// having been bad. The value is reachable from a file — a WAV's `fmt ` chunk
+// carries a `u32` sample rate that `symphonia` passes straight through — and
+// from any project using these crates as libraries, which the README invites.
+// ---------------------------------------------------------------------------
+
+/// A non-finite sample rate must be refused, not built.
+///
+/// Before the fix, `NaN` passed validation (because `NaN < 8_000.0` is false),
+/// the engine built happily, and **every output sample was `NaN`**, silently
+/// and for ever. `INFINITY` was worse in a different way: it reached an
+/// `as usize` saturation followed by an addition, and panicked with an
+/// arithmetic overflow in every build with overflow checks on.
+#[test]
+fn a_non_finite_sample_rate_is_refused_rather_than_built() {
+    for rate in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
+        let config = DeidConfig {
+            sample_rate: rate,
+            ..Default::default()
+        };
+        let err = config
+            .checked()
+            .expect_err(&format!("sample_rate {rate} was accepted"));
+        assert!(err.contains("real number"), "{err}");
+        assert!(
+            Deidentifier::new(config).is_err(),
+            "an engine was built at sample_rate {rate}"
+        );
+    }
+}
+
+/// A sample rate a file can legally declare, but no hardware produces, sizes
+/// the reverb and chorus delay lines. `u32::MAX` asked for about two gigabytes
+/// of buffers from a four-kilobyte file, and a failed allocation aborts.
+#[test]
+fn an_absurd_sample_rate_is_refused_rather_than_allocated() {
+    for rate in [
+        u32::MAX as f32,
+        2e9,
+        DeidConfig::MAX_SAMPLE_RATE * 2.0,
+        DeidConfig::MAX_SAMPLE_RATE + 1.0,
+    ] {
+        let config = DeidConfig {
+            sample_rate: rate,
+            ..Default::default()
+        };
+        assert!(
+            config.checked().is_err(),
+            "sample_rate {rate} Hz was accepted"
+        );
+    }
+    // The ceiling itself works, and sits above every real converter.
+    assert!(DeidConfig {
+        sample_rate: DeidConfig::MAX_SAMPLE_RATE,
+        ..Default::default()
+    }
+    .checked()
+    .is_ok());
+    for real in [8_000.0, 16_000.0, 44_100.0, 48_000.0, 96_000.0, 384_000.0] {
+        assert!(
+            DeidConfig {
+                sample_rate: real,
+                ..Default::default()
+            }
+            .checked()
+            .is_ok(),
+            "{real} Hz is a real rate and must still build"
+        );
+    }
+}
+
+/// `frame_size` had no upper bound at all, and it sizes every internal buffer
+/// and the FFT plan.
+#[test]
+fn an_absurd_frame_size_is_refused() {
+    for frame_size in [
+        DeidConfig::MAX_FRAME_SIZE + 2,
+        1 << 26,
+        (usize::MAX / 2) & !1,
+    ] {
+        assert!(
+            DeidConfig {
+                frame_size,
+                overlap: 2,
+                ..Default::default()
+            }
+            .checked()
+            .is_err(),
+            "frame_size {frame_size} was accepted"
+        );
+    }
+    assert!(DeidConfig {
+        frame_size: DeidConfig::MAX_FRAME_SIZE,
+        ..Default::default()
+    }
+    .checked()
+    .is_ok());
+}
+
+/// Every other float is either clamped to something meaningful or refused for
+/// being `NaN`. None of them may reach the engine unexamined.
+#[test]
+fn non_finite_parameters_are_refused_and_wild_ones_are_clamped() {
+    // A named function-pointer type rather than a boxed closure: no allocation,
+    // no trait object, and a signature short enough to read.
+    type Poison = (&'static str, fn(&mut DeidConfig));
+
+    let named: [Poison; 8] = [
+        ("intensity", |c| c.intensity = f32::NAN),
+        ("mod_smooth", |c| c.mod_smooth = f32::NAN),
+        ("distortion_drive", |c| c.distortion_drive = f32::NAN),
+        ("distortion_mix", |c| c.distortion_mix = f32::NAN),
+        ("chorus_mix", |c| c.chorus_mix = f32::NAN),
+        ("reverb_mix", |c| c.reverb_mix = f32::NAN),
+        ("pitch_bounds.0", |c| c.pitch_bounds.0 = f32::NAN),
+        ("formant_bounds.1", |c| c.formant_bounds.1 = f32::INFINITY),
+    ];
+    for (name, poison) in named {
+        let mut config = DeidConfig::default();
+        poison(&mut config);
+        let err = config
+            .checked()
+            .expect_err(&format!("{name} accepted a non-finite value"));
+        assert!(
+            err.contains(name),
+            "error for {name} does not name it: {err}"
+        );
+    }
+
+    // Finite but wild values are brought back to something the DSP can act on
+    // rather than refused, because each has a sensible nearest legal value.
+    let tamed = DeidConfig {
+        intensity: 99.0,
+        distortion_drive: 1e9,
+        chorus_mix: -5.0,
+        pitch_bounds: (500.0, 0.0001),
+        ..Default::default()
+    }
+    .checked()
+    .expect("finite-but-wild values should be clamped, not refused");
+    assert_eq!(tamed.intensity, 1.0);
+    assert_eq!(tamed.chorus_mix, 0.0);
+    assert!(tamed.distortion_drive <= 64.0);
+    assert!(
+        tamed.pitch_bounds.0 <= tamed.pitch_bounds.1,
+        "bounds came back inverted: {:?}",
+        tamed.pitch_bounds
+    );
+}
+
+/// The whole point, checked end to end: a configuration that survives
+/// validation must produce finite audio from finite audio.
+#[test]
+fn every_configuration_that_builds_produces_finite_audio() {
+    for rate in [8_000.0f32, 44_100.0, 48_000.0, 192_000.0] {
+        let config = DeidConfig {
+            sample_rate: rate,
+            accent: AccentConfig::default(),
+            ..Default::default()
+        };
+        let mut deid = Deidentifier::new(config).unwrap();
+        let out = deid.process_vec(&speech(rate as u32, 0.1));
+        assert!(
+            out.iter().all(|v| v.is_finite()),
+            "{rate} Hz produced non-finite output"
+        );
+    }
+}

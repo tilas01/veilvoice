@@ -31,6 +31,7 @@ use ml_kem::kem::{Decapsulate, Encapsulate};
 use ml_kem::{EncodedSizeUser, KemCore, MlKem768};
 use sha2::Sha256;
 use x25519_dalek::{PublicKey as XPublicKey, StaticSecret as XSecret};
+use zeroize::Zeroize;
 
 /// Domain separation string, so keys derived here can never collide with keys
 /// derived by any other part of the system.
@@ -191,10 +192,16 @@ impl SecretKey {
 
         let ct = ml_kem::Ciphertext::<MlKem768>::try_from(&enc.ml_ciphertext[..])
             .map_err(|_| Error::BadKeyEncoding)?;
-        let ml_shared = self.ml.decapsulate(&ct).map_err(|_| Error::Decapsulate)?;
+        let mut ml_shared = self.ml.decapsulate(&ct).map_err(|_| Error::Decapsulate)?;
 
         let x_self = XPublicKey::from(&self.x);
-        combine(x_shared.as_bytes(), &ml_shared, enc, x_self.as_bytes())
+        let out = combine(x_shared.as_bytes(), &ml_shared, enc, x_self.as_bytes());
+        // `x_shared` is an `x25519_dalek::SharedSecret`, which zeroizes itself
+        // on drop. The ML-KEM half is a plain `Array<u8, U32>` and does not, so
+        // without this the post-quantum shared secret would be the one piece of
+        // key material in this crate left lying in freed memory.
+        ml_shared.zeroize();
+        out
     }
 }
 
@@ -207,7 +214,7 @@ impl PublicKey {
         let x_eph_pub = XPublicKey::from(&x_eph);
         let x_shared = x_eph.diffie_hellman(&self.x);
 
-        let (ml_ct, ml_shared) = self
+        let (ml_ct, mut ml_shared) = self
             .ml
             .encapsulate(&mut rng)
             .map_err(|_| Error::Encapsulate)?;
@@ -219,8 +226,11 @@ impl PublicKey {
             ml_ciphertext,
         };
 
-        let secret = combine(x_shared.as_bytes(), &ml_shared, &enc, self.x.as_bytes())?;
-        Ok((secret, enc))
+        let secret = combine(x_shared.as_bytes(), &ml_shared, &enc, self.x.as_bytes());
+        // See the note in `decapsulate`: the ML-KEM shared secret does not
+        // zeroize itself.
+        ml_shared.zeroize();
+        Ok((secret?, enc))
     }
 }
 
@@ -249,7 +259,6 @@ fn combine(
     hk.expand(&info, out.expose_mut()).map_err(|_| Error::Kdf)?;
 
     // The raw inputs must not outlive the derivation.
-    use zeroize::Zeroize;
     ikm.zeroize();
     Ok(out)
 }

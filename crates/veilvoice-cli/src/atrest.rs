@@ -42,6 +42,10 @@ pub const PLAINTEXT_WARNING: &[&str] = &[
     "Deleting it afterwards is not a fix: on an SSD, SD card or USB stick",
     "the original blocks can survive every overwrite. That is why at-rest",
     "encryption is the default rather than an option you have to find.",
+    "",
+    "The file will be created readable only by your account. That is a file",
+    "permission and nothing more — it does not survive a copy, a backup, or",
+    "anyone who has the disk.",
 ];
 
 /// How a recording is to be sealed.
@@ -202,6 +206,17 @@ mod tests {
                 "reassuring word: {reassurance}"
             );
         }
+        // The owner-only permission the plaintext now gets must be described as
+        // the small thing it is. If it ever reads as a substitute for the
+        // encryption being declined, this is what stops it shipping.
+        assert!(
+            text.contains("a file permission and nothing more"),
+            "the permission must be belittled, not offered as consolation"
+        );
+        assert!(
+            text.contains("anyone who has the disk"),
+            "the limit of a file permission must be stated"
+        );
     }
 
     #[test]

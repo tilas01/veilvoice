@@ -271,25 +271,29 @@ Artwork is **generated, not committed as opaque blobs** —
 
 ## Status
 
-**v0.1.5 — early but real.** The engine, cryptography, audio path, metadata
-cleaning, at-rest encryption, app lock, CLI and GUI are implemented and tested
-(243 tests, clippy clean, no `unsafe`), with randomised campaigns against every
-parser that reads untrusted input and against the website's Markdown renderer.
-Release binaries are built for nine targets and verified bit-for-bit
-reproducible on eight of them; the FreeBSD build is made once in a VM and is
-reported as `not-verified` rather than claimed.
+**v0.1.8 — early but real.** The engine, cryptography, audio path, metadata
+cleaning, at-rest encryption, app lock, tamper detection, CLI and GUI are
+implemented and tested (285 tests plus seven website suites, clippy clean, no
+`unsafe`), with randomised campaigns against every parser that reads untrusted
+input and against the website's Markdown renderer. Release binaries are built
+for nine targets and verified bit-for-bit reproducible on eight of them; the
+FreeBSD build is made once in a VM and is reported as `not-verified` rather than
+claimed.
 
 **Audited by tilas01**, who wrote and reviewed it. Be clear about what that is
 worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters — it is written to be read.
 
-The most recent round found and fixed **seven defects**, four of them reachable
-from a file somebody sends you: two that aborted the process, one that silently
-turned every processed recording into garbage, and three in the website's
-Markdown renderer. None was a confidentiality failure. They are written up
-individually — including the ones the previous audit had already declared clean —
-in [`docs/AUDIT.md`](docs/AUDIT.md).
+Three audit rounds have found and fixed **36 defects** (F-1 to F-36) — the most
+recent round, run against the *classes* of defect rather than a list of things
+that seemed worth checking, accounted for 28 of them. Among them: a
+four-kilobyte file that killed the process, a configuration value that made
+every output sample silent, a secure erase that destroyed a file other than the
+one named, and two ways to freeze a reader's browser tab. **None in any round
+was a confidentiality failure.** Every one is written up individually, including
+the ones earlier rounds had declared clean, in
+[`docs/AUDIT.md`](docs/AUDIT.md).
 
 Using it: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), or
 [the wiki](https://tilas01.github.io/veilvoice/wiki.html).

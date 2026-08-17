@@ -103,9 +103,25 @@ pub fn clean_wav_bytes(bytes: &[u8], policy: Policy) -> Result<(Vec<u8>, Report)
         report.changed = true;
     }
 
+    // The RIFF size field is a `u32`, so a body that does not fit in one cannot
+    // be described by the format at all. `as u32` would have wrapped and
+    // written a size that does not match the file — a silently corrupt WAV
+    // handed back as if it were clean, which for a *metadata cleaner* means
+    // the user believes a file is safe when it will not even open. Refuse
+    // instead. Only reachable for a body at or above 4 GiB, which is past what
+    // RIFF can express in the first place.
+    let riff_size = match u32::try_from(body.len() + 4) {
+        Ok(size) => size,
+        Err(_) => {
+            return Err(Error::Malformed(
+                "the cleaned audio is larger than the RIFF format can describe (4 GiB)".into(),
+            ))
+        }
+    };
+
     let mut out = Vec::with_capacity(body.len() + 12);
     out.extend_from_slice(b"RIFF");
-    out.extend_from_slice(&((body.len() + 4) as u32).to_le_bytes());
+    out.extend_from_slice(&riff_size.to_le_bytes());
     out.extend_from_slice(b"WAVE");
     out.extend_from_slice(&body);
     Ok((out, report))

@@ -15,16 +15,23 @@
 const SUITES = [
   require("./characters.test.js"),
   require("./html.test.js"),
+  require("./css.test.js"),
   require("./markdown.render.test.js"),
   require("./markdown.hostile.test.js"),
+  require("./markdown.complexity.test.js"),
+  require("./repo.test.js"),
   require("./reveal.test.js")
 ];
 
-let failures = 0;
-for (const suite of SUITES) {
-  console.log(`\n${suite.name}`);
-  failures += suite.run();
-}
+// `run` may be synchronous or return a promise: the repository-panel suite
+// drives an async module, and awaiting a number is harmless for the rest.
+(async function () {
+  let failures = 0;
+  for (const suite of SUITES) {
+    console.log(`\n${suite.name}`);
+    failures += await suite.run();
+  }
 
-console.log(failures === 0 ? "\nall site tests passed" : `\n${failures} failing check(s)`);
-process.exit(failures === 0 ? 0 : 1);
+  console.log(failures === 0 ? "\nall site tests passed" : `\n${failures} failing check(s)`);
+  process.exit(failures === 0 ? 0 : 1);
+})();

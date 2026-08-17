@@ -2,28 +2,62 @@
 
 # VeilVoice — internal audit
 
-**Auditor:** tilas01 (maintainer). **Date:** 2026-08-16. **Version:** 0.1.5,
-plus the at-rest-by-default, app-lock and audit work that landed after it.
+**Auditor:** tilas01 (maintainer). **Date:** 2026-08-17. **Version:** 0.1.8,
+covering the whole tree.
 
-This is a *maintainer* audit. It catches what the author can see, which is not
-the same as what an adversary can. **No external firm or independent researcher
-has reviewed this code.** Where that matters, it is said plainly rather than
-papered over.
+## The standard this is held to
 
-**The scope listed as outstanding in the previous revision is now done**, except
-the one item that cannot be done from the inside: an independent review. Working
-through it found **seven real defects**, four of them reachable from a file
-somebody sends you. They are written up individually in §2 rather than
-summarised, because a finding with the details filed off is not a finding.
+Earlier revisions of this document named "an independent audit" as the one
+outstanding item, and treated everything else as done. That framing is dropped.
+It let a very large amount of unexamined code sit behind a single caveat, and it
+made the honest answer to "has this been checked?" depend on someone else doing
+the work.
 
-The uncomfortable conclusion is recorded here rather than buried: the previous
-revision said "no vulnerabilities found" about code that would abort on a
-hostile container and silently destroy every recording it processed after
-reading one NaN. It was not lying — nobody had looked with the right tools. That
-is what "a maintainer audit is worth what a maintainer audit is worth" means in
-practice, and it is the argument for the item that is still open.
+The standard now is stated positively, and it is a standard about **this code**
+rather than about who looked at it:
+
+> Every line is written to current Rust security practice, and the whole tree
+> has been audited against the full range of Rust-specific vulnerability
+> classes: integer overflow and truncating casts under **both** profiles;
+> panics reachable from untrusted input; allocation sized by untrusted input;
+> every parser that reads bytes somebody else produced; resource exhaustion and
+> loops whose termination depends on a length field; TOCTOU, symlinks and file
+> creation modes; secret zeroization, page locking, constant-time comparison and
+> `Debug` leakage; cryptographic misuse; concurrency; dependency risk; and error
+> handling that degrades quietly to a weaker posture. The website is held to the
+> same standard as a security boundary in its own right.
+
+Each of those classes has a section below saying what was examined and what was
+found, including the ones that found nothing — "we looked and there was
+nothing" is a result, and it is not the same as not looking.
+
+**What has not changed:** no external firm or independent researcher has
+reviewed this code, and the documentation still says so wherever it matters.
+That is a fact about the world, not an outstanding task item, and it is
+recorded as such rather than as a promise to be redeemed later. An outside
+reviewer would still be worth having. The difference is that their absence is no
+longer offered as the explanation for anything.
+
+## This round
+
+**Twenty-eight defects found and fixed (F-9 to F-36.)** Thirteen in the Rust,
+fifteen in the website and its stylesheets.
+
+The uncomfortable pattern repeats, and is worth naming rather than burying: the
+previous round said the audit scope was *finished*. It was finished against the
+list that round had drawn up. Drawing up a wider list found, among other things,
+a four-kilobyte file that killed the process, a configuration value that made
+every output sample silently `NaN`, an erase operation that would destroy a file
+other than the one named, and a Markdown document that froze the reader's tab
+for eight seconds. None of those needed a new technique to find. They needed
+somebody to look at that particular thing.
+
+Three of the new findings are the previous round's own recorded "open items"
+(a scheme check on `repo.js`, a KDF cost ceiling, a coverage-guided fuzzing
+setup). Those are now done or built. The rest were not on anybody's list.
 
 ---
+
 
 ## 1. Mechanical checks
 
@@ -33,7 +67,8 @@ practice, and it is the argument for the item that is still open.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **0 vulnerabilities.** Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 269 tests across 8 crates, plus doctests and 5 site-test suites in `tools/site-tests`. |
+| Test suite | 285 tests across 8 crates, plus doctests and 7 site-test suites in `tools/site-tests`. |
+| Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
 | Secrets in the repository | None. `gpg_secrets/` is gitignored; `*.asc` ignored by default with only the public key allowed back explicitly. |
@@ -43,7 +78,11 @@ practice, and it is the argument for the item that is still open.
 
 ## 2. Findings
 
-### 2.1 Fixed during this audit
+### 2.1 Found and fixed in earlier rounds (F-1 to F-8)
+
+Kept in full rather than summarised. A finding with the details filed off is
+not a finding, and several of these are the reason a later one was looked for
+at all.
 
 **F-1 — Duplicate seeding path that panicked (`veilvoice-core`).**
 `Modulator::from_os_rng` read the OS CSPRNG and `.expect()`-ed on failure. It
@@ -158,7 +197,410 @@ no scheme means a relative path and is fine; protocol-relative `//host` and
 leading backslashes are refused explicitly, since both look relative and behave
 external.
 
-### 2.2 Accepted, with reasoning
+### 2.2 Found and fixed in this round -- the Rust
+
+**F-9 -- A four-kilobyte WAV killed the process (`veilvoice-audio`). Denial of
+service, reachable from a file somebody sends you.**
+
+A WAV whose `fmt ` chunk declares a **sample rate of zero** makes `symphonia`
+panic inside `Probe::format`, at `TimeBase::new` -- *before* VeilVoice is handed
+anything it could inspect. VeilVoice's release profile sets `panic = "abort"`,
+so that is not an error a caller can handle: it is the process ending.
+`veilvoice anonymise` on a file somebody sent you was the whole exploit.
+
+Confirmed by construction, and the boundary is narrow: of the malformed headers
+tried -- zero channels, 65 535 channels, zero bits per sample, 65 535 bits per
+sample, a mismatched format tag -- **every other one is already refused cleanly
+by `symphonia` itself**. Only the zero rate crashes.
+
+**Fixed** with a pre-flight check on the file's own bytes before the decoder is
+given the stream (`io::preflight`). It reads the head from the same handle that
+is then rewound and passed on, so the bytes checked are the bytes decoded rather
+than the result of a second open. It is deliberately narrow -- duplicating what
+the decoder already validates would be a second parser to keep in step, which is
+its own bug source.
+
+**Residual, stated rather than engineered around:** this cannot protect against
+a panic in a decoder for a format VeilVoice does not itself parse. Under
+`panic = "abort"` no wrapper can, short of decoding in a separate process. The
+mitigations are this check, keeping `symphonia` current, and its being a
+widely-used pure-Rust decoder rather than a C library.
+
+**F-10 -- A configuration value made every output sample `NaN`, silently
+(`veilvoice-core`). This is F-5 arriving through a second door.**
+
+F-5 sanitised the *samples*. Nothing sanitised the *configuration they were
+processed under*. `DeidConfig::checked()` tested `self.sample_rate < 8_000.0`,
+and `NaN` compares false against every bound, so `NaN` passed validation. The
+engine then built happily and produced `NaN` for every output sample, for the
+whole session, with nothing reported -- the exact failure mode F-5 was written
+up as, reached without a single bad sample ever being read.
+
+Three defects in one place, all confirmed by running them:
+
+- **`NaN`**: builds, and every output sample is `NaN`. Silent, total.
+- **`INFINITY`**: panics with an arithmetic overflow at `pitch.rs:74` in every
+  build with overflow checks on -- which is every debug build and any project
+  consuming these crates as libraries, which the README explicitly invites.
+- **A merely enormous value**: `sample_rate` sizes the delay lines in
+  `effects.rs` (`Reverb`'s comb is `0.0297 x sample_rate` samples, and the three
+  chorus voices are similar). A WAV's `fmt ` chunk carries a **`u32`** sample
+  rate and `symphonia` passes it straight through, so a four-kilobyte file
+  declaring `u32::MAX` asks for roughly **two gigabytes** of buffers before a
+  single sample is processed. A failed allocation aborts. This one *is*
+  file-reachable, and was confirmed end to end through `veilvoice anonymise`.
+
+`frame_size` had no upper bound at all, and it sizes every internal buffer and
+the FFT plan.
+
+**Fixed** by validating the whole configuration rather than parts of it: every
+float is checked for **finiteness first** and then for range; `sample_rate` is
+bounded to 768 kHz (above every real converter -- professional hardware tops out
+at 384 kHz); `frame_size` to 65 536; and the remaining floats are clamped to
+values the DSP can act on, since each has a meaningful nearest legal value.
+`tests/hostile_audio.rs` covers all of it, including that every configuration
+which *does* build produces finite audio.
+
+**F-11 -- Secure erase never terminated on a 32-bit build
+(`veilvoice-crypto`). The file was left intact.**
+
+`shred_file` sized its write buffer with `CHUNK.min(length.max(1) as usize)`.
+On a 32-bit target -- and VeilVoice ships an ARMv7 build -- a file of exactly
+4 GiB truncates to `0`, so the buffer was empty, `take` was always zero,
+`remaining` never decreased, and the loop **ran for ever**. `veilvoice shred`
+hung, and the file it was asked to destroy was still there.
+
+The same 32-bit-only shape as F-4, and equally invisible to any campaign on an
+x86-64 host. **Fixed** by computing the length in `u64` and only then narrowing
+(`length.clamp(1, CHUNK as u64) as usize`), with an explicit refusal if `take`
+is ever zero, so a loop that could reach that state fails instead of spinning.
+Found by reading.
+
+**F-12 -- Secure erase destroyed the wrong file (`veilvoice-crypto`).
+Data loss, and a report that said it had succeeded.**
+
+`shred_file` called `fs::metadata` (which follows symlinks), checked
+`is_file()`, then opened the path (also following). Erasing a symbolic link
+therefore filled **its target** with random data and unlinked only the link --
+and reported `removed: true` about a file that was still there while an
+unrelated one had been destroyed. Point it at a link named `recording.wav` and
+whatever it referenced was gone.
+
+The check was also a TOCTOU: the path could be replaced with a symlink between
+the `metadata` call and the `open`, so the object checked was not necessarily
+the object written.
+
+**Fixed** on both counts: `symlink_metadata` first, refusing a link outright
+with a new `Error::ShredSymlink` that explains why; then open, and ask the *open
+handle* what it is, so no second lookup can disagree with the first. A caveat
+about hard links was added to the report as well, since those share the data
+without being links to the name. Regression tests confirm the target survives.
+
+**F-13 -- A planted executable in the working directory was run
+(`veilvoice-guard`, `veilvoice-watch`). Local code execution.**
+
+`Command::new("reg")`, `Command::new("wevtutil")` and `Command::new("ausearch")`
+do not name the system tool -- they name a *search*. Rust's `Command` resolves a
+bare program name through the platform's search order, and **on Windows that
+order includes the current working directory** ahead of most of `PATH`. Running
+`veilvoice watch` or `veilvoice guard check` from a directory that happens to
+contain a file called `reg.exe` executed it, as the user, with no prompt. A
+downloads folder is enough.
+
+That this is in the *monitor* and the *tamper detector* is the sharp part: they
+are the two features somebody runs precisely because they suspect something is
+already wrong on the machine.
+
+**Fixed** by resolving every system tool to an absolute path -- `%SystemRoot%`'s
+`System32` (and `Sysnative`, for a 32-bit process on 64-bit Windows), and a
+fixed list of standard directories for `ausearch` -- and returning "I cannot
+tell you" when the tool is not where it should be. That is the right answer for
+these modules anyway: their whole design is to report honestly rather than
+guess, and running *something else called `wevtutil`* is the worst possible
+guess. Tested against a decoy.
+
+**F-14 -- The app-lock verifier was world-readable on every save
+(`veilvoice-crypto`).**
+
+`LockStore::save` used `fs::write`, which creates a file with the process umask
+-- ordinarily `0644` -- and only then chmod'd it to `0600`. The stored Argon2id
+password verifier was therefore readable by every other local user for the
+window between the two calls. That window reopened on **every save**, and a save
+happens after every failed unlock attempt: an attacker who can cause failed
+attempts can cause the window to reopen at will.
+
+`LockStore::create` additionally tested `path.exists()` and then wrote, which
+loses twice -- another process can win the race, and a symbolic link planted at
+the lock path would have been followed, so the write would land on whatever it
+pointed at.
+
+**Fixed** with a new `veilvoice_crypto::privatefile` module that applies the
+permission **at creation** via `OpenOptions::mode`, and offers an exclusive form
+built on `create_new` so the refusal is one atomic answer from the kernel rather
+than a check followed by a hope. Tests assert the mode both at creation and
+after a save, and that a planted symlink is refused.
+
+**F-15 -- The private key and the decrypted plaintext were written
+world-readable (`veilvoice-cli`).**
+
+The same create-then-chmod pattern on `veilvoice keygen`'s secret-key file
+(mitigated by the key itself being encrypted, but the window had no reason to
+exist), and no permission handling at all on the two outputs that most need it:
+`veilvoice decrypt`'s plaintext, and `anonymise --encrypt false`'s recording --
+which the tool's own warning describes, correctly, as still containing
+everything that was said.
+
+**Fixed** by routing all three through `privatefile`. The plaintext warning now
+also states what that permission is and is not worth, and a test fails the build
+if that sentence is ever softened -- a file permission must not start reading as
+a substitute for the encryption the user just declined.
+
+**F-16 -- Windows attribution gave a confidently wrong explanation
+(`veilvoice-guard`).**
+
+The Security-log query was built with `path.replace('\'', "''")`. Doubling a
+quote is the SQL and XQuery rule; **XPath 1.0, which is what `wevtutil`
+speaks, has no escape for a quote inside a string literal at all**. A path
+containing an apostrophe therefore produced a syntactically broken query, which
+failed, and the failure was reported to the user as *"object-access auditing is
+off, or this needs to run elevated"*.
+
+Not a code-execution route -- the query is an argument, not a shell string --
+but for a module whose entire purpose is being honest about what it cannot see,
+telling somebody worried about surveillance the wrong reason is the specific
+failure it was written to avoid. **Fixed** by declining the query for such a
+path and saying exactly that, since the character genuinely cannot be expressed.
+
+**F-17 -- Decoding was unbounded (`veilvoice-audio`).**
+
+`io::load` grew its sample buffer with no ceiling. Compressed formats expand: a
+mono MP3 at 32 kbit/s decodes to 48 000 `f32` per second, a forty-eight-fold
+expansion, so a hundred-megabyte download becomes some five gigabytes of
+samples. A failed allocation aborts. **Fixed** with a documented ceiling of
+about twelve hours at 48 kHz, refused with a message that names the limit rather
+than truncating the recording silently.
+
+**F-18 -- The post-quantum shared secret was not zeroized
+(`veilvoice-crypto`).**
+
+`x25519_dalek::SharedSecret` zeroizes itself on drop and the combined input
+keying material was wiped explicitly, but the ML-KEM half is a plain
+`Array<u8, U32>` and was simply dropped. In a crate whose stated design is that
+key material is page-locked and wiped, the post-quantum shared secret was the
+one piece left in freed memory. **Fixed** in both `encapsulate` and
+`decapsulate`.
+
+**F-19 -- The metadata cleaner could emit a corrupt file (`veilvoice-meta`).**
+
+`clean_wav_bytes` wrote its RIFF size as `(body.len() + 4) as u32`. For a body
+at or above 4 GiB that truncates, producing a size field that does not describe
+the file -- a WAV handed back to the user as clean that will not open. For a
+*metadata cleaner* that is the worst shape of bug: the user believes the file is
+safe. Only reachable past what RIFF can express in the first place, so **fixed**
+by refusing with `Error::Malformed` rather than by widening anything.
+
+**F-20 -- The app-lock file's KDF costs were validated too late
+(`veilvoice-crypto`).** Hardening.
+
+`AppLock::parse` accepted whatever costs the file declared and left them to be
+rejected at the first verification. They are attacker-controlled -- this file is
+read before anyone has authenticated -- and `KdfParams::checked` is the single
+funnel that bounds them (F-2, F-3). **Fixed** by validating at parse, so the
+failure is reported as "this lock file is broken", which is true and actionable,
+rather than as a password that never works.
+
+**F-21 -- A hand-written manifest reported every file as new
+(`veilvoice-guard`).**
+
+`Manifest::of` normalises paths to forward slashes; `Manifest::parse` did not.
+A manifest written by hand or by an older build with backslashes therefore keyed
+its entries differently from the ones `check`'s `extra` argument is keyed by, so
+**every recorded file was also reported as newly added**. A tamper report full
+of false positives is one nobody reads, which defeats the only thing the module
+does. **Fixed** by normalising on the way in as well as on the way out.
+
+### 2.3 Found and fixed in this round -- the website
+
+`js/repo.js` fetches README.md over the network and assigns the rendered result
+to `innerHTML`. That path is a security boundary and is audited as one.
+
+**F-22 -- The Markdown renderer could freeze the reader's tab. Quadratic
+backtracking, measured.**
+
+The link and image patterns were `\(([^)\s]+)[^)]*\)`. Those two runs
+**overlap** -- a character that is neither `)` nor whitespace can be taken by
+either -- so for a `(` that never closes the engine tries every way of splitting
+the text between them:
+
+| `![a](` followed by | time to render |
+|---|---|
+| 16 000 characters | 0.13 s |
+| 32 000 | 0.49 s |
+| 64 000 | 1.96 s |
+| 128 000 | 7.97 s |
+
+Four times the work for twice the input, exactly. Rendering happens on the main
+thread, on text the page **fetched over the network**, so a 400 KB document on
+one line is a minute and a half of a frozen tab.
+
+**Fixed** by making the two runs disjoint -- the optional title must begin with
+whitespace, so there is only one way to split any input -- rather than by
+bounding the document. The grammar accepted is unchanged. 128 000 characters now
+renders in under a millisecond.
+
+**F-23 -- A second, independent quadratic in the same file.**
+
+Removing the ambiguity stops the engine trying every split of one attempt. It
+does not stop it making a great many attempts: for `[[[[...](](...`, every `[`
+is a candidate start and an unbounded `[^\]]+` scans forward from each one
+looking for a `]`.
+
+| `[` repeated, then `](` repeated | time |
+|---|---|
+| 10 000 | 0.23 s |
+| 20 000 | 0.90 s |
+| 40 000 | 3.61 s |
+| 80 000 | 14.59 s |
+
+**Fixed** with repetition bounds -- 512 characters for a link label, 2 048 for a
+target, 4 096 for inline code -- which turn each scan into a constant and the
+whole pass linear. The limits are far past anything real, and a test asserts
+that ordinary Markdown still renders as links, because F-8 was exactly the
+mistake of being safe and quietly wrong.
+
+**F-24 -- A deeply nested blockquote crashed the render, and the reader was
+told the network had failed.**
+
+A blockquote strips one `>` and calls `render` again, so the **document** chose
+the recursion depth. Five thousand `>` characters overflowed the JavaScript
+stack and threw a `RangeError`. Because `repo.js` reports any rejection from the
+README fetch as *"could not reach api.github.com"*, the reader was given a
+confident, wrong explanation for a page that had loaded fine and then broken
+while rendering. **Fixed** with a nesting limit of sixteen, past which the
+remaining markers are shown as the text they are.
+
+**F-25 -- A code fence could reach `Object.prototype`.**
+
+The fence info string is matched with `\w*`, and both `constructor` and
+`__proto__` are `\w*`. On a plain object literal, a fence language of
+`constructor` made `KEYWORDS[lang]` resolve through the prototype chain to
+`Object`, and `__proto__` to `Object.prototype`.
+
+Neither did any harm as the code stood -- `String.replace` stringifies a
+non-regex search value, so it looked for the literal text
+`function Object() { [native code] }` and found nothing. That is a description
+of a bug that has not gone off, not of a safe lookup. **Fixed** with a
+null-prototype object and an own-property check.
+
+**F-26 -- Download links were trusted by omission (`js/repo.js`).**
+*The previous round recorded this as open work; it is now closed.*
+
+`link.href = asset.browser_download_url` was assigned with no check, on the
+reasoning that GitHub's own API for this repository always returns a github.com
+URL. That reasoning is true and it is not a control. **Fixed** by requiring
+`https:` and reusing the renderer's own `safeUrl` -- deliberately shared rather
+than re-implemented, because two scheme checks on one page is two things to keep
+in step and the forgotten one is the one that matters. A refused asset is still
+*named*, so the reader learns the file exists; it is simply not clickable.
+
+**F-27 -- A malformed API response was reported as a network failure.**
+
+`assets.sort` called `a.name.localeCompare(b.name)`, which throws if `name` is
+not a string; one bad entry rejected the whole promise and the panel told the
+reader it could not reach GitHub. The asset list and the README size were also
+unbounded. **Fixed**: every field is type-checked, the list is capped at a
+hundred entries, and a README above a megabyte is declined with a message
+saying so rather than rendered.
+
+**F-28 -- Repo-relative links resolved somewhere other than where they
+pointed.**
+
+The rewriting pasted strings together, leaving `..` segments for the browser to
+normalise afterwards, so a link written as `../../../elsewhere` produced a URL
+that resolved to a different part of github.com than the link appeared to name.
+The host was never in doubt, so this is misdirection rather than escape -- but a
+page asking people to click through and read the source should send them where
+the link says. **Fixed** by resolving through `URL` against a fixed base and
+refusing anything that climbs out of it.
+
+**F-29 -- The sticky header had no blur on every iPhone running iOS 17 or
+earlier (`css/main.css`).**
+
+`backdrop-filter` was used unprefixed. Safari did not support the unprefixed
+property until version 18. **Fixed** with `-webkit-backdrop-filter` alongside.
+
+**F-30 -- The legal gate was an invisible modal on pre-2023 engines.**
+
+`color-mix()` arrived in Chrome 111, Safari 16.2 and Firefox 113. An older
+engine discards the whole declaration -- and three of the four uses had no
+preceding fallback, so the element was left with **no background at all**. The
+worst was `.legal-overlay`: a fixed overlay shown together with
+`body.legal-locked { overflow: hidden }`. Without its background the reader got
+a page that had silently stopped scrolling, with nothing visible to explain why.
+**Fixed**: every `color-mix` now has a plain colour before it.
+
+**F-31 -- No focus ring at all on Safari before 15.4.**
+
+`:focus-visible` was the only focus rule. An unsupported pseudo-class makes the
+*entire selector list* invalid, so older Safari dropped the rule and the page
+became unnavigable by keyboard. **Fixed** with a plain `:focus` rule as the
+fallback and `:focus:not(:focus-visible)` to suppress it for pointer clicks --
+kept in separate rules, so one invalid selector cannot take the other down.
+
+**F-32 -- Native controls rendered light on a near-black page.**
+
+No `color-scheme` was declared, so the theme `<select>`'s dropdown list, the
+verifier's `<progress>` bar and the file picker were drawn by the platform in
+its light styling. It is the one part of the page CSS cannot reach. **Fixed**
+per theme, beside the palette it has to agree with, with a test asserting the
+declared scheme matches the background's luminance.
+
+**F-33 -- The legal gate could not be dismissed on an iPhone.**
+
+`.legal-box` used `max-height: 88vh`. On iOS Safari `vh` is measured against the
+viewport with the browser chrome *collapsed*, which is taller than what is
+visible while the URL bar is expanded -- so the bottom of the box, which is
+where the **continue** button is, could sit below the visible area. The page
+behind is deliberately scroll-locked, so there was no way to reach it. The gate
+could not be dismissed, on a phone, on first load, which is when everyone meets
+it. **Fixed** with `dvh` and a `vh` fallback. Found by a check written for this
+round, not by inspection.
+
+**F-34 -- The sticky header took a fifth of a phone screen, and its links were
+too small to hit.**
+
+Nine navigation links at 375 px wrapped onto four rows; because the header is
+`position: sticky` that cost **165 px of an 812 px screen at every scroll
+position** (measured, not estimated). The links were also 22 px tall, below the
+24 px minimum of WCAG 2.5.8 -- and mis-tapping in a nine-item row means landing
+on the wrong section rather than on nothing.
+
+**Fixed** with a two-row header on narrow viewports whose navigation is a single
+horizontally-scrolling row: **79 px**, down from 165. Anchor targets also gained
+`scroll-margin-top`, so following a nav link no longer lands on a heading hidden
+underneath the header.
+
+**F-35 -- The in-browser verifier failed with an unusable message on an
+insecure origin (`js/verify.js`).**
+
+`crypto.subtle` is only defined in a secure context. Over plain `http://` to a
+LAN address -- exactly how somebody serving this folder tests it from a phone --
+it is `undefined`, and the code walked into "Cannot read properties of undefined
+(reading 'digest')". True, and useless. The published site is HTTPS and
+unaffected; this is about not lying to the person who self-hosts. **Fixed** with
+a feature check and a sentence explaining what to do.
+
+**F-36 -- The verifier used twice the memory it needed (`js/verify.js`).**
+
+Chunks were collected into an array and then copied into a second buffer, so
+peak memory was twice the file size before WebCrypto was handed anything -- and
+a release archive is tens of megabytes. On a phone that is the difference
+between checking a download and having the tab killed. **Fixed** by allocating
+the destination once and writing each chunk into it, and by refusing with a
+clear message, naming `sha256sum` and `certutil`, if the buffer cannot be
+allocated at all.
+
+### 2.4 Accepted, with reasoning
 
 **A-1 — Remaining `expect()` sites (6).** Each was reviewed:
 
@@ -411,62 +853,132 @@ Also reviewed by reading:
   outside the two places noted, no `eval`, no `new Function`, no
   `document.write`.
 
-### 4.5 An independent audit — **still outstanding, and still the point**
+### 4.5 The wider sweep, and what it cost to skip it
 
-Everything above is the author checking the author's work with better tools than
-last time. Better tools found seven real defects in code that a previous pass of
-the same author had called clean. That is evidence for the tools, and it is also
-evidence for the limit: the next class of bug is the one the author does not know
-to look for.
+The previous revision closed this section by saying the remaining gap was an
+outside reviewer. That was true and it was also a way of not saying the other
+thing: the scope that round had set itself was narrower than the code.
 
----
+This round set the scope from the *vulnerability classes* rather than from a
+list of things that seemed worth checking, and walked each class across the
+whole tree. Twenty-eight defects. None of them needed a technique the previous
+round lacked. Every one of them needed somebody to look at that particular
+thing:
+
+- The class **"allocation sized by untrusted input"** had been applied to the
+  Argon2 cost parameters (F-3) and to nothing else. Applying it to the DSP
+  configuration found F-10; to the decoder, F-17.
+- The class **"panics reachable from untrusted input"** had been applied to
+  VeilVoice's own parsers and not to the boundary with `symphonia`, where F-9
+  was waiting -- and where, under `panic = "abort"`, a panic is not an error
+  but the end of the process.
+- The class **"TOCTOU and path handling"** had not been applied at all. It
+  found F-12 (an erase that destroyed a file other than the one named), F-14
+  and F-15 (secrets created world-readable), and the check-then-write races
+  behind all three.
+- The class **"dependency and environment trust"** had not been applied to
+  *how a subprocess is located*, which is F-13: a planted `reg.exe` in the
+  working directory, executed by the two features somebody runs when they
+  already suspect their machine.
+- On the website, **"resource exhaustion"** had never been applied to the
+  renderer at all, because the hostile-input suite asked only whether the
+  output was safe. It was. It just took eight seconds to produce (F-22, F-23).
+
+The lesson is recorded plainly because it will apply again: *a finished audit
+scope is only as wide as the list it was drawn from.* The defence is to
+enumerate the classes rather than the worries, which is what the standard at
+the top of this document now says.
 
 ## 5. Still open
 
-1. **A real independent audit.** See §4.5.
-2. **A coverage-guided fuzzing campaign** (`cargo fuzz`, libFuzzer) against the
-   same three parsers, to explore by feedback rather than by construction.
-3. **A scheme check on `repo.js`'s asset links**, so the GitHub API is not
-   trusted by omission.
-4. **A `.veil` cost policy for unattended use.** Opening a hostile container can
-   be made slow by design (see F-3's residual). A caller processing files
-   without a human present may want a cost ceiling lower than 4 GiB; there is
-   currently no way to pass one.
-5. **32-bit targets are not exercised in CI.** F-4 existed only on ARMv7, and
-   nothing in the test matrix would have caught it. The matrix is Windows,
-   macOS and Linux on x86-64.
+1. **An outside reviewer.** Not a task item -- see the standard at the top of
+   this document -- but still worth having, and still absent. Everything here
+   is the author checking the author's work. What that is worth is now a
+   measured quantity twice over: two rounds of wider tools and wider scope have
+   each found real defects in code a previous round had called clean.
 
----
+2. **The coverage-guided campaign has been built but not run to convergence.**
+   `fuzz/` contains six libFuzzer targets, one per parser that reads bytes
+   somebody else produced, and they compile against the real APIs. They have
+   not been run to exhaustion by the maintainer, because libFuzzer needs a
+   clang-based toolchain that the `x86_64-pc-windows-msvc` host this was
+   developed on does not provide. "We have a fuzzing setup" and "we have fuzzed
+   this" are different claims and only the first is true. `fuzz/README.md`
+   says so in the same words.
+
+3. **32-bit targets are still not exercised in CI.** This is now the source of
+   *two* shipped defects rather than one: F-4 (an overflow) and F-11 (a
+   non-terminating erase loop), both reachable only on a 32-bit target, both
+   found by reading, and neither reachable by any campaign on an x86-64 host.
+   The matrix is Windows, macOS and Linux on x86-64. Adding `i686` and
+   `armv7` under emulation is the single highest-value change available to CI.
+
+4. **A hostile file in a format VeilVoice does not itself parse.** F-9's
+   pre-flight covers the one confirmed decoder crash. Under `panic = "abort"`
+   nothing in-process can cover the next one, whatever format it is in;
+   decoding in a separate process is the only complete answer and is not built.
+
+5. **The privileged half of tamper detection**, unchanged from the previous
+   round and for the same reasons -- see `HANDOFF.md` section 7. Detection
+   logic is done; privilege and setup are not, and the obvious version of it is
+   worse than nothing.
 
 ## 6. Verdict
 
-**Eight defects found and fixed across two audit rounds (F-1 to F-8).** Four of
-F-2 to F-8 were reachable from a file somebody sends you; two of those aborted
-the process, and one silently destroyed every recording processed afterwards.
-None was a confidentiality failure — no finding let an attacker recover a
-voiceprint, read a sealed recording, or bypass a password — and the two crashes
-failed closed rather than open. That distinction is worth drawing, and it is not
-a reason to be pleased: a privacy tool that aborts when handed a crafted file, or
-that returns silence and says nothing, has failed the person relying on it.
+**Thirty-six defects found and fixed across three audit rounds (F-1 to F-36):**
+eight in the first two, twenty-eight in this one -- thirteen in the Rust,
+fifteen in the website and its stylesheets.
 
-The cryptography itself stands up. The primitives are standard and well
-reviewed, and the composition — the hybrid combiner, the authenticated container
-header, the domain-separated app-lock verifier — is done properly rather than
-approximately. Every defect found was at a **boundary**: parameters read from a
-file and passed to a library without a bound, samples read from a decoder and
-folded into persistent state without a check, text read from the network and
-rendered without a complete allowlist. That is where to look next, and it is
-where an outside reviewer should start.
+**No finding in any round has been a confidentiality failure.** Nothing has let
+an attacker recover a voiceprint, read a sealed recording, bypass a password, or
+weaken the cryptography. That distinction is real and it is worth drawing. It is
+not a reason to be pleased, because the failures that *did* occur are the ones a
+person relying on this would care about:
+
+- **Two erased the wrong thing or nothing at all.** F-12 filled an unrelated
+  file with random data and reported success; F-11 hung for ever and left the
+  target intact. Both in the feature whose entire promise is destroying a file.
+- **Three killed the process from a file somebody sends you** (F-3, F-9) or
+  from the app-lock file read before anyone has authenticated (F-2).
+- **Two produced silence and said nothing.** F-5 from a sample, F-10 from a
+  configuration value -- the same failure through two doors, the second found
+  only because the first had been written up properly.
+- **One ran a program the user did not choose** (F-13), in the two features
+  somebody runs precisely because they suspect their machine.
+- **Three left secrets readable by other local accounts** (F-14, F-15), or
+  unwiped in freed memory (F-18).
+- **On the website, two froze the reader's tab** for seconds at a time on text
+  fetched over the network (F-22, F-23), and three made the page unusable on
+  engines a great many people are still running -- including a legal gate that
+  was an invisible modal on pre-2023 browsers (F-30) and one that could not be
+  dismissed at all on an iPhone (F-33).
+
+The cryptography itself continues to stand up. The primitives are standard and
+well reviewed, and the composition -- the hybrid combiner, the authenticated
+container header, the domain-separated app-lock verifier -- is done properly
+rather than approximately. Not one defect in three rounds has been in the
+cryptographic construction.
+
+Every defect has instead been at a **boundary**, and the list of boundaries has
+grown each round: parameters read from a file and handed to a library without a
+bound; samples folded into persistent state without a check; *configuration*
+folded into the same state without a check; a decoder handed a file before
+anyone looked at it; a path used without asking what it actually points at; a
+subprocess named without saying where it lives; a file created before its
+permissions were set; text read from the network and rendered without a bound on
+the work. That is where the next one will be too.
 
 The app lock adds a control whose value is real but bounded, and the bound is
 stated everywhere it appears rather than only here. A lock a user over-trusts
 makes them less safe, not more; that is the failure mode this design was written
-to avoid, and it is the one to keep watching for in any future change to it.
+to avoid, and the one to keep watching in any future change to it.
 
 The project's main security asset is not any single control but the fact that
 **every claim it makes is checkable**: no `unsafe`, no network, reproducible
 builds, generated artwork, and documentation that states limits rather than
-hiding them. This revision is part of that. The previous one said "no
-vulnerabilities found" in good faith about code containing at least four; the
-honest response is to say so in the same document, rather than to quietly
-improve the score.
+hiding them. This document is part of that, and it is the third revision in a
+row to have to record that the previous one was more confident than the code
+deserved. The honest response is to say so here rather than to quietly improve
+the score -- and to keep the standard at the top of this document pointed at
+*classes of defect* rather than at a list of things that felt worth checking,
+because the list is what was wrong both times.

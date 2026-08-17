@@ -361,7 +361,14 @@ fn anonymise(
         atrest::seal_to_disk(&out_path, &wav, recipient)?
     } else {
         atrest::confirm_plaintext(at_rest.yes)?;
-        std::fs::write(&out_path, &wav).map_err(|e| format!("{}: {e}", out_path.display()))?;
+        // An unencrypted recording is still a recording of everything that was
+        // said — the warning just above says exactly that — so at minimum it is
+        // not left readable by every other account on the machine. A file
+        // permission is a much weaker thing than the encryption being declined
+        // here, and the summary below says so rather than letting it read as a
+        // consolation.
+        veilvoice_crypto::privatefile::write_owner_only(&out_path, &wav)
+            .map_err(|e| format!("{}: {e}", out_path.display()))?;
         out_path.clone()
     };
 
@@ -627,8 +634,20 @@ fn decrypt(input: PathBuf, output: PathBuf, key: Option<PathBuf>) -> Result<(), 
         }
     };
 
-    std::fs::write(&output, &plaintext).map_err(|e| e.to_string())?;
+    // Owner-only from the moment it exists. This is the *decrypted* contents of
+    // something the user chose to encrypt; writing it out world-readable, even
+    // for the instant before a chmod, would undo the point of having sealed it.
+    veilvoice_crypto::privatefile::write_owner_only(&output, &plaintext)
+        .map_err(|e| format!("{}: {e}", output.display()))?;
     println!("{}", ok(&format!("decrypted to {}", output.display())));
+    println!(
+        "{}",
+        paint(
+            colour::MUTED,
+            "  Written so only your account can read it. That is a file permission, \
+             not disk encryption."
+        )
+    );
     Ok(())
 }
 
@@ -642,6 +661,11 @@ fn load_secret_key(path: &std::path::Path) -> Result<hybrid::SecretKey, String> 
 }
 
 fn keygen(public: PathBuf, secret: PathBuf) -> Result<(), String> {
+    // Reported early so the user is not asked for a passphrase before being
+    // told the file is in the way. The *refusal* that matters is not this one
+    // though — it is `write_owner_only_new` below, which asks the kernel to
+    // fail if anything is already there. Checking `exists()` and then writing
+    // is a race, and it follows a symbolic link planted at the path.
     for path in [&public, &secret] {
         if path.exists() {
             return Err(format!(
@@ -679,9 +703,13 @@ fn keygen(public: PathBuf, secret: PathBuf) -> Result<(), String> {
     )
     .map_err(|e| e.to_string())?;
 
-    std::fs::write(&public, pk.to_bytes()).map_err(|e| e.to_string())?;
-    std::fs::write(&secret, &sealed).map_err(|e| e.to_string())?;
-    restrict_permissions(&secret);
+    // The public key is meant to be shared, so it is written normally. The
+    // private key is created owner-only and *exclusively*: the permission is
+    // applied by the creation rather than by a chmod afterwards, and the
+    // creation fails rather than overwriting anything already at the path.
+    std::fs::write(&public, pk.to_bytes()).map_err(|e| format!("{}: {e}", public.display()))?;
+    veilvoice_crypto::privatefile::write_owner_only_new(&secret, &sealed)
+        .map_err(|e| format!("{}: {e}", secret.display()))?;
 
     println!("{}", ok(&format!("public key  {}", public.display())));
     println!(
@@ -705,19 +733,6 @@ fn keygen(public: PathBuf, secret: PathBuf) -> Result<(), String> {
         )
     );
     Ok(())
-}
-
-/// Make a private key readable only by its owner, where the OS supports it.
-fn restrict_permissions(path: &std::path::Path) {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let _ = std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600));
-    }
-    // On Windows the file inherits the user profile's ACL, which already
-    // excludes other unprivileged users; there is no portable tightening to do.
-    #[cfg(not(unix))]
-    let _ = path;
 }
 
 /// Report, and keep reporting, what is using the microphone and camera.
@@ -887,7 +902,10 @@ fn info() {
     println!("{}", field("Audio", veilvoice_audio::VERSION));
     println!("{}", field("Metadata", veilvoice_meta::VERSION));
     println!("{}", field("Monitor", veilvoice_watch::VERSION));
-    println!("{}", field("License", "GPL-3.0-or-later"));
+    // "Licence" the noun, to match the desktop app and the website. "License"
+    // stays only where it is part of the proper name "GNU General Public
+    // License" or an SPDX identifier.
+    println!("{}", field("Licence", "GPL-3.0-or-later"));
     println!("{}", field("Network access", "none, by construction"));
     println!(
         "{}",

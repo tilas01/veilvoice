@@ -202,10 +202,32 @@ fn finish(header: Header, key: &Secret, plaintext: &[u8]) -> Result<Vec<u8>, Err
 
 /// Decrypt a password-locked container.
 pub fn open_with_password(password: &[u8], container: &[u8]) -> Result<Vec<u8>, Error> {
+    open_with_password_within(password, container, kdf::KdfParams::MAX_M_COST)
+}
+
+/// Decrypt a password-locked container, refusing one that declares a memory
+/// cost above `max_m_cost`.
+///
+/// The cost travels with the file so that a container written years ago still
+/// opens after the defaults are raised. The price is that a *hostile* file can
+/// declare a legitimate-but-large cost and make itself slow and expensive to
+/// open — see F-3's residual in `docs/AUDIT.md`. When a person chose the file
+/// and can stop waiting, that is an acceptable price and
+/// [`open_with_password`] pays it. When nothing human is present — a batch
+/// job, a service, anything handed files it did not choose — pass
+/// [`kdf::KdfParams::UNATTENDED_MAX_M_COST`] here and get
+/// [`Error::KdfCostRefused`] instead of the memory.
+pub fn open_with_password_within(
+    password: &[u8],
+    container: &[u8],
+    max_m_cost: u32,
+) -> Result<Vec<u8>, Error> {
     let (header, body) = Header::parse(container)?;
     if header.mode != Mode::Password {
         return Err(Error::WrongMode);
     }
+    // Checked before the derivation, so the memory is never asked for.
+    header.kdf.within(max_m_cost)?;
     let key = kdf::derive_key(password, &header.salt, header.kdf)?;
     aead::open(&key, &header.nonce, &container[..body], &container[body..])
 }
@@ -398,6 +420,54 @@ mod tests {
             veil_path(Path::new("a.b/c.wav")),
             Path::new("a.b/c.wav.veil")
         );
+    }
+
+    /// The cost ceiling for a caller with nobody watching. A hostile container
+    /// can declare a legal-but-expensive cost; an unattended caller must be
+    /// able to decline before the memory is asked for, not after.
+    #[test]
+    fn an_unattended_caller_can_refuse_an_expensive_container() {
+        let expensive = kdf::KdfParams {
+            m_cost: 64 * 1024, // 64 MiB — legal, and more than we will allow
+            t_cost: 1,
+            p_cost: 1,
+        };
+        let ct = seal_with_password(b"pw", MSG, expensive).unwrap();
+
+        // The default path still opens it: a person chose this file.
+        assert_eq!(open_with_password(b"pw", &ct).unwrap(), MSG);
+
+        // A caller that set a ceiling gets told, with both numbers.
+        match open_with_password_within(b"pw", &ct, 8 * 1024) {
+            Err(Error::KdfCostRefused { requested, ceiling }) => {
+                assert_eq!(requested, 64 * 1024);
+                assert_eq!(ceiling, 8 * 1024);
+            }
+            other => panic!("expected a refusal, got {other:?}"),
+        }
+
+        // And a ceiling above the file's cost is not in the way.
+        assert_eq!(
+            open_with_password_within(b"pw", &ct, kdf::KdfParams::UNATTENDED_MAX_M_COST).unwrap(),
+            MSG
+        );
+    }
+
+    /// The published unattended ceiling has to be usable: comfortably above
+    /// this crate's own default, comfortably below the absurd-value cap.
+    /// Checked at compile time, so tightening either constant past the other
+    /// fails the build rather than a test run.
+    const _: () = assert!(
+        kdf::KdfParams::UNATTENDED_MAX_M_COST < kdf::KdfParams::MAX_M_COST,
+        "the unattended ceiling must sit below the absurd-value cap"
+    );
+
+    #[test]
+    fn the_unattended_ceiling_admits_this_crates_own_default() {
+        assert!(kdf::KdfParams::UNATTENDED_MAX_M_COST > kdf::KdfParams::default().m_cost);
+        assert!(kdf::KdfParams::default()
+            .within(kdf::KdfParams::UNATTENDED_MAX_M_COST)
+            .is_ok());
     }
 
     #[test]

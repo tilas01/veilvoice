@@ -89,19 +89,40 @@ pub struct ShredReport {
 /// so the bytes on disk are the ones being overwritten, as far as the operating
 /// system and the drive allow.
 pub fn shred_file(path: &Path, passes: Passes) -> Result<ShredReport, Error> {
-    let metadata = std::fs::metadata(path).map_err(|_| Error::Shred)?;
+    // `symlink_metadata` does *not* follow the link, which is the whole point.
+    // Overwriting through a symlink destroys whatever it points at — someone
+    // else's key, a config file, `~/.bashrc` — and then unlinks only the link,
+    // so the report would say "removed" about a file that is still there while
+    // an unrelated one has been filled with random bytes. A destructive
+    // operation must refuse to be redirected.
+    let link_meta = std::fs::symlink_metadata(path).map_err(|_| Error::Shred)?;
+    if link_meta.file_type().is_symlink() {
+        return Err(Error::ShredSymlink);
+    }
+
+    // Open first, then ask the *handle* what it is. Checking the path and then
+    // opening it is a race: the file can be replaced with a symlink in between,
+    // and the check would have been performed on a different object than the
+    // one that gets written.
+    let mut file = OpenOptions::new()
+        .write(true)
+        .open(path)
+        .map_err(|_| Error::Shred)?;
+    let metadata = file.metadata().map_err(|_| Error::Shred)?;
     if !metadata.is_file() {
         return Err(Error::Shred);
     }
     let length = metadata.len();
     let count = passes.count();
 
-    let mut file = OpenOptions::new()
-        .write(true)
-        .open(path)
-        .map_err(|_| Error::Shred)?;
-
-    let mut buffer = vec![0u8; CHUNK.min(length.max(1) as usize)];
+    // Computed in `u64` and only then narrowed. `length as usize` truncates on
+    // a 32-bit target — and VeilVoice ships an ARMv7 build — so a file of
+    // exactly 4 GiB gave a zero-length buffer, `take` was then always zero,
+    // `remaining` never decreased and the loop **never terminated**: the erase
+    // hung forever and the file was left intact. The same 32-bit-only shape as
+    // F-4, and equally invisible to a fuzzer on a 64-bit host.
+    let buffer_len = length.clamp(1, CHUNK as u64) as usize;
+    let mut buffer = vec![0u8; buffer_len];
     let mut synced = true;
 
     for pass in 0..count {
@@ -115,6 +136,12 @@ pub fn shred_file(path: &Path, passes: Passes) -> Result<ShredReport, Error> {
 
         while remaining > 0 {
             let take = remaining.min(buffer.len() as u64) as usize;
+            // Belt and braces after the truncation bug above: a zero-length
+            // write makes no progress, so a loop that could reach it would spin
+            // for ever rather than fail. Refuse instead of hanging.
+            if take == 0 {
+                return Err(Error::Shred);
+            }
             if complement {
                 for byte in &mut buffer[..take] {
                     *byte = !*byte;
@@ -155,6 +182,9 @@ fn caveats(synced: bool) -> Vec<String> {
          copies of this file elsewhere on the volume."
             .to_string(),
         "Any backup that has already run still has it.".to_string(),
+        "A hard link elsewhere on the volume points at the same data, so the \
+         contents are gone but another name for them may remain."
+            .to_string(),
         "Full-disk encryption is the reliable answer: destroy the key and the \
          data goes with it, wherever the drive put it."
             .to_string(),
@@ -290,6 +320,74 @@ mod tests {
             shred_file(Path::new("no-such-file-anywhere.bin"), Passes::Single),
             Err(Error::Shred)
         ));
+    }
+
+    /// Regression for the finding that this followed symbolic links. Erasing
+    /// `link -> victim` used to fill `victim` with random bytes and unlink only
+    /// `link`, then report a clean erasure of a file that was still there.
+    /// The target must be untouched and the link must survive.
+    #[cfg(unix)]
+    #[test]
+    fn a_symlink_is_refused_and_its_target_is_untouched() {
+        let dir = tempfile::tempdir().unwrap();
+        let victim = sample(dir.path(), "someone-elses-key", b"DO NOT DESTROY ME");
+        let link = dir.path().join("innocent.wav");
+        std::os::unix::fs::symlink(&victim, &link).unwrap();
+
+        assert!(matches!(
+            shred_file(&link, Passes::Single),
+            Err(Error::ShredSymlink)
+        ));
+        assert_eq!(std::fs::read(&victim).unwrap(), b"DO NOT DESTROY ME");
+        assert!(link.exists(), "the link itself must be left alone too");
+    }
+
+    /// The same on Windows, where a symlink needs either Developer Mode or
+    /// elevation to create — so the test skips rather than fails when it
+    /// cannot make one.
+    #[cfg(windows)]
+    #[test]
+    fn a_symlink_is_refused_and_its_target_is_untouched() {
+        let dir = tempfile::tempdir().unwrap();
+        let victim = sample(dir.path(), "someone-elses-key", b"DO NOT DESTROY ME");
+        let link = dir.path().join("innocent.wav");
+        if std::os::windows::fs::symlink_file(&victim, &link).is_err() {
+            eprintln!("cannot create symlinks on this machine; skipping");
+            return;
+        }
+        assert!(matches!(
+            shred_file(&link, Passes::Single),
+            Err(Error::ShredSymlink)
+        ));
+        assert_eq!(std::fs::read(&victim).unwrap(), b"DO NOT DESTROY ME");
+    }
+
+    /// Regression for the 32-bit truncation that made the loop non-terminating:
+    /// the buffer length must be derived in `u64` and can never be zero, for
+    /// any file length a `u64` can express.
+    #[test]
+    fn the_write_buffer_is_never_empty_at_any_file_length() {
+        // Deliberately computed through a `fn` rather than inline, so the
+        // optimiser cannot fold the assertion into a constant and so the shape
+        // matches the code under test.
+        fn buffer_len_for(length: u64) -> usize {
+            length.clamp(1, CHUNK as u64) as usize
+        }
+        for length in [
+            0u64,
+            1,
+            CHUNK as u64 - 1,
+            CHUNK as u64,
+            u32::MAX as u64,
+            u32::MAX as u64 + 1,
+            u64::MAX,
+        ] {
+            let buffer_len = buffer_len_for(length);
+            assert!(
+                (1..=CHUNK).contains(&buffer_len),
+                "length {length} gave a buffer of {buffer_len}"
+            );
+        }
     }
 
     #[test]

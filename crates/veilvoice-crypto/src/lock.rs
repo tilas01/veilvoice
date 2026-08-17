@@ -256,6 +256,13 @@ impl AppLock {
             t_cost: u32_at(16),
             p_cost: u32_at(20),
         };
+        // Validate the costs here rather than only at the first verification.
+        // They are attacker-controlled — this file is read before anyone has
+        // authenticated — and `KdfParams::checked` is the single funnel that
+        // bounds them (see F-2 and F-3). Refusing at parse time means the
+        // failure is reported as "this lock file is broken", which is true and
+        // actionable, rather than as a password that never works.
+        params.checked()?;
         let mut salt = [0u8; kdf::SALT_LEN];
         salt.copy_from_slice(&bytes[24..40]);
 
@@ -317,15 +324,25 @@ impl LockStore {
     }
 
     /// Create a lock at `path`, refusing to overwrite one already there.
+    ///
+    /// The refusal is done by the *creation* rather than by a prior
+    /// `path.exists()` test. Checking and then writing is a race, and the two
+    /// ways it loses both matter here: another process can win between the two
+    /// steps, and a symbolic link planted at the lock path would have been
+    /// followed, so `fs::write` would have overwritten whatever it pointed at.
+    /// `create_new` asks the kernel to fail if anything is already there,
+    /// which is one atomic answer to both.
     pub fn create(path: &Path, password: &[u8], params: kdf::KdfParams) -> Result<Self, Error> {
-        if path.exists() {
-            return Err(Error::AppLockStore);
-        }
         let store = Self {
             path: path.to_path_buf(),
             lock: AppLock::create(password, params)?,
         };
-        store.save()?;
+        if let Some(parent) = path.parent() {
+            if !parent.as_os_str().is_empty() {
+                std::fs::create_dir_all(parent).map_err(|_| Error::AppLockStore)?;
+            }
+        }
+        write_private(path, &store.lock.to_bytes(), true)?;
         Ok(store)
     }
 
@@ -377,25 +394,33 @@ impl LockStore {
 
     fn save(&self) -> Result<(), Error> {
         if let Some(parent) = self.path.parent() {
-            std::fs::create_dir_all(parent).map_err(|_| Error::AppLockStore)?;
+            if !parent.as_os_str().is_empty() {
+                std::fs::create_dir_all(parent).map_err(|_| Error::AppLockStore)?;
+            }
         }
-        std::fs::write(&self.path, self.lock.to_bytes()).map_err(|_| Error::AppLockStore)?;
-        restrict(&self.path);
-        Ok(())
+        write_private(&self.path, &self.lock.to_bytes(), false)
     }
 }
 
-/// Make the lock file readable only by its owner, where the OS supports it.
-fn restrict(path: &Path) {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let _ = std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600));
-    }
-    // On Windows the file inherits the user profile's ACL, which already
-    // excludes other unprivileged users; there is no portable tightening to do.
-    #[cfg(not(unix))]
-    let _ = path;
+/// Write the lock file so it is owner-only from the moment it exists.
+///
+/// The previous version used `fs::write` — which creates with the process
+/// umask, usually world-readable — and chmod'd afterwards, so the stored
+/// password verifier was readable by every other local user for the window
+/// between the two calls. That window reopened on **every save**, and a save
+/// happens after every failed unlock attempt.
+///
+/// `exclusive` additionally requires that nothing is already at the path, which
+/// is how a lock is created without a check-then-write race and without
+/// following a symbolic link planted there. See
+/// [`crate::privatefile`] for the whole argument.
+fn write_private(path: &Path, bytes: &[u8], exclusive: bool) -> Result<(), Error> {
+    let result = if exclusive {
+        crate::privatefile::write_owner_only_new(path, bytes)
+    } else {
+        crate::privatefile::write_owner_only(path, bytes)
+    };
+    result.map_err(|_| Error::AppLockStore)
 }
 
 /// Where the lock file lives on this platform, if the environment says.
@@ -547,6 +572,55 @@ mod tests {
         let mut reserved = good.clone();
         reserved[9] = 1;
         assert!(matches!(AppLock::parse(&reserved), Err(Error::BadHeader)));
+
+        // Costs are attacker-controlled and must be bounded at parse time, not
+        // only when a password is eventually tried against them.
+        for (offset, value) in [(12usize, u32::MAX), (20, u32::MAX), (16, 0)] {
+            let mut bad = good.clone();
+            bad[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
+            assert!(
+                matches!(AppLock::parse(&bad), Err(Error::KdfParams)),
+                "offset {offset} value {value} was accepted"
+            );
+        }
+    }
+
+    /// Regression: the verifier used to be written with the process umask and
+    /// only chmod'd afterwards, so it was world-readable for a window on every
+    /// single save — and a save happens after every failed attempt.
+    #[cfg(unix)]
+    #[test]
+    fn the_lock_file_is_owner_only_from_the_moment_it_exists() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("applock.bin");
+
+        let mut store = LockStore::create(&path, b"pw", weak()).unwrap();
+        let mode = std::fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+        assert_eq!(mode, 0o600, "created with mode {mode:o}");
+
+        // And it stays that way across the rewrite a failed attempt triggers.
+        let _ = store.unlock(b"nope");
+        let mode = std::fs::metadata(&path).unwrap().permissions().mode() & 0o777;
+        assert_eq!(mode, 0o600, "after a save, mode is {mode:o}");
+    }
+
+    /// Creating must fail atomically rather than by testing `exists()` first,
+    /// so a symbolic link at the lock path is refused instead of followed.
+    #[cfg(unix)]
+    #[test]
+    fn a_symlink_at_the_lock_path_is_not_followed() {
+        let dir = tempfile::tempdir().unwrap();
+        let victim = dir.path().join("victim");
+        std::fs::write(&victim, b"important").unwrap();
+        let path = dir.path().join("applock.bin");
+        std::os::unix::fs::symlink(&victim, &path).unwrap();
+
+        assert!(matches!(
+            LockStore::create(&path, b"pw", weak()),
+            Err(Error::AppLockStore)
+        ));
+        assert_eq!(std::fs::read(&victim).unwrap(), b"important");
     }
 
     /// The verifier must not be a key anything else could derive from the same
