@@ -239,6 +239,12 @@ h3[id] { scroll-margin-top: 90px; }
 
 .hero { padding: 54px 0 34px; text-align: center; }
 
+/* `<picture>` is an inline box by default and is now the hero's direct child,
+ * so it is what `.stagger > *` animates and what has to carry the width. The
+ * `<img>` inside it keeps the border and the sizing rules below. Without this
+ * the banner sits on a text baseline and gains a few stray pixels underneath. */
+.hero .banner-pic { display: block; width: 100%; max-width: 860px; margin: 0 auto; }
+
 .hero img.banner {
   width: 100%;
   max-width: 860px;
@@ -255,7 +261,9 @@ h3[id] { scroll-margin-top: 90px; }
    * them, and every line is readable at every width. */
   border: 1px solid var(--border);
   border-radius: 10px;
-  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  /* No `rise` here: `.stagger > *` already animates the <picture> around it,
+   * and animating both ran the same entrance twice, one nested in the other. */
+  display: block;
 }
 
 @keyframes rise {

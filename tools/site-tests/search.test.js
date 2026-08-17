@@ -212,6 +212,13 @@ async function run() {
   const index = JSON.parse(fs.readFileSync(INDEX_PATH, "utf8"));
   const staticHtml = fs.readFileSync(STATIC_PATH, "utf8");
 
+  // A word guaranteed not to be in the corpus -- assembled from parts, because
+  // this file is itself a tracked file and is therefore *in* the index. Written
+  // out as one literal, the sentinel indexed itself and the "finds nothing"
+  // tests started finding exactly one thing: this line. Four checks failed for
+  // a reason that had nothing to do with the search.
+  const ABSENT = ["qxzv", "nomatch", "sentinel", "wxyq"].join("");
+
   // --- 1. the index itself --------------------------------------------------
   check("the index has documents", Array.isArray(index.docs) && index.docs.length > 50);
   check("the index has sections", Array.isArray(index.secs) && index.secs.length > 300);
@@ -263,7 +270,7 @@ async function run() {
     check("a word from the prose finds the documentation",
           page.paths().some(p => p.endsWith(".md") || p.endsWith(".html")));
 
-    page.type("zzzznotarealtokenzzzz");
+    page.type(ABSENT);
     check("a word that is in nothing returns nothing", page.rows().length === 0);
     check("and says so rather than showing an empty list",
           /nothing matched/i.test(page.count()));
@@ -275,7 +282,7 @@ async function run() {
     const page = await boot(index);
     page.type("argon2");
     const one = page.rows().length;
-    page.type("argon2 zzzznotarealtokenzzzz");
+    page.type("argon2 " + ABSENT);
     check("adding a term that matches nothing empties the results",
           one > 0 && page.rows().length === 0);
   }

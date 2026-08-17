@@ -1,7 +1,20 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
+<!--
+  The animated banner is an APNG, and it is served through <picture> so that a
+  reader who has asked their system for less motion gets the still one instead.
+  An animated image ignores `prefers-reduced-motion` on its own; the media query
+  on the <source> is the only way to honour it without JavaScript.
+
+  A browser that does not understand APNG shows the file's first frame, which is
+  byte-for-byte the static banner. The failure mode is "no animation", never
+  "no image". Both files come out of `assets/generate.py`.
+-->
 <p align="center">
-  <img src="assets/banner.png" alt="VeilVoice — irreversible voice de-identification" width="100%">
+  <picture>
+    <source srcset="assets/banner-animated.png" media="(prefers-reduced-motion: no-preference)">
+    <img src="assets/banner.png" alt="VeilVoice — irreversible voice de-identification" width="100%">
+  </picture>
 </p>
 
 # VeilVoice
