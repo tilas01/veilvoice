@@ -1,5 +1,5 @@
 #!/bin/sh
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: CC-BY-NC-SA-4.0
 #
 # VeilVoice installer for Linux and macOS.
 #
@@ -396,7 +396,7 @@ good "installed$INSTALLED to $BIN"
 # Deliberately after the install, and deliberately not part of it. These are
 # other people's software; VeilVoice recommends them and does not bundle them.
 # Audacity in particular is GPL-2.0-or-later, which is incompatible with this
-# project's GPL-3.0-or-later for combining code -- recommending it is fine,
+# project's CC BY-NC-SA 4.0 for combining code -- recommending it is fine,
 # shipping it inside anything is not.
 
 if [ "$ASSUME_YES" = "0" ] && [ -t 0 ]; then
@@ -406,7 +406,7 @@ if [ "$ASSUME_YES" = "0" ] && [ -t 0 ]; then
     say "    Audacity  -- a free audio editor. Useful for recording and for"
     say "                 trimming a file before veiling it. Not bundled: it is"
     say "                 GPL-2.0-or-later, which cannot be combined with this"
-    say "                 project's GPL-3.0-or-later."
+    say "                 project's CC BY-NC-SA 4.0."
     say ""
     printf '  Install Audacity? [y/N] '
     read -r answer </dev/tty || answer=""

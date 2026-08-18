@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Cryptographically-seeded modulation of the effect parameters.
 //!
 //! The pitch and formant ratios are never constant: a ChaCha20 CSPRNG picks a

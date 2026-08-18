@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! The `.veil` encrypted container format.
 //!
 //! A single self-describing blob: everything needed to decrypt except the

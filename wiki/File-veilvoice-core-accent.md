@@ -1,0 +1,113 @@
+![accent.rs](https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/banners/veilvoice-core/accent.svg)
+
+# `crates/veilvoice-core/src/accent.rs`
+
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 677 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs)
+
+## Contents
+
+- [What an accent is made of, and what a signal-level transform can remove](#what-an-accent-is-made-of-and-what-a-signal-level-transform-can-remove)
+- [Why this also strengthens de-identification](#why-this-also-strengthens-de-identification)
+- [Preserving intelligibility](#preserving-intelligibility)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
+
+Accent and speaker-trait neutralisation.
+
+# What an accent is made of, and what a signal-level transform can remove
+
+Accent is carried by two very different kinds of cue, and they have opposite
+answers here:
+
+* **Suprasegmental cues** — intonation contour and pitch range, long-term
+voice quality and spectral tilt, and the fixed vocal-tract scale behind a
+speaker's vowel space. These are *properties of the signal*, they are
+strongly speaker- and region-identifying, and this module removes them by
+mapping every speaker onto one canonical target.
+* **Segmental cues** — *which phonemes the speaker actually produced*:
+rhoticity, vowel mergers, dental-fricative substitution, aspiration
+patterns. These are not a colouration laid over the words; at this level
+they **are** the words. Removing them means deciding a different phoneme
+was said, which no filter can do — it requires recognising the speech and
+re-synthesising it (see the planned text-to-speech mode, which sidesteps
+this entirely by never carrying the original signal at all).
+
+So this module makes every speaker land on the same pitch register, the same
+apparent vocal-tract length and the same long-term spectral tilt, which
+removes the accent's melody and colour and a large part of its perceived
+origin. It does not, and cannot, re-articulate phonemes.
+`docs/WHITEPAPER.md` must state that limit plainly rather than claim accent
+removal is total.
+
+# Why this also strengthens de-identification
+
+Every step here is *many-to-one*: a whole population of input f0 contours,
+spectral tilts and vocal-tract lengths is collapsed onto a single canonical
+value. That destroys information rather than displacing it, so it composes
+with the phase discard in `crate::spectral` — the two are independent
+one-way steps, and normalising the speaker's *mean* pitch and vocal-tract
+length removes two of the strongest biometric features there are.
+
+# Preserving intelligibility
+
+The critical design rule is that every correction is derived from a
+**long-term** average, never from the current frame. Per-frame spectral shape
+is what distinguishes /i/ from /u/; normalising it frame-by-frame would erase
+the vowels along with the accent. Vocal-tract and tilt corrections therefore
+use multi-second time constants, so they track the speaker and leave the
+phonemes moving freely underneath.
+
+## What calls what
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_default["AccentConfig::default"]
+    n_new(["AccentNeutralizer::new<br/>pub"])
+    n_enabled(["AccentNeutralizer::enabled<br/>pub"])
+    n_stats(["AccentNeutralizer::stats<br/>pub"])
+    n_observe(["AccentNeutralizer::observe<br/>pub"])
+    n_prosody_ratio(["AccentNeutralizer::prosody_ra…<br/>pub"])
+    n_measure_envelope(["AccentNeutralizer::measure_en…<br/>pub"])
+    n_vtln_ratio(["AccentNeutralizer::vtln_ratio<br/>pub"])
+    n_shape(["AccentNeutralizer::shape<br/>pub"])
+    n_recompute_shape["AccentNeutralizer::recompute_…"]
+    n_log_centroid["log_centroid"]
+    n_gain_to_db["gain_to_db"]
+    n_db_to_gain["db_to_gain"]
+    n_measure_envelope --> n_log_centroid
+    n_shape --> n_db_to_gain
+    n_shape --> n_gain_to_db
+    n_shape --> n_recompute_shape
+```
+
+## Items
+
+| Item | Line | Documentation |
+|---|---:|---|
+| `CENTROID_LO_HZ` <sub>const</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L50) | Lower edge of the band used to measure vocal-tract scale, in hertz. |
+| `CENTROID_HI_HZ` <sub>const</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L52) | Upper edge of the band used to measure vocal-tract scale, in hertz. |
+| `LTAS_LO_HZ` <sub>const</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L54) | Lower edge of the band whose long-term tilt is normalised. |
+| `LTAS_HI_HZ` <sub>const</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L56) | Upper edge of the band whose long-term tilt is normalised. |
+| `TILT_REF_HZ` <sub>const</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L58) | Reference frequency of the canonical spectral-tilt line, in hertz. |
+| `MAX_SHAPE_DB` <sub>const</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L60) | Maximum long-term shaping applied to any bin, in decibels. |
+| `TAU_PROSODY_S` <sub>const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L62) | Time constant for the intonation correction, in seconds. |
+| `TAU_VTLN_S` <sub>const</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L65) | Time constant for the vocal-tract estimate, in seconds. |
+| `TAU_LTAS_S` <sub>const</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L67) | Time constant for the long-term average spectrum, in seconds. |
+| `WARMUP_S` <sub>const</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L69) | Seconds of voiced audio over which corrections fade in from nothing. |
+| `AccentConfig` <sub>pub struct</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L76) | How aggressively accent and speaker traits are normalised. |
+| `AccentConfig::default` <sub>fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L106) |  |
+| `AccentStats` <sub>pub struct</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L124) | Live read-out of what the neutraliser is currently doing, for the UI. |
+| `AccentNeutralizer` <sub>pub struct</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L143) | Maps any speaker onto one canonical pitch register, vocal-tract scale and long-term spectrum. |
+| `AccentNeutralizer::new` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L169) | Build for a given spectrum size and sample rate. |
+| `AccentNeutralizer::enabled` <sub>pub fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L198) | Whether neutralisation is active. |
+| `AccentNeutralizer::stats` <sub>pub fn</sub> | [203](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L203) | Live read-out for the UI. |
+| `AccentNeutralizer::observe` <sub>pub fn</sub> | [220](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L220) | Feed this frame's f0 estimate and update the intonation correction. |
+| `AccentNeutralizer::prosody_ratio` <sub>pub fn</sub> | [239](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L239) | Pitch ratio to apply to the excitation this frame. |
+| `AccentNeutralizer::measure_envelope` <sub>pub fn</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L250) | Measure the speaker's vocal-tract scale from the *unwarped* envelope and update the VTLN ratio. |
+| `AccentNeutralizer::vtln_ratio` <sub>pub fn</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L269) | Formant ratio to apply to the envelope this frame. |
+| `AccentNeutralizer::shape` <sub>pub fn</sub> | [289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L289) | Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average. |
+| `AccentNeutralizer::recompute_shape` <sub>fn</sub> | [332](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L332) | Rebuild the correction curve from the current long-term average. |
+| `log_centroid` <sub>fn</sub> | [384](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L384) | Energy-weighted geometric-mean frequency of env over lo, hi bins. |
+| `gain_to_db` <sub>fn</sub> | [403](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L403) |  |
+| `db_to_gain` <sub>fn</sub> | [407](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L407) |  |

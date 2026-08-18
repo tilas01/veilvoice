@@ -1,0 +1,42 @@
+![image.rs](https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/banners/veilvoice-meta/image.svg)
+
+# `crates/veilvoice-meta/src/image.rs`
+
+[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 202 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs)
+
+## Contents
+
+- [What calls what](#what-calls-what)
+- [Items](#items)
+
+Image EXIF/GPS removal.
+
+Images are handled at the container level with `img-parts`: the EXIF and XMP
+segments are dropped and the compressed pixel data is copied through
+untouched. Nothing is re-encoded, so cleaning is lossless and cannot
+introduce visible artefacts.
+
+GPS coordinates are the reason this matters most. A single holiday snapshot
+attached to an otherwise anonymous message can place someone within a few
+metres, and no amount of voice processing helps with that.
+
+## What calls what
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_sniff(["ImageKind::sniff<br/>pub"])
+    n_clean_image_bytes(["clean_image_bytes<br/>pub"])
+    n_clean_image_file(["clean_image_file<br/>pub"])
+    n_clean_image_bytes --> n_sniff
+    n_clean_image_file --> n_clean_image_bytes
+```
+
+## Items
+
+| Item | Line | Documentation |
+|---|---:|---|
+| `ImageKind` <sub>pub enum</sub> | [19](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs#L19) | Image container formats this crate can clean. |
+| `ImageKind::sniff` <sub>pub fn</sub> | [33](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs#L33) | Identify a format from its magic bytes. |
+| `clean_image_bytes` <sub>pub fn</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs#L49) | Strip identifying metadata from encoded image bytes. |
+| `clean_image_file` <sub>pub fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs#L86) | Strip identifying metadata from an image file, in place. |

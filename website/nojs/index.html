@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- SPDX-License-Identifier: GPL-3.0-or-later
+<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
      The JavaScript-free VeilVoice site.
 
@@ -282,9 +282,9 @@ binary is ever modified by signing, which is what lets it stay reproducible.</p>
 <tr><th>Not tamper-proof</th><td>Anyone who can write to your files can delete the lock; anyone holding the disk can edit the counter, move the clock, or attack the hash offline. This protects against casual access, not against the disk. Encrypt the volume if that is the threat.</td></tr>
 </table>
 
-<h3>Libre</h3>
+<h3>Source-available</h3>
 <ul>
-<li>GPL-3.0-or-later. Run, study, change and redistribute it, including commercially; derivatives stay free.</li>
+<li>CC BY-NC-SA 4.0. Run, study, change and redistribute it non-commercially; derivatives stay under the same terms. This is not an open source licence and is not described as one.</li>
 <li>No <code>unsafe</code> anywhere — every crate carries <code>#![forbid(unsafe_code)]</code>.</li>
 <li>No network code. CI fails the build if an HTTP client enters the dependency graph.</li>
 <li>Reproducible builds: pinned toolchain, committed lockfile, path-remapped compilation.</li>
@@ -309,17 +309,31 @@ itself is sensitive, encrypt it, or do not send it.</p>
 
 <h2 id="legal">LICENCE, WARRANTY AND DISCLOSURE</h2>
 
-<p>VeilVoice is free software under the <strong>GNU General Public License v3
-or later</strong>. You may run it for any purpose, study it, change it and
-redistribute it, including commercially. If you distribute a modified version
-you must publish your changes under the same licence. It is provided with
+<p>VeilVoice is source-available under <strong>Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International</strong>
+(CC BY-NC-SA 4.0). You may run it, study it, change it and redistribute it
+<strong>non-commercially</strong>; if you distribute something built on it,
+that goes out under the same licence, with credit. You may not sell it or use
+it for commercial advantage.</p>
+
+<p>This is <strong>not</strong> an open source licence, and this page does not
+call it one: both the Open Source Definition and the Free Software Foundation
+require the freedom to use a work for any purpose, commercial included, and the
+NonCommercial term withholds exactly that. Everything that made this project
+checkable is unchanged &mdash; public source, reproducible builds, generated
+artwork, no unsafe code, no network code. It is provided with
 <strong>absolutely no warranty</strong>.</p>
+
+<p>Releases up to and including <strong>v0.1.9</strong> were published under
+GPL-3.0-or-later and remain under it. A licence already granted cannot be
+withdrawn, so anyone holding one of those versions keeps every freedom it gave
+them, commercial use included, for that version.</p>
 
 <p>This project was developed with <strong>AI assistance (Claude, by
 Anthropic)</strong> and has been reviewed and audited by <strong>tilas01</strong>.
 That is a maintainer audit: no external firm or independent researcher has
 reviewed this code. It is disclosed so you can judge how much to verify before
-relying on it — the source is published under the GPL precisely so that you can.</p>
+relying on it — the source is published precisely so that you can.</p>
 
 <p><strong>Using this website, the repository, the released binaries or any
 output they produce constitutes your binding agreement to these terms in
@@ -329,7 +343,7 @@ JavaScript; reading this section is the same agreement.</p>
 <p>Full texts:
 <a href="../user-agreements/LEGAL-WAIVER.txt">disclaimer and liability waiver</a> ·
 <a href="../user-agreements/LICENCE-PLAIN-ENGLISH.txt">the licence in plain English</a> ·
-<a href="../user-agreements/LICENSE.txt">GPL-3.0 full text</a></p>
+<a href="../user-agreements/LICENSE.txt">CC BY-NC-SA 4.0 licence</a></p>
 
 <div class="note">
 <p><strong>Privacy of this page.</strong> Static HTML on GitHub Pages. No
@@ -339,7 +353,7 @@ JavaScript to remember it with, and that is the trade.</p>
 </div>
 
 <footer>
-<p>VeilVoice — GPL-3.0-or-later ·
+<p>VeilVoice — CC BY-NC-SA 4.0 ·
 <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
 <a href="../index.html">full site</a> ·
 <a href="../wiki.html">wiki</a></p>

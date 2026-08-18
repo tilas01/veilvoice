@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Image EXIF/GPS removal.
 //!
 //! Images are handled at the container level with `img-parts`: the EXIF and XMP

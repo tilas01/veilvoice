@@ -5,7 +5,7 @@
 # works on a fresh clone. Release signing / packaging secrets are optional and
 # only consumed by CI when present.
 #
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
 [workspace]
 resolver = "2"
@@ -30,7 +30,7 @@ exclude = ["fuzz"]
 version = "0.1.9"
 edition = "2021"
 rust-version = "1.96"
-license = "GPL-3.0-or-later"
+license = "CC-BY-NC-SA-4.0"
 authors = ["tilas01"]
 repository = "https://github.com/tilas01/veilvoice"
 homepage = "https://github.com/tilas01/veilvoice"

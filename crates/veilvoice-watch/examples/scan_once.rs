@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Print what is using the microphone and camera right now.
 fn main() {
     let s = veilvoice_watch::support();

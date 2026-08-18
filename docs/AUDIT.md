@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
 
 # VeilVoice — internal audit
 
@@ -86,7 +86,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
 | Secrets in the repository | None. `gpg_secrets/` is gitignored; `*.asc` ignored by default with only the public key allowed back explicitly. |
-| Dependency licences | All permissive (MIT / Apache-2.0 / BSD / ISC / BSL / CC0 / Zlib / Unicode-3.0). No copyleft conflict with GPL-3.0-or-later. Re-checked across the 155 packages rPGP adds. |
+| Dependency licences | All permissive (MIT / Apache-2.0 / BSD / ISC / BSL / CC0 / Zlib / Unicode-3.0). No conflict with CC-BY-NC-SA-4.0. Re-checked across the 155 packages rPGP adds. |
 
 ---
 
@@ -817,7 +817,7 @@ them, which immediately found the missing fingerprint and now covers any page
 added in future the moment it exists. Five pages checked, up from three.
 
 Found while verifying the published release, by asking whether the live search
-page carried the fingerprint -- a check made because HANDOFF section 5 claims CI
+page carried the fingerprint -- a check made because the release documentation claims CI
 enforces it. It said so, and it did not.
 
 ### 2.5 The new code, audited against the classes
@@ -1225,7 +1225,7 @@ the top of this document now says.
    decoding in a separate process is the only complete answer and is not built.
 
 5. **The privileged half of tamper detection**, unchanged from the previous
-   round and for the same reasons -- see `HANDOFF.md` section 7. Detection
+   round and for the same reasons -- see [`ROADMAP.md`](../ROADMAP.md). Detection
    logic is done; privilege and setup are not, and the obvious version of it is
    worse than nothing.
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Whether the operating system has been asked to reduce motion.
 //!
 //! # Why this exists rather than an egui call
