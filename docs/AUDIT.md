@@ -2,7 +2,7 @@
 
 # VeilVoice — internal audit
 
-**Auditor:** tilas01 (maintainer). **Date:** 2026-08-17. **Version:** 0.1.8,
+**Auditor:** tilas01 (maintainer). **Date:** 2026-08-18. **Version:** 0.1.9,
 covering the whole tree.
 
 ## The standard this is held to
@@ -40,8 +40,21 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Twenty-eight defects found and fixed (F-9 to F-36.)** Thirteen in the Rust,
-fifteen in the website and its stylesheets.
+**Ten defects found and fixed (F-37 to F-46.)** Three had shipped; seven were in
+code written during this round and were caught before release. See section 2.5,
+which keeps those two groups apart rather than counting them together.
+
+The round covers what v0.1.9 adds: a search index over the whole repository and
+website, a portable release verifier that needs no GnuPG, install scripts,
+packaging definitions for six formats, and an animated banner.
+
+**One finding is the reason to keep looking at the page rather than at the
+tests.** F-37 had the website rendering the text inside its own banner
+illegibly, on every viewport, for as long as the banner has existed. Every unit
+test passed throughout. It was found by rendering the page and reading it.
+
+*(The previous round: twenty-eight defects, F-9 to F-36, thirteen in the Rust
+and fifteen in the website.)*
 
 The uncomfortable pattern repeats, and is worth naming rather than burying: the
 previous round said the audit scope was *finished*. It was finished against the
@@ -63,16 +76,16 @@ setup). Those are now done or built. The rest were not on anybody's list.
 
 | Check | Result |
 |---|---|
-| `unsafe` code | **None.** All 8 crates carry `#![forbid(unsafe_code)]`, enforced at compile time. |
+| `unsafe` code | **None.** All 9 crates carry `#![forbid(unsafe_code)]`, enforced at compile time. |
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
-| `cargo audit` | **0 vulnerabilities.** Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 285 tests across 8 crates, plus doctests and 7 site-test suites in `tools/site-tests`. |
+| `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
+| Test suite | 336 tests across 9 crates, plus doctests and 10 site-test suites in `tools/site-tests`. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
 | Secrets in the repository | None. `gpg_secrets/` is gitignored; `*.asc` ignored by default with only the public key allowed back explicitly. |
-| Dependency licences | All permissive (MIT / Apache-2.0 / BSD / ISC / BSL / CC0). No copyleft conflict with GPL-3.0-or-later. |
+| Dependency licences | All permissive (MIT / Apache-2.0 / BSD / ISC / BSL / CC0 / Zlib / Unicode-3.0). No copyleft conflict with GPL-3.0-or-later. Re-checked across the 155 packages rPGP adds. |
 
 ---
 
@@ -197,7 +210,7 @@ no scheme means a relative path and is fine; protocol-relative `//host` and
 leading backslashes are refused explicitly, since both look relative and behave
 external.
 
-### 2.2 Found and fixed in this round -- the Rust
+### 2.2 Found and fixed in the third round -- the Rust
 
 **F-9 -- A four-kilobyte WAV killed the process (`veilvoice-audio`). Denial of
 service, reachable from a file somebody sends you.**
@@ -419,7 +432,7 @@ its entries differently from the ones `check`'s `extra` argument is keyed by, so
 of false positives is one nobody reads, which defeats the only thing the module
 does. **Fixed** by normalising on the way in as well as on the way out.
 
-### 2.3 Found and fixed in this round -- the website
+### 2.3 Found and fixed in the third round -- the website
 
 `js/repo.js` fetches README.md over the network and assigns the rendered result
 to `innerHTML`. That path is a security boundary and is audited as one.
@@ -600,7 +613,236 @@ the destination once and writing each chunk into it, and by refusing with a
 clear message, naming `sha256sum` and `certutil`, if the buffer cannot be
 allocated at all.
 
-### 2.4 Accepted, with reasoning
+### 2.4 Found and fixed in this round -- the fourth (F-37 to F-46)
+
+This round audited what v0.1.9 adds: a search index over the whole repository,
+a portable release verifier, install scripts, packaging definitions, and an
+animated banner. Ten defects, and they divide into two groups that are worth
+keeping apart rather than counting together.
+
+**Three were already shipped** (F-37, F-41, F-42) -- they were live on the
+published site or in the published repository when this round began.
+
+**Seven were in code written during this round** (F-38 to F-40, F-43 to F-46),
+caught before any of it was released. Recorded anyway, at the same length,
+because a defect found on the way to shipping is evidence about how the work is
+being done, and quietly omitting them would make this round look cleaner than
+it was. Two of them are the same mistake this document has already recorded
+twice.
+
+**F-37 -- The website destroyed the text in its own banner. Shipped, on every
+viewport, and only visible by looking.**
+
+Every image on the site carried `image-rendering: pixelated`. That property is
+for pixel art being *enlarged*, where it keeps edges crisp. Every image on this
+site is *shrunk*: `banner.png` is 1280 px wide and is never drawn wider than
+860, and on a 375 px phone it is drawn at about 343 -- a 3.7x reduction.
+Nearest-neighbour sampling does not blend the rows it discards, it keeps roughly
+one in four and deletes the rest.
+
+The banner's own text is drawn in one- and two-pixel strokes, so more than half
+of it disappeared. Measured by rendering the page and reading it:
+
+| Intended | As published, at 375 px |
+|---|---|
+| `THE VOICEPRINT IS DESTROYED. THE WORDS STAY READABLE.` | `TIE VOICEPRIN IS DESTOYED. THE WORDS STAY EDGRE.` |
+| `BY TILAS01 ON GITHUB` | `BY ~I,FS01 CN GITHUB` |
+| `SECURE AUDITED RUST CODE` | sliced horizontally, half the strokes gone |
+
+The first thing a phone reader saw was this project's own headline claims,
+illegible -- on a site whose entire argument is that you can go and read things
+for yourself. Not a security defect. It is the same *family* as F-7, where the
+site displayed source that was not the source: a page that undermines its own
+argument by being quietly wrong about what it shows.
+
+**Fixed** by removing the property from all four places it appeared. Confirmed
+by a side-by-side render at 343 px before and after.
+
+**Found by rendering the page**, which is the only way it could have been
+found: every unit test passed throughout, and the geometry checks that exist
+measure layout, not legibility. This is the third revision of this document to
+have to record that looking at the page found something no test did.
+
+**F-38 -- The search index covered about an eighth of what it claimed.**
+
+Sections were **truncated** to 240 characters rather than split, so for any file
+longer than a paragraph most of the text was simply absent from the index --
+while the search page said it searched every file. A search box that silently
+does not look at most of the corpus answers "no results" with exactly the same
+confidence as one that does, which makes it worse than having none.
+
+Found by a test asking whether searching for `onerror` -- a string this
+repository certainly contains, in its own hostile-markup fixtures -- returned
+anything. It did not.
+
+**Fixed** by splitting rather than truncating: every character of every indexed
+file now lands in exactly one chunk, and the 240-character bound applies to how
+much a single *result displays*, not to how much is searched. Coverage is also
+now stated precisely rather than rounded up -- prose, the website, the build
+files and the licences are complete; Rust is indexed by item name and doc
+comment, not by function body, and both the generator and the page say so.
+
+**F-39 -- The search index indexed itself, and could never converge.**
+
+The generator's output is tracked and lives under `website/`, so it was walked
+like any other file. Each run's input therefore contained the previous run's
+output: the file grew on every regeneration and `--check` could never agree
+with a freshly built one.
+
+The failure mode is what makes this worth writing up. It does not look like a
+bug, it looks like flaky CI -- a check that fails, passes after a regenerate,
+and fails again next time. **Fixed** by excluding the generated paths, and
+asserted by a test so it cannot come back as a mystery.
+
+**F-40 -- The no-JavaScript search page hid its own content from find-in-page.**
+
+The static index is the whole reason `website/nojs/` remains a supported
+edition: the entire corpus is in the page so that the reader's own find-in-page
+searches it. Every entry was inside a **collapsed** `<details>`.
+
+Text inside a closed `<details>` is only searchable on engines that auto-expand
+it -- Chromium since 102, later elsewhere. On an older Safari or Firefox the
+page would have answered every search with nothing, while looking perfectly
+fine. That is the exact shape of F-30, F-31 and F-33, and worse than any of
+them, because the page would have been *confidently* empty rather than visibly
+broken.
+
+**Fixed** by expanding every entry, with a contents list to keep a long page
+navigable. Height is free; correctness on browsers a great many people run is
+not.
+
+**F-41 -- The website's artwork had drifted from its generator, and nothing
+checked it.**
+
+`website/assets/` holds its own copies of the icons and banner, and they were
+kept in step by hand. `assets/generate.py --check` only ever looked at
+`assets/`. So the copy the site actually serves could differ from the script
+that is supposed to produce it, with nothing to notice -- and it did, the moment
+the banner changed.
+
+For a project whose stated position is that the artwork is generated rather
+than a committed blob, "generated, and also a second copy somebody maintains by
+hand" is a materially weaker claim than the one being made. **Fixed**: the
+generator writes both copies and `--check` verifies both.
+
+**F-42 -- A documentation link pointed at a file that does not exist.**
+
+`docs/INSTALL.md` shipped a link to `REPRODUCIBLE-BUILDS.md`. The file is called
+`REPRODUCIBLE_BUILDS.md`. One character, written by somebody who had just read
+the real filename.
+
+A dead link is not cosmetic here. The argument this project makes is "go and
+read it yourself", and a link that goes nowhere is that argument failing
+quietly. **Fixed**, and made mechanical: a tenth site-test suite resolves every
+local link in every tracked `.md` and `.html` file.
+
+The first version of that checker reported two faults and both were the checker:
+`docs/AUDIT.md` quotes a README link to explain how it once rendered wrongly,
+and quotes `src="a&quot;onerror=x"` to explain why a naive scanner calls that an
+attack -- so the scanner called them broken links. Documentation describing a
+bug correctly, flagged as a bug. **That is section 4.4 of this document
+happening again**, where five of six "findings" were the checker rather than the
+code. Quoted code is now stripped before extraction, and the suite is verified
+to still detect a planted broken link.
+
+**F-43 -- A byte-order mark was written into a shipped script.**
+
+`Set-Content -Encoding utf8` on Windows PowerShell 5.1 writes a BOM, and one
+landed at the head of `install/install.ps1`. Caught by
+`tools/site-tests/characters.test.js`, which is exactly what that suite exists
+for -- an invisible character causing an invisible fault. Recorded not because
+it was hard to fix but because the guard earned its place again, and because
+the same command will do the same thing to the next person who uses it.
+
+**F-44 -- The Windows installer could not use the GnuPG most Windows machines
+already have.**
+
+Git for Windows bundles an MSYS build of GnuPG, which a great many people have
+without knowing it. Given a Windows path it treats the whole thing as a
+*relative POSIX* path and resolves it against the working directory, producing
+`/c/current/dir/C:\Users\...` and failing with "directory does not exist".
+
+Found by running the installer rather than reading it. **Fixed** by translating
+paths to `/c/Users/...` form when the resolved GnuPG is an MSYS build, which
+turns "install Gpg4win first" into "verified" for a large share of Windows
+users.
+
+**F-45 -- Then its agent would not start, and the error blamed the key.**
+
+With the paths fixed, the import failed with `gpg: error running
+'/usr/bin/gpg-agent': exit status 2`. GnuPG's agent puts a Unix-domain socket
+inside the home directory it is given, and such a path cannot exceed about 108
+bytes. A GUID-named temporary directory produced a 90-character home directory,
+and the agent could not start.
+
+**Measured rather than guessed: a 37-character home directory worked, 90 did
+not.** The user-visible symptom was "the downloaded public key could not be
+imported" -- true, and completely misleading, which is the failure mode this
+project keeps writing up (F-16 told somebody worried about surveillance the
+wrong reason). **Fixed** by keeping the temporary directory short, and by
+refusing with an explanation in the remaining case rather than leaving a puzzle.
+
+**F-46 -- Progress output on stderr terminated the Windows installer.**
+
+Under `$ErrorActionPreference = "Stop"`, Windows PowerShell 5.1 turns anything
+a native program writes to stderr into a terminating error, whatever its exit
+code. GnuPG reports progress on stderr as a matter of course, so the script
+died on a successful verification. **Fixed** by relaxing the preference around
+native calls and judging them on their exit code, which is the thing that
+actually says whether they worked.
+
+### 2.5 The new code, audited against the classes
+
+The standard at the top of this document is a walk of every vulnerability class
+across the whole tree. Applied to what this round adds:
+
+**Untrusted input rendered into a page.** `search.js` reads an index built from
+*every tracked file*, which in this repository includes the hostile-markup
+fixtures -- `<script>`, `onerror=` and the rest are in `search-index.json`
+today, as ordinary text. A single `innerHTML` would turn this project's own
+test corpus into its payload. Every value reaches the page through
+`textContent` or `createTextNode`, and match highlighting builds `<mark>`
+elements rather than strings. Asserted by tests that ask the **tree** whether an
+element is a script, not whether a string contains one -- the section 4.4
+distinction, applied deliberately this time.
+
+**Resource exhaustion in the renderer.** F-22 and F-23 were quadratic blow-ups
+on text fetched over the network, and the same class applies here. The query is
+bounded to 128 characters and 8 terms, scoring is a linear pass with `indexOf`,
+results are capped at 200 scored and 60 rendered, and **no regular expression is
+ever built from user input**, so there is no pattern for a query to blow up.
+Measured: a 5,000-character query renders promptly.
+
+**Allocation sized by untrusted input.** The verifier streams files through
+SHA-256 in 64 KiB chunks rather than reading them whole; a release archive is
+tens of megabytes. This is F-36 in the other direction, avoided on purpose.
+
+**Dependency and environment trust.** The install scripts resolve GnuPG to
+absolute, enumerated paths rather than by bare name. Resolving `gpg` through
+Windows' search order would include the current working directory, so running
+the installer from a folder containing a file called `gpg.exe` would run that
+instead -- **F-13, in the one place where it matters most**, since this is the
+program that decides whether the download is genuine.
+
+**Order of verification.** Every script and the verifier check the signature
+over `SHA256SUMS` *before* comparing any file against it, and refuse if it
+fails. Checking the hash first would prove only that a download matches a list
+that might itself have been replaced. There is no flag anywhere to skip
+verification: an installer with one is an installer whose verification is
+decorative.
+
+**Error handling that degrades to a weaker posture.** The one class this round
+was most alert to, because an installer is full of opportunities for it.
+Without GnuPG the scripts stop rather than falling back to "the hash matched" --
+a hash checked against an unverified list is not a security check. An unsigned
+release is refused outright. `--sums` without `--sig` is refused. The verifier
+refuses to run a signed-list check and a typed-hash check at once and report a
+single answer, because they prove different things.
+
+**Nothing found in these classes** beyond the defects listed above. That is a
+result and is recorded as one.
+
+### 2.6 Accepted, with reasoning
 
 **A-1 — Remaining `expect()` sites (6).** Each was reviewed:
 
@@ -626,6 +868,40 @@ is readable by the owner and root. This is a kernel permission boundary, and
 `support()` states it rather than letting an empty list imply an empty machine.
 
 ---
+
+**A-6 -- `rsa` carries RUSTSEC-2023-0071, and it is accepted on a narrow
+ground.**
+
+The portable verifier uses rPGP so that checking a release needs no GnuPG. That
+brings in the `rsa` crate, which carries the Marvin attack advisory -- key
+recovery through a timing side channel, medium severity, **no fixed version
+available**.
+
+This is a *vulnerability*, not an unmaintained notice, and `.cargo/audit.toml`
+previously stated that vulnerabilities always fail the build. That rule is being
+weakened, so it is written out here and in that file rather than folded into the
+list of unmaintained advisories where nobody would re-read it.
+
+The ground: the advisory concerns operations performed with an RSA **private**
+key -- that is what "key recovery" means, and a timing oracle needs a secret to
+leak. `veilvoice-verify` performs signature *verification* and nothing else. It
+holds a public key compiled into the binary; there is no private key anywhere in
+this repository or in any released artefact, and no code path in the workspace
+signs or decrypts with RSA. VeilVoice's own cryptography is X25519 + ML-KEM-768,
+XChaCha20-Poly1305 and Argon2id.
+
+That is an argument about how the crate is **used**, not about the crate, so it
+is enforced rather than believed: a CI job fails the build if a secret-key or
+decryption API appears in the verifier. If the argument stops being true, the
+build stops with it, rather than this paragraph quietly ageing.
+
+**The dependency itself was weighed rather than waved through.** rPGP is by far
+the largest dependency in this project: 155 packages, every licence permissive,
+no networking crate. The alternative was hand-writing OpenPGP packet parsing and
+RSA PKCS#1 v1.5 verification, where a subtle mistake is a **silent accept** in
+the one tool whose entire job is not to silently accept. A widely used
+implementation that many people read is the better risk, and the size of it is
+the price.
 
 ## 3. Cryptography
 
@@ -894,8 +1170,9 @@ the top of this document now says.
 1. **An outside reviewer.** Not a task item -- see the standard at the top of
    this document -- but still worth having, and still absent. Everything here
    is the author checking the author's work. What that is worth is now a
-   measured quantity twice over: two rounds of wider tools and wider scope have
-   each found real defects in code a previous round had called clean.
+   measured quantity three times over: three rounds of wider tools and wider
+   scope have each found real defects in code a previous round had called
+   clean. This round it was F-37, live on the published site the whole time.
 
 2. **The coverage-guided campaign has been built but not run to convergence.**
    `fuzz/` contains six libFuzzer targets, one per parser that reads bytes
@@ -923,11 +1200,32 @@ the top of this document now says.
    logic is done; privilege and setup are not, and the obvious version of it is
    worse than nothing.
 
+6. **Nobody but the author has run the install scripts or the verifier.** They
+   are tested end to end on Windows against the real published v0.1.8 release,
+   and the verifier checks that release's actual OpenPGP signature with no
+   GnuPG installed. `install.sh` has had its syntax and refusal paths exercised
+   but has never run on a real Linux or macOS machine, because the host this
+   was developed on is Windows. `docs/INSTALL.md` says so in its own words.
+
+7. **None of the package definitions has been built.** WiX, `.deb`, `.rpm`,
+   Flatpak, Homebrew and the Gentoo ebuild parse, and that is the whole of what
+   is claimed. `docs/PACKAGING.md` carries a per-format table saying so. A spec
+   file that has never produced an RPM is a draft.
+
+8. **`rsa` carries an unfixable advisory** (A-6). Accepted on the ground that
+   the verifier performs no private-key operation, and enforced by a CI job
+   rather than left as a claim. If rPGP ever offers a backend that avoids the
+   `rsa` crate for verification, that is worth taking.
+
 ## 6. Verdict
 
-**Thirty-six defects found and fixed across three audit rounds (F-1 to F-36):**
-eight in the first two, twenty-eight in this one -- thirteen in the Rust,
-fifteen in the website and its stylesheets.
+**Forty-six defects found and fixed across four audit rounds (F-1 to F-46):**
+eight in the first two, twenty-eight in the third, ten in this one.
+
+Of this round's ten, **three had shipped** and seven were caught in code written
+during the round. Keeping those apart matters: a round that counts
+just-written-and-immediately-fixed defects alongside ones that were live on the
+published site is flattering itself.
 
 **No finding in any round has been a confidentiality failure.** Nothing has let
 an attacker recover a voiceprint, read a sealed recording, bypass a password, or
@@ -952,12 +1250,24 @@ person relying on this would care about:
   engines a great many people are still running -- including a legal gate that
   was an invisible modal on pre-2023 browsers (F-30) and one that could not be
   dismissed at all on an iPhone (F-33).
+- **And one made the site illegible about itself** (F-37): the banner carrying
+  this project's own claims, its licence and its authorship was rendered with
+  more than half its pixel rows deleted, on every viewport, for as long as the
+  banner has existed. Every test passed the whole time.
 
 The cryptography itself continues to stand up. The primitives are standard and
 well reviewed, and the composition -- the hybrid combiner, the authenticated
 container header, the domain-separated app-lock verifier -- is done properly
 rather than approximately. Not one defect in three rounds has been in the
 cryptographic construction.
+
+This round adds a boundary the previous three did not have: **the point where a
+user decides whether to trust a download.** The install scripts and the verifier
+are that boundary, and they are written to refuse rather than continue, to name
+the check that failed, and to have no flag that skips verification. Three of
+this round's defects (F-44, F-45, F-46) were in that code and were found by
+running it rather than reading it -- which is the same lesson as F-37, in a
+different medium.
 
 Every defect has instead been at a **boundary**, and the list of boundaries has
 grown each round: parameters read from a file and handed to a library without a
