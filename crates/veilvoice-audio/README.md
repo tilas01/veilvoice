@@ -61,7 +61,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>204 lines"])
     n_devices["devices.rs<br/>228 lines"]
-    n_io["io.rs<br/>527 lines"]
+    n_io["io.rs<br/>555 lines"]
     n_live["live.rs<br/>237 lines"]
 ```
 
@@ -70,7 +70,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | 228 | Enumerating audio devices, and guessing which of them are virtual cables. |
-| [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 527 | Reading and writing audio files. |
+| [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 555 | Reading and writing audio files. |
 | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 204 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
 | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 237 | Live microphone scrambling. |
 

@@ -1,10 +1,17 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0
-//
-// The verifier's own tests.
-//
-// The property that matters most is not "a good signature is accepted" but
-// "a bad one is refused". A verifier that accepts everything passes every
-// happy-path test ever written, so most of what follows is negative.
+//! The verifier's own tests.
+//!
+//! The property that matters most here is not "a good signature is accepted"
+//! but **"a bad one is refused"**. A verifier that accepts everything passes
+//! every happy-path test ever written, and would ship looking perfect while
+//! doing the opposite of its job -- so most of what follows is negative:
+//! corrupted signatures, wrong keys, truncated input, mismatched hashes.
+//!
+//! This file is `//!`-documented rather than `//`-commented so that the
+//! reasoning above appears in the generated documentation. A reader deciding
+//! whether to trust `veilvoice-verify` should be able to see what it was tested
+//! *against* without cloning the repository, because the whole purpose of that
+//! binary is to be the thing you check a download with.
 
 use super::*;
 

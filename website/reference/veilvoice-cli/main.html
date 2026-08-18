@@ -39,9 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/main.svg" alt="main.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 1037 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 1077 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#what-is-here">What is here</a>
+  <a href="#two-behaviours-that-surprise-people-on-purpose">Two behaviours that surprise people, on purpose</a>
+  <a href="#passphrase-prompts-cannot-be-piped">Passphrase prompts cannot be piped</a>
+  <a href="#a-clap-ordering-rule-worth-knowing">A clap ordering rule worth knowing</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -49,6 +53,21 @@
 <section id="s-about">
 <p><code>veilvoice</code> &#8212; the command-line interface.</p>
 <p>Everything VeilVoice does, available without a desktop: it runs over SSH, in a container, and on machines that have no GUI toolkit at all. The same engine backs both this and the graphical app.</p>
+<h2 id="what-is-here">What is here</h2>
+<p>Fourteen subcommands, and they divide into four groups:</p>
+<ul>
+<li><strong>Audio</strong> -- <code>anonymise</code> a file, <code>live</code> scramble a microphone, list <code>devices</code>.</li>
+<li><strong>Privacy of the files themselves</strong> -- <code>clean</code> metadata, <code>encrypt</code>, <code>decrypt</code>, <code>keygen</code>, <code>shred</code>.</li>
+<li><strong>Watching the machine</strong> -- <code>watch</code> the microphone and camera, <code>guard</code> VeilVoice&#x27;s own files against tampering.</li>
+<li><strong>The app lock</strong> -- <code>lock set|status|change|remove</code>.</li>
+</ul>
+<h2 id="two-behaviours-that-surprise-people-on-purpose">Two behaviours that surprise people, on purpose</h2>
+<p><strong><code>anonymise</code> writes <code>&lt;out&gt;.veil</code>, not a bare WAV.</strong> Recordings are encrypted at rest by default. <code>--encrypt=false</code> opts out and requires <code>--yes</code>, because an unsealed recording is the thing somebody later wishes they had not produced. The wiki explains where the WAV went.</p>
+<p><strong>The front-ends refuse rather than downgrade.</strong> Asked to encrypt with nothing to encrypt with, this exits with an error instead of writing plain audio and mentioning it. Quiet degradation to a weaker posture is the defect class this project has found in itself most often.</p>
+<h2 id="passphrase-prompts-cannot-be-piped">Passphrase prompts cannot be piped</h2>
+<p><code>rpassword</code> needs a real console; piping a passphrase in blocks on <code>CONIN$</code> rather than reading it. That is a property of terminal input, not a bug here, and it means anything that prompts cannot be smoke-tested from a non-interactive shell. The layer <em>beneath</em> each prompt is therefore tested instead -- see [<code>crate::atrest</code>] and [<code>crate::lock</code>], where the logic lives precisely so it can be reached without a terminal.</p>
+<h2 id="a-clap-ordering-rule-worth-knowing">A clap ordering rule worth knowing</h2>
+<p>An argument declared beside <code>#[command(subcommand)]</code> must precede the subcommand on the command line unless it is marked <code>global = true</code>. So <code>veilvoice lock --path X status</code> parses and <code>veilvoice lock status --path X</code> does not, except that <code>--path</code> is now global specifically so both do.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -153,28 +172,28 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Cli</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L35" rel="noopener noreferrer">35</a></td><td></td></tr>
-<tr><td><code>Command</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L41" rel="noopener noreferrer">41</a></td><td></td></tr>
-<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L179" rel="noopener noreferrer">179</a></td><td></td></tr>
-<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L187" rel="noopener noreferrer">187</a></td><td></td></tr>
-<tr><td><code>main</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L195" rel="noopener noreferrer">195</a></td><td></td></tr>
-<tr><td><code>run</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L206" rel="noopener noreferrer">206</a></td><td></td></tr>
-<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L268" rel="noopener noreferrer">268</a></td><td>The engine settings a user can reach from the command line.</td></tr>
-<tr><td><code>config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L274" rel="noopener noreferrer">274</a></td><td></td></tr>
-<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L287" rel="noopener noreferrer">287</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
-<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L296" rel="noopener noreferrer">296</a></td><td>What to do with the result once it exists.</td></tr>
-<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L305" rel="noopener noreferrer">305</a></td><td></td></tr>
-<tr><td><code>live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L444" rel="noopener noreferrer">444</a></td><td></td></tr>
-<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L530" rel="noopener noreferrer">530</a></td><td>A small textual level meter.</td></tr>
-<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L545" rel="noopener noreferrer">545</a></td><td></td></tr>
-<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L577" rel="noopener noreferrer">577</a></td><td></td></tr>
-<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L594" rel="noopener noreferrer">594</a></td><td></td></tr>
-<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L623" rel="noopener noreferrer">623</a></td><td></td></tr>
-<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L655" rel="noopener noreferrer">655</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
-<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L663" rel="noopener noreferrer">663</a></td><td></td></tr>
-<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L739" rel="noopener noreferrer">739</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
-<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L829" rel="noopener noreferrer">829</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
-<tr><td><code>info</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L897" rel="noopener noreferrer">897</a></td><td></td></tr>
+<tr><td><code>Cli</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L75" rel="noopener noreferrer">75</a></td><td></td></tr>
+<tr><td><code>Command</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L81" rel="noopener noreferrer">81</a></td><td></td></tr>
+<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L219" rel="noopener noreferrer">219</a></td><td></td></tr>
+<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L227" rel="noopener noreferrer">227</a></td><td></td></tr>
+<tr><td><code>main</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L235" rel="noopener noreferrer">235</a></td><td></td></tr>
+<tr><td><code>run</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L246" rel="noopener noreferrer">246</a></td><td></td></tr>
+<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L308" rel="noopener noreferrer">308</a></td><td>The engine settings a user can reach from the command line.</td></tr>
+<tr><td><code>config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L314" rel="noopener noreferrer">314</a></td><td></td></tr>
+<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L327" rel="noopener noreferrer">327</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
+<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L336" rel="noopener noreferrer">336</a></td><td>What to do with the result once it exists.</td></tr>
+<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L345" rel="noopener noreferrer">345</a></td><td></td></tr>
+<tr><td><code>live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L484" rel="noopener noreferrer">484</a></td><td></td></tr>
+<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L570" rel="noopener noreferrer">570</a></td><td>A small textual level meter.</td></tr>
+<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L585" rel="noopener noreferrer">585</a></td><td></td></tr>
+<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L617" rel="noopener noreferrer">617</a></td><td></td></tr>
+<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L634" rel="noopener noreferrer">634</a></td><td></td></tr>
+<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L663" rel="noopener noreferrer">663</a></td><td></td></tr>
+<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L695" rel="noopener noreferrer">695</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
+<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L703" rel="noopener noreferrer">703</a></td><td></td></tr>
+<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L779" rel="noopener noreferrer">779</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
+<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L869" rel="noopener noreferrer">869</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
+<tr><td><code>info</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L937" rel="noopener noreferrer">937</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

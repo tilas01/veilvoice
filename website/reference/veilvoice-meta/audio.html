@@ -39,9 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-meta/audio.svg" alt="audio.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-meta/src/audio.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 240 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 268 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#what-tags-give-away">What tags give away</a>
+  <a href="#removal-or-plausible-replacement">Removal, or plausible replacement</a>
+  <a href="#the-gap-lofty-cannot-close">The gap lofty cannot close</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -49,6 +52,13 @@
 <section id="s-about">
 <p>Audio tag removal and replacement.</p>
 <p>Tags are handled through <code>lofty</code>, which understands ID3v1/ID3v2, Vorbis comments, MP4 atoms and APE, so one code path covers every format VeilVoice imports. Only the tag blocks are rewritten &#8212; the audio stream is never re-encoded, so cleaning a file is lossless.</p>
+<h2 id="what-tags-give-away">What tags give away</h2>
+<p>Far more than a title. Recording software writes its own name and version; phones write a device model; some encoders write a timestamp, and a few write a serial number or a user name taken from the account that made the file. None of that is audible, all of it survives de-identification untouched, and any of it can identify a speaker whose <em>voice</em> no longer does.</p>
+<p>Stripping the voiceprint and leaving the tags would be a complete failure wearing the appearance of success, which is why this crate exists and why the CLI cleans by default.</p>
+<h2 id="removal-or-plausible-replacement">Removal, or plausible replacement</h2>
+<p>[<code>crate::Policy</code>] chooses between deleting tags outright and writing bland ones. Both are legitimate: an empty tag block is itself a signal that a file has been processed, and in some situations looking ordinary matters more than being empty.</p>
+<h2 id="the-gap-lofty-cannot-close">The gap <code>lofty</code> cannot close</h2>
+<p><code>lofty</code> understands ID3v1/ID3v2, Vorbis comments, MP4 atoms and APE through one interface -- but <strong>it cannot remove an ID3v2 block from a WAV file</strong>. A WAV is a RIFF container and an ID3 chunk inside one is a chunk, not a tag, so the tag library does not see it. That is what [<code>crate::wav</code>] is for: a chunk-level cleaner that walks the RIFF structure directly. Without it, cleaning a WAV reported success and left the identifying block in place.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -83,10 +93,10 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>read_head</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L19" rel="noopener noreferrer">19</a></td><td>Read just enough of a file to identify its container.</td></tr>
-<tr><td><code>REALISTIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L33" rel="noopener noreferrer">33</a></td><td>Tags written in Policy::Realistic mode.</td></tr>
-<tr><td><code>clean_audio_file</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L43" rel="noopener noreferrer">43</a></td><td>Strip or replace the tags of an audio file, in place.</td></tr>
-<tr><td><code>clean_audio_tags</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L96" rel="noopener noreferrer">96</a></td><td>Report which tag blocks a file carries, without modifying it.</td></tr>
+<tr><td><code>read_head</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L47" rel="noopener noreferrer">47</a></td><td>Read just enough of a file to identify its container.</td></tr>
+<tr><td><code>REALISTIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L61" rel="noopener noreferrer">61</a></td><td>Tags written in Policy::Realistic mode.</td></tr>
+<tr><td><code>clean_audio_file</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71" rel="noopener noreferrer">71</a></td><td>Strip or replace the tags of an audio file, in place.</td></tr>
+<tr><td><code>clean_audio_tags</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L124" rel="noopener noreferrer">124</a></td><td>Report which tag blocks a file carries, without modifying it.</td></tr>
 </tbody></table>
 </section>
 </div></div>

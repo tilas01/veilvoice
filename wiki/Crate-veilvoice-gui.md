@@ -8,8 +8,10 @@
 
 ## Contents
 
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
+- [The modules](#the-modules)
+- [Two rules this crate keeps](#two-rules-this-crate-keeps)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
 
 The VeilVoice desktop application: an egui/eframe front-end, monospace
 throughout — anonymise a file, scramble a microphone live, watch what is
@@ -19,12 +21,43 @@ panel that states the honest scope.
 The binary lives in `main.rs`; this library exists so the UI logic can be
 unit tested without opening a window.
 
+That split is worth stating plainly, because it is the reason this crate has
+tests at all: a binary crate cannot be unit tested, so everything with logic
+in it -- the app lock's state machine, preference loading, palette
+resolution, the reduced-motion decision -- lives here where a test can reach
+it without a display server. `main.rs` holds only what genuinely needs a
+window.
+
+# The modules
+
+| Module | What it owns |
+|---|---|
+| `security` | The unlock screen, the lock tab, and the at-rest controls |
+| `prefs` | Preferences, and recovering from a corrupt preferences file |
+| `settings` | The settings tab |
+| `theme` | The palette, shared with the command-line front end |
+| `soundbar` | The animated level meter |
+| `reduced_motion` | Whether to animate at all |
+
+# Two rules this crate keeps
+
+**The user interface never softens a scope note.** Where a control has a
+bound -- the app lock is a verifier and not disk encryption, tamper detection
+detects rather than prevents -- the interface says so next to the control,
+and tests fail the build if that text changes. Documentation nobody opens
+does not protect anybody.
+
+**Animation is a preference that is honoured, not a decoration.**
+`reduced_motion` resolves the platform's own setting alongside the user's
+explicit choice, and the whole interface reads that answer rather than each
+widget deciding for itself.
+
 ## How the crate fits together
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>25 lines"])
+    n_lib(["lib.rs<br/>56 lines"])
     n_main(["main.rs<br/>67 lines"])
     n_app["app.rs<br/>1062 lines"]
     n_prefs["prefs.rs<br/>386 lines"]
@@ -51,8 +84,8 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`app.rs`|File-veilvoice-gui-app]] | 1062 | The VeilVoice desktop application. |
-| [[`lib.rs`|File-veilvoice-gui-lib]] | 25 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [[`app.rs`|File-veilvoice-gui-app]] | 1062 | The VeilVoice desktop application: six tabs, one window, no menus. |
+| [[`lib.rs`|File-veilvoice-gui-lib]] | 56 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [[`main.rs`|File-veilvoice-gui-main]] | 67 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [[`prefs.rs`|File-veilvoice-gui-prefs]] | 386 | What the user has chosen about how the app looks and moves. |
 | [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] | 273 | Whether the operating system has been asked to reduce motion. |

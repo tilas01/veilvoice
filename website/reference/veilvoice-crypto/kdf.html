@@ -39,9 +39,11 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/kdf.svg" alt="kdf.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/kdf.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 353 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 387 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#cost-parameters-arrive-from-a-file-so-they-are-hostile-input">Cost parameters arrive from a file, so they are hostile input</a>
+  <a href="#domain-separation">Domain separation</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -50,6 +52,16 @@
 <p>Password-based key derivation with Argon2id.</p>
 <p>Argon2id is the memory-hard KDF recommended by RFC 9106 and the OWASP password-storage guidance; the <code>id</code> variant resists both GPU/ASIC parallelism and the side-channel exposure of pure Argon2i.</p>
 <p>Parameters travel <em>with</em> the ciphertext rather than being compiled in, so a file encrypted today still opens after the defaults are raised, and a user on a small machine can lower the memory cost without forking the format.</p>
+<h2 id="cost-parameters-arrive-from-a-file-so-they-are-hostile-input">Cost parameters arrive from a file, so they are hostile input</h2>
+<p>That flexibility has a sharp edge, and two shipped defects came from it. <code>m_cost</code> and <code>p_cost</code> are read verbatim from a <code>.veil</code> header -- and from the app-lock file, <strong>which is parsed before anyone has authenticated</strong>.</p>
+<ul>
+<li><code>argon2</code> 0.5.3 evaluates <code>m_cost &lt; p_cost * 8</code> <em>before</em> it checks whether <code>p_cost</code> is within range, so a large <code>p_cost</code> overflows the multiplication. With overflow checks on -- every debug build, and any project consuming this crate as a library -- that is a panic on attacker-controlled input (F-2).</li>
+<li><code>m_cost</code> is allocated before anything else happens, so a header claiming <code>u32::MAX</code> asks for <strong>4 TiB</strong>. The allocation fails, and a failed allocation aborts the process. Merely <em>opening</em> a hostile container killed the program (F-3).</li>
+</ul>
+<p>Both are bounded in [<code>KdfParams::checked</code>], in arithmetic that cannot overflow. <strong>Never bypass that funnel.</strong> It is the single place every derivation passes through, and it exists because the alternative -- checks scattered across the call sites -- is how one of them gets missed.</p>
+<p>A residual is stated rather than fixed: a container may still declare a legitimate-but-expensive cost, so an attacker can make opening <em>their</em> file slow. That is inherent to shipping the cost with the file, which is what lets old files open after defaults rise. Slow is not crashing, and the user chose to open that file.</p>
+<h2 id="domain-separation">Domain separation</h2>
+<p>The app-lock password and the recording passphrase are different secrets and are kept different: they are domain-separated in the derivation, so unlocking the application does not unseal recordings and one cannot be derived from the other.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -99,19 +111,19 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>KdfParams</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L17" rel="noopener noreferrer">17</a></td><td>Argon2id cost parameters.</td></tr>
-<tr><td><code>KdfParams::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L31" rel="noopener noreferrer">31</a></td><td>RFC 9106&#x27;s &quot;first recommended&quot; profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock &#8212; strong against offline cracking while still opening a file in well under a second on ordinary hardware.</td></tr>
-<tr><td><code>KdfParams::weak_for_tests</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L44" rel="noopener noreferrer">44</a></td><td>A deliberately cheap profile for tests and low-memory devices.</td></tr>
-<tr><td><code>KdfParams::MAX_P_COST</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L53" rel="noopener noreferrer">53</a></td><td>Argon2&#x27;s own documented ceiling on parallelism: 2^24 - 1.</td></tr>
-<tr><td><code>KdfParams::MAX_M_COST</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L74" rel="noopener noreferrer">74</a></td><td>The largest memory cost this build will attempt, in KiB &#8212; 4 GiB.</td></tr>
-<tr><td><code>KdfParams::UNATTENDED_MAX_M_COST</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L90" rel="noopener noreferrer">90</a></td><td>A ceiling for a caller with nobody watching.</td></tr>
-<tr><td><code>KdfParams::within</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L102" rel="noopener noreferrer">102</a></td><td>Check the costs against a caller-chosen memory ceiling as well as the built-in one.</td></tr>
-<tr><td><code>KdfParams::checked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L131" rel="noopener noreferrer">131</a></td><td>Check the costs are ones Argon2 can accept, before handing them to it.</td></tr>
-<tr><td><code>KdfParams::build</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L151" rel="noopener noreferrer">151</a></td><td>Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF.</td></tr>
-<tr><td><code>SALT_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L160" rel="noopener noreferrer">160</a></td><td>Length of the salt stored in an encrypted container.</td></tr>
-<tr><td><code>KEY_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L162" rel="noopener noreferrer">162</a></td><td>Length of a derived symmetric key.</td></tr>
-<tr><td><code>derive_key</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L168" rel="noopener noreferrer">168</a></td><td>Derive a 32-byte key from password and salt.</td></tr>
-<tr><td><code>random_salt</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L181" rel="noopener noreferrer">181</a></td><td>Draw a fresh random salt from the OS CSPRNG.</td></tr>
+<tr><td><code>KdfParams</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L51" rel="noopener noreferrer">51</a></td><td>Argon2id cost parameters.</td></tr>
+<tr><td><code>KdfParams::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L65" rel="noopener noreferrer">65</a></td><td>RFC 9106&#x27;s &quot;first recommended&quot; profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock &#8212; strong against offline cracking while still opening a file in well under a second on ordinary hardware.</td></tr>
+<tr><td><code>KdfParams::weak_for_tests</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L78" rel="noopener noreferrer">78</a></td><td>A deliberately cheap profile for tests and low-memory devices.</td></tr>
+<tr><td><code>KdfParams::MAX_P_COST</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L87" rel="noopener noreferrer">87</a></td><td>Argon2&#x27;s own documented ceiling on parallelism: 2^24 - 1.</td></tr>
+<tr><td><code>KdfParams::MAX_M_COST</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L108" rel="noopener noreferrer">108</a></td><td>The largest memory cost this build will attempt, in KiB &#8212; 4 GiB.</td></tr>
+<tr><td><code>KdfParams::UNATTENDED_MAX_M_COST</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L124" rel="noopener noreferrer">124</a></td><td>A ceiling for a caller with nobody watching.</td></tr>
+<tr><td><code>KdfParams::within</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L136" rel="noopener noreferrer">136</a></td><td>Check the costs against a caller-chosen memory ceiling as well as the built-in one.</td></tr>
+<tr><td><code>KdfParams::checked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L165" rel="noopener noreferrer">165</a></td><td>Check the costs are ones Argon2 can accept, before handing them to it.</td></tr>
+<tr><td><code>KdfParams::build</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L185" rel="noopener noreferrer">185</a></td><td>Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF.</td></tr>
+<tr><td><code>SALT_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L194" rel="noopener noreferrer">194</a></td><td>Length of the salt stored in an encrypted container.</td></tr>
+<tr><td><code>KEY_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L196" rel="noopener noreferrer">196</a></td><td>Length of a derived symmetric key.</td></tr>
+<tr><td><code>derive_key</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L202" rel="noopener noreferrer">202</a></td><td>Derive a 32-byte key from password and salt.</td></tr>
+<tr><td><code>random_salt</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L215" rel="noopener noreferrer">215</a></td><td>Draw a fresh random salt from the OS CSPRNG.</td></tr>
 </tbody></table>
 </section>
 </div></div>

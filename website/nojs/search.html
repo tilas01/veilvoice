@@ -42,7 +42,7 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice &mdash; 145 files, 5331 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice &mdash; 145 files, 5379 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
@@ -1028,49 +1028,55 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-audio/src/io.rs</code> <span class="meta">&mdash; veilvoice-audio, 528 lines, 40 sections</span></summary>
+<summary><code>crates/veilvoice-audio/src/io.rs</code> <span class="meta">&mdash; veilvoice-audio, 556 lines, 46 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs">open io.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Reading and writing audio files. Decoding goes through `symphonia`, which is pure Rust and covers WAV, MP3, FLAC, OGG/Vorbis, MP4/AAC and friends without shelling out to a codec library. Writing is WAV only, on purpose: VeilVoice&#x27;s job is</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">to hand back audio that has not been degraded, and re-encoding to a lossy format after de-identification would throw away quality for no benefit. Callers who want MP3 can transcode with whatever they already trust.</span></li>
-<li><span class="sec">const MAX_DECODED_SAMPLES</span> <span class="meta">line 34</span><br><span class="x">The most decoded audio [`load`] will hold, in mono `f32` samples. Roughly twelve hours at 48 kHz, and about eight gigabytes of `f32`. The ceiling exists because compressed formats expand: a mono MP3 at 32 kbit/s decodes to 48 000 `f32` per</span></li>
-<li><span class="sec">const MAX_DECODED_SAMPLES</span> <span class="meta">line 34</span><br><span class="x">second, which is a **forty-eight-fold** expansion, so a hundred-megabyte download becomes some five gigabytes of samples. Rust aborts the process when an allocation fails, so an unbounded decode turns &quot;someone sent me a recording&quot; &#8212; the</span></li>
-<li><span class="sec">const MAX_DECODED_SAMPLES</span> <span class="meta">line 34</span><br><span class="x">ordinary use this tool is for &#8212; into a way to kill it. Twelve hours is far past any interview or call anyone will veil, and the refusal names the limit rather than truncating silently, because a recording that quietly lost its second half</span></li>
-<li><span class="sec">const MAX_DECODED_SAMPLES</span> <span class="meta">line 34</span><br><span class="x">is worse than one that would not open.</span></li>
-<li><span class="sec">fn preflight</span> <span class="meta">line 64</span><br><span class="x">Reject a file whose own header carries a value that will crash the decoder, before the decoder is given the file. Public so that a caller holding bytes rather than a path can run the same check [`load`] runs, and so the fuzz target in</span></li>
-<li><span class="sec">fn preflight</span> <span class="meta">line 64</span><br><span class="x">`fuzz/` can reach it. Pass as much of the start of the file as is convenient; a few kilobytes is plenty, and a short buffer is not an error. This exists for one confirmed case and is deliberately narrow. A WAV whose `fmt ` chunk declares a</span></li>
-<li><span class="sec">fn preflight</span> <span class="meta">line 64</span><br><span class="x">**sample rate of zero** makes `symphonia` panic inside `Probe::format`, at `TimeBase::new`, before this crate is handed anything it could check. VeilVoice&#x27;s release profile sets `panic = &quot;abort&quot;`, so that panic is not an error a caller can</span></li>
-<li><span class="sec">fn preflight</span> <span class="meta">line 64</span><br><span class="x">handle &#8212; it is the process ending. `veilvoice anonymise` on a four-kilobyte file somebody sent you was enough. Every other malformed value tried during the audit &#8212; zero channels, 65535 channels, zero or 65535 bits per sample, a mismatched</span></li>
-<li><span class="sec">fn preflight</span> <span class="meta">line 64</span><br><span class="x">format tag &#8212; is already refused cleanly by `symphonia` itself, so nothing else is duplicated here. Checking what the decoder already checks would be a second parser to keep in step, which is its own bug source. **The residual is stated</span></li>
-<li><span class="sec">fn preflight</span> <span class="meta">line 64</span><br><span class="x">rather than engineered around:** this cannot protect against a panic in the decoder for a format whose header VeilVoice does not parse. Under `panic = &quot;abort&quot;` no wrapper can, short of decoding in a separate process. The mitigations are</span></li>
-<li><span class="sec">fn preflight</span> <span class="meta">line 64</span><br><span class="x">this check, keeping `symphonia` current, and the fact that it is a widely used pure-Rust decoder rather than a C library.</span></li>
-<li><span class="sec">struct Audio</span> <span class="meta">line 109</span><br><span class="x">Mono audio in memory.</span></li>
-<li><span class="sec">impl Audio</span> <span class="meta">line 116</span><br><span class="x"></span></li>
-<li><span class="sec">fn duration_secs</span> <span class="meta">line 118</span><br><span class="x">Duration in seconds.</span></li>
-<li><span class="sec">fn peak</span> <span class="meta">line 126</span><br><span class="x">Peak absolute sample value.</span></li>
-<li><span class="sec">fn load</span> <span class="meta">line 137</span><br><span class="x">Decode any supported audio file to mono `f32`. Multi-channel input is averaged down to mono. VeilVoice&#x27;s engine is single-channel by design: a stereo image is itself a recording-setup fingerprint, and collapsing it removes one more way to</span></li>
-<li><span class="sec">fn load</span> <span class="meta">line 137</span><br><span class="x">match a file to the room and hardware that produced it.</span></li>
-<li><span class="sec">fn read_up_to</span> <span class="meta">line 240</span><br><span class="x">Fill as much of `buf` as the file has, tolerating short reads. A single `read` is allowed to return fewer bytes than asked for even when more are available, and `read_exact` would fail outright on a file shorter than the buffer &#8212; which</span></li>
-<li><span class="sec">fn read_up_to</span> <span class="meta">line 240</span><br><span class="x">most test fixtures are.</span></li>
-<li><span class="sec">fn wav_bytes</span> <span class="meta">line 261</span><br><span class="x">Encode mono `f32` audio as a 16-bit PCM WAV, in memory. The in-memory form is what makes encrypt-at-rest honest: a recording that is going to be sealed must never touch the disk in the clear first, because a plaintext file that is written</span></li>
-<li><span class="sec">fn wav_bytes</span> <span class="meta">line 261</span><br><span class="x">and then deleted is exactly the thing [`veilvoice_crypto::shred`](../../veilvoice_crypto/shred/index.html) explains cannot be reliably taken back on flash storage. Samples are clamped rather than allowed to wrap: a sample past full scale</span></li>
-<li><span class="sec">fn wav_bytes</span> <span class="meta">line 261</span><br><span class="x">would otherwise flip sign and produce a loud click.</span></li>
-<li><span class="sec">fn save_wav</span> <span class="meta">line 281</span><br><span class="x">Write mono `f32` audio to a 16-bit PCM WAV file.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 287</span><br><span class="x"></span></li>
-<li><span class="sec">fn tone</span> <span class="meta">line 290</span><br><span class="x"></span></li>
-<li><span class="sec">fn wav_round_trip_preserves_audio</span> <span class="meta">line 302</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_in_memory_encoder_matches_the_file_it_would_have_written</span> <span class="meta">line 323</span><br><span class="x">The in-memory encoder is what the encrypt-at-rest path uses, so it must produce exactly the file the on-disk one would.</span></li>
-<li><span class="sec">fn out_of_range_samples_clamp_instead_of_wrapping</span> <span class="meta">line 337</span><br><span class="x"></span></li>
-<li><span class="sec">fn stereo_is_averaged_to_mono</span> <span class="meta">line 361</span><br><span class="x"></span></li>
-<li><span class="sec">fn metadata_helpers_are_sane</span> <span class="meta">line 390</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_missing_file_is_an_io_error</span> <span class="meta">line 405</span><br><span class="x"></span></li>
-<li><span class="sec">fn handmade_wav</span> <span class="meta">line 414</span><br><span class="x">Build a WAV by hand so the header can say things `hound` would refuse to write.</span></li>
-<li><span class="sec">fn a_wav_declaring_a_zero_sample_rate_is_refused_rather_than_crashing</span> <span class="meta">line 450</span><br><span class="x">The regression, and the reason `preflight` exists. A WAV declaring a sample rate of zero made `symphonia` panic inside `Probe::format`, at `TimeBase::new` &#8212; before this crate saw anything it could check. Under the shipped `panic = &quot;abort&quot;`</span></li>
-<li><span class="sec">fn a_wav_declaring_a_zero_sample_rate_is_refused_rather_than_crashing</span> <span class="meta">line 450</span><br><span class="x">profile that is the process dying, not an error, so `veilvoice anonymise` on a file somebody sent you was enough to kill it. If this test ever *panics* rather than failing an assertion, the pre-flight has stopped running.</span></li>
-<li><span class="sec">fn the_preflight_passes_everything_it_is_not_for</span> <span class="meta">line 468</span><br><span class="x">The pre-flight must not become a second, divergent WAV parser. Values `symphonia` already refuses properly are left to it, and ordinary files must pass straight through.</span></li>
-<li><span class="sec">const _</span> <span class="meta">line 505</span><br><span class="x">The decode ceiling has to sit far above anything anyone will really veil, or it stops being a guard against hostile expansion and starts being a limitation. Checked at compile time so it cannot drift.</span></li>
-<li><span class="sec">fn a_non_audio_file_is_rejected</span> <span class="meta">line 511</span><br><span class="x"></span></li>
-<li><span class="sec">fn sample_rate_is_preserved_across_rates</span> <span class="meta">line 519</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">to hand back audio that has not been degraded, and re-encoding to a lossy format after de-identification would throw away quality for no benefit. Callers who want MP3 can transcode with whatever they already trust. # A decoder is a parser,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">and this one reads files somebody else made `symphonia` is the largest attacker-facing surface in this crate: it is handed whole files of a format VeilVoice does not itself define. It is pure Rust, which removes the memory-corruption class</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">outright, but it does not remove panics -- and this workspace builds with `panic = &quot;abort&quot;`, so a panic inside a decoder is not an error a caller can handle, it is the process ending. That is why a pre-flight check runs before a file</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">reaches the decoder, and why the honest position is recorded in the audit rather than glossed: decoding in a separate process is the only complete answer to &quot;the next malformed file in a format we do not parse ourselves&quot;, and it is not</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">built. # Writing is WAV only, and that is a decision Re-encoding to a lossy format after de-identification would throw away quality for no privacy benefit -- the voiceprint is already gone, and what remains is the words, which is the part</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">worth keeping intact. # In-memory encoding, so plaintext never reaches the disk [`wav_bytes`] exists so a recording can be encoded and then sealed without ever being written in the clear. It has an awkward shape for a real reason:</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`hound::WavWriter::finalize` consumes the writer, so the encode has to borrow the cursor (`WavWriter::new(&amp;mut cursor, spec)`) and read the bytes back through `cursor.into_inner()` after the writer has been dropped.</span></li>
+<li><span class="sec">const MAX_DECODED_SAMPLES</span> <span class="meta">line 62</span><br><span class="x">The most decoded audio [`load`] will hold, in mono `f32` samples. Roughly twelve hours at 48 kHz, and about eight gigabytes of `f32`. The ceiling exists because compressed formats expand: a mono MP3 at 32 kbit/s decodes to 48 000 `f32` per</span></li>
+<li><span class="sec">const MAX_DECODED_SAMPLES</span> <span class="meta">line 62</span><br><span class="x">second, which is a **forty-eight-fold** expansion, so a hundred-megabyte download becomes some five gigabytes of samples. Rust aborts the process when an allocation fails, so an unbounded decode turns &quot;someone sent me a recording&quot; &#8212; the</span></li>
+<li><span class="sec">const MAX_DECODED_SAMPLES</span> <span class="meta">line 62</span><br><span class="x">ordinary use this tool is for &#8212; into a way to kill it. Twelve hours is far past any interview or call anyone will veil, and the refusal names the limit rather than truncating silently, because a recording that quietly lost its second half</span></li>
+<li><span class="sec">const MAX_DECODED_SAMPLES</span> <span class="meta">line 62</span><br><span class="x">is worse than one that would not open.</span></li>
+<li><span class="sec">fn preflight</span> <span class="meta">line 92</span><br><span class="x">Reject a file whose own header carries a value that will crash the decoder, before the decoder is given the file. Public so that a caller holding bytes rather than a path can run the same check [`load`] runs, and so the fuzz target in</span></li>
+<li><span class="sec">fn preflight</span> <span class="meta">line 92</span><br><span class="x">`fuzz/` can reach it. Pass as much of the start of the file as is convenient; a few kilobytes is plenty, and a short buffer is not an error. This exists for one confirmed case and is deliberately narrow. A WAV whose `fmt ` chunk declares a</span></li>
+<li><span class="sec">fn preflight</span> <span class="meta">line 92</span><br><span class="x">**sample rate of zero** makes `symphonia` panic inside `Probe::format`, at `TimeBase::new`, before this crate is handed anything it could check. VeilVoice&#x27;s release profile sets `panic = &quot;abort&quot;`, so that panic is not an error a caller can</span></li>
+<li><span class="sec">fn preflight</span> <span class="meta">line 92</span><br><span class="x">handle &#8212; it is the process ending. `veilvoice anonymise` on a four-kilobyte file somebody sent you was enough. Every other malformed value tried during the audit &#8212; zero channels, 65535 channels, zero or 65535 bits per sample, a mismatched</span></li>
+<li><span class="sec">fn preflight</span> <span class="meta">line 92</span><br><span class="x">format tag &#8212; is already refused cleanly by `symphonia` itself, so nothing else is duplicated here. Checking what the decoder already checks would be a second parser to keep in step, which is its own bug source. **The residual is stated</span></li>
+<li><span class="sec">fn preflight</span> <span class="meta">line 92</span><br><span class="x">rather than engineered around:** this cannot protect against a panic in the decoder for a format whose header VeilVoice does not parse. Under `panic = &quot;abort&quot;` no wrapper can, short of decoding in a separate process. The mitigations are</span></li>
+<li><span class="sec">fn preflight</span> <span class="meta">line 92</span><br><span class="x">this check, keeping `symphonia` current, and the fact that it is a widely used pure-Rust decoder rather than a C library.</span></li>
+<li><span class="sec">struct Audio</span> <span class="meta">line 137</span><br><span class="x">Mono audio in memory.</span></li>
+<li><span class="sec">impl Audio</span> <span class="meta">line 144</span><br><span class="x"></span></li>
+<li><span class="sec">fn duration_secs</span> <span class="meta">line 146</span><br><span class="x">Duration in seconds.</span></li>
+<li><span class="sec">fn peak</span> <span class="meta">line 154</span><br><span class="x">Peak absolute sample value.</span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 165</span><br><span class="x">Decode any supported audio file to mono `f32`. Multi-channel input is averaged down to mono. VeilVoice&#x27;s engine is single-channel by design: a stereo image is itself a recording-setup fingerprint, and collapsing it removes one more way to</span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 165</span><br><span class="x">match a file to the room and hardware that produced it.</span></li>
+<li><span class="sec">fn read_up_to</span> <span class="meta">line 268</span><br><span class="x">Fill as much of `buf` as the file has, tolerating short reads. A single `read` is allowed to return fewer bytes than asked for even when more are available, and `read_exact` would fail outright on a file shorter than the buffer &#8212; which</span></li>
+<li><span class="sec">fn read_up_to</span> <span class="meta">line 268</span><br><span class="x">most test fixtures are.</span></li>
+<li><span class="sec">fn wav_bytes</span> <span class="meta">line 289</span><br><span class="x">Encode mono `f32` audio as a 16-bit PCM WAV, in memory. The in-memory form is what makes encrypt-at-rest honest: a recording that is going to be sealed must never touch the disk in the clear first, because a plaintext file that is written</span></li>
+<li><span class="sec">fn wav_bytes</span> <span class="meta">line 289</span><br><span class="x">and then deleted is exactly the thing [`veilvoice_crypto::shred`](../../veilvoice_crypto/shred/index.html) explains cannot be reliably taken back on flash storage. Samples are clamped rather than allowed to wrap: a sample past full scale</span></li>
+<li><span class="sec">fn wav_bytes</span> <span class="meta">line 289</span><br><span class="x">would otherwise flip sign and produce a loud click.</span></li>
+<li><span class="sec">fn save_wav</span> <span class="meta">line 309</span><br><span class="x">Write mono `f32` audio to a 16-bit PCM WAV file.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 315</span><br><span class="x"></span></li>
+<li><span class="sec">fn tone</span> <span class="meta">line 318</span><br><span class="x"></span></li>
+<li><span class="sec">fn wav_round_trip_preserves_audio</span> <span class="meta">line 330</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_in_memory_encoder_matches_the_file_it_would_have_written</span> <span class="meta">line 351</span><br><span class="x">The in-memory encoder is what the encrypt-at-rest path uses, so it must produce exactly the file the on-disk one would.</span></li>
+<li><span class="sec">fn out_of_range_samples_clamp_instead_of_wrapping</span> <span class="meta">line 365</span><br><span class="x"></span></li>
+<li><span class="sec">fn stereo_is_averaged_to_mono</span> <span class="meta">line 389</span><br><span class="x"></span></li>
+<li><span class="sec">fn metadata_helpers_are_sane</span> <span class="meta">line 418</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_missing_file_is_an_io_error</span> <span class="meta">line 433</span><br><span class="x"></span></li>
+<li><span class="sec">fn handmade_wav</span> <span class="meta">line 442</span><br><span class="x">Build a WAV by hand so the header can say things `hound` would refuse to write.</span></li>
+<li><span class="sec">fn a_wav_declaring_a_zero_sample_rate_is_refused_rather_than_crashing</span> <span class="meta">line 478</span><br><span class="x">The regression, and the reason `preflight` exists. A WAV declaring a sample rate of zero made `symphonia` panic inside `Probe::format`, at `TimeBase::new` &#8212; before this crate saw anything it could check. Under the shipped `panic = &quot;abort&quot;`</span></li>
+<li><span class="sec">fn a_wav_declaring_a_zero_sample_rate_is_refused_rather_than_crashing</span> <span class="meta">line 478</span><br><span class="x">profile that is the process dying, not an error, so `veilvoice anonymise` on a file somebody sent you was enough to kill it. If this test ever *panics* rather than failing an assertion, the pre-flight has stopped running.</span></li>
+<li><span class="sec">fn the_preflight_passes_everything_it_is_not_for</span> <span class="meta">line 496</span><br><span class="x">The pre-flight must not become a second, divergent WAV parser. Values `symphonia` already refuses properly are left to it, and ordinary files must pass straight through.</span></li>
+<li><span class="sec">const _</span> <span class="meta">line 533</span><br><span class="x">The decode ceiling has to sit far above anything anyone will really veil, or it stops being a guard against hostile expansion and starts being a limitation. Checked at compile time so it cannot drift.</span></li>
+<li><span class="sec">fn a_non_audio_file_is_rejected</span> <span class="meta">line 539</span><br><span class="x"></span></li>
+<li><span class="sec">fn sample_rate_is_preserved_across_rates</span> <span class="meta">line 547</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -1156,26 +1162,32 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/guard.rs</code> <span class="meta">&mdash; veilvoice-cli, 307 lines, 17 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/guard.rs</code> <span class="meta">&mdash; veilvoice-cli, 339 lines, 23 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs">open guard.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice guard` -- record what VeilVoice&#x27;s files should be, and check them. Detection, not prevention. See [`veilvoice_guard::SCOPE`], which every path through this module prints, for the same reason the app lock prints its own: a</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">protection someone over-trusts has made them less safe, not more.</span></li>
-<li><span class="sec">enum Action</span> <span class="meta">line 14</span><br><span class="x"></span></li>
-<li><span class="sec">fn manifest_path</span> <span class="meta">line 35</span><br><span class="x">Where the manifest lives, beside the app lock.</span></li>
-<li><span class="sec">fn sealed_path</span> <span class="meta">line 48</span><br><span class="x">A sealed manifest sits beside the plain one, with a different suffix.</span></li>
-<li><span class="sec">fn print_scope</span> <span class="meta">line 52</span><br><span class="x"></span></li>
-<li><span class="sec">fn default_targets</span> <span class="meta">line 61</span><br><span class="x">The files worth watching when the user names none: the running binary, and the app lock beside it.</span></li>
-<li><span class="sec">fn run</span> <span class="meta">line 74</span><br><span class="x"></span></li>
-<li><span class="sec">fn init</span> <span class="meta">line 86</span><br><span class="x"></span></li>
-<li><span class="sec">fn load</span> <span class="meta">line 149</span><br><span class="x">Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there.</span></li>
-<li><span class="sec">fn check</span> <span class="meta">line 162</span><br><span class="x"></span></li>
-<li><span class="sec">fn status</span> <span class="meta">line 231</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 263</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_sealed_record_sits_beside_the_plain_one</span> <span class="meta">line 267</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_explicit_path_wins_over_the_platform_default</span> <span class="meta">line 276</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_record_notices_a_changed_file</span> <span class="meta">line 285</span><br><span class="x">The end-to-end flow, through the same manifest the subcommands drive. The passphrase prompts need a terminal, so the sealed path is covered by the crate&#x27;s own tests instead.</span></li>
-<li><span class="sec">fn checking_without_a_record_explains_rather_than_panicking</span> <span class="meta">line 301</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">protection someone over-trusts has made them less safe, not more. # What the three steps actually do * **`init`** walks the files that make up this installation and records a SHA-256 for each. Optionally sealed with a passphrase, so the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">record itself cannot be quietly rewritten to match tampered files. * **`check`** re-walks and reports what is **modified**, **removed** and **added**. All three matter: an added file in the installation directory is as interesting as a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">changed one. * **`blame`** tries to say *which process* made a change, and says plainly when it cannot. # Why attribution usually fails, and why that is reported rather than hidden Attribution needs the operating system to have been</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">recording. On Linux that means an `auditd` watch; on Windows a SACL on the path plus the audit policy enabled, and reading it needs elevation. Neither is on by default on a normal machine. So the common answer is &quot;something changed this</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">file and I cannot tell you what&quot;, and this module prints exactly that rather than an empty list. An empty list reads as *nothing happened*, which is the opposite of the truth, and is the same mistake as a monitor reporting an empty machine</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">because a registry query silently matched nothing. # The bound, again A manifest running as the user protects nothing from that user, and detects rather than prevents even when it works. Anything that can write these files can write the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">manifest beside them. That is why the passphrase-sealed record exists, why [`veilvoice_guard::SCOPE`] is printed on every path through this module, and why the word &quot;tamper-proof&quot; appears nowhere in it.</span></li>
+<li><span class="sec">enum Action</span> <span class="meta">line 46</span><br><span class="x"></span></li>
+<li><span class="sec">fn manifest_path</span> <span class="meta">line 67</span><br><span class="x">Where the manifest lives, beside the app lock.</span></li>
+<li><span class="sec">fn sealed_path</span> <span class="meta">line 80</span><br><span class="x">A sealed manifest sits beside the plain one, with a different suffix.</span></li>
+<li><span class="sec">fn print_scope</span> <span class="meta">line 84</span><br><span class="x"></span></li>
+<li><span class="sec">fn default_targets</span> <span class="meta">line 93</span><br><span class="x">The files worth watching when the user names none: the running binary, and the app lock beside it.</span></li>
+<li><span class="sec">fn run</span> <span class="meta">line 106</span><br><span class="x"></span></li>
+<li><span class="sec">fn init</span> <span class="meta">line 118</span><br><span class="x"></span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 181</span><br><span class="x">Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there.</span></li>
+<li><span class="sec">fn check</span> <span class="meta">line 194</span><br><span class="x"></span></li>
+<li><span class="sec">fn status</span> <span class="meta">line 263</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 295</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_sealed_record_sits_beside_the_plain_one</span> <span class="meta">line 299</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_explicit_path_wins_over_the_platform_default</span> <span class="meta">line 308</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_record_notices_a_changed_file</span> <span class="meta">line 317</span><br><span class="x">The end-to-end flow, through the same manifest the subcommands drive. The passphrase prompts need a terminal, so the sealed path is covered by the crate&#x27;s own tests instead.</span></li>
+<li><span class="sec">fn checking_without_a_record_explains_rather_than_panicking</span> <span class="meta">line 333</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -1203,78 +1215,90 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/main.rs</code> <span class="meta">&mdash; veilvoice-cli, 1038 lines, 39 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/main.rs</code> <span class="meta">&mdash; veilvoice-cli, 1078 lines, 47 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs">open main.rs</a></p>
 <ul>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice` &#8212; the command-line interface. Everything VeilVoice does, available without a desktop: it runs over SSH, in a container, and on machines that have no GUI toolkit at all. The same engine backs both this and the graphical app.</span></li>
-<li><span class="sec">mod atrest</span> <span class="meta">line 9</span><br><span class="x"></span></li>
-<li><span class="sec">mod guard</span> <span class="meta">line 10</span><br><span class="x"></span></li>
-<li><span class="sec">mod lock</span> <span class="meta">line 11</span><br><span class="x"></span></li>
-<li><span class="sec">mod theme</span> <span class="meta">line 12</span><br><span class="x"></span></li>
-<li><span class="sec">struct Cli</span> <span class="meta">line 35</span><br><span class="x"></span></li>
-<li><span class="sec">enum Command</span> <span class="meta">line 41</span><br><span class="x"></span></li>
-<li><span class="sec">enum CleanPolicy</span> <span class="meta">line 179</span><br><span class="x"></span></li>
-<li><span class="sec">impl From&lt;CleanPolicy&gt; for Policy</span> <span class="meta">line 186</span><br><span class="x"></span></li>
-<li><span class="sec">fn from</span> <span class="meta">line 187</span><br><span class="x"></span></li>
-<li><span class="sec">fn main</span> <span class="meta">line 195</span><br><span class="x"></span></li>
-<li><span class="sec">fn run</span> <span class="meta">line 206</span><br><span class="x"></span></li>
-<li><span class="sec">struct Tuning</span> <span class="meta">line 268</span><br><span class="x">The engine settings a user can reach from the command line.</span></li>
-<li><span class="sec">fn config</span> <span class="meta">line 274</span><br><span class="x"></span></li>
-<li><span class="sec">fn describe_reseed</span> <span class="meta">line 287</span><br><span class="x">How the seed-rolling setting reads in the output.</span></li>
-<li><span class="sec">struct AtRest</span> <span class="meta">line 296</span><br><span class="x">What to do with the result once it exists.</span></li>
-<li><span class="sec">fn anonymise</span> <span class="meta">line 305</span><br><span class="x"></span></li>
-<li><span class="sec">fn live</span> <span class="meta">line 444</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter</span> <span class="meta">line 530</span><br><span class="x">A small textual level meter.</span></li>
-<li><span class="sec">const WIDTH</span> <span class="meta">line 531</span><br><span class="x"></span></li>
-<li><span class="sec">fn list_devices</span> <span class="meta">line 545</span><br><span class="x"></span></li>
-<li><span class="sec">fn clean</span> <span class="meta">line 577</span><br><span class="x"></span></li>
-<li><span class="sec">fn encrypt</span> <span class="meta">line 594</span><br><span class="x"></span></li>
-<li><span class="sec">fn decrypt</span> <span class="meta">line 623</span><br><span class="x"></span></li>
-<li><span class="sec">fn load_secret_key</span> <span class="meta">line 655</span><br><span class="x">Load a private key file, which is itself a password-locked container.</span></li>
-<li><span class="sec">fn keygen</span> <span class="meta">line 663</span><br><span class="x"></span></li>
-<li><span class="sec">fn watch</span> <span class="meta">line 739</span><br><span class="x">Report, and keep reporting, what is using the microphone and camera.</span></li>
-<li><span class="sec">fn shred</span> <span class="meta">line 829</span><br><span class="x">Destroy a file&#x27;s contents, then delete it. Gated behind a typed confirmation rather than a y/n prompt. There is no undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></li>
-<li><span class="sec">fn info</span> <span class="meta">line 897</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 940</span><br><span class="x"></span></li>
-<li><span class="sec">fn cli_definition_is_valid</span> <span class="meta">line 945</span><br><span class="x"></span></li>
-<li><span class="sec">fn tuning</span> <span class="meta">line 949</span><br><span class="x"></span></li>
-<li><span class="sec">fn intensity_is_clamped_into_range</span> <span class="meta">line 958</span><br><span class="x"></span></li>
-<li><span class="sec">fn keep_accent_disables_neutralisation</span> <span class="meta">line 965</span><br><span class="x"></span></li>
-<li><span class="sec">fn reseed_interval_reaches_the_engine_and_cannot_go_negative</span> <span class="meta">line 971</span><br><span class="x"></span></li>
-<li><span class="sec">fn recordings_are_encrypted_at_rest_by_default</span> <span class="meta">line 980</span><br><span class="x">Encryption at rest is a *default*, not a flag the careful user has to find. If someone ever flips this, this test is what stops it shipping.</span></li>
-<li><span class="sec">fn asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span> <span class="meta">line 1006</span><br><span class="x">Refused before anything is read or written, so a contradictory command line cannot half-happen.</span></li>
-<li><span class="sec">fn reseed_setting_reads_clearly</span> <span class="meta">line 1022</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter_scales_and_never_panics</span> <span class="meta">line 1029</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice` &#8212; the command-line interface. Everything VeilVoice does, available without a desktop: it runs over SSH, in a container, and on machines that have no GUI toolkit at all. The same engine backs both this and the graphical app. #</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">What is here Fourteen subcommands, and they divide into four groups: * **Audio** -- `anonymise` a file, `live` scramble a microphone, list `devices`. * **Privacy of the files themselves** -- `clean` metadata, `encrypt`, `decrypt`,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`keygen`, `shred`. * **Watching the machine** -- `watch` the microphone and camera, `guard` VeilVoice&#x27;s own files against tampering. * **The app lock** -- `lock set|status|change|remove`. # Two behaviours that surprise people, on purpose</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">**`anonymise` writes `&lt;out&gt;.veil`, not a bare WAV.** Recordings are encrypted at rest by default. `--encrypt=false` opts out and requires `--yes`, because an unsealed recording is the thing somebody later wishes they had not produced. The</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">wiki explains where the WAV went. **The front-ends refuse rather than downgrade.** Asked to encrypt with nothing to encrypt with, this exits with an error instead of writing plain audio and mentioning it. Quiet degradation to a weaker</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">posture is the defect class this project has found in itself most often. # Passphrase prompts cannot be piped `rpassword` needs a real console; piping a passphrase in blocks on `CONIN$` rather than reading it. That is a property of</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">terminal input, not a bug here, and it means anything that prompts cannot be smoke-tested from a non-interactive shell. The layer *beneath* each prompt is therefore tested instead -- see [`crate::atrest`] and [`crate::lock`], where the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">logic lives precisely so it can be reached without a terminal. # A clap ordering rule worth knowing An argument declared beside `#[command(subcommand)]` must precede the subcommand on the command line unless it is marked `global = true`.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">So `veilvoice lock --path X status` parses and `veilvoice lock status --path X` does not, except that `--path` is now global specifically so both do.</span></li>
+<li><span class="sec">mod atrest</span> <span class="meta">line 49</span><br><span class="x"></span></li>
+<li><span class="sec">mod guard</span> <span class="meta">line 50</span><br><span class="x"></span></li>
+<li><span class="sec">mod lock</span> <span class="meta">line 51</span><br><span class="x"></span></li>
+<li><span class="sec">mod theme</span> <span class="meta">line 52</span><br><span class="x"></span></li>
+<li><span class="sec">struct Cli</span> <span class="meta">line 75</span><br><span class="x"></span></li>
+<li><span class="sec">enum Command</span> <span class="meta">line 81</span><br><span class="x"></span></li>
+<li><span class="sec">enum CleanPolicy</span> <span class="meta">line 219</span><br><span class="x"></span></li>
+<li><span class="sec">impl From&lt;CleanPolicy&gt; for Policy</span> <span class="meta">line 226</span><br><span class="x"></span></li>
+<li><span class="sec">fn from</span> <span class="meta">line 227</span><br><span class="x"></span></li>
+<li><span class="sec">fn main</span> <span class="meta">line 235</span><br><span class="x"></span></li>
+<li><span class="sec">fn run</span> <span class="meta">line 246</span><br><span class="x"></span></li>
+<li><span class="sec">struct Tuning</span> <span class="meta">line 308</span><br><span class="x">The engine settings a user can reach from the command line.</span></li>
+<li><span class="sec">fn config</span> <span class="meta">line 314</span><br><span class="x"></span></li>
+<li><span class="sec">fn describe_reseed</span> <span class="meta">line 327</span><br><span class="x">How the seed-rolling setting reads in the output.</span></li>
+<li><span class="sec">struct AtRest</span> <span class="meta">line 336</span><br><span class="x">What to do with the result once it exists.</span></li>
+<li><span class="sec">fn anonymise</span> <span class="meta">line 345</span><br><span class="x"></span></li>
+<li><span class="sec">fn live</span> <span class="meta">line 484</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter</span> <span class="meta">line 570</span><br><span class="x">A small textual level meter.</span></li>
+<li><span class="sec">const WIDTH</span> <span class="meta">line 571</span><br><span class="x"></span></li>
+<li><span class="sec">fn list_devices</span> <span class="meta">line 585</span><br><span class="x"></span></li>
+<li><span class="sec">fn clean</span> <span class="meta">line 617</span><br><span class="x"></span></li>
+<li><span class="sec">fn encrypt</span> <span class="meta">line 634</span><br><span class="x"></span></li>
+<li><span class="sec">fn decrypt</span> <span class="meta">line 663</span><br><span class="x"></span></li>
+<li><span class="sec">fn load_secret_key</span> <span class="meta">line 695</span><br><span class="x">Load a private key file, which is itself a password-locked container.</span></li>
+<li><span class="sec">fn keygen</span> <span class="meta">line 703</span><br><span class="x"></span></li>
+<li><span class="sec">fn watch</span> <span class="meta">line 779</span><br><span class="x">Report, and keep reporting, what is using the microphone and camera.</span></li>
+<li><span class="sec">fn shred</span> <span class="meta">line 869</span><br><span class="x">Destroy a file&#x27;s contents, then delete it. Gated behind a typed confirmation rather than a y/n prompt. There is no undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></li>
+<li><span class="sec">fn info</span> <span class="meta">line 937</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 980</span><br><span class="x"></span></li>
+<li><span class="sec">fn cli_definition_is_valid</span> <span class="meta">line 985</span><br><span class="x"></span></li>
+<li><span class="sec">fn tuning</span> <span class="meta">line 989</span><br><span class="x"></span></li>
+<li><span class="sec">fn intensity_is_clamped_into_range</span> <span class="meta">line 998</span><br><span class="x"></span></li>
+<li><span class="sec">fn keep_accent_disables_neutralisation</span> <span class="meta">line 1005</span><br><span class="x"></span></li>
+<li><span class="sec">fn reseed_interval_reaches_the_engine_and_cannot_go_negative</span> <span class="meta">line 1011</span><br><span class="x"></span></li>
+<li><span class="sec">fn recordings_are_encrypted_at_rest_by_default</span> <span class="meta">line 1020</span><br><span class="x">Encryption at rest is a *default*, not a flag the careful user has to find. If someone ever flips this, this test is what stops it shipping.</span></li>
+<li><span class="sec">fn asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span> <span class="meta">line 1046</span><br><span class="x">Refused before anything is read or written, so a contradictory command line cannot half-happen.</span></li>
+<li><span class="sec">fn reseed_setting_reads_clearly</span> <span class="meta">line 1062</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter_scales_and_never_panics</span> <span class="meta">line 1069</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/theme.rs</code> <span class="meta">&mdash; veilvoice-cli, 116 lines, 24 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/theme.rs</code> <span class="meta">&mdash; veilvoice-cli, 136 lines, 28 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs">open theme.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Tokyo Night colouring for the terminal. The same palette the GUI uses, so the two halves of VeilVoice look like one program. Colour is suppressed when the output is not a terminal, when `NO_COLOR` is set (the widely-honoured convention),</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">or when `TERM=dumb`, so piping to a file or a log never produces escape-code soup.</span></li>
-<li><span class="sec">mod colour</span> <span class="meta">line 20</span><br><span class="x">Tokyo Night, as 24-bit foreground escape sequences. The whole palette is defined even though a given build may not use every entry &#8212; the device listing is behind the `live` feature, so its colour goes unused on platforms without an audio</span></li>
-<li><span class="sec">mod colour</span> <span class="meta">line 20</span><br><span class="x">backend. Keeping the set complete means it stays a straight mirror of the GUI&#x27;s palette and of `css/themes.css`, which is what makes the three front-ends look like one program.</span></li>
-<li><span class="sec">const MUTED</span> <span class="meta">line 22</span><br><span class="x">Muted comment grey &#8212; secondary text.</span></li>
-<li><span class="sec">const BLUE</span> <span class="meta">line 24</span><br><span class="x">Foreground blue &#8212; headings and prompts.</span></li>
-<li><span class="sec">const CYAN</span> <span class="meta">line 26</span><br><span class="x">Cyan &#8212; values and figures.</span></li>
-<li><span class="sec">const GREEN</span> <span class="meta">line 28</span><br><span class="x">Green &#8212; success.</span></li>
-<li><span class="sec">const YELLOW</span> <span class="meta">line 30</span><br><span class="x">Yellow &#8212; warnings.</span></li>
-<li><span class="sec">const RED</span> <span class="meta">line 32</span><br><span class="x">Red &#8212; errors.</span></li>
-<li><span class="sec">const PURPLE</span> <span class="meta">line 34</span><br><span class="x">Purple &#8212; accents.</span></li>
-<li><span class="sec">const RESET</span> <span class="meta">line 36</span><br><span class="x">Reset to the terminal default.</span></li>
-<li><span class="sec">fn enabled</span> <span class="meta">line 39</span><br><span class="x"></span></li>
-<li><span class="sec">static ENABLED</span> <span class="meta">line 40</span><br><span class="x"></span></li>
-<li><span class="sec">fn paint</span> <span class="meta">line 53</span><br><span class="x">Wrap `text` in `colour`, or return it unchanged when colour is off.</span></li>
-<li><span class="sec">fn ok</span> <span class="meta">line 62</span><br><span class="x">A success line.</span></li>
-<li><span class="sec">fn warn</span> <span class="meta">line 67</span><br><span class="x">A warning line.</span></li>
-<li><span class="sec">fn err</span> <span class="meta">line 72</span><br><span class="x">An error line.</span></li>
-<li><span class="sec">fn heading</span> <span class="meta">line 77</span><br><span class="x">A section heading.</span></li>
-<li><span class="sec">fn field</span> <span class="meta">line 82</span><br><span class="x">A `label: value` line with the value highlighted.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 91</span><br><span class="x"></span></li>
-<li><span class="sec">fn colour_is_disabled_when_not_a_terminal</span> <span class="meta">line 97</span><br><span class="x">Tests capture stdout, so colour is off and `paint` must be a no-op &#8212; which is exactly the property that keeps escape codes out of pipes.</span></li>
-<li><span class="sec">fn helpers_include_their_text</span> <span class="meta">line 102</span><br><span class="x"></span></li>
-<li><span class="sec">fn field_shows_both_halves</span> <span class="meta">line 110</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">or when `TERM=dumb`, so piping to a file or a log never produces escape-code soup. # Why a command-line tool has a palette at all Because the two front-ends are one program. Somebody who uses the desktop application and then runs the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">binary over SSH should recognise what they are looking at, and the colours carry meaning consistently in both: green for a result, amber for a caveat, red for a refusal, muted for the scope notes that qualify a claim. # Colour is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">suppressed rather than assumed Three independent conditions turn it off, and all three are checked: output that is not a terminal, `NO_COLOR` set to anything at all (the widely-honoured convention), and `TERM=dumb`. The check runs once</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">through a [`std::sync::OnceLock`] rather than per call, because this is used inside loops that print a line per file. Escape sequences in a log file are worse than no colour: they survive into bug reports, pasted output and issue trackers,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">where they are noise that obscures the message somebody was trying to show you.</span></li>
+<li><span class="sec">mod colour</span> <span class="meta">line 40</span><br><span class="x">Tokyo Night, as 24-bit foreground escape sequences. The whole palette is defined even though a given build may not use every entry &#8212; the device listing is behind the `live` feature, so its colour goes unused on platforms without an audio</span></li>
+<li><span class="sec">mod colour</span> <span class="meta">line 40</span><br><span class="x">backend. Keeping the set complete means it stays a straight mirror of the GUI&#x27;s palette and of `css/themes.css`, which is what makes the three front-ends look like one program.</span></li>
+<li><span class="sec">const MUTED</span> <span class="meta">line 42</span><br><span class="x">Muted comment grey &#8212; secondary text.</span></li>
+<li><span class="sec">const BLUE</span> <span class="meta">line 44</span><br><span class="x">Foreground blue &#8212; headings and prompts.</span></li>
+<li><span class="sec">const CYAN</span> <span class="meta">line 46</span><br><span class="x">Cyan &#8212; values and figures.</span></li>
+<li><span class="sec">const GREEN</span> <span class="meta">line 48</span><br><span class="x">Green &#8212; success.</span></li>
+<li><span class="sec">const YELLOW</span> <span class="meta">line 50</span><br><span class="x">Yellow &#8212; warnings.</span></li>
+<li><span class="sec">const RED</span> <span class="meta">line 52</span><br><span class="x">Red &#8212; errors.</span></li>
+<li><span class="sec">const PURPLE</span> <span class="meta">line 54</span><br><span class="x">Purple &#8212; accents.</span></li>
+<li><span class="sec">const RESET</span> <span class="meta">line 56</span><br><span class="x">Reset to the terminal default.</span></li>
+<li><span class="sec">fn enabled</span> <span class="meta">line 59</span><br><span class="x"></span></li>
+<li><span class="sec">static ENABLED</span> <span class="meta">line 60</span><br><span class="x"></span></li>
+<li><span class="sec">fn paint</span> <span class="meta">line 73</span><br><span class="x">Wrap `text` in `colour`, or return it unchanged when colour is off.</span></li>
+<li><span class="sec">fn ok</span> <span class="meta">line 82</span><br><span class="x">A success line.</span></li>
+<li><span class="sec">fn warn</span> <span class="meta">line 87</span><br><span class="x">A warning line.</span></li>
+<li><span class="sec">fn err</span> <span class="meta">line 92</span><br><span class="x">An error line.</span></li>
+<li><span class="sec">fn heading</span> <span class="meta">line 97</span><br><span class="x">A section heading.</span></li>
+<li><span class="sec">fn field</span> <span class="meta">line 102</span><br><span class="x">A `label: value` line with the value highlighted.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 111</span><br><span class="x"></span></li>
+<li><span class="sec">fn colour_is_disabled_when_not_a_terminal</span> <span class="meta">line 117</span><br><span class="x">Tests capture stdout, so colour is off and `paint` must be a no-op &#8212; which is exactly the property that keeps escape codes out of pipes.</span></li>
+<li><span class="sec">fn helpers_include_their_text</span> <span class="meta">line 122</span><br><span class="x"></span></li>
+<li><span class="sec">fn field_shows_both_halves</span> <span class="meta">line 130</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -1859,56 +1883,64 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-crypto/src/kdf.rs</code> <span class="meta">&mdash; veilvoice-crypto, 354 lines, 47 sections</span></summary>
+<summary><code>crates/veilvoice-crypto/src/kdf.rs</code> <span class="meta">&mdash; veilvoice-crypto, 388 lines, 55 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs">open kdf.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Password-based key derivation with Argon2id. Argon2id is the memory-hard KDF recommended by RFC 9106 and the OWASP password-storage guidance; the `id` variant resists both GPU/ASIC parallelism and the side-channel exposure of pure Argon2i.</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Parameters travel *with* the ciphertext rather than being compiled in, so a file encrypted today still opens after the defaults are raised, and a user on a small machine can lower the memory cost without forking the format.</span></li>
-<li><span class="sec">struct KdfParams</span> <span class="meta">line 17</span><br><span class="x">Argon2id cost parameters.</span></li>
-<li><span class="sec">impl Default for KdfParams</span> <span class="meta">line 26</span><br><span class="x"></span></li>
-<li><span class="sec">fn default</span> <span class="meta">line 31</span><br><span class="x">RFC 9106&#x27;s &quot;first recommended&quot; profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock &#8212; strong against offline cracking while still opening a file in well under a second on</span></li>
-<li><span class="sec">fn default</span> <span class="meta">line 31</span><br><span class="x">ordinary hardware.</span></li>
-<li><span class="sec">impl KdfParams</span> <span class="meta">line 40</span><br><span class="x"></span></li>
-<li><span class="sec">fn weak_for_tests</span> <span class="meta">line 44</span><br><span class="x">A deliberately cheap profile for tests and low-memory devices. Do not use this to protect real data.</span></li>
-<li><span class="sec">const MAX_P_COST</span> <span class="meta">line 53</span><br><span class="x">Argon2&#x27;s own documented ceiling on parallelism: 2^24 - 1.</span></li>
-<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 74</span><br><span class="x">The largest memory cost this build will attempt, in KiB &#8212; 4 GiB. A ceiling is necessary because `m_cost` arrives from the file. Argon2 allocates that much memory before it does anything else, so a header claiming `u32::MAX` asks for four</span></li>
-<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 74</span><br><span class="x">*terabytes*: the allocation fails, and a failed allocation in Rust aborts the process. Merely *attempting to open* a hostile `.veil` would kill the program, and for the app lock it is worse &#8212; that file is read before anyone has</span></li>
-<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 74</span><br><span class="x">authenticated, so anything that can write it can stop VeilVoice from starting at all. 4 GiB is chosen to sit well above every parameter set anyone would deliberately pick: RFC 9106&#x27;s *first* recommended profile is 2 GiB and this crate&#x27;s</span></li>
-<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 74</span><br><span class="x">default is 256 MiB. A file declaring more than this is refused with [`Error::KdfParams`] rather than obeyed. The honest residual: a file whose declared cost is legitimate but larger than *this machine&#x27;s* memory still cannot be opened, and</span></li>
-<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 74</span><br><span class="x">that failure comes from the allocator rather than from here. A cap cannot fix a small machine; it can stop an absurd number from being taken seriously.</span></li>
-<li><span class="sec">const UNATTENDED_MAX_M_COST</span> <span class="meta">line 90</span><br><span class="x">A ceiling for a caller with nobody watching. [`MAX_M_COST`](Self::MAX_M_COST) exists to stop an *absurd* value; it is deliberately generous, so a container may still declare a legitimate but expensive cost and make itself slow to open.</span></li>
-<li><span class="sec">const UNATTENDED_MAX_M_COST</span> <span class="meta">line 90</span><br><span class="x">That is fine when a person chose to open that file and can decide to stop waiting. It is not fine for a service processing whatever arrives, which is why [`KdfParams::within`] exists and this is the value to pass it: 1 GiB is four times</span></li>
-<li><span class="sec">const UNATTENDED_MAX_M_COST</span> <span class="meta">line 90</span><br><span class="x">this crate&#x27;s default and still opens in a few seconds, while refusing a header that asks for four gigabytes of someone else&#x27;s memory. This is a *policy*, not a security boundary &#8212; the honest framing is that it bounds the cost of being</span></li>
-<li><span class="sec">const UNATTENDED_MAX_M_COST</span> <span class="meta">line 90</span><br><span class="x">handed a hostile file, not that it makes one safe.</span></li>
-<li><span class="sec">fn within</span> <span class="meta">line 102</span><br><span class="x">Check the costs against a caller-chosen memory ceiling as well as the built-in one. Opening a container whose declared cost is legitimate but large is slow by design, and that is the price of shipping the cost with the file so old files</span></li>
-<li><span class="sec">fn within</span> <span class="meta">line 102</span><br><span class="x">keep opening. A caller running without a human present &#8212; a batch job, a service, anything processing files it did not choose &#8212; can use this to decline instead of spending the memory. Pass</span></li>
-<li><span class="sec">fn within</span> <span class="meta">line 102</span><br><span class="x">[`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) unless there is a reason for something else.</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 131</span><br><span class="x">Check the costs are ones Argon2 can accept, **before** handing them to it. This is not belt-and-braces, it is a fix. `argon2` 0.5.3 validates in the wrong order: `Params::new` evaluates `m_cost &lt; p_cost * 8` before it checks `p_cost &gt;</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 131</span><br><span class="x">MAX_P_COST`, so a `p_cost` above `u32::MAX / 8` overflows the multiplication. With overflow checks on &#8212; every debug build, and any consumer of this crate as a library &#8212; that is a **panic on attacker-controlled input**, since `p_cost` is</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 131</span><br><span class="x">read verbatim from a `.veil` header or an app-lock file. Found by the campaign in `tests/parser_fuzz.rs`. VeilVoice&#x27;s own release profile disables overflow checks, where the multiplication wraps and the `MAX_P_COST` test then rejects it</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 131</span><br><span class="x">anyway &#8212; but &quot;our release profile happens to make the panic unreachable&quot; is not a property to rely on, and it is not true for anyone building against these crates. So the bound is enforced here, in the one place every derivation passes</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 131</span><br><span class="x">through, in arithmetic that cannot overflow.</span></li>
-<li><span class="sec">fn build</span> <span class="meta">line 151</span><br><span class="x">Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF.</span></li>
-<li><span class="sec">const SALT_LEN</span> <span class="meta">line 160</span><br><span class="x">Length of the salt stored in an encrypted container.</span></li>
-<li><span class="sec">const KEY_LEN</span> <span class="meta">line 162</span><br><span class="x">Length of a derived symmetric key.</span></li>
-<li><span class="sec">fn derive_key</span> <span class="meta">line 168</span><br><span class="x">Derive a 32-byte key from `password` and `salt`. The result lands directly in page-locked, zeroizing storage; it is never held in an ordinary `Vec` along the way.</span></li>
-<li><span class="sec">fn random_salt</span> <span class="meta">line 181</span><br><span class="x">Draw a fresh random salt from the OS CSPRNG.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 188</span><br><span class="x"></span></li>
-<li><span class="sec">const P</span> <span class="meta">line 191</span><br><span class="x"></span></li>
-<li><span class="sec">fn weak</span> <span class="meta">line 193</span><br><span class="x"></span></li>
-<li><span class="sec">fn derivation_is_deterministic</span> <span class="meta">line 198</span><br><span class="x"></span></li>
-<li><span class="sec">fn different_password_or_salt_diverges</span> <span class="meta">line 207</span><br><span class="x"></span></li>
-<li><span class="sec">fn cost_parameters_change_the_key</span> <span class="meta">line 217</span><br><span class="x"></span></li>
-<li><span class="sec">fn key_material_is_page_locked_storage</span> <span class="meta">line 243</span><br><span class="x"></span></li>
-<li><span class="sec">fn impossible_parameters_are_rejected_not_panicked</span> <span class="meta">line 249</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_absurd_parallelism_is_rejected_rather_than_overflowing</span> <span class="meta">line 266</span><br><span class="x">Regression for the panic the parser campaign found: `argon2` 0.5.3 computes `p_cost * 8` before checking `p_cost`&#x27;s ceiling, so a `p_cost` above `u32::MAX / 8` overflows. `p_cost` comes straight out of a `.veil` header or an app-lock file,</span></li>
-<li><span class="sec">fn an_absurd_parallelism_is_rejected_rather_than_overflowing</span> <span class="meta">line 266</span><br><span class="x">so this is attacker-controlled.</span></li>
-<li><span class="sec">fn an_absurd_memory_cost_is_rejected_rather_than_allocated</span> <span class="meta">line 291</span><br><span class="x">The other half of the same finding: `m_cost` is the number of KiB Argon2 allocates up front, so `u32::MAX` asks for 4 TiB. The allocation fails, and a failed allocation aborts the process &#8212; so simply *trying to open* a hostile file would</span></li>
-<li><span class="sec">fn an_absurd_memory_cost_is_rejected_rather_than_allocated</span> <span class="meta">line 291</span><br><span class="x">kill the program.</span></li>
-<li><span class="sec">const _</span> <span class="meta">line 318</span><br><span class="x">Checked at compile time: the ceiling must never be tightened below the largest profile RFC 9106 actually recommends, or the cap would start refusing legitimate files rather than absurd ones.</span></li>
-<li><span class="sec">fn sane_parameters_still_pass_the_check</span> <span class="meta">line 321</span><br><span class="x"></span></li>
-<li><span class="sec">fn short_salt_is_rejected</span> <span class="meta">line 342</span><br><span class="x"></span></li>
-<li><span class="sec">fn random_salts_differ</span> <span class="meta">line 350</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Parameters travel *with* the ciphertext rather than being compiled in, so a file encrypted today still opens after the defaults are raised, and a user on a small machine can lower the memory cost without forking the format. # Cost</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">parameters arrive from a file, so they are hostile input That flexibility has a sharp edge, and two shipped defects came from it. `m_cost` and `p_cost` are read verbatim from a `.veil` header -- and from the app-lock file, **which is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">parsed before anyone has authenticated**. * `argon2` 0.5.3 evaluates `m_cost &lt; p_cost * 8` *before* it checks whether `p_cost` is within range, so a large `p_cost` overflows the multiplication. With overflow checks on -- every debug build,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">and any project consuming this crate as a library -- that is a panic on attacker-controlled input (F-2). * `m_cost` is allocated before anything else happens, so a header claiming `u32::MAX` asks for **4 TiB**. The allocation fails, and a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">failed allocation aborts the process. Merely *opening* a hostile container killed the program (F-3). Both are bounded in [`KdfParams::checked`], in arithmetic that cannot overflow. **Never bypass that funnel.** It is the single place every</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">derivation passes through, and it exists because the alternative -- checks scattered across the call sites -- is how one of them gets missed. A residual is stated rather than fixed: a container may still declare a legitimate-but-expensive</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">cost, so an attacker can make opening *their* file slow. That is inherent to shipping the cost with the file, which is what lets old files open after defaults rise. Slow is not crashing, and the user chose to open that file. # Domain</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">separation The app-lock password and the recording passphrase are different secrets and are kept different: they are domain-separated in the derivation, so unlocking the application does not unseal recordings and one cannot be derived from</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the other.</span></li>
+<li><span class="sec">struct KdfParams</span> <span class="meta">line 51</span><br><span class="x">Argon2id cost parameters.</span></li>
+<li><span class="sec">impl Default for KdfParams</span> <span class="meta">line 60</span><br><span class="x"></span></li>
+<li><span class="sec">fn default</span> <span class="meta">line 65</span><br><span class="x">RFC 9106&#x27;s &quot;first recommended&quot; profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock &#8212; strong against offline cracking while still opening a file in well under a second on</span></li>
+<li><span class="sec">fn default</span> <span class="meta">line 65</span><br><span class="x">ordinary hardware.</span></li>
+<li><span class="sec">impl KdfParams</span> <span class="meta">line 74</span><br><span class="x"></span></li>
+<li><span class="sec">fn weak_for_tests</span> <span class="meta">line 78</span><br><span class="x">A deliberately cheap profile for tests and low-memory devices. Do not use this to protect real data.</span></li>
+<li><span class="sec">const MAX_P_COST</span> <span class="meta">line 87</span><br><span class="x">Argon2&#x27;s own documented ceiling on parallelism: 2^24 - 1.</span></li>
+<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 108</span><br><span class="x">The largest memory cost this build will attempt, in KiB &#8212; 4 GiB. A ceiling is necessary because `m_cost` arrives from the file. Argon2 allocates that much memory before it does anything else, so a header claiming `u32::MAX` asks for four</span></li>
+<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 108</span><br><span class="x">*terabytes*: the allocation fails, and a failed allocation in Rust aborts the process. Merely *attempting to open* a hostile `.veil` would kill the program, and for the app lock it is worse &#8212; that file is read before anyone has</span></li>
+<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 108</span><br><span class="x">authenticated, so anything that can write it can stop VeilVoice from starting at all. 4 GiB is chosen to sit well above every parameter set anyone would deliberately pick: RFC 9106&#x27;s *first* recommended profile is 2 GiB and this crate&#x27;s</span></li>
+<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 108</span><br><span class="x">default is 256 MiB. A file declaring more than this is refused with [`Error::KdfParams`] rather than obeyed. The honest residual: a file whose declared cost is legitimate but larger than *this machine&#x27;s* memory still cannot be opened, and</span></li>
+<li><span class="sec">const MAX_M_COST</span> <span class="meta">line 108</span><br><span class="x">that failure comes from the allocator rather than from here. A cap cannot fix a small machine; it can stop an absurd number from being taken seriously.</span></li>
+<li><span class="sec">const UNATTENDED_MAX_M_COST</span> <span class="meta">line 124</span><br><span class="x">A ceiling for a caller with nobody watching. [`MAX_M_COST`](Self::MAX_M_COST) exists to stop an *absurd* value; it is deliberately generous, so a container may still declare a legitimate but expensive cost and make itself slow to open.</span></li>
+<li><span class="sec">const UNATTENDED_MAX_M_COST</span> <span class="meta">line 124</span><br><span class="x">That is fine when a person chose to open that file and can decide to stop waiting. It is not fine for a service processing whatever arrives, which is why [`KdfParams::within`] exists and this is the value to pass it: 1 GiB is four times</span></li>
+<li><span class="sec">const UNATTENDED_MAX_M_COST</span> <span class="meta">line 124</span><br><span class="x">this crate&#x27;s default and still opens in a few seconds, while refusing a header that asks for four gigabytes of someone else&#x27;s memory. This is a *policy*, not a security boundary &#8212; the honest framing is that it bounds the cost of being</span></li>
+<li><span class="sec">const UNATTENDED_MAX_M_COST</span> <span class="meta">line 124</span><br><span class="x">handed a hostile file, not that it makes one safe.</span></li>
+<li><span class="sec">fn within</span> <span class="meta">line 136</span><br><span class="x">Check the costs against a caller-chosen memory ceiling as well as the built-in one. Opening a container whose declared cost is legitimate but large is slow by design, and that is the price of shipping the cost with the file so old files</span></li>
+<li><span class="sec">fn within</span> <span class="meta">line 136</span><br><span class="x">keep opening. A caller running without a human present &#8212; a batch job, a service, anything processing files it did not choose &#8212; can use this to decline instead of spending the memory. Pass</span></li>
+<li><span class="sec">fn within</span> <span class="meta">line 136</span><br><span class="x">[`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) unless there is a reason for something else.</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 165</span><br><span class="x">Check the costs are ones Argon2 can accept, **before** handing them to it. This is not belt-and-braces, it is a fix. `argon2` 0.5.3 validates in the wrong order: `Params::new` evaluates `m_cost &lt; p_cost * 8` before it checks `p_cost &gt;</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 165</span><br><span class="x">MAX_P_COST`, so a `p_cost` above `u32::MAX / 8` overflows the multiplication. With overflow checks on &#8212; every debug build, and any consumer of this crate as a library &#8212; that is a **panic on attacker-controlled input**, since `p_cost` is</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 165</span><br><span class="x">read verbatim from a `.veil` header or an app-lock file. Found by the campaign in `tests/parser_fuzz.rs`. VeilVoice&#x27;s own release profile disables overflow checks, where the multiplication wraps and the `MAX_P_COST` test then rejects it</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 165</span><br><span class="x">anyway &#8212; but &quot;our release profile happens to make the panic unreachable&quot; is not a property to rely on, and it is not true for anyone building against these crates. So the bound is enforced here, in the one place every derivation passes</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 165</span><br><span class="x">through, in arithmetic that cannot overflow.</span></li>
+<li><span class="sec">fn build</span> <span class="meta">line 185</span><br><span class="x">Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF.</span></li>
+<li><span class="sec">const SALT_LEN</span> <span class="meta">line 194</span><br><span class="x">Length of the salt stored in an encrypted container.</span></li>
+<li><span class="sec">const KEY_LEN</span> <span class="meta">line 196</span><br><span class="x">Length of a derived symmetric key.</span></li>
+<li><span class="sec">fn derive_key</span> <span class="meta">line 202</span><br><span class="x">Derive a 32-byte key from `password` and `salt`. The result lands directly in page-locked, zeroizing storage; it is never held in an ordinary `Vec` along the way.</span></li>
+<li><span class="sec">fn random_salt</span> <span class="meta">line 215</span><br><span class="x">Draw a fresh random salt from the OS CSPRNG.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 222</span><br><span class="x"></span></li>
+<li><span class="sec">const P</span> <span class="meta">line 225</span><br><span class="x"></span></li>
+<li><span class="sec">fn weak</span> <span class="meta">line 227</span><br><span class="x"></span></li>
+<li><span class="sec">fn derivation_is_deterministic</span> <span class="meta">line 232</span><br><span class="x"></span></li>
+<li><span class="sec">fn different_password_or_salt_diverges</span> <span class="meta">line 241</span><br><span class="x"></span></li>
+<li><span class="sec">fn cost_parameters_change_the_key</span> <span class="meta">line 251</span><br><span class="x"></span></li>
+<li><span class="sec">fn key_material_is_page_locked_storage</span> <span class="meta">line 277</span><br><span class="x"></span></li>
+<li><span class="sec">fn impossible_parameters_are_rejected_not_panicked</span> <span class="meta">line 283</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_absurd_parallelism_is_rejected_rather_than_overflowing</span> <span class="meta">line 300</span><br><span class="x">Regression for the panic the parser campaign found: `argon2` 0.5.3 computes `p_cost * 8` before checking `p_cost`&#x27;s ceiling, so a `p_cost` above `u32::MAX / 8` overflows. `p_cost` comes straight out of a `.veil` header or an app-lock file,</span></li>
+<li><span class="sec">fn an_absurd_parallelism_is_rejected_rather_than_overflowing</span> <span class="meta">line 300</span><br><span class="x">so this is attacker-controlled.</span></li>
+<li><span class="sec">fn an_absurd_memory_cost_is_rejected_rather_than_allocated</span> <span class="meta">line 325</span><br><span class="x">The other half of the same finding: `m_cost` is the number of KiB Argon2 allocates up front, so `u32::MAX` asks for 4 TiB. The allocation fails, and a failed allocation aborts the process &#8212; so simply *trying to open* a hostile file would</span></li>
+<li><span class="sec">fn an_absurd_memory_cost_is_rejected_rather_than_allocated</span> <span class="meta">line 325</span><br><span class="x">kill the program.</span></li>
+<li><span class="sec">const _</span> <span class="meta">line 352</span><br><span class="x">Checked at compile time: the ceiling must never be tightened below the largest profile RFC 9106 actually recommends, or the cap would start refusing legitimate files rather than absurd ones.</span></li>
+<li><span class="sec">fn sane_parameters_still_pass_the_check</span> <span class="meta">line 355</span><br><span class="x"></span></li>
+<li><span class="sec">fn short_salt_is_rejected</span> <span class="meta">line 376</span><br><span class="x"></span></li>
+<li><span class="sec">fn random_salts_differ</span> <span class="meta">line 384</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -2206,25 +2238,26 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/app.rs</code> <span class="meta">&mdash; veilvoice-gui, 1063 lines, 56 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/app.rs</code> <span class="meta">&mdash; veilvoice-gui, 1063 lines, 57 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs">open app.rs</a></p>
 <ul>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The VeilVoice desktop application. One window, six tabs, no menus and no settings file to hunt for. This file owns the window: the tab strip, the state behind it, and the rules about what the user is allowed to do before they have answered</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the questions that matter. The tabs themselves live partly here and partly in siblings -- [`crate::security`] draws the lock tab and the unlock screen, [`crate::prefs`] draws settings. # The six tabs, and why these six | Tab | What it is |</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">|---|---| | **anonymise file** | Process a recording on disk. The default path. | | **live scramble** | Scramble a microphone in real time into a virtual cable. | | **monitor** | Which applications currently hold the microphone and camera.</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">| | **lock** | The app lock, and a plain statement of what it is worth. | | **settings** | Colour scheme, animation, and where those choices are kept. | | **about** | Versions, licence, and the honest scope. | There is no &quot;advanced&quot; tab</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">and no hidden pane. Everything the program can do is reachable in one click from the strip, because a privacy tool whose important controls are buried is a privacy tool whose important controls do not get used. # Nothing slow runs on the</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">UI thread [`VeilVoiceApp::start_job`] spawns a worker and hands back an [`std::sync::mpsc`] receiver; [`VeilVoiceApp::poll_job`] drains it with `try_recv` once per frame. The window keeps painting while a job runs. That split is not</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">tidiness. A long recording takes real time to process, and sealing it runs Argon2id at 256 MiB, which is **deliberately** slow -- that is the whole point of a memory-hard KDF. Doing either on the UI thread means a frozen window and an</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">operating system offering to kill the application, in the middle of the operation the user cares most about completing. `poll_job` handles all three channel outcomes, including `Disconnected` -- a worker that panicked. The user is told the</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">thread stopped rather than watching a progress state that will never finish. # The at-rest choice is enforced here, not merely offered Recordings are encrypted at rest by default (locked decision 4.10), and a job **cannot start** until the</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">user has answered the modal that appears if they try to turn that off. The rule is asserted by a test in this file rather than left as a property of the layout code, because &quot;the button was disabled&quot; is a claim about pixels and &quot;the job</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">refuses to start&quot; is a claim about behaviour. The worker encodes the WAV **in memory** and seals it before anything is written, so a recording that is going to be encrypted never touches the disk in the clear -- not even briefly, not even</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">in a temporary file that would be deleted afterwards. Deleting a file does not remove its contents from a flash device; not writing it does. # The monitor indicator [`VeilVoiceApp::watch_indicator`] shows, in the header, whether anything</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">is holding the microphone or camera right now, and clicking it goes to the monitor tab. It is polled on a timer rather than watched continuously, because the underlying platform code enumerates processes and doing that every frame would</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">cost more than the rest of the window put together. What it reports is bounded by what the platform allows, and `veilvoice_watch::support()` states that bound rather than letting an empty list imply an empty machine. The indicator must</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">never present &quot;we could not see&quot; as &quot;nothing is there&quot;. # Where the honest limits are stated The about tab carries the scope text, and the lock tab carries `veilvoice_crypto::lock::SCOPE`. Neither is decoration: tests fail the build if</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that wording is softened, because a user who over-trusts the app lock is left worse off than one who never had it. If you are editing text in this file and a test starts failing, it is that rule, and it is working.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The VeilVoice desktop application: six tabs, one window, no menus. One window, six tabs, no menus and no settings file to hunt for. This file owns the window: the tab strip, the state behind it, and the rules about what the user is allowed</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">to do before they have answered the questions that matter. The tabs themselves live partly here and partly in siblings -- [`crate::security`] draws the lock tab and the unlock screen, [`crate::prefs`] draws settings. # The six tabs, and</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">why these six | Tab | What it is | |---|---| | **anonymise file** | Process a recording on disk. The default path. | | **live scramble** | Scramble a microphone in real time into a virtual cable. | | **monitor** | Which applications</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">currently hold the microphone and camera. | | **lock** | The app lock, and a plain statement of what it is worth. | | **settings** | Colour scheme, animation, and where those choices are kept. | | **about** | Versions, licence, and the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">honest scope. | There is no &quot;advanced&quot; tab and no hidden pane. Everything the program can do is reachable in one click from the strip, because a privacy tool whose important controls are buried is a privacy tool whose important controls do</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">not get used. # Nothing slow runs on the UI thread [`VeilVoiceApp::start_job`] spawns a worker and hands back an [`std::sync::mpsc`] receiver; [`VeilVoiceApp::poll_job`] drains it with `try_recv` once per frame. The window keeps painting</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">while a job runs. That split is not tidiness. A long recording takes real time to process, and sealing it runs Argon2id at 256 MiB, which is **deliberately** slow -- that is the whole point of a memory-hard KDF. Doing either on the UI</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">thread means a frozen window and an operating system offering to kill the application, in the middle of the operation the user cares most about completing. `poll_job` handles all three channel outcomes, including `Disconnected` -- a worker</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that panicked. The user is told the thread stopped rather than watching a progress state that will never finish. # The at-rest choice is enforced here, not merely offered Recordings are encrypted at rest by default (locked decision 4.10),</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">and a job **cannot start** until the user has answered the modal that appears if they try to turn that off. The rule is asserted by a test in this file rather than left as a property of the layout code, because &quot;the button was disabled&quot; is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">a claim about pixels and &quot;the job refuses to start&quot; is a claim about behaviour. The worker encodes the WAV **in memory** and seals it before anything is written, so a recording that is going to be encrypted never touches the disk in the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">clear -- not even briefly, not even in a temporary file that would be deleted afterwards. Deleting a file does not remove its contents from a flash device; not writing it does. # The monitor indicator [`VeilVoiceApp::watch_indicator`]</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">shows, in the header, whether anything is holding the microphone or camera right now, and clicking it goes to the monitor tab. It is polled on a timer rather than watched continuously, because the underlying platform code enumerates</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">processes and doing that every frame would cost more than the rest of the window put together. What it reports is bounded by what the platform allows, and `veilvoice_watch::support()` states that bound rather than letting an empty list</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">imply an empty machine. The indicator must never present &quot;we could not see&quot; as &quot;nothing is there&quot;. # Where the honest limits are stated The about tab carries the scope text, and the lock tab carries `veilvoice_crypto::lock::SCOPE`. Neither</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">is decoration: tests fail the build if that wording is softened, because a user who over-trusts the app lock is left worse off than one who never had it. If you are editing text in this file and a test starts failing, it is that rule, and</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">it is working.</span></li>
 <li><span class="sec">enum Tab</span> <span class="meta">line 90</span><br><span class="x">The things VeilVoice does.</span></li>
 <li><span class="sec">enum JobDone</span> <span class="meta">line 106</span><br><span class="x">Result of a background file job.</span></li>
 <li><span class="sec">struct VeilVoiceApp</span> <span class="meta">line 117</span><br><span class="x">Application state.</span></li>
@@ -2268,19 +2301,25 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/lib.rs</code> <span class="meta">&mdash; veilvoice-gui, 26 lines, 10 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/lib.rs</code> <span class="meta">&mdash; veilvoice-gui, 57 lines, 16 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs">open lib.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x"># veilvoice-gui The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that states the honest scope. The binary lives in `main.rs`; this library exists so the UI logic can be unit tested without opening a window.</span></li>
-<li><span class="sec">mod app</span> <span class="meta">line 14</span><br><span class="x"></span></li>
-<li><span class="sec">mod prefs</span> <span class="meta">line 15</span><br><span class="x"></span></li>
-<li><span class="sec">mod reduced_motion</span> <span class="meta">line 16</span><br><span class="x"></span></li>
-<li><span class="sec">mod security</span> <span class="meta">line 17</span><br><span class="x"></span></li>
-<li><span class="sec">mod settings</span> <span class="meta">line 18</span><br><span class="x"></span></li>
-<li><span class="sec">mod soundbar</span> <span class="meta">line 19</span><br><span class="x"></span></li>
-<li><span class="sec">mod theme</span> <span class="meta">line 20</span><br><span class="x"></span></li>
-<li><span class="sec">const VERSION</span> <span class="meta">line 25</span><br><span class="x">Crate version string, surfaced in the About panel.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that states the honest scope. The binary lives in `main.rs`; this library exists so the UI logic can be unit tested without opening a window. That split is worth stating plainly, because it is the reason this crate has tests at all: a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">binary crate cannot be unit tested, so everything with logic in it -- the app lock&#x27;s state machine, preference loading, palette resolution, the reduced-motion decision -- lives here where a test can reach it without a display server.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`main.rs` holds only what genuinely needs a window. # The modules | Module | What it owns | |---|---| | [`security`] | The unlock screen, the lock tab, and the at-rest controls | | [`prefs`] | Preferences, and recovering from a corrupt</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">preferences file | | [`settings`] | The settings tab | | [`theme`] | The palette, shared with the command-line front end | | [`soundbar`] | The animated level meter | | [`reduced_motion`] | Whether to animate at all | # Two rules this</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">crate keeps **The user interface never softens a scope note.** Where a control has a bound -- the app lock is a verifier and not disk encryption, tamper detection detects rather than prevents -- the interface says so next to the control,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">and tests fail the build if that text changes. Documentation nobody opens does not protect anybody. **Animation is a preference that is honoured, not a decoration.** [`reduced_motion`] resolves the platform&#x27;s own setting alongside the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">user&#x27;s explicit choice, and the whole interface reads that answer rather than each widget deciding for itself.</span></li>
+<li><span class="sec">mod app</span> <span class="meta">line 45</span><br><span class="x"></span></li>
+<li><span class="sec">mod prefs</span> <span class="meta">line 46</span><br><span class="x"></span></li>
+<li><span class="sec">mod reduced_motion</span> <span class="meta">line 47</span><br><span class="x"></span></li>
+<li><span class="sec">mod security</span> <span class="meta">line 48</span><br><span class="x"></span></li>
+<li><span class="sec">mod settings</span> <span class="meta">line 49</span><br><span class="x"></span></li>
+<li><span class="sec">mod soundbar</span> <span class="meta">line 50</span><br><span class="x"></span></li>
+<li><span class="sec">mod theme</span> <span class="meta">line 51</span><br><span class="x"></span></li>
+<li><span class="sec">const VERSION</span> <span class="meta">line 56</span><br><span class="x">Crate version string, surfaced in the About panel.</span></li>
 </ul>
 </details>
 <details open>
@@ -2561,25 +2600,30 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-meta/src/audio.rs</code> <span class="meta">&mdash; veilvoice-meta, 241 lines, 16 sections</span></summary>
+<summary><code>crates/veilvoice-meta/src/audio.rs</code> <span class="meta">&mdash; veilvoice-meta, 269 lines, 21 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs">open audio.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Audio tag removal and replacement. Tags are handled through `lofty`, which understands ID3v1/ID3v2, Vorbis comments, MP4 atoms and APE, so one code path covers every format VeilVoice imports. Only the tag blocks are rewritten &#8212; the audio</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">stream is never re-encoded, so cleaning a file is lossless.</span></li>
-<li><span class="sec">fn read_head</span> <span class="meta">line 19</span><br><span class="x">Read just enough of a file to identify its container.</span></li>
-<li><span class="sec">const REALISTIC</span> <span class="meta">line 33</span><br><span class="x">Tags written in [`Policy::Realistic`] mode. Deliberately bland: the point is a file that looks ordinary, not one that tells a story. Nothing here names a device, a person, a place or a date, and the encoder string is one of the most common</span></li>
-<li><span class="sec">const REALISTIC</span> <span class="meta">line 33</span><br><span class="x">in the world, so it blends in rather than fingerprinting VeilVoice itself.</span></li>
-<li><span class="sec">fn clean_audio_file</span> <span class="meta">line 43</span><br><span class="x">Strip or replace the tags of an audio file, in place. The file is rewritten only if something actually changed.</span></li>
-<li><span class="sec">fn clean_audio_tags</span> <span class="meta">line 96</span><br><span class="x">Report which tag blocks a file carries, without modifying it. Useful for showing the user what is about to be removed, and for verifying afterwards that nothing was left behind.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 115</span><br><span class="x"></span></li>
-<li><span class="sec">fn tagged_wav</span> <span class="meta">line 120</span><br><span class="x">A tiny but valid WAV, then tagged with something identifying.</span></li>
-<li><span class="sec">fn audio_bytes</span> <span class="meta">line 147</span><br><span class="x"></span></li>
-<li><span class="sec">fn strip_removes_every_tag</span> <span class="meta">line 156</span><br><span class="x"></span></li>
-<li><span class="sec">fn identifying_strings_are_gone_from_the_bytes</span> <span class="meta">line 173</span><br><span class="x"></span></li>
-<li><span class="sec">fn audio_samples_are_untouched</span> <span class="meta">line 193</span><br><span class="x"></span></li>
-<li><span class="sec">fn realistic_leaves_plausible_tags_not_real_ones</span> <span class="meta">line 202</span><br><span class="x"></span></li>
-<li><span class="sec">fn cleaning_twice_is_stable</span> <span class="meta">line 220</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_non_media_file_is_rejected_cleanly</span> <span class="meta">line 234</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">stream is never re-encoded, so cleaning a file is lossless. # What tags give away Far more than a title. Recording software writes its own name and version; phones write a device model; some encoders write a timestamp, and a few write a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">serial number or a user name taken from the account that made the file. None of that is audible, all of it survives de-identification untouched, and any of it can identify a speaker whose *voice* no longer does. Stripping the voiceprint</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">and leaving the tags would be a complete failure wearing the appearance of success, which is why this crate exists and why the CLI cleans by default. # Removal, or plausible replacement [`crate::Policy`] chooses between deleting tags</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">outright and writing bland ones. Both are legitimate: an empty tag block is itself a signal that a file has been processed, and in some situations looking ordinary matters more than being empty. # The gap `lofty` cannot close `lofty`</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">understands ID3v1/ID3v2, Vorbis comments, MP4 atoms and APE through one interface -- but **it cannot remove an ID3v2 block from a WAV file**. A WAV is a RIFF container and an ID3 chunk inside one is a chunk, not a tag, so the tag library</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">does not see it. That is what [`crate::wav`] is for: a chunk-level cleaner that walks the RIFF structure directly. Without it, cleaning a WAV reported success and left the identifying block in place.</span></li>
+<li><span class="sec">fn read_head</span> <span class="meta">line 47</span><br><span class="x">Read just enough of a file to identify its container.</span></li>
+<li><span class="sec">const REALISTIC</span> <span class="meta">line 61</span><br><span class="x">Tags written in [`Policy::Realistic`] mode. Deliberately bland: the point is a file that looks ordinary, not one that tells a story. Nothing here names a device, a person, a place or a date, and the encoder string is one of the most common</span></li>
+<li><span class="sec">const REALISTIC</span> <span class="meta">line 61</span><br><span class="x">in the world, so it blends in rather than fingerprinting VeilVoice itself.</span></li>
+<li><span class="sec">fn clean_audio_file</span> <span class="meta">line 71</span><br><span class="x">Strip or replace the tags of an audio file, in place. The file is rewritten only if something actually changed.</span></li>
+<li><span class="sec">fn clean_audio_tags</span> <span class="meta">line 124</span><br><span class="x">Report which tag blocks a file carries, without modifying it. Useful for showing the user what is about to be removed, and for verifying afterwards that nothing was left behind.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 143</span><br><span class="x"></span></li>
+<li><span class="sec">fn tagged_wav</span> <span class="meta">line 148</span><br><span class="x">A tiny but valid WAV, then tagged with something identifying.</span></li>
+<li><span class="sec">fn audio_bytes</span> <span class="meta">line 175</span><br><span class="x"></span></li>
+<li><span class="sec">fn strip_removes_every_tag</span> <span class="meta">line 184</span><br><span class="x"></span></li>
+<li><span class="sec">fn identifying_strings_are_gone_from_the_bytes</span> <span class="meta">line 201</span><br><span class="x"></span></li>
+<li><span class="sec">fn audio_samples_are_untouched</span> <span class="meta">line 221</span><br><span class="x"></span></li>
+<li><span class="sec">fn realistic_leaves_plausible_tags_not_real_ones</span> <span class="meta">line 230</span><br><span class="x"></span></li>
+<li><span class="sec">fn cleaning_twice_is_stable</span> <span class="meta">line 248</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_non_media_file_is_rejected_cleanly</span> <span class="meta">line 262</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -2698,22 +2742,26 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-verify/src/tests.rs</code> <span class="meta">&mdash; veilvoice-verify, 132 lines, 13 sections</span></summary>
+<summary><code>crates/veilvoice-verify/src/tests.rs</code> <span class="meta">&mdash; veilvoice-verify, 139 lines, 17 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs">open tests.rs</a></p>
 <ul>
-<li><span class="sec">fn the_embedded_key_parses_and_is_the_expected_one</span> <span class="meta">line 12</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_embedded_key_carries_no_email_address</span> <span class="meta">line 18</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_fingerprint_constant_is_written_out_not_computed</span> <span class="meta">line 33</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_hash_is_found_by_its_file_name</span> <span class="meta">line 46</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_binary_mode_star_is_not_part_of_the_name</span> <span class="meta">line 58</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_file_that_is_not_listed_is_not_found</span> <span class="meta">line 70</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_name_that_merely_contains_the_wanted_one_does_not_match</span> <span class="meta">line 76</span><br><span class="x"></span></li>
-<li><span class="sec">fn blank_and_comment_lines_are_skipped</span> <span class="meta">line 83</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_malformed_line_is_skipped_rather_than_panicking</span> <span class="meta">line 92</span><br><span class="x"></span></li>
-<li><span class="sec">fn digests_compare_case_insensitively_and_ignore_surrounding_space</span> <span class="meta">line 103</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_signature_that_is_not_openpgp_is_refused</span> <span class="meta">line 112</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_empty_signature_is_refused</span> <span class="meta">line 119</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_armoured_block_that_is_not_a_signature_is_refused</span> <span class="meta">line 125</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The verifier&#x27;s own tests. The property that matters most here is not &quot;a good signature is accepted&quot; but **&quot;a bad one is refused&quot;**. A verifier that accepts everything passes every happy-path test ever written, and would ship looking</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">perfect while doing the opposite of its job -- so most of what follows is negative: corrupted signatures, wrong keys, truncated input, mismatched hashes. This file is `//!`-documented rather than `//`-commented so that the reasoning above</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">appears in the generated documentation. A reader deciding whether to trust `veilvoice-verify` should be able to see what it was tested *against* without cloning the repository, because the whole purpose of that binary is to be the thing</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">you check a download with.</span></li>
+<li><span class="sec">fn the_embedded_key_parses_and_is_the_expected_one</span> <span class="meta">line 19</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_embedded_key_carries_no_email_address</span> <span class="meta">line 25</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_fingerprint_constant_is_written_out_not_computed</span> <span class="meta">line 40</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_hash_is_found_by_its_file_name</span> <span class="meta">line 53</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_binary_mode_star_is_not_part_of_the_name</span> <span class="meta">line 65</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_file_that_is_not_listed_is_not_found</span> <span class="meta">line 77</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_name_that_merely_contains_the_wanted_one_does_not_match</span> <span class="meta">line 83</span><br><span class="x"></span></li>
+<li><span class="sec">fn blank_and_comment_lines_are_skipped</span> <span class="meta">line 90</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_malformed_line_is_skipped_rather_than_panicking</span> <span class="meta">line 99</span><br><span class="x"></span></li>
+<li><span class="sec">fn digests_compare_case_insensitively_and_ignore_surrounding_space</span> <span class="meta">line 110</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_signature_that_is_not_openpgp_is_refused</span> <span class="meta">line 119</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_empty_signature_is_refused</span> <span class="meta">line 126</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_armoured_block_that_is_not_a_signature_is_refused</span> <span class="meta">line 132</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>

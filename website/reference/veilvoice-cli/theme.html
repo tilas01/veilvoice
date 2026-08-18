@@ -39,9 +39,11 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/theme.svg" alt="theme.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/theme.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 115 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 135 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#why-a-command-line-tool-has-a-palette-at-all">Why a command-line tool has a palette at all</a>
+  <a href="#colour-is-suppressed-rather-than-assumed">Colour is suppressed rather than assumed</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -49,6 +51,11 @@
 <section id="s-about">
 <p>Tokyo Night colouring for the terminal.</p>
 <p>The same palette the GUI uses, so the two halves of VeilVoice look like one program. Colour is suppressed when the output is not a terminal, when <code>NO_COLOR</code> is set (the widely-honoured convention), or when <code>TERM=dumb</code>, so piping to a file or a log never produces escape-code soup.</p>
+<h2 id="why-a-command-line-tool-has-a-palette-at-all">Why a command-line tool has a palette at all</h2>
+<p>Because the two front-ends are one program. Somebody who uses the desktop application and then runs the binary over SSH should recognise what they are looking at, and the colours carry meaning consistently in both: green for a result, amber for a caveat, red for a refusal, muted for the scope notes that qualify a claim.</p>
+<h2 id="colour-is-suppressed-rather-than-assumed">Colour is suppressed rather than assumed</h2>
+<p>Three independent conditions turn it off, and all three are checked: output that is not a terminal, <code>NO_COLOR</code> set to anything at all (the widely-honoured convention), and <code>TERM=dumb</code>. The check runs once through a [<code>std::sync::OnceLock</code>] rather than per call, because this is used inside loops that print a line per file.</p>
+<p>Escape sequences in a log file are worse than no colour: they survive into bug reports, pasted output and issue trackers, where they are noise that obscures the message somebody was trying to show you.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -107,14 +114,14 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>colour</code> <sub>pub mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L20" rel="noopener noreferrer">20</a></td><td>Tokyo Night, as 24-bit foreground escape sequences.</td></tr>
-<tr><td><code>enabled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L39" rel="noopener noreferrer">39</a></td><td></td></tr>
-<tr><td><code>paint</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L53" rel="noopener noreferrer">53</a></td><td>Wrap text in colour, or return it unchanged when colour is off.</td></tr>
-<tr><td><code>ok</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L62" rel="noopener noreferrer">62</a></td><td>A success line.</td></tr>
-<tr><td><code>warn</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L67" rel="noopener noreferrer">67</a></td><td>A warning line.</td></tr>
-<tr><td><code>err</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L72" rel="noopener noreferrer">72</a></td><td>An error line.</td></tr>
-<tr><td><code>heading</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L77" rel="noopener noreferrer">77</a></td><td>A section heading.</td></tr>
-<tr><td><code>field</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82" rel="noopener noreferrer">82</a></td><td>A label: value line with the value highlighted.</td></tr>
+<tr><td><code>colour</code> <sub>pub mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L40" rel="noopener noreferrer">40</a></td><td>Tokyo Night, as 24-bit foreground escape sequences.</td></tr>
+<tr><td><code>enabled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L59" rel="noopener noreferrer">59</a></td><td></td></tr>
+<tr><td><code>paint</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L73" rel="noopener noreferrer">73</a></td><td>Wrap text in colour, or return it unchanged when colour is off.</td></tr>
+<tr><td><code>ok</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82" rel="noopener noreferrer">82</a></td><td>A success line.</td></tr>
+<tr><td><code>warn</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L87" rel="noopener noreferrer">87</a></td><td>A warning line.</td></tr>
+<tr><td><code>err</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L92" rel="noopener noreferrer">92</a></td><td>An error line.</td></tr>
+<tr><td><code>heading</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L97" rel="noopener noreferrer">97</a></td><td>A section heading.</td></tr>
+<tr><td><code>field</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L102" rel="noopener noreferrer">102</a></td><td>A label: value line with the value highlighted.</td></tr>
 </tbody></table>
 </section>
 </div></div>

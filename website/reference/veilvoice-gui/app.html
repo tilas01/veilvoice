@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-gui/src/app.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="The VeilVoice desktop application.">
+<meta name="description" content="The VeilVoice desktop application: six tabs, one window, no menus.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -52,7 +52,7 @@
 </nav>
 <div>
 <section id="s-about">
-<p>The VeilVoice desktop application.</p>
+<p>The VeilVoice desktop application: six tabs, one window, no menus.</p>
 <p>One window, six tabs, no menus and no settings file to hunt for. This file owns the window: the tab strip, the state behind it, and the rules about what the user is allowed to do before they have answered the questions that matter. The tabs themselves live partly here and partly in siblings -- [<code>crate::security</code>] draws the lock tab and the unlock screen, [<code>crate::prefs</code>] draws settings.</p>
 <h2 id="the-six-tabs-and-why-these-six">The six tabs, and why these six</h2>
 <p>| Tab | What it is | |---|---| | <strong>anonymise file</strong> | Process a recording on disk. The default path. | | <strong>live scramble</strong> | Scramble a microphone in real time into a virtual cable. | | <strong>monitor</strong> | Which applications currently hold the microphone and camera. | | <strong>lock</strong> | The app lock, and a plain statement of what it is worth. | | <strong>settings</strong> | Colour scheme, animation, and where those choices are kept. | | <strong>about</strong> | Versions, licence, and the honest scope. |</p>

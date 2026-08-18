@@ -4,6 +4,46 @@
 //! Everything VeilVoice does, available without a desktop: it runs over SSH, in
 //! a container, and on machines that have no GUI toolkit at all. The same
 //! engine backs both this and the graphical app.
+//!
+//! # What is here
+//!
+//! Fourteen subcommands, and they divide into four groups:
+//!
+//! * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
+//!   `devices`.
+//! * **Privacy of the files themselves** -- `clean` metadata, `encrypt`,
+//!   `decrypt`, `keygen`, `shred`.
+//! * **Watching the machine** -- `watch` the microphone and camera, `guard`
+//!   VeilVoice's own files against tampering.
+//! * **The app lock** -- `lock set|status|change|remove`.
+//!
+//! # Two behaviours that surprise people, on purpose
+//!
+//! **`anonymise` writes `<out>.veil`, not a bare WAV.** Recordings are
+//! encrypted at rest by default. `--encrypt=false` opts out and requires
+//! `--yes`, because an unsealed recording is the thing somebody later wishes
+//! they had not produced. The wiki explains where the WAV went.
+//!
+//! **The front-ends refuse rather than downgrade.** Asked to encrypt with
+//! nothing to encrypt with, this exits with an error instead of writing plain
+//! audio and mentioning it. Quiet degradation to a weaker posture is the defect
+//! class this project has found in itself most often.
+//!
+//! # Passphrase prompts cannot be piped
+//!
+//! `rpassword` needs a real console; piping a passphrase in blocks on
+//! `CONIN$` rather than reading it. That is a property of terminal input, not a
+//! bug here, and it means anything that prompts cannot be smoke-tested from a
+//! non-interactive shell. The layer *beneath* each prompt is therefore tested
+//! instead -- see [`crate::atrest`] and [`crate::lock`], where the logic lives
+//! precisely so it can be reached without a terminal.
+//!
+//! # A clap ordering rule worth knowing
+//!
+//! An argument declared beside `#[command(subcommand)]` must precede the
+//! subcommand on the command line unless it is marked `global = true`. So
+//! `veilvoice lock --path X status` parses and `veilvoice lock status --path X`
+//! does not, except that `--path` is now global specifically so both do.
 #![forbid(unsafe_code)]
 
 mod atrest;
