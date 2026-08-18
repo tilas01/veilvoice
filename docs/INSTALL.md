@@ -1,0 +1,273 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+
+# Installing VeilVoice
+
+There are three ways to get VeilVoice, and they differ in who is doing the
+checking rather than in what you end up with.
+
+| | You run | The checking is done by |
+|---|---|---|
+| [By hand](#1-by-hand) | four commands | **you**, and you can see each one |
+| [With the install script](#2-with-the-install-script) | one command | the script, which refuses if anything fails |
+| [From source](#3-from-source) | `cargo build` | the compiler, plus whatever you read |
+
+The by-hand route is first on purpose. The install script does exactly what it
+describes and nothing else, but "run this script and trust it" is a strange
+thing to ask on behalf of a tool whose entire argument is that you should not
+have to trust anybody. If you only ever read one section here, read that one.
+
+**Status of this document.** The install scripts have been written and tested
+end to end on Windows against the real published v0.1.8 release, and the
+verification chain has been checked by hand on the same release. They have
+**not** yet been run by anyone other than the author, nor on a machine that did
+not build them. Until that has happened they should be treated as working but
+unproven — see [What is not finished](#what-is-not-finished).
+
+---
+
+## The fingerprint
+
+Everything below rests on one value:
+
+```
+8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A
+```
+
+That is the OpenPGP key VeilVoice releases are signed with. It is published in
+[`README.md`](../README.md), on
+[the website](https://tilas01.github.io/veilvoice/), in the wiki, and in every
+release's notes, and it is **hardcoded in the install scripts** rather than
+fetched — a fingerprint you download alongside the thing it is meant to
+authenticate is not a check, it is a formality.
+
+The key's user ID is exactly `tilas01`, with no e-mail address attached.
+
+If the fingerprint you see anywhere disagrees with the one above, stop.
+
+---
+
+## 1. By hand
+
+Four commands, on any platform with GnuPG and a SHA-256 tool. Replace
+`v0.1.9` and the archive name with the release and build you want; the
+[releases page](https://github.com/tilas01/veilvoice/releases) lists them.
+
+```bash
+# 1. Get the key, and check its fingerprint against the value above.
+curl -fsSLO https://tilas01.github.io/veilvoice/assets/veilvoice-signing-key.asc
+gpg --import veilvoice-signing-key.asc
+gpg --fingerprint tilas01
+```
+
+Compare what that prints against the fingerprint above, **character by
+character**. This is the only step that anchors any of the others, and it is
+the one step nothing can do for you.
+
+```bash
+# 2. Get the release, the hash list, and the signature over it.
+V=v0.1.9
+B=https://github.com/tilas01/veilvoice/releases/download/$V
+curl -fsSLO $B/veilvoice-$V-linux-x86_64.tar.gz
+curl -fsSLO $B/SHA256SUMS
+curl -fsSLO $B/SHA256SUMS.asc
+
+# 3. Verify the signature over the hash list.
+gpg --verify SHA256SUMS.asc SHA256SUMS
+
+# 4. Verify the download against the now-trusted hash list.
+sha256sum -c SHA256SUMS --ignore-missing
+```
+
+On macOS use `shasum -a 256 -c SHA256SUMS --ignore-missing`. On Windows, in
+PowerShell:
+
+```powershell
+Get-FileHash -Algorithm SHA256 .\veilvoice-v0.1.9-windows-x86_64.zip
+# then compare that hash against the matching line in SHA256SUMS
+```
+
+### Why that order, and not the other one
+
+Step 3 before step 4, always.
+
+Checking the hash first proves that your download matches a list. It does not
+prove anything about the list. Whoever could replace the download could replace
+`SHA256SUMS` beside it, and the two would agree perfectly. The signature is the
+only thing that makes the hash list worth comparing against, and the
+fingerprint is the only thing that makes the signature worth checking.
+
+A "good signature" warning about the key not being certified is expected and is
+not a problem:
+
+```
+gpg: Good signature from "tilas01" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+```
+
+That says GnuPG has no web-of-trust path to the key — which is true, and is why
+you compared the fingerprint yourself in step 1. What matters is
+`Good signature`. `BAD signature` means stop.
+
+---
+
+## 2. With the install script
+
+The scripts live in [`install/`](../install/). Each one downloads the release,
+performs exactly the checks above in exactly that order, and **refuses, naming
+the check that failed**, rather than continuing past anything it could not
+verify. None of them has a flag to skip verification, because an installer with
+one is an installer whose verification is decorative.
+
+### Linux and macOS
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/tilas01/veilvoice/main/install/install.sh
+less install.sh          # it is 400 lines and it is meant to be read
+sh install.sh
+```
+
+| Option | Effect |
+|---|---|
+| `--yes` | no prompts, and **no** optional components |
+| `--version v0.1.9` | a specific release rather than the latest |
+| `--prefix ~/.local` | where to install (default `~/.local`) |
+| `--with-audacity` | install Audacity too |
+| `--with-gpg` | install GnuPG if it is missing |
+
+### Windows
+
+```powershell
+irm https://raw.githubusercontent.com/tilas01/veilvoice/main/install/install.ps1 -OutFile install.ps1
+notepad install.ps1      # read it first
+powershell -ExecutionPolicy Bypass -File install.ps1
+```
+
+`install.bat` is a wrapper for people who would rather double-click; it passes
+its arguments straight through to `install.ps1` and contains no logic of its
+own, deliberately — two implementations of a verification routine means one of
+them is the stale one, and the stale one is the one that will be running when
+it matters.
+
+| Option | Effect |
+|---|---|
+| `-Yes` | no prompts, and **no** optional components |
+| `-Version v0.1.9` | a specific release |
+| `-Prefix "D:\Tools\VeilVoice"` | where to install |
+| `-WithVBCable` | open the VB-CABLE download page |
+| `-WithAudacity` | install Audacity through winget |
+
+### The optional extras, and why they are questions
+
+VeilVoice needs none of them. Each is offered **once**, as a question that
+**defaults to no**, and `--yes` / `-Yes` installs none of them at all: `--yes`
+means "do not ask me", and answering an unasked question by installing software
+on somebody's machine is precisely the behaviour that makes install scripts
+untrustworthy.
+
+- **VB-CABLE** (Windows) is what lets live mode feed a veiled microphone into a
+  call. It is **proprietary donationware** by VB-Audio, not free software. The
+  script only *opens their download page* — it will not silently fetch and run
+  a third-party installer, which would be a strange thing to do inside a script
+  whose whole subject is verifying what you run.
+- **Audacity** is a free audio editor, useful for recording and trimming before
+  veiling. It is not bundled because it is GPL-2.0-or-later, which cannot be
+  combined with this project's GPL-3.0-or-later.
+- **GnuPG**, where missing, because without it the signature cannot be checked
+  at all. If you decline it, the script stops rather than falling back to
+  "the hash matched" — a hash checked against an unverified list is not a
+  security check.
+
+### What a refusal looks like
+
+```
+REFUSED: the signing key's fingerprint does not match
+  expected  8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A
+  found     1234567890ABCDEF1234567890ABCDEF12345678
+
+  This is the check that anchors every other one, so nothing further
+  was attempted.
+
+Nothing has been installed.
+```
+
+Every refusal says which check failed and installs nothing. There is no
+partial state to clean up: the download lands in a temporary directory that is
+removed on exit, and nothing is copied anywhere until every check has passed.
+
+---
+
+## 3. From source
+
+A fresh clone needs no secrets and no configuration.
+
+```bash
+git clone https://github.com/tilas01/veilvoice
+cd veilvoice
+cargo build --release --workspace
+```
+
+The binaries land in `target/release/`. `cargo run -p veilvoice-cli -- info`
+reports what the build supports.
+
+If you want a binary you can compare against the published one, see
+[REPRODUCIBLE-BUILDS.md](REPRODUCIBLE-BUILDS.md).
+
+---
+
+## Where things get installed
+
+| Platform | Default location |
+|---|---|
+| Linux, macOS | `~/.local/bin` |
+| Windows | `%LOCALAPPDATA%\Programs\VeilVoice` |
+
+Both are per-user and need no administrator or `sudo`. Nothing is written
+outside them, no service is installed, no registry key is created beyond the
+user `PATH` entry on Windows, and nothing runs at startup.
+
+To uninstall, delete that directory. VeilVoice keeps its own configuration
+under the usual per-user location for the platform; `veilvoice lock status`
+names the lock file's path if you have set one.
+
+---
+
+## Known rough edges
+
+**Git for Windows' bundled GnuPG has a path-length limit.** It is an MSYS
+build, and its agent puts a Unix-domain socket inside the home directory it is
+given, which cannot exceed about 108 bytes. `install.ps1` keeps its temporary
+directory short for that reason, and says so plainly if your `TEMP` is long
+enough that even a short name overflows. Gpg4win is a native build and has no
+such limit.
+
+**`~/.local/bin` may not be on your `PATH`.** The script says so if it is not,
+and prints the line to add.
+
+**macOS Gatekeeper.** The binaries are not notarised — notarisation requires an
+Apple Developer account, which requires a legal identity, which this project
+does not have. macOS will refuse to run them until you allow it explicitly in
+*System Settings → Privacy & Security*. This is stated rather than worked
+around: a project that publishes under a pseudonym cannot also be notarised,
+and pretending otherwise would be worse than the inconvenience.
+
+---
+
+## What is not finished
+
+Recorded here rather than left for you to discover:
+
+- **Nobody but the author has run these scripts.** They are tested end to end
+  on Windows against the real v0.1.8 release, and the by-hand chain is verified
+  on the same release. That is not the same as having been run on a machine
+  that did not build them, and until it has been, treat "it works" as a claim
+  with one source.
+- **`install.sh` has not been run on a real Linux or macOS machine.** Its
+  syntax is checked and its refusal paths are exercised, but the host this was
+  developed on is Windows. The verification chain it performs is identical to
+  the by-hand one above, which *has* been checked against the real release.
+- **The portable verifier, the packaged installers (WiX, `.deb`, `.rpm`,
+  Flatpak, Homebrew), the OpenBSD and NetBSD builds and the Gentoo ebuild are
+  not built yet.** They are specified in `HANDOFF.md` section 7.
+
+If you run these on a machine that did not build them, saying so in an issue is
+genuinely the most useful thing you could contribute.
