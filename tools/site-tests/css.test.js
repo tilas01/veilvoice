@@ -265,6 +265,57 @@ function run() {
     pass("nav links declare a 24px minimum tap target");
   }
 
+  // --- 8. the cycling fact line -------------------------------------------
+  //
+  // The keyframe percentages are one slot of N, so `--fact-count` in the
+  // stylesheet and the number of `.fact` elements in the page must agree.
+  // Adding a fact without widening the cycle overlaps two messages and makes
+  // both unreadable -- on the strip carrying this project's own claims, which
+  // is the neighbourhood finding F-37 lived in.
+  const indexHtml = fs.readFileSync(
+    path.join(ROOT, "website", "index.html"), "utf8");
+  const declared = /--fact-count:\s*(\d+)/.exec(main);
+  const present = (indexHtml.match(/class="fact"/g) || []).length;
+  if (!declared) {
+    fail("main.css: --fact-count is not declared, so nothing pins the cycle");
+  } else if (Number(declared[1]) !== present) {
+    fail(`the fact line disagrees with itself: main.css says ${declared[1]}, ` +
+         `index.html has ${present}`);
+  } else if (present < 20) {
+    fail(`only ${present} facts; the strip was specified as at least 20`);
+  } else {
+    pass(`the fact line's ${present} entries match --fact-count`);
+  }
+
+  // Every fact needs its own index and colour, or they all animate together.
+  const indices = [...indexHtml.matchAll(/class="fact"\s+style="--f:(\d+);--c:([^"]+)"/g)];
+  if (indices.length !== present) {
+    fail(`${present - indices.length} fact(s) are missing --f or --c`);
+  } else {
+    const seen = new Set(indices.map(m => m[1]));
+    if (seen.size !== present) {
+      fail("two facts share an --f index, so they appear at the same moment");
+    } else if (indices.some(m => !/^var\(--[a-z0-9-]+\)$/.test(m[2]))) {
+      fail("a fact's colour is not a palette token, so it will not follow the theme");
+    } else {
+      pass("each fact has a distinct slot and a palette colour");
+    }
+  }
+
+  // The resting state of a `.fact` is invisible, and the global
+  // reduced-motion rule collapses animations to 0.01ms -- which would leave
+  // the strip permanently blank for a reader who asked for less motion. That
+  // needs handling explicitly rather than by the blanket rule.
+  const reduced = main.slice(main.indexOf(".facts"));
+  if (!/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[^}]*\.fact\s*\{[^}]*animation:\s*none/.test(reduced)) {
+    fail("main.css: .fact must stop animating under prefers-reduced-motion");
+  } else if (!/\.fact:first-child\s*\{[^}]*opacity:\s*1/.test(reduced)) {
+    fail("main.css: with motion reduced, one fact must remain visible " +
+         "-- otherwise the strip is blank and nobody can tell");
+  } else {
+    pass("with motion reduced, the cycle stops and the first fact stays");
+  }
+
   return failures;
 }
 
