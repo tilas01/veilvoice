@@ -149,6 +149,51 @@ def tracked_files(root):
     return sorted(names)
 
 
+def untracked_files(root):
+    """Files git does not track and is not ignoring."""
+    out = subprocess.run(
+        ["git", "ls-files", "-z", "--others", "--exclude-standard"],
+        cwd=root, check=True, stdout=subprocess.PIPE,
+    ).stdout.decode("utf-8")
+    return sorted(n for n in out.split("\0") if n)
+
+
+def warn_about_untracked(root):
+    """Say so when a new file would be indexed but has not been staged yet.
+
+    The index is built from `git ls-files`, which lists *tracked* files. Write a
+    new document, generate, and commit it in one step and the index you commit
+    was built without it -- because at the moment it was built, git had never
+    heard of it. CI then regenerates from the committed tree, finds one more
+    file, and fails with "differs from the generator output", which is true and
+    tells you nothing about why.
+
+    That happened while this feature was being built, so the failure is now
+    explained where it can be acted on rather than discovered from a red CI run
+    ten minutes later. It is a warning rather than a refusal: an untracked file
+    is a perfectly ordinary state to be in, and the generator should still work.
+    """
+    would_index = [
+        rel for rel in untracked_files(root)
+        if not BINARY.search(rel) and rel not in GENERATED
+    ]
+    if not would_index:
+        return
+    print()
+    print("  NOTE: %d file(s) are not tracked by git, so they are NOT in this"
+          % len(would_index))
+    print("  index. `git ls-files` is what this walks, and it lists tracked")
+    print("  files only:")
+    for rel in would_index[:10]:
+        print("    %s" % rel)
+    if len(would_index) > 10:
+        print("    ...and %d more" % (len(would_index) - 10))
+    print()
+    print("  If they belong in the index, stage them and generate again:")
+    print("    git add -A && python tools/search-index/generate.py")
+    print()
+
+
 def kind_of(rel):
     for pattern, kind in KIND_RULES:
         if pattern.search(rel):
@@ -612,6 +657,7 @@ def write(root):
             handle.write(render(index))
         print("  wrote %s" % rel)
     print("  %d files, %d sections" % (len(index["docs"]), len(index["secs"])))
+    warn_about_untracked(root)
     return 0
 
 
@@ -635,6 +681,7 @@ def check(root):
             print("  MISMATCH %s" % line)
         print()
         print("Run 'python tools/search-index/generate.py' and commit the result.")
+        warn_about_untracked(root)
         return 1
     print("  search index matches the repository (%d files, %d sections)"
           % (len(index["docs"]), len(index["secs"])))
