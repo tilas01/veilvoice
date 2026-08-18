@@ -156,3 +156,28 @@ jobs:
             exit 1
           fi
           echo "no networking crates found"
+
+  # `rsa` is in the dependency graph through `pgp`, and it carries
+  # RUSTSEC-2023-0071 -- the Marvin attack, key recovery through a timing side
+  # channel, with no fixed version available. `.cargo/audit.toml` accepts it on
+  # one specific ground: the advisory is about RSA *private key* operations, and
+  # `veilvoice-verify` only ever verifies a signature against a public key
+  # compiled into it. There is no secret for a timing oracle to leak.
+  #
+  # That is an argument about how the crate is used, not about the crate, so it
+  # has to be enforced rather than believed. If a secret-key or decryption API
+  # ever appears, this fails and the acceptance has to be re-argued.
+  rsa-usage:
+    name: no RSA private-key operations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail if the verifier gains a private-key code path
+        run: |
+          PATTERN='SignedSecretKey|SecretKeyParams|decrypt|sign_binary_data|sign_text_data'
+          if grep -RnE "$PATTERN" crates/veilvoice-verify/src/; then
+            echo "::error::veilvoice-verify appears to perform a private-key operation."
+            echo "RUSTSEC-2023-0071 is accepted in .cargo/audit.toml only because it does not."
+            exit 1
+          fi
+          echo "verification only: no secret-key or decryption API in the verifier"
