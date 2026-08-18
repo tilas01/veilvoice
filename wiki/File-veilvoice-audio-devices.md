@@ -2,14 +2,57 @@
 
 # `crates/veilvoice-audio/src/devices.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 188 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs)
+[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 228 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs)
 
 ## Contents
 
-- [What calls what](#what-calls-what)
-- [Items](#items)
+- [What this is for](#what-this-is-for)
+- [The detection is name matching, and that is a limitation, not an oversight](#the-detection-is-name-matching-and-that-is-a-limitation-not-an-oversight)
+- [Enumeration can fail, and does](#enumeration-can-fail-and-does)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
-Device enumeration and virtual-cable detection.
+Enumerating audio devices, and guessing which of them are virtual cables.
+
+# What this is for
+
+Live scrambling is only useful if the veiled voice can be routed *into*
+something else -- a call, a stream, a recorder. The way that is done on every
+desktop platform is a **virtual audio cable**: a driver that presents a
+playback device on one side and a microphone on the other, so anything that
+can select a microphone can receive VeilVoice's output.
+
+So the list this module produces is not merely a list. Picking the wrong
+output device is the single most common way for live mode to appear broken
+while working perfectly, and the whole reason `DeviceInfo::is_virtual_cable`
+exists is to put the right entry in front of the user.
+
+# The detection is name matching, and that is a limitation, not an oversight
+
+There is **no portable way to ask an audio device whether it is virtual**.
+CPAL does not expose it because the underlying APIs largely do not either.
+So `VIRTUAL_CABLE_HINTS` matches on name fragments, which means:
+
+* a cable this list has never heard of is reported as an ordinary device;
+* a real device whose name happens to contain "loopback" or "virtual" is
+flagged when it should not be.
+
+Both are wrong in the harmless direction: the flag reorders and annotates a
+list, it never restricts what the user may choose. A heuristic that hides
+options would be a different and worse thing than one that highlights them,
+and this is deliberately the second.
+
+The alternative -- showing an unsorted list of identically named endpoints
+and letting the user find the right one -- was tried and is worse.
+
+# Enumeration can fail, and does
+
+Device lists come from the OS and are not stable: a device can disappear
+between being listed and being opened, a host may have no devices at all,
+and on Linux a machine with no sound server is entirely normal. Every
+function here returns a `crate::Error` rather than panicking or quietly
+returning an empty list, because an empty list and a failed query mean very
+different things to somebody trying to work out why they cannot be heard.
 
 ## What calls what
 
@@ -29,11 +72,11 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Direction` <sub>pub enum</sub> | [9](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L9) | Which direction a device carries audio. |
-| `DeviceInfo` <sub>pub struct</sub> | [18](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L18) | A device the user can choose. |
-| `VIRTUAL_CABLE_HINTS` <sub>const</sub> | [34](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L34) | Name fragments used by the common virtual audio cables. |
-| `looks_virtual` <sub>fn</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L46) |  |
-| `list` <sub>pub fn</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L52) | List the devices available in one direction. |
-| `find_virtual_cable` <sub>pub fn</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L85) | Find the first output device that looks like a virtual audio cable. |
-| `name_of` <sub>pub fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L95) | The name of an opened device, or a placeholder when the OS will not say. |
-| `open` <sub>pub fn</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L100) | Look up a device by exact name, or the host default when name is None. |
+| `Direction` <sub>pub enum</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L49) | Which direction a device carries audio. |
+| `DeviceInfo` <sub>pub struct</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L58) | A device the user can choose. |
+| `VIRTUAL_CABLE_HINTS` <sub>const</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L74) | Name fragments used by the common virtual audio cables. |
+| `looks_virtual` <sub>fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L86) |  |
+| `list` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L92) | List the devices available in one direction. |
+| `find_virtual_cable` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L125) | Find the first output device that looks like a virtual audio cable. |
+| `name_of` <sub>pub fn</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L135) | The name of an opened device, or a placeholder when the OS will not say. |
+| `open` <sub>pub fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L140) | Look up a device by exact name, or the host default when name is None. |

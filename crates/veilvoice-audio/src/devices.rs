@@ -1,5 +1,45 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0
-//! Device enumeration and virtual-cable detection.
+//! Enumerating audio devices, and guessing which of them are virtual cables.
+//!
+//! # What this is for
+//!
+//! Live scrambling is only useful if the veiled voice can be routed *into*
+//! something else -- a call, a stream, a recorder. The way that is done on every
+//! desktop platform is a **virtual audio cable**: a driver that presents a
+//! playback device on one side and a microphone on the other, so anything that
+//! can select a microphone can receive VeilVoice's output.
+//!
+//! So the list this module produces is not merely a list. Picking the wrong
+//! output device is the single most common way for live mode to appear broken
+//! while working perfectly, and the whole reason [`DeviceInfo::is_virtual_cable`]
+//! exists is to put the right entry in front of the user.
+//!
+//! # The detection is name matching, and that is a limitation, not an oversight
+//!
+//! There is **no portable way to ask an audio device whether it is virtual**.
+//! CPAL does not expose it because the underlying APIs largely do not either.
+//! So [`VIRTUAL_CABLE_HINTS`] matches on name fragments, which means:
+//!
+//! * a cable this list has never heard of is reported as an ordinary device;
+//! * a real device whose name happens to contain "loopback" or "virtual" is
+//!   flagged when it should not be.
+//!
+//! Both are wrong in the harmless direction: the flag reorders and annotates a
+//! list, it never restricts what the user may choose. A heuristic that hides
+//! options would be a different and worse thing than one that highlights them,
+//! and this is deliberately the second.
+//!
+//! The alternative -- showing an unsorted list of identically named endpoints
+//! and letting the user find the right one -- was tried and is worse.
+//!
+//! # Enumeration can fail, and does
+//!
+//! Device lists come from the OS and are not stable: a device can disappear
+//! between being listed and being opened, a host may have no devices at all,
+//! and on Linux a machine with no sound server is entirely normal. Every
+//! function here returns a [`crate::Error`] rather than panicking or quietly
+//! returning an empty list, because an empty list and a failed query mean very
+//! different things to somebody trying to work out why they cannot be heard.
 
 use crate::Error;
 use cpal::traits::{DeviceTrait, HostTrait};

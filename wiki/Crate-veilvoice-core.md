@@ -69,13 +69,13 @@ let _ms = deid.stats().last_block_ms();
 flowchart TD
     n_lib(["lib.rs<br/>68 lines"])
     n_accent["accent.rs<br/>677 lines"]
-    n_chain["chain.rs<br/>764 lines"]
-    n_effects["effects.rs<br/>177 lines"]
+    n_chain["chain.rs<br/>856 lines"]
+    n_effects["effects.rs<br/>214 lines"]
     n_modulation["modulation.rs<br/>280 lines"]
     n_pitch["pitch.rs<br/>274 lines"]
     n_spectral["spectral.rs<br/>428 lines"]
     n_stft["stft.rs<br/>246 lines"]
-    n_window["window.rs<br/>54 lines"]
+    n_window["window.rs<br/>91 lines"]
     n_accent --> n_pitch
     n_accent --> n_spectral
     n_chain --> n_accent
@@ -94,11 +94,11 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`accent.rs`|File-veilvoice-core-accent]] | 677 | Accent and speaker-trait neutralisation. |
-| [[`chain.rs`|File-veilvoice-core-chain]] | 764 | The assembled de-identification chain and its live performance statistics. |
-| [[`effects.rs`|File-veilvoice-core-effects]] | 177 | Light time-domain effects applied after resynthesis. |
+| [[`chain.rs`|File-veilvoice-core-chain]] | 856 | The assembled de-identification chain and its live performance statistics. |
+| [[`effects.rs`|File-veilvoice-core-effects]] | 214 | Light time-domain effects applied after resynthesis. |
 | [[`lib.rs`|File-veilvoice-core-lib]] | 68 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
 | [[`modulation.rs`|File-veilvoice-core-modulation]] | 280 | Cryptographically-seeded modulation of the effect parameters. |
 | [[`pitch.rs`|File-veilvoice-core-pitch]] | 274 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [[`spectral.rs`|File-veilvoice-core-spectral]] | 428 | Frequency-domain de-identification transform. |
 | [[`stft.rs`|File-veilvoice-core-stft]] | 246 | Streaming short-time Fourier transform with overlap-add resynthesis. |
-| [[`window.rs`|File-veilvoice-core-window]] | 54 | Analysis/synthesis windowing helpers. |
+| [[`window.rs`|File-veilvoice-core-window]] | 91 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |

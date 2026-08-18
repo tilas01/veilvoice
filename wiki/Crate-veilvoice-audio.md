@@ -46,7 +46,7 @@ detects an installed one so the UI can offer it directly.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>204 lines"])
-    n_devices["devices.rs<br/>188 lines"]
+    n_devices["devices.rs<br/>228 lines"]
     n_io["io.rs<br/>527 lines"]
     n_live["live.rs<br/>237 lines"]
 ```
@@ -55,7 +55,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`devices.rs`|File-veilvoice-audio-devices]] | 188 | Device enumeration and virtual-cable detection. |
+| [[`devices.rs`|File-veilvoice-audio-devices]] | 228 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [[`io.rs`|File-veilvoice-audio-io]] | 527 | Reading and writing audio files. |
 | [[`lib.rs`|File-veilvoice-audio-lib]] | 204 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
 | [[`live.rs`|File-veilvoice-audio-live]] | 237 | Live microphone scrambling. |

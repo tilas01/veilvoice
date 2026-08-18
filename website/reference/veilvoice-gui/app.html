@@ -39,15 +39,36 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/app.svg" alt="app.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/app.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 986 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1062 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#the-six-tabs-and-why-these-six">The six tabs, and why these six</a>
+  <a href="#nothing-slow-runs-on-the-ui-thread">Nothing slow runs on the UI thread</a>
+  <a href="#the-at-rest-choice-is-enforced-here-not-merely-offered">The at-rest choice is enforced here, not merely offered</a>
+  <a href="#the-monitor-indicator">The monitor indicator</a>
+  <a href="#where-the-honest-limits-are-stated">Where the honest limits are stated</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
 <div>
 <section id="s-about">
 <p>The VeilVoice desktop application.</p>
+<p>One window, six tabs, no menus and no settings file to hunt for. This file owns the window: the tab strip, the state behind it, and the rules about what the user is allowed to do before they have answered the questions that matter. The tabs themselves live partly here and partly in siblings -- [<code>crate::security</code>] draws the lock tab and the unlock screen, [<code>crate::prefs</code>] draws settings.</p>
+<h2 id="the-six-tabs-and-why-these-six">The six tabs, and why these six</h2>
+<p>| Tab | What it is | |---|---| | <strong>anonymise file</strong> | Process a recording on disk. The default path. | | <strong>live scramble</strong> | Scramble a microphone in real time into a virtual cable. | | <strong>monitor</strong> | Which applications currently hold the microphone and camera. | | <strong>lock</strong> | The app lock, and a plain statement of what it is worth. | | <strong>settings</strong> | Colour scheme, animation, and where those choices are kept. | | <strong>about</strong> | Versions, licence, and the honest scope. |</p>
+<p>There is no &quot;advanced&quot; tab and no hidden pane. Everything the program can do is reachable in one click from the strip, because a privacy tool whose important controls are buried is a privacy tool whose important controls do not get used.</p>
+<h2 id="nothing-slow-runs-on-the-ui-thread">Nothing slow runs on the UI thread</h2>
+<p>[<code>VeilVoiceApp::start_job</code>] spawns a worker and hands back an [<code>std::sync::mpsc</code>] receiver; [<code>VeilVoiceApp::poll_job</code>] drains it with <code>try_recv</code> once per frame. The window keeps painting while a job runs.</p>
+<p>That split is not tidiness. A long recording takes real time to process, and sealing it runs Argon2id at 256 MiB, which is <strong>deliberately</strong> slow -- that is the whole point of a memory-hard KDF. Doing either on the UI thread means a frozen window and an operating system offering to kill the application, in the middle of the operation the user cares most about completing.</p>
+<p><code>poll_job</code> handles all three channel outcomes, including <code>Disconnected</code> -- a worker that panicked. The user is told the thread stopped rather than watching a progress state that will never finish.</p>
+<h2 id="the-at-rest-choice-is-enforced-here-not-merely-offered">The at-rest choice is enforced here, not merely offered</h2>
+<p>Recordings are encrypted at rest by default (locked decision 4.10), and a job <strong>cannot start</strong> until the user has answered the modal that appears if they try to turn that off. The rule is asserted by a test in this file rather than left as a property of the layout code, because &quot;the button was disabled&quot; is a claim about pixels and &quot;the job refuses to start&quot; is a claim about behaviour.</p>
+<p>The worker encodes the WAV <strong>in memory</strong> and seals it before anything is written, so a recording that is going to be encrypted never touches the disk in the clear -- not even briefly, not even in a temporary file that would be deleted afterwards. Deleting a file does not remove its contents from a flash device; not writing it does.</p>
+<h2 id="the-monitor-indicator">The monitor indicator</h2>
+<p>[<code>VeilVoiceApp::watch_indicator</code>] shows, in the header, whether anything is holding the microphone or camera right now, and clicking it goes to the monitor tab. It is polled on a timer rather than watched continuously, because the underlying platform code enumerates processes and doing that every frame would cost more than the rest of the window put together.</p>
+<p>What it reports is bounded by what the platform allows, and <code>veilvoice_watch::support()</code> states that bound rather than letting an empty list imply an empty machine. The indicator must never present &quot;we could not see&quot; as &quot;nothing is there&quot;.</p>
+<h2 id="where-the-honest-limits-are-stated">Where the honest limits are stated</h2>
+<p>The about tab carries the scope text, and the lock tab carries <code>veilvoice_crypto::lock::SCOPE</code>. Neither is decoration: tests fail the build if that wording is softened, because a user who over-trusts the app lock is left worse off than one who never had it. If you are editing text in this file and a test starts failing, it is that rule, and it is working.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -168,29 +189,29 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Tab</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L14" rel="noopener noreferrer">14</a></td><td>The things VeilVoice does.</td></tr>
-<tr><td><code>JobDone</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L30" rel="noopener noreferrer">30</a></td><td>Result of a background file job.</td></tr>
-<tr><td><code>VeilVoiceApp</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L41" rel="noopener noreferrer">41</a></td><td>Application state.</td></tr>
-<tr><td><code>preferred_output</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L95" rel="noopener noreferrer">95</a></td><td>Pick the output to start on: a virtual cable if the machine has one, because routing there is what lets other applications hear the veiled voice at all; otherwise the system default.</td></tr>
-<tr><td><code>preferred_input</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L104" rel="noopener noreferrer">104</a></td><td>Pick the input to start on: the system default, else whatever is first.</td></tr>
-<tr><td><code>VeilVoiceApp::without_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L118" rel="noopener noreferrer">118</a></td><td>The application with no devices enumerated.</td></tr>
-<tr><td><code>VeilVoiceApp::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L151" rel="noopener noreferrer">151</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L169" rel="noopener noreferrer">169</a></td><td>Build the app, applying theme and fonts to ctx.</td></tr>
-<tr><td><code>VeilVoiceApp::config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L184" rel="noopener noreferrer">184</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::update</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L198" rel="noopener noreferrer">198</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::poll_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L302" rel="noopener noreferrer">302</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::settings</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L336" rel="noopener noreferrer">336</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::file_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L373" rel="noopener noreferrer">373</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::start_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L453" rel="noopener noreferrer">453</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::live_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L509" rel="noopener noreferrer">509</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::start_live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L600" rel="noopener noreferrer">600</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::poll_watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L614" rel="noopener noreferrer">614</a></td><td>Re-scan on a timer rather than every frame.</td></tr>
-<tr><td><code>VeilVoiceApp::watch_indicator</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L638" rel="noopener noreferrer">638</a></td><td>The always-visible indicator.</td></tr>
-<tr><td><code>VeilVoiceApp::watch_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L667" rel="noopener noreferrer">667</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::about_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L743" rel="noopener noreferrer">743</a></td><td></td></tr>
-<tr><td><code>device_picker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L794" rel="noopener noreferrer">794</a></td><td></td></tr>
-<tr><td><code>field</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L819" rel="noopener noreferrer">819</a></td><td></td></tr>
-<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L826" rel="noopener noreferrer">826</a></td><td></td></tr>
+<tr><td><code>Tab</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L90" rel="noopener noreferrer">90</a></td><td>The things VeilVoice does.</td></tr>
+<tr><td><code>JobDone</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L106" rel="noopener noreferrer">106</a></td><td>Result of a background file job.</td></tr>
+<tr><td><code>VeilVoiceApp</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L117" rel="noopener noreferrer">117</a></td><td>Application state.</td></tr>
+<tr><td><code>preferred_output</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L171" rel="noopener noreferrer">171</a></td><td>Pick the output to start on: a virtual cable if the machine has one, because routing there is what lets other applications hear the veiled voice at all; otherwise the system default.</td></tr>
+<tr><td><code>preferred_input</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L180" rel="noopener noreferrer">180</a></td><td>Pick the input to start on: the system default, else whatever is first.</td></tr>
+<tr><td><code>VeilVoiceApp::without_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L194" rel="noopener noreferrer">194</a></td><td>The application with no devices enumerated.</td></tr>
+<tr><td><code>VeilVoiceApp::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L227" rel="noopener noreferrer">227</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L245" rel="noopener noreferrer">245</a></td><td>Build the app, applying theme and fonts to ctx.</td></tr>
+<tr><td><code>VeilVoiceApp::config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L260" rel="noopener noreferrer">260</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::update</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L274" rel="noopener noreferrer">274</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::poll_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L378" rel="noopener noreferrer">378</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::settings</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L412" rel="noopener noreferrer">412</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::file_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L449" rel="noopener noreferrer">449</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::start_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L529" rel="noopener noreferrer">529</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::live_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L585" rel="noopener noreferrer">585</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::start_live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L676" rel="noopener noreferrer">676</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::poll_watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L690" rel="noopener noreferrer">690</a></td><td>Re-scan on a timer rather than every frame.</td></tr>
+<tr><td><code>VeilVoiceApp::watch_indicator</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L714" rel="noopener noreferrer">714</a></td><td>The always-visible indicator.</td></tr>
+<tr><td><code>VeilVoiceApp::watch_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L743" rel="noopener noreferrer">743</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::about_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L819" rel="noopener noreferrer">819</a></td><td></td></tr>
+<tr><td><code>device_picker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L870" rel="noopener noreferrer">870</a></td><td></td></tr>
+<tr><td><code>field</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L895" rel="noopener noreferrer">895</a></td><td></td></tr>
+<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L902" rel="noopener noreferrer">902</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -42,7 +42,7 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice &mdash; 145 files, 5268 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice &mdash; 145 files, 5331 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
@@ -997,26 +997,34 @@ nav.top a{margin-right:14px}
 </details>
 <h2 id="k-rust">Rust source <span class="meta">(52)</span></h2>
 <details open>
-<summary><code>crates/veilvoice-audio/src/devices.rs</code> <span class="meta">&mdash; veilvoice-audio, 189 lines, 17 sections</span></summary>
+<summary><code>crates/veilvoice-audio/src/devices.rs</code> <span class="meta">&mdash; veilvoice-audio, 229 lines, 25 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs">open devices.rs</a></p>
 <ul>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Device enumeration and virtual-cable detection.</span></li>
-<li><span class="sec">enum Direction</span> <span class="meta">line 9</span><br><span class="x">Which direction a device carries audio.</span></li>
-<li><span class="sec">struct DeviceInfo</span> <span class="meta">line 18</span><br><span class="x">A device the user can choose.</span></li>
-<li><span class="sec">const VIRTUAL_CABLE_HINTS</span> <span class="meta">line 34</span><br><span class="x">Name fragments used by the common virtual audio cables. Routing the veiled voice into one of these is what lets any other application &#8212; a call, a stream, a recorder &#8212; receive it as if it were a microphone. Matching on the name is crude,</span></li>
-<li><span class="sec">const VIRTUAL_CABLE_HINTS</span> <span class="meta">line 34</span><br><span class="x">but there is no portable way to ask an audio device whether it is virtual, and the alternative is making the user hunt through a list of identically-named endpoints.</span></li>
-<li><span class="sec">fn looks_virtual</span> <span class="meta">line 46</span><br><span class="x"></span></li>
-<li><span class="sec">fn list</span> <span class="meta">line 52</span><br><span class="x">List the devices available in one direction.</span></li>
-<li><span class="sec">fn find_virtual_cable</span> <span class="meta">line 85</span><br><span class="x">Find the first output device that looks like a virtual audio cable. Returns `None` rather than an error when none is installed: that is a normal state, and the caller should offer to install one rather than fail.</span></li>
-<li><span class="sec">fn name_of</span> <span class="meta">line 95</span><br><span class="x">The name of an opened device, or a placeholder when the OS will not say. Saves every caller from depending on `cpal` just to print a device name.</span></li>
-<li><span class="sec">fn open</span> <span class="meta">line 100</span><br><span class="x">Look up a device by exact name, or the host default when `name` is `None`.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 127</span><br><span class="x"></span></li>
-<li><span class="sec">fn virtual_cable_names_are_recognised</span> <span class="meta">line 131</span><br><span class="x"></span></li>
-<li><span class="sec">fn ordinary_devices_are_not_mistaken_for_cables</span> <span class="meta">line 143</span><br><span class="x"></span></li>
-<li><span class="sec">fn matching_ignores_case</span> <span class="meta">line 154</span><br><span class="x"></span></li>
-<li><span class="sec">fn enumeration_is_safe_without_audio_hardware</span> <span class="meta">line 163</span><br><span class="x">Enumeration must not panic or hang on a machine with no sound hardware, which is exactly what CI runners look like.</span></li>
-<li><span class="sec">fn missing_virtual_cable_is_not_an_error</span> <span class="meta">line 176</span><br><span class="x"></span></li>
-<li><span class="sec">fn opening_an_unknown_device_reports_its_name</span> <span class="meta">line 181</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Enumerating audio devices, and guessing which of them are virtual cables. # What this is for Live scrambling is only useful if the veiled voice can be routed *into* something else -- a call, a stream, a recorder. The way that is done on</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">every desktop platform is a **virtual audio cable**: a driver that presents a playback device on one side and a microphone on the other, so anything that can select a microphone can receive VeilVoice&#x27;s output. So the list this module</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">produces is not merely a list. Picking the wrong output device is the single most common way for live mode to appear broken while working perfectly, and the whole reason [`DeviceInfo::is_virtual_cable`] exists is to put the right entry in</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">front of the user. # The detection is name matching, and that is a limitation, not an oversight There is **no portable way to ask an audio device whether it is virtual**. CPAL does not expose it because the underlying APIs largely do not</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">either. So [`VIRTUAL_CABLE_HINTS`] matches on name fragments, which means: * a cable this list has never heard of is reported as an ordinary device; * a real device whose name happens to contain &quot;loopback&quot; or &quot;virtual&quot; is flagged when it</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">should not be. Both are wrong in the harmless direction: the flag reorders and annotates a list, it never restricts what the user may choose. A heuristic that hides options would be a different and worse thing than one that highlights</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">them, and this is deliberately the second. The alternative -- showing an unsorted list of identically named endpoints and letting the user find the right one -- was tried and is worse. # Enumeration can fail, and does Device lists come</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">from the OS and are not stable: a device can disappear between being listed and being opened, a host may have no devices at all, and on Linux a machine with no sound server is entirely normal. Every function here returns a [`crate::Error`]</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">rather than panicking or quietly returning an empty list, because an empty list and a failed query mean very different things to somebody trying to work out why they cannot be heard.</span></li>
+<li><span class="sec">enum Direction</span> <span class="meta">line 49</span><br><span class="x">Which direction a device carries audio.</span></li>
+<li><span class="sec">struct DeviceInfo</span> <span class="meta">line 58</span><br><span class="x">A device the user can choose.</span></li>
+<li><span class="sec">const VIRTUAL_CABLE_HINTS</span> <span class="meta">line 74</span><br><span class="x">Name fragments used by the common virtual audio cables. Routing the veiled voice into one of these is what lets any other application &#8212; a call, a stream, a recorder &#8212; receive it as if it were a microphone. Matching on the name is crude,</span></li>
+<li><span class="sec">const VIRTUAL_CABLE_HINTS</span> <span class="meta">line 74</span><br><span class="x">but there is no portable way to ask an audio device whether it is virtual, and the alternative is making the user hunt through a list of identically-named endpoints.</span></li>
+<li><span class="sec">fn looks_virtual</span> <span class="meta">line 86</span><br><span class="x"></span></li>
+<li><span class="sec">fn list</span> <span class="meta">line 92</span><br><span class="x">List the devices available in one direction.</span></li>
+<li><span class="sec">fn find_virtual_cable</span> <span class="meta">line 125</span><br><span class="x">Find the first output device that looks like a virtual audio cable. Returns `None` rather than an error when none is installed: that is a normal state, and the caller should offer to install one rather than fail.</span></li>
+<li><span class="sec">fn name_of</span> <span class="meta">line 135</span><br><span class="x">The name of an opened device, or a placeholder when the OS will not say. Saves every caller from depending on `cpal` just to print a device name.</span></li>
+<li><span class="sec">fn open</span> <span class="meta">line 140</span><br><span class="x">Look up a device by exact name, or the host default when `name` is `None`.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 167</span><br><span class="x"></span></li>
+<li><span class="sec">fn virtual_cable_names_are_recognised</span> <span class="meta">line 171</span><br><span class="x"></span></li>
+<li><span class="sec">fn ordinary_devices_are_not_mistaken_for_cables</span> <span class="meta">line 183</span><br><span class="x"></span></li>
+<li><span class="sec">fn matching_ignores_case</span> <span class="meta">line 194</span><br><span class="x"></span></li>
+<li><span class="sec">fn enumeration_is_safe_without_audio_hardware</span> <span class="meta">line 203</span><br><span class="x">Enumeration must not panic or hang on a machine with no sound hardware, which is exactly what CI runners look like.</span></li>
+<li><span class="sec">fn missing_virtual_cable_is_not_an_error</span> <span class="meta">line 216</span><br><span class="x"></span></li>
+<li><span class="sec">fn opening_an_unknown_device_reports_its_name</span> <span class="meta">line 221</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -1366,89 +1374,116 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-core/src/chain.rs</code> <span class="meta">&mdash; veilvoice-core, 765 lines, 53 sections</span></summary>
+<summary><code>crates/veilvoice-core/src/chain.rs</code> <span class="meta">&mdash; veilvoice-core, 857 lines, 72 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs">open chain.rs</a></p>
 <ul>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The assembled de-identification chain and its live performance statistics.</span></li>
-<li><span class="sec">struct DeidConfig</span> <span class="meta">line 14</span><br><span class="x">User-facing configuration for the de-identifier.</span></li>
-<li><span class="sec">impl Default for DeidConfig</span> <span class="meta">line 57</span><br><span class="x"></span></li>
-<li><span class="sec">fn default</span> <span class="meta">line 58</span><br><span class="x"></span></li>
-<li><span class="sec">impl DeidConfig</span> <span class="meta">line 79</span><br><span class="x"></span></li>
-<li><span class="sec">fn hop</span> <span class="meta">line 80</span><br><span class="x"></span></li>
-<li><span class="sec">fn scaled</span> <span class="meta">line 85</span><br><span class="x">Scale a `(lo, hi)` ratio range toward 1.0 by `intensity`.</span></li>
-<li><span class="sec">const MAX_SAMPLE_RATE</span> <span class="meta">line 105</span><br><span class="x">The largest sample rate this engine will build for, in Hz. Every value in here is reachable from a file: a WAV&#x27;s `fmt ` chunk carries a **`u32`** sample rate, and `symphonia` passes whatever it finds straight through. That number then</span></li>
-<li><span class="sec">const MAX_SAMPLE_RATE</span> <span class="meta">line 105</span><br><span class="x">sizes the delay lines in `effects.rs` &#8212; `Reverb`&#x27;s comb is `0.0297 &#215; sample_rate` samples and the chorus voices are similar &#8212; so a four-kilobyte file declaring `u32::MAX` asks for roughly two gigabytes of buffers before a single sample is</span></li>
-<li><span class="sec">const MAX_SAMPLE_RATE</span> <span class="meta">line 105</span><br><span class="x">processed. A failed allocation in Rust aborts the process, which is the same shape as F-3: opening a hostile file kills the program. 768 kHz is chosen well above anything real. Professional converters top out at 384 kHz and DSD-rate PCM at</span></li>
-<li><span class="sec">const MAX_SAMPLE_RATE</span> <span class="meta">line 105</span><br><span class="x">705.6 kHz; nothing legitimate asks for more, and the largest buffer this permits is a few megabytes.</span></li>
-<li><span class="sec">const MAX_FRAME_SIZE</span> <span class="meta">line 113</span><br><span class="x">The largest FFT size this engine will build for. Bounded for the same reason as the sample rate: `frame_size` sizes every internal buffer and the FFT plan, and there was previously no upper limit at all, so a caller could ask for a</span></li>
-<li><span class="sec">const MAX_FRAME_SIZE</span> <span class="meta">line 113</span><br><span class="x">`usize::MAX / 2` transform. 65536 is eight times the largest size anyone uses for speech.</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 124</span><br><span class="x">Validate and normalise; returns an error string on impossible values. Every float is checked for finiteness, not merely for range. A `NaN` compares false against every bound, so a bare `self.sample_rate &lt; 8_000.0` test *passes* `NaN` &#8212; and</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 124</span><br><span class="x">an engine built at a `NaN` sample rate produced `NaN` for every output sample, for the whole session, with nothing reported. That is F-5 arriving through a second door: F-5 sanitised the samples, and nothing sanitised the configuration</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 124</span><br><span class="x">they were processed under.</span></li>
-<li><span class="sec">fn clamp_ratio_bounds</span> <span class="meta">line 194</span><br><span class="x">Keep a `(lo, hi)` ratio pair inside a range a resampler can act on, and in the right order.</span></li>
-<li><span class="sec">const MIN</span> <span class="meta">line 195</span><br><span class="x"></span></li>
-<li><span class="sec">const MAX</span> <span class="meta">line 196</span><br><span class="x"></span></li>
-<li><span class="sec">struct ProcessStats</span> <span class="meta">line 208</span><br><span class="x">Rolling performance statistics, surfaced live to the UI.</span></li>
-<li><span class="sec">impl ProcessStats</span> <span class="meta">line 227</span><br><span class="x"></span></li>
-<li><span class="sec">fn last_block_ms</span> <span class="meta">line 229</span><br><span class="x">Most recent block processing time in milliseconds.</span></li>
-<li><span class="sec">fn worst_block_ms</span> <span class="meta">line 233</span><br><span class="x">Worst block processing time in milliseconds.</span></li>
-<li><span class="sec">fn ema_block_ms</span> <span class="meta">line 237</span><br><span class="x">Smoothed block processing time in milliseconds.</span></li>
-<li><span class="sec">fn last_realtime_factor</span> <span class="meta">line 242</span><br><span class="x">Processing time divided by the block&#x27;s real-time duration. &lt; 1.0 means the machine keeps up with real time; the headroom is `1 - factor`.</span></li>
-<li><span class="sec">struct Deidentifier</span> <span class="meta">line 258</span><br><span class="x">The complete, irreversible voice de-identification chain. Feed it mono `f32` samples; it returns mono `f32` samples of equal length, delayed by [`Deidentifier::latency_samples`]. Not real-time-thread cheap to *construct* (allocates FFT</span></li>
-<li><span class="sec">struct Deidentifier</span> <span class="meta">line 258</span><br><span class="x">plans), but `process` performs no heap allocation and is safe to run inside an audio callback.</span></li>
-<li><span class="sec">impl Deidentifier</span> <span class="meta">line 277</span><br><span class="x"></span></li>
-<li><span class="sec">fn new</span> <span class="meta">line 279</span><br><span class="x">Build with a fresh, unpredictable seed from the OS CSPRNG.</span></li>
-<li><span class="sec">fn from_seed</span> <span class="meta">line 286</span><br><span class="x">Build with an explicit seed (deterministic; for tests or seed-from-key).</span></li>
-<li><span class="sec">fn latency_samples</span> <span class="meta">line 344</span><br><span class="x">Fixed algorithmic latency in samples.</span></li>
-<li><span class="sec">fn stats</span> <span class="meta">line 349</span><br><span class="x">Live performance statistics (copy).</span></li>
-<li><span class="sec">fn accent_stats</span> <span class="meta">line 354</span><br><span class="x">Live accent-neutralisation read-out (detected f0, applied ratios).</span></li>
-<li><span class="sec">fn process</span> <span class="meta">line 360</span><br><span class="x">Process `input` into `output` (equal length). Allocation-free; safe for an audio callback. Updates [`Deidentifier::stats`].</span></li>
-<li><span class="sec">fn process_vec</span> <span class="meta">line 419</span><br><span class="x">Convenience: process a whole buffer and return a new `Vec`.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 427</span><br><span class="x"></span></li>
-<li><span class="sec">fn rms</span> <span class="meta">line 430</span><br><span class="x"></span></li>
-<li><span class="sec">fn config_rejects_impossible_values</span> <span class="meta">line 438</span><br><span class="x"></span></li>
-<li><span class="sec">fn output_finite_and_length_preserved</span> <span class="meta">line 456</span><br><span class="x"></span></li>
-<li><span class="sec">fn loudness_roughly_preserved_no_runaway</span> <span class="meta">line 467</span><br><span class="x"></span></li>
-<li><span class="sec">fn different_seeds_produce_different_output</span> <span class="meta">line 487</span><br><span class="x"></span></li>
-<li><span class="sec">fn speaker</span> <span class="meta">line 504</span><br><span class="x">Harmonically rich voiced speech from a speaker with a given pitch and vocal-tract scale (`vtl` &gt; 1 = longer tract = lower formants).</span></li>
-<li><span class="sec">fn accent_only</span> <span class="meta">line 528</span><br><span class="x">Isolate the accent path: no random modulation, no time-domain effects.</span></li>
-<li><span class="sec">fn measure_f0</span> <span class="meta">line 539</span><br><span class="x"></span></li>
-<li><span class="sec">fn accent_neutralisation_converges_speakers_end_to_end</span> <span class="meta">line 548</span><br><span class="x">The end-to-end claim: two speakers who differ sharply in register go in, and come out sharing one canonical register.</span></li>
-<li><span class="sec">fn accent_neutralisation_can_be_switched_off</span> <span class="meta">line 572</span><br><span class="x"></span></li>
-<li><span class="sec">fn accent_stats_are_populated</span> <span class="meta">line 604</span><br><span class="x"></span></li>
-<li><span class="sec">fn stays_comfortably_realtime_with_accent_on</span> <span class="meta">line 622</span><br><span class="x">Accent tracking must not cost the real-time budget. Release builds are far faster; this only guards against an accidental order-of-magnitude regression such as un-decimated pitch search.</span></li>
-<li><span class="sec">fn rolling_the_seed_introduces_no_clicks</span> <span class="meta">line 640</span><br><span class="x">The property that makes rolling usable at all: it must be inaudible. A discontinuity in the phase offsets would show up as a sample-to-sample jump far larger than the signal ever produces on its own.</span></li>
-<li><span class="sec">fn rolling_changes_the_audio_but_keeps_it_sane</span> <span class="meta">line 668</span><br><span class="x"></span></li>
-<li><span class="sec">fn rolling_stays_deterministic_for_a_given_seed</span> <span class="meta">line 711</span><br><span class="x">Rolling must not cost determinism &#8212; reproducible builds and the whole test suite depend on `from_seed` being repeatable.</span></li>
-<li><span class="sec">fn reseed_interval_is_validated</span> <span class="meta">line 727</span><br><span class="x"></span></li>
-<li><span class="sec">fn stats_are_populated</span> <span class="meta">line 755</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The assembled de-identification chain and its live performance statistics. Every other module in this crate does one job. This is the file that puts them in order and decides what happens to a block of samples, so it is the one to read</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">first if you want to know what VeilVoice actually *does* to audio. # The signal path [`Deidentifier::process`] takes a block of input and writes an equal-length block of output. Everything below happens inside it, per STFT frame: 1. **Roll</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the modulation stream** if this frame is the one where the ratchet fires. See &quot;forward secrecy&quot; below. 2. **Draw this frame&#x27;s modulation** from the CSPRNG -- a pitch ratio and a formant ratio, glided toward fresh random targets rather than</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">jumped, so the scrambling is inaudible as scrambling. 3. **Track the fundamental** from the newest hop of *time-domain* samples. This cannot be done in the frequency domain: at any frame size with usable latency, the FFT&#x27;s bin spacing</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">cannot tell 100 Hz from 140 Hz. The tracker keeps its own longer history and is fed only what is new. 4. **Let the accent neutraliser observe** that estimate, so its long-term picture of the speaker stays current. 5. **Transform the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">spectrum** -- this is the irreversible step, and it lives in [`crate::spectral`]. Measured phase is discarded and resynthesised; pitch, vocal-tract scale and spectral tilt are mapped onto canonical values. Then, once per block rather than</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">per frame, a short time-domain tail: soft clip, chorus, reverb. Those are cosmetic. **They are not what makes the output unlinkable** and nothing here should be read as though they were. # Why it is one-way, in one paragraph Two</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">independent reasons, and both are needed: * **The mapping is many-to-one.** Every speaker is pushed toward the same pitch register, the same vocal-tract scale and the same long-term spectrum. Many different inputs produce the same output,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">so there is no inverse to compute -- not &quot;an inverse that is hard to find&quot;, none. * **The phase is gone.** The measured phase of every frame is discarded and replaced. Phase carries the precise waveform and a speaker&#x27;s micro-timing; it is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">never stored, so nothing downstream can restore it. The CSPRNG modulation on top means there is not even one fixed transform to characterise. That is a third reason, and it is the weakest of the three: randomness alone would be reversible</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">by anyone holding the seed. The seed never leaves the process and is zeroized on drop, but the argument does not rest on that. # Forward secrecy, and what `reseed_secs` is really for The modulation stream rolls onto a fresh seed every</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">[`DeidConfig::reseed_secs`] (two seconds by default), drawing the new seed from the stream it replaces. ChaCha20 cannot be run backwards, so obtaining the current state tells an adversary nothing about the modulation that drove any earlier</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">segment: a long recording is a chain of short independently-sealed streams rather than one long one. **This is forward secrecy, not irreversibility.** Rolling more often does not make the output harder to invert -- the phase discard and</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the many-to-one mapping already did that, and they do not depend on the ratchet at all. Setting `reseed_secs` to `0.0` keeps one stream for the session and the output is exactly as unlinkable as before. The roll is deliberately cheap: no</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">syscall, no allocation, no lock. It has to be, because it happens inside an audio callback. # Real-time constraints [`Deidentifier::process`] is allocation-free and safe to call from an audio callback. That is a property of this file and</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">it is easy to lose: a `Vec` grown inside the per-frame closure, a lock taken, or a log line written would each turn a working live path into audible dropouts on somebody else&#x27;s machine and not on yours. [`Deidentifier::process_vec`] is the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">convenience form that *does* allocate. It is for offline processing; do not reach for it in a callback. [`ProcessStats`] records what each block cost -- last, worst, and an exponential moving average -- so a front-end can show a real-time</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">factor instead of guessing. `worst_block_ms` is the one that matters for live use: the average being comfortable says nothing about whether the worst block missed its deadline. # Configuration is validated in one place</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">[`DeidConfig::checked`] is the single funnel, and nothing should bypass it. Two shipped defects are the reason it exists in that shape: a configuration value once made every output sample silently `NaN` (F-10), and parameters read from a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">file and handed to a library without a bound killed the process (F-2, F-3). The engine keeps persistent state, so a bad value is not one bad block -- it is every block from then on.</span></li>
+<li><span class="sec">struct DeidConfig</span> <span class="meta">line 106</span><br><span class="x">User-facing configuration for the de-identifier.</span></li>
+<li><span class="sec">impl Default for DeidConfig</span> <span class="meta">line 149</span><br><span class="x"></span></li>
+<li><span class="sec">fn default</span> <span class="meta">line 150</span><br><span class="x"></span></li>
+<li><span class="sec">impl DeidConfig</span> <span class="meta">line 171</span><br><span class="x"></span></li>
+<li><span class="sec">fn hop</span> <span class="meta">line 172</span><br><span class="x"></span></li>
+<li><span class="sec">fn scaled</span> <span class="meta">line 177</span><br><span class="x">Scale a `(lo, hi)` ratio range toward 1.0 by `intensity`.</span></li>
+<li><span class="sec">const MAX_SAMPLE_RATE</span> <span class="meta">line 197</span><br><span class="x">The largest sample rate this engine will build for, in Hz. Every value in here is reachable from a file: a WAV&#x27;s `fmt ` chunk carries a **`u32`** sample rate, and `symphonia` passes whatever it finds straight through. That number then</span></li>
+<li><span class="sec">const MAX_SAMPLE_RATE</span> <span class="meta">line 197</span><br><span class="x">sizes the delay lines in `effects.rs` &#8212; `Reverb`&#x27;s comb is `0.0297 &#215; sample_rate` samples and the chorus voices are similar &#8212; so a four-kilobyte file declaring `u32::MAX` asks for roughly two gigabytes of buffers before a single sample is</span></li>
+<li><span class="sec">const MAX_SAMPLE_RATE</span> <span class="meta">line 197</span><br><span class="x">processed. A failed allocation in Rust aborts the process, which is the same shape as F-3: opening a hostile file kills the program. 768 kHz is chosen well above anything real. Professional converters top out at 384 kHz and DSD-rate PCM at</span></li>
+<li><span class="sec">const MAX_SAMPLE_RATE</span> <span class="meta">line 197</span><br><span class="x">705.6 kHz; nothing legitimate asks for more, and the largest buffer this permits is a few megabytes.</span></li>
+<li><span class="sec">const MAX_FRAME_SIZE</span> <span class="meta">line 205</span><br><span class="x">The largest FFT size this engine will build for. Bounded for the same reason as the sample rate: `frame_size` sizes every internal buffer and the FFT plan, and there was previously no upper limit at all, so a caller could ask for a</span></li>
+<li><span class="sec">const MAX_FRAME_SIZE</span> <span class="meta">line 205</span><br><span class="x">`usize::MAX / 2` transform. 65536 is eight times the largest size anyone uses for speech.</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 216</span><br><span class="x">Validate and normalise; returns an error string on impossible values. Every float is checked for finiteness, not merely for range. A `NaN` compares false against every bound, so a bare `self.sample_rate &lt; 8_000.0` test *passes* `NaN` &#8212; and</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 216</span><br><span class="x">an engine built at a `NaN` sample rate produced `NaN` for every output sample, for the whole session, with nothing reported. That is F-5 arriving through a second door: F-5 sanitised the samples, and nothing sanitised the configuration</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 216</span><br><span class="x">they were processed under.</span></li>
+<li><span class="sec">fn clamp_ratio_bounds</span> <span class="meta">line 286</span><br><span class="x">Keep a `(lo, hi)` ratio pair inside a range a resampler can act on, and in the right order.</span></li>
+<li><span class="sec">const MIN</span> <span class="meta">line 287</span><br><span class="x"></span></li>
+<li><span class="sec">const MAX</span> <span class="meta">line 288</span><br><span class="x"></span></li>
+<li><span class="sec">struct ProcessStats</span> <span class="meta">line 300</span><br><span class="x">Rolling performance statistics, surfaced live to the UI.</span></li>
+<li><span class="sec">impl ProcessStats</span> <span class="meta">line 319</span><br><span class="x"></span></li>
+<li><span class="sec">fn last_block_ms</span> <span class="meta">line 321</span><br><span class="x">Most recent block processing time in milliseconds.</span></li>
+<li><span class="sec">fn worst_block_ms</span> <span class="meta">line 325</span><br><span class="x">Worst block processing time in milliseconds.</span></li>
+<li><span class="sec">fn ema_block_ms</span> <span class="meta">line 329</span><br><span class="x">Smoothed block processing time in milliseconds.</span></li>
+<li><span class="sec">fn last_realtime_factor</span> <span class="meta">line 334</span><br><span class="x">Processing time divided by the block&#x27;s real-time duration. &lt; 1.0 means the machine keeps up with real time; the headroom is `1 - factor`.</span></li>
+<li><span class="sec">struct Deidentifier</span> <span class="meta">line 350</span><br><span class="x">The complete, irreversible voice de-identification chain. Feed it mono `f32` samples; it returns mono `f32` samples of equal length, delayed by [`Deidentifier::latency_samples`]. Not real-time-thread cheap to *construct* (allocates FFT</span></li>
+<li><span class="sec">struct Deidentifier</span> <span class="meta">line 350</span><br><span class="x">plans), but `process` performs no heap allocation and is safe to run inside an audio callback.</span></li>
+<li><span class="sec">impl Deidentifier</span> <span class="meta">line 369</span><br><span class="x"></span></li>
+<li><span class="sec">fn new</span> <span class="meta">line 371</span><br><span class="x">Build with a fresh, unpredictable seed from the OS CSPRNG.</span></li>
+<li><span class="sec">fn from_seed</span> <span class="meta">line 378</span><br><span class="x">Build with an explicit seed (deterministic; for tests or seed-from-key).</span></li>
+<li><span class="sec">fn latency_samples</span> <span class="meta">line 436</span><br><span class="x">Fixed algorithmic latency in samples.</span></li>
+<li><span class="sec">fn stats</span> <span class="meta">line 441</span><br><span class="x">Live performance statistics (copy).</span></li>
+<li><span class="sec">fn accent_stats</span> <span class="meta">line 446</span><br><span class="x">Live accent-neutralisation read-out (detected f0, applied ratios).</span></li>
+<li><span class="sec">fn process</span> <span class="meta">line 452</span><br><span class="x">Process `input` into `output` (equal length). Allocation-free; safe for an audio callback. Updates [`Deidentifier::stats`].</span></li>
+<li><span class="sec">fn process_vec</span> <span class="meta">line 511</span><br><span class="x">Convenience: process a whole buffer and return a new `Vec`.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 519</span><br><span class="x"></span></li>
+<li><span class="sec">fn rms</span> <span class="meta">line 522</span><br><span class="x"></span></li>
+<li><span class="sec">fn config_rejects_impossible_values</span> <span class="meta">line 530</span><br><span class="x"></span></li>
+<li><span class="sec">fn output_finite_and_length_preserved</span> <span class="meta">line 548</span><br><span class="x"></span></li>
+<li><span class="sec">fn loudness_roughly_preserved_no_runaway</span> <span class="meta">line 559</span><br><span class="x"></span></li>
+<li><span class="sec">fn different_seeds_produce_different_output</span> <span class="meta">line 579</span><br><span class="x"></span></li>
+<li><span class="sec">fn speaker</span> <span class="meta">line 596</span><br><span class="x">Harmonically rich voiced speech from a speaker with a given pitch and vocal-tract scale (`vtl` &gt; 1 = longer tract = lower formants).</span></li>
+<li><span class="sec">fn accent_only</span> <span class="meta">line 620</span><br><span class="x">Isolate the accent path: no random modulation, no time-domain effects.</span></li>
+<li><span class="sec">fn measure_f0</span> <span class="meta">line 631</span><br><span class="x"></span></li>
+<li><span class="sec">fn accent_neutralisation_converges_speakers_end_to_end</span> <span class="meta">line 640</span><br><span class="x">The end-to-end claim: two speakers who differ sharply in register go in, and come out sharing one canonical register.</span></li>
+<li><span class="sec">fn accent_neutralisation_can_be_switched_off</span> <span class="meta">line 664</span><br><span class="x"></span></li>
+<li><span class="sec">fn accent_stats_are_populated</span> <span class="meta">line 696</span><br><span class="x"></span></li>
+<li><span class="sec">fn stays_comfortably_realtime_with_accent_on</span> <span class="meta">line 714</span><br><span class="x">Accent tracking must not cost the real-time budget. Release builds are far faster; this only guards against an accidental order-of-magnitude regression such as un-decimated pitch search.</span></li>
+<li><span class="sec">fn rolling_the_seed_introduces_no_clicks</span> <span class="meta">line 732</span><br><span class="x">The property that makes rolling usable at all: it must be inaudible. A discontinuity in the phase offsets would show up as a sample-to-sample jump far larger than the signal ever produces on its own.</span></li>
+<li><span class="sec">fn rolling_changes_the_audio_but_keeps_it_sane</span> <span class="meta">line 760</span><br><span class="x"></span></li>
+<li><span class="sec">fn rolling_stays_deterministic_for_a_given_seed</span> <span class="meta">line 803</span><br><span class="x">Rolling must not cost determinism &#8212; reproducible builds and the whole test suite depend on `from_seed` being repeatable.</span></li>
+<li><span class="sec">fn reseed_interval_is_validated</span> <span class="meta">line 819</span><br><span class="x"></span></li>
+<li><span class="sec">fn stats_are_populated</span> <span class="meta">line 847</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-core/src/effects.rs</code> <span class="meta">&mdash; veilvoice-core, 178 lines, 21 sections</span></summary>
+<summary><code>crates/veilvoice-core/src/effects.rs</code> <span class="meta">&mdash; veilvoice-core, 215 lines, 29 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs">open effects.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Light time-domain effects applied after resynthesis. These run on the continuous output stream (not per FFT frame) and exist to (a) further decorrelate the signal from the original, and (b) add a few detuned &quot;voices&quot; so the spectrogram is</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">densely filled rather than showing a clean harmonic stack &#8212; without harming intelligibility, so every mix defaults low. None of them are invertible in a way that recovers the source voice.</span></li>
-<li><span class="sec">struct SoftClip</span> <span class="meta">line 14</span><br><span class="x">Symmetric soft-clip (tanh) waveshaper. `drive` sets curvature, `mix` blends dry/wet. Adds gentle odd harmonics that smear residual identity cues.</span></li>
-<li><span class="sec">impl SoftClip</span> <span class="meta">line 20</span><br><span class="x"></span></li>
-<li><span class="sec">fn new</span> <span class="meta">line 21</span><br><span class="x"></span></li>
-<li><span class="sec">fn process</span> <span class="meta">line 30</span><br><span class="x"></span></li>
-<li><span class="sec">struct DelayVoice</span> <span class="meta">line 38</span><br><span class="x">A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices.</span></li>
-<li><span class="sec">impl DelayVoice</span> <span class="meta">line 47</span><br><span class="x"></span></li>
-<li><span class="sec">fn new</span> <span class="meta">line 48</span><br><span class="x"></span></li>
-<li><span class="sec">fn process</span> <span class="meta">line 62</span><br><span class="x"></span></li>
-<li><span class="sec">struct Chorus</span> <span class="meta">line 79</span><br><span class="x">Detuned chorus ensemble.</span></li>
-<li><span class="sec">impl Chorus</span> <span class="meta">line 84</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">densely filled rather than showing a clean harmonic stack &#8212; without harming intelligibility, so every mix defaults low. None of them are invertible in a way that recovers the source voice. # How little these contribute, said plainly It</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">would be easy to read a chorus and a reverb as part of the anonymity argument. They are not, and this crate should not let anybody think they are. **The voiceprint is destroyed in [`crate::spectral`]** -- by discarding measured phase and</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">by mapping every speaker onto one canonical pitch register and vocal-tract scale. That has already happened before a single sample reaches this file. What these three add is *decorrelation at the margins*: a denser spectrogram, a few</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">detuned voices where there was a clean harmonic stack, and some odd harmonics smearing whatever residual cues survived. Useful, cheap, and nowhere near sufficient alone. Set all three mixes to zero and the output is exactly as unlinkable</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">as before. The reason to be exact about this is that a filter chain of precisely this shape -- clip, chorus, reverb -- is what a *voice changer* ships, and a voice changer offers no anonymity whatsoever. Everything that separates this</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">project from that one happens upstream of this file. # Why every mix defaults low Intelligibility is a requirement, not a preference. Each of these effects trades clarity for density, and past a fairly low mix the words start to cost more</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">than the added decorrelation is worth. The defaults sit where a listener does not notice the effect is there at all; they are a starting point a user may raise, not a recommendation to raise them. # Real-time constraints These run per</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">output sample inside an audio callback, on the continuous stream rather than per FFT frame. Every buffer is allocated once at construction: `process` allocates nothing, takes no lock and reads no clock. [`Chorus`] and [`Reverb`] own their</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">delay lines and index them with wrapping arithmetic, so changing sample rate means building a new one rather than resizing a live one.</span></li>
+<li><span class="sec">struct SoftClip</span> <span class="meta">line 51</span><br><span class="x">Symmetric soft-clip (tanh) waveshaper. `drive` sets curvature, `mix` blends dry/wet. Adds gentle odd harmonics that smear residual identity cues.</span></li>
+<li><span class="sec">impl SoftClip</span> <span class="meta">line 57</span><br><span class="x"></span></li>
+<li><span class="sec">fn new</span> <span class="meta">line 58</span><br><span class="x"></span></li>
+<li><span class="sec">fn process</span> <span class="meta">line 67</span><br><span class="x"></span></li>
+<li><span class="sec">struct DelayVoice</span> <span class="meta">line 75</span><br><span class="x">A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices.</span></li>
+<li><span class="sec">impl DelayVoice</span> <span class="meta">line 84</span><br><span class="x"></span></li>
 <li><span class="sec">fn new</span> <span class="meta">line 85</span><br><span class="x"></span></li>
-<li><span class="sec">fn process</span> <span class="meta">line 98</span><br><span class="x"></span></li>
-<li><span class="sec">struct Reverb</span> <span class="meta">line 110</span><br><span class="x">Minimal Schroeder-style reverb: one feedback comb + one all-pass. Kept very light so speech stays dry enough to transcribe.</span></li>
-<li><span class="sec">impl Reverb</span> <span class="meta">line 120</span><br><span class="x"></span></li>
-<li><span class="sec">fn new</span> <span class="meta">line 121</span><br><span class="x"></span></li>
+<li><span class="sec">fn process</span> <span class="meta">line 99</span><br><span class="x"></span></li>
+<li><span class="sec">struct Chorus</span> <span class="meta">line 116</span><br><span class="x">Detuned chorus ensemble.</span></li>
+<li><span class="sec">impl Chorus</span> <span class="meta">line 121</span><br><span class="x"></span></li>
+<li><span class="sec">fn new</span> <span class="meta">line 122</span><br><span class="x"></span></li>
 <li><span class="sec">fn process</span> <span class="meta">line 135</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 152</span><br><span class="x"></span></li>
-<li><span class="sec">fn softclip_is_bounded_and_finite</span> <span class="meta">line 156</span><br><span class="x"></span></li>
-<li><span class="sec">fn chorus_and_reverb_finite</span> <span class="meta">line 165</span><br><span class="x"></span></li>
+<li><span class="sec">struct Reverb</span> <span class="meta">line 147</span><br><span class="x">Minimal Schroeder-style reverb: one feedback comb + one all-pass. Kept very light so speech stays dry enough to transcribe.</span></li>
+<li><span class="sec">impl Reverb</span> <span class="meta">line 157</span><br><span class="x"></span></li>
+<li><span class="sec">fn new</span> <span class="meta">line 158</span><br><span class="x"></span></li>
+<li><span class="sec">fn process</span> <span class="meta">line 172</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 189</span><br><span class="x"></span></li>
+<li><span class="sec">fn softclip_is_bounded_and_finite</span> <span class="meta">line 193</span><br><span class="x"></span></li>
+<li><span class="sec">fn chorus_and_reverb_finite</span> <span class="meta">line 202</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -1607,16 +1642,23 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-core/src/window.rs</code> <span class="meta">&mdash; veilvoice-core, 55 lines, 7 sections</span></summary>
+<summary><code>crates/veilvoice-core/src/window.rs</code> <span class="meta">&mdash; veilvoice-core, 92 lines, 14 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs">open window.rs</a></p>
 <ul>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Analysis/synthesis windowing helpers.</span></li>
-<li><span class="sec">fn hann</span> <span class="meta">line 10</span><br><span class="x">Periodic Hann window of length `n` (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design). `w[i] = 0.5 - 0.5 * cos(2*pi*i / n)`</span></li>
-<li><span class="sec">fn ola_gain</span> <span class="meta">line 26</span><br><span class="x">Overlap-add normalisation for a window applied on **both** analysis and synthesis at the given `hop`. For a Constant-Overlap-Add window the steady-state reconstruction gain is `sum(w^2) / hop`; dividing synthesis frames by it yields unity</span></li>
-<li><span class="sec">fn ola_gain</span> <span class="meta">line 26</span><br><span class="x">gain. We return the reciprocal (`hop / sum(w^2)`) so callers can multiply.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 37</span><br><span class="x"></span></li>
-<li><span class="sec">fn hann_endpoints_are_zero</span> <span class="meta">line 41</span><br><span class="x"></span></li>
-<li><span class="sec">fn ola_gain_positive_and_finite</span> <span class="meta">line 49</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. Two functions, both small, both easy to get subtly wrong in ways that do not look wrong. # Why the *periodic* Hann window There are two Hann windows and</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">they differ by one sample. The **symmetric** variant (`cos(2*pi*i / (n-1))`) is the right one for designing filters, and it is what most textbook snippets show. The **periodic** variant (`cos(2*pi*i / n)`, which is what [`hann`] returns)</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">is the right one for an STFT, because it is the one that tiles: shifted copies of it sum to a constant, and the symmetric one does not quite. Using the wrong one does not produce an obvious failure. It produces a faint periodic amplitude</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">ripple at the hop rate -- a quiet buzz that sounds like a codec artefact rather than like a bug, and that nothing in a test suite notices unless the test is looking for exactly it. # Why the gain is computed rather than assumed VeilVoice</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">windows **twice**: once on analysis and once on synthesis. That is deliberate -- a synthesis window suppresses the discontinuities that modifying a spectrum introduces at frame edges, and this crate modifies every spectrum it touches. The</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">cost is that the reconstruction gain is no longer the familiar Constant-Overlap-Add value, it is `sum(w^2) / hop`. [`ola_gain`] returns the reciprocal of that, so a caller multiplies rather than divides -- one multiply per sample in a hot</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">loop instead of one divide. It is derived from the window actually in use rather than hardcoded for a particular size and overlap, so changing either cannot silently change the output level. The zero-length and single-sample cases are</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">handled explicitly, and the degenerate `sum(w^2) == 0` returns unity rather than infinity: this is a gain that gets multiplied into every output sample, and one non-finite value entering an engine with persistent state is permanent.</span></li>
+<li><span class="sec">fn hann</span> <span class="meta">line 47</span><br><span class="x">Periodic Hann window of length `n` (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design). `w[i] = 0.5 - 0.5 * cos(2*pi*i / n)`</span></li>
+<li><span class="sec">fn ola_gain</span> <span class="meta">line 63</span><br><span class="x">Overlap-add normalisation for a window applied on **both** analysis and synthesis at the given `hop`. For a Constant-Overlap-Add window the steady-state reconstruction gain is `sum(w^2) / hop`; dividing synthesis frames by it yields unity</span></li>
+<li><span class="sec">fn ola_gain</span> <span class="meta">line 63</span><br><span class="x">gain. We return the reciprocal (`hop / sum(w^2)`) so callers can multiply.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 74</span><br><span class="x"></span></li>
+<li><span class="sec">fn hann_endpoints_are_zero</span> <span class="meta">line 78</span><br><span class="x"></span></li>
+<li><span class="sec">fn ola_gain_positive_and_finite</span> <span class="meta">line 86</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -2164,50 +2206,65 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/app.rs</code> <span class="meta">&mdash; veilvoice-gui, 987 lines, 41 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/app.rs</code> <span class="meta">&mdash; veilvoice-gui, 1063 lines, 56 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs">open app.rs</a></p>
 <ul>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The VeilVoice desktop application.</span></li>
-<li><span class="sec">enum Tab</span> <span class="meta">line 14</span><br><span class="x">The things VeilVoice does.</span></li>
-<li><span class="sec">enum JobDone</span> <span class="meta">line 30</span><br><span class="x">Result of a background file job.</span></li>
-<li><span class="sec">struct VeilVoiceApp</span> <span class="meta">line 41</span><br><span class="x">Application state.</span></li>
-<li><span class="sec">fn preferred_output</span> <span class="meta">line 95</span><br><span class="x">Pick the output to start on: a virtual cable if the machine has one, because routing there is what lets other applications hear the veiled voice at all; otherwise the system default. A free function over a device list rather than a step</span></li>
-<li><span class="sec">fn preferred_output</span> <span class="meta">line 95</span><br><span class="x">inside `Default`, so the choice can be tested against every arrangement of devices without touching the machine&#x27;s audio stack. That matters more than it looks: building the app enumerates devices through `cpal`, and several tests doing</span></li>
-<li><span class="sec">fn preferred_output</span> <span class="meta">line 95</span><br><span class="x">that at once on a headless runner is a good way to find out what WASAPI does when there are no endpoints and COM is being initialised from four threads at once. The answer was an access violation.</span></li>
-<li><span class="sec">fn preferred_input</span> <span class="meta">line 104</span><br><span class="x">Pick the input to start on: the system default, else whatever is first.</span></li>
-<li><span class="sec">impl VeilVoiceApp</span> <span class="meta">line 112</span><br><span class="x"></span></li>
-<li><span class="sec">fn without_devices</span> <span class="meta">line 118</span><br><span class="x">The application with no devices enumerated. `Default` calls this after asking the system what it has. Tests that are not about device selection use it directly, so the suite touches the platform&#x27;s audio stack exactly once instead of once</span></li>
-<li><span class="sec">fn without_devices</span> <span class="meta">line 118</span><br><span class="x">per test.</span></li>
-<li><span class="sec">impl Default for VeilVoiceApp</span> <span class="meta">line 150</span><br><span class="x"></span></li>
-<li><span class="sec">fn default</span> <span class="meta">line 151</span><br><span class="x"></span></li>
-<li><span class="sec">impl VeilVoiceApp</span> <span class="meta">line 164</span><br><span class="x"></span></li>
-<li><span class="sec">fn new</span> <span class="meta">line 169</span><br><span class="x">Build the app, applying theme and fonts to `ctx`. This is where the lock file is read, rather than in `Default`: tests and anything else constructing the app must not touch the real one.</span></li>
-<li><span class="sec">fn config</span> <span class="meta">line 184</span><br><span class="x"></span></li>
-<li><span class="sec">impl eframe::App for VeilVoiceApp</span> <span class="meta">line 197</span><br><span class="x"></span></li>
-<li><span class="sec">fn update</span> <span class="meta">line 198</span><br><span class="x"></span></li>
-<li><span class="sec">impl VeilVoiceApp</span> <span class="meta">line 301</span><br><span class="x"></span></li>
-<li><span class="sec">fn poll_job</span> <span class="meta">line 302</span><br><span class="x"></span></li>
-<li><span class="sec">fn settings</span> <span class="meta">line 336</span><br><span class="x"></span></li>
-<li><span class="sec">fn file_tab</span> <span class="meta">line 373</span><br><span class="x"></span></li>
-<li><span class="sec">fn start_job</span> <span class="meta">line 453</span><br><span class="x"></span></li>
-<li><span class="sec">fn live_tab</span> <span class="meta">line 509</span><br><span class="x"></span></li>
-<li><span class="sec">fn start_live</span> <span class="meta">line 600</span><br><span class="x"></span></li>
-<li><span class="sec">fn poll_watch</span> <span class="meta">line 614</span><br><span class="x">Re-scan on a timer rather than every frame.</span></li>
-<li><span class="sec">fn watch_indicator</span> <span class="meta">line 638</span><br><span class="x">The always-visible indicator.</span></li>
-<li><span class="sec">fn watch_tab</span> <span class="meta">line 667</span><br><span class="x"></span></li>
-<li><span class="sec">fn about_tab</span> <span class="meta">line 743</span><br><span class="x"></span></li>
-<li><span class="sec">fn device_picker</span> <span class="meta">line 794</span><br><span class="x"></span></li>
-<li><span class="sec">fn field</span> <span class="meta">line 819</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter</span> <span class="meta">line 826</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 853</span><br><span class="x"></span></li>
-<li><span class="sec">fn device</span> <span class="meta">line 858</span><br><span class="x">Device selection is tested against synthetic lists, never the machine. See `preferred_output` for why that is not merely tidier.</span></li>
-<li><span class="sec">fn defaults_are_the_safe_ones</span> <span class="meta">line 867</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_job_cannot_start_before_the_at_rest_choice_is_made</span> <span class="meta">line 886</span><br><span class="x">The default is only worth anything if the button honours it: with encryption on and nothing to encrypt with, a job must not start.</span></li>
-<li><span class="sec">fn config_reflects_the_controls</span> <span class="meta">line 893</span><br><span class="x"></span></li>
-<li><span class="sec">fn every_reachable_reseed_setting_is_valid</span> <span class="meta">line 911</span><br><span class="x">The slider&#x27;s whole range must produce a configuration the engine accepts, or a user could drag it into an error.</span></li>
-<li><span class="sec">fn a_virtual_cable_is_preferred_over_the_system_default</span> <span class="meta">line 924</span><br><span class="x">A virtual cable must win, because routing there is the whole point of live mode. Every arrangement, none of them involving real hardware.</span></li>
-<li><span class="sec">fn the_default_input_is_preferred_then_the_first</span> <span class="meta">line 957</span><br><span class="x"></span></li>
-<li><span class="sec">fn building_the_app_with_real_device_enumeration_does_not_panic</span> <span class="meta">line 976</span><br><span class="x">The one test that talks to the machine&#x27;s audio stack. Kept single, and last: enumerating devices from several test threads at once on a headless runner is what produced an access violation in CI.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The VeilVoice desktop application. One window, six tabs, no menus and no settings file to hunt for. This file owns the window: the tab strip, the state behind it, and the rules about what the user is allowed to do before they have answered</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the questions that matter. The tabs themselves live partly here and partly in siblings -- [`crate::security`] draws the lock tab and the unlock screen, [`crate::prefs`] draws settings. # The six tabs, and why these six | Tab | What it is |</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">|---|---| | **anonymise file** | Process a recording on disk. The default path. | | **live scramble** | Scramble a microphone in real time into a virtual cable. | | **monitor** | Which applications currently hold the microphone and camera.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">| | **lock** | The app lock, and a plain statement of what it is worth. | | **settings** | Colour scheme, animation, and where those choices are kept. | | **about** | Versions, licence, and the honest scope. | There is no &quot;advanced&quot; tab</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">and no hidden pane. Everything the program can do is reachable in one click from the strip, because a privacy tool whose important controls are buried is a privacy tool whose important controls do not get used. # Nothing slow runs on the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">UI thread [`VeilVoiceApp::start_job`] spawns a worker and hands back an [`std::sync::mpsc`] receiver; [`VeilVoiceApp::poll_job`] drains it with `try_recv` once per frame. The window keeps painting while a job runs. That split is not</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">tidiness. A long recording takes real time to process, and sealing it runs Argon2id at 256 MiB, which is **deliberately** slow -- that is the whole point of a memory-hard KDF. Doing either on the UI thread means a frozen window and an</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">operating system offering to kill the application, in the middle of the operation the user cares most about completing. `poll_job` handles all three channel outcomes, including `Disconnected` -- a worker that panicked. The user is told the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">thread stopped rather than watching a progress state that will never finish. # The at-rest choice is enforced here, not merely offered Recordings are encrypted at rest by default (locked decision 4.10), and a job **cannot start** until the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">user has answered the modal that appears if they try to turn that off. The rule is asserted by a test in this file rather than left as a property of the layout code, because &quot;the button was disabled&quot; is a claim about pixels and &quot;the job</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">refuses to start&quot; is a claim about behaviour. The worker encodes the WAV **in memory** and seals it before anything is written, so a recording that is going to be encrypted never touches the disk in the clear -- not even briefly, not even</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">in a temporary file that would be deleted afterwards. Deleting a file does not remove its contents from a flash device; not writing it does. # The monitor indicator [`VeilVoiceApp::watch_indicator`] shows, in the header, whether anything</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">is holding the microphone or camera right now, and clicking it goes to the monitor tab. It is polled on a timer rather than watched continuously, because the underlying platform code enumerates processes and doing that every frame would</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">cost more than the rest of the window put together. What it reports is bounded by what the platform allows, and `veilvoice_watch::support()` states that bound rather than letting an empty list imply an empty machine. The indicator must</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">never present &quot;we could not see&quot; as &quot;nothing is there&quot;. # Where the honest limits are stated The about tab carries the scope text, and the lock tab carries `veilvoice_crypto::lock::SCOPE`. Neither is decoration: tests fail the build if</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that wording is softened, because a user who over-trusts the app lock is left worse off than one who never had it. If you are editing text in this file and a test starts failing, it is that rule, and it is working.</span></li>
+<li><span class="sec">enum Tab</span> <span class="meta">line 90</span><br><span class="x">The things VeilVoice does.</span></li>
+<li><span class="sec">enum JobDone</span> <span class="meta">line 106</span><br><span class="x">Result of a background file job.</span></li>
+<li><span class="sec">struct VeilVoiceApp</span> <span class="meta">line 117</span><br><span class="x">Application state.</span></li>
+<li><span class="sec">fn preferred_output</span> <span class="meta">line 171</span><br><span class="x">Pick the output to start on: a virtual cable if the machine has one, because routing there is what lets other applications hear the veiled voice at all; otherwise the system default. A free function over a device list rather than a step</span></li>
+<li><span class="sec">fn preferred_output</span> <span class="meta">line 171</span><br><span class="x">inside `Default`, so the choice can be tested against every arrangement of devices without touching the machine&#x27;s audio stack. That matters more than it looks: building the app enumerates devices through `cpal`, and several tests doing</span></li>
+<li><span class="sec">fn preferred_output</span> <span class="meta">line 171</span><br><span class="x">that at once on a headless runner is a good way to find out what WASAPI does when there are no endpoints and COM is being initialised from four threads at once. The answer was an access violation.</span></li>
+<li><span class="sec">fn preferred_input</span> <span class="meta">line 180</span><br><span class="x">Pick the input to start on: the system default, else whatever is first.</span></li>
+<li><span class="sec">impl VeilVoiceApp</span> <span class="meta">line 188</span><br><span class="x"></span></li>
+<li><span class="sec">fn without_devices</span> <span class="meta">line 194</span><br><span class="x">The application with no devices enumerated. `Default` calls this after asking the system what it has. Tests that are not about device selection use it directly, so the suite touches the platform&#x27;s audio stack exactly once instead of once</span></li>
+<li><span class="sec">fn without_devices</span> <span class="meta">line 194</span><br><span class="x">per test.</span></li>
+<li><span class="sec">impl Default for VeilVoiceApp</span> <span class="meta">line 226</span><br><span class="x"></span></li>
+<li><span class="sec">fn default</span> <span class="meta">line 227</span><br><span class="x"></span></li>
+<li><span class="sec">impl VeilVoiceApp</span> <span class="meta">line 240</span><br><span class="x"></span></li>
+<li><span class="sec">fn new</span> <span class="meta">line 245</span><br><span class="x">Build the app, applying theme and fonts to `ctx`. This is where the lock file is read, rather than in `Default`: tests and anything else constructing the app must not touch the real one.</span></li>
+<li><span class="sec">fn config</span> <span class="meta">line 260</span><br><span class="x"></span></li>
+<li><span class="sec">impl eframe::App for VeilVoiceApp</span> <span class="meta">line 273</span><br><span class="x"></span></li>
+<li><span class="sec">fn update</span> <span class="meta">line 274</span><br><span class="x"></span></li>
+<li><span class="sec">impl VeilVoiceApp</span> <span class="meta">line 377</span><br><span class="x"></span></li>
+<li><span class="sec">fn poll_job</span> <span class="meta">line 378</span><br><span class="x"></span></li>
+<li><span class="sec">fn settings</span> <span class="meta">line 412</span><br><span class="x"></span></li>
+<li><span class="sec">fn file_tab</span> <span class="meta">line 449</span><br><span class="x"></span></li>
+<li><span class="sec">fn start_job</span> <span class="meta">line 529</span><br><span class="x"></span></li>
+<li><span class="sec">fn live_tab</span> <span class="meta">line 585</span><br><span class="x"></span></li>
+<li><span class="sec">fn start_live</span> <span class="meta">line 676</span><br><span class="x"></span></li>
+<li><span class="sec">fn poll_watch</span> <span class="meta">line 690</span><br><span class="x">Re-scan on a timer rather than every frame.</span></li>
+<li><span class="sec">fn watch_indicator</span> <span class="meta">line 714</span><br><span class="x">The always-visible indicator.</span></li>
+<li><span class="sec">fn watch_tab</span> <span class="meta">line 743</span><br><span class="x"></span></li>
+<li><span class="sec">fn about_tab</span> <span class="meta">line 819</span><br><span class="x"></span></li>
+<li><span class="sec">fn device_picker</span> <span class="meta">line 870</span><br><span class="x"></span></li>
+<li><span class="sec">fn field</span> <span class="meta">line 895</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter</span> <span class="meta">line 902</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 929</span><br><span class="x"></span></li>
+<li><span class="sec">fn device</span> <span class="meta">line 934</span><br><span class="x">Device selection is tested against synthetic lists, never the machine. See `preferred_output` for why that is not merely tidier.</span></li>
+<li><span class="sec">fn defaults_are_the_safe_ones</span> <span class="meta">line 943</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_job_cannot_start_before_the_at_rest_choice_is_made</span> <span class="meta">line 962</span><br><span class="x">The default is only worth anything if the button honours it: with encryption on and nothing to encrypt with, a job must not start.</span></li>
+<li><span class="sec">fn config_reflects_the_controls</span> <span class="meta">line 969</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_reachable_reseed_setting_is_valid</span> <span class="meta">line 987</span><br><span class="x">The slider&#x27;s whole range must produce a configuration the engine accepts, or a user could drag it into an error.</span></li>
+<li><span class="sec">fn a_virtual_cable_is_preferred_over_the_system_default</span> <span class="meta">line 1000</span><br><span class="x">A virtual cable must win, because routing there is the whole point of live mode. Every arrangement, none of them involving real hardware.</span></li>
+<li><span class="sec">fn the_default_input_is_preferred_then_the_first</span> <span class="meta">line 1033</span><br><span class="x"></span></li>
+<li><span class="sec">fn building_the_app_with_real_device_enumeration_does_not_panic</span> <span class="meta">line 1052</span><br><span class="x">The one test that talks to the machine&#x27;s audio stack. Kept single, and last: enumerating devices from several test threads at once on a headless runner is what produced an access violation in CI.</span></li>
 </ul>
 </details>
 <details open>
@@ -2227,13 +2284,19 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/main.rs</code> <span class="meta">&mdash; veilvoice-gui, 41 lines, 4 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/main.rs</code> <span class="meta">&mdash; veilvoice-gui, 68 lines, 10 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs">open main.rs</a></p>
 <ul>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">VeilVoice desktop application entry point.</span></li>
-<li><span class="sec">const ICON_RGBA</span> <span class="meta">line 15</span><br><span class="x">The window icon, as raw 32x32 RGBA produced by `assets/generate.py`. Raw rather than PNG so the application needs no image decoder just to draw its own title bar.</span></li>
-<li><span class="sec">const ICON_SIZE</span> <span class="meta">line 16</span><br><span class="x"></span></li>
-<li><span class="sec">fn main</span> <span class="meta">line 18</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Entry point for the desktop application: open a window, hand it to [`veilvoice_gui::VeilVoiceApp`], and get out of the way. Everything of substance is in the library beside this file. That split is the point: a binary crate cannot be unit</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">tested, so the whole user interface lives in `lib.rs` and its modules where tests can reach it, and this file holds only what genuinely needs a window to exist. Three decisions are made here and nowhere else. **No console window on</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Windows, in release only.** A release build sets `windows_subsystem = &quot;windows&quot;`, so double-clicking the application does not flash up a terminal behind it. A debug build deliberately keeps the console, because that is where panics and</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`eprintln!` go and losing them while developing costs far more than the flash of a window is worth. **The icon is raw RGBA, not a PNG.** `assets/generate.py` writes `icon-32.rgba` beside the PNG it generates from the same pixels, so the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">application can set its own title-bar icon without linking an image decoder. A decoder is a parser, a parser is an attack surface, and this one would exist solely to draw a 32x32 square. The length is checked before use, and a mismatch</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">means the window simply opens without an icon rather than panicking at startup. **The window has a minimum size.** The layout is monospace and column-based, and below roughly 560 by 480 the columns start overlapping rather than reflowing</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">-- so the floor is enforced here instead of being left to produce an unreadable window on somebody else&#x27;s machine.</span></li>
+<li><span class="sec">const ICON_RGBA</span> <span class="meta">line 42</span><br><span class="x">The window icon, as raw 32x32 RGBA produced by `assets/generate.py`. Raw rather than PNG so the application needs no image decoder just to draw its own title bar.</span></li>
+<li><span class="sec">const ICON_SIZE</span> <span class="meta">line 43</span><br><span class="x"></span></li>
+<li><span class="sec">fn main</span> <span class="meta">line 45</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>

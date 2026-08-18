@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-gui/src/main.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="VeilVoice desktop application entry point.">
+<meta name="description" content="Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/main.svg" alt="main.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 40 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 67 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-calls-what">What calls what</a>
@@ -47,7 +47,12 @@
 </nav>
 <div>
 <section id="s-about">
-<p>VeilVoice desktop application entry point.</p>
+<p>Entry point for the desktop application: open a window, hand it to [<code>veilvoice_gui::VeilVoiceApp</code>], and get out of the way.</p>
+<p>Everything of substance is in the library beside this file. That split is the point: a binary crate cannot be unit tested, so the whole user interface lives in <code>lib.rs</code> and its modules where tests can reach it, and this file holds only what genuinely needs a window to exist.</p>
+<p>Three decisions are made here and nowhere else.</p>
+<p><strong>No console window on Windows, in release only.</strong> A release build sets <code>windows_subsystem = &quot;windows&quot;</code>, so double-clicking the application does not flash up a terminal behind it. A debug build deliberately keeps the console, because that is where panics and <code>eprintln!</code> go and losing them while developing costs far more than the flash of a window is worth.</p>
+<p><strong>The icon is raw RGBA, not a PNG.</strong> <code>assets/generate.py</code> writes <code>icon-32.rgba</code> beside the PNG it generates from the same pixels, so the application can set its own title-bar icon without linking an image decoder. A decoder is a parser, a parser is an attack surface, and this one would exist solely to draw a 32x32 square. The length is checked before use, and a mismatch means the window simply opens without an icon rather than panicking at startup.</p>
+<p><strong>The window has a minimum size.</strong> The layout is monospace and column-based, and below roughly 560 by 480 the columns start overlapping rather than reflowing -- so the floor is enforced here instead of being left to produce an unreadable window on somebody else&#x27;s machine.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -70,9 +75,9 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>ICON_RGBA</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L15" rel="noopener noreferrer">15</a></td><td>The window icon, as raw 32x32 RGBA produced by assets/generate.py.</td></tr>
-<tr><td><code>ICON_SIZE</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L16" rel="noopener noreferrer">16</a></td><td></td></tr>
-<tr><td><code>main</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L18" rel="noopener noreferrer">18</a></td><td></td></tr>
+<tr><td><code>ICON_RGBA</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L42" rel="noopener noreferrer">42</a></td><td>The window icon, as raw 32x32 RGBA produced by assets/generate.py.</td></tr>
+<tr><td><code>ICON_SIZE</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L43" rel="noopener noreferrer">43</a></td><td></td></tr>
+<tr><td><code>main</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L45" rel="noopener noreferrer">45</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>
