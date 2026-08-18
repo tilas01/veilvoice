@@ -151,8 +151,8 @@ with the lock file.
 
 ## Platform coverage
 
-Nine targets are built and published today, and the release workflow adds
-OpenBSD and NetBSD to that.
+Ten targets are built and published today; OpenBSD is attempted and currently
+fails, for the reason below.
 
 | Platform | Built | Reproducibility checked |
 |---|---|---|
@@ -163,12 +163,24 @@ OpenBSD and NetBSD to that.
 | Linux arm64 (gnu, musl) | yes | yes |
 | Linux armv7 (Raspberry Pi) | yes | yes |
 | FreeBSD x86_64 | yes | **no** — built once in a VM |
-| OpenBSD x86_64 | yes | **no** — built once in a VM |
+| OpenBSD x86_64 | **no — see below** | n/a |
 | NetBSD x86_64 | yes | **no** — built once in a VM |
 
 Windows 10 and 11 share one executable. They are not split, and will not be
 unless a measurement says they should be: shipping two identical binaries under
 different names is a way of looking thorough rather than being it.
+
+**OpenBSD does not currently build**, and the reason is specific rather than
+flaky: its packaged Rust is 1.94.1, and this workspace declares
+`rust-version = "1.96"`. `cargo` refuses with "rustc 1.94.1 is not supported by
+the following packages" before compiling anything. The job is left in the
+workflow rather than deleted, because it will start working when OpenBSD's
+ports catch up and nothing else needs to change; it is `continue-on-error`, so
+it does not block a release. v0.1.9 shipped without an OpenBSD archive.
+
+Lowering the MSRV to suit one platform's package lag was considered and
+rejected: the toolchain floor is a property of the code, not of whichever
+distribution is slowest this month.
 
 The three BSD builds run in emulated VMs on a Linux runner, are the most
 fragile jobs in the workflow, and are allowed to fail without blocking a
