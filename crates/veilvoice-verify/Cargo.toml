@@ -1,0 +1,35 @@
+# The portable verifier: one small binary that checks a VeilVoice release
+# without GnuPG installed. See src/main.rs for what it does and does not prove.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[package]
+name = "veilvoice-verify"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Verify a VeilVoice release without GnuPG installed"
+
+[dependencies]
+# A full OpenPGP implementation, in pure Rust, so this binary needs no GnuPG
+# and no C toolchain.
+#
+# `default-features = false` drops bzip2. A detached signature over a hash list
+# is never compressed, so the only thing the default feature would buy is a
+# decompressor this tool can never reach -- and an attack surface reachable
+# only through input it refuses anyway.
+#
+# This is by far the largest dependency in the project, and that is a real cost
+# honestly weighed: the alternative was hand-writing OpenPGP packet parsing and
+# RSA PKCS#1 v1.5 verification, and a subtle mistake there would be a silent
+# accept in the one tool whose entire job is not to silently accept. A widely
+# used implementation that many people read is the better risk.
+pgp = { version = "0.20", default-features = false }
+sha2 = "0.10"
+
+[dev-dependencies]
+hex = "0.4"

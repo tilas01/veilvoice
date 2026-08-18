@@ -9,6 +9,7 @@ checking rather than in what you end up with.
 |---|---|---|
 | [By hand](#1-by-hand) | four commands | **you**, and you can see each one |
 | [With the install script](#2-with-the-install-script) | one command | the script, which refuses if anything fails |
+| [With the portable verifier](#2b-with-the-portable-verifier) | one command, no GnuPG needed | a binary carrying the key |
 | [From source](#3-from-source) | `cargo build` | the compiler, plus whatever you read |
 
 The by-hand route is first on purpose. The install script does exactly what it
@@ -16,11 +17,12 @@ describes and nothing else, but "run this script and trust it" is a strange
 thing to ask on behalf of a tool whose entire argument is that you should not
 have to trust anybody. If you only ever read one section here, read that one.
 
-**Status of this document.** The install scripts have been written and tested
-end to end on Windows against the real published v0.1.8 release, and the
-verification chain has been checked by hand on the same release. They have
-**not** yet been run by anyone other than the author, nor on a machine that did
-not build them. Until that has happened they should be treated as working but
+**Status of this document.** The install scripts and the portable verifier have
+been written and tested end to end on Windows against the real published v0.1.8
+release -- the verifier checks that release's actual OpenPGP signature with no
+GnuPG installed -- and the by-hand chain has been checked on the same release.
+They have **not** yet been run by anyone other than the author, nor on a machine
+that did not build them. Until that has happened they should be treated as working but
 unproven — see [What is not finished](#what-is-not-finished).
 
 ---
@@ -196,6 +198,71 @@ removed on exit, and nothing is copied anywhere until every check has passed.
 
 ---
 
+## 2b. With the portable verifier
+
+`veilvoice-verify` ships in every release archive. It is one binary that does
+the same checks as GnuPG, with **nothing else installed** -- the signing key and
+its fingerprint are compiled into it. It downloads nothing and writes nothing.
+
+```bash
+veilvoice-verify key
+    # prints the fingerprint it carries. Compare it against the one above.
+
+veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz     --sums SHA256SUMS --sig SHA256SUMS.asc
+```
+
+### The one thing it cannot carry
+
+It cannot embed the expected hash of the file it is checking: a file cannot
+contain its own digest, because writing the digest in changes the file. So the
+hash comes from outside, and **where it came from decides what a match proves**.
+The tool keeps these apart and refuses to run both at once and report one
+answer.
+
+| Hash from | Proves | Rests on trusting |
+|---|---|---|
+| the published `SHA256SUMS` | the download is **intact** | whoever signed the release |
+| somebody else's own build of the same tag | the release is **reproducible** | nobody in particular |
+
+The first is what most people want. The second is what makes the first worth
+anything: it closes the gap that a signed binary could contain something the
+source does not. It needs a build by somebody who is not the author, which is
+why this project cannot perform it for you.
+
+```bash
+# the stronger check, once somebody else has published a hash from their build
+veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz --sha256 <their hash>
+
+veilvoice-verify --explain     # the difference, at length
+```
+
+VeilVoice's own releases are built twice, in separate directories, and compared
+before they ship. That is the publisher checking their own work -- worth
+something, and not the same as somebody else checking it.
+
+### Why it depends on a large library
+
+`veilvoice-verify` uses [`pgp`](https://crates.io/crates/pgp) (rPGP), a pure-Rust
+OpenPGP implementation, and it is by far the largest dependency in this project.
+That cost was weighed rather than ignored. The alternative was hand-writing
+OpenPGP packet parsing and RSA PKCS#1 v1.5 verification, and a subtle mistake
+there would be a **silent accept** in the one tool whose entire job is not to
+silently accept. A widely used implementation that many people read is the
+better risk.
+
+One consequence is recorded honestly rather than buried: that library brings in
+the `rsa` crate, which carries
+[RUSTSEC-2023-0071](https://rustsec.org/advisories/RUSTSEC-2023-0071) (the Marvin
+attack) with no fixed version available. The advisory concerns RSA **private
+key** operations. This tool only ever verifies a signature against a public key
+compiled into it -- there is no private key anywhere in this repository, and no
+secret for a timing side channel to leak. That reasoning is written out in
+`.cargo/audit.toml`, and because it is an argument about *usage* rather than
+about the crate, CI fails the build if a secret-key or decryption API ever
+appears in the verifier.
+
+---
+
 ## 3. From source
 
 A fresh clone needs no secrets and no configuration.
@@ -265,9 +332,13 @@ Recorded here rather than left for you to discover:
   syntax is checked and its refusal paths are exercised, but the host this was
   developed on is Windows. The verification chain it performs is identical to
   the by-hand one above, which *has* been checked against the real release.
-- **The portable verifier, the packaged installers (WiX, `.deb`, `.rpm`,
-  Flatpak, Homebrew), the OpenBSD and NetBSD builds and the Gentoo ebuild are
-  not built yet.** They are specified in `HANDOFF.md` section 7.
+- **The packaged installers (WiX, `.deb`, `.rpm`, Flatpak, Homebrew), the
+  OpenBSD and NetBSD builds and the Gentoo ebuild are not built yet.** They are
+  specified in `HANDOFF.md` section 7. macOS Intel and Apple Silicon are already
+  separate builds, and a single Windows executable already covers 10 and 11.
+- **The portable verifier exists and is tested**, including against the real
+  published v0.1.8 signature, but like the scripts it has only been run by its
+  author.
 
 If you run these on a machine that did not build them, saying so in an issue is
 genuinely the most useful thing you could contribute.

@@ -160,11 +160,15 @@ jobs:
             # anyway. File processing, encryption and metadata cleaning are
             # pure Rust and work fine, so the feature is switched off rather
             # than the build failing.
-            echo "CARGO_ARGS=-p veilvoice-cli --no-default-features" >> "$GITHUB_ENV"
-            echo "BINARIES=veilvoice" >> "$GITHUB_ENV"
+            # The verifier ships everywhere, including here. It has no audio,
+            # windowing or platform dependencies -- it reads two files and
+            # checks a signature -- and it is most useful precisely on the
+            # stripped-down targets, where GnuPG is least likely to be present.
+            echo "CARGO_ARGS=-p veilvoice-cli -p veilvoice-verify --no-default-features" >> "$GITHUB_ENV"
+            echo "BINARIES=veilvoice veilvoice-verify" >> "$GITHUB_ENV"
           else
             echo "CARGO_ARGS=--workspace" >> "$GITHUB_ENV"
-            echo "BINARIES=veilvoice veilvoice-gui" >> "$GITHUB_ENV"
+            echo "BINARIES=veilvoice veilvoice-gui veilvoice-verify" >> "$GITHUB_ENV"
           fi
           case "${{ matrix.target }}" in
             armv7-unknown-linux-gnueabihf)
