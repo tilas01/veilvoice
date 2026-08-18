@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-License-Identifier: GPL-3.0-or-later
+
+  WiX v4 source for the Windows installer.
+
+  Build (needs the WiX .NET tool: `dotnet tool install -g wix`):
+
+      wix build packaging/wix/veilvoice.wxs -arch x64 ^
+          -d Version=0.1.9 -d BinDir=dist\veilvoice-v0.1.9-windows-x86_64 ^
+          -o dist/VeilVoice-0.1.9-x64.msi
+
+  # What this installs, and what it deliberately does not
+
+  Two executables, the licence, the documentation, a Start Menu shortcut, and
+  nothing else. No service, no scheduled task, no driver, nothing that runs at
+  startup, no registry key outside the installer's own uninstall entry. A
+  privacy tool that installs a background service is a privacy tool with a
+  background service, and this one has no need of it.
+
+  It installs **per-machine** into Program Files, so it needs elevation. That is
+  the one thing an MSI gives that the script does not, and it is why this exists
+  alongside `install/install.ps1` rather than instead of it.
+
+  # The optional components
+
+  VB-CABLE and Audacity appear in the feature tree as features that are **off by
+  default** (`Level="1000"`, above the install level, so they are not selected
+  unless the user goes into the custom-setup page and turns them on). They do
+  not install those programs. They cannot: VB-CABLE is proprietary donationware
+  with its own licence and its own installer, and Audacity is a separate
+  project. What they install is a shortcut to the download page, so that
+  choosing them is an informed act rather than a silent one.
+
+  This is the same rule the install scripts follow, for the same reason: never
+  silently, never by default. An installer that quietly bundles somebody else's
+  proprietary driver is exactly the kind of thing this project exists to be the
+  opposite of.
+
+  # What is NOT verified here
+
+  An MSI can be signed with an Authenticode certificate. This one is not, and
+  cannot be: Authenticode requires a certificate issued to a verified legal
+  identity, and this project is published under a pseudonym. Windows will show
+  an "unknown publisher" warning. That is stated in `docs/INSTALL.md` rather
+  than worked around, and it is the reason the OpenPGP signature over
+  SHA256SUMS remains the real check: verify the archive first, then install.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package Name="VeilVoice"
+           Manufacturer="tilas01"
+           Version="$(var.Version)"
+           UpgradeCode="6F3B1C2A-9D4E-4A18-B7C5-2E9A1F0D8B34"
+           Scope="perMachine"
+           Compressed="yes">
+
+    <!-- Upgrades replace an older install rather than sitting beside it. -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of VeilVoice is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- The licence has to be accepted, and it is the real GPL text. -->
+    <WixVariable Id="WixUILicenseRtf" Value="packaging/wix/LICENSE.rtf" />
+    <ui:WixUI Id="WixUI_FeatureTree" />
+
+    <Icon Id="VeilVoiceIcon" SourceFile="assets/icon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="VeilVoiceIcon" />
+    <Property Id="ARPURLINFOABOUT" Value="https://tilas01.github.io/veilvoice/" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/tilas01/veilvoice" />
+    <!-- No "run at startup" checkbox, deliberately: there is nothing to run. -->
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="VeilVoice">
+        <Directory Id="DocsFolder" Name="docs" />
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="AppShortcutFolder" Name="VeilVoice" />
+    </StandardDirectory>
+
+    <!-- ================= the program itself ================= -->
+    <Feature Id="Main" Title="VeilVoice" Level="1" AllowAbsent="no"
+             Description="The command-line tool, the desktop app and the portable verifier.">
+      <ComponentGroupRef Id="ProgramFiles" />
+      <ComponentGroupRef Id="Shortcuts" />
+    </Feature>
+
+    <!-- ================= optional, off by default ================= -->
+    <!--
+      Level="1000" is above the default install level, so neither of these is
+      selected unless the user turns it on in the feature tree. Never silently,
+      never by default.
+    -->
+    <Feature Id="VBCableLink" Level="1000" Title="VB-CABLE (a link, not the software)"
+             Description="Adds a shortcut to VB-Audio's download page. VB-CABLE is a virtual audio cable, needed only for live mode. It is PROPRIETARY donationware by VB-Audio, is not free software, and is NOT installed by this installer -- you would be accepting their licence, on their site.">
+      <ComponentGroupRef Id="VBCableShortcut" />
+    </Feature>
+
+    <Feature Id="AudacityLink" Level="1000" Title="Audacity (a link, not the software)"
+             Description="Adds a shortcut to Audacity's download page. Audacity is a free audio editor, useful for recording before veiling. It is not bundled: it is GPL-2.0-or-later, which cannot be combined with this project's GPL-3.0-or-later.">
+      <ComponentGroupRef Id="AudacityShortcut" />
+    </Feature>
+
+    <ComponentGroup Id="ProgramFiles" Directory="INSTALLFOLDER">
+      <Component Id="VeilVoiceCli" Guid="*">
+        <File Id="veilvoice.exe" Source="$(var.BinDir)\veilvoice.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="VeilVoiceGui" Guid="*">
+        <File Id="veilvoice_gui.exe" Source="$(var.BinDir)\veilvoice-gui.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="VeilVoiceVerify" Guid="*">
+        <File Id="veilvoice_verify.exe" Source="$(var.BinDir)\veilvoice-verify.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="LicenceText" Guid="*">
+        <File Id="LICENSE" Source="$(var.BinDir)\LICENSE" KeyPath="yes" />
+      </Component>
+      <Component Id="Readme" Guid="*">
+        <File Id="README.md" Source="$(var.BinDir)\README.md" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="Shortcuts" Directory="AppShortcutFolder">
+      <Component Id="AppShortcut" Guid="*">
+        <Shortcut Id="GuiShortcut"
+                  Name="VeilVoice"
+                  Description="Irreversible voice de-identification"
+                  Target="[INSTALLFOLDER]veilvoice-gui.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="VeilVoiceIcon" />
+        <Shortcut Id="SiteShortcut"
+                  Name="VeilVoice documentation"
+                  Target="https://tilas01.github.io/veilvoice/" />
+        <RemoveFolder Id="RemoveAppShortcutFolder" Directory="AppShortcutFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\tilas01\VeilVoice"
+                       Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="VBCableShortcut" Directory="AppShortcutFolder">
+      <Component Id="VBCableUrl" Guid="*">
+        <Shortcut Id="VBCableLinkShortcut"
+                  Name="Get VB-CABLE (proprietary, third party)"
+                  Target="https://vb-audio.com/Cable/" />
+        <RegistryValue Root="HKCU" Key="Software\tilas01\VeilVoice"
+                       Name="vbcable_link" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="AudacityShortcut" Directory="AppShortcutFolder">
+      <Component Id="AudacityUrl" Guid="*">
+        <Shortcut Id="AudacityLinkShortcut"
+                  Name="Get Audacity (free software, third party)"
+                  Target="https://www.audacityteam.org/download/" />
+        <RegistryValue Root="HKCU" Key="Software\tilas01\VeilVoice"
+                       Name="audacity_link" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+  </Package>
+</Wix>

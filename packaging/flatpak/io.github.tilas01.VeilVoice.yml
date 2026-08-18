@@ -1,0 +1,80 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Flatpak manifest for the VeilVoice desktop application.
+#
+#   flatpak-builder --user --install build packaging/flatpak/io.github.tilas01.VeilVoice.yml
+#
+# # The sandbox is the point, so it is kept tight
+#
+# A Flatpak's permissions are a public claim about what the application can
+# reach, and a privacy tool asking for more than it needs is making a poor one.
+# What is granted, and why each one:
+#
+#   --socket=wayland, --socket=fallback-x11, --share=ipc, --device=dri
+#       It is a desktop application and has to draw a window.
+#   --socket=pulseaudio
+#       Live mode records from a microphone and plays back through a virtual
+#       cable. Without this the file-processing half still works.
+#   --filesystem=xdg-music, --filesystem=xdg-documents, --filesystem=xdg-download
+#       Recordings live in one of those three often enough that the portal
+#       alone is awkward. Not `home`, and emphatically not `host`.
+#
+# What is NOT granted, deliberately:
+#
+#   --share=network
+#       There is none. VeilVoice has no networking code, CI fails the build if
+#       an HTTP client enters the dependency graph, and this line's absence is
+#       the claim a user can check without reading any of that.
+#   --talk-name=org.freedesktop.secrets
+#       Passphrases are held in page-locked memory for the session and never
+#       stored. Reaching a keyring would mean writing a secret somewhere.
+#   --filesystem=host, --device=all
+#       Never.
+
+app-id: io.github.tilas01.VeilVoice
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: veilvoice-gui
+
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --device=dri
+  - --socket=pulseaudio
+  - --filesystem=xdg-music
+  - --filesystem=xdg-documents
+  - --filesystem=xdg-download
+  # No --share=network. See the note above: this is the checkable form of the
+  # "fully offline" claim.
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/veilvoice/cargo
+    # Same remaps as the project's own release build, so a Flatpak build is
+    # comparable with the published binaries rather than differing by paths.
+    RUSTFLAGS: --remap-path-prefix=/run/build/veilvoice=/veilvoice
+
+modules:
+  - name: veilvoice
+    buildsystem: simple
+    build-commands:
+      # --locked: exactly the dependency versions the project tested.
+      - cargo build --release --locked --workspace --offline
+      - install -Dm755 target/release/veilvoice-gui /app/bin/veilvoice-gui
+      - install -Dm755 target/release/veilvoice /app/bin/veilvoice
+      - install -Dm755 target/release/veilvoice-verify /app/bin/veilvoice-verify
+      - install -Dm644 assets/icon.png /app/share/icons/hicolor/256x256/apps/io.github.tilas01.VeilVoice.png
+      - install -Dm644 packaging/flatpak/io.github.tilas01.VeilVoice.desktop /app/share/applications/io.github.tilas01.VeilVoice.desktop
+      - install -Dm644 packaging/flatpak/io.github.tilas01.VeilVoice.metainfo.xml /app/share/metainfo/io.github.tilas01.VeilVoice.metainfo.xml
+    sources:
+      - type: git
+        url: https://github.com/tilas01/veilvoice.git
+        tag: v0.1.9
+      # `flatpak-cargo-generator.py` produces this from Cargo.lock so the build
+      # needs no network. Regenerate it whenever Cargo.lock changes.
+      - cargo-sources.json
