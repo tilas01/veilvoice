@@ -4,6 +4,38 @@
 //! Detection, not prevention. See [`veilvoice_guard::SCOPE`], which every path
 //! through this module prints, for the same reason the app lock prints its own:
 //! a protection someone over-trusts has made them less safe, not more.
+//!
+//! # What the three steps actually do
+//!
+//! * **`init`** walks the files that make up this installation and records a
+//!   SHA-256 for each. Optionally sealed with a passphrase, so the record
+//!   itself cannot be quietly rewritten to match tampered files.
+//! * **`check`** re-walks and reports what is **modified**, **removed** and
+//!   **added**. All three matter: an added file in the installation directory
+//!   is as interesting as a changed one.
+//! * **`blame`** tries to say *which process* made a change, and says plainly
+//!   when it cannot.
+//!
+//! # Why attribution usually fails, and why that is reported rather than hidden
+//!
+//! Attribution needs the operating system to have been recording. On Linux that
+//! means an `auditd` watch; on Windows a SACL on the path plus the audit policy
+//! enabled, and reading it needs elevation. Neither is on by default on a
+//! normal machine.
+//!
+//! So the common answer is "something changed this file and I cannot tell you
+//! what", and this module prints exactly that rather than an empty list. An
+//! empty list reads as *nothing happened*, which is the opposite of the truth,
+//! and is the same mistake as a monitor reporting an empty machine because a
+//! registry query silently matched nothing.
+//!
+//! # The bound, again
+//!
+//! A manifest running as the user protects nothing from that user, and detects
+//! rather than prevents even when it works. Anything that can write these files
+//! can write the manifest beside them. That is why the passphrase-sealed record
+//! exists, why [`veilvoice_guard::SCOPE`] is printed on every path through this
+//! module, and why the word "tamper-proof" appears nowhere in it.
 
 use crate::theme::{colour, err, field, heading, ok, paint, warn};
 use clap::Subcommand;

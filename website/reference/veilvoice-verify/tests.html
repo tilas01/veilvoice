@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-verify/src/tests.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="crates/veilvoice-verify/src/tests.rs">
+<meta name="description" content="The verifier&#x27;s own tests.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -39,14 +39,18 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/tests.svg" alt="tests.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 131 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 138 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
 <div>
-<section id="about"><p style="color:var(--muted)">This file has no <code>//!</code> module documentation yet. That is a gap in the source rather than in this page.</p></section>
+<section id="s-about">
+<p>The verifier&#x27;s own tests.</p>
+<p>The property that matters most here is not &quot;a good signature is accepted&quot; but <strong>&quot;a bad one is refused&quot;</strong>. A verifier that accepts everything passes every happy-path test ever written, and would ship looking perfect while doing the opposite of its job -- so most of what follows is negative: corrupted signatures, wrong keys, truncated input, mismatched hashes.</p>
+<p>This file is <code>//!</code>-documented rather than <code>//</code>-commented so that the reasoning above appears in the generated documentation. A reader deciding whether to trust <code>veilvoice-verify</code> should be able to see what it was tested <em>against</em> without cloning the repository, because the whole purpose of that binary is to be the thing you check a download with.</p>
+</section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
@@ -104,19 +108,19 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>the_embedded_key_parses_and_is_the_expected_one</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L12" rel="noopener noreferrer">12</a></td><td></td></tr>
-<tr><td><code>the_embedded_key_carries_no_email_address</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L18" rel="noopener noreferrer">18</a></td><td></td></tr>
-<tr><td><code>the_fingerprint_constant_is_written_out_not_computed</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L33" rel="noopener noreferrer">33</a></td><td></td></tr>
-<tr><td><code>a_hash_is_found_by_its_file_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L46" rel="noopener noreferrer">46</a></td><td></td></tr>
-<tr><td><code>a_binary_mode_star_is_not_part_of_the_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L58" rel="noopener noreferrer">58</a></td><td></td></tr>
-<tr><td><code>a_file_that_is_not_listed_is_not_found</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L70" rel="noopener noreferrer">70</a></td><td></td></tr>
-<tr><td><code>a_name_that_merely_contains_the_wanted_one_does_not_match</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L76" rel="noopener noreferrer">76</a></td><td></td></tr>
-<tr><td><code>blank_and_comment_lines_are_skipped</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L83" rel="noopener noreferrer">83</a></td><td></td></tr>
-<tr><td><code>a_malformed_line_is_skipped_rather_than_panicking</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L92" rel="noopener noreferrer">92</a></td><td></td></tr>
-<tr><td><code>digests_compare_case_insensitively_and_ignore_surrounding_space</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L103" rel="noopener noreferrer">103</a></td><td></td></tr>
-<tr><td><code>a_signature_that_is_not_openpgp_is_refused</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L112" rel="noopener noreferrer">112</a></td><td></td></tr>
-<tr><td><code>an_empty_signature_is_refused</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L119" rel="noopener noreferrer">119</a></td><td></td></tr>
-<tr><td><code>an_armoured_block_that_is_not_a_signature_is_refused</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L125" rel="noopener noreferrer">125</a></td><td></td></tr>
+<tr><td><code>the_embedded_key_parses_and_is_the_expected_one</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L19" rel="noopener noreferrer">19</a></td><td></td></tr>
+<tr><td><code>the_embedded_key_carries_no_email_address</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L25" rel="noopener noreferrer">25</a></td><td></td></tr>
+<tr><td><code>the_fingerprint_constant_is_written_out_not_computed</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L40" rel="noopener noreferrer">40</a></td><td></td></tr>
+<tr><td><code>a_hash_is_found_by_its_file_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L53" rel="noopener noreferrer">53</a></td><td></td></tr>
+<tr><td><code>a_binary_mode_star_is_not_part_of_the_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L65" rel="noopener noreferrer">65</a></td><td></td></tr>
+<tr><td><code>a_file_that_is_not_listed_is_not_found</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L77" rel="noopener noreferrer">77</a></td><td></td></tr>
+<tr><td><code>a_name_that_merely_contains_the_wanted_one_does_not_match</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L83" rel="noopener noreferrer">83</a></td><td></td></tr>
+<tr><td><code>blank_and_comment_lines_are_skipped</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L90" rel="noopener noreferrer">90</a></td><td></td></tr>
+<tr><td><code>a_malformed_line_is_skipped_rather_than_panicking</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L99" rel="noopener noreferrer">99</a></td><td></td></tr>
+<tr><td><code>digests_compare_case_insensitively_and_ignore_surrounding_space</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L110" rel="noopener noreferrer">110</a></td><td></td></tr>
+<tr><td><code>a_signature_that_is_not_openpgp_is_refused</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L119" rel="noopener noreferrer">119</a></td><td></td></tr>
+<tr><td><code>an_empty_signature_is_refused</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L126" rel="noopener noreferrer">126</a></td><td></td></tr>
+<tr><td><code>an_armoured_block_that_is_not_a_signature_is_refused</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L132" rel="noopener noreferrer">132</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

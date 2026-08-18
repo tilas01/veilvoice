@@ -7,6 +7,34 @@
 //! audio that has not been degraded, and re-encoding to a lossy format after
 //! de-identification would throw away quality for no benefit. Callers who want
 //! MP3 can transcode with whatever they already trust.
+//!
+//! # A decoder is a parser, and this one reads files somebody else made
+//!
+//! `symphonia` is the largest attacker-facing surface in this crate: it is
+//! handed whole files of a format VeilVoice does not itself define. It is pure
+//! Rust, which removes the memory-corruption class outright, but it does not
+//! remove panics -- and this workspace builds with `panic = "abort"`, so a
+//! panic inside a decoder is not an error a caller can handle, it is the
+//! process ending.
+//!
+//! That is why a pre-flight check runs before a file reaches the decoder, and
+//! why the honest position is recorded in the audit rather than glossed:
+//! decoding in a separate process is the only complete answer to "the next
+//! malformed file in a format we do not parse ourselves", and it is not built.
+//!
+//! # Writing is WAV only, and that is a decision
+//!
+//! Re-encoding to a lossy format after de-identification would throw away
+//! quality for no privacy benefit -- the voiceprint is already gone, and what
+//! remains is the words, which is the part worth keeping intact.
+//!
+//! # In-memory encoding, so plaintext never reaches the disk
+//!
+//! [`wav_bytes`] exists so a recording can be encoded and then sealed without
+//! ever being written in the clear. It has an awkward shape for a real reason:
+//! `hound::WavWriter::finalize` consumes the writer, so the encode has to borrow
+//! the cursor (`WavWriter::new(&mut cursor, spec)`) and read the bytes back
+//! through `cursor.into_inner()` after the writer has been dropped.
 
 use crate::Error;
 use std::io::{Read, Seek, SeekFrom};

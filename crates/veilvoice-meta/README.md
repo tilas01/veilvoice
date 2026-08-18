@@ -66,7 +66,7 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>111 lines"])
-    n_audio["audio.rs<br/>240 lines"]
+    n_audio["audio.rs<br/>268 lines"]
     n_image["image.rs<br/>202 lines"]
     n_wav["wav.rs<br/>332 lines"]
     n_audio --> n_wav
@@ -76,7 +76,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`audio.rs`](../../docs/files/veilvoice-meta/audio.md) | 240 | Audio tag removal and replacement. |
+| [`audio.rs`](../../docs/files/veilvoice-meta/audio.md) | 268 | Audio tag removal and replacement. |
 | [`image.rs`](../../docs/files/veilvoice-meta/image.md) | 202 | Image EXIF/GPS removal. |
 | [`lib.rs`](../../docs/files/veilvoice-meta/lib.md) | 111 | Strip or spoof the identifying metadata that rides along with media files. |
 | [`wav.rs`](../../docs/files/veilvoice-meta/wav.md) | 332 | Chunk-level RIFF/WAVE metadata removal. |

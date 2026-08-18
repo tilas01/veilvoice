@@ -43,6 +43,8 @@
 <p style="color:var(--muted)"><a href="index.html">reference</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/README.md" rel="noopener noreferrer">the same page on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#the-modules">The modules</a>
+  <a href="#two-rules-this-crate-keeps">Two rules this crate keeps</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -50,6 +52,12 @@
 <section id="s-about">
 <p>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</p>
 <p>The binary lives in <code>main.rs</code>; this library exists so the UI logic can be unit tested without opening a window.</p>
+<p>That split is worth stating plainly, because it is the reason this crate has tests at all: a binary crate cannot be unit tested, so everything with logic in it -- the app lock&#x27;s state machine, preference loading, palette resolution, the reduced-motion decision -- lives here where a test can reach it without a display server. <code>main.rs</code> holds only what genuinely needs a window.</p>
+<h2 id="the-modules">The modules</h2>
+<p>| Module | What it owns | |---|---| | [<code>security</code>] | The unlock screen, the lock tab, and the at-rest controls | | [<code>prefs</code>] | Preferences, and recovering from a corrupt preferences file | | [<code>settings</code>] | The settings tab | | [<code>theme</code>] | The palette, shared with the command-line front end | | [<code>soundbar</code>] | The animated level meter | | [<code>reduced_motion</code>] | Whether to animate at all |</p>
+<h2 id="two-rules-this-crate-keeps">Two rules this crate keeps</h2>
+<p><strong>The user interface never softens a scope note.</strong> Where a control has a bound -- the app lock is a verifier and not disk encryption, tamper detection detects rather than prevents -- the interface says so next to the control, and tests fail the build if that text changes. Documentation nobody opens does not protect anybody.</p>
+<p><strong>Animation is a preference that is honoured, not a decoration.</strong> [<code>reduced_motion</code>] resolves the platform&#x27;s own setting alongside the user&#x27;s explicit choice, and the whole interface reads that answer rather than each widget deciding for itself.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -71,7 +79,7 @@
 <path d="M440.0 274.0 C 440.0 294.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
 <rect x="120.4" y="20.0" width="88.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
 <text x="164.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">lib.rs</text>
-<text x="164.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">25 lines</text>
+<text x="164.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">56 lines</text>
 <rect x="235.2" y="20.0" width="88.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
 <text x="279.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">main.rs</text>
 <text x="279.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">67 lines</text>
@@ -102,7 +110,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#565f89&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;25 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;56 lines&quot;])
     n_main([&quot;main.rs&lt;br/&gt;67 lines&quot;])
     n_app[&quot;app.rs&lt;br/&gt;1062 lines&quot;]
     n_prefs[&quot;prefs.rs&lt;br/&gt;386 lines&quot;]
@@ -129,8 +137,8 @@ flowchart TD
 <section id="s-files">
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
-<tr><td><a href="veilvoice-gui/app.html"><code>app.rs</code></a></td><td>1062</td><td>The VeilVoice desktop application.</td></tr>
-<tr><td><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a></td><td>25</td><td>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</td></tr>
+<tr><td><a href="veilvoice-gui/app.html"><code>app.rs</code></a></td><td>1062</td><td>The VeilVoice desktop application: six tabs, one window, no menus.</td></tr>
+<tr><td><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a></td><td>56</td><td>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</td></tr>
 <tr><td><a href="veilvoice-gui/main.html"><code>main.rs</code></a></td><td>67</td><td>Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.</td></tr>
 <tr><td><a href="veilvoice-gui/prefs.html"><code>prefs.rs</code></a></td><td>386</td><td>What the user has chosen about how the app looks and moves.</td></tr>
 <tr><td><a href="veilvoice-gui/reduced_motion.html"><code>reduced_motion.rs</code></a></td><td>273</td><td>Whether the operating system has been asked to reduce motion.</td></tr>

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0
-//! The VeilVoice desktop application.
+//! The VeilVoice desktop application: six tabs, one window, no menus.
 //!
 //! One window, six tabs, no menus and no settings file to hunt for. This file
 //! owns the window: the tab strip, the state behind it, and the rules about
