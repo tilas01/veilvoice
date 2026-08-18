@@ -39,9 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/effects.svg" alt="effects.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/effects.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 177 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 214 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#how-little-these-contribute-said-plainly">How little these contribute, said plainly</a>
+  <a href="#why-every-mix-defaults-low">Why every mix defaults low</a>
+  <a href="#real-time-constraints">Real-time constraints</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -49,6 +52,14 @@
 <section id="s-about">
 <p>Light time-domain effects applied after resynthesis.</p>
 <p>These run on the continuous output stream (not per FFT frame) and exist to (a) further decorrelate the signal from the original, and (b) add a few detuned &quot;voices&quot; so the spectrogram is densely filled rather than showing a clean harmonic stack &#8212; without harming intelligibility, so every mix defaults low. None of them are invertible in a way that recovers the source voice.</p>
+<h2 id="how-little-these-contribute-said-plainly">How little these contribute, said plainly</h2>
+<p>It would be easy to read a chorus and a reverb as part of the anonymity argument. They are not, and this crate should not let anybody think they are. <strong>The voiceprint is destroyed in [<code>crate::spectral</code>]</strong> -- by discarding measured phase and by mapping every speaker onto one canonical pitch register and vocal-tract scale. That has already happened before a single sample reaches this file.</p>
+<p>What these three add is <em>decorrelation at the margins</em>: a denser spectrogram, a few detuned voices where there was a clean harmonic stack, and some odd harmonics smearing whatever residual cues survived. Useful, cheap, and nowhere near sufficient alone. Set all three mixes to zero and the output is exactly as unlinkable as before.</p>
+<p>The reason to be exact about this is that a filter chain of precisely this shape -- clip, chorus, reverb -- is what a <em>voice changer</em> ships, and a voice changer offers no anonymity whatsoever. Everything that separates this project from that one happens upstream of this file.</p>
+<h2 id="why-every-mix-defaults-low">Why every mix defaults low</h2>
+<p>Intelligibility is a requirement, not a preference. Each of these effects trades clarity for density, and past a fairly low mix the words start to cost more than the added decorrelation is worth. The defaults sit where a listener does not notice the effect is there at all; they are a starting point a user may raise, not a recommendation to raise them.</p>
+<h2 id="real-time-constraints">Real-time constraints</h2>
+<p>These run per output sample inside an audio callback, on the continuous stream rather than per FFT frame. Every buffer is allocated once at construction: <code>process</code> allocates nothing, takes no lock and reads no clock. [<code>Chorus</code>] and [<code>Reverb</code>] own their delay lines and index them with wrapping arithmetic, so changing sample rate means building a new one rather than resizing a live one.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -98,18 +109,18 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>SoftClip</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L14" rel="noopener noreferrer">14</a></td><td>Symmetric soft-clip (tanh) waveshaper.</td></tr>
-<tr><td><code>SoftClip::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L21" rel="noopener noreferrer">21</a></td><td></td></tr>
-<tr><td><code>SoftClip::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L30" rel="noopener noreferrer">30</a></td><td></td></tr>
-<tr><td><code>DelayVoice</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L38" rel="noopener noreferrer">38</a></td><td>A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices.</td></tr>
-<tr><td><code>DelayVoice::new</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L48" rel="noopener noreferrer">48</a></td><td></td></tr>
-<tr><td><code>DelayVoice::process</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L62" rel="noopener noreferrer">62</a></td><td></td></tr>
-<tr><td><code>Chorus</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L79" rel="noopener noreferrer">79</a></td><td>Detuned chorus ensemble.</td></tr>
-<tr><td><code>Chorus::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L85" rel="noopener noreferrer">85</a></td><td></td></tr>
-<tr><td><code>Chorus::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L98" rel="noopener noreferrer">98</a></td><td></td></tr>
-<tr><td><code>Reverb</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L110" rel="noopener noreferrer">110</a></td><td>Minimal Schroeder-style reverb: one feedback comb + one all-pass.</td></tr>
-<tr><td><code>Reverb::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L121" rel="noopener noreferrer">121</a></td><td></td></tr>
-<tr><td><code>Reverb::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L135" rel="noopener noreferrer">135</a></td><td></td></tr>
+<tr><td><code>SoftClip</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L51" rel="noopener noreferrer">51</a></td><td>Symmetric soft-clip (tanh) waveshaper.</td></tr>
+<tr><td><code>SoftClip::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L58" rel="noopener noreferrer">58</a></td><td></td></tr>
+<tr><td><code>SoftClip::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L67" rel="noopener noreferrer">67</a></td><td></td></tr>
+<tr><td><code>DelayVoice</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L75" rel="noopener noreferrer">75</a></td><td>A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices.</td></tr>
+<tr><td><code>DelayVoice::new</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L85" rel="noopener noreferrer">85</a></td><td></td></tr>
+<tr><td><code>DelayVoice::process</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L99" rel="noopener noreferrer">99</a></td><td></td></tr>
+<tr><td><code>Chorus</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L116" rel="noopener noreferrer">116</a></td><td>Detuned chorus ensemble.</td></tr>
+<tr><td><code>Chorus::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L122" rel="noopener noreferrer">122</a></td><td></td></tr>
+<tr><td><code>Chorus::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L135" rel="noopener noreferrer">135</a></td><td></td></tr>
+<tr><td><code>Reverb</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L147" rel="noopener noreferrer">147</a></td><td>Minimal Schroeder-style reverb: one feedback comb + one all-pass.</td></tr>
+<tr><td><code>Reverb::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L158" rel="noopener noreferrer">158</a></td><td></td></tr>
+<tr><td><code>Reverb::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L172" rel="noopener noreferrer">172</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

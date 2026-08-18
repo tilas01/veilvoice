@@ -83,13 +83,13 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>68 lines"])
     n_accent["accent.rs<br/>677 lines"]
-    n_chain["chain.rs<br/>764 lines"]
-    n_effects["effects.rs<br/>177 lines"]
+    n_chain["chain.rs<br/>856 lines"]
+    n_effects["effects.rs<br/>214 lines"]
     n_modulation["modulation.rs<br/>280 lines"]
     n_pitch["pitch.rs<br/>274 lines"]
     n_spectral["spectral.rs<br/>428 lines"]
     n_stft["stft.rs<br/>246 lines"]
-    n_window["window.rs<br/>54 lines"]
+    n_window["window.rs<br/>91 lines"]
     n_accent --> n_pitch
     n_accent --> n_spectral
     n_chain --> n_accent
@@ -108,14 +108,14 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | 677 | Accent and speaker-trait neutralisation. |
-| [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 764 | The assembled de-identification chain and its live performance statistics. |
-| [`effects.rs`](../../docs/files/veilvoice-core/effects.md) | 177 | Light time-domain effects applied after resynthesis. |
+| [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 856 | The assembled de-identification chain and its live performance statistics. |
+| [`effects.rs`](../../docs/files/veilvoice-core/effects.md) | 214 | Light time-domain effects applied after resynthesis. |
 | [`lib.rs`](../../docs/files/veilvoice-core/lib.md) | 68 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
 | [`modulation.rs`](../../docs/files/veilvoice-core/modulation.md) | 280 | Cryptographically-seeded modulation of the effect parameters. |
 | [`pitch.rs`](../../docs/files/veilvoice-core/pitch.md) | 274 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [`spectral.rs`](../../docs/files/veilvoice-core/spectral.md) | 428 | Frequency-domain de-identification transform. |
 | [`stft.rs`](../../docs/files/veilvoice-core/stft.md) | 246 | Streaming short-time Fourier transform with overlap-add resynthesis. |
-| [`window.rs`](../../docs/files/veilvoice-core/window.md) | 54 | Analysis/synthesis windowing helpers. |
+| [`window.rs`](../../docs/files/veilvoice-core/window.md) | 91 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
 
 ## Public items
 

@@ -1,5 +1,32 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0
-//! VeilVoice desktop application entry point.
+//! Entry point for the desktop application: open a window, hand it to
+//! [`veilvoice_gui::VeilVoiceApp`], and get out of the way.
+//!
+//! Everything of substance is in the library beside this file. That split is
+//! the point: a binary crate cannot be unit tested, so the whole user interface
+//! lives in `lib.rs` and its modules where tests can reach it, and this file
+//! holds only what genuinely needs a window to exist.
+//!
+//! Three decisions are made here and nowhere else.
+//!
+//! **No console window on Windows, in release only.** A release build sets
+//! `windows_subsystem = "windows"`, so double-clicking the application does not
+//! flash up a terminal behind it. A debug build deliberately keeps the console,
+//! because that is where panics and `eprintln!` go and losing them while
+//! developing costs far more than the flash of a window is worth.
+//!
+//! **The icon is raw RGBA, not a PNG.** `assets/generate.py` writes
+//! `icon-32.rgba` beside the PNG it generates from the same pixels, so the
+//! application can set its own title-bar icon without linking an image decoder.
+//! A decoder is a parser, a parser is an attack surface, and this one would
+//! exist solely to draw a 32x32 square. The length is checked before use, and a
+//! mismatch means the window simply opens without an icon rather than panicking
+//! at startup.
+//!
+//! **The window has a minimum size.** The layout is monospace and column-based,
+//! and below roughly 560 by 480 the columns start overlapping rather than
+//! reflowing -- so the floor is enforced here instead of being left to produce
+//! an unreadable window on somebody else's machine.
 // No console window on Windows for a release build; a debug build keeps it so
 // panics and `eprintln!` stay visible while developing.
 #![cfg_attr(

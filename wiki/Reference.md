@@ -6,7 +6,7 @@ Every crate and every source file, generated from the doc comments in the code b
 
 Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice.
 
-- [[`devices.rs`|File-veilvoice-audio-devices]] &mdash; Device enumeration and virtual-cable detection.
+- [[`devices.rs`|File-veilvoice-audio-devices]] &mdash; Enumerating audio devices, and guessing which of them are virtual cables.
 - [[`io.rs`|File-veilvoice-audio-io]] &mdash; Reading and writing audio files.
 - [[`lib.rs`|File-veilvoice-audio-lib]] &mdash; Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path.
 - [[`live.rs`|File-veilvoice-audio-live]] &mdash; Live microphone scrambling.
@@ -33,7 +33,7 @@ Irreversible voice de-identification DSP engine: cryptographically-modulated pit
 - [[`pitch.rs`|File-veilvoice-core-pitch]] &mdash; Monophonic fundamental-frequency tracker (decimated YIN).
 - [[`spectral.rs`|File-veilvoice-core-spectral]] &mdash; Frequency-domain de-identification transform.
 - [[`stft.rs`|File-veilvoice-core-stft]] &mdash; Streaming short-time Fourier transform with overlap-add resynthesis.
-- [[`window.rs`|File-veilvoice-core-window]] &mdash; Analysis/synthesis windowing helpers.
+- [[`window.rs`|File-veilvoice-core-window]] &mdash; Analysis and synthesis windowing, and the one constant that keeps overlap-add honest.
 
 ## [[veilvoice-crypto|Crate-veilvoice-crypto]]
 
@@ -63,7 +63,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 
 - [[`app.rs`|File-veilvoice-gui-app]] &mdash; The VeilVoice desktop application.
 - [[`lib.rs`|File-veilvoice-gui-lib]] &mdash; The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.
-- [[`main.rs`|File-veilvoice-gui-main]] &mdash; VeilVoice desktop application entry point.
+- [[`main.rs`|File-veilvoice-gui-main]] &mdash; Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.
 - [[`prefs.rs`|File-veilvoice-gui-prefs]] &mdash; What the user has chosen about how the app looks and moves.
 - [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] &mdash; Whether the operating system has been asked to reduce motion.
 - [[`security.rs`|File-veilvoice-gui-security]] &mdash; The application lock, and the at-rest encryption of what VeilVoice writes.

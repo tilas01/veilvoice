@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-audio/src/devices.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="Device enumeration and virtual-cable detection.">
+<meta name="description" content="Enumerating audio devices, and guessing which of them are virtual cables.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -39,15 +39,31 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/devices.svg" alt="devices.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/devices.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 188 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 228 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#what-this-is-for">What this is for</a>
+  <a href="#the-detection-is-name-matching-and-that-is-a-limitation-not-an-oversight">The detection is name matching, and that is a limitation, not an oversight</a>
+  <a href="#enumeration-can-fail-and-does">Enumeration can fail, and does</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
 <div>
 <section id="s-about">
-<p>Device enumeration and virtual-cable detection.</p>
+<p>Enumerating audio devices, and guessing which of them are virtual cables.</p>
+<h2 id="what-this-is-for">What this is for</h2>
+<p>Live scrambling is only useful if the veiled voice can be routed <em>into</em> something else -- a call, a stream, a recorder. The way that is done on every desktop platform is a <strong>virtual audio cable</strong>: a driver that presents a playback device on one side and a microphone on the other, so anything that can select a microphone can receive VeilVoice&#x27;s output.</p>
+<p>So the list this module produces is not merely a list. Picking the wrong output device is the single most common way for live mode to appear broken while working perfectly, and the whole reason [<code>DeviceInfo::is_virtual_cable</code>] exists is to put the right entry in front of the user.</p>
+<h2 id="the-detection-is-name-matching-and-that-is-a-limitation-not-an-oversight">The detection is name matching, and that is a limitation, not an oversight</h2>
+<p>There is <strong>no portable way to ask an audio device whether it is virtual</strong>. CPAL does not expose it because the underlying APIs largely do not either. So [<code>VIRTUAL_CABLE_HINTS</code>] matches on name fragments, which means:</p>
+<ul>
+<li>a cable this list has never heard of is reported as an ordinary device;</li>
+<li>a real device whose name happens to contain &quot;loopback&quot; or &quot;virtual&quot; is flagged when it should not be.</li>
+</ul>
+<p>Both are wrong in the harmless direction: the flag reorders and annotates a list, it never restricts what the user may choose. A heuristic that hides options would be a different and worse thing than one that highlights them, and this is deliberately the second.</p>
+<p>The alternative -- showing an unsorted list of identically named endpoints and letting the user find the right one -- was tried and is worse.</p>
+<h2 id="enumeration-can-fail-and-does">Enumeration can fail, and does</h2>
+<p>Device lists come from the OS and are not stable: a device can disappear between being listed and being opened, a host may have no devices at all, and on Linux a machine with no sound server is entirely normal. Every function here returns a [<code>crate::Error</code>] rather than panicking or quietly returning an empty list, because an empty list and a failed query mean very different things to somebody trying to work out why they cannot be heard.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -90,14 +106,14 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Direction</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L9" rel="noopener noreferrer">9</a></td><td>Which direction a device carries audio.</td></tr>
-<tr><td><code>DeviceInfo</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L18" rel="noopener noreferrer">18</a></td><td>A device the user can choose.</td></tr>
-<tr><td><code>VIRTUAL_CABLE_HINTS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L34" rel="noopener noreferrer">34</a></td><td>Name fragments used by the common virtual audio cables.</td></tr>
-<tr><td><code>looks_virtual</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L46" rel="noopener noreferrer">46</a></td><td></td></tr>
-<tr><td><code>list</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L52" rel="noopener noreferrer">52</a></td><td>List the devices available in one direction.</td></tr>
-<tr><td><code>find_virtual_cable</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L85" rel="noopener noreferrer">85</a></td><td>Find the first output device that looks like a virtual audio cable.</td></tr>
-<tr><td><code>name_of</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L95" rel="noopener noreferrer">95</a></td><td>The name of an opened device, or a placeholder when the OS will not say.</td></tr>
-<tr><td><code>open</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L100" rel="noopener noreferrer">100</a></td><td>Look up a device by exact name, or the host default when name is None.</td></tr>
+<tr><td><code>Direction</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L49" rel="noopener noreferrer">49</a></td><td>Which direction a device carries audio.</td></tr>
+<tr><td><code>DeviceInfo</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L58" rel="noopener noreferrer">58</a></td><td>A device the user can choose.</td></tr>
+<tr><td><code>VIRTUAL_CABLE_HINTS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L74" rel="noopener noreferrer">74</a></td><td>Name fragments used by the common virtual audio cables.</td></tr>
+<tr><td><code>looks_virtual</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L86" rel="noopener noreferrer">86</a></td><td></td></tr>
+<tr><td><code>list</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L92" rel="noopener noreferrer">92</a></td><td>List the devices available in one direction.</td></tr>
+<tr><td><code>find_virtual_cable</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L125" rel="noopener noreferrer">125</a></td><td>Find the first output device that looks like a virtual audio cable.</td></tr>
+<tr><td><code>name_of</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L135" rel="noopener noreferrer">135</a></td><td>The name of an opened device, or a placeholder when the OS will not say.</td></tr>
+<tr><td><code>open</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L140" rel="noopener noreferrer">140</a></td><td>Look up a device by exact name, or the host default when name is None.</td></tr>
 </tbody></table>
 </section>
 </div></div>

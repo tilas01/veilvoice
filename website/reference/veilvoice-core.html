@@ -94,10 +94,10 @@ let _ms = deid.stats().last_block_ms();</code></pre>
 <text x="436.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">677 lines</text>
 <rect x="510.4" y="20.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="558.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">chain.rs</text>
-<text x="558.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">764 lines</text>
+<text x="558.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">856 lines</text>
 <rect x="120.4" y="120.0" width="104.0" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="172.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">effects.rs</text>
-<text x="172.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">177 lines</text>
+<text x="172.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">214 lines</text>
 <rect x="250.4" y="120.0" width="126.8" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="313.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">modulation.rs</text>
 <text x="313.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">280 lines</text>
@@ -112,7 +112,7 @@ let _ms = deid.stats().last_block_ms();</code></pre>
 <text x="711.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">246 lines</text>
 <rect x="391.8" y="220.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="440.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">window.rs</text>
-<text x="440.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">54 lines</text>
+<text x="440.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">91 lines</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">Every arrow is a <code>crate::</code> or <code>super::</code> path one module actually uses, read out of the source rather than drawn by hand.</p>
@@ -121,13 +121,13 @@ let _ms = deid.stats().last_block_ms();</code></pre>
 flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;68 lines&quot;])
     n_accent[&quot;accent.rs&lt;br/&gt;677 lines&quot;]
-    n_chain[&quot;chain.rs&lt;br/&gt;764 lines&quot;]
-    n_effects[&quot;effects.rs&lt;br/&gt;177 lines&quot;]
+    n_chain[&quot;chain.rs&lt;br/&gt;856 lines&quot;]
+    n_effects[&quot;effects.rs&lt;br/&gt;214 lines&quot;]
     n_modulation[&quot;modulation.rs&lt;br/&gt;280 lines&quot;]
     n_pitch[&quot;pitch.rs&lt;br/&gt;274 lines&quot;]
     n_spectral[&quot;spectral.rs&lt;br/&gt;428 lines&quot;]
     n_stft[&quot;stft.rs&lt;br/&gt;246 lines&quot;]
-    n_window[&quot;window.rs&lt;br/&gt;54 lines&quot;]
+    n_window[&quot;window.rs&lt;br/&gt;91 lines&quot;]
     n_accent --&gt; n_pitch
     n_accent --&gt; n_spectral
     n_chain --&gt; n_accent
@@ -146,14 +146,14 @@ flowchart TD
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-core/accent.html"><code>accent.rs</code></a></td><td>677</td><td>Accent and speaker-trait neutralisation.</td></tr>
-<tr><td><a href="veilvoice-core/chain.html"><code>chain.rs</code></a></td><td>764</td><td>The assembled de-identification chain and its live performance statistics.</td></tr>
-<tr><td><a href="veilvoice-core/effects.html"><code>effects.rs</code></a></td><td>177</td><td>Light time-domain effects applied after resynthesis.</td></tr>
+<tr><td><a href="veilvoice-core/chain.html"><code>chain.rs</code></a></td><td>856</td><td>The assembled de-identification chain and its live performance statistics.</td></tr>
+<tr><td><a href="veilvoice-core/effects.html"><code>effects.rs</code></a></td><td>214</td><td>Light time-domain effects applied after resynthesis.</td></tr>
 <tr><td><a href="veilvoice-core/lib.html"><code>lib.rs</code></a></td><td>68</td><td>The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine.</td></tr>
 <tr><td><a href="veilvoice-core/modulation.html"><code>modulation.rs</code></a></td><td>280</td><td>Cryptographically-seeded modulation of the effect parameters.</td></tr>
 <tr><td><a href="veilvoice-core/pitch.html"><code>pitch.rs</code></a></td><td>274</td><td>Monophonic fundamental-frequency tracker (decimated YIN).</td></tr>
 <tr><td><a href="veilvoice-core/spectral.html"><code>spectral.rs</code></a></td><td>428</td><td>Frequency-domain de-identification transform.</td></tr>
 <tr><td><a href="veilvoice-core/stft.html"><code>stft.rs</code></a></td><td>246</td><td>Streaming short-time Fourier transform with overlap-add resynthesis.</td></tr>
-<tr><td><a href="veilvoice-core/window.html"><code>window.rs</code></a></td><td>54</td><td>Analysis/synthesis windowing helpers.</td></tr>
+<tr><td><a href="veilvoice-core/window.html"><code>window.rs</code></a></td><td>91</td><td>Analysis and synthesis windowing, and the one constant that keeps overlap-add honest.</td></tr>
 </tbody></table>
 </section>
 </div></div>

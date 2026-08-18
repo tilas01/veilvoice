@@ -44,7 +44,7 @@
 <h2><a href="veilvoice-audio.html">veilvoice-audio</a></h2>
 <p>Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice.</p>
 <ul>
-<li><a href="veilvoice-audio/devices.html"><code>devices.rs</code></a> <span style="color:var(--muted)">Device enumeration and virtual-cable detection.</span></li>
+<li><a href="veilvoice-audio/devices.html"><code>devices.rs</code></a> <span style="color:var(--muted)">Enumerating audio devices, and guessing which of them are virtual cables.</span></li>
 <li><a href="veilvoice-audio/io.html"><code>io.rs</code></a> <span style="color:var(--muted)">Reading and writing audio files.</span></li>
 <li><a href="veilvoice-audio/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</span></li>
 <li><a href="veilvoice-audio/live.html"><code>live.rs</code></a> <span style="color:var(--muted)">Live microphone scrambling.</span></li>
@@ -73,7 +73,7 @@
 <li><a href="veilvoice-core/pitch.html"><code>pitch.rs</code></a> <span style="color:var(--muted)">Monophonic fundamental-frequency tracker (decimated YIN).</span></li>
 <li><a href="veilvoice-core/spectral.html"><code>spectral.rs</code></a> <span style="color:var(--muted)">Frequency-domain de-identification transform.</span></li>
 <li><a href="veilvoice-core/stft.html"><code>stft.rs</code></a> <span style="color:var(--muted)">Streaming short-time Fourier transform with overlap-add resynthesis.</span></li>
-<li><a href="veilvoice-core/window.html"><code>window.rs</code></a> <span style="color:var(--muted)">Analysis/synthesis windowing helpers.</span></li>
+<li><a href="veilvoice-core/window.html"><code>window.rs</code></a> <span style="color:var(--muted)">Analysis and synthesis windowing, and the one constant that keeps overlap-add honest.</span></li>
 </ul>
 </section>
 <section id="veilvoice-crypto">
@@ -106,7 +106,7 @@
 <ul>
 <li><a href="veilvoice-gui/app.html"><code>app.rs</code></a> <span style="color:var(--muted)">The VeilVoice desktop application.</span></li>
 <li><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</span></li>
-<li><a href="veilvoice-gui/main.html"><code>main.rs</code></a> <span style="color:var(--muted)">VeilVoice desktop application entry point.</span></li>
+<li><a href="veilvoice-gui/main.html"><code>main.rs</code></a> <span style="color:var(--muted)">Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.</span></li>
 <li><a href="veilvoice-gui/prefs.html"><code>prefs.rs</code></a> <span style="color:var(--muted)">What the user has chosen about how the app looks and moves.</span></li>
 <li><a href="veilvoice-gui/reduced_motion.html"><code>reduced_motion.rs</code></a> <span style="color:var(--muted)">Whether the operating system has been asked to reduce motion.</span></li>
 <li><a href="veilvoice-gui/security.html"><code>security.rs</code></a> <span style="color:var(--muted)">The application lock, and the at-rest encryption of what VeilVoice writes.</span></li>
