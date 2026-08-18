@@ -39,9 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/guard.svg" alt="guard.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/guard.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 306 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 338 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#what-the-three-steps-actually-do">What the three steps actually do</a>
+  <a href="#why-attribution-usually-fails-and-why-that-is-reported-rather-than-hidden">Why attribution usually fails, and why that is reported rather than hidden</a>
+  <a href="#the-bound-again">The bound, again</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -49,6 +52,17 @@
 <section id="s-about">
 <p><code>veilvoice guard</code> -- record what VeilVoice&#x27;s files should be, and check them.</p>
 <p>Detection, not prevention. See [<code>veilvoice_guard::SCOPE</code>], which every path through this module prints, for the same reason the app lock prints its own: a protection someone over-trusts has made them less safe, not more.</p>
+<h2 id="what-the-three-steps-actually-do">What the three steps actually do</h2>
+<ul>
+<li><strong><code>init</code></strong> walks the files that make up this installation and records a SHA-256 for each. Optionally sealed with a passphrase, so the record itself cannot be quietly rewritten to match tampered files.</li>
+<li><strong><code>check</code></strong> re-walks and reports what is <strong>modified</strong>, <strong>removed</strong> and <strong>added</strong>. All three matter: an added file in the installation directory is as interesting as a changed one.</li>
+<li><strong><code>blame</code></strong> tries to say <em>which process</em> made a change, and says plainly when it cannot.</li>
+</ul>
+<h2 id="why-attribution-usually-fails-and-why-that-is-reported-rather-than-hidden">Why attribution usually fails, and why that is reported rather than hidden</h2>
+<p>Attribution needs the operating system to have been recording. On Linux that means an <code>auditd</code> watch; on Windows a SACL on the path plus the audit policy enabled, and reading it needs elevation. Neither is on by default on a normal machine.</p>
+<p>So the common answer is &quot;something changed this file and I cannot tell you what&quot;, and this module prints exactly that rather than an empty list. An empty list reads as <em>nothing happened</em>, which is the opposite of the truth, and is the same mistake as a monitor reporting an empty machine because a registry query silently matched nothing.</p>
+<h2 id="the-bound-again">The bound, again</h2>
+<p>A manifest running as the user protects nothing from that user, and detects rather than prevents even when it works. Anything that can write these files can write the manifest beside them. That is why the passphrase-sealed record exists, why [<code>veilvoice_guard::SCOPE</code>] is printed on every path through this module, and why the word &quot;tamper-proof&quot; appears nowhere in it.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -122,16 +136,16 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Action</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L14" rel="noopener noreferrer">14</a></td><td></td></tr>
-<tr><td><code>manifest_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L35" rel="noopener noreferrer">35</a></td><td>Where the manifest lives, beside the app lock.</td></tr>
-<tr><td><code>sealed_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L48" rel="noopener noreferrer">48</a></td><td>A sealed manifest sits beside the plain one, with a different suffix.</td></tr>
-<tr><td><code>print_scope</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L52" rel="noopener noreferrer">52</a></td><td></td></tr>
-<tr><td><code>default_targets</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L61" rel="noopener noreferrer">61</a></td><td>The files worth watching when the user names none: the running binary, and the app lock beside it.</td></tr>
-<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L74" rel="noopener noreferrer">74</a></td><td></td></tr>
-<tr><td><code>init</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L86" rel="noopener noreferrer">86</a></td><td></td></tr>
-<tr><td><code>load</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L149" rel="noopener noreferrer">149</a></td><td>Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there.</td></tr>
-<tr><td><code>check</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L162" rel="noopener noreferrer">162</a></td><td></td></tr>
-<tr><td><code>status</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L231" rel="noopener noreferrer">231</a></td><td></td></tr>
+<tr><td><code>Action</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L46" rel="noopener noreferrer">46</a></td><td></td></tr>
+<tr><td><code>manifest_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L67" rel="noopener noreferrer">67</a></td><td>Where the manifest lives, beside the app lock.</td></tr>
+<tr><td><code>sealed_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L80" rel="noopener noreferrer">80</a></td><td>A sealed manifest sits beside the plain one, with a different suffix.</td></tr>
+<tr><td><code>print_scope</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L84" rel="noopener noreferrer">84</a></td><td></td></tr>
+<tr><td><code>default_targets</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L93" rel="noopener noreferrer">93</a></td><td>The files worth watching when the user names none: the running binary, and the app lock beside it.</td></tr>
+<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L106" rel="noopener noreferrer">106</a></td><td></td></tr>
+<tr><td><code>init</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L118" rel="noopener noreferrer">118</a></td><td></td></tr>
+<tr><td><code>load</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L181" rel="noopener noreferrer">181</a></td><td>Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there.</td></tr>
+<tr><td><code>check</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L194" rel="noopener noreferrer">194</a></td><td></td></tr>
+<tr><td><code>status</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L263" rel="noopener noreferrer">263</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -15,16 +15,60 @@
 
 ## Contents
 
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
-- [Public items](#public-items)
-- [Reading it elsewhere](#reading-it-elsewhere)
+- [What is here](#what-is-here)
+- [Two behaviours that surprise people, on purpose](#two-behaviours-that-surprise-people-on-purpose)
+- [Passphrase prompts cannot be piped](#passphrase-prompts-cannot-be-piped)
+- [A clap ordering rule worth knowing](#a-clap-ordering-rule-worth-knowing)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
+  - [Public items](#public-items)
+  - [Reading it elsewhere](#reading-it-elsewhere)
 
 `veilvoice` — the command-line interface.
 
 Everything VeilVoice does, available without a desktop: it runs over SSH, in
 a container, and on machines that have no GUI toolkit at all. The same
 engine backs both this and the graphical app.
+
+# What is here
+
+Fourteen subcommands, and they divide into four groups:
+
+* **Audio** -- `anonymise` a file, `live` scramble a microphone, list
+`devices`.
+* **Privacy of the files themselves** -- `clean` metadata, `encrypt`,
+`decrypt`, `keygen`, `shred`.
+* **Watching the machine** -- `watch` the microphone and camera, `guard`
+VeilVoice's own files against tampering.
+* **The app lock** -- `lock set|status|change|remove`.
+
+# Two behaviours that surprise people, on purpose
+
+**`anonymise` writes `<out>.veil`, not a bare WAV.** Recordings are
+encrypted at rest by default. `--encrypt=false` opts out and requires
+`--yes`, because an unsealed recording is the thing somebody later wishes
+they had not produced. The wiki explains where the WAV went.
+
+**The front-ends refuse rather than downgrade.** Asked to encrypt with
+nothing to encrypt with, this exits with an error instead of writing plain
+audio and mentioning it. Quiet degradation to a weaker posture is the defect
+class this project has found in itself most often.
+
+# Passphrase prompts cannot be piped
+
+`rpassword` needs a real console; piping a passphrase in blocks on
+`CONIN$` rather than reading it. That is a property of terminal input, not a
+bug here, and it means anything that prompts cannot be smoke-tested from a
+non-interactive shell. The layer *beneath* each prompt is therefore tested
+instead -- see `crate::atrest` and `crate::lock`, where the logic lives
+precisely so it can be reached without a terminal.
+
+# A clap ordering rule worth knowing
+
+An argument declared beside `#[command(subcommand)]` must precede the
+subcommand on the command line unless it is marked `global = true`. So
+`veilvoice lock --path X status` parses and `veilvoice lock status --path X`
+does not, except that `--path` is now global specifically so both do.
 
 ## How the crate fits together
 
@@ -36,11 +80,11 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1037 lines"])
+    n_main(["main.rs<br/>1077 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
-    n_guard["guard.rs<br/>306 lines"]
+    n_guard["guard.rs<br/>338 lines"]
     n_lock["lock.rs<br/>239 lines"]
-    n_theme["theme.rs<br/>115 lines"]
+    n_theme["theme.rs<br/>135 lines"]
     n_atrest --> n_theme
     n_guard --> n_atrest
     n_guard --> n_lock
@@ -54,10 +98,10 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
-| [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 306 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
+| [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1037 | veilvoice — the command-line interface. |
-| [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 115 | Tokyo Night colouring for the terminal. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1077 | veilvoice — the command-line interface. |
+| [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 135 | Tokyo Night colouring for the terminal. |
 
 ## Public items
 

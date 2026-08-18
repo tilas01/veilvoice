@@ -5,6 +5,26 @@
 //! program. Colour is suppressed when the output is not a terminal, when
 //! `NO_COLOR` is set (the widely-honoured convention), or when `TERM=dumb`, so
 //! piping to a file or a log never produces escape-code soup.
+//!
+//! # Why a command-line tool has a palette at all
+//!
+//! Because the two front-ends are one program. Somebody who uses the desktop
+//! application and then runs the binary over SSH should recognise what they are
+//! looking at, and the colours carry meaning consistently in both: green for a
+//! result, amber for a caveat, red for a refusal, muted for the scope notes
+//! that qualify a claim.
+//!
+//! # Colour is suppressed rather than assumed
+//!
+//! Three independent conditions turn it off, and all three are checked:
+//! output that is not a terminal, `NO_COLOR` set to anything at all (the
+//! widely-honoured convention), and `TERM=dumb`. The check runs once through a
+//! [`std::sync::OnceLock`] rather than per call, because this is used inside
+//! loops that print a line per file.
+//!
+//! Escape sequences in a log file are worse than no colour: they survive into
+//! bug reports, pasted output and issue trackers, where they are noise that
+//! obscures the message somebody was trying to show you.
 
 use std::io::IsTerminal;
 use std::sync::OnceLock;

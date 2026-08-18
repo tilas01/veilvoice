@@ -39,9 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/io.svg" alt="io.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/io.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 527 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 555 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#a-decoder-is-a-parser-and-this-one-reads-files-somebody-else-made">A decoder is a parser, and this one reads files somebody else made</a>
+  <a href="#writing-is-wav-only-and-that-is-a-decision">Writing is WAV only, and that is a decision</a>
+  <a href="#in-memory-encoding-so-plaintext-never-reaches-the-disk">In-memory encoding, so plaintext never reaches the disk</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -49,6 +52,13 @@
 <section id="s-about">
 <p>Reading and writing audio files.</p>
 <p>Decoding goes through <code>symphonia</code>, which is pure Rust and covers WAV, MP3, FLAC, OGG/Vorbis, MP4/AAC and friends without shelling out to a codec library. Writing is WAV only, on purpose: VeilVoice&#x27;s job is to hand back audio that has not been degraded, and re-encoding to a lossy format after de-identification would throw away quality for no benefit. Callers who want MP3 can transcode with whatever they already trust.</p>
+<h2 id="a-decoder-is-a-parser-and-this-one-reads-files-somebody-else-made">A decoder is a parser, and this one reads files somebody else made</h2>
+<p><code>symphonia</code> is the largest attacker-facing surface in this crate: it is handed whole files of a format VeilVoice does not itself define. It is pure Rust, which removes the memory-corruption class outright, but it does not remove panics -- and this workspace builds with <code>panic = &quot;abort&quot;</code>, so a panic inside a decoder is not an error a caller can handle, it is the process ending.</p>
+<p>That is why a pre-flight check runs before a file reaches the decoder, and why the honest position is recorded in the audit rather than glossed: decoding in a separate process is the only complete answer to &quot;the next malformed file in a format we do not parse ourselves&quot;, and it is not built.</p>
+<h2 id="writing-is-wav-only-and-that-is-a-decision">Writing is WAV only, and that is a decision</h2>
+<p>Re-encoding to a lossy format after de-identification would throw away quality for no privacy benefit -- the voiceprint is already gone, and what remains is the words, which is the part worth keeping intact.</p>
+<h2 id="in-memory-encoding-so-plaintext-never-reaches-the-disk">In-memory encoding, so plaintext never reaches the disk</h2>
+<p>[<code>wav_bytes</code>] exists so a recording can be encoded and then sealed without ever being written in the clear. It has an awkward shape for a real reason: <code>hound::WavWriter::finalize</code> consumes the writer, so the encode has to borrow the cursor (<code>WavWriter::new(&amp;mut cursor, spec)</code>) and read the bytes back through <code>cursor.into_inner()</code> after the writer has been dropped.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -101,15 +111,15 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>MAX_DECODED_SAMPLES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L34" rel="noopener noreferrer">34</a></td><td>The most decoded audio load will hold, in mono f32 samples.</td></tr>
-<tr><td><code>preflight</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L64" rel="noopener noreferrer">64</a></td><td>Reject a file whose own header carries a value that will crash the decoder, before the decoder is given the file.</td></tr>
-<tr><td><code>Audio</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L109" rel="noopener noreferrer">109</a></td><td>Mono audio in memory.</td></tr>
-<tr><td><code>Audio::duration_secs</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L118" rel="noopener noreferrer">118</a></td><td>Duration in seconds.</td></tr>
-<tr><td><code>Audio::peak</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L126" rel="noopener noreferrer">126</a></td><td>Peak absolute sample value.</td></tr>
-<tr><td><code>load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L137" rel="noopener noreferrer">137</a></td><td>Decode any supported audio file to mono f32.</td></tr>
-<tr><td><code>read_up_to</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L240" rel="noopener noreferrer">240</a></td><td>Fill as much of buf as the file has, tolerating short reads.</td></tr>
-<tr><td><code>wav_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L261" rel="noopener noreferrer">261</a></td><td>Encode mono f32 audio as a 16-bit PCM WAV, in memory.</td></tr>
-<tr><td><code>save_wav</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L281" rel="noopener noreferrer">281</a></td><td>Write mono f32 audio to a 16-bit PCM WAV file.</td></tr>
+<tr><td><code>MAX_DECODED_SAMPLES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L62" rel="noopener noreferrer">62</a></td><td>The most decoded audio load will hold, in mono f32 samples.</td></tr>
+<tr><td><code>preflight</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L92" rel="noopener noreferrer">92</a></td><td>Reject a file whose own header carries a value that will crash the decoder, before the decoder is given the file.</td></tr>
+<tr><td><code>Audio</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L137" rel="noopener noreferrer">137</a></td><td>Mono audio in memory.</td></tr>
+<tr><td><code>Audio::duration_secs</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L146" rel="noopener noreferrer">146</a></td><td>Duration in seconds.</td></tr>
+<tr><td><code>Audio::peak</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L154" rel="noopener noreferrer">154</a></td><td>Peak absolute sample value.</td></tr>
+<tr><td><code>load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L165" rel="noopener noreferrer">165</a></td><td>Decode any supported audio file to mono f32.</td></tr>
+<tr><td><code>read_up_to</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L268" rel="noopener noreferrer">268</a></td><td>Fill as much of buf as the file has, tolerating short reads.</td></tr>
+<tr><td><code>wav_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L289" rel="noopener noreferrer">289</a></td><td>Encode mono f32 audio as a 16-bit PCM WAV, in memory.</td></tr>
+<tr><td><code>save_wav</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L309" rel="noopener noreferrer">309</a></td><td>Write mono f32 audio to a 16-bit PCM WAV file.</td></tr>
 </tbody></table>
 </section>
 </div></div>
