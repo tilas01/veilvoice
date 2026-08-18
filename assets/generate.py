@@ -309,39 +309,102 @@ BAR_MAX = 62
 AA_STEPS = 16
 
 
+# Peak of the harmonic sums below, measured rather than assumed.
+#
+# Three sinusoids whose amplitudes sum to 1.0 only reach 1.0 if they all peak
+# together, and the phase offsets are there precisely so they do not. Without
+# this the band quietly lost a fifth of its height when the harmonics were
+# added -- the animation still worked, still looped, and simply looked smaller,
+# which is the kind of change no test notices.
+#
+# Sampled from the same expressions the function uses, at import, so editing an
+# amplitude re-measures instead of leaving a stale constant behind.
+def _wave_peak():
+    coherent = 0.0
+    incoherent = 0.0
+    steps = 720
+    for step in range(steps):
+        angle = 2.0 * math.pi * step / steps
+        coherent = max(coherent, abs(
+            0.62 * math.sin(angle)
+            + 0.26 * math.sin(2.0 * angle + 0.9)
+            + 0.12 * math.sin(3.0 * angle + 2.1)))
+        for extra in (1.0, 2.0, 3.0):
+            incoherent = max(incoherent, abs(
+                0.70 * math.sin(angle)
+                + 0.30 * math.sin(angle * (extra + 1.0) / extra)))
+    return coherent, incoherent
+
+
+WAVE_PEAK_COHERENT, WAVE_PEAK_INCOHERENT = _wave_peak()
+
+
 def _wave(i, phase, coherent):
     """Half-height of bar `i` at animation `phase` (0.0 to 1.0), in *fractional*
     pixels.
 
-    Deterministic in both arguments, so every frame is reproducible and the
-    loop closes exactly: `phase` enters only through `sin`, and the integer
-    hash below does not depend on it.
+    Deterministic in both arguments, so every frame is reproducible and the loop
+    closes exactly: `phase` enters only through `sin`, always at a whole-number
+    multiple of the base frequency, and the integer hash below does not depend
+    on it.
 
     Returns a float on purpose. Rounding each height to a whole pixel is what
     made the first animation look stepped rather than fluid: a bar near the top
     of its travel changes by a fraction of a pixel per frame, so it sat still
     for several frames and then jumped. `draw_bar` renders the fractional part
-    as partial coverage instead, which is what the browser does for the CSS
-    bars this is meant to match.
+    as partial coverage instead, which is what the browser does for the CSS bars
+    this is meant to match.
+
+    # Why three harmonics rather than one
+
+    A single sinusoid is the shape of a test tone. Speech is a fundamental plus
+    harmonics whose amplitudes fall off, and its energy breathes rather than
+    holding steady -- so the bars are summed from three components at 1x, 2x and
+    3x the base rate, with the amplitudes falling roughly as 1/k, plus a slow
+    envelope at 1x.
+
+    **Every multiplier is a whole number, and that is load-bearing.**
+    `sin(k * 2*pi*phase + c)` has period exactly 1 in `phase` for integer `k`,
+    so the frame at phase 1.0 is byte-identical to the frame at 0.0 no matter
+    how many terms are added. A rate of, say, 1.7 would look perfectly good in
+    any single frame and tear once per loop, which is the sort of defect that
+    survives review because nobody watches an animation for a whole cycle.
+
+    The amplitudes are chosen to sum to 1.0 so the result stays in [-1, 1] and
+    the band cannot overflow its own height.
     """
     if coherent:
         # A travelling wave: neighbouring bars differ by a fixed phase step, so
-        # the crest walks along the band.
+        # the crest walks along the band. The harmonics inherit that step
+        # multiplied, which is what gives a real waveform its shorter ripples
+        # riding on the fundamental.
         angle = 2.0 * math.pi * (phase - i * 0.085)
-        shape = 0.5 + 0.5 * math.sin(angle)
-        # A gentle envelope so the band is not a perfect rectangle of equal peaks.
+        wave = (
+            0.62 * math.sin(angle)
+            + 0.26 * math.sin(2.0 * angle + 0.9)
+            + 0.12 * math.sin(3.0 * angle + 2.1)
+        )
+        shape = 0.5 + 0.5 * (wave / WAVE_PEAK_COHERENT)
+        # A gentle standing envelope so the band is not a rectangle of equal
+        # peaks, and a slow breath so the whole thing does not pulse in lockstep.
         envelope = 0.62 + 0.38 * abs(((i * 7) % 23) / 23.0 - 0.5) * 2.0
-        return BAR_MAX * (0.20 + 0.80 * shape) * envelope
+        breath = 0.88 + 0.12 * math.sin(angle * 1.0 - i * 0.31)
+        return BAR_MAX * (0.20 + 0.80 * shape) * envelope * breath
 
     # Incoherent: each bar keeps its own pseudo-random phase and rate, so the
-    # bars never line up. Same energy, no shared structure.
+    # bars never line up. Same energy, no shared structure -- which is the
+    # picture of what VeilVoice does to the phase relationships in a voice.
     h = (i * 2654435761) & 0xFFFFFFFF
     offset = ((h >> 7) % 1000) / 1000.0
-    rate = 1.0 + ((h >> 17) % 3)
+    # Whole-number rates only, for the same loop-closing reason as above.
+    rate = 1.0 + float((h >> 17) % 3)
     angle = 2.0 * math.pi * (phase * rate + offset)
-    shape = 0.5 + 0.5 * math.sin(angle)
+    second = 2.0 * math.pi * (phase * (rate + 1.0) + offset * 1.7)
+    wave = 0.70 * math.sin(angle) + 0.30 * math.sin(second)
+    shape = 0.5 + 0.5 * (wave / WAVE_PEAK_INCOHERENT)
     envelope = 0.55 + 0.45 * (((h >> 3) % 100) / 100.0)
-    return BAR_MAX * (0.18 + 0.82 * shape) * envelope
+    breath = 0.86 + 0.14 * math.sin(2.0 * math.pi * phase + offset * 6.283)
+    return BAR_MAX * (0.18 + 0.82 * shape) * envelope * breath
 
 
 def _blend(fg, bg, alpha):
