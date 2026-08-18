@@ -1,5 +1,97 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! The assembled de-identification chain and its live performance statistics.
+//!
+//! Every other module in this crate does one job. This is the file that puts
+//! them in order and decides what happens to a block of samples, so it is the
+//! one to read first if you want to know what VeilVoice actually *does* to
+//! audio.
+//!
+//! # The signal path
+//!
+//! [`Deidentifier::process`] takes a block of input and writes an equal-length
+//! block of output. Everything below happens inside it, per STFT frame:
+//!
+//! 1. **Roll the modulation stream** if this frame is the one where the
+//!    ratchet fires. See "forward secrecy" below.
+//! 2. **Draw this frame's modulation** from the CSPRNG -- a pitch ratio and a
+//!    formant ratio, glided toward fresh random targets rather than jumped, so
+//!    the scrambling is inaudible as scrambling.
+//! 3. **Track the fundamental** from the newest hop of *time-domain* samples.
+//!    This cannot be done in the frequency domain: at any frame size with
+//!    usable latency, the FFT's bin spacing cannot tell 100 Hz from 140 Hz.
+//!    The tracker keeps its own longer history and is fed only what is new.
+//! 4. **Let the accent neutraliser observe** that estimate, so its long-term
+//!    picture of the speaker stays current.
+//! 5. **Transform the spectrum** -- this is the irreversible step, and it lives
+//!    in [`crate::spectral`]. Measured phase is discarded and resynthesised;
+//!    pitch, vocal-tract scale and spectral tilt are mapped onto canonical
+//!    values.
+//!
+//! Then, once per block rather than per frame, a short time-domain tail: soft
+//! clip, chorus, reverb. Those are cosmetic. **They are not what makes the
+//! output unlinkable** and nothing here should be read as though they were.
+//!
+//! # Why it is one-way, in one paragraph
+//!
+//! Two independent reasons, and both are needed:
+//!
+//! * **The mapping is many-to-one.** Every speaker is pushed toward the same
+//!   pitch register, the same vocal-tract scale and the same long-term
+//!   spectrum. Many different inputs produce the same output, so there is no
+//!   inverse to compute -- not "an inverse that is hard to find", none.
+//! * **The phase is gone.** The measured phase of every frame is discarded and
+//!   replaced. Phase carries the precise waveform and a speaker's
+//!   micro-timing; it is never stored, so nothing downstream can restore it.
+//!
+//! The CSPRNG modulation on top means there is not even one fixed transform to
+//! characterise. That is a third reason, and it is the weakest of the three:
+//! randomness alone would be reversible by anyone holding the seed. The seed
+//! never leaves the process and is zeroized on drop, but the argument does not
+//! rest on that.
+//!
+//! # Forward secrecy, and what `reseed_secs` is really for
+//!
+//! The modulation stream rolls onto a fresh seed every [`DeidConfig::reseed_secs`]
+//! (two seconds by default), drawing the new seed from the stream it replaces.
+//! ChaCha20 cannot be run backwards, so obtaining the current state tells an
+//! adversary nothing about the modulation that drove any earlier segment: a
+//! long recording is a chain of short independently-sealed streams rather than
+//! one long one.
+//!
+//! **This is forward secrecy, not irreversibility.** Rolling more often does
+//! not make the output harder to invert -- the phase discard and the
+//! many-to-one mapping already did that, and they do not depend on the ratchet
+//! at all. Setting `reseed_secs` to `0.0` keeps one stream for the session and
+//! the output is exactly as unlinkable as before.
+//!
+//! The roll is deliberately cheap: no syscall, no allocation, no lock. It has
+//! to be, because it happens inside an audio callback.
+//!
+//! # Real-time constraints
+//!
+//! [`Deidentifier::process`] is allocation-free and safe to call from an audio
+//! callback. That is a property of this file and it is easy to lose: a `Vec`
+//! grown inside the per-frame closure, a lock taken, or a log line written
+//! would each turn a working live path into audible dropouts on somebody
+//! else's machine and not on yours.
+//!
+//! [`Deidentifier::process_vec`] is the convenience form that *does* allocate.
+//! It is for offline processing; do not reach for it in a callback.
+//!
+//! [`ProcessStats`] records what each block cost -- last, worst, and an
+//! exponential moving average -- so a front-end can show a real-time factor
+//! instead of guessing. `worst_block_ms` is the one that matters for live use:
+//! the average being comfortable says nothing about whether the worst block
+//! missed its deadline.
+//!
+//! # Configuration is validated in one place
+//!
+//! [`DeidConfig::checked`] is the single funnel, and nothing should bypass it.
+//! Two shipped defects are the reason it exists in that shape: a configuration
+//! value once made every output sample silently `NaN` (F-10), and parameters
+//! read from a file and handed to a library without a bound killed the process
+//! (F-2, F-3). The engine keeps persistent state, so a bad value is not one bad
+//! block -- it is every block from then on.
 
 use crate::accent::{AccentConfig, AccentNeutralizer, AccentStats};
 use crate::effects::{Chorus, Reverb, SoftClip};
