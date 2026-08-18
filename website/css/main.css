@@ -139,7 +139,7 @@ header.top {
 .brand img { width: 26px; height: 26px; }
 .brand a { color: var(--fg); border: 0; }
 
-nav.links { display: flex; gap: 14px; margin-left: auto; flex-wrap: wrap; }
+nav.links { display: flex; gap: 14px; flex-wrap: wrap; }
 nav.links a {
   color: var(--muted);
   font-size: 13px;
@@ -907,6 +907,26 @@ body.legal-locked { overflow: hidden; }
  *   no .js at all             -> off and LOCKED: scripts are not running, so
  *                               there is no way back and the control says so.
  */
+
+/* The two site controls, grouped and set apart from the navigation.
+ *
+ * The switch used to live among the nav links, where it read as one more
+ * destination. It is not: it chooses which *edition* of the site you are
+ * served, which is the same kind of choice as the colour scheme. Grouping them
+ * says so without a word of explanation. */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  padding-left: 14px;
+  border-left: 1px solid var(--border);
+}
+@media (max-width: 760px) {
+  /* On a phone the navigation already takes its own row, so the divider would
+   * separate the controls from nothing. */
+  .controls { margin-left: auto; padding-left: 0; border-left: 0; }
+}
 
 .js-toggle {
   display: inline-flex;
