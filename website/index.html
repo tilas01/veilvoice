@@ -10,9 +10,17 @@
 <meta property="og:title" content="VeilVoice — irreversible voice de-identification">
 <meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
 <meta property="og:image" content="assets/banner.png">
+<!-- Declarative, so it costs no script and works with JavaScript off.
+     Same-origin only: a prefetch is a real request, and a privacy tool
+     quietly reaching a third party to feel fast would undercut its own
+     argument. The megabyte-sized search index is NOT here on purpose --
+     js/prefetch.js fetches that one only when the connection is willing. -->
+<link rel="prefetch" href="wiki.html">
+<link rel="prefetch" href="search.html">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/main.css">
 <script src="js/theme.js"></script>
+<script src="js/prefetch.js" defer></script>
 <script src="js/legal.js" defer></script>
 <script src="js/reveal.js" defer></script>
 </head>
@@ -32,7 +40,14 @@
       <a href="#crypto">security</a>
       <a href="wiki.html">wiki</a>
       <a href="search.html">search</a>
-      <a href="nojs/index.html">no-js</a>
+      <a class="js-toggle" href="nojs/index.html" role="switch" aria-checked="false"
+         title="Switch to the HTML-and-CSS edition. This does not turn JavaScript off in your browser -- it serves you pages that run no scripts at all.">
+        <span>JavaScript</span>
+        <span class="js-toggle-track" aria-hidden="true"><span class="js-toggle-knob"></span></span>
+        <span class="js-toggle-state js-when-on">on</span>
+        <span class="js-toggle-state js-when-off">off</span>
+        <span class="js-toggle-lock">(locked: scripts are not running)</span>
+      </a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <label for="theme" style="position:absolute;left:-9999px">Colour scheme</label>
@@ -67,17 +82,6 @@
     original voice, <strong>while the words stay clean and transcribable</strong>.
   </p>
 
-  <div class="veil" aria-hidden="true">
-    <span style="animation-delay:0ms"></span><span style="animation-delay:120ms"></span>
-    <span style="animation-delay:240ms"></span><span style="animation-delay:80ms"></span>
-    <span style="animation-delay:300ms"></span><span style="animation-delay:180ms"></span>
-    <span class="veiled" style="animation-delay:60ms"></span>
-    <span class="veiled" style="animation-delay:420ms"></span>
-    <span class="veiled" style="animation-delay:220ms"></span>
-    <span class="veiled" style="animation-delay:500ms"></span>
-    <span class="veiled" style="animation-delay:140ms"></span>
-    <span class="veiled" style="animation-delay:360ms"></span>
-  </div>
 
   <div class="row" style="--i:2">
     <a class="btn primary" href="#download">download</a>
@@ -85,12 +89,27 @@
     <a class="btn" href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a>
   </div>
 
+  <!--
+    This message lives in <noscript>, and the same point is repeated in the
+    welcome dialog. That is not duplication for its own sake: the dialog is
+    drawn by `js/legal.js`, so a reader with JavaScript off never sees it. A
+    notice about having JavaScript off has to be somewhere that works with
+    JavaScript off.
+  -->
   <noscript>
     <div class="noscript-banner">
-      <strong>JavaScript is off.</strong> This page still reads fine, but the
-      hash verifier and the live repository panel need it. There is a
-      <a href="nojs/index.html">JavaScript-free version</a> built to work
-      without it at all.
+      <strong>JavaScript is off, so this site will not be displayed with it.
+      You are being served the HTML and CSS only.</strong>
+      This page still reads fine that way, but the hash verifier and the live
+      repository panel need scripts and will not appear. The
+      <a href="nojs/index.html">JavaScript-free edition</a> is built for this
+      and has everything in the page, including a
+      <a href="nojs/search.html">complete search index</a> your browser's own
+      find-in-page can search.
+      <br><br>
+      The <strong>JavaScript</strong> switch in the header shows <em>off</em>
+      and is locked, because nothing on a page can turn scripts back on -- only
+      your browser can.
     </div>
   </noscript>
 </div>
@@ -220,6 +239,36 @@
           collapsed onto one canonical value — so a whole population of speakers
           lands on the same output and there is nothing left to invert. What
           comes out is understandable, transcribable, and belongs to nobody.
+        </p>
+        <!--
+          Moved here from the hero, where it sat directly under the animated
+          banner: two waveforms animating at once read as decoration competing
+          with itself, and neither was saying anything the other was not.
+
+          Here it has a job. Left, blue, even: a voice as it was. Right, purple,
+          out of step: the same energy with the structure that identified the
+          speaker gone. That is the sentence above, drawn.
+        -->
+        <figure class="veil-figure">
+          <div class="veil" aria-hidden="true">
+    <span style="animation-delay:0ms"></span><span style="animation-delay:120ms"></span>
+    <span style="animation-delay:240ms"></span><span style="animation-delay:80ms"></span>
+    <span style="animation-delay:300ms"></span><span style="animation-delay:180ms"></span>
+    <span class="veiled" style="animation-delay:60ms"></span>
+    <span class="veiled" style="animation-delay:420ms"></span>
+    <span class="veiled" style="animation-delay:220ms"></span>
+    <span class="veiled" style="animation-delay:500ms"></span>
+    <span class="veiled" style="animation-delay:140ms"></span>
+    <span class="veiled" style="animation-delay:360ms"></span>
+  </div>
+          <figcaption>
+            The same energy, and no shared structure. Left, a voice as it was
+            recorded; right, what is left after the phase relationship that
+            identified the speaker has been destroyed. The words survive the
+            journey; the speaker does not.
+          </figcaption>
+        </figure>
+        <p>
         </p>
       </li>
 

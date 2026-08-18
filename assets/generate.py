@@ -241,20 +241,48 @@ def text_width(string, scale_factor=1, spacing=1):
 # Animated, this reads immediately: the left marches, the right seethes.
 
 BAND_MID = 336          # vertical centre of the waveform
-BAND_TOP = 258          # the animated rectangle, kept a little generous so
-BAND_HEIGHT = 156       # no frame can clip a tall bar
+
+# The animated rectangle, cropped to what actually moves.
+#
+# An APNG frame may declare a sub-rectangle, and every byte outside it is not
+# in the file at all. The first version declared a generous 1280x156 band "so
+# no frame can clip a tall bar" -- which was true and cost about a quarter of
+# the file for rows and columns that never change. The bars reach BAR_MAX above
+# and below BAND_MID and span BAR_LEFT to width-BAR_LEFT, so the box below is
+# that, plus two pixels of margin for the anti-aliased ends.
+#
+# The margin is not decoration: a bar end is blended into the row *outside* its
+# whole-pixel height, so a rectangle cropped exactly to BAR_MAX would clip the
+# very edge this animation exists to make smooth.
+BAND_TOP = 336 - 62 - 2
+BAND_HEIGHT = (62 + 2) * 2
+BAND_X = 78
+BAND_WIDTH = 1128
 BAR_STEP = 12
 BAR_WIDTH = 6
 BAR_LEFT = 80
 BAR_MAX = 62
 
+# How many levels of partial coverage an anti-aliased bar end may take. See the
+# note in `draw_bar`: this trades an invisible amount of precision for a large
+# amount of compressibility.
+AA_STEPS = 16
+
 
 def _wave(i, phase, coherent):
-    """Half-height of bar `i` at animation `phase` (0.0 to 1.0).
+    """Half-height of bar `i` at animation `phase` (0.0 to 1.0), in *fractional*
+    pixels.
 
     Deterministic in both arguments, so every frame is reproducible and the
     loop closes exactly: `phase` enters only through `sin`, and the integer
     hash below does not depend on it.
+
+    Returns a float on purpose. Rounding each height to a whole pixel is what
+    made the first animation look stepped rather than fluid: a bar near the top
+    of its travel changes by a fraction of a pixel per frame, so it sat still
+    for several frames and then jumped. `draw_bar` renders the fractional part
+    as partial coverage instead, which is what the browser does for the CSS
+    bars this is meant to match.
     """
     if coherent:
         # A travelling wave: neighbouring bars differ by a fixed phase step, so
@@ -263,7 +291,7 @@ def _wave(i, phase, coherent):
         shape = 0.5 + 0.5 * math.sin(angle)
         # A gentle envelope so the band is not a perfect rectangle of equal peaks.
         envelope = 0.62 + 0.38 * abs(((i * 7) % 23) / 23.0 - 0.5) * 2.0
-        return int(BAR_MAX * (0.20 + 0.80 * shape) * envelope)
+        return BAR_MAX * (0.20 + 0.80 * shape) * envelope
 
     # Incoherent: each bar keeps its own pseudo-random phase and rate, so the
     # bars never line up. Same energy, no shared structure.
@@ -273,10 +301,71 @@ def _wave(i, phase, coherent):
     angle = 2.0 * math.pi * (phase * rate + offset)
     shape = 0.5 + 0.5 * math.sin(angle)
     envelope = 0.55 + 0.45 * (((h >> 3) % 100) / 100.0)
-    return int(BAR_MAX * (0.18 + 0.82 * shape) * envelope)
+    return BAR_MAX * (0.18 + 0.82 * shape) * envelope
 
 
-def draw_band(px, phase, width=None, y_offset=0):
+def _blend(fg, bg, alpha):
+    """`fg` over `bg` at `alpha`, rounded to whole channel values.
+
+    Both are opaque here, so this is a plain linear interpolation. Rounding
+    with `int(v + 0.5)` rather than truncating keeps the two ends symmetric --
+    truncation biases every edge pixel one step towards the background, which
+    over a whole band reads as bars that are subtly too short.
+    """
+    return (
+        int(fg[0] * alpha + bg[0] * (1.0 - alpha) + 0.5),
+        int(fg[1] * alpha + bg[1] * (1.0 - alpha) + 0.5),
+        int(fg[2] * alpha + bg[2] * (1.0 - alpha) + 0.5),
+        255,
+    )
+
+
+def draw_bar(dst, x, centre, half, w, colour):
+    """One bar, centred on `centre`, with anti-aliased ends.
+
+    `half` is fractional. The rows fully inside the bar are painted flat; the
+    single row at each end is blended against whatever is already there by the
+    fraction it actually covers. That is the whole of the smoothness fix: the
+    bar's apparent height now changes continuously instead of in whole pixels,
+    so at 60 frames a second the crest glides rather than clicking from one row
+    to the next.
+    """
+    top = centre - half
+    bottom = centre + half
+
+    first = int(math.floor(top))
+    last = int(math.ceil(bottom))
+
+    for y in range(first, last):
+        if y < 0 or y >= len(dst):
+            continue
+        # How much of this one-pixel row the bar covers, in [0, 1].
+        covered = min(bottom, y + 1.0) - max(top, float(y))
+        if covered <= 0.0:
+            continue
+
+        # Quantise coverage to sixteen steps.
+        #
+        # Continuous coverage produces a different edge colour on almost every
+        # frame, and a PNG's compression works on repeated bytes -- so the file
+        # grew from 300 KB to 405 KB for a difference no eye can see at 1/60 s.
+        # Sixteen steps is finer than the eye can separate at this size and
+        # gives the compressor something to find: the animation stays fluid and
+        # the download stops being larger than the rest of the site put
+        # together.
+        covered = round(covered * AA_STEPS) / AA_STEPS
+        if covered <= 0.0:
+            continue
+        for px_x in range(x, x + w):
+            if px_x < 0 or px_x >= len(dst[0]):
+                continue
+            if covered >= 0.999:
+                dst[y][px_x] = colour
+            else:
+                dst[y][px_x] = _blend(colour, dst[y][px_x], covered)
+
+
+def draw_band(px, phase, width=None, y_offset=0, x_offset=0):
     """Draw the waveform band into `px` at the given animation phase.
 
     `y_offset` shifts the drawing up by that many rows, so the same routine can
@@ -289,21 +378,30 @@ def draw_band(px, phase, width=None, y_offset=0):
     for i, x in enumerate(range(BAR_LEFT, width - BAR_LEFT, BAR_STEP)):
         progress = (x - BAR_LEFT) / float(width - 2 * BAR_LEFT)
         coherent = progress < 0.45
-        height = max(4, _wave(i, phase, coherent))
+        half = max(2.0, _wave(i, phase, coherent))
         colour = BLUE if coherent else PURPLE
-        rect(px, x, BAND_MID - height - y_offset, BAR_WIDTH, height * 2, colour)
+        draw_bar(px, x - x_offset, BAND_MID - y_offset, half, BAR_WIDTH, colour)
 
 
 def band_strip(phase, background):
     """Just the animated rectangle, for one APNG frame.
 
-    Drawn onto a copy of the *static banner's* own rows for that region, so the
-    faint grid behind the bars is preserved and each frame replaces the region
-    outright. That is why the frames declare `blend_op = SOURCE`: there is
-    nothing to blend against, the strip is already complete.
+    Drawn onto a copy of the *static banner's* own pixels for that region, so
+    the faint grid behind the bars is preserved and each frame replaces the
+    region outright. That is why the frames declare `blend_op = SOURCE`: there
+    is nothing to blend against, the strip is already complete.
     """
-    rows = [list(background[y]) for y in range(BAND_TOP, BAND_TOP + BAND_HEIGHT)]
-    draw_band(rows, phase, width=len(background[0]), y_offset=BAND_TOP)
+    rows = [
+        list(background[y][BAND_X:BAND_X + BAND_WIDTH])
+        for y in range(BAND_TOP, BAND_TOP + BAND_HEIGHT)
+    ]
+    draw_band(
+        rows,
+        phase,
+        width=len(background[0]),
+        y_offset=BAND_TOP,
+        x_offset=BAND_X,
+    )
     return rows
 
 
@@ -436,12 +534,16 @@ def _raw_rows(pixels):
     return bytes(raw)
 
 
-def write_apng(path, frames, delay_ms):
+def write_apng(path, frames, delay_num, delay_den):
     """Write an APNG.
 
     `frames` is a list of `(x, y, pixels)`. The first must be the full image and
     sit at the origin; the rest are sub-rectangles that replace what is under
-    them. `delay_ms` is the delay on every frame.
+    them. The delay is a *rational* number of seconds, `delay_num/delay_den`,
+    because that is what the format stores and because 60 frames per second is
+    1/60 -- a value milliseconds cannot express without rounding (16 ms is
+    62.5 fps, 17 ms is 58.8) and rounding a frame interval is what makes an
+    animation visibly stutter.
     """
     first_x, first_y, first = frames[0]
     if (first_x, first_y) != (0, 0):
@@ -460,7 +562,7 @@ def write_apng(path, frames, delay_ms):
             sequence,
             len(pixels[0]), len(pixels),
             x, y,
-            delay_ms, 1000,          # delay as a fraction of a second
+            delay_num, delay_den,    # delay as an exact fraction of a second
             APNG_DISPOSE_NONE, APNG_BLEND_SOURCE,
         ))
 
@@ -543,12 +645,23 @@ def decode_apng(blob):
     return frames
 
 
-# How the animation is shaped. 24 frames at 70 ms is a 1.68 s loop -- long
-# enough not to read as a flicker, short enough that a reader sees the whole
-# idea without waiting. The phase of frame `i` is `i / FRAMES`, so the last
-# frame lands exactly one cycle from the first and the loop is seamless.
-BANNER_FRAMES = 24
-BANNER_DELAY_MS = 70
+# How the animation is shaped.
+#
+# **Sixty frames per second, one full cycle per second.** The first version ran
+# 24 frames at 70 ms -- about 14 fps -- which is fine for a blinking cursor and
+# far too coarse for a travelling wave: the crest visibly jumped from bar to
+# bar instead of moving along them.
+#
+# The delay is exactly 1/60 s rather than a rounded 16 or 17 ms. At 16 ms the
+# loop runs 0.96 s and at 17 ms it runs 1.02 s, and either way the frame
+# interval no longer divides the display's own 60 Hz refresh evenly, which is
+# what produces a stutter that is hard to name but easy to see.
+#
+# The phase of frame `i` is `i / FRAMES`, so the last frame lands exactly one
+# cycle from the first: the loop closes with no seam and no repeated frame.
+BANNER_FRAMES = 60
+BANNER_DELAY_NUM = 1
+BANNER_DELAY_DEN = 60
 
 
 def banner_frames():
@@ -557,7 +670,7 @@ def banner_frames():
     frames = [(0, 0, base)]
     for index in range(1, BANNER_FRAMES):
         phase = index / float(BANNER_FRAMES)
-        frames.append((0, BAND_TOP, band_strip(phase, base)))
+        frames.append((BAND_X, BAND_TOP, band_strip(phase, base)))
     return frames
 
 
@@ -702,7 +815,8 @@ def main():
     write_apng(
         os.path.join(here, "banner-animated.png"),
         banner_frames(),
-        BANNER_DELAY_MS,
+        BANNER_DELAY_NUM,
+        BANNER_DELAY_DEN,
     )
 
     # And the website's own copies, from the same run rather than by hand.

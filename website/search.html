@@ -10,9 +10,17 @@
 <meta property="og:title" content="Search — VeilVoice">
 <meta property="og:description" content="Search the whole repository and website. Sort, filter, and a complete static index for readers without JavaScript.">
 <meta property="og:image" content="assets/banner.png">
+<!-- Declarative, so it costs no script and works with JavaScript off.
+     Same-origin only: a prefetch is a real request, and a privacy tool
+     quietly reaching a third party to feel fast would undercut its own
+     argument. The megabyte-sized search index is NOT here on purpose --
+     js/prefetch.js fetches that one only when the connection is willing. -->
+<link rel="prefetch" href="index.html">
+<link rel="prefetch" href="wiki.html">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/main.css">
 <script src="js/theme.js"></script>
+<script src="js/prefetch.js" defer></script>
 <script src="js/legal.js" defer></script>
 <script src="js/search.js" defer></script>
 </head>
@@ -32,7 +40,14 @@
       <a href="index.html#crypto">security</a>
       <a href="wiki.html">wiki</a>
       <a href="search.html" aria-current="page">search</a>
-      <a href="nojs/index.html">no-js</a>
+      <a class="js-toggle" href="nojs/index.html" role="switch" aria-checked="false"
+         title="Switch to the HTML-and-CSS edition. This does not turn JavaScript off in your browser -- it serves you pages that run no scripts at all.">
+        <span>JavaScript</span>
+        <span class="js-toggle-track" aria-hidden="true"><span class="js-toggle-knob"></span></span>
+        <span class="js-toggle-state js-when-on">on</span>
+        <span class="js-toggle-state js-when-off">off</span>
+        <span class="js-toggle-lock">(locked: scripts are not running)</span>
+      </a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <label for="theme" style="position:absolute;left:-9999px">Colour scheme</label>

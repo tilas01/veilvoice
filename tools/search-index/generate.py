@@ -530,6 +530,9 @@ def render_static(index):
     add('<title>Search index &mdash; VeilVoice (no JavaScript)</title>')
     add('<meta name="description" content="A complete static index of every '
         'file and section in VeilVoice. No JavaScript required.">')
+    # Markup, not script, so it works in this edition exactly as in the other.
+    add('<link rel="prefetch" href="index.html">')
+    add('<link rel="prefetch" href="../index.html">')
     add('<style>')
     add(':root{--bg:#1a1b26;--fg:#c0caf5;--muted:#565f89;--accent:#7aa2f7;'
         '--accent-2:#bb9af7;--border:#414868;--bg-inset:#16161e;color-scheme:dark}')
@@ -556,13 +559,26 @@ def render_static(index):
     add('.x{color:var(--muted)}')
     add('nav.top{margin-bottom:14px}')
     add('nav.top a{margin-right:14px}')
+    add('.js-toggle{display:inline-flex;align-items:center;gap:7px;border:0;'
+        'color:var(--muted);font-size:13px;min-height:24px;white-space:nowrap}')
+    add('.js-toggle-track{position:relative;width:30px;height:16px;flex:none;'
+        'border:1px solid var(--border);border-radius:999px;'
+        'background:var(--bg-inset)}')
+    add('.js-toggle-knob{position:absolute;top:2px;left:2px;width:10px;'
+        'height:10px;border-radius:50%;background:var(--muted)}')
     add('</style>')
     add('</head>')
     add('<body>')
     add('<main>')
     add('<nav class="top">')
     add('<a href="index.html">no-JavaScript edition</a>')
-    add('<a href="../index.html">main site</a>')
+    add('<a class="js-toggle" href="../index.html" role="switch" '
+        'aria-checked="false" title="Switch to the full site, which runs '
+        'scripts. This control changes no browser setting.">'
+        '<span>JavaScript</span>'
+        '<span class="js-toggle-track" aria-hidden="true">'
+        '<span class="js-toggle-knob"></span></span>'
+        '<span class="js-toggle-state">off</span></a>')
     add('<a href="../search.html">live search</a>')
     add('<a href="https://github.com/%s">repository</a>' % esc(REPO))
     add('</nav>')
