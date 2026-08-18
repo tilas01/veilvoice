@@ -284,8 +284,21 @@ h3[id] { scroll-margin-top: 90px; }
 /* Bars start even and blue on the left, fragment and shift purple to the
  * right: the product in one picture, matching the icon. Pure CSS. */
 
-.veil { display: flex; gap: 3px; justify-content: center; align-items: center;
-        height: 74px; margin: 30px 0 6px; }
+/* The bars now live inside a figure in the walkthrough rather than in the hero.
+ * They were directly beneath the animated banner, so the page opened with two
+ * waveforms animating at once -- redundant, and each made the other look like
+ * decoration. Beside the sentence about the voiceprint being destroyed they
+ * illustrate it instead. */
+.veil-figure { margin: 14px 0 18px; }
+.veil-figure figcaption {
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 62ch;
+  margin-top: 4px;
+}
+
+.veil { display: flex; gap: 3px; justify-content: flex-start; align-items: center;
+        height: 54px; margin: 0 0 8px; }
 .veil span {
   width: 5px;
   border-radius: 2px;
@@ -875,3 +888,112 @@ body.legal-locked { overflow: hidden; }
   .search-controls { position: static; }
   .search-filters select { flex: 1 1 45%; }
 }
+
+/* ---------- the JavaScript edition toggle ---------- */
+/*
+ * A switch, not a link that looks like one, because the thing it controls is a
+ * binary state the reader is in: which edition of this site they are being
+ * served. `role="switch"` and `aria-checked` are on the anchor so assistive
+ * technology reports that state rather than "link, no-js".
+ *
+ * It is honest about what it does. It does **not** turn JavaScript off in the
+ * browser -- nothing on a page can do that -- it moves you between the full
+ * site and the HTML-and-CSS edition. The label says "JavaScript" and the title
+ * attribute says the rest.
+ *
+ * Three states:
+ *   .js  + on the full site   -> on,  and clicking goes to the no-JS edition
+ *   .js  + on the no-JS site  -> off, and clicking comes back
+ *   no .js at all             -> off and LOCKED: scripts are not running, so
+ *                               there is no way back and the control says so.
+ */
+
+.js-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  color: var(--muted);
+  font-size: 13px;
+  min-height: 24px;          /* WCAG 2.5.8, same as the nav links */
+  white-space: nowrap;
+}
+.js-toggle:hover { color: var(--accent); }
+
+.js-toggle-track {
+  position: relative;
+  width: 30px;
+  height: 16px;
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-inset);
+  transition: background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.js-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+  /* transform only: the compositor moves it without laying the page out. */
+  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1),
+              background-color 0.16s ease;
+}
+
+/*
+ * ON is driven by `html.js`, not by the `aria-checked` attribute.
+ *
+ * The attribute is in the markup, and markup cannot know whether scripts run.
+ * The first version hardcoded `aria-checked="true"`, so with JavaScript
+ * disabled the switch cheerfully reported "on" *while* displaying "scripts are
+ * not running" beside it -- a control contradicting itself in the one state it
+ * exists to describe.
+ *
+ * So the honest default is off, in the markup, for everyone; `theme.js` adds
+ * `html.js` and upgrades `aria-checked` when it actually runs. A reader with no
+ * JavaScript is never told a script is running.
+ */
+html.js .js-toggle .js-toggle-track {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+html.js .js-toggle .js-toggle-knob {
+  transform: translateX(14px);
+  background: var(--bg);
+}
+
+/* Which word is shown. Two spans rather than one, because CSS can hide an
+ * element but cannot rewrite its text, and this has to be right with no script
+ * available to rewrite anything. */
+.js-when-on { display: none; }
+html.js .js-when-on { display: inline; }
+html.js .js-when-off { display: none; }
+
+.js-toggle-state { font-variant-numeric: tabular-nums; }
+
+/*
+ * Locked. `html.js` is set by `theme.js` from a blocking head script, so its
+ * absence means scripts are not running -- which is exactly when this control
+ * cannot be used, because moving back to the full site would be moving to a
+ * page that needs the thing that is switched off.
+ *
+ * Written as `html:not(.js)` rather than toggled by script for the obvious
+ * reason: script is what is missing.
+ */
+html:not(.js) .js-toggle {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+html:not(.js) .js-toggle .js-toggle-track {
+  border-style: dashed;
+}
+html:not(.js) .js-toggle-lock { display: inline; }
+.js-toggle-lock { display: none; color: var(--muted); }
+
+/* On the no-JavaScript edition the switch is off because that is the edition
+ * the reader chose, not because scripts are broken -- so no lock note there.
+ * That page carries its own copy of these rules and does not load this file. */

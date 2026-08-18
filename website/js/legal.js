@@ -101,6 +101,17 @@
       '    <span>I have read the licence (GPL-3.0-or-later) and will comply with it.</span>',
       '  </label>',
 
+      // Stated here as well as in the page's <noscript>, because the two
+      // reach different readers: this dialog is drawn by script, so somebody
+      // with JavaScript off never sees a word of it.
+      '  <p>There are <b>two editions</b> of this site. This one runs scripts.',
+      '  The <b>JavaScript</b> switch in the header serves you the other:',
+      '  <b>HTML and CSS only</b>, with no script running at all -- including a',
+      "  complete search index your browser's own find-in-page can search.",
+      '  The switch changes which edition you are sent, not any setting in your',
+      '  browser; if you turn JavaScript off yourself it shows <b>off</b> and',
+      '  locks, because a page cannot turn scripts back on.</p>',
+
       '  <p class="legal-fine">Using this website, the repository, the released',
       '  binaries or any output they produce constitutes your binding agreement',
       '  to these terms in full.</p>',
