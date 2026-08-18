@@ -53,6 +53,13 @@
     <source srcset="assets/banner-animated.png" media="(prefers-reduced-motion: no-preference)">
     <img class="banner" src="assets/banner.png" alt="VeilVoice — irreversible voice de-identification">
   </picture>
+  <!-- The page had no h1 at all: the banner is an image, and an image is not a
+       heading. A screen reader's outline began at "WHAT IT ACTUALLY DOES", and
+       the document's own subject was never stated in text anywhere. Visually
+       hidden because the banner already says it far better in pixels; present
+       because a heading is for the reader who is not looking at pixels. -->
+  <h1 class="visually-hidden">VeilVoice — irreversible voice de-identification</h1>
+
   <p class="tagline" style="--i:1">
     VeilVoice destroys the <strong>biometric voiceprint</strong> of a speaker —
     pitch, formants, timbre, micro-timing and the melody of an accent — so that
@@ -119,6 +126,22 @@
       <div class="card">
         <h3>Transcribe without giving up your voice</h3>
         <p>Speech-to-text needs the words, not the voiceprint. Anonymise first and the service gets speech it can transcribe and a voice belonging to nobody.</p>
+      </div>
+      <div class="card">
+        <h3>See what is listening</h3>
+        <p>Which applications are holding your microphone or camera, right now, with an alert the moment one starts. De-identifying a call achieves little if a second program is recording the raw microphone beside it. macOS exposes no interface for this, so nothing is reported there rather than something guessed.</p>
+      </div>
+      <div class="card">
+        <h3>Detect tampering with its own files</h3>
+        <p>A signed manifest of what VeilVoice should be, and a check that reports what changed. Where the system's own auditing allows it, it names the program responsible — and says plainly when it cannot see, rather than implying nothing happened.</p>
+      </div>
+      <div class="card">
+        <h3>Erase a recording</h3>
+        <p>Overwrite and unlink, with an honest account of what that is worth. On flash storage the controller may have written the data somewhere the filesystem can no longer reach, so this is not a guarantee and is not described as one.</p>
+      </div>
+      <div class="card">
+        <h3>Verify a download without GnuPG</h3>
+        <p><code>veilvoice-verify</code> ships in every archive and carries the signing key compiled in. It checks the signature over the hash list and then the file, on a machine with no GnuPG and no network. It distinguishes a download being <em>intact</em> from a build being <em>reproducible</em>, because those are different claims.</p>
       </div>
     </div>
 
