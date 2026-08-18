@@ -40,8 +40,9 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Ten defects found and fixed (F-37 to F-46.)** Three had shipped; seven were in
-code written during this round and were caught before release. See section 2.5,
+**Eleven defects found and fixed (F-37 to F-47.)** Three had shipped; seven were
+in code written during this round and were caught before release; one (F-47) was
+found after the release was tagged, while verifying it. See section 2.5,
 which keeps those two groups apart rather than counting them together.
 
 The round covers what v0.1.9 adds: a search index over the whole repository and
@@ -791,6 +792,34 @@ died on a successful verification. **Fixed** by relaxing the preference around
 native calls and judging them on their exit code, which is the thing that
 actually says whether they worked.
 
+**F-47 -- The page checks applied to a list of pages, not to every page.
+Found after v0.1.9 was tagged.**
+
+`tools/site-tests/html.test.js` opens with a comment saying it checks "the
+signing-key fingerprint on every page". It checked a hardcoded list of three
+files. `search.html` was added to the site in this release and was therefore
+checked for **nothing**: not balanced tags, not duplicate ids, not dangling
+anchors, not third-party assets, not inline event handlers, and not the
+fingerprint -- which it did not have.
+
+The fingerprint is the one thing on these pages that lets a reader tell a real
+release from a forged one, and the page that shipped without it is the one
+about finding things in this project.
+
+**This is section 4.5 of this document happening to the tests themselves.** The
+lesson recorded there -- *a finished scope is only as wide as the list it was
+drawn from* -- was written about audit scope, and the same failure was sitting
+in the test that enforces it. Enumerating from memory is the defect; enumerating
+from the directory is the fix.
+
+**Fixed** by discovering every `.html` file under `website/` rather than listing
+them, which immediately found the missing fingerprint and now covers any page
+added in future the moment it exists. Five pages checked, up from three.
+
+Found while verifying the published release, by asking whether the live search
+page carried the fingerprint -- a check made because HANDOFF section 5 claims CI
+enforces it. It said so, and it did not.
+
 ### 2.5 The new code, audited against the classes
 
 The standard at the top of this document is a walk of every vulnerability class
@@ -1219,8 +1248,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Forty-six defects found and fixed across four audit rounds (F-1 to F-46):**
-eight in the first two, twenty-eight in the third, ten in this one.
+**Forty-seven defects found and fixed across four audit rounds (F-1 to F-47):**
+eight in the first two, twenty-eight in the third, eleven in this one.
 
 Of this round's ten, **three had shipped** and seven were caught in code written
 during the round. Keeping those apart matters: a round that counts
