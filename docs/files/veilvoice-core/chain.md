@@ -11,14 +11,111 @@
 
 # `crates/veilvoice-core/src/chain.rs`
 
-[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 764 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs)
+[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 856 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs)
 
 ## Contents
 
-- [What calls what](#what-calls-what)
-- [Items](#items)
+- [The signal path](#the-signal-path)
+- [Why it is one-way, in one paragraph](#why-it-is-one-way-in-one-paragraph)
+- [Forward secrecy, and what reseedsecs is really for](#forward-secrecy-and-what-reseedsecs-is-really-for)
+- [Real-time constraints](#real-time-constraints)
+- [Configuration is validated in one place](#configuration-is-validated-in-one-place)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 The assembled de-identification chain and its live performance statistics.
+
+Every other module in this crate does one job. This is the file that puts
+them in order and decides what happens to a block of samples, so it is the
+one to read first if you want to know what VeilVoice actually *does* to
+audio.
+
+# The signal path
+
+`Deidentifier::process` takes a block of input and writes an equal-length
+block of output. Everything below happens inside it, per STFT frame:
+
+1. **Roll the modulation stream** if this frame is the one where the
+ratchet fires. See "forward secrecy" below.
+2. **Draw this frame's modulation** from the CSPRNG -- a pitch ratio and a
+formant ratio, glided toward fresh random targets rather than jumped, so
+the scrambling is inaudible as scrambling.
+3. **Track the fundamental** from the newest hop of *time-domain* samples.
+This cannot be done in the frequency domain: at any frame size with
+usable latency, the FFT's bin spacing cannot tell 100 Hz from 140 Hz.
+The tracker keeps its own longer history and is fed only what is new.
+4. **Let the accent neutraliser observe** that estimate, so its long-term
+picture of the speaker stays current.
+5. **Transform the spectrum** -- this is the irreversible step, and it lives
+in `crate::spectral`. Measured phase is discarded and resynthesised;
+pitch, vocal-tract scale and spectral tilt are mapped onto canonical
+values.
+
+Then, once per block rather than per frame, a short time-domain tail: soft
+clip, chorus, reverb. Those are cosmetic. **They are not what makes the
+output unlinkable** and nothing here should be read as though they were.
+
+# Why it is one-way, in one paragraph
+
+Two independent reasons, and both are needed:
+
+* **The mapping is many-to-one.** Every speaker is pushed toward the same
+pitch register, the same vocal-tract scale and the same long-term
+spectrum. Many different inputs produce the same output, so there is no
+inverse to compute -- not "an inverse that is hard to find", none.
+* **The phase is gone.** The measured phase of every frame is discarded and
+replaced. Phase carries the precise waveform and a speaker's
+micro-timing; it is never stored, so nothing downstream can restore it.
+
+The CSPRNG modulation on top means there is not even one fixed transform to
+characterise. That is a third reason, and it is the weakest of the three:
+randomness alone would be reversible by anyone holding the seed. The seed
+never leaves the process and is zeroized on drop, but the argument does not
+rest on that.
+
+# Forward secrecy, and what `reseed_secs` is really for
+
+The modulation stream rolls onto a fresh seed every `DeidConfig::reseed_secs`
+(two seconds by default), drawing the new seed from the stream it replaces.
+ChaCha20 cannot be run backwards, so obtaining the current state tells an
+adversary nothing about the modulation that drove any earlier segment: a
+long recording is a chain of short independently-sealed streams rather than
+one long one.
+
+**This is forward secrecy, not irreversibility.** Rolling more often does
+not make the output harder to invert -- the phase discard and the
+many-to-one mapping already did that, and they do not depend on the ratchet
+at all. Setting `reseed_secs` to `0.0` keeps one stream for the session and
+the output is exactly as unlinkable as before.
+
+The roll is deliberately cheap: no syscall, no allocation, no lock. It has
+to be, because it happens inside an audio callback.
+
+# Real-time constraints
+
+`Deidentifier::process` is allocation-free and safe to call from an audio
+callback. That is a property of this file and it is easy to lose: a `Vec`
+grown inside the per-frame closure, a lock taken, or a log line written
+would each turn a working live path into audible dropouts on somebody
+else's machine and not on yours.
+
+`Deidentifier::process_vec` is the convenience form that *does* allocate.
+It is for offline processing; do not reach for it in a callback.
+
+`ProcessStats` records what each block cost -- last, worst, and an
+exponential moving average -- so a front-end can show a real-time factor
+instead of guessing. `worst_block_ms` is the one that matters for live use:
+the average being comfortable says nothing about whether the worst block
+missed its deadline.
+
+# Configuration is validated in one place
+
+`DeidConfig::checked` is the single funnel, and nothing should bypass it.
+Two shipped defects are the reason it exists in that shape: a configuration
+value once made every output sample silently `NaN` (F-10), and parameters
+read from a file and handed to a library without a bound killed the process
+(F-2, F-3). The engine keeps persistent state, so a bad value is not one bad
+block -- it is every block from then on.
 
 ## What calls what
 
@@ -56,27 +153,27 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `DeidConfig` <sub>pub struct</sub> | [14](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L14) | User-facing configuration for the de-identifier. |
-| `DeidConfig::default` <sub>fn</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L58) |  |
-| `DeidConfig::hop` <sub>fn</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L80) |  |
-| `DeidConfig::scaled` <sub>fn</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L85) | Scale a (lo, hi) ratio range toward 1.0 by intensity. |
-| `DeidConfig::MAX_SAMPLE_RATE` <sub>pub const</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L105) | The largest sample rate this engine will build for, in Hz. |
-| `DeidConfig::MAX_FRAME_SIZE` <sub>pub const</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L113) | The largest FFT size this engine will build for. |
-| `DeidConfig::checked` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L124) | Validate and normalise; returns an error string on impossible values. |
-| `clamp_ratio_bounds` <sub>fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L194) | Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order. |
-| `ProcessStats` <sub>pub struct</sub> | [208](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L208) | Rolling performance statistics, surfaced live to the UI. |
-| `ProcessStats::last_block_ms` <sub>pub fn</sub> | [229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L229) | Most recent block processing time in milliseconds. |
-| `ProcessStats::worst_block_ms` <sub>pub fn</sub> | [233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L233) | Worst block processing time in milliseconds. |
-| `ProcessStats::ema_block_ms` <sub>pub fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L237) | Smoothed block processing time in milliseconds. |
-| `ProcessStats::last_realtime_factor` <sub>pub fn</sub> | [242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L242) | Processing time divided by the block's real-time duration. |
-| `Deidentifier` <sub>pub struct</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L258) | The complete, irreversible voice de-identification chain. |
-| `Deidentifier::new` <sub>pub fn</sub> | [279](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L279) | Build with a fresh, unpredictable seed from the OS CSPRNG. |
-| `Deidentifier::from_seed` <sub>pub fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L286) | Build with an explicit seed (deterministic; for tests or seed-from-key). |
-| `Deidentifier::latency_samples` <sub>pub fn</sub> | [344](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L344) | Fixed algorithmic latency in samples. |
-| `Deidentifier::stats` <sub>pub fn</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L349) | Live performance statistics (copy). |
-| `Deidentifier::accent_stats` <sub>pub fn</sub> | [354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L354) | Live accent-neutralisation read-out (detected f0, applied ratios). |
-| `Deidentifier::process` <sub>pub fn</sub> | [360](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L360) | Process input into output (equal length). |
-| `Deidentifier::process_vec` <sub>pub fn</sub> | [419](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L419) | Convenience: process a whole buffer and return a new Vec. |
+| `DeidConfig` <sub>pub struct</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L106) | User-facing configuration for the de-identifier. |
+| `DeidConfig::default` <sub>fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L150) |  |
+| `DeidConfig::hop` <sub>fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L172) |  |
+| `DeidConfig::scaled` <sub>fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L177) | Scale a (lo, hi) ratio range toward 1.0 by intensity. |
+| `DeidConfig::MAX_SAMPLE_RATE` <sub>pub const</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L197) | The largest sample rate this engine will build for, in Hz. |
+| `DeidConfig::MAX_FRAME_SIZE` <sub>pub const</sub> | [205](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L205) | The largest FFT size this engine will build for. |
+| `DeidConfig::checked` <sub>pub fn</sub> | [216](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L216) | Validate and normalise; returns an error string on impossible values. |
+| `clamp_ratio_bounds` <sub>fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L286) | Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order. |
+| `ProcessStats` <sub>pub struct</sub> | [300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L300) | Rolling performance statistics, surfaced live to the UI. |
+| `ProcessStats::last_block_ms` <sub>pub fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L321) | Most recent block processing time in milliseconds. |
+| `ProcessStats::worst_block_ms` <sub>pub fn</sub> | [325](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L325) | Worst block processing time in milliseconds. |
+| `ProcessStats::ema_block_ms` <sub>pub fn</sub> | [329](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L329) | Smoothed block processing time in milliseconds. |
+| `ProcessStats::last_realtime_factor` <sub>pub fn</sub> | [334](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L334) | Processing time divided by the block's real-time duration. |
+| `Deidentifier` <sub>pub struct</sub> | [350](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L350) | The complete, irreversible voice de-identification chain. |
+| `Deidentifier::new` <sub>pub fn</sub> | [371](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L371) | Build with a fresh, unpredictable seed from the OS CSPRNG. |
+| `Deidentifier::from_seed` <sub>pub fn</sub> | [378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L378) | Build with an explicit seed (deterministic; for tests or seed-from-key). |
+| `Deidentifier::latency_samples` <sub>pub fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L436) | Fixed algorithmic latency in samples. |
+| `Deidentifier::stats` <sub>pub fn</sub> | [441](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L441) | Live performance statistics (copy). |
+| `Deidentifier::accent_stats` <sub>pub fn</sub> | [446](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L446) | Live accent-neutralisation read-out (detected f0, applied ratios). |
+| `Deidentifier::process` <sub>pub fn</sub> | [452](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L452) | Process input into output (equal length). |
+| `Deidentifier::process_vec` <sub>pub fn</sub> | [511](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L511) | Convenience: process a whole buffer and return a new Vec. |
 
 ---
 

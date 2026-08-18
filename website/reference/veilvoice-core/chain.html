@@ -39,15 +39,42 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/chain.svg" alt="chain.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/chain.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 764 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 856 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#the-signal-path">The signal path</a>
+  <a href="#why-it-is-one-way-in-one-paragraph">Why it is one-way, in one paragraph</a>
+  <a href="#forward-secrecy-and-what-reseedsecs-is-really-for">Forward secrecy, and what reseedsecs is really for</a>
+  <a href="#real-time-constraints">Real-time constraints</a>
+  <a href="#configuration-is-validated-in-one-place">Configuration is validated in one place</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
 <div>
 <section id="s-about">
 <p>The assembled de-identification chain and its live performance statistics.</p>
+<p>Every other module in this crate does one job. This is the file that puts them in order and decides what happens to a block of samples, so it is the one to read first if you want to know what VeilVoice actually <em>does</em> to audio.</p>
+<h2 id="the-signal-path">The signal path</h2>
+<p>[<code>Deidentifier::process</code>] takes a block of input and writes an equal-length block of output. Everything below happens inside it, per STFT frame:</p>
+<p>1. <strong>Roll the modulation stream</strong> if this frame is the one where the ratchet fires. See &quot;forward secrecy&quot; below. 2. <strong>Draw this frame&#x27;s modulation</strong> from the CSPRNG -- a pitch ratio and a formant ratio, glided toward fresh random targets rather than jumped, so the scrambling is inaudible as scrambling. 3. <strong>Track the fundamental</strong> from the newest hop of <em>time-domain</em> samples. This cannot be done in the frequency domain: at any frame size with usable latency, the FFT&#x27;s bin spacing cannot tell 100 Hz from 140 Hz. The tracker keeps its own longer history and is fed only what is new. 4. <strong>Let the accent neutraliser observe</strong> that estimate, so its long-term picture of the speaker stays current. 5. <strong>Transform the spectrum</strong> -- this is the irreversible step, and it lives in [<code>crate::spectral</code>]. Measured phase is discarded and resynthesised; pitch, vocal-tract scale and spectral tilt are mapped onto canonical values.</p>
+<p>Then, once per block rather than per frame, a short time-domain tail: soft clip, chorus, reverb. Those are cosmetic. <strong>They are not what makes the output unlinkable</strong> and nothing here should be read as though they were.</p>
+<h2 id="why-it-is-one-way-in-one-paragraph">Why it is one-way, in one paragraph</h2>
+<p>Two independent reasons, and both are needed:</p>
+<ul>
+<li><strong>The mapping is many-to-one.</strong> Every speaker is pushed toward the same pitch register, the same vocal-tract scale and the same long-term spectrum. Many different inputs produce the same output, so there is no inverse to compute -- not &quot;an inverse that is hard to find&quot;, none.</li>
+<li><strong>The phase is gone.</strong> The measured phase of every frame is discarded and replaced. Phase carries the precise waveform and a speaker&#x27;s micro-timing; it is never stored, so nothing downstream can restore it.</li>
+</ul>
+<p>The CSPRNG modulation on top means there is not even one fixed transform to characterise. That is a third reason, and it is the weakest of the three: randomness alone would be reversible by anyone holding the seed. The seed never leaves the process and is zeroized on drop, but the argument does not rest on that.</p>
+<h2 id="forward-secrecy-and-what-reseedsecs-is-really-for">Forward secrecy, and what <code>reseed_secs</code> is really for</h2>
+<p>The modulation stream rolls onto a fresh seed every [<code>DeidConfig::reseed_secs</code>] (two seconds by default), drawing the new seed from the stream it replaces. ChaCha20 cannot be run backwards, so obtaining the current state tells an adversary nothing about the modulation that drove any earlier segment: a long recording is a chain of short independently-sealed streams rather than one long one.</p>
+<p><strong>This is forward secrecy, not irreversibility.</strong> Rolling more often does not make the output harder to invert -- the phase discard and the many-to-one mapping already did that, and they do not depend on the ratchet at all. Setting <code>reseed_secs</code> to <code>0.0</code> keeps one stream for the session and the output is exactly as unlinkable as before.</p>
+<p>The roll is deliberately cheap: no syscall, no allocation, no lock. It has to be, because it happens inside an audio callback.</p>
+<h2 id="real-time-constraints">Real-time constraints</h2>
+<p>[<code>Deidentifier::process</code>] is allocation-free and safe to call from an audio callback. That is a property of this file and it is easy to lose: a <code>Vec</code> grown inside the per-frame closure, a lock taken, or a log line written would each turn a working live path into audible dropouts on somebody else&#x27;s machine and not on yours.</p>
+<p>[<code>Deidentifier::process_vec</code>] is the convenience form that <em>does</em> allocate. It is for offline processing; do not reach for it in a callback.</p>
+<p>[<code>ProcessStats</code>] records what each block cost -- last, worst, and an exponential moving average -- so a front-end can show a real-time factor instead of guessing. <code>worst_block_ms</code> is the one that matters for live use: the average being comfortable says nothing about whether the worst block missed its deadline.</p>
+<h2 id="configuration-is-validated-in-one-place">Configuration is validated in one place</h2>
+<p>[<code>DeidConfig::checked</code>] is the single funnel, and nothing should bypass it. Two shipped defects are the reason it exists in that shape: a configuration value once made every output sample silently <code>NaN</code> (F-10), and parameters read from a file and handed to a library without a bound killed the process (F-2, F-3). The engine keeps persistent state, so a bad value is not one bad block -- it is every block from then on.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -133,27 +160,27 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>DeidConfig</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L14" rel="noopener noreferrer">14</a></td><td>User-facing configuration for the de-identifier.</td></tr>
-<tr><td><code>DeidConfig::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L58" rel="noopener noreferrer">58</a></td><td></td></tr>
-<tr><td><code>DeidConfig::hop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L80" rel="noopener noreferrer">80</a></td><td></td></tr>
-<tr><td><code>DeidConfig::scaled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L85" rel="noopener noreferrer">85</a></td><td>Scale a (lo, hi) ratio range toward 1.0 by intensity.</td></tr>
-<tr><td><code>DeidConfig::MAX_SAMPLE_RATE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L105" rel="noopener noreferrer">105</a></td><td>The largest sample rate this engine will build for, in Hz.</td></tr>
-<tr><td><code>DeidConfig::MAX_FRAME_SIZE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L113" rel="noopener noreferrer">113</a></td><td>The largest FFT size this engine will build for.</td></tr>
-<tr><td><code>DeidConfig::checked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L124" rel="noopener noreferrer">124</a></td><td>Validate and normalise; returns an error string on impossible values.</td></tr>
-<tr><td><code>clamp_ratio_bounds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L194" rel="noopener noreferrer">194</a></td><td>Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order.</td></tr>
-<tr><td><code>ProcessStats</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L208" rel="noopener noreferrer">208</a></td><td>Rolling performance statistics, surfaced live to the UI.</td></tr>
-<tr><td><code>ProcessStats::last_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L229" rel="noopener noreferrer">229</a></td><td>Most recent block processing time in milliseconds.</td></tr>
-<tr><td><code>ProcessStats::worst_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L233" rel="noopener noreferrer">233</a></td><td>Worst block processing time in milliseconds.</td></tr>
-<tr><td><code>ProcessStats::ema_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L237" rel="noopener noreferrer">237</a></td><td>Smoothed block processing time in milliseconds.</td></tr>
-<tr><td><code>ProcessStats::last_realtime_factor</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L242" rel="noopener noreferrer">242</a></td><td>Processing time divided by the block&#x27;s real-time duration.</td></tr>
-<tr><td><code>Deidentifier</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L258" rel="noopener noreferrer">258</a></td><td>The complete, irreversible voice de-identification chain.</td></tr>
-<tr><td><code>Deidentifier::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L279" rel="noopener noreferrer">279</a></td><td>Build with a fresh, unpredictable seed from the OS CSPRNG.</td></tr>
-<tr><td><code>Deidentifier::from_seed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L286" rel="noopener noreferrer">286</a></td><td>Build with an explicit seed (deterministic; for tests or seed-from-key).</td></tr>
-<tr><td><code>Deidentifier::latency_samples</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L344" rel="noopener noreferrer">344</a></td><td>Fixed algorithmic latency in samples.</td></tr>
-<tr><td><code>Deidentifier::stats</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L349" rel="noopener noreferrer">349</a></td><td>Live performance statistics (copy).</td></tr>
-<tr><td><code>Deidentifier::accent_stats</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L354" rel="noopener noreferrer">354</a></td><td>Live accent-neutralisation read-out (detected f0, applied ratios).</td></tr>
-<tr><td><code>Deidentifier::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L360" rel="noopener noreferrer">360</a></td><td>Process input into output (equal length).</td></tr>
-<tr><td><code>Deidentifier::process_vec</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L419" rel="noopener noreferrer">419</a></td><td>Convenience: process a whole buffer and return a new Vec.</td></tr>
+<tr><td><code>DeidConfig</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L106" rel="noopener noreferrer">106</a></td><td>User-facing configuration for the de-identifier.</td></tr>
+<tr><td><code>DeidConfig::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L150" rel="noopener noreferrer">150</a></td><td></td></tr>
+<tr><td><code>DeidConfig::hop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L172" rel="noopener noreferrer">172</a></td><td></td></tr>
+<tr><td><code>DeidConfig::scaled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L177" rel="noopener noreferrer">177</a></td><td>Scale a (lo, hi) ratio range toward 1.0 by intensity.</td></tr>
+<tr><td><code>DeidConfig::MAX_SAMPLE_RATE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L197" rel="noopener noreferrer">197</a></td><td>The largest sample rate this engine will build for, in Hz.</td></tr>
+<tr><td><code>DeidConfig::MAX_FRAME_SIZE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L205" rel="noopener noreferrer">205</a></td><td>The largest FFT size this engine will build for.</td></tr>
+<tr><td><code>DeidConfig::checked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L216" rel="noopener noreferrer">216</a></td><td>Validate and normalise; returns an error string on impossible values.</td></tr>
+<tr><td><code>clamp_ratio_bounds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L286" rel="noopener noreferrer">286</a></td><td>Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order.</td></tr>
+<tr><td><code>ProcessStats</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L300" rel="noopener noreferrer">300</a></td><td>Rolling performance statistics, surfaced live to the UI.</td></tr>
+<tr><td><code>ProcessStats::last_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L321" rel="noopener noreferrer">321</a></td><td>Most recent block processing time in milliseconds.</td></tr>
+<tr><td><code>ProcessStats::worst_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L325" rel="noopener noreferrer">325</a></td><td>Worst block processing time in milliseconds.</td></tr>
+<tr><td><code>ProcessStats::ema_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L329" rel="noopener noreferrer">329</a></td><td>Smoothed block processing time in milliseconds.</td></tr>
+<tr><td><code>ProcessStats::last_realtime_factor</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L334" rel="noopener noreferrer">334</a></td><td>Processing time divided by the block&#x27;s real-time duration.</td></tr>
+<tr><td><code>Deidentifier</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L350" rel="noopener noreferrer">350</a></td><td>The complete, irreversible voice de-identification chain.</td></tr>
+<tr><td><code>Deidentifier::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L371" rel="noopener noreferrer">371</a></td><td>Build with a fresh, unpredictable seed from the OS CSPRNG.</td></tr>
+<tr><td><code>Deidentifier::from_seed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L378" rel="noopener noreferrer">378</a></td><td>Build with an explicit seed (deterministic; for tests or seed-from-key).</td></tr>
+<tr><td><code>Deidentifier::latency_samples</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L436" rel="noopener noreferrer">436</a></td><td>Fixed algorithmic latency in samples.</td></tr>
+<tr><td><code>Deidentifier::stats</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L441" rel="noopener noreferrer">441</a></td><td>Live performance statistics (copy).</td></tr>
+<tr><td><code>Deidentifier::accent_stats</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L446" rel="noopener noreferrer">446</a></td><td>Live accent-neutralisation read-out (detected f0, applied ratios).</td></tr>
+<tr><td><code>Deidentifier::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L452" rel="noopener noreferrer">452</a></td><td>Process input into output (equal length).</td></tr>
+<tr><td><code>Deidentifier::process_vec</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L511" rel="noopener noreferrer">511</a></td><td>Convenience: process a whole buffer and return a new Vec.</td></tr>
 </tbody></table>
 </section>
 </div></div>

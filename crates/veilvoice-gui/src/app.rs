@@ -1,5 +1,81 @@
 // SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! The VeilVoice desktop application.
+//!
+//! One window, six tabs, no menus and no settings file to hunt for. This file
+//! owns the window: the tab strip, the state behind it, and the rules about
+//! what the user is allowed to do before they have answered the questions that
+//! matter. The tabs themselves live partly here and partly in siblings --
+//! [`crate::security`] draws the lock tab and the unlock screen,
+//! [`crate::prefs`] draws settings.
+//!
+//! # The six tabs, and why these six
+//!
+//! | Tab | What it is |
+//! |---|---|
+//! | **anonymise file** | Process a recording on disk. The default path. |
+//! | **live scramble** | Scramble a microphone in real time into a virtual cable. |
+//! | **monitor** | Which applications currently hold the microphone and camera. |
+//! | **lock** | The app lock, and a plain statement of what it is worth. |
+//! | **settings** | Colour scheme, animation, and where those choices are kept. |
+//! | **about** | Versions, licence, and the honest scope. |
+//!
+//! There is no "advanced" tab and no hidden pane. Everything the program can
+//! do is reachable in one click from the strip, because a privacy tool whose
+//! important controls are buried is a privacy tool whose important controls do
+//! not get used.
+//!
+//! # Nothing slow runs on the UI thread
+//!
+//! [`VeilVoiceApp::start_job`] spawns a worker and hands back an
+//! [`std::sync::mpsc`] receiver; [`VeilVoiceApp::poll_job`] drains it with
+//! `try_recv` once per frame. The window keeps painting while a job runs.
+//!
+//! That split is not tidiness. A long recording takes real time to process,
+//! and sealing it runs Argon2id at 256 MiB, which is **deliberately** slow --
+//! that is the whole point of a memory-hard KDF. Doing either on the UI thread
+//! means a frozen window and an operating system offering to kill the
+//! application, in the middle of the operation the user cares most about
+//! completing.
+//!
+//! `poll_job` handles all three channel outcomes, including
+//! `Disconnected` -- a worker that panicked. The user is told the thread
+//! stopped rather than watching a progress state that will never finish.
+//!
+//! # The at-rest choice is enforced here, not merely offered
+//!
+//! Recordings are encrypted at rest by default (locked decision 4.10), and a
+//! job **cannot start** until the user has answered the modal that appears if
+//! they try to turn that off. The rule is asserted by a test in this file
+//! rather than left as a property of the layout code, because "the button was
+//! disabled" is a claim about pixels and "the job refuses to start" is a claim
+//! about behaviour.
+//!
+//! The worker encodes the WAV **in memory** and seals it before anything is
+//! written, so a recording that is going to be encrypted never touches the disk
+//! in the clear -- not even briefly, not even in a temporary file that would
+//! be deleted afterwards. Deleting a file does not remove its contents from a
+//! flash device; not writing it does.
+//!
+//! # The monitor indicator
+//!
+//! [`VeilVoiceApp::watch_indicator`] shows, in the header, whether anything is
+//! holding the microphone or camera right now, and clicking it goes to the
+//! monitor tab. It is polled on a timer rather than watched continuously,
+//! because the underlying platform code enumerates processes and doing that
+//! every frame would cost more than the rest of the window put together.
+//!
+//! What it reports is bounded by what the platform allows, and
+//! `veilvoice_watch::support()` states that bound rather than letting an empty
+//! list imply an empty machine. The indicator must never present "we could not
+//! see" as "nothing is there".
+//!
+//! # Where the honest limits are stated
+//!
+//! The about tab carries the scope text, and the lock tab carries
+//! `veilvoice_crypto::lock::SCOPE`. Neither is decoration: tests fail the build
+//! if that wording is softened, because a user who over-trusts the app lock is
+//! left worse off than one who never had it. If you are editing text in this
+//! file and a test starts failing, it is that rule, and it is working.
 
 use crate::security::Security;
 use crate::theme::palette as p;

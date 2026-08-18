@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-core/src/window.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="Analysis/synthesis windowing helpers.">
+<meta name="description" content="Analysis and synthesis windowing, and the one constant that keeps overlap-add honest.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -39,15 +39,25 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/window.svg" alt="window.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/window.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 54 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 91 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#why-the-periodic-hann-window">Why the periodic Hann window</a>
+  <a href="#why-the-gain-is-computed-rather-than-assumed">Why the gain is computed rather than assumed</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
 <div>
 <section id="s-about">
-<p>Analysis/synthesis windowing helpers.</p>
+<p>Analysis and synthesis windowing, and the one constant that keeps overlap-add honest.</p>
+<p>Two functions, both small, both easy to get subtly wrong in ways that do not look wrong.</p>
+<h2 id="why-the-periodic-hann-window">Why the <em>periodic</em> Hann window</h2>
+<p>There are two Hann windows and they differ by one sample. The <strong>symmetric</strong> variant (<code>cos(2*pi*i / (n-1))</code>) is the right one for designing filters, and it is what most textbook snippets show. The <strong>periodic</strong> variant (<code>cos(2*pi*i / n)</code>, which is what [<code>hann</code>] returns) is the right one for an STFT, because it is the one that tiles: shifted copies of it sum to a constant, and the symmetric one does not quite.</p>
+<p>Using the wrong one does not produce an obvious failure. It produces a faint periodic amplitude ripple at the hop rate -- a quiet buzz that sounds like a codec artefact rather than like a bug, and that nothing in a test suite notices unless the test is looking for exactly it.</p>
+<h2 id="why-the-gain-is-computed-rather-than-assumed">Why the gain is computed rather than assumed</h2>
+<p>VeilVoice windows <strong>twice</strong>: once on analysis and once on synthesis. That is deliberate -- a synthesis window suppresses the discontinuities that modifying a spectrum introduces at frame edges, and this crate modifies every spectrum it touches. The cost is that the reconstruction gain is no longer the familiar Constant-Overlap-Add value, it is <code>sum(w^2) / hop</code>.</p>
+<p>[<code>ola_gain</code>] returns the reciprocal of that, so a caller multiplies rather than divides -- one multiply per sample in a hot loop instead of one divide. It is derived from the window actually in use rather than hardcoded for a particular size and overlap, so changing either cannot silently change the output level.</p>
+<p>The zero-length and single-sample cases are handled explicitly, and the degenerate <code>sum(w^2) == 0</code> returns unity rather than infinity: this is a gain that gets multiplied into every output sample, and one non-finite value entering an engine with persistent state is permanent.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -75,8 +85,8 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>hann</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L10" rel="noopener noreferrer">10</a></td><td>Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design).</td></tr>
-<tr><td><code>ola_gain</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L26" rel="noopener noreferrer">26</a></td><td>Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop.</td></tr>
+<tr><td><code>hann</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L47" rel="noopener noreferrer">47</a></td><td>Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design).</td></tr>
+<tr><td><code>ola_gain</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L63" rel="noopener noreferrer">63</a></td><td>Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop.</td></tr>
 </tbody></table>
 </section>
 </div></div>
