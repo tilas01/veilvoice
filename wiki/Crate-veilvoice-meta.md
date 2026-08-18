@@ -1,0 +1,68 @@
+![veilvoice-meta](https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/banners/veilvoice-meta.svg)
+
+# veilvoice-meta
+
+> Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.
+
+[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/README.md)
+
+## Contents
+
+- [Why this exists](#why-this-exists)
+- [Strip versus spoof](#strip-versus-spoof)
+- [What this crate cannot do](#what-this-crate-cannot-do)
+- [How the crate fits together](#how-the-crate-fits-together)
+- [The files](#the-files)
+
+Strip or spoof the identifying metadata that rides along with media files.
+
+## Why this exists
+
+De-identifying a voice accomplishes nothing if the file still says who
+recorded it. A phone recording routinely carries the device model, the
+recording software, a precise timestamp and — for images — GPS coordinates
+accurate to a few metres. That is often a far easier way to identify someone
+than analysing their voice, and it survives every DSP transform because it
+is not in the audio at all.
+
+## Strip versus spoof
+
+Removing every tag is not always the least conspicuous choice. A file with
+*no* metadata whatsoever is itself a signal: it says the sender was trying to
+hide something, and it stands out in a set of otherwise ordinary files.
+`Policy` therefore offers two approaches:
+
+- `Policy::Strip` — remove everything. Best when the file is expected to
+be sanitised anyway, or when any false statement would be worse than an
+obvious absence.
+- `Policy::Realistic` — replace the tags with plausible, non-identifying
+values so the file looks unremarkable rather than scrubbed.
+
+## What this crate cannot do
+
+It removes *container* metadata. It cannot remove information encoded in the
+media itself: a photograph still shows the room it was taken in, and audio
+still carries its room acoustics and background noise. Nor does it touch
+filesystem timestamps or the filename, both of which are outside the file —
+callers that care must handle those separately.
+
+## How the crate fits together
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_lib(["lib.rs<br/>111 lines"])
+    n_audio["audio.rs<br/>240 lines"]
+    n_image["image.rs<br/>202 lines"]
+    n_wav["wav.rs<br/>332 lines"]
+    n_audio --> n_wav
+```
+
+## The files
+
+| File | Lines | What it is |
+|---|---:|---|
+| [[`audio.rs`|File-veilvoice-meta-audio]] | 240 | Audio tag removal and replacement. |
+| [[`image.rs`|File-veilvoice-meta-image]] | 202 | Image EXIF/GPS removal. |
+| [[`lib.rs`|File-veilvoice-meta-lib]] | 111 | Strip or spoof the identifying metadata that rides along with media files. |
+| [[`wav.rs`|File-veilvoice-meta-wav]] | 332 | Chunk-level RIFF/WAVE metadata removal. |

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: CC-BY-NC-SA-4.0
 """Generate VeilVoice's icon and banner.
 
 The artwork is *generated*, not committed as opaque binaries, so anyone can see
@@ -179,6 +179,24 @@ GLYPHS = {
     "0": ["01110", "10001", "10011", "10101", "11001", "10001", "01110"],
     "1": ["00100", "01100", "00100", "00100", "00100", "00100", "01110"],
     "3": ["11110", "00001", "00001", "01110", "00001", "00001", "11110"],
+    # The digit set used to be exactly 0, 1 and 3, because those were the only
+    # ones the two strings on the banner needed. Changing the licence line to
+    # "CC BY-NC-SA 4.0" asked for a `4`, and `text()` silently draws nothing for
+    # a character it does not have -- so the banner would have shipped reading
+    # "CC BY-NC-SA .0", on the social preview card, wrong about its own licence
+    # and with every test passing. That is finding F-37 exactly: a banner
+    # illegible about the project, invisible to the suite, obvious on sight.
+    #
+    # The whole set is defined now rather than the one digit that was wanted,
+    # so the next string to go on the banner cannot reintroduce the same hole.
+    # `check_glyphs()` below refuses to generate if one is ever missing again.
+    "2": ["01110", "10001", "00001", "00010", "00100", "01000", "11111"],
+    "4": ["00010", "00110", "01010", "10010", "11111", "00010", "00010"],
+    "5": ["11111", "10000", "11110", "00001", "00001", "10001", "01110"],
+    "6": ["00110", "01000", "10000", "11110", "10001", "10001", "01110"],
+    "7": ["11111", "00001", "00010", "00100", "01000", "01000", "01000"],
+    "8": ["01110", "10001", "10001", "01110", "10001", "10001", "01110"],
+    "9": ["01110", "10001", "10001", "01111", "00001", "00010", "01100"],
     "-": ["00000", "00000", "00000", "11111", "00000", "00000", "00000"],
     ".": ["00000", "00000", "00000", "00000", "00000", "01100", "01100"],
     ",": ["00000", "00000", "00000", "00000", "01100", "01100", "01000"],
@@ -192,7 +210,29 @@ GLYPHS = {
 
 
 def text(pixels, string, x0, y0, colour, scale_factor=1, spacing=1):
-    """Draw `string` in the 5x7 font. Unknown characters are skipped."""
+    """Draw `string` in the 5x7 font.
+
+    A character with no glyph is a **hard error**, not a silent gap.
+
+    It used to advance the cursor and draw nothing, which meant a string could
+    contain a character this font had never defined and the only symptom was a
+    blank space in the finished artwork. Changing the licence line to
+    "CC BY-NC-SA 4.0" hit exactly that -- there was no `4` -- and the banner
+    would have gone out reading "CC BY-NC-SA .0" on GitHub's social preview
+    card, stating the wrong licence, with `--check` passing because the
+    generator and the committed file agreed with each other about the same
+    mistake.
+
+    That is finding F-37's shape a second time: artwork that is wrong about the
+    project, invisible to every test, obvious the moment somebody looks. A
+    generator that cannot draw what it was asked to draw should say so.
+    """
+    missing = sorted({ch for ch in string.upper() if ch not in GLYPHS})
+    if missing:
+        raise SystemExit(
+            ("assets/generate.py: no glyph for %s in %r." + chr(10) +
+             "Add it to GLYPHS rather than letting the banner render a gap.")
+            % (", ".join(repr(ch) for ch in missing), string))
     cursor = x0
     for ch in string.upper():
         glyph = GLYPHS.get(ch)
@@ -433,7 +473,7 @@ def banner():
     text(px, "THE VOICEPRINT IS DESTROYED. THE WORDS STAY READABLE.", 80, 430, COMMENT, 3)
     text(px, "FULLY OFFLINE", 80, 478, GREEN, 3)
     text(px, "SECURE AUDITED RUST CODE", 80, 512, CYAN, 3)
-    text(px, "GPL-3.0-OR-LATER", 80, 546, COMMENT, 3)
+    text(px, "CC BY-NC-SA 4.0", 80, 546, COMMENT, 3)
     # Attribution, in the same green as the offline claim.
     text(px, "BY TILAS01 ON GITHUB", 80, 580, GREEN, 3)
 

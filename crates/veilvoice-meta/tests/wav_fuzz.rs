@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Randomised robustness testing for the RIFF chunk walker.
 //!
 //! `clean_wav_bytes` exists because `lofty` cannot remove ID3v2 from a WAV, so

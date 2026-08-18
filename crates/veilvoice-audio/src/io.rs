@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Reading and writing audio files.
 //!
 //! Decoding goes through `symphonia`, which is pure Rust and covers WAV, MP3,

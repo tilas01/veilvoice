@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! The assembled de-identification chain and its live performance statistics.
 
 use crate::accent::{AccentConfig, AccentNeutralizer, AccentStats};

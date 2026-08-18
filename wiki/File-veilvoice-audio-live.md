@@ -1,0 +1,59 @@
+![live.rs](https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/banners/veilvoice-audio/live.svg)
+
+# `crates/veilvoice-audio/src/live.rs`
+
+[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 237 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs)
+
+## Contents
+
+- [Structure](#structure)
+- [Rules the callbacks follow](#rules-the-callbacks-follow)
+- [Latency](#latency)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
+
+Live microphone scrambling.
+
+# Structure
+
+Capture and playback run as two independent callbacks driven by the audio
+hardware, joined by a lock-free SPSC ring buffer. The de-identification runs
+inside the *output* callback, which is the shortest path: adding a worker
+thread would mean a second buffer and a second scheduling delay for no
+benefit, and `veilvoice_core::Deidentifier::process` is explicitly
+allocation-free and safe to call from an audio callback.
+
+# Rules the callbacks follow
+
+An audio callback that blocks produces a dropout, so neither callback ever
+allocates, locks, or waits. Statistics are published through a mutex the
+callback only ever *tries* to take: if the UI thread happens to hold it, the
+update is skipped rather than the audio stalling.
+
+# Latency
+
+Total latency is the input buffer, plus the ring backlog, plus the engine's
+one-frame group delay (~21 ms at the defaults), plus the output buffer. The
+ring is intentionally short — enough to absorb jitter between two clocks
+that are not synchronised, not enough to accumulate a delay the user would
+notice while speaking.
+
+## What calls what
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_start(["LiveSession::start<br/>pub"])
+    n_stats(["LiveSession::stats<br/>pub"])
+```
+
+## Items
+
+| Item | Line | Documentation |
+|---|---:|---|
+| `RING_MILLIS` <sub>const</sub> | [37](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L37) | How much jitter the ring absorbs before it starts dropping samples. |
+| `LiveStats` <sub>pub struct</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L41) | A snapshot of what the live path is doing, safe to read from the UI. |
+| `LiveSession` <sub>pub struct</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L56) | A running live-scramble session. |
+| `Shared` <sub>struct</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L64) |  |
+| `LiveSession::start` <sub>pub fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L76) | Start scrambling from input into output. |
+| `LiveSession::stats` <sub>pub fn</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L197) | Read the current statistics, resetting the peak meters. |

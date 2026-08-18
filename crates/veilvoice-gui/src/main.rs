@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! VeilVoice desktop application entry point.
 // No console window on Windows for a release build; a debug build keeps it so
 // panics and `eprintln!` stay visible while developing.

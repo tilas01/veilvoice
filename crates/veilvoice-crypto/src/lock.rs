@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! The application lock: an Argon2id password verifier with a rate limit.
 //!
 //! # What this is worth, stated before anything else

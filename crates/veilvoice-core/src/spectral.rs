@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Frequency-domain de-identification transform.
 //!
 //! For every STFT frame we:
@@ -42,7 +42,8 @@
 //! configuration, which maps every speaker onto a *single constant* register
 //! that need only be snapped once; it does mean any residual intonation
 //! (`prosody_flatten` below 1.0) is quantised to the same grid. Lifting that
-//! restriction needs window-kernel synthesis, noted as future work in HANDOFF.
+//! restriction needs window-kernel synthesis, noted as future work in the
+//! project roadmap.
 //!
 //! None of this weakens irreversibility. The measured phase is still discarded
 //! in full, and pinning the output to one canonical fundamental destroys *more*

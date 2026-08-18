@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: CC-BY-NC-SA-4.0
 #
 # Build, lint and test on every supported platform. Windows first — it is the
 # primary target — then macOS and Linux.
@@ -82,6 +82,16 @@ jobs:
       # a complete working tree, which is what this needs.
       - name: Committed search index must match the repository
         run: python tools/search-index/generate.py --check
+
+      # The per-crate and per-file documentation is generated from the doc
+      # comments in the source, so a comment edited without regenerating leaves
+      # 287 files describing code that has moved on. That is finding F-41 --
+      # generated output drifting from its generator, silently -- and it is the
+      # reason this documentation is generated rather than written. The check
+      # also sweeps for files the generator no longer produces, so a deleted
+      # module cannot leave its page behind describing something that is gone.
+      - name: Committed documentation must match the source
+        run: python tools/docs/generate.py --check
 
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested

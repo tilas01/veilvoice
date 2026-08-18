@@ -1,0 +1,94 @@
+![spectral.rs](https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/banners/veilvoice-core/spectral.svg)
+
+# `crates/veilvoice-core/src/spectral.rs`
+
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 428 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs)
+
+## Contents
+
+- [Voiced frames: an explicit harmonic comb](#voiced-frames-an-explicit-harmonic-comb)
+- [What calls what](#what-calls-what)
+- [Items](#items)
+
+Frequency-domain de-identification transform.
+
+For every STFT frame we:
+1. take the magnitude spectrum and **discard the measured phase** — this is
+the irreversible step, it permanently erases the speaker's waveform /
+micro-timing;
+2. estimate a smooth spectral **envelope** (the vocal-tract / formant
+structure, i.e. the biometric identity) and the **excitation** residual
+(glottal source + phonetic detail that carries the words);
+3. shift the excitation by a cryptographically-modulated *pitch* ratio and
+warp the envelope by an independent *formant* ratio, so the identity is
+moved somewhere it never was while the phonemes stay legible;
+4. resynthesise a fresh phase, plus a fixed random per-bin offset.
+
+## Voiced frames: an explicit harmonic comb
+
+Step 4 has two modes. On **unvoiced** frames each bin accumulates its own
+centre frequency — the classic channel-vocoder phase, exactly right for
+fricatives and noise.
+
+On **voiced** frames that alone is not enough, and it is audible. Bin centres
+are multiples of `sample_rate / n` (46.875 Hz at the default settings), and a
+harmonic peak spans several bins, so a plain channel vocoder turns each
+partial into a cluster of independent grid-frequency sinusoids with unrelated
+phases. A 210 Hz voice comes out beating around 187.5 and 234.4 Hz: metallic,
+and with a pitch that cannot be steered, which would make the canonical
+register `crate::accent` aims for unreachable.
+
+So when the frame is voiced and accent neutralisation is active, the
+excitation is not resampled at all — it is **replaced** by an ideal harmonic
+comb at the canonical fundamental, quantised to the nearest whole bin. This
+is the textbook source-filter model of voiced speech (an impulse train
+through the vocal-tract filter), and because every comb line then sits
+exactly on a bin centre, the existing per-bin phase advance is precisely the
+right advance for it: successive frames overlap-add coherently and each
+harmonic emerges as one clean partial. The envelope still supplies the
+formants, so the vowels are untouched.
+
+Snapping to the bin grid is what buys that coherence, and it costs pitch
+resolution — the grid step is coarse. That is not a problem for the default
+configuration, which maps every speaker onto a *single constant* register
+that need only be snapped once; it does mean any residual intonation
+(`prosody_flatten` below 1.0) is quantised to the same grid. Lifting that
+restriction needs window-kernel synthesis, noted as future work in the
+project roadmap.
+
+None of this weakens irreversibility. The measured phase is still discarded
+in full, and pinning the output to one canonical fundamental destroys *more*
+pitch information than randomising it would — a constant carries nothing.
+
+Between steps 2 and 4 the optional `crate::accent` neutraliser folds in its
+long-term corrections: it reads the unwarped envelope to measure the
+speaker's vocal-tract scale, contributes extra pitch and formant ratios, and
+rotates the warped envelope toward a canonical spectral tilt.
+
+The measured phase is never reused, so no amount of downstream processing can
+reconstruct the original excitation phase — the transform is one-way.
+
+## What calls what
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_new(["SpectralState::new<br/>pub"])
+    n_retarget_phase_offsets(["SpectralState::retarget_phase…<br/>pub"])
+    n_transform(["SpectralState::transform<br/>pub"])
+    n_resample_linear["resample_linear"]
+    n_box_smooth["box_smooth"]
+    n_transform --> n_box_smooth
+    n_transform --> n_resample_linear
+```
+
+## Items
+
+| Item | Line | Documentation |
+|---|---:|---|
+| `SpectralState` <sub>pub struct</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L66) | Persistent per-instance state for the spectral transform. |
+| `SpectralState::new` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L90) | n = FFT size, hop = analysis/synthesis hop, rand_phase = fixed per-bin phase offsets in radians (length n/2+1) drawn from the CSPRNG. |
+| `SpectralState::retarget_phase_offsets` <sub>pub fn</sub> | [131](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L131) | Aim the per-bin phase offsets at fresh values. |
+| `SpectralState::transform` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L145) | Rewrite spec (length n/2+1) in place, given the current modulation. |
+| `resample_linear` <sub>fn</sub> | [279](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L279) | Linear resampling of a non-negative spectral function. |
+| `box_smooth` <sub>pub(crate) fn</sub> | [300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L300) | In-place-ish box smoother using a running sum. |

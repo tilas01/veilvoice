@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
 
 # Installing VeilVoice
 
@@ -173,7 +173,7 @@ untrustworthy.
   whose whole subject is verifying what you run.
 - **Audacity** is a free audio editor, useful for recording and trimming before
   veiling. It is not bundled because it is GPL-2.0-or-later, which cannot be
-  combined with this project's GPL-3.0-or-later.
+  combined with this project's CC BY-NC-SA 4.0.
 - **GnuPG**, where missing, because without it the signature cannot be checked
   at all. If you decline it, the script stops rather than falling back to
   "the hash matched" — a hash checked against an unverified list is not a
@@ -334,7 +334,7 @@ Recorded here rather than left for you to discover:
   the by-hand one above, which *has* been checked against the real release.
 - **The packaged installers (WiX, `.deb`, `.rpm`, Flatpak, Homebrew), the
   OpenBSD and NetBSD builds and the Gentoo ebuild are not built yet.** They are
-  specified in `HANDOFF.md` section 7. macOS Intel and Apple Silicon are already
+  specified in [`ROADMAP.md`](../ROADMAP.md). macOS Intel and Apple Silicon are already
   separate builds, and a single Windows executable already covers 10 and 11.
 - **The portable verifier exists and is tested**, including against the real
   published v0.1.8 signature, but like the scripts it has only been run by its

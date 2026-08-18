@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Authenticated encryption with XChaCha20-Poly1305.
 //!
 //! XChaCha20 rather than plain ChaCha20 because its 192-bit nonce can be drawn

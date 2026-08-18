@@ -1,7 +1,7 @@
 # The portable verifier: one small binary that checks a VeilVoice release
 # without GnuPG installed. See src/main.rs for what it does and does not prove.
 #
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: CC-BY-NC-SA-4.0
 
 [package]
 name = "veilvoice-verify"

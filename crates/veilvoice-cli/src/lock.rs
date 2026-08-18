@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! `veilvoice lock` — manage the application lock from the command line.
 //!
 //! The lock guards the desktop app: with one set, VeilVoice asks for a password

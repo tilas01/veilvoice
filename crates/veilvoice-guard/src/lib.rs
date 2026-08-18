@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! # veilvoice-guard
 //!
 //! Tamper **detection** for VeilVoice's own files: a manifest of what they
@@ -49,7 +49,7 @@
 //! It is also an installer, a privileged daemon and a much larger attack
 //! surface bolted onto a project that currently needs no privileges at all --
 //! and it still could not stop a root-level attacker, only watch one. So the
-//! unprivileged half ships first, on its own merits, and `HANDOFF.md` records
+//! unprivileged half ships first, on its own merits, and `ROADMAP.md` records
 //! what the privileged half would need to be worth adding.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]

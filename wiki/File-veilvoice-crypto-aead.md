@@ -1,0 +1,47 @@
+![aead.rs](https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/banners/veilvoice-crypto/aead.svg)
+
+# `crates/veilvoice-crypto/src/aead.rs`
+
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 168 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs)
+
+## Contents
+
+- [What calls what](#what-calls-what)
+- [Items](#items)
+
+Authenticated encryption with XChaCha20-Poly1305.
+
+XChaCha20 rather than plain ChaCha20 because its 192-bit nonce can be drawn
+at random with no practical collision risk. The 96-bit nonce of RFC 8439
+ChaCha20-Poly1305 requires a counter and careful state tracking to stay
+unique across runs; getting that wrong is catastrophic, and a random
+192-bit nonce removes the failure mode entirely.
+
+Every call is authenticated over associated data as well as the plaintext,
+which is how the container header in `crate::container` is bound to its
+ciphertext: flipping a bit in the stored KDF parameters produces a
+decryption failure rather than a silently different key.
+
+## What calls what
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_random_nonce(["random_nonce<br/>pub"])
+    n_cipher["cipher"]
+    n_seal(["seal<br/>pub"])
+    n_open(["open<br/>pub"])
+    n_open --> n_cipher
+    n_seal --> n_cipher
+```
+
+## Items
+
+| Item | Line | Documentation |
+|---|---:|---|
+| `NONCE_LEN` <sub>pub const</sub> | [20](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L20) | Nonce length for XChaCha20-Poly1305, in bytes. |
+| `TAG_LEN` <sub>pub const</sub> | [22](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L22) | Poly1305 authentication tag length, in bytes. |
+| `random_nonce` <sub>pub fn</sub> | [25](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L25) | Draw a fresh random nonce from the OS CSPRNG. |
+| `cipher` <sub>fn</sub> | [31](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L31) |  |
+| `seal` <sub>pub fn</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41) | Encrypt plaintext, authenticating aad alongside it. |
+| `open` <sub>pub fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L60) | Decrypt and verify. |
