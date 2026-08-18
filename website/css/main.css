@@ -280,6 +280,73 @@ h3[id] { scroll-margin-top: 90px; }
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
+/* ---------- the cycling fact line ---------- */
+/*
+ * One line at a time, changing every 3.6 seconds: slow enough to read
+ * without becoming something the reader has to wait for.
+ *
+ * Pure CSS, so it works in the no-JavaScript edition, follows whichever palette
+ * the reader has chosen, and costs no bytes beyond the text itself. The
+ * alternative -- an animated image -- would be minutes long at this pace,
+ * would bake one theme in, and would put this project's own claims inside a
+ * picture where they cannot be selected, searched or read aloud. Finding F-37
+ * was exactly that, rendered illegibly.
+ *
+ * Every fact shares one keyframe and differs only by delay. The percentages
+ * below are one slot of 26, so they are tied to the number of `.fact`
+ * elements in the page: `--fact-count` records it and a site test compares the
+ * two, because adding a line without widening the cycle would overlap two
+ * messages -- readable in neither.
+ */
+.facts {
+  --fact-count: 26;
+  --fact-cycle: 93.6s;
+  position: relative;
+  margin: 26px auto 0;
+  max-width: 640px;
+  /* Reserve the line's height so nothing below it moves as messages swap.
+   * Two lines' worth: the longest of these wraps on a narrow phone. */
+  min-height: 3.2em;
+}
+
+.fact {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  color: var(--c, var(--muted));
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fact-cycle var(--fact-cycle) linear infinite;
+  animation-delay: calc(var(--f) * var(--fact-cycle) / var(--fact-count));
+  /* `opacity` and `transform` only -- the two properties that animate without
+   * a layout pass, which is the rule the rest of this stylesheet follows. */
+  will-change: opacity, transform;
+}
+
+@keyframes fact-cycle {
+  0%            { opacity: 0; transform: translateY(5px); }
+  0.385%     { opacity: 1; transform: none; }
+  2.923%   { opacity: 1; transform: none; }
+  3.308%    { opacity: 0; transform: translateY(-5px); }
+  100%          { opacity: 0; transform: translateY(-5px); }
+}
+
+/* The global reduced-motion rule at the top of this file collapses every
+ * animation to 0.01ms, which for this component would end every message at its
+ * final keyframe -- opacity 0 -- and leave the line blank. So the preference is
+ * handled explicitly here: no cycling, and the first fact simply stays.
+ *
+ * This is the same trap as an animated image ignoring the preference. A
+ * blanket rule that neutralises motion has to be checked against components
+ * whose *resting* state is invisible. */
+@media (prefers-reduced-motion: reduce) {
+  .fact { animation: none; opacity: 0; transform: none; }
+  .fact:first-child { opacity: 1; }
+  .facts { min-height: 0; }
+}
+
 /* ---------- the veil animation ---------- */
 /* Bars start even and blue on the left, fragment and shift purple to the
  * right: the product in one picture, matching the icon. Pure CSS. */
