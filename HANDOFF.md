@@ -5,19 +5,33 @@
 **Read this first.** It is written to be lossless: a new session should be able
 to continue from here without the previous conversation.
 
-**State as of 2026-08-18:** **v0.1.9 on `main`.** Eleven platforms (OpenBSD and
-NetBSD join FreeBSD), GPG-signed, reproducible on eight -- the three BSDs are
-built once in VMs and are honestly marked `not-verified`. Live site.
-**336 tests** across 9 crates plus **ten** website suites, clippy clean, no
-`unsafe`.
+**State as of 2026-08-18:** **v0.1.9 released, signed and verified.** Ten
+platforms published, GPG-signed. Live site. **336 tests** across 9 crates plus
+**ten** website suites, clippy clean, no `unsafe`.
+
+The release was verified by hand after publication: fingerprint checked against
+the live site, `gpg --verify` good, archive hash matched, and the **shipped
+`veilvoice-verify` binary verified its own release with no GnuPG installed**.
+Pages deployed, live search confirmed working.
 
 v0.1.9 is about **getting a genuine copy, and finding your way around one**:
-a search index over the whole repository and website with a real no-JavaScript
-answer, a portable verifier that checks a release without GnuPG installed,
-install scripts that refuse rather than continue, and packaging definitions for
-six formats. A fourth audit round found ten defects (F-37 to F-46); three had
-shipped, seven were caught in code written during the round and are written up
-anyway.
+
+- **`crates/veilvoice-verify`** -- a portable verifier (rPGP), so checking a
+  release needs no GnuPG. Ships in every archive.
+- **`install/`** -- `install.sh`, `install.ps1`, `install.bat`. Fingerprint
+  hardcoded, signature before hash, no flag to skip verification, optional
+  extras default to no.
+- **Search** over the whole repository and website, with a genuine
+  no-JavaScript answer (`website/nojs/search.html`).
+- **`packaging/`** -- WiX, deb, rpm, Flatpak, Homebrew, Gentoo. **None built.**
+- **A 60 fps animated banner** from `assets/generate.py`.
+- Fourth audit round: **eleven defects, F-37 to F-47.** Three had shipped.
+
+**Landed on `main` since the tag, unreleased:** a JavaScript edition switch
+(grouped with the colour picker as a control, not a nav link), declarative
+background prefetch that works with no JavaScript, `docs/USING_THE_CRATES.md`
+with compiled examples, search-scoring performance work, and the CSS waveform
+moved out of the hero. **These are unreleased -- v0.1.10 has not been cut.**
 
 v0.1.8 is a **security release**. A third audit round -- run against the
 *classes* of defect rather than a list of things that seemed worth checking --
@@ -462,3 +476,142 @@ Remaining, in order:
 - **`website/js/markdown.js` contains literal NUL bytes** (it did, as parking
   sentinels). String-matching editors cannot target them; patch such files with
   a script. They are gone now, replaced by private-use characters.
+
+---
+
+## 9. Requested and not yet built
+
+Everything here was asked for explicitly. Nothing in this section exists yet;
+where a request has an honesty trap in it, the trap is named rather than left
+for the next person to walk into.
+
+### 9.1 Screen-capture monitoring, and the claim not to make
+
+**Requested:** detect any application that is screen recording or taking
+screenshots; alert with application name, PID, time periods and details, and
+how often. Keep the existing microphone and camera monitoring, and add keyboard
+and mouse input monitoring alongside it.
+
+**Also requested:** a setting -- *on by default* -- that blocks remote screen
+viewing. **This is where the care is needed.**
+
+A userspace program **cannot** block all remote screen viewing. Anything with
+the privileges to capture the screen can capture it, and a toggle claiming
+otherwise would be the exact overclaim this project refuses to make (see
+section 4.11, and every "detects rather than prevents" sentence in the tree).
+
+What is genuinely achievable, and should be built instead:
+
+- **Windows:** `SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE)` really
+  does exclude *VeilVoice's own window* from screen capture, recording and
+  screen sharing. That is a true and useful thing, and it is the honest version
+  of the request. Name it for what it does -- something like **"Hide this
+  window from screen capture"** -- not "block remote viewing".
+- **Detection** of screen capture is partial everywhere. Enumerate known
+  capture and remote-access processes, watch for the Windows magnification and
+  duplication APIs, and report *what was actually observed*. Where nothing can
+  be seen, say so, exactly as `veilvoice-watch::support()` already does on
+  macOS.
+- **Keyboard and mouse hooks:** installed hooks are not enumerable from
+  userspace on Windows. Do not claim to detect keyloggers. What can be done is
+  reporting processes with suspicious access, and saying plainly that this is
+  a heuristic.
+
+Follow the existing convention: one file per platform under
+`crates/veilvoice-watch/src/`, `support()` reporting honestly what the platform
+allows, and `SCOPE`-style wording with a test that fails the build if it is
+softened.
+
+### 9.2 Website structure: a page per section
+
+**Requested:** split the single-page site so each header is its own page where
+that helps the reader, rather than one long `index.html`.
+
+Current sections on `index.html`: `#what`, `#download`, `#guide`, `#verify`,
+`#crypto`, plus `wiki.html` and `search.html`. Splitting means real pages, real
+`<h1>`s, working prefetch between them, and the nav pointing at pages rather
+than fragments. Keep the fragments working as redirects or anchors so no
+published link dies -- `tools/site-tests/links.test.js` will catch any that do.
+
+### 9.3 Motion and polish, minimal but smooth
+
+**Requested:** smooth loading and scrolling, tasteful hover effects, and
+tooltips -- monospace, in the site palette, minimal rather than showy. The bar
+is set by what is already there: 150 ms entrances, `opacity` and `transform`
+only, and `prefers-reduced-motion` neutralised globally at the top of
+`main.css`. Any tooltip must be CSS-first so it works in the no-JavaScript
+edition too.
+
+### 9.4 The welcome dialog and a detected lack of JavaScript
+
+**Requested:** when JavaScript is disabled, say on the welcome screen that the
+HTML-and-CSS edition is being served *because we detected it is off*.
+
+Half of this is done -- the `<noscript>` banner on `index.html` says exactly
+that, and the switch shows locked-off. What is not done is the same message in
+the welcome dialog itself, and it **cannot be**: that dialog is drawn by
+`js/legal.js`, so with JavaScript off it never appears. Do not "fix" this by
+putting the message only in the dialog; it has to live where it can be read.
+If the dialog is ever made server-rendered or static, revisit it.
+
+### 9.5 A demo, and a GitHub wiki
+
+**Requested:** demo and example sections; another GIF showing an unfiltered
+voice becoming an unidentifiable wave; and the wiki published to the **GitHub
+wiki** as well as the website, identical in both.
+
+The wiki content lives in `website/wiki.html`. Publishing the same content to
+the GitHub wiki means a generator (same pattern as
+`tools/search-index/generate.py`: deterministic, with `--check`) rather than a
+hand-maintained second copy -- `website/assets/` drifting from its generator
+was finding **F-41**, and two copies of a wiki would drift the same way.
+
+The "voice becoming unidentifiable" animation is **not** wanted in the banner:
+the hero already animates, and two waveforms at once was the defect fixed in
+`51a2fab`. It belongs in a demo section, or as a second GIF in the README.
+
+### 9.6 Still open from earlier rounds
+
+Unchanged, and still true:
+
+- **Nobody but the author has run** the install scripts or the verifier;
+  `install.sh` has never run on real Linux or macOS.
+- **No package definition has ever been built.**
+- **OpenBSD does not build:** its packaged Rust is 1.94.1, the workspace needs
+  1.96. Documented in `docs/PACKAGING.md`; the job is left in place.
+- `fuzz/` not run to convergence; 32-bit targets not in CI; `gpg_secrets/`
+  still inside OneDrive.
+
+---
+
+## 10. Looking at the site, which is not optional
+
+The Browser pane **has never composited in this environment** -- `screenshot`
+returns "the Browser pane is not displayed". Two sessions lost time to this.
+Drive headless Edge over CDP instead. A working driver lives in the scratchpad
+of the session that wrote this; the essentials:
+
+```
+msedge.exe --headless=new --disable-gpu --hide-scrollbars
+           --remote-debugging-port=PORT --user-data-dir=SHORT_PATH
+```
+
+then over the DevTools WebSocket: `Page.enable`, `Runtime.enable`,
+`Emulation.setDeviceMetricsOverride`, `Page.navigate`, and
+`Page.captureScreenshot` with `captureBeyondViewport: true` for a full page.
+
+Three switches earned their place:
+
+- `Page.addScriptToEvaluateOnNewDocument` setting
+  `sessionStorage["veilvoice-accepted-v1"] = "yes"`, so the legal gate does not
+  cover every screenshot.
+- `Emulation.setScriptExecutionDisabled` -- **this is what found the switch
+  claiming "on" with scripts disabled.** Render with it before believing any
+  claim about the no-JavaScript path.
+- `Emulation.setEmulatedMedia` with `prefers-reduced-motion: reduce`, to check
+  the `<picture>` fallback really serves the still banner.
+
+**Measure with the minimum, never a single sample.** A one-shot timing of a
+keystroke reported 14.4 ms and then 19.1 ms for the same work; minimum-of-25
+gave a stable 0.7 ms for scoring. Section 8 has said this since v0.1.8 and it
+was still got wrong once in the session that wrote this.
