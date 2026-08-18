@@ -210,7 +210,7 @@ The binaries land in `target/release/`. `cargo run -p veilvoice-cli -- info`
 reports what the build supports.
 
 If you want a binary you can compare against the published one, see
-[REPRODUCIBLE-BUILDS.md](REPRODUCIBLE-BUILDS.md).
+[REPRODUCIBLE_BUILDS.md](REPRODUCIBLE_BUILDS.md).
 
 ---
 
