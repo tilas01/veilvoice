@@ -100,7 +100,11 @@ cargo build --release
 ```
 
 Release binaries are built twice in different directories and verified
-byte-identical. See [`docs/REPRODUCIBLE_BUILDS.md`](docs/REPRODUCIBLE_BUILDS.md)
+byte-identical. Install with a script that refuses rather than continues
+([`docs/INSTALL.md`](docs/INSTALL.md)), check a download without GnuPG
+installed (`veilvoice-verify`), or package it yourself
+([`docs/PACKAGING.md`](docs/PACKAGING.md)).
+See [`docs/REPRODUCIBLE_BUILDS.md`](docs/REPRODUCIBLE_BUILDS.md)
 to check a download against the source yourself.
 
 ---

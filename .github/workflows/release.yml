@@ -318,9 +318,105 @@ jobs:
             dist/repro-*.txt
           if-no-files-found: error
 
+  openbsd:
+    name: openbsd-x86_64
+    runs-on: ubuntu-latest
+    # Allowed to fail without stopping a release, exactly like FreeBSD. These
+    # run in an emulated VM on a Linux runner and are the most fragile jobs
+    # here; a release should not be blocked because somebody else's VM image
+    # moved. When one fails the release simply ships without that archive.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the CLI in a Openbsd VM
+        uses: vmactions/openbsd-vm@v1
+        with:
+          usesh: true
+          prepare: pkg_add rust
+          run: |
+            set -e
+            cargo build --release --locked -p veilvoice-cli -p veilvoice-verify --no-default-features
+            ./target/release/veilvoice info
+      - name: Stage the archive
+        run: |
+          out="veilvoice-${{ github.ref_name }}-openbsd-x86_64"
+          mkdir -p "dist/$out"
+          cp target/release/veilvoice "dist/$out/"
+          cp target/release/veilvoice-verify "dist/$out/" 2>/dev/null || true
+          cp README.md LICENSE "dist/$out/"
+          cp -r docs "dist/$out/docs"
+          {
+            echo "This build has no live microphone scrambling: cpal, the audio"
+            echo "device library, has no BSD backend. Everything else works —"
+            echo "anonymise, clean, encrypt, decrypt, keygen, shred."
+            echo
+            echo "OpenBSD's pledge/unveil are not used: VeilVoice opens files the user names, and a sandbox it configures for itself would be a claim this project has not tested."
+            echo
+            echo "Run 'veilvoice info' to confirm what this binary supports."
+          } > "dist/$out/NOTES.txt"
+          tar -C dist -czf "dist/$out.tar.gz" "$out"
+          # Built once, in a VM, rather than twice in separate directories.
+          # Reported as what it is rather than claimed.
+          echo "openbsd-x86_64: not-verified (built once, in a VM)" > dist/repro-openbsd-x86_64.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openbsd-x86_64
+          path: |
+            dist/*.tar.gz
+            dist/repro-*.txt
+          if-no-files-found: error
+
+  netbsd:
+    name: netbsd-x86_64
+    runs-on: ubuntu-latest
+    # Allowed to fail without stopping a release, exactly like FreeBSD. These
+    # run in an emulated VM on a Linux runner and are the most fragile jobs
+    # here; a release should not be blocked because somebody else's VM image
+    # moved. When one fails the release simply ships without that archive.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the CLI in a Netbsd VM
+        uses: vmactions/netbsd-vm@v1
+        with:
+          usesh: true
+          prepare: /usr/sbin/pkg_add rust
+          run: |
+            set -e
+            cargo build --release --locked -p veilvoice-cli -p veilvoice-verify --no-default-features
+            ./target/release/veilvoice info
+      - name: Stage the archive
+        run: |
+          out="veilvoice-${{ github.ref_name }}-netbsd-x86_64"
+          mkdir -p "dist/$out"
+          cp target/release/veilvoice "dist/$out/"
+          cp target/release/veilvoice-verify "dist/$out/" 2>/dev/null || true
+          cp README.md LICENSE "dist/$out/"
+          cp -r docs "dist/$out/docs"
+          {
+            echo "This build has no live microphone scrambling: cpal, the audio"
+            echo "device library, has no BSD backend. Everything else works —"
+            echo "anonymise, clean, encrypt, decrypt, keygen, shred."
+            echo
+            echo "Built against pkgsrc's Rust, which may lag the pinned toolchain; that is why this archive is marked not-verified for reproducibility."
+            echo
+            echo "Run 'veilvoice info' to confirm what this binary supports."
+          } > "dist/$out/NOTES.txt"
+          tar -C dist -czf "dist/$out.tar.gz" "$out"
+          # Built once, in a VM, rather than twice in separate directories.
+          # Reported as what it is rather than claimed.
+          echo "netbsd-x86_64: not-verified (built once, in a VM)" > dist/repro-netbsd-x86_64.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: netbsd-x86_64
+          path: |
+            dist/*.tar.gz
+            dist/repro-*.txt
+          if-no-files-found: error
+
   publish:
     name: publish
-    needs: [build, freebsd]
+    needs: [build, freebsd, openbsd, netbsd]
     # `build` must succeed; `freebsd` is allowed to fail without stopping a
     # release, so this runs as long as the matrix itself did.
     if: always() && needs.build.result == 'success'

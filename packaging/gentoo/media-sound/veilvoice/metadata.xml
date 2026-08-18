@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>tilas01@users.noreply.github.com</email>
+		<name>tilas01</name>
+	</maintainer>
+	<longdescription lang="en">
+		VeilVoice destroys the biometric voiceprint of a speaker - pitch,
+		formants, timbre, micro-timing and the melody of an accent - so that
+		neither software nor a human listener can re-identify the speaker or
+		reconstruct the original voice, while the words themselves stay clean
+		and transcribable. It does not hide what was said.
+	</longdescription>
+	<use>
+		<flag name="cli">Build the command-line tool</flag>
+		<flag name="gui">Build the desktop application</flag>
+		<flag name="live">Enable live microphone scrambling (needs ALSA)</flag>
+	</use>
+	<upstream>
+		<bugs-to>https://github.com/tilas01/veilvoice/issues</bugs-to>
+		<remote-id type="github">tilas01/veilvoice</remote-id>
+	</upstream>
+</pkgmetadata>

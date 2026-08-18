@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=VeilVoice
+GenericName=Voice de-identification
+Comment=Destroy the voiceprint in a recording, keep the words
+Exec=veilvoice-gui
+Icon=veilvoice
+Terminal=false
+Categories=AudioVideo;Audio;Security;
+Keywords=voice;anonymise;anonymize;privacy;audio;de-identification;
+StartupNotify=true
