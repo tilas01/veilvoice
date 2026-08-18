@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+export DH_VERBOSE = 1
+# Reproducible builds: Debian sets SOURCE_DATE_EPOCH, and these remaps stop the
+# build directory and the cargo registry path being baked into the binary. The
+# same flags the project's own release workflow uses.
+export RUSTFLAGS = --remap-path-prefix=$(CURDIR)=/veilvoice --remap-path-prefix=$(HOME)/.cargo=/cargo
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# --locked: build exactly the dependency versions the project tested.
+	cargo build --release --locked --workspace
+
+override_dh_auto_test:
+	cargo test --release --locked --workspace
+
+override_dh_auto_install:
+	install -Dpm 0755 target/release/veilvoice \
+		debian/veilvoice/usr/bin/veilvoice
+	install -Dpm 0755 target/release/veilvoice-verify \
+		debian/veilvoice/usr/bin/veilvoice-verify
+	install -Dpm 0755 target/release/veilvoice-gui \
+		debian/veilvoice-gui/usr/bin/veilvoice-gui
+	install -Dpm 0644 assets/icon.png \
+		debian/veilvoice-gui/usr/share/icons/hicolor/256x256/apps/veilvoice.png
+	install -Dpm 0644 packaging/veilvoice.desktop \
+		debian/veilvoice-gui/usr/share/applications/veilvoice.desktop
