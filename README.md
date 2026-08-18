@@ -177,6 +177,16 @@ cannot see, because an empty list from a blind monitor is a false reassurance.
 
 ## Use it as a library
 
+**Worked examples, with the licence implications spelled out, are in
+[`docs/USING_THE_CRATES.md`](docs/USING_THE_CRATES.md).** Every example there is
+a real file under `crates/*/examples/`, compiled on every commit, so none of it
+can quietly stop being true:
+
+```bash
+cargo run -p veilvoice-core   --example veil_a_buffer
+cargo run -p veilvoice-crypto --example seal_and_open
+```
+
 Every crate is a normal Rust library. Point Cargo at the repository:
 
 ```toml
