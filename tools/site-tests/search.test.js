@@ -57,7 +57,20 @@ function makeNode(tagName) {
     get className() { return [...classes].join(" "); },
     set className(v) { classes.clear(); String(v).split(/\s+/).filter(Boolean).forEach(c => classes.add(c)); },
     get firstChild() { return node.childNodes[0] || null; },
-    appendChild(child) { node.childNodes.push(child); return child; },
+    appendChild(child) {
+      // Appending a fragment appends its children and empties it, which is
+      // exactly what a browser does and what the row-count assertions below
+      // depend on.
+      if (child && child.isFragment) {
+        for (const grandchild of child.childNodes.slice()) {
+          node.childNodes.push(grandchild);
+        }
+        child.childNodes.length = 0;
+        return child;
+      }
+      node.childNodes.push(child);
+      return child;
+    },
     removeChild(child) {
       const at = node.childNodes.indexOf(child);
       if (at !== -1) { node.childNodes.splice(at, 1); }
@@ -132,6 +145,15 @@ async function boot(index, { failFetch = false, badShape = false } = {}) {
       documentElement: { classList: { add: v => docClasses.add(v) } },
       getElementById: id => ids[id] || null,
       createElement: makeNode,
+      // A fragment is a node whose children are moved, not the node itself.
+      // Modelled rather than stubbed away: `search.js` builds rows into one and
+      // attaches them in a single call, and a stub that swallowed that would
+      // let a broken render pass this suite.
+      createDocumentFragment: () => {
+        const frag = makeNode("#document-fragment");
+        frag.isFragment = true;
+        return frag;
+      },
       createTextNode: data => ({ nodeType: 3, data: String(data) }),
       addEventListener: (type, fn) => { if (type === "DOMContentLoaded") { ready = fn; } }
     },

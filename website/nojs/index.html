@@ -19,6 +19,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VeilVoice — no-JavaScript edition</title>
 <meta name="description" content="VeilVoice without JavaScript: irreversible voice de-identification, fully offline. One file, no scripts, no third-party requests.">
+<!-- Prefetch works with no JavaScript at all: it is markup, not script.
+     A reader who runs no scripts should not get a slower site for it. -->
+<link rel="prefetch" href="search.html">
+<link rel="prefetch" href="../index.html">
 <link rel="icon" href="../assets/icon-32.png" type="image/png">
 <style>
 :root {
@@ -70,6 +74,17 @@ nav.top a{margin-right:14px}
 .themes input:checked + label{border-color:var(--accent);color:var(--accent)}
 .themes input:focus-visible + label{outline:2px solid var(--accent);outline-offset:2px}
 footer{margin-top:40px;border-top:1px solid var(--border);padding-top:18px;color:var(--muted);font-size:12.5px}
+
+/* The JavaScript toggle. This edition is the "off" position, so the switch is
+   drawn off and points back to the full site. Same markup and the same three
+   states as the main stylesheet, kept here because this page is standalone by
+   design and loads nothing from the parent directory. */
+.js-toggle{display:inline-flex;align-items:center;gap:7px;border:0;color:var(--muted);font-size:13px;min-height:24px;white-space:nowrap}
+.js-toggle:hover{color:var(--accent)}
+.js-toggle-track{position:relative;width:30px;height:16px;flex:none;border:1px solid var(--border);border-radius:999px;background:var(--bg-inset)}
+.js-toggle-knob{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--muted);transition:transform .16s ease}
+/* No "on" rule here at all: this edition is the off position by definition,
+   and a rule that could switch it on would only ever fire by mistake. */
 </style>
 </head>
 <body>
@@ -98,7 +113,12 @@ footer{margin-top:40px;border-top:1px solid var(--border);padding-top:18px;color
   <a href="#limits">limits</a>
   <a href="#legal">legal</a>
   <a href="search.html">search</a>
-  <a href="../index.html">full site</a>
+  <a class="js-toggle" href="../index.html" role="switch" aria-checked="false"
+     title="Switch to the full site, which runs scripts. This control does not change any browser setting.">
+    <span>JavaScript</span>
+    <span class="js-toggle-track" aria-hidden="true"><span class="js-toggle-knob"></span></span>
+    <span class="js-toggle-state">off</span>
+  </a>
   <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
 </nav>
 
