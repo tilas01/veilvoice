@@ -1,0 +1,41 @@
+Source: veilvoice
+Section: sound
+Priority: optional
+Maintainer: tilas01 <tilas01@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13),
+               cargo,
+               rustc (>= 1.96),
+               pkg-config,
+               libasound2-dev,
+               libgtk-3-dev,
+               libxkbcommon-dev
+Standards-Version: 4.7.0
+Homepage: https://github.com/tilas01/veilvoice
+Rules-Requires-Root: no
+
+Package: veilvoice
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: irreversible voice de-identification, fully offline
+ VeilVoice destroys the biometric voiceprint of a speaker - pitch, formants,
+ timbre, micro-timing and the melody of an accent - so that neither software
+ nor a human listener can re-identify the speaker or reconstruct the original
+ voice, while the words themselves stay clean and transcribable.
+ .
+ It does not hide what was said. Intelligibility is preserved on purpose, and
+ the words remain in the output and can be transcribed. If the message itself
+ is sensitive, encrypt it; that is a separate problem with a separate answer.
+ .
+ Fully offline by construction: there is no networking code in the project and
+ the build fails if an HTTP client enters the dependency graph.
+ .
+ This package contains the command-line tool and the portable release verifier.
+
+Package: veilvoice-gui
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, veilvoice (= ${binary:Version})
+Description: irreversible voice de-identification - desktop application
+ The VeilVoice desktop application.
+ .
+ See the veilvoice package for what the tool does and, just as importantly,
+ what it does not do.
