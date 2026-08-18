@@ -61,7 +61,7 @@ Integrity manifest and tamper detection for VeilVoice's own files, with best-eff
 
 egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 
-- [[`app.rs`|File-veilvoice-gui-app]] &mdash; The VeilVoice desktop application.
+- [[`app.rs`|File-veilvoice-gui-app]] &mdash; The VeilVoice desktop application: six tabs, one window, no menus.
 - [[`lib.rs`|File-veilvoice-gui-lib]] &mdash; The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.
 - [[`main.rs`|File-veilvoice-gui-main]] &mdash; Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.
 - [[`prefs.rs`|File-veilvoice-gui-prefs]] &mdash; What the user has chosen about how the app looks and moves.
@@ -85,7 +85,7 @@ Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.
 Verify a VeilVoice release without GnuPG installed
 
 - [[`main.rs`|File-veilvoice-verify-main]] &mdash; The portable verifier: check a VeilVoice release without GnuPG installed.
-- [[`tests.rs`|File-veilvoice-verify-tests]] &mdash; no module documentation yet
+- [[`tests.rs`|File-veilvoice-verify-tests]] &mdash; The verifier's own tests.
 
 ## [[veilvoice-watch|Crate-veilvoice-watch]]
 

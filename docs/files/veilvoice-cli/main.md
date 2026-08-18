@@ -11,18 +11,62 @@
 
 # `crates/veilvoice-cli/src/main.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 1037 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 1077 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs)
 
 ## Contents
 
-- [What calls what](#what-calls-what)
-- [Items](#items)
+- [What is here](#what-is-here)
+- [Two behaviours that surprise people, on purpose](#two-behaviours-that-surprise-people-on-purpose)
+- [Passphrase prompts cannot be piped](#passphrase-prompts-cannot-be-piped)
+- [A clap ordering rule worth knowing](#a-clap-ordering-rule-worth-knowing)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 `veilvoice` — the command-line interface.
 
 Everything VeilVoice does, available without a desktop: it runs over SSH, in
 a container, and on machines that have no GUI toolkit at all. The same
 engine backs both this and the graphical app.
+
+# What is here
+
+Fourteen subcommands, and they divide into four groups:
+
+* **Audio** -- `anonymise` a file, `live` scramble a microphone, list
+`devices`.
+* **Privacy of the files themselves** -- `clean` metadata, `encrypt`,
+`decrypt`, `keygen`, `shred`.
+* **Watching the machine** -- `watch` the microphone and camera, `guard`
+VeilVoice's own files against tampering.
+* **The app lock** -- `lock set|status|change|remove`.
+
+# Two behaviours that surprise people, on purpose
+
+**`anonymise` writes `<out>.veil`, not a bare WAV.** Recordings are
+encrypted at rest by default. `--encrypt=false` opts out and requires
+`--yes`, because an unsealed recording is the thing somebody later wishes
+they had not produced. The wiki explains where the WAV went.
+
+**The front-ends refuse rather than downgrade.** Asked to encrypt with
+nothing to encrypt with, this exits with an error instead of writing plain
+audio and mentioning it. Quiet degradation to a weaker posture is the defect
+class this project has found in itself most often.
+
+# Passphrase prompts cannot be piped
+
+`rpassword` needs a real console; piping a passphrase in blocks on
+`CONIN$` rather than reading it. That is a property of terminal input, not a
+bug here, and it means anything that prompts cannot be smoke-tested from a
+non-interactive shell. The layer *beneath* each prompt is therefore tested
+instead -- see `crate::atrest` and `crate::lock`, where the logic lives
+precisely so it can be reached without a terminal.
+
+# A clap ordering rule worth knowing
+
+An argument declared beside `#[command(subcommand)]` must precede the
+subcommand on the command line unless it is marked `global = true`. So
+`veilvoice lock --path X status` parses and `veilvoice lock status --path X`
+does not, except that `--path` is now global specifically so both do.
 
 ## What calls what
 
@@ -75,28 +119,28 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Cli` <sub>struct</sub> | [35](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L35) |  |
-| `Command` <sub>enum</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L41) |  |
-| `CleanPolicy` <sub>enum</sub> | [179](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L179) |  |
-| `Policy::from` <sub>fn</sub> | [187](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L187) |  |
-| `main` <sub>fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L195) |  |
-| `run` <sub>fn</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L206) |  |
-| `Tuning` <sub>struct</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L268) | The engine settings a user can reach from the command line. |
-| `config` <sub>fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L274) |  |
-| `describe_reseed` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L287) | How the seed-rolling setting reads in the output. |
-| `AtRest` <sub>struct</sub> | [296](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L296) | What to do with the result once it exists. |
-| `anonymise` <sub>fn</sub> | [305](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L305) |  |
-| `live` <sub>fn</sub> | [444](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L444) |  |
-| `meter` <sub>fn</sub> | [530](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L530) | A small textual level meter. |
-| `list_devices` <sub>fn</sub> | [545](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L545) |  |
-| `clean` <sub>fn</sub> | [577](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L577) |  |
-| `encrypt` <sub>fn</sub> | [594](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L594) |  |
-| `decrypt` <sub>fn</sub> | [623](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L623) |  |
-| `load_secret_key` <sub>fn</sub> | [655](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L655) | Load a private key file, which is itself a password-locked container. |
-| `keygen` <sub>fn</sub> | [663](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L663) |  |
-| `watch` <sub>fn</sub> | [739](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L739) | Report, and keep reporting, what is using the microphone and camera. |
-| `shred` <sub>fn</sub> | [829](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L829) | Destroy a file's contents, then delete it. |
-| `info` <sub>fn</sub> | [897](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L897) |  |
+| `Cli` <sub>struct</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L75) |  |
+| `Command` <sub>enum</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L81) |  |
+| `CleanPolicy` <sub>enum</sub> | [219](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L219) |  |
+| `Policy::from` <sub>fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L227) |  |
+| `main` <sub>fn</sub> | [235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L235) |  |
+| `run` <sub>fn</sub> | [246](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L246) |  |
+| `Tuning` <sub>struct</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L308) | The engine settings a user can reach from the command line. |
+| `config` <sub>fn</sub> | [314](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L314) |  |
+| `describe_reseed` <sub>fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L327) | How the seed-rolling setting reads in the output. |
+| `AtRest` <sub>struct</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L336) | What to do with the result once it exists. |
+| `anonymise` <sub>fn</sub> | [345](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L345) |  |
+| `live` <sub>fn</sub> | [484](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L484) |  |
+| `meter` <sub>fn</sub> | [570](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L570) | A small textual level meter. |
+| `list_devices` <sub>fn</sub> | [585](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L585) |  |
+| `clean` <sub>fn</sub> | [617](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L617) |  |
+| `encrypt` <sub>fn</sub> | [634](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L634) |  |
+| `decrypt` <sub>fn</sub> | [663](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L663) |  |
+| `load_secret_key` <sub>fn</sub> | [695](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L695) | Load a private key file, which is itself a password-locked container. |
+| `keygen` <sub>fn</sub> | [703](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L703) |  |
+| `watch` <sub>fn</sub> | [779](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L779) | Report, and keep reporting, what is using the microphone and camera. |
+| `shred` <sub>fn</sub> | [869](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L869) | Destroy a file's contents, then delete it. |
+| `info` <sub>fn</sub> | [937](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L937) |  |
 
 ---
 

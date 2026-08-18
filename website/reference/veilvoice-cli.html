@@ -43,6 +43,10 @@
 <p style="color:var(--muted)"><a href="index.html">reference</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/README.md" rel="noopener noreferrer">the same page on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#what-is-here">What is here</a>
+  <a href="#two-behaviours-that-surprise-people-on-purpose">Two behaviours that surprise people, on purpose</a>
+  <a href="#passphrase-prompts-cannot-be-piped">Passphrase prompts cannot be piped</a>
+  <a href="#a-clap-ordering-rule-worth-knowing">A clap ordering rule worth knowing</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -50,6 +54,21 @@
 <section id="s-about">
 <p><code>veilvoice</code> &#8212; the command-line interface.</p>
 <p>Everything VeilVoice does, available without a desktop: it runs over SSH, in a container, and on machines that have no GUI toolkit at all. The same engine backs both this and the graphical app.</p>
+<h2 id="what-is-here">What is here</h2>
+<p>Fourteen subcommands, and they divide into four groups:</p>
+<ul>
+<li><strong>Audio</strong> -- <code>anonymise</code> a file, <code>live</code> scramble a microphone, list <code>devices</code>.</li>
+<li><strong>Privacy of the files themselves</strong> -- <code>clean</code> metadata, <code>encrypt</code>, <code>decrypt</code>, <code>keygen</code>, <code>shred</code>.</li>
+<li><strong>Watching the machine</strong> -- <code>watch</code> the microphone and camera, <code>guard</code> VeilVoice&#x27;s own files against tampering.</li>
+<li><strong>The app lock</strong> -- <code>lock set|status|change|remove</code>.</li>
+</ul>
+<h2 id="two-behaviours-that-surprise-people-on-purpose">Two behaviours that surprise people, on purpose</h2>
+<p><strong><code>anonymise</code> writes <code>&lt;out&gt;.veil</code>, not a bare WAV.</strong> Recordings are encrypted at rest by default. <code>--encrypt=false</code> opts out and requires <code>--yes</code>, because an unsealed recording is the thing somebody later wishes they had not produced. The wiki explains where the WAV went.</p>
+<p><strong>The front-ends refuse rather than downgrade.</strong> Asked to encrypt with nothing to encrypt with, this exits with an error instead of writing plain audio and mentioning it. Quiet degradation to a weaker posture is the defect class this project has found in itself most often.</p>
+<h2 id="passphrase-prompts-cannot-be-piped">Passphrase prompts cannot be piped</h2>
+<p><code>rpassword</code> needs a real console; piping a passphrase in blocks on <code>CONIN$</code> rather than reading it. That is a property of terminal input, not a bug here, and it means anything that prompts cannot be smoke-tested from a non-interactive shell. The layer <em>beneath</em> each prompt is therefore tested instead -- see [<code>crate::atrest</code>] and [<code>crate::lock</code>], where the logic lives precisely so it can be reached without a terminal.</p>
+<h2 id="a-clap-ordering-rule-worth-knowing">A clap ordering rule worth knowing</h2>
+<p>An argument declared beside <code>#[command(subcommand)]</code> must precede the subcommand on the command line unless it is marked <code>global = true</code>. So <code>veilvoice lock --path X status</code> parses and <code>veilvoice lock status --path X</code> does not, except that <code>--path</code> is now global specifically so both do.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -65,30 +84,30 @@
 <path d="M440.0 174.0 C 440.0 194.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
 <rect x="265.6" y="20.0" width="104.0" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
 <text x="317.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">main.rs</text>
-<text x="317.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">1037 lines</text>
+<text x="317.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">1077 lines</text>
 <rect x="395.6" y="20.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="443.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">atrest.rs</text>
 <text x="443.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">275 lines</text>
 <rect x="518.0" y="20.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="566.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">guard.rs</text>
-<text x="566.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">306 lines</text>
+<text x="566.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">338 lines</text>
 <rect x="391.8" y="120.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">lock.rs</text>
 <text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">239 lines</text>
 <rect x="391.8" y="220.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="440.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">theme.rs</text>
-<text x="440.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">115 lines</text>
+<text x="440.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">135 lines</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">Every arrow is a <code>crate::</code> or <code>super::</code> path one module actually uses, read out of the source rather than drawn by hand.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#565f89&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_main([&quot;main.rs&lt;br/&gt;1037 lines&quot;])
+    n_main([&quot;main.rs&lt;br/&gt;1077 lines&quot;])
     n_atrest[&quot;atrest.rs&lt;br/&gt;275 lines&quot;]
-    n_guard[&quot;guard.rs&lt;br/&gt;306 lines&quot;]
+    n_guard[&quot;guard.rs&lt;br/&gt;338 lines&quot;]
     n_lock[&quot;lock.rs&lt;br/&gt;239 lines&quot;]
-    n_theme[&quot;theme.rs&lt;br/&gt;115 lines&quot;]
+    n_theme[&quot;theme.rs&lt;br/&gt;135 lines&quot;]
     n_atrest --&gt; n_theme
     n_guard --&gt; n_atrest
     n_guard --&gt; n_lock
@@ -102,10 +121,10 @@ flowchart TD
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-cli/atrest.html"><code>atrest.rs</code></a></td><td>275</td><td>Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.</td></tr>
-<tr><td><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a></td><td>306</td><td>veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</td></tr>
+<tr><td><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a></td><td>338</td><td>veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</td></tr>
 <tr><td><a href="veilvoice-cli/lock.html"><code>lock.rs</code></a></td><td>239</td><td>veilvoice lock &#8212; manage the application lock from the command line.</td></tr>
-<tr><td><a href="veilvoice-cli/main.html"><code>main.rs</code></a></td><td>1037</td><td>veilvoice &#8212; the command-line interface.</td></tr>
-<tr><td><a href="veilvoice-cli/theme.html"><code>theme.rs</code></a></td><td>115</td><td>Tokyo Night colouring for the terminal.</td></tr>
+<tr><td><a href="veilvoice-cli/main.html"><code>main.rs</code></a></td><td>1077</td><td>veilvoice &#8212; the command-line interface.</td></tr>
+<tr><td><a href="veilvoice-cli/theme.html"><code>theme.rs</code></a></td><td>135</td><td>Tokyo Night colouring for the terminal.</td></tr>
 </tbody></table>
 </section>
 </div></div>

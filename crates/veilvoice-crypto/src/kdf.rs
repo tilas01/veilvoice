@@ -8,6 +8,40 @@
 //! Parameters travel *with* the ciphertext rather than being compiled in, so a
 //! file encrypted today still opens after the defaults are raised, and a user
 //! on a small machine can lower the memory cost without forking the format.
+//!
+//! # Cost parameters arrive from a file, so they are hostile input
+//!
+//! That flexibility has a sharp edge, and two shipped defects came from it.
+//! `m_cost` and `p_cost` are read verbatim from a `.veil` header -- and from the
+//! app-lock file, **which is parsed before anyone has authenticated**.
+//!
+//! * `argon2` 0.5.3 evaluates `m_cost < p_cost * 8` *before* it checks whether
+//!   `p_cost` is within range, so a large `p_cost` overflows the multiplication.
+//!   With overflow checks on -- every debug build, and any project consuming
+//!   this crate as a library -- that is a panic on attacker-controlled input
+//!   (F-2).
+//! * `m_cost` is allocated before anything else happens, so a header claiming
+//!   `u32::MAX` asks for **4 TiB**. The allocation fails, and a failed
+//!   allocation aborts the process. Merely *opening* a hostile container killed
+//!   the program (F-3).
+//!
+//! Both are bounded in [`KdfParams::checked`], in arithmetic that cannot
+//! overflow. **Never bypass that funnel.** It is the single place every
+//! derivation passes through, and it exists because the alternative -- checks
+//! scattered across the call sites -- is how one of them gets missed.
+//!
+//! A residual is stated rather than fixed: a container may still declare a
+//! legitimate-but-expensive cost, so an attacker can make opening *their* file
+//! slow. That is inherent to shipping the cost with the file, which is what lets
+//! old files open after defaults rise. Slow is not crashing, and the user chose
+//! to open that file.
+//!
+//! # Domain separation
+//!
+//! The app-lock password and the recording passphrase are different secrets and
+//! are kept different: they are domain-separated in the derivation, so
+//! unlocking the application does not unseal recordings and one cannot be
+//! derived from the other.
 
 use crate::{Error, Secret};
 use argon2::{Algorithm, Argon2, Params, Version};
