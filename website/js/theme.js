@@ -69,6 +69,23 @@
   // than transparent for ever waiting for an observer that will never run.
   document.documentElement.classList.add("js");
 
+  // Upgrade the JavaScript switch from its honest default.
+  //
+  // The markup says `aria-checked="false"` because markup cannot know whether
+  // scripts run, and a switch that claims "on" when nothing is running is
+  // simply lying to whoever most needs the truth. Reaching this line proves
+  // scripts run, so the attribute is corrected here -- the visual state is
+  // handled by CSS through `html.js`, but assistive technology reads the
+  // attribute and it has to agree.
+  document.addEventListener("DOMContentLoaded", function () {
+    var toggle = document.querySelector(".js-toggle[role=\"switch\"]");
+    // Only on the full site: the no-JavaScript edition's switch is genuinely
+    // off, and it does not load this file anyway.
+    if (toggle && toggle.getAttribute("href") !== "../index.html") {
+      toggle.setAttribute("aria-checked", "true");
+    }
+  });
+
   document.addEventListener("DOMContentLoaded", function () {
     var select = document.getElementById("theme");
     if (select) { build(select); }
