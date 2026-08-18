@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! # veilvoice-watch
 //!
 //! Find out which applications are using your microphone and camera, right now.

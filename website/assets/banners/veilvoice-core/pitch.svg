@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 150" width="1200" height="150" role="img" aria-label="pitch.rs">
+<title>pitch.rs</title>
+<rect x="0" y="0" width="1200" height="150" rx="10" fill="#1a1b26"/>
+<rect x="0.5" y="0.5" width="1199" height="149" rx="10" fill="none" stroke="#2f3549"/>
+<rect x="34.0" y="36.2" width="7.0" height="77.5" rx="3" fill="#7aa2f7" opacity="0.93"/>
+<rect x="47.0" y="60.7" width="7.0" height="28.7" rx="3" fill="#7aa2f7" opacity="0.69"/>
+<rect x="60.0" y="40.8" width="7.0" height="68.3" rx="3" fill="#7aa2f7" opacity="0.88"/>
+<rect x="73.0" y="50.9" width="7.0" height="48.2" rx="3" fill="#7aa2f7" opacity="0.79"/>
+<rect x="86.0" y="37.8" width="7.0" height="74.4" rx="3" fill="#7aa2f7" opacity="0.91"/>
+<rect x="99.0" y="45.3" width="7.0" height="59.5" rx="3" fill="#7aa2f7" opacity="0.84"/>
+<rect x="112.0" y="32.1" width="7.0" height="85.8" rx="3" fill="#7aa2f7" opacity="0.97"/>
+<rect x="125.0" y="48.9" width="7.0" height="52.2" rx="3" fill="#7aa2f7" opacity="0.81"/>
+<rect x="138.0" y="59.9" width="7.0" height="30.2" rx="3" fill="#7aa2f7" opacity="0.70"/>
+<rect x="151.0" y="39.4" width="7.0" height="71.3" rx="3" fill="#7aa2f7" opacity="0.90"/>
+<rect x="164.0" y="43.9" width="7.0" height="62.1" rx="3" fill="#7aa2f7" opacity="0.85"/>
+<rect x="177.0" y="46.7" width="7.0" height="56.6" rx="3" fill="#7dcfff" opacity="0.83"/>
+<rect x="190.0" y="50.0" width="7.0" height="50.0" rx="3" fill="#7dcfff" opacity="0.79"/>
+<rect x="203.0" y="54.7" width="7.0" height="40.5" rx="3" fill="#7dcfff" opacity="0.75"/>
+<rect x="216.0" y="45.2" width="7.0" height="59.6" rx="3" fill="#7dcfff" opacity="0.84"/>
+<rect x="229.0" y="43.2" width="7.0" height="63.6" rx="3" fill="#bb9af7" opacity="0.86"/>
+<rect x="242.0" y="53.4" width="7.0" height="43.2" rx="3" fill="#bb9af7" opacity="0.76"/>
+<rect x="255.0" y="53.7" width="7.0" height="42.6" rx="3" fill="#bb9af7" opacity="0.76"/>
+<rect x="268.0" y="49.5" width="7.0" height="51.0" rx="3" fill="#bb9af7" opacity="0.80"/>
+<rect x="281.0" y="48.2" width="7.0" height="53.5" rx="3" fill="#bb9af7" opacity="0.81"/>
+<rect x="294.0" y="47.6" width="7.0" height="54.9" rx="3" fill="#bb9af7" opacity="0.82"/>
+<rect x="307.0" y="51.9" width="7.0" height="46.3" rx="3" fill="#bb9af7" opacity="0.78"/>
+<rect x="320.0" y="52.5" width="7.0" height="45.0" rx="3" fill="#bb9af7" opacity="0.77"/>
+<rect x="333.0" y="45.9" width="7.0" height="58.1" rx="3" fill="#bb9af7" opacity="0.83"/>
+<rect x="346.0" y="45.1" width="7.0" height="59.8" rx="3" fill="#bb9af7" opacity="0.84"/>
+<rect x="359.0" y="46.8" width="7.0" height="56.5" rx="3" fill="#bb9af7" opacity="0.83"/>
+<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">pitch.rs</text>
+<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#565f89">Monophonic fundamental-frequency tracker (decimated YIN).</text>
+<text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CORE</text>
+</svg>

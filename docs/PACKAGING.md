@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
 
 # Packaging
 
@@ -116,7 +116,7 @@ wix build packaging/wix/veilvoice.wxs -arch x64 \
 The WiX source refers to `packaging/wix/LICENSE.rtf` for the licence dialog,
 which is not committed: WiX needs RTF, and converting `LICENSE` to RTF is a
 build step rather than a source file. Any converter will do; the text must be
-the unmodified GPL-3.0.
+the unmodified CC BY-NC-SA 4.0 licence.
 
 ```bash
 # Debian / Ubuntu  (copy packaging/debian to ./debian first)

@@ -1,21 +1,15 @@
-<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
 
-<!--
-  The animated banner is an APNG, and it is served through <picture> so that a
-  reader who has asked their system for less motion gets the still one instead.
-  An animated image ignores `prefers-reduced-motion` on its own; the media query
-  on the <source> is the only way to honour it without JavaScript.
-
-  A browser that does not understand APNG shows the file's first frame, which is
-  byte-for-byte the static banner. The failure mode is "no animation", never
-  "no image". Both files come out of `assets/generate.py`.
--->
-<p align="center">
-  <picture>
-    <source srcset="assets/banner-animated.png" media="(prefers-reduced-motion: no-preference)">
-    <img src="assets/banner.png" alt="VeilVoice — irreversible voice de-identification" width="100%">
-  </picture>
-</p>
+<!-- The banner is the still image on purpose. The animated version
+     exists and is used on the website, but a README is read in a
+     hundred clients that handle animation differently, and GitHub's
+     own renderer escapes the `<picture>` element this used to need --
+     which put a paragraph of raw markup above the project's name in
+     the website's repository panel. Animations belong in the parts of
+     the documentation that explain how the tool works, not in the
+     first thing every reader sees. Both images come from
+     `assets/generate.py`. -->
+![VeilVoice — irreversible voice de-identification](assets/banner.png)
 
 # VeilVoice
 
@@ -247,7 +241,7 @@ what you said. If the content is sensitive too, do not upload it at all —
 transcribe locally.
 
 Local transcription is the stronger answer and is a planned integration (see
-[`HANDOFF.md`](HANDOFF.md)); until then, `whisper.cpp` reads the WAV VeilVoice
+[`ROADMAP.md`](ROADMAP.md)); until then, `whisper.cpp` reads the WAV VeilVoice
 writes with no extra work.
 
 ---
@@ -275,7 +269,10 @@ writes with no extra work.
   in constant time, and opaque to `Debug`.
 - **Reproducible & verifiable.** Pinned toolchain, committed lockfile,
   path-remapped builds, and a double-build check in CI.
-- **Libre.** GPL-3.0-or-later.
+- **Source-available.** CC BY-NC-SA 4.0. Read it, build it, audit it,
+  fork it, share it -- but not sell it. This is deliberately *not* an
+  open source licence, and this project does not call itself one; see
+  [`LICENSE`](LICENSE) for what that does and does not mean.
 
 ---
 
@@ -324,11 +321,16 @@ the ones earlier rounds had declared clean, in
 
 Using it: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), or
 [the wiki](https://tilas01.github.io/veilvoice/wiki.html).
-Roadmap and open work: [`HANDOFF.md`](HANDOFF.md).
+Roadmap and open work: [`ROADMAP.md`](ROADMAP.md).
 
 ## Licence
 
-GPL-3.0-or-later. See [`LICENSE`](LICENSE).
+CC BY-NC-SA 4.0. See [`LICENSE`](LICENSE).
+
+Releases up to and including v0.1.9 were published under GPL-3.0-or-later
+and remain under it -- a licence already granted cannot be withdrawn, so
+those versions keep every freedom the GPL gave them, commercial use
+included. The change applies to what is released after it.
 
 Virtual audio routing on Windows is usually provided by
 [VB-CABLE](https://vb-audio.com/Cable/), which is proprietary donationware and

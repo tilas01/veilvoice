@@ -48,3 +48,17 @@ gpg_secrets/
 # artwork is that it comes from a script you can read.
 __pycache__/
 *.pyc
+
+# Local development files. These are working notes and editor configuration,
+# not part of what anybody downloads, and a public repository is not the place
+# for either.
+#
+# NOTE, because untracking is not deleting: `git rm --cached` stops a file
+# being published from now on, but every version already committed stays in the
+# repository's history and can still be fetched by anyone who clones it.
+# Removing it from history means rewriting published history and force-pushing,
+# which is a separate and deliberate act. The public-facing replacement for the
+# handover notes is ROADMAP.md, which is written to be read by anybody.
+HANDOFF.md
+HANDOVER.md
+.claude/

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: CC-BY-NC-SA-4.0
 #
 # Homebrew formula for VeilVoice.
 #
@@ -16,7 +16,7 @@ class Veilvoice < Formula
   # Replace on each release with the sha256 from the published SHA256SUMS,
   # which is signed. `brew fetch --force veilvoice` then prints what it saw.
   sha256 "REPLACE_WITH_THE_SIGNED_SHA256_OF_THE_SOURCE_TARBALL"
-  license "GPL-3.0-or-later"
+  license "CC-BY-NC-SA-4.0"
   head "https://github.com/tilas01/veilvoice.git", branch: "main"
 
   depends_on "rust" => :build

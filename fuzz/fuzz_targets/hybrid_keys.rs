@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Key and encapsulation decoding, coverage-guided.
 //!
 //! `PublicKey::from_bytes` reads a `.pub` file, which is a file somebody sent

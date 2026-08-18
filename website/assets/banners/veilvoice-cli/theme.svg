@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 150" width="1200" height="150" role="img" aria-label="theme.rs">
+<title>theme.rs</title>
+<rect x="0" y="0" width="1200" height="150" rx="10" fill="#1a1b26"/>
+<rect x="0.5" y="0.5" width="1199" height="149" rx="10" fill="none" stroke="#2f3549"/>
+<rect x="34.0" y="52.8" width="7.0" height="44.4" rx="3" fill="#7aa2f7" opacity="0.77"/>
+<rect x="47.0" y="46.6" width="7.0" height="56.8" rx="3" fill="#7aa2f7" opacity="0.83"/>
+<rect x="60.0" y="31.4" width="7.0" height="87.3" rx="3" fill="#7aa2f7" opacity="0.98"/>
+<rect x="73.0" y="39.8" width="7.0" height="70.4" rx="3" fill="#7aa2f7" opacity="0.89"/>
+<rect x="86.0" y="38.3" width="7.0" height="73.4" rx="3" fill="#7aa2f7" opacity="0.91"/>
+<rect x="99.0" y="52.4" width="7.0" height="45.1" rx="3" fill="#7aa2f7" opacity="0.77"/>
+<rect x="112.0" y="50.4" width="7.0" height="49.3" rx="3" fill="#7aa2f7" opacity="0.79"/>
+<rect x="125.0" y="43.4" width="7.0" height="63.2" rx="3" fill="#7aa2f7" opacity="0.86"/>
+<rect x="138.0" y="36.4" width="7.0" height="77.2" rx="3" fill="#7aa2f7" opacity="0.93"/>
+<rect x="151.0" y="50.7" width="7.0" height="48.5" rx="3" fill="#7aa2f7" opacity="0.79"/>
+<rect x="164.0" y="52.1" width="7.0" height="45.8" rx="3" fill="#7aa2f7" opacity="0.77"/>
+<rect x="177.0" y="57.8" width="7.0" height="34.3" rx="3" fill="#7dcfff" opacity="0.72"/>
+<rect x="190.0" y="55.4" width="7.0" height="39.2" rx="3" fill="#7dcfff" opacity="0.74"/>
+<rect x="203.0" y="38.1" width="7.0" height="73.8" rx="3" fill="#7dcfff" opacity="0.91"/>
+<rect x="216.0" y="46.8" width="7.0" height="56.5" rx="3" fill="#7dcfff" opacity="0.83"/>
+<rect x="229.0" y="38.5" width="7.0" height="73.1" rx="3" fill="#bb9af7" opacity="0.91"/>
+<rect x="242.0" y="45.9" width="7.0" height="58.1" rx="3" fill="#bb9af7" opacity="0.83"/>
+<rect x="255.0" y="49.2" width="7.0" height="51.6" rx="3" fill="#bb9af7" opacity="0.80"/>
+<rect x="268.0" y="48.2" width="7.0" height="53.5" rx="3" fill="#bb9af7" opacity="0.81"/>
+<rect x="281.0" y="51.2" width="7.0" height="47.6" rx="3" fill="#bb9af7" opacity="0.78"/>
+<rect x="294.0" y="47.3" width="7.0" height="55.3" rx="3" fill="#bb9af7" opacity="0.82"/>
+<rect x="307.0" y="44.9" width="7.0" height="60.2" rx="3" fill="#bb9af7" opacity="0.84"/>
+<rect x="320.0" y="43.9" width="7.0" height="62.1" rx="3" fill="#bb9af7" opacity="0.85"/>
+<rect x="333.0" y="52.7" width="7.0" height="44.5" rx="3" fill="#bb9af7" opacity="0.77"/>
+<rect x="346.0" y="48.2" width="7.0" height="53.5" rx="3" fill="#bb9af7" opacity="0.81"/>
+<rect x="359.0" y="56.2" width="7.0" height="37.6" rx="3" fill="#bb9af7" opacity="0.73"/>
+<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">theme.rs</text>
+<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#565f89">Tokyo Night colouring for the terminal.</text>
+<text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CLI</text>
+</svg>

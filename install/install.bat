@@ -1,5 +1,5 @@
 @echo off
-REM SPDX-License-Identifier: GPL-3.0-or-later
+REM SPDX-License-Identifier: CC-BY-NC-SA-4.0
 REM
 REM VeilVoice installer for Windows -- a wrapper, so that double-clicking works.
 REM

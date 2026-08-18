@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: CC-BY-NC-SA-4.0
 """Build the search index for the repository and the website.
 
     python tools/search-index/generate.py           # write the index
@@ -82,6 +82,32 @@ GENERATED = frozenset({
     "website/search-index.json",
     "website/nojs/search.html",
 })
+
+# `tools/docs/generate.py` renders the doc comments in the source into four
+# places: a README per crate, a page per file, the website reference, and the
+# GitHub wiki. All four are the *same prose*, and that prose is already indexed
+# at its origin -- the `.rs` files, whose `//!` and `///` comments this walk
+# reads directly.
+#
+# Indexing the renderings as well would return four results for one sentence,
+# three of them copies, and would roughly quadruple the megabyte a reader's
+# browser downloads to search at all. So the source is indexed and the
+# renderings are not, which is the same decision as excluding this script's own
+# output above, for the same reason.
+GENERATED_PREFIXES = (
+    "docs/files/",
+    "website/reference/",
+    "wiki/",
+    "assets/banners/",
+    "website/assets/banners/",
+)
+CRATE_README = re.compile(r"^crates/[^/]+/README\.md$")
+
+
+def is_generated(rel):
+    return (rel in GENERATED
+            or rel.startswith(GENERATED_PREFIXES)
+            or bool(CRATE_README.match(rel)))
 
 REPO = "tilas01/veilvoice"
 REF = "main"
@@ -175,7 +201,7 @@ def warn_about_untracked(root):
     """
     would_index = [
         rel for rel in untracked_files(root)
-        if not BINARY.search(rel) and rel not in GENERATED
+        if not BINARY.search(rel) and not is_generated(rel)
     ]
     if not would_index:
         return
@@ -416,7 +442,7 @@ def build(root):
     secs = []
 
     for rel in tracked_files(root):
-        if BINARY.search(rel) or rel in GENERATED:
+        if BINARY.search(rel) or is_generated(rel):
             continue
         full = os.path.join(root, rel.replace("/", os.sep))
         try:

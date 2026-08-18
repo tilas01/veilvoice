@@ -1,11 +1,11 @@
 <!doctype html>
-<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
 <html lang="en" data-theme="tokyo-night">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VeilVoice — irreversible voice de-identification</title>
-<meta name="description" content="VeilVoice destroys the biometric voiceprint — pitch, formants, timbre, accent — while keeping speech transcribable. Fully offline, no unsafe code, reproducible builds, GPL-3.0.">
+<meta name="description" content="VeilVoice destroys the biometric voiceprint — pitch, formants, timbre, accent — while keeping speech transcribable. Fully offline, no unsafe code, reproducible builds, CC BY-NC-SA 4.0.">
 <link rel="icon" href="assets/icon-32.png" type="image/png">
 <meta property="og:title" content="VeilVoice — irreversible voice de-identification">
 <meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
@@ -39,6 +39,7 @@
       <a href="#verify">verify</a>
       <a href="#crypto">security</a>
       <a href="wiki.html">wiki</a>
+      <a href="reference/index.html">reference</a>
       <a href="search.html">search</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
@@ -469,9 +470,9 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
       encryption and the at-rest encryption above, not this.</p>
     </div>
 
-    <h3>Libre, and what that buys you</h3>
+    <h3>Source-available, and what that buys you</h3>
     <ul>
-      <li><strong>GPL-3.0-or-later.</strong> You may use, study, modify and redistribute it; derivatives stay free under the same terms.</li>
+      <li><strong>CC BY-NC-SA 4.0.</strong> You may read, study, modify and redistribute it, and derivatives stay under the same terms. You may not sell it. This is not an open source licence and is not described as one &mdash; the NonCommercial term is exactly what the Open Source Definition forbids.</li>
       <li><strong>No <code>unsafe</code> anywhere.</strong> Every crate carries <code>#![forbid(unsafe_code)]</code>, including the page-locking path. Whole classes of memory-corruption bugs are impossible by construction.</li>
       <li><strong>Offline by construction.</strong> No telemetry, no update check. CI fails the build if an HTTP client so much as enters the dependency graph.</li>
       <li><strong>Reproducible.</strong> Pinned toolchain, committed lockfile, path-remapped builds. Rebuild a release and confirm it matches, byte for byte.</li>
@@ -507,7 +508,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
       <div class="stat"><b id="stars">—</b><span>stars</span></div>
       <div class="stat"><b id="forks">—</b><span>forks</span></div>
       <div class="stat"><b id="issues">—</b><span>open issues</span></div>
-      <div class="stat"><b id="repo-license">GPL-3.0</b><span>licence</span></div>
+      <div class="stat"><b id="repo-license">CC BY-NC-SA</b><span>licence</span></div>
     </div>
     <p id="repo-desc" class="lede"></p>
 
@@ -522,7 +523,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <footer>
   <div class="wrap">
     <p>
-      VeilVoice — GPL-3.0-or-later ·
+      VeilVoice — CC BY-NC-SA 4.0 ·
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
       <a href="wiki.html">wiki</a> ·
       <a href="user-agreements/LEGAL-WAIVER.txt">legal</a> ·

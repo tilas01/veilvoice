@@ -1,0 +1,99 @@
+![hybrid.rs](https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/banners/veilvoice-crypto/hybrid.svg)
+
+# `crates/veilvoice-crypto/src/hybrid.rs`
+
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 435 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs)
+
+## Contents
+
+- [Why hybrid](#why-hybrid)
+- [The combiner](#the-combiner)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
+
+Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.
+
+# Why hybrid
+
+ML-KEM (FIPS 203, formerly Kyber) is believed secure against a quantum
+adversary, but it is young, and lattice schemes have had implementation
+breaks. X25519 is battle-tested but falls to a cryptographically relevant
+quantum computer. Running both and mixing the two shared secrets means an
+attacker must break *both*: the construction is at least as strong as the
+stronger of the two, and it degrades gracefully if either one is broken.
+This is the same reasoning behind the hybrids now deployed in TLS.
+
+It matters here specifically because of *harvest-now-decrypt-later*: a
+recording captured today can be stored until quantum hardware exists. A tool
+whose whole purpose is protecting who is speaking has to assume the
+adversary is patient.
+
+# The combiner
+
+The two shared secrets are mixed with HKDF-SHA256 rather than concatenated
+or XORed. Both secrets, both ciphertexts and both public keys go into the
+input, which binds the derived key to the exact transcript that produced it
+and prevents an attacker who can substitute one half from steering the
+result. Feeding the full transcript is what makes the combiner robust when
+one KEM's ciphertexts are malleable.
+
+## What calls what
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_to_bytes(["PublicKey::to_bytes<br/>pub"])
+    n_from_bytes(["PublicKey::from_bytes<br/>pub"])
+    n_to_bytes(["Encapsulation::to_bytes<br/>pub"])
+    n_from_bytes(["Encapsulation::from_bytes<br/>pub"])
+    n_generate(["SecretKey::generate<br/>pub"])
+    n_to_bytes(["SecretKey::to_bytes<br/>pub"])
+    n_from_bytes(["SecretKey::from_bytes<br/>pub"])
+    n_public_key(["SecretKey::public_key<br/>pub"])
+    n_decapsulate(["SecretKey::decapsulate<br/>pub"])
+    n_encapsulate(["PublicKey::encapsulate<br/>pub"])
+    n_combine["combine"]
+    n_next_u32["OsRng::next_u32"]
+    n_next_u64["OsRng::next_u64"]
+    n_fill_bytes["OsRng::fill_bytes"]
+    n_try_fill_bytes["OsRng::try_fill_bytes"]
+    n_decapsulate --> n_combine
+    n_encapsulate --> n_combine
+    n_next_u32 --> n_fill_bytes
+    n_next_u64 --> n_fill_bytes
+```
+
+## Items
+
+| Item | Line | Documentation |
+|---|---:|---|
+| `HKDF_INFO` <sub>const</sub> | [38](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L38) | Domain separation string, so keys derived here can never collide with keys derived by any other part of the system. |
+| `X25519_PUB_LEN` <sub>pub const</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L41) | Encoded length of the X25519 public key. |
+| `MLKEM_EK_LEN` <sub>pub const</sub> | [43](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L43) | Encoded length of the ML-KEM-768 encapsulation (public) key. |
+| `MLKEM_CT_LEN` <sub>pub const</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L45) | Encoded length of an ML-KEM-768 ciphertext. |
+| `MLKEM_DK_LEN` <sub>pub const</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L47) | Encoded length of the ML-KEM-768 decapsulation (private) key. |
+| `X25519_SECRET_LEN` <sub>pub const</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L49) | Encoded length of the X25519 private scalar. |
+| `SECRET_KEY_LEN` <sub>pub const</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L51) | Total encoded length of a SecretKey. |
+| `PUBLIC_KEY_LEN` <sub>pub const</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L53) | Total encoded length of a PublicKey. |
+| `ENCAPSULATION_LEN` <sub>pub const</sub> | [55](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L55) | Total encoded length of an Encapsulation. |
+| `MlKemDk` <sub>type</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L57) |  |
+| `MlKemEk` <sub>type</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L58) |  |
+| `PublicKey` <sub>pub struct</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L63) | A recipient's public key: an X25519 point plus an ML-KEM-768 encapsulation key. |
+| `SecretKey` <sub>pub struct</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L69) | A recipient's private key. |
+| `Encapsulation` <sub>pub struct</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L77) | The public values a sender transmits so the recipient can recover the shared secret. |
+| `PublicKey::to_bytes` <sub>pub fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L86) | Serialise to PUBLIC_KEY_LEN bytes. |
+| `PublicKey::from_bytes` <sub>pub fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L94) | Parse from exactly PUBLIC_KEY_LEN bytes. |
+| `Encapsulation::to_bytes` <sub>pub fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L111) | Serialise to ENCAPSULATION_LEN bytes. |
+| `Encapsulation::from_bytes` <sub>pub fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L119) | Parse from exactly ENCAPSULATION_LEN bytes. |
+| `SecretKey::generate` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L136) | Generate a fresh key pair from the OS CSPRNG. |
+| `SecretKey::to_bytes` <sub>pub fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L157) | Serialise to SECRET_KEY_LEN bytes. |
+| `SecretKey::from_bytes` <sub>pub fn</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L166) | Parse from exactly SECRET_KEY_LEN bytes. |
+| `SecretKey::public_key` <sub>pub fn</sub> | [181](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L181) | The matching public key. |
+| `SecretKey::decapsulate` <sub>pub fn</sub> | [189](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L189) | Recover the shared secret from a sender's Encapsulation. |
+| `PublicKey::encapsulate` <sub>pub fn</sub> | [211](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L211) | Produce a shared secret for this recipient, plus the public values they need in order to recover it. |
+| `combine` <sub>fn</sub> | [238](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L238) | Mix both shared secrets with the full transcript. |
+| `OsRng` <sub>struct</sub> | [271](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L271) | Bridges the OS CSPRNG to the rand_core traits the KEM crates expect. |
+| `OsRng::next_u32` <sub>fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L274) |  |
+| `OsRng::next_u64` <sub>fn</sub> | [279](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L279) |  |
+| `OsRng::fill_bytes` <sub>fn</sub> | [284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L284) |  |
+| `OsRng::try_fill_bytes` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287) |  |

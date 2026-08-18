@@ -1,0 +1,81 @@
+![lib.rs](https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/banners/veilvoice-crypto/lib.svg)
+
+# `crates/veilvoice-crypto/src/lib.rs`
+
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 175 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs)
+
+## Contents
+
+- [What this crate is for](#what-this-crate-is-for)
+- [Threat model, stated plainly](#threat-model-stated-plainly)
+- [Example](#example)
+- [What calls what](#what-calls-what)
+- [Items](#items)
+
+Key derivation, post-quantum-hybrid key agreement, authenticated encryption
+and amnesic secret storage for VeilVoice.
+
+## What this crate is for
+
+[[`veilvoice_core`|Crate-veilvoice-core]] makes a voice
+unrecognisable; it does not hide the *words*, and it is not meant to. When a
+recording needs to stay secret as well — at rest on disk, or in transit to
+someone else — that is this crate's job.
+
+- `kdf` — Argon2id, for turning a password into a key.
+- `hybrid` — X25519 + ML-KEM-768, so a recording captured today is not
+readable by a quantum adversary tomorrow.
+- `aead` — XChaCha20-Poly1305, with random nonces and authenticated
+associated data.
+- `container` — the `.veil` file format that ties the three together.
+- `amnesia` — page-locked, zeroizing, constant-time-comparable secrets.
+- `shred` — secure erasure, and an honest account of what that is worth
+on flash storage.
+- `privatefile` — writing a file that is owner-only from the moment it
+exists, rather than world-readable until a second syscall tightens it.
+- `lock` — the application lock: an Argon2id verifier with a rate limit,
+which protects against casual access and says so rather than pretending to
+be tamper-proof.
+
+## Threat model, stated plainly
+
+This crate protects data **at rest and in transit** against an attacker who
+later obtains the file, including one who stores it until quantum hardware
+exists. It does **not** protect against an attacker who is already running
+code as you, or who can read this process's memory: page-locking keeps keys
+out of the swap file, not out of a debugger. Hibernation writes RAM to disk
+wholesale and defeats locking entirely.
+
+## Example
+
+```
+use veilvoice_crypto::{container, kdf};
+
+# fn main() -> Result<(), veilvoice_crypto::Error> {
+// Cheap parameters so the doctest is fast; real callers use the default.
+let params = kdf::KdfParams::weak_for_tests();
+let sealed = container::seal_with_password(b"pass phrase", b"audio bytes", params)?;
+assert_eq!(container::open_with_password(b"pass phrase", &sealed)?, b"audio bytes");
+assert!(container::open_with_password(b"wrong", &sealed).is_err());
+# Ok(())
+# }
+```
+
+VeilVoice contains **no `unsafe` code at all** — including the page-locking
+in `amnesia`, which goes through a safe wrapper.
+
+## What calls what
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_fmt["Error::fmt"]
+```
+
+## Items
+
+| Item | Line | Documentation |
+|---|---:|---|
+| `VERSION` <sub>pub const</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L72) | Crate version string, surfaced in the About panel. |
+| `Error` <sub>pub enum</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L81) | Everything that can go wrong in this crate. |
+| `Error::fmt` <sub>fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L136) |  |

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! Where do the output partials actually land?
 //!
 //! Prints the strongest partials of a synthetic speaker before and after
