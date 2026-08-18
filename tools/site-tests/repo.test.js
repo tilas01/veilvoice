@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //
 // `repo.js` is the only module on this site that puts data from a *third party*
 // into the page. It fetches the GitHub API and raw README.md, and everything it
@@ -20,7 +20,7 @@
 // click listener to the button, and the click is what starts the fetches. All
 // three are wired here rather than short-circuited, because a stub that models
 // only the happy path cannot express a failure -- the mistake the reveal suite
-// made once already (HANDOFF section 8).
+// made once already, and recorded in the audit.
 
 "use strict";
 
@@ -74,7 +74,7 @@ function makeElement(tag) {
      * Returning an empty list here instead would have quietly skipped the
      * link-rewriting pass in `repo.js` altogether -- the test would have
      * "passed" while exercising nothing, which is precisely the failure the
-     * reveal suite already made once (HANDOFF section 8: a test double must
+     * reveal suite already made once (a test double must
      * model the platform, not the happy path). This is not a real parser and
      * does not pretend to be; it handles the double-quoted attributes this
      * renderer emits, which is all the renderer can produce.
@@ -327,6 +327,53 @@ check("the number of list items a single response can create is bounded", async 
   );
   const n = document.getElementById("asset-list").children.length;
   return n > 200 ? [`${n} list items were created from one response`] : [];
+});
+
+check("a README's own banner markup is not shown as text", async () => {
+  // This is what was live on the site: the project's README opens with a
+  // centred banner, GitHub's own idiom for one, and the panel rendered its
+  // source code as a paragraph above the word VeilVoice.
+  //
+  // Nothing was broken in isolation. `markdown.js` escapes raw HTML because
+  // that is what makes its output safe to hand to `innerHTML`, and a README is
+  // entitled to contain presentational markup. The two correct behaviours met
+  // and produced tag soup at the top of the page -- which is the same shape as
+  // F-37, a thing that was wrong on every viewport for as long as it existed
+  // and that every test passed straight through.
+  const { document } = await drive(
+    only("README.md", textReply(
+      '<!-- a comment that must not appear either -->\n' +
+      '<p align="center">\n' +
+      '  <picture>\n' +
+      '    <source srcset="assets/banner-animated.png">\n' +
+      '    <img src="assets/banner.png" alt="VeilVoice">\n' +
+      '  </picture>\n' +
+      '</p>\n' +
+      '\n' +
+      '# VeilVoice\n' +
+      '\n' +
+      'Irreversible voice de-identification.\n' +
+      '\n' +
+      '```html\n' +
+      '<picture>this one is an example and must survive</picture>\n' +
+      '```\n'))
+  );
+  const html = document.getElementById("readme").innerHTML || "";
+  const problems = [];
+  if (/&lt;picture&gt;|&lt;source|&lt;p align/.test(html.replace(/<code[\s\S]*?<\/code>/g, ""))) {
+    problems.push("raw HTML was rendered as escaped text outside a code block");
+  }
+  if (/a comment that must not appear/.test(html)) {
+    problems.push("an HTML comment from the README was shown to the reader");
+  }
+  if (!/VeilVoice/.test(html)) {
+    problems.push("the prose was stripped along with the markup");
+  }
+  // A fenced example is being shown on purpose and must not be swept up.
+  if (!/this one is an example/.test(html)) {
+    problems.push("markup inside a fenced block was stripped; it is an example");
+  }
+  return problems;
 });
 
 check("an enormous README is refused, and the reader is told why", async () => {

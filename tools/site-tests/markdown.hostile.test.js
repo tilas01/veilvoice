@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //
 // Hostile-input tests for the site's Markdown renderer.
 //

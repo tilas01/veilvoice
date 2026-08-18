@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //
 // Live repository data: stars, description, latest release, and the README
 // rendered with syntax highlighting.
@@ -202,6 +202,73 @@
    */
   var MAX_README_CHARS = 1024 * 1024;
 
+  /**
+   * Remove block-level raw HTML from a Markdown document.
+   *
+   * `markdown.js` escapes raw HTML rather than emitting it, which is the
+   * property that makes it safe to hand its output to `innerHTML`. The
+   * consequence is that a README opening with a centred banner --
+   * `<p align="center"><picture>...</picture></p>`, which is how GitHub wants
+   * one written -- rendered as a paragraph of escaped tag soup above the
+   * project's own name. That was live on the site.
+   *
+   * Neither half of that is a bug on its own. Together they are, and the fix
+   * belongs here rather than in the renderer: block-level markup in somebody
+   * else's README is presentation, and this panel is showing the prose. The
+   * renderer keeps escaping everything, exactly as before.
+   *
+   * The rule is CommonMark's, simplified to the two block kinds that actually
+   * occur: a comment runs to `-->`, and any other HTML block runs to the next
+   * blank line. Fenced code is left alone -- a fence full of markup is an
+   * example being shown deliberately, which is the distinction
+   * `links.test.js` and the hostile-input suite both had to learn.
+   *
+   * One pass, no backtracking. Every regular expression here is anchored and
+   * runs against a single line, because this text arrives over the network and
+   * two quadratics in this file's neighbourhood already froze a reader's tab
+   * for eight seconds (F-22, F-23).
+   */
+  var HTML_BLOCK_START = /^<(?:!--|\/?[a-zA-Z][a-zA-Z0-9-]*)/;
+  var FENCE = /^(?:```|~~~)/;
+
+  function stripHtmlBlocks(markdown) {
+    var lines = markdown.split("\n");
+    var out = [];
+    var i = 0;
+    var inFence = false;
+    var fence = "";
+    while (i < lines.length) {
+      var line = lines[i];
+      var trimmed = line.replace(/^[ \t]+/, "");
+      if (inFence) {
+        if (trimmed.indexOf(fence) === 0) { inFence = false; }
+        out.push(line);
+        i++;
+        continue;
+      }
+      if (FENCE.test(trimmed)) {
+        inFence = true;
+        fence = trimmed.slice(0, 3);
+        out.push(line);
+        i++;
+        continue;
+      }
+      if (HTML_BLOCK_START.test(trimmed)) {
+        if (trimmed.indexOf("<!--") === 0) {
+          while (i < lines.length && lines[i].indexOf("-->") === -1) { i++; }
+          i++;                       // the line carrying the terminator
+        } else {
+          while (i < lines.length && lines[i].trim() !== "") { i++; }
+        }
+        continue;
+      }
+      out.push(line);
+      i++;
+    }
+    return out.join("\n");
+  }
+
+
   function loadReadme() {
     return fetch(RAW)
       .then(function (r) {
@@ -219,7 +286,7 @@
             " KB) and has not been rendered here. Read it on GitHub.";
           return;
         }
-        target.innerHTML = window.MD.render(markdown);
+        target.innerHTML = window.MD.render(stripHtmlBlocks(markdown));
         // The README's own banner is already the page hero; showing it twice
         // just pushes the content down.
         var first = target.querySelector("img");

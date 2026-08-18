@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! The VeilVoice desktop application.
 
 use crate::security::Security;
@@ -748,7 +748,7 @@ impl VeilVoiceApp {
         field(ui, "metadata", veilvoice_meta::VERSION);
         field(ui, "monitor", veilvoice_watch::VERSION);
         field(ui, "crypto", veilvoice_crypto::VERSION);
-        field(ui, "licence", "GPL-3.0-or-later");
+        field(ui, "licence", "CC-BY-NC-SA-4.0");
         field(ui, "network access", "none, by construction");
         field(
             ui,

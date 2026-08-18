@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 150" width="1200" height="150" role="img" aria-label="main.rs">
+<title>main.rs</title>
+<rect x="0" y="0" width="1200" height="150" rx="10" fill="#1a1b26"/>
+<rect x="0.5" y="0.5" width="1199" height="149" rx="10" fill="none" stroke="#2f3549"/>
+<rect x="34.0" y="47.2" width="7.0" height="55.6" rx="3" fill="#7aa2f7" opacity="0.82"/>
+<rect x="47.0" y="47.7" width="7.0" height="54.6" rx="3" fill="#7aa2f7" opacity="0.82"/>
+<rect x="60.0" y="31.3" width="7.0" height="87.4" rx="3" fill="#7aa2f7" opacity="0.98"/>
+<rect x="73.0" y="53.5" width="7.0" height="43.0" rx="3" fill="#7aa2f7" opacity="0.76"/>
+<rect x="86.0" y="57.8" width="7.0" height="34.3" rx="3" fill="#7aa2f7" opacity="0.72"/>
+<rect x="99.0" y="41.1" width="7.0" height="67.7" rx="3" fill="#7aa2f7" opacity="0.88"/>
+<rect x="112.0" y="58.0" width="7.0" height="34.0" rx="3" fill="#7aa2f7" opacity="0.72"/>
+<rect x="125.0" y="47.8" width="7.0" height="54.4" rx="3" fill="#7aa2f7" opacity="0.82"/>
+<rect x="138.0" y="49.3" width="7.0" height="51.3" rx="3" fill="#7aa2f7" opacity="0.80"/>
+<rect x="151.0" y="53.3" width="7.0" height="43.5" rx="3" fill="#7aa2f7" opacity="0.76"/>
+<rect x="164.0" y="43.2" width="7.0" height="63.6" rx="3" fill="#7aa2f7" opacity="0.86"/>
+<rect x="177.0" y="52.4" width="7.0" height="45.3" rx="3" fill="#7dcfff" opacity="0.77"/>
+<rect x="190.0" y="40.0" width="7.0" height="70.0" rx="3" fill="#7dcfff" opacity="0.89"/>
+<rect x="203.0" y="52.3" width="7.0" height="45.4" rx="3" fill="#7dcfff" opacity="0.77"/>
+<rect x="216.0" y="44.4" width="7.0" height="61.2" rx="3" fill="#7dcfff" opacity="0.85"/>
+<rect x="229.0" y="32.1" width="7.0" height="85.8" rx="3" fill="#bb9af7" opacity="0.97"/>
+<rect x="242.0" y="51.0" width="7.0" height="48.1" rx="3" fill="#bb9af7" opacity="0.79"/>
+<rect x="255.0" y="41.3" width="7.0" height="67.4" rx="3" fill="#bb9af7" opacity="0.88"/>
+<rect x="268.0" y="46.6" width="7.0" height="56.8" rx="3" fill="#bb9af7" opacity="0.83"/>
+<rect x="281.0" y="44.8" width="7.0" height="60.5" rx="3" fill="#bb9af7" opacity="0.85"/>
+<rect x="294.0" y="43.0" width="7.0" height="64.0" rx="3" fill="#bb9af7" opacity="0.86"/>
+<rect x="307.0" y="36.0" width="7.0" height="78.1" rx="3" fill="#bb9af7" opacity="0.93"/>
+<rect x="320.0" y="43.1" width="7.0" height="63.7" rx="3" fill="#bb9af7" opacity="0.86"/>
+<rect x="333.0" y="42.3" width="7.0" height="65.4" rx="3" fill="#bb9af7" opacity="0.87"/>
+<rect x="346.0" y="53.7" width="7.0" height="42.6" rx="3" fill="#bb9af7" opacity="0.76"/>
+<rect x="359.0" y="48.1" width="7.0" height="53.8" rx="3" fill="#bb9af7" opacity="0.81"/>
+<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">main.rs</text>
+<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#565f89">The portable verifier: check a VeilVoice release without GnuPG installed.</text>
+<text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">VERIFY</text>
+</svg>

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //
 // Search: the live one, and the one that works with no JavaScript at all.
 //

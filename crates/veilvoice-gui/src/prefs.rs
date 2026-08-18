@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! What the user has chosen about how the app looks and moves.
 //!
 //! # Nothing here is secret, and nothing here is required

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! The RIFF chunk walker in `veilvoice-meta`, coverage-guided.
 //!
 //! This one walks a flat list of chunks whose sizes come from the file, so its

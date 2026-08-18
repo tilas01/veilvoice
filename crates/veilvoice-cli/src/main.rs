@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
 //! `veilvoice` — the command-line interface.
 //!
 //! Everything VeilVoice does, available without a desktop: it runs over SSH, in
@@ -905,7 +905,7 @@ fn info() {
     // "Licence" the noun, to match the desktop app and the website. "License"
     // stays only where it is part of the proper name "GNU General Public
     // License" or an SPDX identifier.
-    println!("{}", field("Licence", "GPL-3.0-or-later"));
+    println!("{}", field("Licence", "CC-BY-NC-SA-4.0"));
     println!("{}", field("Network access", "none, by construction"));
     println!(
         "{}",
