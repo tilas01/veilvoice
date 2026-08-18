@@ -615,3 +615,57 @@ Three switches earned their place:
 keystroke reported 14.4 ms and then 19.1 ms for the same work; minimum-of-25
 gave a stable 0.7 ms for scoring. Section 8 has said this since v0.1.8 and it
 was still got wrong once in the session that wrote this.
+
+### 9.7 A README, a flowchart and a banner for every crate and every file
+
+**Requested, and to be done _before_ the final audit and the production
+release.** Scale, measured rather than guessed: **9 crates and 48 `.rs`
+files.**
+
+What was asked for:
+
+- A README for **every crate**, in the website's Tokyo Night palette, with a
+  full explanation of how that crate works and a flowchart.
+- A flowchart **and a banner for every individual `.rs` file** (48 of each).
+- All of it mirrored into the website wiki, at **full parity**.
+
+Four decisions to make before writing any of it, because getting them wrong
+means redoing 100+ artefacts:
+
+**1. Flowcharts must be Mermaid, not images.** GitHub renders ```mermaid
+fences natively in Markdown and in the wiki, so a flowchart stays *text*:
+diffable, greppable, reviewable in a pull request, and indexed by
+`tools/search-index/generate.py` like everything else. A PNG flowchart is an
+opaque blob, which section 4 forbids on principle and which
+`assets/generate.py --check` would then have to verify 48 times. Mermaid also
+takes a theme, so the Tokyo Night palette can be declared once and reused.
+
+**2. Banners must be generated, and probably SVG.** `assets/generate.py`
+already produces reproducible PNGs and verifies them by decoded pixels. Adding
+48 more PNGs is roughly 48 x 17 KB of binary the repository has to carry and
+`--check` has to decode. An SVG banner generator emits *text*, costs almost
+nothing, scales, and is auditable by reading. If PNG is wanted anyway, extend
+`assets/generate.py` and its `--check`; do not hand-commit images.
+
+**3. Per-file docs must be generated from the source, not written beside it.**
+48 hand-written files describing 48 source files will drift, and drift is what
+`F-41` was. Generate them from the doc comments already in the tree (`//!` and
+`///`), so the description of a file cannot disagree with the file. A generator
+with `--check`, in the pattern of the other two, means CI fails when they part
+company.
+
+**4. Website parity has to come from one source.** The wiki currently lives in
+`website/wiki.html` and is hand-maintained. Publishing the same content to the
+GitHub wiki *and* the website means one generator with two outputs, exactly as
+`tools/search-index/generate.py` writes both the JSON and the static page. Two
+hand-maintained copies will drift; that is F-41 again, and it is worth saying
+twice because the request explicitly asks for "full parity".
+
+A reasonable order: the palette and the Mermaid theme first, then one crate end
+to end as the template, then agree it, then the remaining eight, then the 48
+files by generator, then wiki parity, then the audit.
+
+**Do not start the final audit until this is in**, per the request -- but note
+that adding 100+ documents is itself a large surface for the audit to cover,
+and `links.test.js`, `characters.test.js` and the search index will all need to
+stay green throughout.
