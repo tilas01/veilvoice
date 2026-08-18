@@ -584,38 +584,6 @@ Unchanged, and still true:
 
 ---
 
-## 10. Looking at the site, which is not optional
-
-The Browser pane **has never composited in this environment** -- `screenshot`
-returns "the Browser pane is not displayed". Two sessions lost time to this.
-Drive headless Edge over CDP instead. A working driver lives in the scratchpad
-of the session that wrote this; the essentials:
-
-```
-msedge.exe --headless=new --disable-gpu --hide-scrollbars
-           --remote-debugging-port=PORT --user-data-dir=SHORT_PATH
-```
-
-then over the DevTools WebSocket: `Page.enable`, `Runtime.enable`,
-`Emulation.setDeviceMetricsOverride`, `Page.navigate`, and
-`Page.captureScreenshot` with `captureBeyondViewport: true` for a full page.
-
-Three switches earned their place:
-
-- `Page.addScriptToEvaluateOnNewDocument` setting
-  `sessionStorage["veilvoice-accepted-v1"] = "yes"`, so the legal gate does not
-  cover every screenshot.
-- `Emulation.setScriptExecutionDisabled` -- **this is what found the switch
-  claiming "on" with scripts disabled.** Render with it before believing any
-  claim about the no-JavaScript path.
-- `Emulation.setEmulatedMedia` with `prefers-reduced-motion: reduce`, to check
-  the `<picture>` fallback really serves the still banner.
-
-**Measure with the minimum, never a single sample.** A one-shot timing of a
-keystroke reported 14.4 ms and then 19.1 ms for the same work; minimum-of-25
-gave a stable 0.7 ms for scoring. Section 8 has said this since v0.1.8 and it
-was still got wrong once in the session that wrote this.
-
 ### 9.7 A README, a flowchart and a banner for every crate and every file
 
 **Requested, and to be done _before_ the final audit and the production
@@ -669,3 +637,37 @@ files by generator, then wiki parity, then the audit.
 that adding 100+ documents is itself a large surface for the audit to cover,
 and `links.test.js`, `characters.test.js` and the search index will all need to
 stay green throughout.
+
+---
+
+## 10. Looking at the site, which is not optional
+
+The Browser pane **has never composited in this environment** -- `screenshot`
+returns "the Browser pane is not displayed". Two sessions lost time to this.
+Drive headless Edge over CDP instead. A working driver lives in the scratchpad
+of the session that wrote this; the essentials:
+
+```
+msedge.exe --headless=new --disable-gpu --hide-scrollbars
+           --remote-debugging-port=PORT --user-data-dir=SHORT_PATH
+```
+
+then over the DevTools WebSocket: `Page.enable`, `Runtime.enable`,
+`Emulation.setDeviceMetricsOverride`, `Page.navigate`, and
+`Page.captureScreenshot` with `captureBeyondViewport: true` for a full page.
+
+Three switches earned their place:
+
+- `Page.addScriptToEvaluateOnNewDocument` setting
+  `sessionStorage["veilvoice-accepted-v1"] = "yes"`, so the legal gate does not
+  cover every screenshot.
+- `Emulation.setScriptExecutionDisabled` -- **this is what found the switch
+  claiming "on" with scripts disabled.** Render with it before believing any
+  claim about the no-JavaScript path.
+- `Emulation.setEmulatedMedia` with `prefers-reduced-motion: reduce`, to check
+  the `<picture>` fallback really serves the still banner.
+
+**Measure with the minimum, never a single sample.** A one-shot timing of a
+keystroke reported 14.4 ms and then 19.1 ms for the same work; minimum-of-25
+gave a stable 0.7 ms for scoring. Section 8 has said this since v0.1.8 and it
+was still got wrong once in the session that wrote this.
