@@ -20,11 +20,32 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..", "..");
 const SITE = path.join(ROOT, "website");
 
-const PAGES = [
-  path.join(SITE, "index.html"),
-  path.join(SITE, "wiki.html"),
-  path.join(SITE, "nojs", "index.html")
-];
+/**
+ * Every HTML page the site publishes, **discovered** rather than listed.
+ *
+ * This was a hardcoded list of three files, under a comment saying the checks
+ * applied to "every page". They did not. `search.html` was added and was never
+ * checked at all -- not for the signing-key fingerprint, not for balanced tags,
+ * not for third-party assets, not for inline event handlers. It shipped
+ * without the fingerprint, which is the one thing on these pages that lets a
+ * reader tell a real release from a forged one.
+ *
+ * That is section 4.5 of `docs/AUDIT.md` happening to the tests themselves:
+ * *a finished scope is only as wide as the list it was drawn from.* The
+ * defence is to enumerate from the directory rather than from memory, so a new
+ * page is covered the moment it exists rather than whenever somebody remembers
+ * to add it here.
+ */
+function discoverPages(dir = SITE, found = []) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) { discoverPages(full, found); }
+    else if (entry.name.endsWith(".html")) { found.push(full); }
+  }
+  return found.sort();
+}
+
+const PAGES = discoverPages();
 
 // Hosts the site is allowed to link to. Not fetch from — link to. Nothing on
 // these pages may *load* from anywhere but the same origin.
