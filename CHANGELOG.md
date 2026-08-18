@@ -6,6 +6,159 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## v0.1.9
+
+Getting a genuine copy, and finding your way around one.
+
+This release adds a search index over the whole repository and website, a
+portable verifier that checks a release **without GnuPG installed**, install
+scripts that refuse rather than continue, package definitions for six formats,
+and OpenBSD and NetBSD builds. A fourth audit round found ten defects
+([`docs/AUDIT.md`](docs/AUDIT.md)); three of them had shipped.
+
+### Verify a download without installing anything
+
+`veilvoice-verify` ships in every archive. It carries the signing key and the
+fingerprint `8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A` compiled in, needs no
+GnuPG, uses no network, and writes nothing.
+
+```
+veilvoice-verify key
+veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
+    --sums SHA256SUMS --sig SHA256SUMS.asc
+```
+
+It cannot embed the expected hash of the file it checks -- a file cannot contain
+its own digest -- so the hash comes from outside, and **where it came from
+decides what a match proves**. A hash from the published `SHA256SUMS` proves the
+download is *intact*, and rests entirely on trusting whoever signed it. A hash
+from somebody else's build of the same tag proves the release is *reproducible*,
+and rests on nobody in particular. The tool says which one it just established
+and refuses to run both at once and report a single answer. `--explain` sets out
+the difference at length.
+
+### Install scripts that refuse rather than continue
+
+`install/install.sh`, `install/install.ps1` and `install/install.bat`. Each
+checks the key's fingerprint against a value **hardcoded in the script**,
+verifies the signature over `SHA256SUMS`, verifies the archive against that
+list, and only then installs. In that order: checking the hash first proves only
+that a download matches a list that might itself have been replaced.
+
+There is no flag to skip verification, because an installer with one is an
+installer whose verification is decorative. Without GnuPG the scripts stop
+rather than falling back to "the hash matched". Every refusal names the check
+that failed and installs nothing.
+
+Optional extras are asked once, default to **no**, and are not installed at all
+under `--yes` -- which means "do not ask me", not "assume yes". VB-CABLE is
+proprietary donationware, so the Windows script only opens VB-Audio's page: it
+will not accept somebody else's licence on your behalf.
+
+Documented in [`docs/INSTALL.md`](docs/INSTALL.md), which puts the **by-hand**
+route first, because "run this script and trust it" is a strange thing to ask on
+behalf of a tool whose argument is that you should not have to trust anybody.
+
+### Search the whole project
+
+A new [search page](https://tilas01.github.io/veilvoice/search.html) indexes
+every tracked file -- the Rust and its doc comments, the documentation, the
+website, the tests, the build and the licences -- with sorting and filtering.
+Results link to the exact line on GitHub or the exact section on the site.
+
+It works **without JavaScript**. `website/nojs/search.html` is a complete static
+index of every file and section, generated from the same walk of the repository,
+so the two cannot disagree. The whole corpus is in the page and your browser's
+own find-in-page searches it. Everything is expanded rather than folded away,
+because text inside a collapsed `<details>` is not searchable on every browser,
+and an index that answers confidently with nothing is worse than no index.
+
+Coverage is stated precisely rather than rounded up: documentation, the website,
+the build files and the licences are complete; Rust is indexed by item name and
+doc comment, **not** by function body.
+
+### Packaging and platforms
+
+WiX (Windows MSI), `.deb`, `.rpm`, Flatpak, a Homebrew formula and a Gentoo live
+ebuild, in `packaging/`. Every one builds from the tagged source with `--locked`
+rather than repackaging a binary. The Flatpak requests **no network permission**,
+which is the checkable form of the offline claim. Nothing installs a service, a
+scheduled task or anything that runs at startup.
+
+**None of the package definitions has been built or installed yet** -- they
+parse, and that is the whole of what is claimed.
+[`docs/PACKAGING.md`](docs/PACKAGING.md) carries a per-format status table.
+
+OpenBSD and NetBSD builds join FreeBSD. All three run in emulated VMs, are
+allowed to fail without blocking a release, and are marked `not-verified` for
+reproducibility because they are built once rather than twice.
+
+### Fixes
+
+- **The website rendered the text in its own banner illegibly (F-37).** Every
+  image carried `image-rendering: pixelated`, which is for pixel art being
+  *enlarged*; every image here is *shrunk*. Nearest-neighbour sampling deletes
+  the rows it discards rather than blending them, so on a phone the hero read
+  `TIE VOICEPRIN IS DESTOYED. THE WORDS STAY EDGRE.` and
+  `BY ~I,FS01 CN GITHUB` instead of the claim, the licence and the authorship.
+  It had been that way for as long as the banner existed, on every viewport,
+  with every test passing. Found by rendering the page and reading it.
+- **The website's artwork had drifted from its generator (F-41).**
+  `website/assets/` held hand-maintained copies that `--check` never looked at.
+  The generator now writes both and checks both -- "generated from source" and
+  "generated, plus a copy somebody maintains by hand" are different claims.
+- **A documentation link pointed at a file that does not exist (F-42).** Now
+  mechanical: a site-test suite resolves every local link in every tracked
+  document.
+- Seven further defects were found in code written during this round and fixed
+  before release. They are written up at the same length in
+  [`docs/AUDIT.md`](docs/AUDIT.md) rather than omitted, because a round that
+  quietly drops them looks cleaner than it was.
+
+### The banner
+
+No bar is missing from it any more. The waveform used to drop one bar in five to
+suggest "the signal coming apart", which read as a broken image -- and was the
+wrong idea anyway: VeilVoice does not remove signal, it destroys the structure
+that identifies a speaker while keeping every word. The left half is now a
+coherent travelling wave and the right half is the same bars with the phase
+relationship between them gone.
+
+It is animated, as a 24-frame APNG generated by `assets/generate.py` like every
+other asset here, and served through `<picture>` so that a reader who has asked
+their system for less motion gets the still one. A browser without APNG support
+shows the first frame, which is byte-for-byte the static banner.
+
+### A dependency worth naming
+
+The portable verifier uses rPGP so that checking a release needs no GnuPG. It is
+by far the largest dependency in this project, and it brings in the `rsa` crate,
+which carries [RUSTSEC-2023-0071](https://rustsec.org/advisories/RUSTSEC-2023-0071)
+with no fixed version available.
+
+That advisory concerns RSA **private key** operations. The verifier only ever
+checks a signature against a public key compiled into it; there is no private
+key in this repository and no secret for a timing side channel to leak. Because
+that is an argument about *usage* rather than about the crate, CI now fails the
+build if a secret-key or decryption API appears in the verifier -- so the
+argument cannot quietly stop being true. Reasoning in `.cargo/audit.toml` and
+`docs/AUDIT.md` (A-6).
+
+The alternative was hand-writing OpenPGP parsing and RSA verification, where a
+subtle mistake is a silent accept in the one tool whose job is not to silently
+accept.
+
+### Still not done, and said plainly
+
+- **Nobody but the author has run the install scripts or the verifier.** They
+  are tested end to end on Windows against the real published v0.1.8 release.
+  `install.sh` has never run on a real Linux or macOS machine.
+- **No package definition has been built.**
+- The `fuzz/` targets still have not been run to convergence, and 32-bit targets
+  are still not in CI. Both unchanged from v0.1.8.
+
+336 tests, ten website suites, no `unsafe`, no networking crates.
+
 ## v0.1.8
 
 A security release. A third audit round, run against the *classes* of defect
