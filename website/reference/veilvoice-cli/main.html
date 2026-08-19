@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/main.svg" alt="main.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 1077 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 1201 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-is-here">What is here</a>
@@ -72,100 +72,100 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 394" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1208 394" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
-<rect x="0" y="0" width="1200" height="394" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M116.4 247.0 C 712.4 247.0, 712.4 47.0, 693.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M116.4 247.0 C 880.4 247.0, 880.4 47.0, 861.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M676.4 274.0 C 676.4 294.0, 657.4 300.0, 657.4 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M231.2 247.0 C 712.4 247.0, 712.4 47.0, 693.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M231.2 247.0 C 880.4 247.0, 880.4 47.0, 861.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M186.8 274.0 C 186.8 294.0, 516.0 300.0, 516.0 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M531.2 74.0 C 531.2 94.0, 600.0 100.0, 600.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 68.2 200.0, 68.2 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 446.8 200.0, 446.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 676.4 200.0, 676.4 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 561.6 200.0, 561.6 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 1135.6 200.0, 1135.6 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 791.2 200.0, 791.2 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 316.8 200.0, 316.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 186.8 200.0, 186.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 1020.8 200.0, 1020.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M600.0 174.0 C 600.0 194.0, 906.0 200.0, 906.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<rect x="341.6" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="401.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Policy::from</text>
-<text x="401.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
-<rect x="486.8" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="531.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main</text>
-<text x="531.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
-<rect x="555.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="600.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="600.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 246</text>
-<rect x="601.6" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="646.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">config</text>
-<text x="646.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 314</text>
-<rect x="716.4" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="787.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed</text>
-<text x="787.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 327</text>
+<rect x="0" y="0" width="1208" height="394" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M116.4 247.0 C 716.2 247.0, 716.2 47.0, 697.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M116.4 247.0 C 884.2 247.0, 884.2 47.0, 865.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M676.4 274.0 C 676.4 294.0, 661.2 300.0, 661.2 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M231.2 247.0 C 716.2 247.0, 716.2 47.0, 697.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M231.2 247.0 C 884.2 247.0, 884.2 47.0, 865.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M186.8 274.0 C 186.8 294.0, 519.8 300.0, 519.8 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M535.0 74.0 C 535.0 94.0, 603.8 100.0, 603.8 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 68.2 200.0, 68.2 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 446.8 200.0, 446.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 676.4 200.0, 676.4 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 561.6 200.0, 561.6 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 1139.4 200.0, 1139.4 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 791.2 200.0, 791.2 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 316.8 200.0, 316.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 186.8 200.0, 186.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 1020.8 200.0, 1020.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M603.8 174.0 C 603.8 194.0, 906.0 200.0, 906.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="345.4" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="405.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Policy::from</text>
+<text x="405.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 248</text>
+<rect x="490.6" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="535.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main</text>
+<text x="535.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 256</text>
+<rect x="559.4" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="603.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
+<text x="603.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 267</text>
+<rect x="605.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="649.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">config</text>
+<text x="649.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 438</text>
+<rect x="720.2" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="791.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed</text>
+<text x="791.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 451</text>
 <rect x="20.0" y="220.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="68.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">anonymise</text>
-<text x="68.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 345</text>
+<text x="68.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 469</text>
 <rect x="142.4" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="186.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">live</text>
-<text x="186.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 484</text>
-<rect x="471.6" y="320.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="516.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">meter</text>
-<text x="516.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 570</text>
+<text x="186.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 608</text>
+<rect x="475.4" y="320.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="519.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">meter</text>
+<text x="519.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 694</text>
 <rect x="257.2" y="220.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="316.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_devices</text>
-<text x="316.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 585</text>
+<text x="316.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 709</text>
 <rect x="402.4" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="446.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean</text>
-<text x="446.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 617</text>
+<text x="446.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 741</text>
 <rect x="517.2" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="561.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">encrypt</text>
-<text x="561.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 634</text>
+<text x="561.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 758</text>
 <rect x="632.0" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="676.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decrypt</text>
-<text x="676.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 663</text>
-<rect x="586.4" y="320.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="657.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load_secret_key</text>
-<text x="657.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 695</text>
+<text x="676.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 787</text>
+<rect x="590.2" y="320.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="661.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load_secret_key</text>
+<text x="661.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 819</text>
 <rect x="746.8" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="791.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">keygen</text>
-<text x="791.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 703</text>
+<text x="791.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 827</text>
 <rect x="861.6" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="906.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">watch</text>
-<text x="906.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 779</text>
+<text x="906.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 903</text>
 <rect x="976.4" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1020.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">shred</text>
-<text x="1020.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 869</text>
-<rect x="1091.2" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="1135.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">info</text>
-<text x="1135.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 937</text>
+<text x="1020.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 993</text>
+<rect x="1091.2" y="220.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="1139.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">info</text>
+<text x="1139.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1061</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_from[&quot;Policy::from&lt;br/&gt;line 227&quot;]
-    n_main[&quot;main&lt;br/&gt;line 235&quot;]
-    n_run[&quot;run&lt;br/&gt;line 246&quot;]
-    n_config[&quot;config&lt;br/&gt;line 314&quot;]
-    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 327&quot;]
-    n_anonymise[&quot;anonymise&lt;br/&gt;line 345&quot;]
-    n_live[&quot;live&lt;br/&gt;line 484&quot;]
-    n_meter[&quot;meter&lt;br/&gt;line 570&quot;]
-    n_list_devices[&quot;list_devices&lt;br/&gt;line 585&quot;]
-    n_clean[&quot;clean&lt;br/&gt;line 617&quot;]
-    n_encrypt[&quot;encrypt&lt;br/&gt;line 634&quot;]
-    n_decrypt[&quot;decrypt&lt;br/&gt;line 663&quot;]
-    n_load_secret_key[&quot;load_secret_key&lt;br/&gt;line 695&quot;]
-    n_keygen[&quot;keygen&lt;br/&gt;line 703&quot;]
-    n_watch[&quot;watch&lt;br/&gt;line 779&quot;]
-    n_shred[&quot;shred&lt;br/&gt;line 869&quot;]
-    n_info[&quot;info&lt;br/&gt;line 937&quot;]
+    n_from[&quot;Policy::from&lt;br/&gt;line 248&quot;]
+    n_main[&quot;main&lt;br/&gt;line 256&quot;]
+    n_run[&quot;run&lt;br/&gt;line 267&quot;]
+    n_config[&quot;config&lt;br/&gt;line 438&quot;]
+    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 451&quot;]
+    n_anonymise[&quot;anonymise&lt;br/&gt;line 469&quot;]
+    n_live[&quot;live&lt;br/&gt;line 608&quot;]
+    n_meter[&quot;meter&lt;br/&gt;line 694&quot;]
+    n_list_devices[&quot;list_devices&lt;br/&gt;line 709&quot;]
+    n_clean[&quot;clean&lt;br/&gt;line 741&quot;]
+    n_encrypt[&quot;encrypt&lt;br/&gt;line 758&quot;]
+    n_decrypt[&quot;decrypt&lt;br/&gt;line 787&quot;]
+    n_load_secret_key[&quot;load_secret_key&lt;br/&gt;line 819&quot;]
+    n_keygen[&quot;keygen&lt;br/&gt;line 827&quot;]
+    n_watch[&quot;watch&lt;br/&gt;line 903&quot;]
+    n_shred[&quot;shred&lt;br/&gt;line 993&quot;]
+    n_info[&quot;info&lt;br/&gt;line 1061&quot;]
     n_anonymise --&gt; n_config
     n_anonymise --&gt; n_describe_reseed
     n_decrypt --&gt; n_load_secret_key
@@ -191,28 +191,28 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Cli</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L75" rel="noopener noreferrer">75</a></td><td></td></tr>
-<tr><td><code>Command</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L81" rel="noopener noreferrer">81</a></td><td></td></tr>
-<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L219" rel="noopener noreferrer">219</a></td><td></td></tr>
-<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L227" rel="noopener noreferrer">227</a></td><td></td></tr>
-<tr><td><code>main</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L235" rel="noopener noreferrer">235</a></td><td></td></tr>
-<tr><td><code>run</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L246" rel="noopener noreferrer">246</a></td><td></td></tr>
-<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L308" rel="noopener noreferrer">308</a></td><td>The engine settings a user can reach from the command line.</td></tr>
-<tr><td><code>config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L314" rel="noopener noreferrer">314</a></td><td></td></tr>
-<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L327" rel="noopener noreferrer">327</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
-<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L336" rel="noopener noreferrer">336</a></td><td>What to do with the result once it exists.</td></tr>
-<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L345" rel="noopener noreferrer">345</a></td><td></td></tr>
-<tr><td><code>live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L484" rel="noopener noreferrer">484</a></td><td></td></tr>
-<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L570" rel="noopener noreferrer">570</a></td><td>A small textual level meter.</td></tr>
-<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L585" rel="noopener noreferrer">585</a></td><td></td></tr>
-<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L617" rel="noopener noreferrer">617</a></td><td></td></tr>
-<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L634" rel="noopener noreferrer">634</a></td><td></td></tr>
-<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L663" rel="noopener noreferrer">663</a></td><td></td></tr>
-<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L695" rel="noopener noreferrer">695</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
-<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L703" rel="noopener noreferrer">703</a></td><td></td></tr>
-<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L779" rel="noopener noreferrer">779</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
-<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L869" rel="noopener noreferrer">869</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
-<tr><td><code>info</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L937" rel="noopener noreferrer">937</a></td><td></td></tr>
+<tr><td><code>Cli</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L76" rel="noopener noreferrer">76</a></td><td></td></tr>
+<tr><td><code>Command</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L82" rel="noopener noreferrer">82</a></td><td></td></tr>
+<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L240" rel="noopener noreferrer">240</a></td><td></td></tr>
+<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L248" rel="noopener noreferrer">248</a></td><td></td></tr>
+<tr><td><code>main</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L256" rel="noopener noreferrer">256</a></td><td></td></tr>
+<tr><td><code>run</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L267" rel="noopener noreferrer">267</a></td><td></td></tr>
+<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L432" rel="noopener noreferrer">432</a></td><td>The engine settings a user can reach from the command line.</td></tr>
+<tr><td><code>config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L438" rel="noopener noreferrer">438</a></td><td></td></tr>
+<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L451" rel="noopener noreferrer">451</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
+<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L460" rel="noopener noreferrer">460</a></td><td>What to do with the result once it exists.</td></tr>
+<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L469" rel="noopener noreferrer">469</a></td><td></td></tr>
+<tr><td><code>live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L608" rel="noopener noreferrer">608</a></td><td></td></tr>
+<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L694" rel="noopener noreferrer">694</a></td><td>A small textual level meter.</td></tr>
+<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L709" rel="noopener noreferrer">709</a></td><td></td></tr>
+<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L741" rel="noopener noreferrer">741</a></td><td></td></tr>
+<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L758" rel="noopener noreferrer">758</a></td><td></td></tr>
+<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L787" rel="noopener noreferrer">787</a></td><td></td></tr>
+<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L819" rel="noopener noreferrer">819</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
+<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L827" rel="noopener noreferrer">827</a></td><td></td></tr>
+<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L903" rel="noopener noreferrer">903</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
+<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L993" rel="noopener noreferrer">993</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
+<tr><td><code>info</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1061" rel="noopener noreferrer">1061</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>
