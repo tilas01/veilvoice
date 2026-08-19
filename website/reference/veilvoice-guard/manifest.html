@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -43,6 +43,7 @@
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#format">Format</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -56,6 +57,50 @@
 ...</code></pre>
 <p>Text rather than a packed binary layout because the point of the file is to be checkable. Someone who suspects tampering can read it with <code>cat</code> and compare a digest by hand with <code>sha256sum</code>, without this crate and without trusting it. A binary format would have been marginally smaller and would have made the honest response to &quot;prove it&quot; be &quot;run my tool again&quot;.</p>
 <p>Paths are stored with forward slashes so a manifest written on Windows still reads on Linux, and are rejected if they contain a newline -- otherwise a filename could forge a record.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>539 lines defining <strong>17 functions</strong> (15 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>struct Entry</code> <span style="color:var(--muted)">line 34</span> &mdash; One recorded file.</li>
+<li><code>enum Change</code> <span style="color:var(--muted)">line 43</span> &mdash; How a file differs from its record.</li>
+<li><code>struct Report</code> <span style="color:var(--muted)">line 101</span> &mdash; The result of checking a manifest against the disk.</li>
+<li><code>struct Manifest</code> <span style="color:var(--muted)">line 117</span> &mdash; A record of a set of files.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>Change::path</code> <span style="color:var(--muted)">line 75</span> &mdash; The path this change concerns.
+</li>
+<li><code>Change::describe</code> <span style="color:var(--muted)">line 85</span> &mdash; A single line for a terminal or a log.
+</li>
+<li><code>Report::is_clean</code> <span style="color:var(--muted)">line 110</span> &mdash; Whether anything at all differs.
+</li>
+<li><code>Manifest::of</code> <span style="color:var(--muted)">line 146</span> &mdash; Record every readable file in paths.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>digest_of</code>, <code>normalise</code></span>
+</li>
+<li><code>Manifest::len</code> <span style="color:var(--muted)">line 171</span> &mdash; How many files are recorded.
+</li>
+<li><code>Manifest::is_empty</code> <span style="color:var(--muted)">line 176</span> &mdash; Whether nothing is recorded.
+</li>
+<li><code>Manifest::paths</code> <span style="color:var(--muted)">line 181</span> &mdash; The recorded paths, in order.
+</li>
+<li><code>Manifest::check</code> <span style="color:var(--muted)">line 190</span> &mdash; Compare the record against what is on disk now.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>digest_of</code>, <code>normalise</code></span>
+</li>
+<li><code>Manifest::save</code> <span style="color:var(--muted)">line 297</span> &mdash; Write the manifest to path in the clear.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
+</li>
+<li><code>Manifest::load</code> <span style="color:var(--muted)">line 308</span> &mdash; Read a manifest written by Manifest::save.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code></span>
+</li>
+<li><code>Manifest::seal</code> <span style="color:var(--muted)">line 322</span> &mdash; Seal the manifest under a passphrase.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
+</li>
+<li><code>Manifest::open_sealed</code> <span style="color:var(--muted)">line 331</span> &mdash; Open a manifest sealed by Manifest::seal.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code></span>
+</li>
+<li><code>files_in</code> <span style="color:var(--muted)">line 344</span> &mdash; Every file directly inside dir, for use as check&#x27;s extra argument.
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -71,57 +116,91 @@
 <path d="M2606.0 47.0 C 2628.0 47.0, 2628.0 47.0, 1914.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M2071.6 47.0 C 2093.6 47.0, 2093.6 47.0, 1746.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M2392.4 47.0 C 2414.4 47.0, 2414.4 47.0, 1746.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L75" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="79.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Change::path</text>
 <text x="79.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 75</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L85" target="_blank" rel="noopener noreferrer">
 <rect x="165.2" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="240.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Change::describe</text>
 <text x="240.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 85</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L110" target="_blank" rel="noopener noreferrer">
 <rect x="340.8" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="415.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::is_clean</text>
 <text x="415.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L125" target="_blank" rel="noopener noreferrer">
 <rect x="516.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="564.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">normalise</text>
 <text x="564.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 125</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L129" target="_blank" rel="noopener noreferrer">
 <rect x="638.8" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="687.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">digest_of</text>
 <text x="687.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 129</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L146" target="_blank" rel="noopener noreferrer">
 <rect x="761.2" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="820.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::of</text>
 <text x="820.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 146</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L171" target="_blank" rel="noopener noreferrer">
 <rect x="906.4" y="20.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="969.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::len</text>
 <text x="969.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 171</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L176" target="_blank" rel="noopener noreferrer">
 <rect x="1059.2" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1141.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::is_empty</text>
 <text x="1141.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 176</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L181" target="_blank" rel="noopener noreferrer">
 <rect x="1250.0" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1321.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::paths</text>
 <text x="1321.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 181</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L190" target="_blank" rel="noopener noreferrer">
 <rect x="1418.0" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1489.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::check</text>
 <text x="1489.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 190</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L231" target="_blank" rel="noopener noreferrer">
 <rect x="1586.0" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="1664.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::to_text</text>
 <text x="1664.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 231</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L241" target="_blank" rel="noopener noreferrer">
 <rect x="1769.2" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="1840.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::parse</text>
 <text x="1840.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 241</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L297" target="_blank" rel="noopener noreferrer">
 <rect x="1937.2" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2004.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::save</text>
 <text x="2004.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 297</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L308" target="_blank" rel="noopener noreferrer">
 <rect x="2097.6" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2164.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::load</text>
 <text x="2164.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L322" target="_blank" rel="noopener noreferrer">
 <rect x="2258.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2325.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::seal</text>
 <text x="2325.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 322</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L331" target="_blank" rel="noopener noreferrer">
 <rect x="2418.4" y="20.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2512.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::open_sealed</text>
 <text x="2512.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 331</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L344" target="_blank" rel="noopener noreferrer">
 <rect x="2632.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2676.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">files_in</text>
 <text x="2676.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 344</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -153,6 +232,23 @@ flowchart TD
     n_open_sealed --&gt; n_parse
     n_save --&gt; n_to_text
     n_seal --&gt; n_to_text
+    click n_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L75&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L85&quot; &quot;open the source&quot;
+    click n_is_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L110&quot; &quot;open the source&quot;
+    click n_normalise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L125&quot; &quot;open the source&quot;
+    click n_digest_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L129&quot; &quot;open the source&quot;
+    click n_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L146&quot; &quot;open the source&quot;
+    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L171&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L176&quot; &quot;open the source&quot;
+    click n_paths href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L181&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L190&quot; &quot;open the source&quot;
+    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L231&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L241&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L297&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L308&quot; &quot;open the source&quot;
+    click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L322&quot; &quot;open the source&quot;
+    click n_open_sealed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L331&quot; &quot;open the source&quot;
+    click n_files_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L344&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_path,n_describe,n_is_clean,n_of,n_len,n_is_empty,n_paths,n_check,n_save,n_load,n_seal,n_open_sealed,n_files_in entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

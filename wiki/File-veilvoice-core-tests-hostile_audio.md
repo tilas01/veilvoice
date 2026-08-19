@@ -58,6 +58,19 @@ flowchart TD
     n_every_flavour_of_non_finite_is_survived --> n_speech
     n_hostile_input_is_survived_with_accent_neutralisation_off --> n_speech
     n_pathological_but_legal_audio_is_handled --> n_engine
+    click n_speech href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L17" "open the source"
+    click n_engine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L30" "open the source"
+    click n_a_single_nan_does_not_poison_the_engine_for_ever href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L36" "open the source"
+    click n_every_flavour_of_non_finite_is_survived href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L63" "open the source"
+    click n_an_entirely_non_finite_buffer_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L93" "open the source"
+    click n_digital_silence_stays_silent_and_leaves_the_state_usable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L105" "open the source"
+    click n_pathological_but_legal_audio_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L123" "open the source"
+    click n_hostile_input_is_survived_with_accent_neutralisation_off href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L162" "open the source"
+    click n_a_non_finite_sample_rate_is_refused_rather_than_built href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L200" "open the source"
+    click n_an_absurd_sample_rate_is_refused_rather_than_allocated href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L221" "open the source"
+    click n_an_absurd_frame_size_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L260" "open the source"
+    click n_non_finite_parameters_are_refused_and_wild_ones_are_clamped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L288" "open the source"
+    click n_every_configuration_that_builds_produces_finite_audio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L339" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_speech,n_engine,n_a_single_nan_does_not_poison_the_engine_for_ever,n_every_flavour_of_non_finite_is_survived,n_an_entirely_non_finite_buffer_is_handled,n_digital_silence_stays_silent_and_leaves_the_state_usable,n_pathological_but_legal_audio_is_handled,n_hostile_input_is_survived_with_accent_neutralisation_off,n_a_non_finite_sample_rate_is_refused_rather_than_built,n_an_absurd_sample_rate_is_refused_rather_than_allocated,n_an_absurd_frame_size_is_refused,n_non_finite_parameters_are_refused_and_wild_ones_are_clamped,n_every_configuration_that_builds_produces_finite_audio helper
 ```

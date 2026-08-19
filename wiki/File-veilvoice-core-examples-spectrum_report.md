@@ -40,6 +40,9 @@ flowchart TD
     n_main["main<br/>line 71"]
     n_main --> n_peaks
     n_main --> n_speaker
+    click n_speaker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L19" "open the source"
+    click n_peaks href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L41" "open the source"
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L71" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_speaker,n_peaks,n_main helper
 ```

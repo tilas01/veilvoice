@@ -79,6 +79,9 @@ flowchart TD
     n_colour_for["colour_for<br/>line 114"]
     n_draw --> n_colour_for
     n_draw --> n_height_fraction
+    click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L52" "open the source"
+    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L68" "open the source"
+    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L114" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_draw entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

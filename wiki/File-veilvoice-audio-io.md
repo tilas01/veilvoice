@@ -84,6 +84,13 @@ flowchart TD
     n_load --> n_preflight
     n_load --> n_read_up_to
     n_save_wav --> n_wav_bytes
+    click n_preflight href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L92" "open the source"
+    click n_duration_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L146" "open the source"
+    click n_peak href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L154" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L165" "open the source"
+    click n_read_up_to href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L268" "open the source"
+    click n_wav_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L289" "open the source"
+    click n_save_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L309" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_duration_secs,n_peak,n_load,n_save_wav entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

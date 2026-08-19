@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -45,6 +45,7 @@
   <a href="#a-decoder-is-a-parser-and-this-one-reads-files-somebody-else-made">A decoder is a parser, and this one reads files somebody else made</a>
   <a href="#writing-is-wav-only-and-that-is-a-decision">Writing is WAV only, and that is a decision</a>
   <a href="#in-memory-encoding-so-plaintext-never-reaches-the-disk">In-memory encoding, so plaintext never reaches the disk</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -58,7 +59,26 @@
 <h2 id="writing-is-wav-only-and-that-is-a-decision">Writing is WAV only, and that is a decision</h2>
 <p>Re-encoding to a lossy format after de-identification would throw away quality for no privacy benefit -- the voiceprint is already gone, and what remains is the words, which is the part worth keeping intact.</p>
 <h2 id="in-memory-encoding-so-plaintext-never-reaches-the-disk">In-memory encoding, so plaintext never reaches the disk</h2>
-<p>[<code>wav_bytes</code>] exists so a recording can be encoded and then sealed without ever being written in the clear. It has an awkward shape for a real reason: <code>hound::WavWriter::finalize</code> consumes the writer, so the encode has to borrow the cursor (<code>WavWriter::new(&amp;mut cursor, spec)</code>) and read the bytes back through <code>cursor.into_inner()</code> after the writer has been dropped.</p>
+<p><code>wav_bytes</code> exists so a recording can be encoded and then sealed without ever being written in the clear. It has an awkward shape for a real reason: <code>hound::WavWriter::finalize</code> consumes the writer, so the encode has to borrow the cursor (<code>WavWriter::new(&amp;mut cursor, spec)</code>) and read the bytes back through <code>cursor.into_inner()</code> after the writer has been dropped.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>555 lines defining <strong>7 functions</strong> (6 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>struct Audio</code> <span style="color:var(--muted)">line 137</span> &mdash; Mono audio in memory.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>Audio::duration_secs</code> <span style="color:var(--muted)">line 146</span> &mdash; Duration in seconds.
+</li>
+<li><code>Audio::peak</code> <span style="color:var(--muted)">line 154</span> &mdash; Peak absolute sample value.
+</li>
+<li><code>load</code> <span style="color:var(--muted)">line 165</span> &mdash; Decode any supported audio file to mono f32.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>preflight</code>, <code>read_up_to</code></span>
+</li>
+<li><code>save_wav</code> <span style="color:var(--muted)">line 309</span> &mdash; Write mono f32 audio to a 16-bit PCM WAV file.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>wav_bytes</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -69,27 +89,41 @@
 <path d="M598.8 47.0 C 620.8 47.0, 620.8 47.0, 143.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M554.4 74.0 C 554.4 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M836.0 47.0 C 858.0 47.0, 858.0 47.0, 724.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L92" target="_blank" rel="noopener noreferrer">
 <rect x="44.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="92.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">preflight</text>
 <text x="92.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L146" target="_blank" rel="noopener noreferrer">
 <rect x="166.4" y="20.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="256.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Audio::duration_secs</text>
 <text x="256.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 146</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L154" target="_blank" rel="noopener noreferrer">
 <rect x="372.4" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="428.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Audio::peak</text>
 <text x="428.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L165" target="_blank" rel="noopener noreferrer">
 <rect x="510.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="554.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load</text>
 <text x="554.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 165</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L268" target="_blank" rel="noopener noreferrer">
 <rect x="388.0" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_up_to</text>
 <text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 268</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L289" target="_blank" rel="noopener noreferrer">
 <rect x="624.8" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="673.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wav_bytes</text>
 <text x="673.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L309" target="_blank" rel="noopener noreferrer">
 <rect x="747.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="791.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">save_wav</text>
 <text x="791.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -106,6 +140,13 @@ flowchart TD
     n_load --&gt; n_preflight
     n_load --&gt; n_read_up_to
     n_save_wav --&gt; n_wav_bytes
+    click n_preflight href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L92&quot; &quot;open the source&quot;
+    click n_duration_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L146&quot; &quot;open the source&quot;
+    click n_peak href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L154&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L165&quot; &quot;open the source&quot;
+    click n_read_up_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L268&quot; &quot;open the source&quot;
+    click n_wav_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L289&quot; &quot;open the source&quot;
+    click n_save_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L309&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_duration_secs,n_peak,n_load,n_save_wav entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

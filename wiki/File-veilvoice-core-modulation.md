@@ -58,6 +58,14 @@ flowchart TD
     n_next_frame(["Modulator::next_frame<br/>line 131"])
     n_drop["Modulator::drop<br/>line 145"]
     n_from_seed --> n_new
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L32" "open the source"
+    click n_retarget href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L42" "open the source"
+    click n_step href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45" "open the source"
+    click n_from_seed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L73" "open the source"
+    click n_fill_phase_offsets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L92" "open the source"
+    click n_reseed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L120" "open the source"
+    click n_next_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L131" "open the source"
+    click n_drop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L145" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_from_seed,n_fill_phase_offsets,n_reseed,n_next_frame entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

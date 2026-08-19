@@ -91,6 +91,13 @@ flowchart TD
     n_ok --> n_paint
     n_paint --> n_enabled
     n_warn --> n_paint
+    click n_enabled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L59" "open the source"
+    click n_paint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L73" "open the source"
+    click n_ok href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82" "open the source"
+    click n_warn href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L87" "open the source"
+    click n_err href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L92" "open the source"
+    click n_heading href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L97" "open the source"
+    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L102" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_ok,n_warn,n_err,n_heading,n_field entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

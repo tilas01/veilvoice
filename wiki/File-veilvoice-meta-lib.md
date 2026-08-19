@@ -66,6 +66,10 @@ flowchart TD
     n_from["Error::from<br/>line 89"]
     n_fmt["Error::fmt<br/>line 95"]
     n_source["Error::source<br/>line 105"]
+    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L70" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L89" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L95" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L105" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_note,n_from,n_fmt,n_source helper
 ```
