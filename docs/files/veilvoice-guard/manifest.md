@@ -113,6 +113,23 @@ flowchart TD
     n_open_sealed --> n_parse
     n_save --> n_to_text
     n_seal --> n_to_text
+    click n_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L75" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L85" "open the source"
+    click n_is_clean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L110" "open the source"
+    click n_normalise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L125" "open the source"
+    click n_digest_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L129" "open the source"
+    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L146" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L171" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L176" "open the source"
+    click n_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L181" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L190" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L231" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L241" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L297" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L308" "open the source"
+    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L322" "open the source"
+    click n_open_sealed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L331" "open the source"
+    click n_files_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L344" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_path,n_describe,n_is_clean,n_of,n_len,n_is_empty,n_paths,n_check,n_save,n_load,n_seal,n_open_sealed,n_files_in entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

@@ -98,6 +98,11 @@ flowchart TD
     n_box_smooth["box_smooth<br/>line 300"]
     n_transform --> n_box_smooth
     n_transform --> n_resample_linear
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L90" "open the source"
+    click n_retarget_phase_offsets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L131" "open the source"
+    click n_transform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L145" "open the source"
+    click n_resample_linear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L279" "open the source"
+    click n_box_smooth href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L300" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_retarget_phase_offsets,n_transform entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

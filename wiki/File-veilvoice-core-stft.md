@@ -52,6 +52,10 @@ flowchart TD
     n_process(["StftEngine::process<br/>line 92"])
     n_process_frame["StftEngine::process_frame<br/>line 141"]
     n_process --> n_process_frame
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L47" "open the source"
+    click n_latency_samples href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L85" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L92" "open the source"
+    click n_process_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L141" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_latency_samples,n_process entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

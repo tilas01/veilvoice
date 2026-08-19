@@ -104,6 +104,19 @@ flowchart TD
     n_diff["Monitor::diff<br/>line 251"]
     n_poll --> n_diff
     n_poll --> n_scan
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L57" "open the source"
+    click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L88" "open the source"
+    click n_held_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L93" "open the source"
+    click n_support href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L115" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L157" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L163" "open the source"
+    click n_scan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L177" "open the source"
+    click n_alert href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L203" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L213" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L232" "open the source"
+    click n_current href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L237" "open the source"
+    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L246" "open the source"
+    click n_diff href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L251" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_key,n_held_for,n_support,n_alert,n_describe,n_new,n_current,n_poll entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

@@ -81,6 +81,15 @@ flowchart TD
     n_open_with_secret_key --> n_parse
     n_seal_to_public_key --> n_finish
     n_seal_with_password --> n_finish
+    click n_to_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L69" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L89" "open the source"
+    click n_veil_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L152" "open the source"
+    click n_seal_with_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L159" "open the source"
+    click n_seal_to_public_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L176" "open the source"
+    click n_finish href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L195" "open the source"
+    click n_open_with_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L204" "open the source"
+    click n_open_with_password_within href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L220" "open the source"
+    click n_open_with_secret_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L236" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_veil_path,n_seal_with_password,n_seal_to_public_key,n_open_with_password,n_open_with_secret_key entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

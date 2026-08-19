@@ -101,6 +101,14 @@ flowchart TD
     n_load --> n_contrast_problems
     n_load --> n_parse
     n_parse --> n_parse_hex
+    click n_luminance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L85" "open the source"
+    click n_contrast href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L101" "open the source"
+    click n_contrast_problems href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L121" "open the source"
+    click n_parse_hex href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L154" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L171" "open the source"
+    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L249" "open the source"
+    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L282" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L309" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_default_dir,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

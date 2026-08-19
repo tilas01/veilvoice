@@ -63,6 +63,10 @@ flowchart TD
     n_open(["open<br/>line 60"])
     n_open --> n_cipher
     n_seal --> n_cipher
+    click n_random_nonce href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L25" "open the source"
+    click n_cipher href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L31" "open the source"
+    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41" "open the source"
+    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L60" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_random_nonce,n_seal,n_open entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

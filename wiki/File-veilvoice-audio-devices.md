@@ -85,6 +85,11 @@ flowchart TD
     n_open(["open<br/>line 140"])
     n_find_virtual_cable --> n_list
     n_list --> n_looks_virtual
+    click n_looks_virtual href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L86" "open the source"
+    click n_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L92" "open the source"
+    click n_find_virtual_cable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L125" "open the source"
+    click n_name_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L135" "open the source"
+    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L140" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_find_virtual_cable,n_name_of,n_open entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

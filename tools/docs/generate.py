@@ -835,6 +835,8 @@ def crate_graph(model):
         nodes.append({
             "id": stem,
             "label": [entry["name"], "%d lines" % entry["lines"]],
+            "url": "https://github.com/%s/blob/%s/%s"
+                   % (REPO, REF, entry["rel"]),
             "root": stem in ("lib", "main"),
         })
     return nodes, list(model["edges"])
@@ -888,10 +890,13 @@ def file_graph(entry):
 
         nodes.append({
             "id": item["name"],
-            # The line number is half of "reference the lines": the label
-            # carries it, and the page links to it on GitHub.
+            # The line number is half of "reference the lines"; the URL is the
+            # other half. A reader who wants to know what a box actually does
+            # should be one click from the code, not one search.
             "label": [label, "line %d" % item["line"]],
             "line": item["line"],
+            "url": "https://github.com/%s/blob/%s/%s#L%d"
+                   % (REPO, REF, entry["rel"], item["line"]),
             "role": role,
             "root": role == "entry",
         })
@@ -1059,6 +1064,14 @@ def mermaid(colours, nodes, edges, direction="TD"):
         out.append("    %s%s" % (mermaid_id(node["id"]), shape))
     for src, dst in edges:
         out.append("    %s --> %s" % (mermaid_id(src), mermaid_id(dst)))
+
+    # One `click` per node: GitHub renders these as real links inside the
+    # fence, so a box in the diagram opens the code it stands for.
+    for node in nodes:
+        if not node.get("url"):
+            continue
+        out.append('    click %s href "%s" "open the source"'
+                   % (mermaid_id(node["id"]), node["url"]))
 
     # Roles as classes rather than per-node styling: one declaration each,
     # readable in the diff, and the same three colours on every page so a
@@ -1295,6 +1308,14 @@ def diagram_svg(colours, nodes, edges, width=880):
     role_token = {role: token for role, token, _ in ROLES}
     for node in nodes:
         x, y, w, h = placed[node["id"]]
+        # Wrapped in an anchor so the whole box is the target rather than just
+        # the words. `_blank` because the reader is in the middle of a diagram
+        # and taking the page away to show one function is the wrong trade;
+        # `noopener noreferrer` because a new tab should not get a handle back.
+        linked = bool(node.get("url"))
+        if linked:
+            add('<a href="%s" target="_blank" rel="noopener noreferrer">'
+                % esc(node["url"]))
         token = role_token.get(node.get("role"), "border")
         stroke = "var(--%s, %s)" % (token, colours.get(token, colours["border"]))
         add('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="7" '
@@ -1306,6 +1327,8 @@ def diagram_svg(colours, nodes, edges, width=880):
                 'fill="var(--%s, %s)" text-anchor="middle">%s</text>'
                 % (x + w / 2.0, y + pad_y + LINE_H * (number + 0.75),
                    MONO, token, colours[token], esc(line)))
+        if linked:
+            add('</a>')
     add('</svg>')
     return "\n".join(out) + "\n"
 
@@ -1534,7 +1557,7 @@ def html_page(colours, depth, title, description, body, fingerprint):
     add('      <a href="%sindex.html">home</a>' % up)
     add('      <a href="%swiki.html">wiki</a>' % up)
     add('      <a href="%sreference/index.html">reference</a>' % up)
-    add('      <a href="%ssearch.html">search</a>' % up)
+    add('      <a href="%ssearch.html">index</a>' % up)
     add('      <a href="https://github.com/%s" rel="noopener noreferrer">github</a>' % REPO)
     add('    </nav>')
     add('    <div class="controls">')
@@ -1597,11 +1620,18 @@ def inline_html(text):
         parked.append(html)
         return "\ue000%d\ue001" % (len(parked) - 1)
 
+    # Order matters, and getting it wrong is visible on the page.
+    #
+    # A rustdoc intra-doc link is `[`name`]` -- brackets around an inline code
+    # span. Running the inline-code pass first replaces those backticks with a
+    # placeholder, so the rustdoc pattern no longer matches and the brackets
+    # survive into the page: readers saw `[hann]` with the brackets showing.
+    # Found by looking at a rendered page, not by reading this function.
+    out = MD_RUSTDOC_LINK.sub(lambda m: park("<code>%s</code>" % m.group(1)), out)
     out = MD_INLINE_CODE.sub(lambda m: park("<code>%s</code>" % m.group(1)), out)
     out = MD_LINK.sub(
         lambda m: park('<a href="%s">%s</a>' % (m.group(2), m.group(1)))
         if safe_url(m.group(2)) else park(m.group(1)), out)
-    out = MD_RUSTDOC_LINK.sub(lambda m: park("<code>%s</code>" % m.group(1)), out)
     out = MD_BOLD.sub(lambda m: park("<strong>%s</strong>" % m.group(1)), out)
     out = MD_ITALIC.sub(lambda m: park("<em>%s</em>" % m.group(1)), out)
 
@@ -1704,6 +1734,58 @@ def diagram_block(colours, nodes, edges, note, mermaid_source):
     return out
 
 
+def contains_html(entry, anchor):
+    """The same "what is in here" account, for the website."""
+    counts, types, ways_in = contains(entry)
+    if not (types or ways_in or counts["functions"]):
+        return []
+
+    out = ['<section id="s-contains">']
+    out.append('<h2 id="%s">WHAT THIS FILE CONTAINS</h2>' % anchor)
+    out.append(
+        "<p>%d lines defining <strong>%d function%s</strong> (%d public), "
+        "<strong>%d type%s</strong> and <strong>%d constant%s</strong>. "
+        "Everything below is read out of the source, so it cannot disagree "
+        "with the code.</p>"
+        % (counts["lines"],
+           counts["functions"], "" if counts["functions"] == 1 else "s",
+           counts["public"],
+           counts["types"], "" if counts["types"] == 1 else "s",
+           counts["constants"], "" if counts["constants"] == 1 else "s"))
+
+    if types:
+        out.append("<p><strong>The types it owns.</strong></p><ul>")
+        for item in types:
+            summary = first_sentence(item["doc"]) or ""
+            out.append("<li><code>%s %s</code> <span style=\"color:var(--muted)\">"
+                       "line %d</span>%s</li>"
+                       % (esc(item["kind"]), esc(item["name"]), item["line"],
+                          " &mdash; " + inline_html(summary) if summary else ""))
+        out.append("</ul>")
+
+    if ways_in:
+        out.append("<p><strong>What happens when it runs.</strong> These are the "
+                   "ways in: public, and nothing else in this file calls them, so "
+                   "they are what an outside caller reaches first.</p><ul>")
+        for item, reaches in ways_in:
+            name = ("%s::%s" % (item["owner"], item["name"])
+                    if item["owner"] else item["name"])
+            summary = first_sentence(item["doc"]) or ""
+            out.append("<li><code>%s</code> <span style=\"color:var(--muted)\">"
+                       "line %d</span>%s"
+                       % (esc(name), item["line"],
+                          " &mdash; " + inline_html(summary) if summary else ""))
+            if reaches:
+                out.append("<br><span style=\"color:var(--muted);font-size:12px\">"
+                           "reaches %s</span>"
+                           % ", ".join("<code>%s</code>" % esc(r)
+                                       for r in reaches[:12]))
+            out.append("</li>")
+        out.append("</ul>")
+    out.append("</section>")
+    return out
+
+
 def html_crate(colours, model, fingerprint, links):
     crate = model["crate"]
     nodes, edges = crate_graph(model)
@@ -1779,7 +1861,11 @@ def html_file(colours, model, entry, fingerprint, links):
                 'read the source</a></p>'
                 % (crate, esc(crate), entry["lines"], REPO, REF, entry["rel"]))
 
-    fixed = [(2, "What calls what")]
+    fixed = []
+    has_contains = bool(contains_html(entry, "x"))
+    if has_contains:
+        fixed.append((2, "What this file contains"))
+    fixed.append((2, "What calls what"))
     if entry["items"]:
         fixed.append((2, "Items"))
     sections = sections_for_page(entry["doc"], fixed)
@@ -1799,8 +1885,11 @@ def html_file(colours, model, entry, fingerprint, links):
                     'has no <code>//!</code> module documentation yet. That is a '
                     'gap in the source rather than in this page.</p></section>')
 
+    if has_contains:
+        body.extend(contains_html(entry, fixed_anchors[0]))
+    calls_anchor = fixed_anchors[1] if has_contains else fixed_anchors[0]
     body.append('<section id="s-calls">')
-    body.append('<h2 id="%s">WHAT CALLS WHAT</h2>' % fixed_anchors[0])
+    body.append('<h2 id="%s">WHAT CALLS WHAT</h2>' % calls_anchor)
     if nodes:
         note = ("The functions this file defines, and the calls between them. An "
                 "edge means the callee's name appears, called, inside the caller's "
@@ -1816,7 +1905,8 @@ def html_file(colours, model, entry, fingerprint, links):
 
     if entry["items"]:
         body.append('<section id="s-items">')
-        body.append('<h2 id="%s">ITEMS</h2>' % fixed_anchors[1])
+        body.append('<h2 id="%s">ITEMS</h2>'
+                    % fixed_anchors[2 if has_contains else 1])
         body.append('<table><thead><tr><th>Item</th><th>Line</th>'
                     '<th>Documentation</th></tr></thead><tbody>')
         for item in entry["items"]:

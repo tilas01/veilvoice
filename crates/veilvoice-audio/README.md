@@ -63,6 +63,10 @@ flowchart TD
     n_devices["devices.rs<br/>228 lines"]
     n_io["io.rs<br/>555 lines"]
     n_live["live.rs<br/>237 lines"]
+    click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" "open the source"
+    click n_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" "open the source"
+    click n_io href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" "open the source"
+    click n_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" "open the source"
 ```
 
 ## The files

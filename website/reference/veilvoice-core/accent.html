@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -45,6 +45,7 @@
   <a href="#what-an-accent-is-made-of-and-what-a-signal-level-transform-can-remove">What an accent is made of, and what a signal-level transform can remove</a>
   <a href="#why-this-also-strengthens-de-identification">Why this also strengthens de-identification</a>
   <a href="#preserving-intelligibility">Preserving intelligibility</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -59,9 +60,38 @@
 </ul>
 <p>So this module makes every speaker land on the same pitch register, the same apparent vocal-tract length and the same long-term spectral tilt, which removes the accent&#x27;s melody and colour and a large part of its perceived origin. It does not, and cannot, re-articulate phonemes. <code>docs/WHITEPAPER.md</code> must state that limit plainly rather than claim accent removal is total.</p>
 <h2 id="why-this-also-strengthens-de-identification">Why this also strengthens de-identification</h2>
-<p>Every step here is <em>many-to-one</em>: a whole population of input f0 contours, spectral tilts and vocal-tract lengths is collapsed onto a single canonical value. That destroys information rather than displacing it, so it composes with the phase discard in [<code>crate::spectral</code>] &#8212; the two are independent one-way steps, and normalising the speaker&#x27;s <em>mean</em> pitch and vocal-tract length removes two of the strongest biometric features there are.</p>
+<p>Every step here is <em>many-to-one</em>: a whole population of input f0 contours, spectral tilts and vocal-tract lengths is collapsed onto a single canonical value. That destroys information rather than displacing it, so it composes with the phase discard in <code>crate::spectral</code> &#8212; the two are independent one-way steps, and normalising the speaker&#x27;s <em>mean</em> pitch and vocal-tract length removes two of the strongest biometric features there are.</p>
 <h2 id="preserving-intelligibility">Preserving intelligibility</h2>
 <p>The critical design rule is that every correction is derived from a <strong>long-term</strong> average, never from the current frame. Per-frame spectral shape is what distinguishes /i/ from /u/; normalising it frame-by-frame would erase the vowels along with the accent. Vocal-tract and tilt corrections therefore use multi-second time constants, so they track the speaker and leave the phonemes moving freely underneath.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>677 lines defining <strong>13 functions</strong> (8 public), <strong>3 types</strong> and <strong>10 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>struct AccentConfig</code> <span style="color:var(--muted)">line 76</span> &mdash; How aggressively accent and speaker traits are normalised.</li>
+<li><code>struct AccentStats</code> <span style="color:var(--muted)">line 124</span> &mdash; Live read-out of what the neutraliser is currently doing, for the UI.</li>
+<li><code>struct AccentNeutralizer</code> <span style="color:var(--muted)">line 143</span> &mdash; Maps any speaker onto one canonical pitch register, vocal-tract scale and long-term spectrum.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>AccentNeutralizer::new</code> <span style="color:var(--muted)">line 169</span> &mdash; Build for a given spectrum size and sample rate.
+</li>
+<li><code>AccentNeutralizer::enabled</code> <span style="color:var(--muted)">line 198</span> &mdash; Whether neutralisation is active.
+</li>
+<li><code>AccentNeutralizer::stats</code> <span style="color:var(--muted)">line 203</span> &mdash; Live read-out for the UI.
+</li>
+<li><code>AccentNeutralizer::observe</code> <span style="color:var(--muted)">line 220</span> &mdash; Feed this frame&#x27;s f0 estimate and update the intonation correction.
+</li>
+<li><code>AccentNeutralizer::prosody_ratio</code> <span style="color:var(--muted)">line 239</span> &mdash; Pitch ratio to apply to the excitation this frame.
+</li>
+<li><code>AccentNeutralizer::measure_envelope</code> <span style="color:var(--muted)">line 250</span> &mdash; Measure the speaker&#x27;s vocal-tract scale from the <em>unwarped</em> envelope and update the VTLN ratio.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>log_centroid</code></span>
+</li>
+<li><code>AccentNeutralizer::vtln_ratio</code> <span style="color:var(--muted)">line 269</span> &mdash; Formant ratio to apply to the envelope this frame.
+</li>
+<li><code>AccentNeutralizer::shape</code> <span style="color:var(--muted)">line 289</span> &mdash; Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>db_to_gain</code>, <code>gain_to_db</code>, <code>recompute_shape</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -73,45 +103,71 @@
 <path d="M2138.0 74.0 C 2138.0 94.0, 1410.2 100.0, 1410.2 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M2138.0 74.0 C 2138.0 94.0, 1280.2 100.0, 1280.2 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M2138.0 74.0 C 2138.0 94.0, 929.0 100.0, 929.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L106" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="113.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentConfig::default</text>
 <text x="113.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 106</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L169" target="_blank" rel="noopener noreferrer">
 <rect x="233.6" y="20.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="331.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::new</text>
 <text x="331.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 169</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L198" target="_blank" rel="noopener noreferrer">
 <rect x="454.8" y="20.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="567.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::enabled</text>
 <text x="567.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 198</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L203" target="_blank" rel="noopener noreferrer">
 <rect x="706.4" y="20.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="811.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::stats</text>
 <text x="811.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 203</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L220" target="_blank" rel="noopener noreferrer">
 <rect x="942.8" y="20.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1055.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::observe</text>
 <text x="1055.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 220</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L239" target="_blank" rel="noopener noreferrer">
 <rect x="1194.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1322.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::prosody_ra&#8230;</text>
 <text x="1322.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 239</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L250" target="_blank" rel="noopener noreferrer">
 <rect x="1476.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1604.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::measure_en&#8230;</text>
 <text x="1604.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 250</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L269" target="_blank" rel="noopener noreferrer">
 <rect x="1758.4" y="20.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1882.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::vtln_ratio</text>
 <text x="1882.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 269</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L289" target="_blank" rel="noopener noreferrer">
 <rect x="2032.8" y="20.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2138.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::shape</text>
 <text x="2138.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L332" target="_blank" rel="noopener noreferrer">
 <rect x="801.0" y="120.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="929.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AccentNeutralizer::recompute_&#8230;</text>
 <text x="929.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 332</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L384" target="_blank" rel="noopener noreferrer">
 <rect x="1083.0" y="120.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1142.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">log_centroid</text>
 <text x="1142.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 384</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L403" target="_blank" rel="noopener noreferrer">
 <rect x="1228.2" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1280.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">gain_to_db</text>
 <text x="1280.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 403</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L407" target="_blank" rel="noopener noreferrer">
 <rect x="1358.2" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1410.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">db_to_gain</text>
 <text x="1410.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 407</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -135,6 +191,19 @@ flowchart TD
     n_shape --&gt; n_db_to_gain
     n_shape --&gt; n_gain_to_db
     n_shape --&gt; n_recompute_shape
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L106&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L169&quot; &quot;open the source&quot;
+    click n_enabled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L198&quot; &quot;open the source&quot;
+    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L203&quot; &quot;open the source&quot;
+    click n_observe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L220&quot; &quot;open the source&quot;
+    click n_prosody_ratio href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L239&quot; &quot;open the source&quot;
+    click n_measure_envelope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L250&quot; &quot;open the source&quot;
+    click n_vtln_ratio href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L269&quot; &quot;open the source&quot;
+    click n_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L289&quot; &quot;open the source&quot;
+    click n_recompute_shape href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L332&quot; &quot;open the source&quot;
+    click n_log_centroid href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L384&quot; &quot;open the source&quot;
+    click n_gain_to_db href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L403&quot; &quot;open the source&quot;
+    click n_db_to_gain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L407&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_enabled,n_stats,n_observe,n_prosody_ratio,n_measure_envelope,n_vtln_ratio,n_shape entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

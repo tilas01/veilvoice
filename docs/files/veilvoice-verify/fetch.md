@@ -110,6 +110,12 @@ flowchart TD
     n_valid_asset(["valid_asset<br/>line 247"])
     n_download --> n_find_downloader
     n_download --> n_no_downloader_message
+    click n_find_downloader href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L97" "open the source"
+    click n_no_downloader_message href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L138" "open the source"
+    click n_download href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L155" "open the source"
+    click n_asset_url href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L221" "open the source"
+    click n_valid_tag href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L238" "open the source"
+    click n_valid_asset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L247" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_download,n_asset_url,n_valid_tag,n_valid_asset entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

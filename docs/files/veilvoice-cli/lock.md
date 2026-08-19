@@ -76,6 +76,15 @@ flowchart TD
     n_run --> n_status
     n_set --> n_print_scope
     n_status --> n_print_scope
+    click n_resolve href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L33" "open the source"
+    click n_print_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L45" "open the source"
+    click n_wrap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L54" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L72" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L85" "open the source"
+    click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L119" "open the source"
+    click n_change href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L162" "open the source"
+    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L174" "open the source"
+    click n_open_or_explain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L185" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

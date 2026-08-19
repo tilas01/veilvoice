@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -45,6 +45,7 @@
   <a href="#how-it-works">How it works</a>
   <a href="#sound-servers">Sound servers</a>
   <a href="#the-permission-boundary">The permission boundary</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -57,7 +58,16 @@
 <h2 id="sound-servers">Sound servers</h2>
 <p>On most desktops PipeWire or PulseAudio owns the hardware, so the process holding the PCM node is the <em>server</em>, not the application behind it. That is reported honestly rather than hidden: the server appearing means something is capturing, and where the client can be identified from the ALSA <code>/proc/asound</code> bookkeeping, it is named too.</p>
 <h2 id="the-permission-boundary">The permission boundary</h2>
-<p><code>/proc/&lt;pid&gt;/fd</code> is readable only by the process owner and root. Without root you therefore see your own processes; another user&#x27;s are invisible. That is a kernel boundary, not a gap in this code, and [<code>crate::support</code>] says so rather than letting an empty list imply an empty machine.</p>
+<p><code>/proc/&lt;pid&gt;/fd</code> is readable only by the process owner and root. Without root you therefore see your own processes; another user&#x27;s are invisible. That is a kernel boundary, not a gap in this code, and <code>crate::support</code> says so rather than letting an empty list imply an empty machine.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>192 lines defining <strong>5 functions</strong> (1 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>scan</code> <span style="color:var(--muted)">line 37</span>
+<br><span style="color:var(--muted);font-size:12px">reaches <code>classify</code>, <code>process_name</code>, <code>started_at</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -68,21 +78,31 @@
 <path d="M352.2 74.0 C 352.2 94.0, 302.4 100.0, 302.4 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M352.2 74.0 C 352.2 94.0, 432.4 100.0, 432.4 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M352.2 74.0 C 352.2 94.0, 570.0 100.0, 570.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L37" target="_blank" rel="noopener noreferrer">
 <rect x="311.6" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="352.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">scan</text>
 <text x="352.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 37</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L94" target="_blank" rel="noopener noreferrer">
 <rect x="258.0" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="302.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">classify</text>
 <text x="302.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L115" target="_blank" rel="noopener noreferrer">
 <rect x="372.8" y="120.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="432.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">process_name</text>
 <text x="432.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 115</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L126" target="_blank" rel="noopener noreferrer">
 <rect x="518.0" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="570.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">started_at</text>
 <text x="570.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 126</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L132" target="_blank" rel="noopener noreferrer">
 <rect x="418.8" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="493.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">approx_now_minus</text>
 <text x="493.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -97,6 +117,11 @@ flowchart TD
     n_scan --&gt; n_classify
     n_scan --&gt; n_process_name
     n_scan --&gt; n_started_at
+    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L37&quot; &quot;open the source&quot;
+    click n_classify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L94&quot; &quot;open the source&quot;
+    click n_process_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L115&quot; &quot;open the source&quot;
+    click n_started_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L126&quot; &quot;open the source&quot;
+    click n_approx_now_minus href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L132&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_scan entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

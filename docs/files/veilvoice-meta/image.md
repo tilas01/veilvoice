@@ -61,6 +61,9 @@ flowchart TD
     n_clean_image_file(["clean_image_file<br/>line 86"])
     n_clean_image_bytes --> n_sniff
     n_clean_image_file --> n_clean_image_bytes
+    click n_sniff href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs#L33" "open the source"
+    click n_clean_image_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs#L49" "open the source"
+    click n_clean_image_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs#L86" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_image_file entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

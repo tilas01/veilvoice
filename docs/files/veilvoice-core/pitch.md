@@ -76,6 +76,10 @@ flowchart TD
     n_estimate(["PitchTracker::estimate<br/>line 111"])
     n_parabolic["PitchTracker::parabolic<br/>line 173"]
     n_estimate --> n_parabolic
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L69" "open the source"
+    click n_push href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L91" "open the source"
+    click n_estimate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L111" "open the source"
+    click n_parabolic href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L173" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_push,n_estimate entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

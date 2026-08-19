@@ -93,6 +93,14 @@ flowchart TD
     n_install_fonts --> n_user_font_paths
     n_set_by_id --> n_by_id
     n_set_by_id --> n_install
+    click n_active href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L256" "open the source"
+    click n_themes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L273" "open the source"
+    click n_load_custom href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L286" "open the source"
+    click n_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L300" "open the source"
+    click n_set_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L307" "open the source"
+    click n_user_font_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L412" "open the source"
+    click n_install_fonts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L427" "open the source"
+    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L450" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load_custom,n_set_by_id,n_install_fonts entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

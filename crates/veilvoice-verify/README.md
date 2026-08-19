@@ -75,6 +75,9 @@ flowchart TD
     n_main(["main.rs<br/>746 lines"])
     n_fetch["fetch.rs<br/>320 lines"]
     n_tests["tests.rs<br/>138 lines"]
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs" "open the source"
+    click n_fetch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" "open the source"
+    click n_tests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" "open the source"
 ```
 
 ## The files

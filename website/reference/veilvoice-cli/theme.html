@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -44,6 +44,7 @@
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-command-line-tool-has-a-palette-at-all">Why a command-line tool has a palette at all</a>
   <a href="#colour-is-suppressed-rather-than-assumed">Colour is suppressed rather than assumed</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -54,8 +55,29 @@
 <h2 id="why-a-command-line-tool-has-a-palette-at-all">Why a command-line tool has a palette at all</h2>
 <p>Because the two front-ends are one program. Somebody who uses the desktop application and then runs the binary over SSH should recognise what they are looking at, and the colours carry meaning consistently in both: green for a result, amber for a caveat, red for a refusal, muted for the scope notes that qualify a claim.</p>
 <h2 id="colour-is-suppressed-rather-than-assumed">Colour is suppressed rather than assumed</h2>
-<p>Three independent conditions turn it off, and all three are checked: output that is not a terminal, <code>NO_COLOR</code> set to anything at all (the widely-honoured convention), and <code>TERM=dumb</code>. The check runs once through a [<code>std::sync::OnceLock</code>] rather than per call, because this is used inside loops that print a line per file.</p>
+<p>Three independent conditions turn it off, and all three are checked: output that is not a terminal, <code>NO_COLOR</code> set to anything at all (the widely-honoured convention), and <code>TERM=dumb</code>. The check runs once through a <code>std::sync::OnceLock</code> rather than per call, because this is used inside loops that print a line per file.</p>
 <p>Escape sequences in a log file are worse than no colour: they survive into bug reports, pasted output and issue trackers, where they are noise that obscures the message somebody was trying to show you.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>135 lines defining <strong>7 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>ok</code> <span style="color:var(--muted)">line 82</span> &mdash; A success line.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
+</li>
+<li><code>warn</code> <span style="color:var(--muted)">line 87</span> &mdash; A warning line.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
+</li>
+<li><code>err</code> <span style="color:var(--muted)">line 92</span> &mdash; An error line.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
+</li>
+<li><code>heading</code> <span style="color:var(--muted)">line 97</span> &mdash; A section heading.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
+</li>
+<li><code>field</code> <span style="color:var(--muted)">line 102</span> &mdash; A label: value line with the value highlighted.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -69,27 +91,41 @@
 <path d="M369.6 47.0 C 391.6 47.0, 391.6 47.0, 265.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M262.4 47.0 C 284.4 47.0, 284.4 47.0, 158.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M476.8 47.0 C 498.8 47.0, 498.8 47.0, 265.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L59" target="_blank" rel="noopener noreferrer">
 <rect x="74.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="114.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">enabled</text>
 <text x="114.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 59</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L73" target="_blank" rel="noopener noreferrer">
 <rect x="181.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="221.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">paint</text>
 <text x="221.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 73</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82" target="_blank" rel="noopener noreferrer">
 <rect x="288.4" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="329.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ok</text>
 <text x="329.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 82</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L87" target="_blank" rel="noopener noreferrer">
 <rect x="395.6" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="436.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">warn</text>
 <text x="436.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L92" target="_blank" rel="noopener noreferrer">
 <rect x="502.8" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="543.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">err</text>
 <text x="543.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L97" target="_blank" rel="noopener noreferrer">
 <rect x="610.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="650.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">heading</text>
 <text x="650.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 97</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L102" target="_blank" rel="noopener noreferrer">
 <rect x="717.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="761.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
 <text x="761.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 102</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -109,6 +145,13 @@ flowchart TD
     n_ok --&gt; n_paint
     n_paint --&gt; n_enabled
     n_warn --&gt; n_paint
+    click n_enabled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L59&quot; &quot;open the source&quot;
+    click n_paint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L73&quot; &quot;open the source&quot;
+    click n_ok href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82&quot; &quot;open the source&quot;
+    click n_warn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L87&quot; &quot;open the source&quot;
+    click n_err href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L92&quot; &quot;open the source&quot;
+    click n_heading href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L97&quot; &quot;open the source&quot;
+    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L102&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_ok,n_warn,n_err,n_heading,n_field entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

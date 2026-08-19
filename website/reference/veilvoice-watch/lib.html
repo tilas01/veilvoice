@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -44,6 +44,7 @@
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-belongs-in-a-voice-privacy-tool">Why this belongs in a voice-privacy tool</a>
   <a href="#what-it-can-actually-see-per-platform">What it can actually see, per platform</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -54,9 +55,40 @@
 <p>VeilVoice protects the audio you choose to send. This answers a different and more basic question: <em>is something listening that you did not choose?</em> A de-identified voice on a call is worth very little if a second program is recording the raw microphone at the same time.</p>
 <p>Operating systems have grown indicators for this &#8212; the orange dot, the taskbar icon &#8212; but they are small, easily missed, and tell you only that <em>something</em> is active, rarely what. This reports the process, its PID and how long it has held the device.</p>
 <h3 id="what-it-can-actually-see-per-platform">What it can actually see, per platform</h3>
-<p>Detection is honest about its limits, because a monitor that quietly sees nothing is worse than no monitor at all &#8212; it produces false confidence. [<code>support</code>] reports what the current platform can do before you rely on it.</p>
+<p>Detection is honest about its limits, because a monitor that quietly sees nothing is worse than no monitor at all &#8212; it produces false confidence. <code>support</code> reports what the current platform can do before you rely on it.</p>
 <p>| Platform | Microphone | Camera | How | |---|---|---|---| | Windows | &#9989; | &#9989; | The same <code>CapabilityAccessManager</code> records the OS privacy indicator uses | | Linux | &#9989; | &#9989; | <code>/proc/*/fd</code> handles open on <code>/dev/snd/pcm*</code> and <code>/dev/video*</code> | | macOS | &#10060; | &#10060; | No public API exposes it; anything claiming otherwise on macOS is guessing |</p>
 <p>On Linux you see every process you have permission to inspect. Without root that means your own; other users&#x27; processes are invisible, and that is a kernel permission boundary rather than something this crate can work around.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>401 lines defining <strong>13 functions</strong> (9 public), <strong>6 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>enum DeviceKind</code> <span style="color:var(--muted)">line 49</span> &mdash; The kind of device being used.</li>
+<li><code>struct DeviceUse</code> <span style="color:var(--muted)">line 67</span> &mdash; One application holding one device.</li>
+<li><code>struct Support</code> <span style="color:var(--muted)">line 101</span> &mdash; What detection is possible here.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 149</span> &mdash; Everything that can go wrong here.</li>
+<li><code>enum Change</code> <span style="color:var(--muted)">line 194</span> &mdash; A change between two scans.</li>
+<li><code>struct Monitor</code> <span style="color:var(--muted)">line 226</span> &mdash; Watches for changes between scans.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>DeviceUse::key</code> <span style="color:var(--muted)">line 88</span> &mdash; A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed.
+</li>
+<li><code>DeviceUse::held_for</code> <span style="color:var(--muted)">line 93</span> &mdash; How long this application has held the device.
+</li>
+<li><code>support</code> <span style="color:var(--muted)">line 115</span> &mdash; Report what this platform can detect.
+</li>
+<li><code>Change::alert</code> <span style="color:var(--muted)">line 203</span> &mdash; A one-line alert suitable for a notification or an overlay.
+</li>
+<li><code>DeviceUse::describe</code> <span style="color:var(--muted)">line 213</span> &mdash; name (pid 1234), or just the name when there is no PID.
+</li>
+<li><code>Monitor::new</code> <span style="color:var(--muted)">line 232</span> &mdash; A monitor that has not yet seen anything.
+</li>
+<li><code>Monitor::current</code> <span style="color:var(--muted)">line 237</span> &mdash; The most recent snapshot.
+</li>
+<li><code>Monitor::poll</code> <span style="color:var(--muted)">line 246</span> &mdash; Scan, and report what changed since the previous call.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>diff</code>, <code>scan</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -66,45 +98,71 @@
 <rect x="0" y="0" width="1825" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M1741.4 74.0 C 1741.4 94.0, 912.4 100.0, 912.4 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M1804.8 47.0 C 1826.8 47.0, 1826.8 47.0, 983.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L57" target="_blank" rel="noopener noreferrer">
 <rect x="761.2" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="813.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeviceKind::fmt</text>
 <text x="813.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 57</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L88" target="_blank" rel="noopener noreferrer">
 <rect x="150.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="217.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeviceUse::key</text>
 <text x="217.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 88</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L93" target="_blank" rel="noopener noreferrer">
 <rect x="310.4" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="396.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeviceUse::held_for</text>
 <text x="396.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 93</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L115" target="_blank" rel="noopener noreferrer">
 <rect x="508.8" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="553.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">support</text>
 <text x="553.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 115</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L157" target="_blank" rel="noopener noreferrer">
 <rect x="623.6" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="679.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::from</text>
 <text x="679.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 157</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L163" target="_blank" rel="noopener noreferrer">
 <rect x="761.2" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="813.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
 <text x="813.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 163</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L177" target="_blank" rel="noopener noreferrer">
 <rect x="891.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="935.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">scan</text>
 <text x="935.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 177</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L203" target="_blank" rel="noopener noreferrer">
 <rect x="1006.0" y="20.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1069.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Change::alert</text>
 <text x="1069.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 203</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L213" target="_blank" rel="noopener noreferrer">
 <rect x="1158.8" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1245.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeviceUse::describe</text>
 <text x="1245.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 213</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L232" target="_blank" rel="noopener noreferrer">
 <rect x="1357.2" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1416.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Monitor::new</text>
 <text x="1416.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 232</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L237" target="_blank" rel="noopener noreferrer">
 <rect x="1502.4" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1577.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Monitor::current</text>
 <text x="1577.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 237</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L246" target="_blank" rel="noopener noreferrer">
 <rect x="1678.0" y="20.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1741.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Monitor::poll</text>
 <text x="1741.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 246</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L251" target="_blank" rel="noopener noreferrer">
 <rect x="849.0" y="120.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="912.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Monitor::diff</text>
 <text x="912.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 251</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -126,6 +184,19 @@ flowchart TD
     n_diff[&quot;Monitor::diff&lt;br/&gt;line 251&quot;]
     n_poll --&gt; n_diff
     n_poll --&gt; n_scan
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L57&quot; &quot;open the source&quot;
+    click n_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L88&quot; &quot;open the source&quot;
+    click n_held_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L93&quot; &quot;open the source&quot;
+    click n_support href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L115&quot; &quot;open the source&quot;
+    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L157&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L163&quot; &quot;open the source&quot;
+    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L177&quot; &quot;open the source&quot;
+    click n_alert href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L203&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L213&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L232&quot; &quot;open the source&quot;
+    click n_current href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L237&quot; &quot;open the source&quot;
+    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L246&quot; &quot;open the source&quot;
+    click n_diff href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L251&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_key,n_held_for,n_support,n_alert,n_describe,n_new,n_current,n_poll entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

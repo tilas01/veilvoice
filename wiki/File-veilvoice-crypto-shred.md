@@ -74,6 +74,9 @@ flowchart TD
     n_shred_file(["shred_file<br/>line 91"])
     n_caveats["caveats<br/>line 176"]
     n_shred_file --> n_caveats
+    click n_count href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L61" "open the source"
+    click n_shred_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L91" "open the source"
+    click n_caveats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L176" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_shred_file entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

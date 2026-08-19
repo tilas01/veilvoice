@@ -75,6 +75,9 @@ flowchart TD
     n_lib(["lib.rs<br/>140 lines"])
     n_blame["blame.rs<br/>405 lines"]
     n_manifest["manifest.rs<br/>539 lines"]
+    click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs" "open the source"
+    click n_blame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" "open the source"
+    click n_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs" "open the source"
 ```
 
 ## The files

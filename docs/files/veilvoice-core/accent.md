@@ -120,6 +120,19 @@ flowchart TD
     n_shape --> n_db_to_gain
     n_shape --> n_gain_to_db
     n_shape --> n_recompute_shape
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L106" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L169" "open the source"
+    click n_enabled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L198" "open the source"
+    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L203" "open the source"
+    click n_observe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L220" "open the source"
+    click n_prosody_ratio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L239" "open the source"
+    click n_measure_envelope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L250" "open the source"
+    click n_vtln_ratio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L269" "open the source"
+    click n_shape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L289" "open the source"
+    click n_recompute_shape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L332" "open the source"
+    click n_log_centroid href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L384" "open the source"
+    click n_gain_to_db href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L403" "open the source"
+    click n_db_to_gain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L407" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_enabled,n_stats,n_observe,n_prosody_ratio,n_measure_envelope,n_vtln_ratio,n_shape entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

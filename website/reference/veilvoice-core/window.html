@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -44,6 +44,7 @@
 <nav class="toc" aria-label="Contents">
   <a href="#why-the-periodic-hann-window">Why the periodic Hann window</a>
   <a href="#why-the-gain-is-computed-rather-than-assumed">Why the gain is computed rather than assumed</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -52,12 +53,22 @@
 <p>Analysis and synthesis windowing, and the one constant that keeps overlap-add honest.</p>
 <p>Two functions, both small, both easy to get subtly wrong in ways that do not look wrong.</p>
 <h2 id="why-the-periodic-hann-window">Why the <em>periodic</em> Hann window</h2>
-<p>There are two Hann windows and they differ by one sample. The <strong>symmetric</strong> variant (<code>cos(2*pi*i / (n-1))</code>) is the right one for designing filters, and it is what most textbook snippets show. The <strong>periodic</strong> variant (<code>cos(2*pi*i / n)</code>, which is what [<code>hann</code>] returns) is the right one for an STFT, because it is the one that tiles: shifted copies of it sum to a constant, and the symmetric one does not quite.</p>
+<p>There are two Hann windows and they differ by one sample. The <strong>symmetric</strong> variant (<code>cos(2*pi*i / (n-1))</code>) is the right one for designing filters, and it is what most textbook snippets show. The <strong>periodic</strong> variant (<code>cos(2*pi*i / n)</code>, which is what <code>hann</code> returns) is the right one for an STFT, because it is the one that tiles: shifted copies of it sum to a constant, and the symmetric one does not quite.</p>
 <p>Using the wrong one does not produce an obvious failure. It produces a faint periodic amplitude ripple at the hop rate -- a quiet buzz that sounds like a codec artefact rather than like a bug, and that nothing in a test suite notices unless the test is looking for exactly it.</p>
 <h2 id="why-the-gain-is-computed-rather-than-assumed">Why the gain is computed rather than assumed</h2>
 <p>VeilVoice windows <strong>twice</strong>: once on analysis and once on synthesis. That is deliberate -- a synthesis window suppresses the discontinuities that modifying a spectrum introduces at frame edges, and this crate modifies every spectrum it touches. The cost is that the reconstruction gain is no longer the familiar Constant-Overlap-Add value, it is <code>sum(w^2) / hop</code>.</p>
-<p>[<code>ola_gain</code>] returns the reciprocal of that, so a caller multiplies rather than divides -- one multiply per sample in a hot loop instead of one divide. It is derived from the window actually in use rather than hardcoded for a particular size and overlap, so changing either cannot silently change the output level.</p>
+<p><code>ola_gain</code> returns the reciprocal of that, so a caller multiplies rather than divides -- one multiply per sample in a hot loop instead of one divide. It is derived from the window actually in use rather than hardcoded for a particular size and overlap, so changing either cannot silently change the output level.</p>
 <p>The zero-length and single-sample cases are handled explicitly, and the degenerate <code>sum(w^2) == 0</code> returns unity rather than infinity: this is a gain that gets multiplied into every output sample, and one non-finite value entering an engine with persistent state is permanent.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>91 lines defining <strong>2 functions</strong> (2 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>hann</code> <span style="color:var(--muted)">line 47</span> &mdash; Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design).
+</li>
+<li><code>ola_gain</code> <span style="color:var(--muted)">line 63</span> &mdash; Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop.
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -65,12 +76,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L47" target="_blank" rel="noopener noreferrer">
 <rect x="342.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="382.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hann</text>
 <text x="382.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 47</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L63" target="_blank" rel="noopener noreferrer">
 <rect x="449.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="493.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ola_gain</text>
 <text x="493.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 63</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -79,6 +94,8 @@
 flowchart TD
     n_hann([&quot;hann&lt;br/&gt;line 47&quot;])
     n_ola_gain([&quot;ola_gain&lt;br/&gt;line 63&quot;])
+    click n_hann href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L47&quot; &quot;open the source&quot;
+    click n_ola_gain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L63&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_hann,n_ola_gain entry</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
