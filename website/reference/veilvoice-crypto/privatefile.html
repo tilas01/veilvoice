@@ -50,7 +50,7 @@
 <div>
 <section id="s-about">
 <p>Writing a file that only its owner can read.</p>
-<p>Returns [<code>std::io::Result</code>] rather than this crate&#x27;s <a href="crate::Error"><code>Error</code></a>, which is <code>Copy</code> and therefore cannot carry the underlying reason. A caller reporting &quot;could not write the key&quot; is far more useful when it can say why.</p>
+<p>Returns [<code>std::io::Result</code>] rather than this crate&#x27;s <code>Error</code>, which is <code>Copy</code> and therefore cannot carry the underlying reason. A caller reporting &quot;could not write the key&quot; is far more useful when it can say why.</p>
 <h2 id="why-this-is-not-stdfswrite-plus-a-chmod">Why this is not <code>std::fs::write</code> plus a <code>chmod</code></h2>
 <p><code>std::fs::write</code> creates the file with the process umask, which on almost every Unix system means <code>0644</code> -- world readable. Tightening it afterwards with <code>set_permissions</code> leaves a window, however short, in which any other local user can open the file and read all of it. For a file that exists <em>because</em> its contents are sensitive, that window has no reason to exist: <code>OpenOptions::mode</code> applies the permission at the moment of creation, before any byte is written.</p>
 <p>The audit found this pattern in three places -- the app-lock verifier, the encrypted private key written by <code>veilvoice keygen</code>, and the plaintext a recording is decrypted into. The verifier one was the worst, because it is rewritten after <em>every</em> failed unlock attempt, so the window reopened on each try. This module is the single answer to all of them.</p>

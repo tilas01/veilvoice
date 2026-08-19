@@ -316,6 +316,41 @@ function run() {
     pass("with motion reduced, the cycle stops and the first fact stays");
   }
 
+  // --- 9. the fact strip states numbers, and numbers go stale ------------
+  //
+  // It said "336 tests" and "47 defects across four audit rounds" while the
+  // tree had 354 and 59. Both were true when written. Everything else in this
+  // repository that makes a claim is generated and checked; this was the one
+  // place claims were hand-typed with nothing watching them.
+  //
+  // `docs/AUDIT.md` is the authority: it is the document that has to be
+  // correct for any of the rest to mean anything.
+  const audit = fs.readFileSync(path.join(ROOT, "docs", "AUDIT.md"), "utf8");
+
+  const auditTests = /(\d+) tests across \d+ crates/.exec(audit);
+  const pageTests = /(\d+) tests, and ten more suites/.exec(indexHtml);
+  if (!auditTests || !pageTests) {
+    fail("the test-count claim could not be found in the audit or on the page");
+  } else if (auditTests[1] !== pageTests[1]) {
+    fail(`the front page says ${pageTests[1]} tests, docs/AUDIT.md says ${auditTests[1]}`);
+  } else {
+    pass(`the front page's test count (${pageTests[1]}) matches the audit`);
+  }
+
+  // Anchored on the verdict line rather than on "F-1 to F-": section 2.1's
+  // heading is also "(F-1 to F-8)", and matching that would compare the page
+  // against the count from three rounds ago.
+  const auditFindings = /audit rounds \(F-1 to F-(\d+)\)/.exec(audit);
+  const pageFindings = /(\d+) defects found and fixed across (\w+) audit rounds/.exec(indexHtml);
+  if (!auditFindings || !pageFindings) {
+    fail("the defect-count claim could not be found in the audit or on the page");
+  } else if (auditFindings[1] !== pageFindings[1]) {
+    fail(`the front page claims ${pageFindings[1]} defects, ` +
+         `docs/AUDIT.md's findings run to F-${auditFindings[1]}`);
+  } else {
+    pass(`the front page's defect count (${pageFindings[1]}) matches the audit`);
+  }
+
   return failures;
 }
 
