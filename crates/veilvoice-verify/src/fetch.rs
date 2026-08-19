@@ -105,7 +105,7 @@ fn find_downloader() -> Option<Downloader> {
                 style: Style::Curl,
             });
         }
-        return None;
+        None
     }
     #[cfg(not(windows))]
     {

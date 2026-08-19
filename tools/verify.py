@@ -39,10 +39,23 @@ def repo_root():
 
 
 def run(root, label, command, capture=True):
-    """Run one step. Returns (ok, output)."""
+    """Run one step. Returns (ok, output).
+
+    Cargo steps are run with `RUSTFLAGS=-D warnings`, because that is what CI
+    sets and a local check that does not match CI is worse than no local check:
+    it passes, and then the push fails ten minutes later for something that was
+    on screen the whole time. Three CI failures in one session came through
+    exactly that gap -- an unused `mut`, a `needless_return`, a dead enum
+    variant -- each a warning locally and an error there.
+    """
+    environment = dict(os.environ)
+    if command and str(command[0]).startswith("cargo"):
+        existing = environment.get("RUSTFLAGS", "")
+        if "-D warnings" not in existing:
+            environment["RUSTFLAGS"] = (existing + " -D warnings").strip()
     try:
         result = subprocess.run(
-            command, cwd=root, shell=isinstance(command, str),
+            command, cwd=root, shell=isinstance(command, str), env=environment,
             stdout=subprocess.PIPE if capture else None,
             stderr=subprocess.STDOUT if capture else None,
         )
