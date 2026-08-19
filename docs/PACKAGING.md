@@ -151,10 +151,9 @@ with the lock file.
 
 ## Platform coverage
 
-Ten targets are built and published today. OpenBSD failed for two releases
-because of a declared toolchain floor that turned out to be wrong; that is
-fixed, and the next release is the first test of it -- so it is described below
-as expected to work rather than as working, until one has actually shipped.
+Eleven targets are built and published today, OpenBSD among them. It had failed
+for two releases because of a declared toolchain floor that turned out to be
+wrong; v0.1.11 is the first release to carry an OpenBSD archive.
 
 | Platform | Built | Reproducibility checked |
 |---|---|---|
@@ -165,7 +164,7 @@ as expected to work rather than as working, until one has actually shipped.
 | Linux arm64 (gnu, musl) | yes | yes |
 | Linux armv7 (Raspberry Pi) | yes | yes |
 | FreeBSD x86_64 | yes | **no** — built once in a VM |
-| OpenBSD x86_64 | attempted — see below | n/a |
+| OpenBSD x86_64 | yes, since v0.1.11 | not-verified (built once, in a VM) |
 | NetBSD x86_64 | yes | **no** — built once in a VM |
 
 Windows 10 and 11 share one executable. They are not split, and will not be
