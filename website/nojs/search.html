@@ -42,13 +42,13 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice &mdash; 155 files, 6155 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice &mdash; 156 files, 6198 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
 <ul class="toc">
 <li><a href="#k-doc">Documentation</a> <span class="meta">12 files</span></li>
-<li><a href="#k-rust">Rust source</a> <span class="meta">55 files</span></li>
+<li><a href="#k-rust">Rust source</a> <span class="meta">56 files</span></li>
 <li><a href="#k-test">Tests and fuzzing</a> <span class="meta">10 files</span></li>
 <li><a href="#k-web">Website</a> <span class="meta">15 files</span></li>
 <li><a href="#k-tool">Tools and generators</a> <span class="meta">19 files</span></li>
@@ -1088,7 +1088,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">packaging/</span> <span class="meta">line 3</span><br><span class="x">permission. | | `homebrew/` | A formula, not a cask: it builds from source. | | `gentoo/` | A live ebuild that builds from this repository. | | `veilvoice.desktop` | Shared desktop entry for the Linux packages. |</span></li>
 </ul>
 </details>
-<h2 id="k-rust">Rust source <span class="meta">(55)</span></h2>
+<h2 id="k-rust">Rust source <span class="meta">(56)</span></h2>
 <details open>
 <summary><code>crates/veilvoice-audio/src/devices.rs</code> <span class="meta">&mdash; veilvoice-audio, 229 lines, 25 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs">open devices.rs</a></p>
@@ -1284,6 +1284,54 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
+<summary><code>crates/veilvoice-cli/src/install.rs</code> <span class="meta">&mdash; veilvoice-cli, 514 lines, 42 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs">open install.rs</a></p>
+<ul>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice install` -- put this program somewhere the system can find it. # Portable is the default, and installing is the exception VeilVoice runs from wherever it is unpacked. Nothing has to be installed, nothing is written outside the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">folder unless the user does something that writes outside the folder, and deleting the folder removes it. That is the posture this project has always had and it is not being given up. This exists because &quot;runs from anywhere&quot; and &quot;I would</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">like to type `veilvoice` in a terminal&quot; are both reasonable, and the second needs three things a portable folder cannot provide: a stable location, an entry on `PATH`, and a way for the operating system to list and remove it. # No</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">administrator, and nothing outside the user&#x27;s own account Everything here is per-user: `%LOCALAPPDATA%` on Windows, `~/.local` on everything else, and on Windows the `HKCU` registry rather than `HKLM`. No elevation is requested, nothing is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">written to a system directory, and no service is created. That is a deliberate limit rather than an oversight. A per-user install can be undone by the user who made it, needs no privilege to audit, and cannot break anybody else&#x27;s account.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">A machine-wide install would need administrator rights, and the reason to ask for those has to be better than &quot;so the program is on everyone&#x27;s PATH&quot;. # Every change is reversible, and `uninstall` reverses exactly these | What | Where |</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Undone by | |---|---|---| | The binaries | `&lt;prefix&gt;/VeilVoice` | removing that directory | | `PATH` entry | `HKCU\Environment`, or a shell profile line | removing just that entry | | Uninstall entry | `HKCU\...\Uninstall\VeilVoice` |</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">deleting that key | The `PATH` edit is the one that can damage something, so it is the one handled most carefully: the existing value is read, the entry is appended only if absent, and removal takes out that entry and nothing else. A tool</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that overwrites `PATH` wholesale has broken a machine, and doing it during an *uninstall* is worse -- that is the moment somebody is least inclined to check. # Why the registry through `reg.exe` The same reason `veilvoice-watch` reads it</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that way: this workspace carries `#![forbid(unsafe_code)]` in every crate, and the Win32 registry API needs `unsafe` FFI. Shelling out to a system tool keeps that guarantee and costs a subprocess on an operation that runs once. `reg.exe`</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">is resolved by absolute path -- resolving it by name would search the working directory first, which is finding F-13.</span></li>
+<li><span class="sec">const NAME</span> <span class="meta">line 57</span><br><span class="x">The name of the directory and the uninstall entry.</span></li>
+<li><span class="sec">const PROGRAMS</span> <span class="meta">line 60</span><br><span class="x">Files that make up an installation, if they are beside the running binary.</span></li>
+<li><span class="sec">fn no_window</span> <span class="meta">line 69</span><br><span class="x">Spawn without a console window. Same reasoning as the copies in `veilvoice-watch` and `veilvoice-guard`: on Windows a `Command` for a console program creates one, and if this is ever called from the desktop application a window would</span></li>
+<li><span class="sec">fn no_window</span> <span class="meta">line 69</span><br><span class="x">flash. `creation_flags` is safe, so this costs nothing against `#![forbid(unsafe_code)]`.</span></li>
+<li><span class="sec">const CREATE_NO_WINDOW</span> <span class="meta">line 73</span><br><span class="x"></span></li>
+<li><span class="sec">fn reg_exe</span> <span class="meta">line 86</span><br><span class="x">`reg.exe`, by absolute path. Never by bare name: Windows searches the current directory before most of `PATH`, so running this from a folder containing `reg.exe` would run that instead. This is the program that edits `PATH`, so it is a</span></li>
+<li><span class="sec">fn reg_exe</span> <span class="meta">line 86</span><br><span class="x">poor place to be relaxed about which binary is doing it.</span></li>
+<li><span class="sec">fn prefix</span> <span class="meta">line 92</span><br><span class="x">Where an installation goes, for this user only.</span></li>
+<li><span class="sec">fn bin_dir</span> <span class="meta">line 109</span><br><span class="x">The directory a `PATH` entry should point at.</span></li>
+<li><span class="sec">struct Status</span> <span class="meta">line 121</span><br><span class="x">What an installation currently looks like.</span></li>
+<li><span class="sec">fn status</span> <span class="meta">line 133</span><br><span class="x">Read the current state without changing anything.</span></li>
+<li><span class="sec">fn exe_name</span> <span class="meta">line 153</span><br><span class="x"></span></li>
+<li><span class="sec">fn path_contains</span> <span class="meta">line 167</span><br><span class="x">Is `dir` already on this user&#x27;s `PATH`? Reads the *current process* environment, which is what &quot;will typing `veilvoice` work in this terminal&quot; actually depends on. A registry value that a new terminal would pick up is a different question,</span></li>
+<li><span class="sec">fn path_contains</span> <span class="meta">line 167</span><br><span class="x">and the report says which one it answered.</span></li>
+<li><span class="sec">fn copy_programs</span> <span class="meta">line 175</span><br><span class="x">Copy the binaries into place. Returns what was copied.</span></li>
+<li><span class="sec">fn add_to_path</span> <span class="meta">line 217</span><br><span class="x">Add `dir` to the user&#x27;s `PATH`, if it is not there already. Reads the existing value and appends. Never writes a `PATH` it did not first read: replacing that variable wholesale is how a tool breaks a machine, and there is no undo.</span></li>
+<li><span class="sec">fn read_user_path</span> <span class="meta">line 255</span><br><span class="x"></span></li>
+<li><span class="sec">fn add_to_path</span> <span class="meta">line 289</span><br><span class="x"></span></li>
+<li><span class="sec">fn register_uninstall</span> <span class="meta">line 299</span><br><span class="x">Register with Add/Remove Programs, so the system can list and remove it.</span></li>
+<li><span class="sec">fn register_uninstall</span> <span class="meta">line 338</span><br><span class="x"></span></li>
+<li><span class="sec">fn remove_from_path</span> <span class="meta">line 343</span><br><span class="x"></span></li>
+<li><span class="sec">fn remove_from_path</span> <span class="meta">line 384</span><br><span class="x"></span></li>
+<li><span class="sec">fn unregister_uninstall</span> <span class="meta">line 389</span><br><span class="x"></span></li>
+<li><span class="sec">fn unregister_uninstall</span> <span class="meta">line 398</span><br><span class="x"></span></li>
+<li><span class="sec">fn install</span> <span class="meta">line 403</span><br><span class="x">Install for this user. Returns the lines to report.</span></li>
+<li><span class="sec">fn uninstall</span> <span class="meta">line 430</span><br><span class="x">Remove what `install` added.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 470</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_prefix_is_found_on_this_platform</span> <span class="meta">line 474</span><br><span class="x"></span></li>
+<li><span class="sec">fn status_reads_without_changing_anything</span> <span class="meta">line 482</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_executable_name_matches_the_platform</span> <span class="meta">line 493</span><br><span class="x"></span></li>
+<li><span class="sec">fn path_membership_is_an_exact_directory_match</span> <span class="meta">line 503</span><br><span class="x"></span></li>
+</ul>
+</details>
+<details open>
 <summary><code>crates/veilvoice-cli/src/lock.rs</code> <span class="meta">&mdash; veilvoice-cli, 240 lines, 18 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs">open lock.rs</a></p>
 <ul>
@@ -1308,7 +1356,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/main.rs</code> <span class="meta">&mdash; veilvoice-cli, 1078 lines, 47 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/main.rs</code> <span class="meta">&mdash; veilvoice-cli, 1202 lines, 48 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs">open main.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice` &#8212; the command-line interface. Everything VeilVoice does, available without a desktop: it runs over SSH, in a container, and on machines that have no GUI toolkit at all. The same engine backs both this and the graphical app. #</span></li>
@@ -1322,42 +1370,43 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">So `veilvoice lock --path X status` parses and `veilvoice lock status --path X` does not, except that `--path` is now global specifically so both do.</span></li>
 <li><span class="sec">mod atrest</span> <span class="meta">line 49</span><br><span class="x"></span></li>
 <li><span class="sec">mod guard</span> <span class="meta">line 50</span><br><span class="x"></span></li>
-<li><span class="sec">mod lock</span> <span class="meta">line 51</span><br><span class="x"></span></li>
-<li><span class="sec">mod theme</span> <span class="meta">line 52</span><br><span class="x"></span></li>
-<li><span class="sec">struct Cli</span> <span class="meta">line 75</span><br><span class="x"></span></li>
-<li><span class="sec">enum Command</span> <span class="meta">line 81</span><br><span class="x"></span></li>
-<li><span class="sec">enum CleanPolicy</span> <span class="meta">line 219</span><br><span class="x"></span></li>
-<li><span class="sec">impl From&lt;CleanPolicy&gt; for Policy</span> <span class="meta">line 226</span><br><span class="x"></span></li>
-<li><span class="sec">fn from</span> <span class="meta">line 227</span><br><span class="x"></span></li>
-<li><span class="sec">fn main</span> <span class="meta">line 235</span><br><span class="x"></span></li>
-<li><span class="sec">fn run</span> <span class="meta">line 246</span><br><span class="x"></span></li>
-<li><span class="sec">struct Tuning</span> <span class="meta">line 308</span><br><span class="x">The engine settings a user can reach from the command line.</span></li>
-<li><span class="sec">fn config</span> <span class="meta">line 314</span><br><span class="x"></span></li>
-<li><span class="sec">fn describe_reseed</span> <span class="meta">line 327</span><br><span class="x">How the seed-rolling setting reads in the output.</span></li>
-<li><span class="sec">struct AtRest</span> <span class="meta">line 336</span><br><span class="x">What to do with the result once it exists.</span></li>
-<li><span class="sec">fn anonymise</span> <span class="meta">line 345</span><br><span class="x"></span></li>
-<li><span class="sec">fn live</span> <span class="meta">line 484</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter</span> <span class="meta">line 570</span><br><span class="x">A small textual level meter.</span></li>
-<li><span class="sec">const WIDTH</span> <span class="meta">line 571</span><br><span class="x"></span></li>
-<li><span class="sec">fn list_devices</span> <span class="meta">line 585</span><br><span class="x"></span></li>
-<li><span class="sec">fn clean</span> <span class="meta">line 617</span><br><span class="x"></span></li>
-<li><span class="sec">fn encrypt</span> <span class="meta">line 634</span><br><span class="x"></span></li>
-<li><span class="sec">fn decrypt</span> <span class="meta">line 663</span><br><span class="x"></span></li>
-<li><span class="sec">fn load_secret_key</span> <span class="meta">line 695</span><br><span class="x">Load a private key file, which is itself a password-locked container.</span></li>
-<li><span class="sec">fn keygen</span> <span class="meta">line 703</span><br><span class="x"></span></li>
-<li><span class="sec">fn watch</span> <span class="meta">line 779</span><br><span class="x">Report, and keep reporting, what is using the microphone and camera.</span></li>
-<li><span class="sec">fn shred</span> <span class="meta">line 869</span><br><span class="x">Destroy a file&#x27;s contents, then delete it. Gated behind a typed confirmation rather than a y/n prompt. There is no undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></li>
-<li><span class="sec">fn info</span> <span class="meta">line 937</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 980</span><br><span class="x"></span></li>
-<li><span class="sec">fn cli_definition_is_valid</span> <span class="meta">line 985</span><br><span class="x"></span></li>
-<li><span class="sec">fn tuning</span> <span class="meta">line 989</span><br><span class="x"></span></li>
-<li><span class="sec">fn intensity_is_clamped_into_range</span> <span class="meta">line 998</span><br><span class="x"></span></li>
-<li><span class="sec">fn keep_accent_disables_neutralisation</span> <span class="meta">line 1005</span><br><span class="x"></span></li>
-<li><span class="sec">fn reseed_interval_reaches_the_engine_and_cannot_go_negative</span> <span class="meta">line 1011</span><br><span class="x"></span></li>
-<li><span class="sec">fn recordings_are_encrypted_at_rest_by_default</span> <span class="meta">line 1020</span><br><span class="x">Encryption at rest is a *default*, not a flag the careful user has to find. If someone ever flips this, this test is what stops it shipping.</span></li>
-<li><span class="sec">fn asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span> <span class="meta">line 1046</span><br><span class="x">Refused before anything is read or written, so a contradictory command line cannot half-happen.</span></li>
-<li><span class="sec">fn reseed_setting_reads_clearly</span> <span class="meta">line 1062</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter_scales_and_never_panics</span> <span class="meta">line 1069</span><br><span class="x"></span></li>
+<li><span class="sec">mod install</span> <span class="meta">line 51</span><br><span class="x"></span></li>
+<li><span class="sec">mod lock</span> <span class="meta">line 52</span><br><span class="x"></span></li>
+<li><span class="sec">mod theme</span> <span class="meta">line 53</span><br><span class="x"></span></li>
+<li><span class="sec">struct Cli</span> <span class="meta">line 76</span><br><span class="x"></span></li>
+<li><span class="sec">enum Command</span> <span class="meta">line 82</span><br><span class="x"></span></li>
+<li><span class="sec">enum CleanPolicy</span> <span class="meta">line 240</span><br><span class="x"></span></li>
+<li><span class="sec">impl From&lt;CleanPolicy&gt; for Policy</span> <span class="meta">line 247</span><br><span class="x"></span></li>
+<li><span class="sec">fn from</span> <span class="meta">line 248</span><br><span class="x"></span></li>
+<li><span class="sec">fn main</span> <span class="meta">line 256</span><br><span class="x"></span></li>
+<li><span class="sec">fn run</span> <span class="meta">line 267</span><br><span class="x"></span></li>
+<li><span class="sec">struct Tuning</span> <span class="meta">line 432</span><br><span class="x">The engine settings a user can reach from the command line.</span></li>
+<li><span class="sec">fn config</span> <span class="meta">line 438</span><br><span class="x"></span></li>
+<li><span class="sec">fn describe_reseed</span> <span class="meta">line 451</span><br><span class="x">How the seed-rolling setting reads in the output.</span></li>
+<li><span class="sec">struct AtRest</span> <span class="meta">line 460</span><br><span class="x">What to do with the result once it exists.</span></li>
+<li><span class="sec">fn anonymise</span> <span class="meta">line 469</span><br><span class="x"></span></li>
+<li><span class="sec">fn live</span> <span class="meta">line 608</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter</span> <span class="meta">line 694</span><br><span class="x">A small textual level meter.</span></li>
+<li><span class="sec">const WIDTH</span> <span class="meta">line 695</span><br><span class="x"></span></li>
+<li><span class="sec">fn list_devices</span> <span class="meta">line 709</span><br><span class="x"></span></li>
+<li><span class="sec">fn clean</span> <span class="meta">line 741</span><br><span class="x"></span></li>
+<li><span class="sec">fn encrypt</span> <span class="meta">line 758</span><br><span class="x"></span></li>
+<li><span class="sec">fn decrypt</span> <span class="meta">line 787</span><br><span class="x"></span></li>
+<li><span class="sec">fn load_secret_key</span> <span class="meta">line 819</span><br><span class="x">Load a private key file, which is itself a password-locked container.</span></li>
+<li><span class="sec">fn keygen</span> <span class="meta">line 827</span><br><span class="x"></span></li>
+<li><span class="sec">fn watch</span> <span class="meta">line 903</span><br><span class="x">Report, and keep reporting, what is using the microphone and camera.</span></li>
+<li><span class="sec">fn shred</span> <span class="meta">line 993</span><br><span class="x">Destroy a file&#x27;s contents, then delete it. Gated behind a typed confirmation rather than a y/n prompt. There is no undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></li>
+<li><span class="sec">fn info</span> <span class="meta">line 1061</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 1104</span><br><span class="x"></span></li>
+<li><span class="sec">fn cli_definition_is_valid</span> <span class="meta">line 1109</span><br><span class="x"></span></li>
+<li><span class="sec">fn tuning</span> <span class="meta">line 1113</span><br><span class="x"></span></li>
+<li><span class="sec">fn intensity_is_clamped_into_range</span> <span class="meta">line 1122</span><br><span class="x"></span></li>
+<li><span class="sec">fn keep_accent_disables_neutralisation</span> <span class="meta">line 1129</span><br><span class="x"></span></li>
+<li><span class="sec">fn reseed_interval_reaches_the_engine_and_cannot_go_negative</span> <span class="meta">line 1135</span><br><span class="x"></span></li>
+<li><span class="sec">fn recordings_are_encrypted_at_rest_by_default</span> <span class="meta">line 1144</span><br><span class="x">Encryption at rest is a *default*, not a flag the careful user has to find. If someone ever flips this, this test is what stops it shipping.</span></li>
+<li><span class="sec">fn asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span> <span class="meta">line 1170</span><br><span class="x">Refused before anything is read or written, so a contradictory command line cannot half-happen.</span></li>
+<li><span class="sec">fn reseed_setting_reads_clearly</span> <span class="meta">line 1186</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter_scales_and_never_panics</span> <span class="meta">line 1193</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>

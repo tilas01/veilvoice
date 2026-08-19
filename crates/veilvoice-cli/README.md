@@ -80,9 +80,10 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1077 lines"])
+    n_main(["main.rs<br/>1201 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
     n_guard["guard.rs<br/>338 lines"]
+    n_install["install.rs<br/>513 lines"]
     n_lock["lock.rs<br/>239 lines"]
     n_theme["theme.rs<br/>135 lines"]
     n_atrest --> n_theme
@@ -99,8 +100,9 @@ flowchart TD
 |---|---:|---|
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
+| [`install.rs`](../../docs/files/veilvoice-cli/install.md) | 513 | veilvoice install -- put this program somewhere the system can find it. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1077 | veilvoice — the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1201 | veilvoice — the command-line interface. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 135 | Tokyo Night colouring for the terminal. |
 
 ## Public items
@@ -115,6 +117,13 @@ flowchart TD
 | `fn read_new_password` | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | Read a password twice, without echoing it, and check the two agree. |
 | `enum Action` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
 | `fn run` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
+| `const NAME` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | The name of the directory and the uninstall entry. |
+| `fn prefix` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | Where an installation goes, for this user only. |
+| `fn bin_dir` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | The directory a PATH entry should point at. |
+| `struct Status` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | What an installation currently looks like. |
+| `fn status` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | Read the current state without changing anything. |
+| `fn install` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | Install for this user. |
+| `fn uninstall` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | Remove what install added. |
 | `enum Action` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
 | `fn wrap` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | Greedy word wrap. |
 | `fn run` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
