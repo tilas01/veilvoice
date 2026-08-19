@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-watch/windows.svg" alt="windows.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-watch/src/windows.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 412 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 416 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#where-the-answer-lives">Where the answer lives</a>
@@ -128,19 +128,19 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>no_window</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L45" rel="noopener noreferrer">45</a></td><td>Spawn without a console window.</td></tr>
-<tr><td><code>CONSENT_STORE</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L58" rel="noopener noreferrer">58</a></td><td>The full hive name, not the HKCU abbreviation: reg query echoes subkey paths back in long form, and the reply has to be matched against what was asked for.</td></tr>
-<tr><td><code>FILETIME_TO_UNIX_SECS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L62" rel="noopener noreferrer">62</a></td><td>FILETIME counts 100-nanosecond intervals from 1601-01-01; Unix time starts at 1970-01-01.</td></tr>
-<tr><td><code>BACKSLASH</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L65" rel="noopener noreferrer">65</a></td><td>The registry path separator, as a byte.</td></tr>
-<tr><td><code>reg_exe</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L80" rel="noopener noreferrer">80</a></td><td>The absolute path of reg.exe, or None if it is not where it should be.</td></tr>
-<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L96" rel="noopener noreferrer">96</a></td><td></td></tr>
-<tr><td><code>collect</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L109" rel="noopener noreferrer">109</a></td><td>Walk one capability&#x27;s subkeys, two levels deep to catch NonPackaged.</td></tr>
-<tr><td><code>subkeys</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L128" rel="noopener noreferrer">128</a></td><td>Immediate subkey paths of key, or nothing if it does not exist.</td></tr>
-<tr><td><code>read_entry</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L155" rel="noopener noreferrer">155</a></td><td>Read one application&#x27;s entry, returning it only if the device is in use now.</td></tr>
-<tr><td><code>read_u64</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L179" rel="noopener noreferrer">179</a></td><td></td></tr>
-<tr><td><code>decode_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L194" rel="noopener noreferrer">194</a></td><td>Registry keys encode a path with # where a separator belongs.</td></tr>
-<tr><td><code>friendly_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L199" rel="noopener noreferrer">199</a></td><td>The executable name, or the package family name for a Store app.</td></tr>
-<tr><td><code>filetime_to_system</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L209" rel="noopener noreferrer">209</a></td><td></td></tr>
+<tr><td><code>no_window</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L49" rel="noopener noreferrer">49</a></td><td>Spawn without a console window.</td></tr>
+<tr><td><code>CONSENT_STORE</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L62" rel="noopener noreferrer">62</a></td><td>The full hive name, not the HKCU abbreviation: reg query echoes subkey paths back in long form, and the reply has to be matched against what was asked for.</td></tr>
+<tr><td><code>FILETIME_TO_UNIX_SECS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L66" rel="noopener noreferrer">66</a></td><td>FILETIME counts 100-nanosecond intervals from 1601-01-01; Unix time starts at 1970-01-01.</td></tr>
+<tr><td><code>BACKSLASH</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L69" rel="noopener noreferrer">69</a></td><td>The registry path separator, as a byte.</td></tr>
+<tr><td><code>reg_exe</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L84" rel="noopener noreferrer">84</a></td><td>The absolute path of reg.exe, or None if it is not where it should be.</td></tr>
+<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L100" rel="noopener noreferrer">100</a></td><td></td></tr>
+<tr><td><code>collect</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L113" rel="noopener noreferrer">113</a></td><td>Walk one capability&#x27;s subkeys, two levels deep to catch NonPackaged.</td></tr>
+<tr><td><code>subkeys</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L132" rel="noopener noreferrer">132</a></td><td>Immediate subkey paths of key, or nothing if it does not exist.</td></tr>
+<tr><td><code>read_entry</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L159" rel="noopener noreferrer">159</a></td><td>Read one application&#x27;s entry, returning it only if the device is in use now.</td></tr>
+<tr><td><code>read_u64</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L183" rel="noopener noreferrer">183</a></td><td></td></tr>
+<tr><td><code>decode_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L198" rel="noopener noreferrer">198</a></td><td>Registry keys encode a path with # where a separator belongs.</td></tr>
+<tr><td><code>friendly_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L203" rel="noopener noreferrer">203</a></td><td>The executable name, or the package family name for a Store app.</td></tr>
+<tr><td><code>filetime_to_system</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L213" rel="noopener noreferrer">213</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

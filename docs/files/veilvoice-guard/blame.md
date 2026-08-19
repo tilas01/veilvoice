@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-guard/src/blame.rs`
 
-[`veilvoice-guard`](../../../crates/veilvoice-guard/README.md) &middot; 401 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs)
+[`veilvoice-guard`](../../../crates/veilvoice-guard/README.md) &middot; 405 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs)
 
 ## Contents
 
@@ -74,15 +74,15 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `no_window` <sub>fn</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L48) | Spawn without a console window. |
-| `system_tool` <sub>fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L75) | Resolve a system tool to an absolute path, rather than letting the operating system search for it. |
-| `Blame` <sub>pub enum</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L90) | What, if anything, is known about who changed a file. |
-| `Blame::describe` <sub>pub fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L111) | A single line for a terminal, an alert or a log. |
-| `Blame::is_known` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L122) | Whether an actual name was found. |
-| `unconfigured` <sub>fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L128) | Build the "nobody configured auditing" answer for this platform. |
-| `who_touched` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L147) | Try to name the program that last wrote to path. |
-| `linux` <sub>mod</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L164) |  |
-| `windows` <sub>mod</sub> | [242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L242) |  |
+| `no_window` <sub>fn</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L52) | Spawn without a console window. |
+| `system_tool` <sub>fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L79) | Resolve a system tool to an absolute path, rather than letting the operating system search for it. |
+| `Blame` <sub>pub enum</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L94) | What, if anything, is known about who changed a file. |
+| `Blame::describe` <sub>pub fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L115) | A single line for a terminal, an alert or a log. |
+| `Blame::is_known` <sub>pub fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L126) | Whether an actual name was found. |
+| `unconfigured` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L132) | Build the "nobody configured auditing" answer for this platform. |
+| `who_touched` <sub>pub fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L151) | Try to name the program that last wrote to path. |
+| `linux` <sub>mod</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L168) |  |
+| `windows` <sub>mod</sub> | [246](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L246) |  |
 
 ---
 
