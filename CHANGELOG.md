@@ -6,6 +6,60 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## v0.1.11
+
+**If you have v0.1.10 on Windows, replace it.** The desktop application flashed
+a console window and could fail with no message at all.
+
+### The Windows desktop application
+
+Three separate defects were behind one report — "it flashes a command prompt,
+loads in an unusable state, and crashes".
+
+**The flashing console was never the application's own window.** `veilvoice-gui`
+has no console. Every *subprocess* it starts has one, and on Windows that means
+a window appears and vanishes as the child runs: once at startup, when the
+application asks the system whether animation is wanted, and again on every
+poll while the monitor tab is open. Every subprocess in the project now starts
+with `CREATE_NO_WINDOW`, and a test in each crate fails if one is added without
+it.
+
+**A failure used to produce nothing at all.** No console, and the release build
+aborts rather than unwinds, so a crash left no message, no dialog and no log —
+nothing to report but "it crashed". VeilVoice now writes a short report beside
+your preferences and tells you about it next time it starts. **It is written on
+your machine and sent nowhere**; there is no network code in this program to
+send it with.
+
+If the window never appears at all, the most likely cause is that the computer
+could not provide an OpenGL context — common in a virtual machine, over a
+remote desktop session, or with hybrid graphics. The report says so, and points
+at `veilvoice`, the command-line tool, which does the same work and needs no
+graphics.
+
+### Icons
+
+Every executable now carries its icon, on every platform.
+
+- **Windows:** embedded in the binary, at all six sizes. It was previously
+  shipped as a loose `.ico` beside the program — a file Windows never reads —
+  so Explorer, the taskbar and any pinned shortcut showed the generic
+  executable glyph. A release check reads the built binary and fails if the
+  icon is missing.
+- **macOS:** an `icon.icns` with six sizes.
+- **Linux, FreeBSD, NetBSD, OpenBSD:** a `.desktop` launcher entry and hicolor
+  theme icons at six sizes, which is how those desktops find an application's
+  icon. There were none before.
+
+All of it comes from `assets/generate.py`, from the same pixels as everything
+else, and `--check` verifies it.
+
+### Licence
+
+**VeilVoice is GPL-3.0-or-later.** v0.1.10 was briefly published under a
+different licence; that is reverted, and this and every future release are
+GPL-3.0-or-later, as every release before v0.1.10 was.
+
 ## v0.1.10
 
 Documentation you cannot outrun.
