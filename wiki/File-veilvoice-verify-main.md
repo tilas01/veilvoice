@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/main.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 617 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 746 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs)
 
 ## Contents
 
@@ -54,7 +54,7 @@ them from disk. It does not install anything, and it writes nothing.
 
 ## What this file contains
 
-617 lines defining **16 functions** (0 public), **0 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+746 lines defining **18 functions** (0 public), **0 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -63,22 +63,24 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_good["good<br/>line 147"]
-    n_deny["deny<br/>line 152"]
-    n_embedded_key["embedded_key<br/>line 172"]
-    n_fingerprint_of["fingerprint_of<br/>line 185"]
-    n_sha256_file["sha256_file<br/>line 202"]
-    n_digests_match["digests_match<br/>line 231"]
-    n_digest_from_sums["digest_from_sums<br/>line 241"]
-    n_verify_detached["verify_detached<br/>line 264"]
-    n_read_text["read_text<br/>line 286"]
-    n_command_key["command_key<br/>line 290"]
-    n_command_sums["command_sums<br/>line 309"]
-    n_command_file_against_sums["command_file_against_sums<br/>line 347"]
-    n_command_file_against_hash["command_file_against_hash<br/>line 431"]
-    n_command_hash["command_hash<br/>line 483"]
-    n_take_value["take_value<br/>line 500"]
-    n_main["main<br/>line 506"]
+    n_good["good<br/>line 167"]
+    n_fail["fail<br/>line 178"]
+    n_deny["deny<br/>line 192"]
+    n_embedded_key["embedded_key<br/>line 212"]
+    n_fingerprint_of["fingerprint_of<br/>line 225"]
+    n_sha256_file["sha256_file<br/>line 242"]
+    n_digests_match["digests_match<br/>line 271"]
+    n_digest_from_sums["digest_from_sums<br/>line 281"]
+    n_verify_detached["verify_detached<br/>line 304"]
+    n_read_text["read_text<br/>line 326"]
+    n_command_key["command_key<br/>line 330"]
+    n_command_sums["command_sums<br/>line 349"]
+    n_command_file_against_sums["command_file_against_sums<br/>line 387"]
+    n_command_file_against_hash["command_file_against_hash<br/>line 471"]
+    n_command_hash["command_hash<br/>line 523"]
+    n_take_value["take_value<br/>line 540"]
+    n_command_release["command_release<br/>line 556"]
+    n_main["main<br/>line 627"]
     n_command_file_against_hash --> n_deny
     n_command_file_against_hash --> n_digests_match
     n_command_file_against_hash --> n_good
@@ -96,6 +98,10 @@ flowchart TD
     n_command_key --> n_deny
     n_command_key --> n_embedded_key
     n_command_key --> n_fingerprint_of
+    n_command_release --> n_command_file_against_sums
+    n_command_release --> n_command_sums
+    n_command_release --> n_deny
+    n_command_release --> n_fail
     n_command_sums --> n_deny
     n_command_sums --> n_embedded_key
     n_command_sums --> n_good
@@ -106,34 +112,37 @@ flowchart TD
     n_main --> n_command_file_against_sums
     n_main --> n_command_hash
     n_main --> n_command_key
+    n_main --> n_command_release
     n_main --> n_command_sums
     n_main --> n_deny
     n_main --> n_take_value
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_good,n_deny,n_embedded_key,n_fingerprint_of,n_sha256_file,n_digests_match,n_digest_from_sums,n_verify_detached,n_read_text,n_command_key,n_command_sums,n_command_file_against_sums,n_command_file_against_hash,n_command_hash,n_take_value,n_main helper
+    class n_good,n_fail,n_deny,n_embedded_key,n_fingerprint_of,n_sha256_file,n_digests_match,n_digest_from_sums,n_verify_detached,n_read_text,n_command_key,n_command_sums,n_command_file_against_sums,n_command_file_against_hash,n_command_hash,n_take_value,n_command_release,n_main helper
 ```
 
 ## Items
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `PUBLIC_KEY` <sub>const</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L57) | The signing key, compiled in. |
-| `FINGERPRINT` <sub>const</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L69) | The fingerprint, written out rather than derived. |
-| `USAGE` <sub>const</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L71) |  |
-| `EXPLAIN` <sub>const</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L100) |  |
-| `good` <sub>fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L147) |  |
-| `deny` <sub>fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L152) | Every refusal goes through here, so every refusal names the check. |
-| `embedded_key` <sub>fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L172) | Parse the embedded key and confirm its fingerprint is the expected one. |
-| `fingerprint_of` <sub>fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L185) |  |
-| `sha256_file` <sub>fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L202) | SHA-256 of a file, read in chunks. |
-| `digests_match` <sub>fn</sub> | [231](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L231) | Compare two hex digests without caring about case or stray whitespace. |
-| `digest_from_sums` <sub>fn</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L241) | Find a file's line in a sha256sum-format list. |
-| `verify_detached` <sub>fn</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L264) | Verify a detached signature over data using the embedded key. |
-| `read_text` <sub>fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L286) |  |
-| `command_key` <sub>fn</sub> | [290](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L290) |  |
-| `command_sums` <sub>fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L309) |  |
-| `command_file_against_sums` <sub>fn</sub> | [347](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L347) |  |
-| `command_file_against_hash` <sub>fn</sub> | [431](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L431) |  |
-| `command_hash` <sub>fn</sub> | [483](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L483) |  |
-| `take_value` <sub>fn</sub> | [500](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L500) |  |
-| `main` <sub>fn</sub> | [506](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L506) |  |
+| `PUBLIC_KEY` <sub>const</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L59) | The signing key, compiled in. |
+| `FINGERPRINT` <sub>const</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L71) | The fingerprint, written out rather than derived. |
+| `USAGE` <sub>const</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L73) |  |
+| `EXPLAIN` <sub>const</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L120) |  |
+| `good` <sub>fn</sub> | [167](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L167) |  |
+| `fail` <sub>fn</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L178) | A failure that is not a refusal: something did not happen, rather than something was checked and found wrong. |
+| `deny` <sub>fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L192) | Every refusal goes through here, so every refusal names the check. |
+| `embedded_key` <sub>fn</sub> | [212](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L212) | Parse the embedded key and confirm its fingerprint is the expected one. |
+| `fingerprint_of` <sub>fn</sub> | [225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L225) |  |
+| `sha256_file` <sub>fn</sub> | [242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L242) | SHA-256 of a file, read in chunks. |
+| `digests_match` <sub>fn</sub> | [271](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L271) | Compare two hex digests without caring about case or stray whitespace. |
+| `digest_from_sums` <sub>fn</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L281) | Find a file's line in a sha256sum-format list. |
+| `verify_detached` <sub>fn</sub> | [304](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L304) | Verify a detached signature over data using the embedded key. |
+| `read_text` <sub>fn</sub> | [326](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L326) |  |
+| `command_key` <sub>fn</sub> | [330](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L330) |  |
+| `command_sums` <sub>fn</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L349) |  |
+| `command_file_against_sums` <sub>fn</sub> | [387](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L387) |  |
+| `command_file_against_hash` <sub>fn</sub> | [471](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L471) |  |
+| `command_hash` <sub>fn</sub> | [523](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L523) |  |
+| `take_value` <sub>fn</sub> | [540](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L540) |  |
+| `command_release` <sub>fn</sub> | [556](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L556) | Fetch a release and check it, in one step. |
+| `main` <sub>fn</sub> | [627](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L627) |  |

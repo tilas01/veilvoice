@@ -59,7 +59,8 @@ them from disk. It does not install anything, and it writes nothing.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>617 lines"])
+    n_main(["main.rs<br/>746 lines"])
+    n_fetch["fetch.rs<br/>320 lines"]
     n_tests["tests.rs<br/>138 lines"]
 ```
 
@@ -67,5 +68,6 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`main.rs`|File-veilvoice-verify-main]] | 617 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [[`fetch.rs`|File-veilvoice-verify-fetch]] | 320 | Download a release, without putting an HTTP client in the dependency graph. |
+| [[`main.rs`|File-veilvoice-verify-main]] | 746 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [[`tests.rs`|File-veilvoice-verify-tests]] | 138 | The verifier's own tests. |

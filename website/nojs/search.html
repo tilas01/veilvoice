@@ -42,13 +42,13 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice &mdash; 154 files, 6115 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice &mdash; 155 files, 6155 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
 <ul class="toc">
 <li><a href="#k-doc">Documentation</a> <span class="meta">12 files</span></li>
-<li><a href="#k-rust">Rust source</a> <span class="meta">54 files</span></li>
+<li><a href="#k-rust">Rust source</a> <span class="meta">55 files</span></li>
 <li><a href="#k-test">Tests and fuzzing</a> <span class="meta">10 files</span></li>
 <li><a href="#k-web">Website</a> <span class="meta">15 files</span></li>
 <li><a href="#k-tool">Tools and generators</a> <span class="meta">19 files</span></li>
@@ -1088,7 +1088,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">packaging/</span> <span class="meta">line 3</span><br><span class="x">permission. | | `homebrew/` | A formula, not a cask: it builds from source. | | `gentoo/` | A live ebuild that builds from this repository. | | `veilvoice.desktop` | Shared desktop entry for the Linux packages. |</span></li>
 </ul>
 </details>
-<h2 id="k-rust">Rust source <span class="meta">(54)</span></h2>
+<h2 id="k-rust">Rust source <span class="meta">(55)</span></h2>
 <details open>
 <summary><code>crates/veilvoice-audio/src/devices.rs</code> <span class="meta">&mdash; veilvoice-audio, 229 lines, 25 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs">open devices.rs</a></p>
@@ -2925,36 +2925,82 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-verify/src/main.rs</code> <span class="meta">&mdash; veilvoice-verify, 618 lines, 27 sections</span></summary>
+<summary><code>crates/veilvoice-verify/src/fetch.rs</code> <span class="meta">&mdash; veilvoice-verify, 321 lines, 34 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs">open fetch.rs</a></p>
+<ul>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Download a release, without putting an HTTP client in the dependency graph. # The constraint this is written around VeilVoice is **offline by construction**, and that is not a slogan: a CI job fails the build if `reqwest`, `hyper`, `curl`,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`ureq`, `tungstenite`, `isahc` or `surf` appears anywhere in `cargo tree`. The claim on the front page -- &quot;no network code in the dependency graph&quot; -- is one a reader can check in ten seconds, and it is a large part of why this project is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">worth trusting. Fetching a release to check it is a genuinely useful thing for *this* binary to do, and it is also the one thing that claim forbids. So the download is done by **the tool the operating system already ships**, invoked as a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">subprocess: | Platform | Used | Already present because | |---|---|---| | Windows 10+ | `curl.exe` | shipped in `System32` since 2018 | | macOS | `curl` | part of the base system | | Linux, BSD | `curl`, else `wget` | one or the other is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">on essentially every install | `cargo tree` stays exactly as clean as it was, the CI job that enforces it is untouched, and nothing in the *library* crates gained the ability to talk to anything. What changed is that one command-line tool,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">whose entire purpose is checking downloads, can now also make one -- when asked, never on its own. This is the same pattern the rest of the project already uses for platform work it will not link a dependency for: `veilvoice-watch` reads</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the registry through `reg query`, and `veilvoice-guard` reads the event log through `wevtutil`. # What is deliberately not done here **No downloader is resolved by bare name.** Finding `curl` by searching `PATH` on Windows includes the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">current directory, so running this from a folder containing a hostile `curl.exe` would run that instead -- finding F-13, in the one program whose job is deciding whether a download is genuine. Absolute paths are tried first, and a bare</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">name is only ever a last resort on platforms where the search order does not include the working directory. **Nothing is fetched implicitly.** A download happens because the user passed a subcommand that says so. There is no update check,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">no telemetry, and no &quot;just in case&quot; request. **Only one host is ever contacted**, and it is compiled in. A URL cannot be supplied on the command line, so this cannot be turned into a general downloader by an argument.</span></li>
+<li><span class="sec">const HOST</span> <span class="meta">line 62</span><br><span class="x">The only host this will ever talk to. Compiled in rather than accepted as an argument. A verifier that can be pointed anywhere is a download tool wearing a verifier&#x27;s name, and the fingerprint check below is only meaningful against</span></li>
+<li><span class="sec">const HOST</span> <span class="meta">line 62</span><br><span class="x">artefacts from the project it was built for.</span></li>
+<li><span class="sec">const REPO</span> <span class="meta">line 65</span><br><span class="x">The repository releases are fetched from.</span></li>
+<li><span class="sec">const MAX_BYTES</span> <span class="meta">line 73</span><br><span class="x">The largest file this will accept. A release archive is tens of megabytes. This bounds what a redirected or substituted response can make the tool write to disk, and it is checked after the download rather than trusted from a header,</span></li>
+<li><span class="sec">const MAX_BYTES</span> <span class="meta">line 73</span><br><span class="x">because a header is something the other end chose.</span></li>
+<li><span class="sec">struct Downloader</span> <span class="meta">line 76</span><br><span class="x">Where a downloader was found, and what to call it.</span></li>
+<li><span class="sec">enum Style</span> <span class="meta">line 82</span><br><span class="x"></span></li>
+<li><span class="sec">fn find_downloader</span> <span class="meta">line 97</span><br><span class="x">Absolute paths first, and a bare name only where that is safe. Resolving a program by bare name on Windows searches the **current directory** before most of `PATH`, so a file called `curl.exe` sitting beside a downloaded archive would be</span></li>
+<li><span class="sec">fn find_downloader</span> <span class="meta">line 97</span><br><span class="x">run instead of the system one. That is finding F-13, and this is the program where it would matter most.</span></li>
+<li><span class="sec">fn no_downloader_message</span> <span class="meta">line 138</span><br><span class="x">Say what could not be found, and what to do instead. A tool that cannot download should explain how to proceed without it, not merely report an absence. Everything this fetches can be fetched by hand.</span></li>
+<li><span class="sec">fn download</span> <span class="meta">line 155</span><br><span class="x">Fetch one URL into `into`. Returns the path written. Every failure is reported rather than retried. A verifier that quietly tries again is a verifier whose output does not say what actually happened.</span></li>
+<li><span class="sec">fn asset_url</span> <span class="meta">line 221</span><br><span class="x">The URL of one file in one release.</span></li>
+<li><span class="sec">const SUMS</span> <span class="meta">line 226</span><br><span class="x">The three files every release publishes for checking itself.</span></li>
+<li><span class="sec">const SIGNATURE</span> <span class="meta">line 227</span><br><span class="x"></span></li>
+<li><span class="sec">fn valid_tag</span> <span class="meta">line 238</span><br><span class="x">A release tag, rejected unless it looks like one. The tag becomes part of a URL and part of a filename, so it is validated rather than trusted: without this, a tag containing `../` would write outside the download directory, and one</span></li>
+<li><span class="sec">fn valid_tag</span> <span class="meta">line 238</span><br><span class="x">containing a shell metacharacter would be passed to a subprocess. The argument is passed as a separate argv entry rather than through a shell, so the second is already handled -- but a check that only holds because of how the caller</span></li>
+<li><span class="sec">fn valid_tag</span> <span class="meta">line 238</span><br><span class="x">happens to invoke things is not a check.</span></li>
+<li><span class="sec">fn valid_asset</span> <span class="meta">line 247</span><br><span class="x">An asset filename, rejected unless it looks like one.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 257</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_url_outside_the_compiled_in_host_is_refused</span> <span class="meta">line 261</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_tag_that_would_escape_the_directory_is_refused</span> <span class="meta">line 270</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_asset_name_that_would_escape_the_directory_is_refused</span> <span class="meta">line 287</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_asset_url_is_built_from_the_compiled_in_host_and_repository</span> <span class="meta">line 301</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_absent_downloader_message_says_how_to_proceed_without_one</span> <span class="meta">line 309</span><br><span class="x"></span></li>
+</ul>
+</details>
+<details open>
+<summary><code>crates/veilvoice-verify/src/main.rs</code> <span class="meta">&mdash; veilvoice-verify, 747 lines, 33 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs">open main.rs</a></p>
 <ul>
-<li><span class="sec">const PUBLIC_KEY</span> <span class="meta">line 57</span><br><span class="x">The signing key, compiled in. Read from the copy the website serves, so there is exactly one key file in this repository and no chance of a second one drifting from it. A test asserts that this key&#x27;s fingerprint is [`FINGERPRINT`]; if</span></li>
-<li><span class="sec">const PUBLIC_KEY</span> <span class="meta">line 57</span><br><span class="x">somebody swaps the file, the build fails rather than the verifier trusting a new key.</span></li>
-<li><span class="sec">const FINGERPRINT</span> <span class="meta">line 69</span><br><span class="x">The fingerprint, written out rather than derived. Deriving it from `PUBLIC_KEY` would make this constant agree with the key automatically, which sounds like an improvement and is the opposite of one: the whole point is that a reader can</span></li>
-<li><span class="sec">const FINGERPRINT</span> <span class="meta">line 69</span><br><span class="x">compare this string against the one published in `README.md`, on the website and in the release notes. A value computed from the very file it is meant to authenticate checks nothing.</span></li>
-<li><span class="sec">const USAGE</span> <span class="meta">line 71</span><br><span class="x"></span></li>
-<li><span class="sec">const EXPLAIN</span> <span class="meta">line 100</span><br><span class="x"></span></li>
-<li><span class="sec">fn good</span> <span class="meta">line 147</span><br><span class="x"></span></li>
-<li><span class="sec">fn deny</span> <span class="meta">line 152</span><br><span class="x">Every refusal goes through here, so every refusal names the check.</span></li>
-<li><span class="sec">fn embedded_key</span> <span class="meta">line 172</span><br><span class="x">Parse the embedded key and confirm its fingerprint is the expected one. Done at run time rather than trusted, because &quot;the binary contains a key&quot; and &quot;the binary contains *the* key&quot; are different statements, and only the second is worth</span></li>
-<li><span class="sec">fn embedded_key</span> <span class="meta">line 172</span><br><span class="x">anything.</span></li>
-<li><span class="sec">fn fingerprint_of</span> <span class="meta">line 185</span><br><span class="x"></span></li>
-<li><span class="sec">fn sha256_file</span> <span class="meta">line 202</span><br><span class="x">SHA-256 of a file, read in chunks. Streamed rather than read whole: a release archive is tens of megabytes and there is no reason for this to need that much memory at once. The web verifier had the same problem in the other direction --</span></li>
-<li><span class="sec">fn sha256_file</span> <span class="meta">line 202</span><br><span class="x">finding F-36.</span></li>
-<li><span class="sec">fn digests_match</span> <span class="meta">line 231</span><br><span class="x">Compare two hex digests without caring about case or stray whitespace. Not constant time, and deliberately so: both values are public, and there is no secret here for a timing difference to leak. Saying that plainly is better than a</span></li>
-<li><span class="sec">fn digests_match</span> <span class="meta">line 231</span><br><span class="x">`subtle` dependency that implies there was a threat.</span></li>
-<li><span class="sec">fn digest_from_sums</span> <span class="meta">line 241</span><br><span class="x">Find a file&#x27;s line in a `sha256sum`-format list. The format is `&lt;hex&gt; &lt;name&gt;`, and `sha256sum` writes a `*` before the name for a binary-mode hash. Only the file&#x27;s base name is compared: the list is written with plain names, and the file</span></li>
-<li><span class="sec">fn digest_from_sums</span> <span class="meta">line 241</span><br><span class="x">being checked is usually somewhere else entirely.</span></li>
-<li><span class="sec">fn verify_detached</span> <span class="meta">line 264</span><br><span class="x">Verify a detached signature over `data` using the embedded key.</span></li>
-<li><span class="sec">fn read_text</span> <span class="meta">line 286</span><br><span class="x"></span></li>
-<li><span class="sec">fn command_key</span> <span class="meta">line 290</span><br><span class="x"></span></li>
-<li><span class="sec">fn command_sums</span> <span class="meta">line 309</span><br><span class="x"></span></li>
-<li><span class="sec">fn command_file_against_sums</span> <span class="meta">line 347</span><br><span class="x"></span></li>
-<li><span class="sec">fn command_file_against_hash</span> <span class="meta">line 431</span><br><span class="x"></span></li>
-<li><span class="sec">fn command_hash</span> <span class="meta">line 483</span><br><span class="x"></span></li>
-<li><span class="sec">fn take_value</span> <span class="meta">line 500</span><br><span class="x"></span></li>
-<li><span class="sec">fn main</span> <span class="meta">line 506</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 617</span><br><span class="x"></span></li>
+<li><span class="sec">mod fetch</span> <span class="meta">line 43</span><br><span class="x"></span></li>
+<li><span class="sec">const PUBLIC_KEY</span> <span class="meta">line 59</span><br><span class="x">The signing key, compiled in. Read from the copy the website serves, so there is exactly one key file in this repository and no chance of a second one drifting from it. A test asserts that this key&#x27;s fingerprint is [`FINGERPRINT`]; if</span></li>
+<li><span class="sec">const PUBLIC_KEY</span> <span class="meta">line 59</span><br><span class="x">somebody swaps the file, the build fails rather than the verifier trusting a new key.</span></li>
+<li><span class="sec">const FINGERPRINT</span> <span class="meta">line 71</span><br><span class="x">The fingerprint, written out rather than derived. Deriving it from `PUBLIC_KEY` would make this constant agree with the key automatically, which sounds like an improvement and is the opposite of one: the whole point is that a reader can</span></li>
+<li><span class="sec">const FINGERPRINT</span> <span class="meta">line 71</span><br><span class="x">compare this string against the one published in `README.md`, on the website and in the release notes. A value computed from the very file it is meant to authenticate checks nothing.</span></li>
+<li><span class="sec">const USAGE</span> <span class="meta">line 73</span><br><span class="x"></span></li>
+<li><span class="sec">const EXPLAIN</span> <span class="meta">line 120</span><br><span class="x"></span></li>
+<li><span class="sec">fn good</span> <span class="meta">line 167</span><br><span class="x"></span></li>
+<li><span class="sec">fn fail</span> <span class="meta">line 178</span><br><span class="x">A failure that is not a refusal: something did not happen, rather than something was checked and found wrong. Kept apart from [`deny`] on purpose. &quot;The download failed&quot; and &quot;the signature is bad&quot; are different facts and a reader must not</span></li>
+<li><span class="sec">fn fail</span> <span class="meta">line 178</span><br><span class="x">have to work out which one they were told -- the second means somebody may have tampered with a release, and the first usually means a network hiccup.</span></li>
+<li><span class="sec">fn deny</span> <span class="meta">line 192</span><br><span class="x">Every refusal goes through here, so every refusal names the check.</span></li>
+<li><span class="sec">fn embedded_key</span> <span class="meta">line 212</span><br><span class="x">Parse the embedded key and confirm its fingerprint is the expected one. Done at run time rather than trusted, because &quot;the binary contains a key&quot; and &quot;the binary contains *the* key&quot; are different statements, and only the second is worth</span></li>
+<li><span class="sec">fn embedded_key</span> <span class="meta">line 212</span><br><span class="x">anything.</span></li>
+<li><span class="sec">fn fingerprint_of</span> <span class="meta">line 225</span><br><span class="x"></span></li>
+<li><span class="sec">fn sha256_file</span> <span class="meta">line 242</span><br><span class="x">SHA-256 of a file, read in chunks. Streamed rather than read whole: a release archive is tens of megabytes and there is no reason for this to need that much memory at once. The web verifier had the same problem in the other direction --</span></li>
+<li><span class="sec">fn sha256_file</span> <span class="meta">line 242</span><br><span class="x">finding F-36.</span></li>
+<li><span class="sec">fn digests_match</span> <span class="meta">line 271</span><br><span class="x">Compare two hex digests without caring about case or stray whitespace. Not constant time, and deliberately so: both values are public, and there is no secret here for a timing difference to leak. Saying that plainly is better than a</span></li>
+<li><span class="sec">fn digests_match</span> <span class="meta">line 271</span><br><span class="x">`subtle` dependency that implies there was a threat.</span></li>
+<li><span class="sec">fn digest_from_sums</span> <span class="meta">line 281</span><br><span class="x">Find a file&#x27;s line in a `sha256sum`-format list. The format is `&lt;hex&gt; &lt;name&gt;`, and `sha256sum` writes a `*` before the name for a binary-mode hash. Only the file&#x27;s base name is compared: the list is written with plain names, and the file</span></li>
+<li><span class="sec">fn digest_from_sums</span> <span class="meta">line 281</span><br><span class="x">being checked is usually somewhere else entirely.</span></li>
+<li><span class="sec">fn verify_detached</span> <span class="meta">line 304</span><br><span class="x">Verify a detached signature over `data` using the embedded key.</span></li>
+<li><span class="sec">fn read_text</span> <span class="meta">line 326</span><br><span class="x"></span></li>
+<li><span class="sec">fn command_key</span> <span class="meta">line 330</span><br><span class="x"></span></li>
+<li><span class="sec">fn command_sums</span> <span class="meta">line 349</span><br><span class="x"></span></li>
+<li><span class="sec">fn command_file_against_sums</span> <span class="meta">line 387</span><br><span class="x"></span></li>
+<li><span class="sec">fn command_file_against_hash</span> <span class="meta">line 471</span><br><span class="x"></span></li>
+<li><span class="sec">fn command_hash</span> <span class="meta">line 523</span><br><span class="x"></span></li>
+<li><span class="sec">fn take_value</span> <span class="meta">line 540</span><br><span class="x"></span></li>
+<li><span class="sec">fn command_release</span> <span class="meta">line 556</span><br><span class="x">Fetch a release and check it, in one step. The order is the same one every other path in this tool takes and the same one the install scripts take: **the signature over the hash list first**, then the file against that list. Checking the</span></li>
+<li><span class="sec">fn command_release</span> <span class="meta">line 556</span><br><span class="x">hash first would prove only that a download matches a list which might itself have been replaced. Downloads go to a directory the caller can inspect afterwards. Nothing is deleted on success: somebody who has just verified a release</span></li>
+<li><span class="sec">fn command_release</span> <span class="meta">line 556</span><br><span class="x">usually wants the release.</span></li>
+<li><span class="sec">fn main</span> <span class="meta">line 627</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 746</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
