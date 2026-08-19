@@ -27,7 +27,7 @@ members = [
 exclude = ["fuzz"]
 
 [workspace.package]
-version = "0.1.11"
+version = "0.1.12"
 edition = "2021"
 # The oldest Rust this actually compiles on, measured rather than assumed.
 #
