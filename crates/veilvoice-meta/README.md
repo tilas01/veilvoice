@@ -80,6 +80,7 @@ flowchart TD
 | [`image.rs`](../../docs/files/veilvoice-meta/image.md) | 202 | Image EXIF/GPS removal. |
 | [`lib.rs`](../../docs/files/veilvoice-meta/lib.md) | 111 | Strip or spoof the identifying metadata that rides along with media files. |
 | [`wav.rs`](../../docs/files/veilvoice-meta/wav.md) | 332 | Chunk-level RIFF/WAVE metadata removal. |
+| [`wav_fuzz.rs`](../../docs/files/veilvoice-meta/tests-wav_fuzz.md) | 291 | Randomised robustness testing for the RIFF chunk walker. |
 
 ## Public items
 
