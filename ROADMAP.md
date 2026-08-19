@@ -65,7 +65,10 @@ is work in progress.
 | 26 | Every website theme in the app, plus user-defined palettes with contrast computed rather than assumed | **done** | — |
 | 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **planned** | 3–4 d |
 | 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **planned** | 1–2 d |
-| 29 | One single binary, optimised and still byte-reproducible | **planned** | 2 d |
+| 29 | One single binary — the same executable runs as the desktop app or as the command line, installed or portable | **planned** | 2 d |
+| 30 | Windows installer: Tokyo Night, animated, and a **portable** option that installs nothing | **planned** | 4–5 d |
+| 31 | Optional companion setup — VB-CABLE on Windows, PipeWire on Linux, BlackHole on macOS, and Audacity everywhere — detected if present, installed only if confirmed | **planned** | 3–4 d |
+| 32 | The site's search presented as an **index**, and animated | **next** | 1 d |
 
 ## Security and monitoring features
 
@@ -75,24 +78,24 @@ it cannot do as plainly as what it can.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 30 | Screen-capture detection — application name, PID, when, how often | **planned** | 3 d |
-| 31 | Hide VeilVoice's own window from screen capture and recording | **planned** | 1–2 d |
-| 32 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **planned** | 2–3 d |
-| 33 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **planned** | 3–4 d |
-| 34 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
-| 35 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography | **planned** | 2–3 d |
-| 36 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
-| 37 | Alert on driver and kernel-module installation; cross-view checks | **planned** | 3–4 d |
-| 38 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **planned** | 2 d |
-| 39 | Duress and decoy passwords | **planned** | 7–10 d |
-| 40 | Cloud transcription through your own API key | **blocked** | — |
+| 33 | Screen-capture detection — application name, PID, when, how often | **planned** | 3 d |
+| 34 | Hide VeilVoice's own window from screen capture and recording | **planned** | 1–2 d |
+| 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **planned** | 2–3 d |
+| 36 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **planned** | 3–4 d |
+| 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
+| 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography | **planned** | 2–3 d |
+| 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
+| 40 | Alert on driver and kernel-module installation; cross-view checks | **planned** | 3–4 d |
+| 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **planned** | 2 d |
+| 42 | Duress and decoy passwords | **planned** | 7–10 d |
+| 43 | Cloud transcription through your own API key | **blocked** | — |
 
 ## Finally
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 41 | Full audit of the whole tree — every vulnerability class, cryptographic practice, workflow accuracy, and full wiki parity — with every finding written up individually | **planned** | 5–8 d |
-| 42 | Production release | **planned** | 1–2 d |
+| 44 | Full audit of the whole tree — every vulnerability class, cryptographic practice, workflow accuracy, and full wiki parity — with every finding written up individually | **planned** | 5–8 d |
+| 45 | Production release | **planned** | 1–2 d |
 
 ---
 
@@ -133,6 +136,29 @@ is *less than people think*, and this project already documents that), and what
 an attacker who learns the trigger can make it do. It is off by default, it
 takes a deliberate setup, and it will carry the plainest warnings in the
 project.
+
+---
+
+## Notes on a few of these
+
+**The installer and the portable build are the same binary.** One executable
+that opens a window when it is double-clicked and takes subcommands when it is
+given them, and which does not care whether it was installed or unzipped. An
+installer that produces a *different* program from the portable download is two
+things to test, two things to sign, and two things to get subtly out of step.
+
+**The companion setup asks, every time, and never assumes.** VB-CABLE is
+proprietary donationware, Audacity is somebody else's software, and PipeWire is
+part of the user's operating system. So each is: detect whether it is already
+there, say what it is and who makes it, and install only on an explicit yes.
+Never silently, never ticked by default. That rule predates this roadmap -- it
+is the same one the existing install scripts follow -- and it does not relax
+because the interface got prettier.
+
+**"Documented in the wiki" is a build step, not a promise.** Every page of the
+reference is generated from the source by `tools/docs/generate.py`, and CI
+fails if the tree and the documentation disagree. Installer documentation goes
+through the same route, so it cannot drift from what the installer does.
 
 ---
 
