@@ -280,6 +280,96 @@ h3[id] { scroll-margin-top: 90px; }
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
+/* ---------- tooltips ---------- */
+/*
+ * `data-tip` on any element, shown on hover and on keyboard focus. No
+ * JavaScript, so the scripts-off edition behaves identically.
+ *
+ * Deliberately *not* the `title` attribute. `title` is unstyleable, appears
+ * after a delay the reader cannot change, never appears on a touch device, and
+ * is announced by some screen readers in addition to whatever else the element
+ * says. Where both existed the reader got two boxes on a desktop and the same
+ * sentence twice through a screen reader.
+ *
+ * Nothing a reader actually needs is stored only here. A tooltip expands an
+ * abbreviation or names a unit; it never carries the point of a sentence,
+ * because on a phone it does not exist.
+ */
+[data-tip] {
+  position: relative;
+  /* The dotted underline is the affordance. Without it a tooltip is a secret:
+   * hover-only information with nothing indicating there is anything to hover.
+   * `text-decoration` rather than a border, so it follows descenders and wraps
+   * with the text. */
+  text-decoration: underline dotted var(--muted);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  /* Anchored to the element's left edge, not centred.
+   *
+   * Centring looks better in isolation and overflows the viewport the moment
+   * the annotated word is near the left margin -- which was exactly what
+   * happened to the `Argon2id` tooltip in the left-hand column, half of it
+   * off-screen. Found by rendering the page with the tooltip forced open;
+   * nothing about the CSS looks wrong on its own.
+   *
+   * Left-anchoring cannot overflow on the left at all, and the width cap keeps
+   * it inside a column on the right. `.tip-right` is the opt-out for a term
+   * genuinely close to the right edge. */
+  left: 0;
+  transform: translate(0, 4px);
+  z-index: 40;
+
+  /* Monospace and the site palette, as asked. Sized in ch so the box is a
+   * predictable number of characters wide whatever the reader's font. */
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.5;
+  white-space: normal;
+  width: max-content;
+  max-width: 34ch;
+  padding: 7px 10px;
+  text-align: left;
+  text-decoration: none;
+
+  color: var(--fg);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+
+  opacity: 0;
+  visibility: hidden;
+  /* `visibility` is in the transition on purpose: without it the box stays in
+   * the accessibility tree and stays hoverable while invisible, so a pointer
+   * passing through empty space triggers a tooltip that is not there. */
+  transition: opacity 0.14s ease, transform 0.14s ease, visibility 0s linear 0.14s;
+  pointer-events: none;
+}
+
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, 0);
+  transition: opacity 0.14s ease, transform 0.14s ease, visibility 0s;
+}
+
+/* For a term close to the right edge, where a left-anchored box would run off
+ * that side instead. */
+[data-tip].tip-right::after { left: auto; right: 0; }
+
+/* The global reduced-motion rule collapses the transition, which is correct
+ * here: the box appears at once rather than sliding, and it still appears.
+ * Unlike the fact strip, the resting state of a tooltip is *meant* to be
+ * hidden, so no override is needed -- stated because the two components look
+ * alike and the difference is the whole reason one needed an exception. */
+
 /* ---------- the cycling fact line ---------- */
 /*
  * One line at a time, changing every 3.6 seconds: slow enough to read
