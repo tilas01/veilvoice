@@ -47,23 +47,33 @@ commit, on every platform, by everybody.
 
 Set `VEILVOICE_FUZZ_ROUNDS` to run it longer than the default.
 
+## What this file contains
+
+306 lines defining **12 functions** (0 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct Rng` (line 41) -- xorshift32.
+
 ## What calls what
+
+_Colour key: **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new["Rng::new"]
-    n_next_u32["Rng::next_u32"]
-    n_below["Rng::below"]
-    n_byte["Rng::byte"]
-    n_rounds["rounds"]
-    n_mutate["mutate"]
-    n_weak["weak"]
-    n_cheap["cheap"]
-    n_the_container_header_parser_survives_hostile_input["the_container_header_parser_s…"]
-    n_the_app_lock_parser_survives_hostile_input["the_app_lock_parser_survives_…"]
-    n_both_parsers_survive_pure_noise["both_parsers_survive_pure_noi…"]
-    n_every_length_around_a_boundary_is_handled["every_length_around_a_boundar…"]
+    n_new["Rng::new<br/>line 44"]
+    n_next_u32["Rng::next_u32<br/>line 47"]
+    n_below["Rng::below<br/>line 53"]
+    n_byte["Rng::byte<br/>line 60"]
+    n_rounds["rounds<br/>line 65"]
+    n_mutate["mutate<br/>line 77"]
+    n_weak["weak<br/>line 151"]
+    n_cheap["cheap<br/>line 169"]
+    n_the_container_header_parser_survives_hostile_input["the_container_header_parser_s…<br/>line 174"]
+    n_the_app_lock_parser_survives_hostile_input["the_app_lock_parser_survives_…<br/>line 225"]
+    n_both_parsers_survive_pure_noise["both_parsers_survive_pure_noi…<br/>line 265"]
+    n_every_length_around_a_boundary_is_handled["every_length_around_a_boundar…<br/>line 285"]
     n_below --> n_next_u32
     n_both_parsers_survive_pure_noise --> n_cheap
     n_both_parsers_survive_pure_noise --> n_new
@@ -80,6 +90,8 @@ flowchart TD
     n_the_container_header_parser_survives_hostile_input --> n_new
     n_the_container_header_parser_survives_hostile_input --> n_rounds
     n_the_container_header_parser_survives_hostile_input --> n_weak
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_new,n_next_u32,n_below,n_byte,n_rounds,n_mutate,n_weak,n_cheap,n_the_container_header_parser_survives_hostile_input,n_the_app_lock_parser_survives_hostile_input,n_both_parsers_survive_pure_noise,n_every_length_around_a_boundary_is_handled helper
 ```
 
 ## Items

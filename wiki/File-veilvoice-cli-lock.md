@@ -22,20 +22,35 @@ Every path through this module prints `veilvoice_crypto::lock::SCOPE`, for
 one reason: a lock the user believes is stronger than it is has made them
 *less* safe, not more.
 
+## What this file contains
+
+239 lines defining **9 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Action` (line 21)
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `run` (line 72)
+  - reaches: `change`, `remove`, `resolve`, `set`, `status`, `open_or_explain`, `print_scope`, `wrap`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_resolve["resolve"]
-    n_print_scope["print_scope"]
-    n_wrap(["wrap<br/>pub"])
-    n_run(["run<br/>pub"])
-    n_status["status"]
-    n_set["set"]
-    n_change["change"]
-    n_remove["remove"]
-    n_open_or_explain["open_or_explain"]
+    n_resolve["resolve<br/>line 33"]
+    n_print_scope["print_scope<br/>line 45"]
+    n_wrap["wrap<br/>line 54"]
+    n_run(["run<br/>line 72"])
+    n_status["status<br/>line 85"]
+    n_set["set<br/>line 119"]
+    n_change["change<br/>line 162"]
+    n_remove["remove<br/>line 174"]
+    n_open_or_explain["open_or_explain<br/>line 185"]
     n_change --> n_open_or_explain
     n_print_scope --> n_wrap
     n_remove --> n_open_or_explain
@@ -46,6 +61,12 @@ flowchart TD
     n_run --> n_status
     n_set --> n_print_scope
     n_status --> n_print_scope
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_run entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_wrap api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_resolve,n_print_scope,n_status,n_set,n_change,n_remove,n_open_or_explain helper
 ```
 
 ## Items

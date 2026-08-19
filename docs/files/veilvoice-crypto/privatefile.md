@@ -17,6 +17,7 @@
 
 - [Why this is not std::fs::write plus a chmod](#why-this-is-not-stdfswrite-plus-a-chmod)
 - [What this does not do](#what-this-does-not-do)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -55,6 +56,17 @@ no portable tightening to apply beyond that -- so on Windows this is an
 ordinary write, and says so rather than implying a protection it did not
 obtain.
 
+## What this file contains
+
+157 lines defining **3 functions** (2 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `write_owner_only` (line 44) -- Create path containing bytes, readable only by the current user.
+  - reaches: `write_inner`
+- `write_owner_only_new` (line 55) -- As write_owner_only, but fail if anything is already at path.
+  - reaches: `write_inner`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -63,14 +75,20 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_write_owner_only(["write_owner_only<br/>pub"])
-    n_write_owner_only_new(["write_owner_only_new<br/>pub"])
-    n_write_inner["write_inner"]
+    n_write_owner_only(["write_owner_only<br/>line 44"])
+    n_write_owner_only_new(["write_owner_only_new<br/>line 55"])
+    n_write_inner["write_inner<br/>line 59"]
     n_write_owner_only --> n_write_inner
     n_write_owner_only_new --> n_write_inner
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_write_owner_only,n_write_owner_only_new entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_write_inner helper
 ```
 
 ## Items

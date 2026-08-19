@@ -63,48 +63,55 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 177" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
-<rect x="0" y="0" width="880" height="177" fill="#16161e" rx="8"/>
-<path d="M583.6 47.0 C 605.6 47.0, 605.6 47.0, 158.6 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M554.4 74.0 C 554.4 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M820.8 47.0 C 842.8 47.0, 842.8 47.0, 709.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<rect x="59.2" y="20.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="107.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">preflight</text>
-<text x="107.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="181.6" y="20.0" width="180.0" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="271.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Audio::duration_secs</text>
-<text x="271.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="387.6" y="20.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="443.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Audio::peak</text>
-<text x="443.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="525.2" y="20.0" width="58.4" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="554.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">load</text>
-<text x="554.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="388.0" y="120.0" width="104.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">read_up_to</text>
-<rect x="609.6" y="20.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="657.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">wav_bytes</text>
-<text x="657.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="732.0" y="20.0" width="88.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="776.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">save_wav</text>
-<text x="776.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 194" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
+<rect x="0" y="0" width="880" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M598.8 47.0 C 620.8 47.0, 620.8 47.0, 143.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M554.4 74.0 C 554.4 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M836.0 47.0 C 858.0 47.0, 858.0 47.0, 724.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<rect x="44.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="92.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">preflight</text>
+<text x="92.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<rect x="166.4" y="20.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="256.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Audio::duration_secs</text>
+<text x="256.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 146</text>
+<rect x="372.4" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="428.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Audio::peak</text>
+<text x="428.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+<rect x="510.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="554.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load</text>
+<text x="554.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 165</text>
+<rect x="388.0" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_up_to</text>
+<text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 268</text>
+<rect x="624.8" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="673.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wav_bytes</text>
+<text x="673.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
+<rect x="747.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="791.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">save_wav</text>
+<text x="791.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_preflight([&quot;preflight&lt;br/&gt;pub&quot;])
-    n_duration_secs([&quot;Audio::duration_secs&lt;br/&gt;pub&quot;])
-    n_peak([&quot;Audio::peak&lt;br/&gt;pub&quot;])
-    n_load([&quot;load&lt;br/&gt;pub&quot;])
-    n_read_up_to[&quot;read_up_to&quot;]
-    n_wav_bytes([&quot;wav_bytes&lt;br/&gt;pub&quot;])
-    n_save_wav([&quot;save_wav&lt;br/&gt;pub&quot;])
+    n_preflight[&quot;preflight&lt;br/&gt;line 92&quot;]
+    n_duration_secs([&quot;Audio::duration_secs&lt;br/&gt;line 146&quot;])
+    n_peak([&quot;Audio::peak&lt;br/&gt;line 154&quot;])
+    n_load([&quot;load&lt;br/&gt;line 165&quot;])
+    n_read_up_to[&quot;read_up_to&lt;br/&gt;line 268&quot;]
+    n_wav_bytes[&quot;wav_bytes&lt;br/&gt;line 289&quot;]
+    n_save_wav([&quot;save_wav&lt;br/&gt;line 309&quot;])
     n_load --&gt; n_preflight
     n_load --&gt; n_read_up_to
-    n_save_wav --&gt; n_wav_bytes</code></pre>
+    n_save_wav --&gt; n_wav_bytes
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_duration_secs,n_peak,n_load,n_save_wav entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_preflight,n_wav_bytes api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_read_up_to helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

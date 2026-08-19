@@ -19,6 +19,7 @@
 - [Read once, at startup](#read-once-at-startup)
 - [Absolute paths, always](#absolute-paths-always)
 - [When it cannot tell](#when-it-cannot-tell)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -56,6 +57,20 @@ cannot read, which is a worse failure than missing the preference for the
 few who set it. The settings panel only claims the system asked for reduced
 motion when it actually saw it say so.
 
+## What this file contains
+
+328 lines defining **8 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Query` (line 68) -- What the platform said.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `Query::reduces` (line 81) -- Whether to treat this as a request to reduce motion.
+- `query` (line 101) -- Ask the operating system.
+  - reaches: `macos_query`, `unix_query`, `windows_query`, `no_window`, `tool`, `parse_user_preferences_mask`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -64,17 +79,19 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_no_window["no_window"]
-    n_reduces(["Query::reduces<br/>pub"])
-    n_tool["tool"]
-    n_query(["query<br/>pub"])
-    n_windows_query["windows_query"]
-    n_parse_user_preferences_mask["parse_user_preferences_mask"]
-    n_macos_query["macos_query"]
-    n_unix_query["unix_query"]
+    n_no_window["no_window<br/>line 56"]
+    n_reduces(["Query::reduces<br/>line 81"])
+    n_tool["tool<br/>line 87"]
+    n_query(["query<br/>line 101"])
+    n_windows_query["windows_query<br/>line 125"]
+    n_parse_user_preferences_mask["parse_user_preferences_mask<br/>line 155"]
+    n_macos_query["macos_query<br/>line 179"]
+    n_unix_query["unix_query<br/>line 204"]
     n_macos_query --> n_no_window
     n_macos_query --> n_tool
     n_query --> n_macos_query
@@ -85,6 +102,10 @@ flowchart TD
     n_windows_query --> n_no_window
     n_windows_query --> n_parse_user_preferences_mask
     n_windows_query --> n_tool
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_reduces,n_query entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_no_window,n_tool,n_windows_query,n_parse_user_preferences_mask,n_macos_query,n_unix_query helper
 ```
 
 ## Items

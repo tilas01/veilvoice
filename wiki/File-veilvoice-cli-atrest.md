@@ -35,19 +35,43 @@ and then encrypted, because a plaintext file that is created and deleted is
 precisely what `veilvoice_crypto::shred` explains cannot be reliably taken
 back on flash storage.
 
+## What this file contains
+
+275 lines defining **5 functions** (4 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Recipient` (line 52) -- How a recording is to be sealed.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `seal_to_disk` (line 60) -- Seal plaintext and write it to <path>.veil, returning where it landed.
+  - reaches: `read_new_password`, `into_secret`
+- `confirm_plaintext` (line 111) -- Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.
+- `prompt_secret` (line 162) -- Prompt once, without echoing, and keep the answer in a Secret.
+  - reaches: `into_secret`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_seal_to_disk(["seal_to_disk<br/>pub"])
-    n_confirm_plaintext(["confirm_plaintext<br/>pub"])
-    n_into_secret["into_secret"]
-    n_prompt_secret(["prompt_secret<br/>pub"])
-    n_read_new_password(["read_new_password<br/>pub"])
+    n_seal_to_disk(["seal_to_disk<br/>line 60"])
+    n_confirm_plaintext(["confirm_plaintext<br/>line 111"])
+    n_into_secret["into_secret<br/>line 154"]
+    n_prompt_secret(["prompt_secret<br/>line 162"])
+    n_read_new_password["read_new_password<br/>line 168"]
     n_prompt_secret --> n_into_secret
     n_read_new_password --> n_into_secret
     n_seal_to_disk --> n_read_new_password
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_seal_to_disk,n_confirm_plaintext,n_prompt_secret entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_read_new_password api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_into_secret helper
 ```
 
 ## Items

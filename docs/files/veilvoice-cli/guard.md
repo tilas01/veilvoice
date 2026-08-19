@@ -18,6 +18,7 @@
 - [What the three steps actually do](#what-the-three-steps-actually-do)
 - [Why attribution usually fails, and why that is reported rather than hidden](#why-attribution-usually-fails-and-why-that-is-reported-rather-than-hidden)
 - [The bound, again](#the-bound-again)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -59,6 +60,19 @@ can write the manifest beside them. That is why the passphrase-sealed record
 exists, why `veilvoice_guard::SCOPE` is printed on every path through this
 module, and why the word "tamper-proof" appears nowhere in it.
 
+## What this file contains
+
+338 lines defining **9 functions** (1 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Action` (line 46)
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `run` (line 106)
+  - reaches: `check`, `init`, `manifest_path`, `status`, `load`, `print_scope`, `sealed_path`, `default_targets`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -67,18 +81,20 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_manifest_path["manifest_path"]
-    n_sealed_path["sealed_path"]
-    n_print_scope["print_scope"]
-    n_default_targets["default_targets"]
-    n_run(["run<br/>pub"])
-    n_init["init"]
-    n_load["load"]
-    n_check["check"]
-    n_status["status"]
+    n_manifest_path["manifest_path<br/>line 67"]
+    n_sealed_path["sealed_path<br/>line 80"]
+    n_print_scope["print_scope<br/>line 84"]
+    n_default_targets["default_targets<br/>line 93"]
+    n_run(["run<br/>line 106"])
+    n_init["init<br/>line 118"]
+    n_load["load<br/>line 181"]
+    n_check["check<br/>line 194"]
+    n_status["status<br/>line 263"]
     n_check --> n_load
     n_check --> n_print_scope
     n_check --> n_sealed_path
@@ -92,6 +108,10 @@ flowchart TD
     n_run --> n_status
     n_status --> n_print_scope
     n_status --> n_sealed_path
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_run entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_manifest_path,n_sealed_path,n_print_scope,n_default_targets,n_init,n_load,n_check,n_status helper
 ```
 
 ## Items

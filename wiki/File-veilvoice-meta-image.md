@@ -21,16 +21,35 @@ GPS coordinates are the reason this matters most. A single holiday snapshot
 attached to an otherwise anonymous message can place someone within a few
 metres, and no amount of voice processing helps with that.
 
+## What this file contains
+
+202 lines defining **3 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum ImageKind` (line 19) -- Image container formats this crate can clean.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `clean_image_file` (line 86) -- Strip identifying metadata from an image file, in place.
+  - reaches: `clean_image_bytes`, `sniff`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_sniff(["ImageKind::sniff<br/>pub"])
-    n_clean_image_bytes(["clean_image_bytes<br/>pub"])
-    n_clean_image_file(["clean_image_file<br/>pub"])
+    n_sniff["ImageKind::sniff<br/>line 33"]
+    n_clean_image_bytes["clean_image_bytes<br/>line 49"]
+    n_clean_image_file(["clean_image_file<br/>line 86"])
     n_clean_image_bytes --> n_sniff
     n_clean_image_file --> n_clean_image_bytes
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_clean_image_file entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_sniff,n_clean_image_bytes api
 ```
 
 ## Items

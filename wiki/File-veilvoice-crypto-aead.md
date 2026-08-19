@@ -23,17 +23,35 @@ which is how the container header in `crate::container` is bound to its
 ciphertext: flipping a bit in the stored KDF parameters produces a
 decryption failure rather than a silently different key.
 
+## What this file contains
+
+168 lines defining **4 functions** (3 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `random_nonce` (line 25) -- Draw a fresh random nonce from the OS CSPRNG.
+- `seal` (line 41) -- Encrypt plaintext, authenticating aad alongside it.
+  - reaches: `cipher`
+- `open` (line 60) -- Decrypt and verify.
+  - reaches: `cipher`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_random_nonce(["random_nonce<br/>pub"])
-    n_cipher["cipher"]
-    n_seal(["seal<br/>pub"])
-    n_open(["open<br/>pub"])
+    n_random_nonce(["random_nonce<br/>line 25"])
+    n_cipher["cipher<br/>line 31"]
+    n_seal(["seal<br/>line 41"])
+    n_open(["open<br/>line 60"])
     n_open --> n_cipher
     n_seal --> n_cipher
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_random_nonce,n_seal,n_open entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_cipher helper
 ```
 
 ## Items

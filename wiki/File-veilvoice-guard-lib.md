@@ -65,15 +65,27 @@ and it still could not stop a root-level attacker, only watch one. So the
 unprivileged half ships first, on its own merits, and `ROADMAP.md` records
 what the privileged half would need to be worth adding.
 
+## What this file contains
+
+140 lines defining **4 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Error` (line 80) -- Everything that can go wrong in this crate.
+
 ## What calls what
+
+_Colour key: **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Error::from"]
-    n_from["Error::from"]
-    n_fmt["Error::fmt"]
-    n_source["Error::source"]
+    n_from["Error::from<br/>line 90"]
+    n_from["Error::from<br/>line 96"]
+    n_fmt["Error::fmt<br/>line 102"]
+    n_source["Error::source<br/>line 112"]
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_from,n_from,n_fmt,n_source helper
 ```
 
 ## Items

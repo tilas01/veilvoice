@@ -39,13 +39,32 @@ ring is intentionally short — enough to absorb jitter between two clocks
 that are not synchronised, not enough to accumulate a delay the user would
 notice while speaking.
 
+## What this file contains
+
+237 lines defining **2 functions** (2 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct LiveStats` (line 41) -- A snapshot of what the live path is doing, safe to read from the UI.
+- `struct LiveSession` (line 56) -- A running live-scramble session.
+- `struct Shared` (line 64)
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `LiveSession::start` (line 76) -- Start scrambling from input into output.
+- `LiveSession::stats` (line 197) -- Read the current statistics, resetting the peak meters.
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_start(["LiveSession::start<br/>pub"])
-    n_stats(["LiveSession::stats<br/>pub"])
+    n_start(["LiveSession::start<br/>line 76"])
+    n_stats(["LiveSession::stats<br/>line 197"])
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_start,n_stats entry
 ```
 
 ## Items

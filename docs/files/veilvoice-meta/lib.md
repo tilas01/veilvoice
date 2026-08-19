@@ -18,6 +18,7 @@
 - [Why this exists](#why-this-exists)
 - [Strip versus spoof](#strip-versus-spoof)
 - [What this crate cannot do](#what-this-crate-cannot-do)
+- [What this file contains](#what-this-file-contains)
 - [What calls what](#what-calls-what)
 - [Items](#items)
 
@@ -53,6 +54,16 @@ still carries its room acoustics and background noise. Nor does it touch
 filesystem timestamps or the filename, both of which are outside the file —
 callers that care must handle those separately.
 
+## What this file contains
+
+111 lines defining **4 functions** (0 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Policy` (line 51) -- How aggressively to rewrite metadata.
+- `struct Report` (line 62) -- What changed in a single file.
+- `enum Error` (line 79) -- Everything that can go wrong in this crate.
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -61,13 +72,17 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_note["Report::note"]
-    n_from["Error::from"]
-    n_fmt["Error::fmt"]
-    n_source["Error::source"]
+    n_note["Report::note<br/>line 70"]
+    n_from["Error::from<br/>line 89"]
+    n_fmt["Error::fmt<br/>line 95"]
+    n_source["Error::source<br/>line 105"]
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_note,n_from,n_fmt,n_source helper
 ```
 
 ## Items

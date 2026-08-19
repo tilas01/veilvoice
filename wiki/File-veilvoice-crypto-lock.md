@@ -67,35 +67,71 @@ rather than merely conventional, the verifier is derived over a domain-
 separated input, so the same passphrase used in both places still produces
 unrelated values.
 
+## What this file contains
+
+732 lines defining **23 functions** (17 public), **2 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct AppLock` (line 119) -- A password verifier plus its attempt history.
+- `struct LockStore` (line 303) -- An AppLock bound to a file, which is persisted after every attempt.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `AppLock::create` (line 133) -- Create a lock for password.
+  - reaches: `derive_verifier`
+- `AppLock::verify` (line 150) -- Check password, recording the outcome.
+  - reaches: `unix_now`, `verify_at`, `cooldown_at`, `derive_verifier`, `delay_secs`
+- `AppLock::cooldown` (line 171) -- Seconds still to wait before another attempt is accepted.
+  - reaches: `cooldown_at`, `unix_now`, `delay_secs`
+- `AppLock::failures` (line 188) -- Consecutive failed attempts recorded so far.
+- `AppLock::params` (line 193) -- The Argon2id cost this lock was created with.
+- `AppLock::to_bytes` (line 217) -- Serialise exactly as it appears on disk.
+- `LockStore::open` (line 314) -- Load the lock at path, or Ok(None) if no lock is configured there.
+  - reaches: `parse`
+- `LockStore::create` (line 335) -- Create a lock at path, refusing to overwrite one already there.
+  - reaches: `derive_verifier`
+- `LockStore::change_password` (line 365) -- Replace the password, after proving the current one.
+  - reaches: `save`, `unlock`, `write_private`
+- `LockStore::remove` (line 375) -- Remove the lock, after proving the password.
+  - reaches: `unlock`, `save`, `write_private`
+- `LockStore::cooldown` (line 381) -- Seconds still to wait before another attempt is accepted.
+  - reaches: `cooldown_at`, `unix_now`, `delay_secs`
+- `LockStore::failures` (line 386) -- Consecutive failed attempts recorded so far.
+- `LockStore::path` (line 391) -- Where this lock is stored.
+- `default_path` (line 433) -- Where the lock file lives on this platform, if the environment says.
+
 ## What calls what
 
 _22 of 20 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_delay_secs(["delay_secs<br/>pub"])
-    n_unix_now["unix_now"]
-    n_create(["AppLock::create<br/>pub"])
-    n_verify(["AppLock::verify<br/>pub"])
-    n_verify_at["AppLock::verify_at"]
-    n_cooldown(["AppLock::cooldown<br/>pub"])
-    n_cooldown_at["AppLock::cooldown_at"]
-    n_failures(["AppLock::failures<br/>pub"])
-    n_params(["AppLock::params<br/>pub"])
-    n_to_bytes(["AppLock::to_bytes<br/>pub"])
-    n_parse(["AppLock::parse<br/>pub"])
-    n_derive_verifier["derive_verifier"]
-    n_open(["LockStore::open<br/>pub"])
-    n_create(["LockStore::create<br/>pub"])
-    n_unlock(["LockStore::unlock<br/>pub"])
-    n_change_password(["LockStore::change_password<br/>pub"])
-    n_remove(["LockStore::remove<br/>pub"])
-    n_cooldown(["LockStore::cooldown<br/>pub"])
-    n_failures(["LockStore::failures<br/>pub"])
-    n_path(["LockStore::path<br/>pub"])
-    n_save["LockStore::save"]
-    n_write_private["write_private"]
+    n_delay_secs["delay_secs<br/>line 94"]
+    n_unix_now["unix_now<br/>line 107"]
+    n_create(["AppLock::create<br/>line 133"])
+    n_verify(["AppLock::verify<br/>line 150"])
+    n_verify_at["AppLock::verify_at<br/>line 154"]
+    n_cooldown(["AppLock::cooldown<br/>line 171"])
+    n_cooldown_at["AppLock::cooldown_at<br/>line 175"]
+    n_failures(["AppLock::failures<br/>line 188"])
+    n_params(["AppLock::params<br/>line 193"])
+    n_to_bytes(["AppLock::to_bytes<br/>line 217"])
+    n_parse["AppLock::parse<br/>line 234"]
+    n_derive_verifier["derive_verifier<br/>line 291"]
+    n_open(["LockStore::open<br/>line 314"])
+    n_create(["LockStore::create<br/>line 335"])
+    n_unlock["LockStore::unlock<br/>line 355"]
+    n_change_password(["LockStore::change_password<br/>line 365"])
+    n_remove(["LockStore::remove<br/>line 375"])
+    n_cooldown(["LockStore::cooldown<br/>line 381"])
+    n_failures(["LockStore::failures<br/>line 386"])
+    n_path(["LockStore::path<br/>line 391"])
+    n_save["LockStore::save<br/>line 395"]
+    n_write_private["write_private<br/>line 417"]
     n_change_password --> n_save
     n_change_password --> n_unlock
     n_cooldown --> n_cooldown_at
@@ -110,6 +146,12 @@ flowchart TD
     n_verify --> n_verify_at
     n_verify_at --> n_cooldown_at
     n_verify_at --> n_derive_verifier
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_create,n_verify,n_cooldown,n_failures,n_params,n_to_bytes,n_open,n_create,n_change_password,n_remove,n_cooldown,n_failures,n_path entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_delay_secs,n_parse,n_unlock api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_unix_now,n_verify_at,n_cooldown_at,n_derive_verifier,n_save,n_write_private helper
 ```
 
 ## Items

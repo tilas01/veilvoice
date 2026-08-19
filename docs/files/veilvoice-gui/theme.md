@@ -17,6 +17,7 @@
 
 - [One palette, three front-ends](#one-palette-three-front-ends)
 - [Why the active theme is an index, not a lock](#why-the-active-theme-is-an-index-not-a-lock)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -49,6 +50,22 @@ out of range would otherwise panic on a slice index, in a paint loop, which
 is the worst possible place for it -- so the read saturates to the default
 instead.
 
+## What this file contains
+
+745 lines defining **8 functions** (7 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct Theme` (line 46) -- One complete colour scheme.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `load_custom` (line 286) -- Read the user's palettes and add them to the table.
+- `set_by_id` (line 307) -- Switch to id, and apply it to ctx.
+  - reaches: `by_id`, `install`, `themes`, `active`
+- `install_fonts` (line 427) -- Load JetBrains Mono if the system has it.
+  - reaches: `user_font_paths`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -57,23 +74,31 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_active(["active<br/>pub"])
-    n_themes(["themes<br/>pub"])
-    n_load_custom(["load_custom<br/>pub"])
-    n_by_id(["by_id<br/>pub"])
-    n_set_by_id(["set_by_id<br/>pub"])
-    n_user_font_paths["user_font_paths"]
-    n_install_fonts(["install_fonts<br/>pub"])
-    n_install(["install<br/>pub"])
+    n_active["active<br/>line 256"]
+    n_themes["themes<br/>line 273"]
+    n_load_custom(["load_custom<br/>line 286"])
+    n_by_id["by_id<br/>line 300"]
+    n_set_by_id(["set_by_id<br/>line 307"])
+    n_user_font_paths["user_font_paths<br/>line 412"]
+    n_install_fonts(["install_fonts<br/>line 427"])
+    n_install["install<br/>line 450"]
     n_active --> n_themes
     n_by_id --> n_themes
     n_install --> n_active
     n_install_fonts --> n_user_font_paths
     n_set_by_id --> n_by_id
     n_set_by_id --> n_install
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_load_custom,n_set_by_id,n_install_fonts entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_active,n_themes,n_by_id,n_install api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_user_font_paths helper
 ```
 
 ## Items

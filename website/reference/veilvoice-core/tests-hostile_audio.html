@@ -54,65 +54,78 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3315 77" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
-<rect x="0" y="0" width="3315" height="77" fill="#16161e" rx="8"/>
-<path d="M475.2 38.5 C 497.2 38.5, 497.2 38.5, 196.2 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M475.2 38.5 C 497.2 38.5, 497.2 38.5, 96.6 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M1039.2 38.5 C 1061.2 38.5, 1061.2 38.5, 196.2 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M1039.2 38.5 C 1061.2 38.5, 1061.2 38.5, 96.6 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M1321.2 38.5 C 1343.2 38.5, 1343.2 38.5, 196.2 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M1321.2 38.5 C 1343.2 38.5, 1343.2 38.5, 96.6 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M3295.2 38.5 C 3317.2 38.5, 3317.2 38.5, 96.6 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M757.2 38.5 C 779.2 38.5, 779.2 38.5, 196.2 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M757.2 38.5 C 779.2 38.5, 779.2 38.5, 96.6 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M1885.2 38.5 C 1907.2 38.5, 1907.2 38.5, 96.6 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M1603.2 38.5 C 1625.2 38.5, 1625.2 38.5, 196.2 38.5" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<rect x="20.0" y="20.0" width="73.6" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="56.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">speech</text>
-<rect x="119.6" y="20.0" width="73.6" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="156.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">engine</text>
-<rect x="219.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="347.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">a_single_nan_does_not_poison_&#8230;</text>
-<rect x="501.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="629.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">every_flavour_of_non_finite_i&#8230;</text>
-<rect x="783.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="911.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">an_entirely_non_finite_buffer&#8230;</text>
-<rect x="1065.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="1193.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">digital_silence_stays_silent_&#8230;</text>
-<rect x="1347.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="1475.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">pathological_but_legal_audio_&#8230;</text>
-<rect x="1629.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="1757.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">hostile_input_is_survived_wit&#8230;</text>
-<rect x="1911.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="2039.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">a_non_finite_sample_rate_is_r&#8230;</text>
-<rect x="2193.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="2321.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">an_absurd_sample_rate_is_refu&#8230;</text>
-<rect x="2475.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="2603.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">an_absurd_frame_size_is_refus&#8230;</text>
-<rect x="2757.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="2885.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">non_finite_parameters_are_ref&#8230;</text>
-<rect x="3039.2" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="3167.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">every_configuration_that_buil&#8230;</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3330 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
+<rect x="0" y="0" width="3330" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M490.4 47.0 C 512.4 47.0, 512.4 47.0, 211.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M490.4 47.0 C 512.4 47.0, 512.4 47.0, 104.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1054.4 47.0 C 1076.4 47.0, 1076.4 47.0, 211.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1054.4 47.0 C 1076.4 47.0, 1076.4 47.0, 104.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1336.4 47.0 C 1358.4 47.0, 1358.4 47.0, 211.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1336.4 47.0 C 1358.4 47.0, 1358.4 47.0, 104.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M3310.4 47.0 C 3332.4 47.0, 3332.4 47.0, 104.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M772.4 47.0 C 794.4 47.0, 794.4 47.0, 211.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M772.4 47.0 C 794.4 47.0, 794.4 47.0, 104.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1900.4 47.0 C 1922.4 47.0, 1922.4 47.0, 104.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1618.4 47.0 C 1640.4 47.0, 1640.4 47.0, 211.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<rect x="20.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="60.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">speech</text>
+<text x="60.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 17</text>
+<rect x="127.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="167.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">engine</text>
+<text x="167.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 30</text>
+<rect x="234.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="362.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_single_nan_does_not_poison_&#8230;</text>
+<text x="362.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 36</text>
+<rect x="516.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="644.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">every_flavour_of_non_finite_i&#8230;</text>
+<text x="644.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 63</text>
+<rect x="798.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="926.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">an_entirely_non_finite_buffer&#8230;</text>
+<text x="926.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 93</text>
+<rect x="1080.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="1208.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">digital_silence_stays_silent_&#8230;</text>
+<text x="1208.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
+<rect x="1362.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="1490.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">pathological_but_legal_audio_&#8230;</text>
+<text x="1490.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 123</text>
+<rect x="1644.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="1772.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hostile_input_is_survived_wit&#8230;</text>
+<text x="1772.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
+<rect x="1926.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="2054.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_non_finite_sample_rate_is_r&#8230;</text>
+<text x="2054.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
+<rect x="2208.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="2336.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">an_absurd_sample_rate_is_refu&#8230;</text>
+<text x="2336.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 221</text>
+<rect x="2490.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="2618.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">an_absurd_frame_size_is_refus&#8230;</text>
+<text x="2618.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
+<rect x="2772.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="2900.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">non_finite_parameters_are_ref&#8230;</text>
+<text x="2900.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 288</text>
+<rect x="3054.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="3182.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">every_configuration_that_buil&#8230;</text>
+<text x="3182.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 339</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_speech[&quot;speech&quot;]
-    n_engine[&quot;engine&quot;]
-    n_a_single_nan_does_not_poison_the_engine_for_ever[&quot;a_single_nan_does_not_poison_&#8230;&quot;]
-    n_every_flavour_of_non_finite_is_survived[&quot;every_flavour_of_non_finite_i&#8230;&quot;]
-    n_an_entirely_non_finite_buffer_is_handled[&quot;an_entirely_non_finite_buffer&#8230;&quot;]
-    n_digital_silence_stays_silent_and_leaves_the_state_usable[&quot;digital_silence_stays_silent_&#8230;&quot;]
-    n_pathological_but_legal_audio_is_handled[&quot;pathological_but_legal_audio_&#8230;&quot;]
-    n_hostile_input_is_survived_with_accent_neutralisation_off[&quot;hostile_input_is_survived_wit&#8230;&quot;]
-    n_a_non_finite_sample_rate_is_refused_rather_than_built[&quot;a_non_finite_sample_rate_is_r&#8230;&quot;]
-    n_an_absurd_sample_rate_is_refused_rather_than_allocated[&quot;an_absurd_sample_rate_is_refu&#8230;&quot;]
-    n_an_absurd_frame_size_is_refused[&quot;an_absurd_frame_size_is_refus&#8230;&quot;]
-    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped[&quot;non_finite_parameters_are_ref&#8230;&quot;]
-    n_every_configuration_that_builds_produces_finite_audio[&quot;every_configuration_that_buil&#8230;&quot;]
+    n_speech[&quot;speech&lt;br/&gt;line 17&quot;]
+    n_engine[&quot;engine&lt;br/&gt;line 30&quot;]
+    n_a_single_nan_does_not_poison_the_engine_for_ever[&quot;a_single_nan_does_not_poison_&#8230;&lt;br/&gt;line 36&quot;]
+    n_every_flavour_of_non_finite_is_survived[&quot;every_flavour_of_non_finite_i&#8230;&lt;br/&gt;line 63&quot;]
+    n_an_entirely_non_finite_buffer_is_handled[&quot;an_entirely_non_finite_buffer&#8230;&lt;br/&gt;line 93&quot;]
+    n_digital_silence_stays_silent_and_leaves_the_state_usable[&quot;digital_silence_stays_silent_&#8230;&lt;br/&gt;line 105&quot;]
+    n_pathological_but_legal_audio_is_handled[&quot;pathological_but_legal_audio_&#8230;&lt;br/&gt;line 123&quot;]
+    n_hostile_input_is_survived_with_accent_neutralisation_off[&quot;hostile_input_is_survived_wit&#8230;&lt;br/&gt;line 162&quot;]
+    n_a_non_finite_sample_rate_is_refused_rather_than_built[&quot;a_non_finite_sample_rate_is_r&#8230;&lt;br/&gt;line 200&quot;]
+    n_an_absurd_sample_rate_is_refused_rather_than_allocated[&quot;an_absurd_sample_rate_is_refu&#8230;&lt;br/&gt;line 221&quot;]
+    n_an_absurd_frame_size_is_refused[&quot;an_absurd_frame_size_is_refus&#8230;&lt;br/&gt;line 260&quot;]
+    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped[&quot;non_finite_parameters_are_ref&#8230;&lt;br/&gt;line 288&quot;]
+    n_every_configuration_that_builds_produces_finite_audio[&quot;every_configuration_that_buil&#8230;&lt;br/&gt;line 339&quot;]
     n_a_single_nan_does_not_poison_the_engine_for_ever --&gt; n_engine
     n_a_single_nan_does_not_poison_the_engine_for_ever --&gt; n_speech
     n_an_entirely_non_finite_buffer_is_handled --&gt; n_engine
@@ -123,7 +136,9 @@ flowchart TD
     n_every_flavour_of_non_finite_is_survived --&gt; n_engine
     n_every_flavour_of_non_finite_is_survived --&gt; n_speech
     n_hostile_input_is_survived_with_accent_neutralisation_off --&gt; n_speech
-    n_pathological_but_legal_audio_is_handled --&gt; n_engine</code></pre>
+    n_pathological_but_legal_audio_is_handled --&gt; n_engine
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_speech,n_engine,n_a_single_nan_does_not_poison_the_engine_for_ever,n_every_flavour_of_non_finite_is_survived,n_an_entirely_non_finite_buffer_is_handled,n_digital_silence_stays_silent_and_leaves_the_state_usable,n_pathological_but_legal_audio_is_handled,n_hostile_input_is_survived_with_accent_neutralisation_off,n_a_non_finite_sample_rate_is_refused_rather_than_built,n_an_absurd_sample_rate_is_refused_rather_than_allocated,n_an_absurd_frame_size_is_refused,n_non_finite_parameters_are_refused_and_wild_ones_are_clamped,n_every_configuration_that_builds_produces_finite_audio helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

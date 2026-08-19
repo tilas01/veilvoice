@@ -15,6 +15,7 @@
 
 ## Contents
 
+- [What this file contains](#what-this-file-contains)
 - [What calls what](#what-calls-what)
 - [Items](#items)
 
@@ -41,6 +42,22 @@ The algorithm is YIN's cumulative mean normalised difference function
 (de Cheveigné & Kawahara, 2002) with parabolic interpolation, minus the
 optimisations that only matter for offline accuracy.
 
+## What this file contains
+
+274 lines defining **4 functions** (3 public), **2 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct PitchEstimate` (line 41) -- One f0 measurement.
+- `struct PitchTracker` (line 51) -- Rolling, allocation-free f0 tracker.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `PitchTracker::new` (line 69) -- Build a tracker for input at sample_rate hertz.
+- `PitchTracker::push` (line 91) -- Feed new input samples (anti-aliased and decimated internally).
+- `PitchTracker::estimate` (line 111) -- Estimate f0 over the newest history.
+  - reaches: `parabolic`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -49,14 +66,20 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new(["PitchTracker::new<br/>pub"])
-    n_push(["PitchTracker::push<br/>pub"])
-    n_estimate(["PitchTracker::estimate<br/>pub"])
-    n_parabolic["PitchTracker::parabolic"]
+    n_new(["PitchTracker::new<br/>line 69"])
+    n_push(["PitchTracker::push<br/>line 91"])
+    n_estimate(["PitchTracker::estimate<br/>line 111"])
+    n_parabolic["PitchTracker::parabolic<br/>line 173"]
     n_estimate --> n_parabolic
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_new,n_push,n_estimate entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_parabolic helper
 ```
 
 ## Items
