@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Encryption at rest for the recordings VeilVoice writes, and the passphrase
 //! prompts that feed it.
 //!

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! The VeilVoice desktop application: six tabs, one window, no menus.
 //!
 //! One window, six tabs, no menus and no settings file to hunt for. This file
@@ -828,15 +828,51 @@ impl VeilVoiceApp {
         }
     }
 
+    /// Say so if the last run ended badly, and offer the file.
+    ///
+    /// A report written to disk that nobody is told about is a report nobody
+    /// reads. The crash log exists because this application had no way at all
+    /// to explain a failure -- no console, and an abort on panic -- and leaving
+    /// its output for the user to stumble across would only half fix that.
+    ///
+    /// Shown in the about tab rather than as a modal on launch: the previous
+    /// run failing is worth knowing and is not worth a dialog in front of
+    /// somebody who has just successfully opened the application.
+    fn previous_crash(&mut self, ui: &mut egui::Ui) {
+        let Some((path, _)) = crate::crashlog::previous() else {
+            return;
+        };
+        ui.horizontal_wrapped(|ui| {
+            ui.label(
+                RichText::new("The previous run ended unexpectedly.")
+                    .color(p::yellow())
+                    .strong(),
+            );
+        });
+        ui.label(
+            RichText::new(format!(
+                "A report was written to {}. It was written on this machine                  and sent nowhere -- VeilVoice has no network code at all.",
+                path.display()
+            ))
+            .color(p::muted())
+            .size(12.0),
+        );
+        if ui.button("dismiss this notice").clicked() {
+            crate::crashlog::clear();
+        }
+        ui.add_space(10.0);
+    }
+
     fn about_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
+        self.previous_crash(ui);
         field(ui, "app", env!("CARGO_PKG_VERSION"));
         field(ui, "engine", veilvoice_core::VERSION);
         field(ui, "audio", veilvoice_audio::VERSION);
         field(ui, "metadata", veilvoice_meta::VERSION);
         field(ui, "monitor", veilvoice_watch::VERSION);
         field(ui, "crypto", veilvoice_crypto::VERSION);
-        field(ui, "licence", "CC-BY-NC-SA-4.0");
+        field(ui, "licence", "GPL-3.0-or-later");
         field(ui, "network access", "none, by construction");
         field(
             ui,

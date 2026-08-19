@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# SPDX-License-Identifier: CC-BY-NC-SA-4.0
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 export DH_VERBOSE = 1
 # Reproducible builds: Debian sets SOURCE_DATE_EPOCH, and these remaps stop the

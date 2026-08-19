@@ -5,29 +5,17 @@ Source: https://github.com/tilas01/veilvoice
 
 Files: *
 Copyright: 2026 tilas01
-License: CC-BY-NC-SA-4.0
+License: GPL-3.0-or-later
 
-License: CC-BY-NC-SA-4.0
- This work is licensed under the Creative Commons
- Attribution-NonCommercial-ShareAlike 4.0 International License.
+License: GPL-3.0-or-later
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later
+ version.
  .
- You are free to share and adapt the material, under three terms: you must give
- appropriate credit and indicate if changes were made (Attribution); you may not
- use the material for commercial purposes (NonCommercial); and if you remix,
- transform or build upon it you must distribute your contributions under the
- same licence (ShareAlike).
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE. See the GNU General Public License for more details.
  .
- The full legal code is authoritative and is at
- https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
- .
- NOTE: this is not a DFSG-free licence. The NonCommercial term means Debian
- will not accept this package into main, and this packaging is therefore for
- local builds or a third-party repository only. That is stated here rather than
- discovered at upload time.
- .
- NOTE: releases up to and including v0.1.9 were published under
- GPL-3.0-or-later and remain under that licence.
-
-Files: debian/*
-Copyright: 2026 tilas01
-License: CC-BY-NC-SA-4.0
+ On Debian systems, the complete text of the GNU General Public License version
+ 3 can be found in "/usr/share/common-licenses/GPL-3".

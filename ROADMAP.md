@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
 # VeilVoice — roadmap
 
@@ -57,7 +57,6 @@ progress.
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
 | 18 | Documentation generator — a page, flowchart and banner for every crate and **every** `.rs` file, mirrored to the website and the GitHub wiki | **done** | — |
-| 19 | Licence change to CC BY-NC-SA 4.0 across the tree | **done** | — |
 | 20 | Repository panel no longer shows a README's own markup as text | **done** | — |
 | 21 | Write the missing module documentation for the 14 files that had almost none | **done** | — |
 | 22 | Website split into a page per section, every published link still working | **planned** | 2 d |

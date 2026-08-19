@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: CC-BY-NC-SA-4.0
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Screenshot a page of the site with headless Edge, over the DevTools protocol.
 
     python -m http.server 8787 --bind 127.0.0.1 --directory website

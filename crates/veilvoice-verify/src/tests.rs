@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! The verifier's own tests.
 //!
 //! The property that matters most here is not "a good signature is accepted"

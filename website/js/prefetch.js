@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Fetch, quietly and in the background, the few things a reader is most likely
 // to open next -- so that clicking them is instant instead of a wait.

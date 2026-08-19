@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: CC-BY-NC-SA-4.0
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # RPM spec for VeilVoice (Fedora, RHEL, openSUSE).
 #
@@ -16,12 +16,9 @@ Version:        %{vv_version}
 Release:        1%{?dist}
 Summary:        Irreversible voice de-identification, fully offline
 
-# The whole work is CC-BY-NC-SA-4.0. Dependencies are permissive and are
+# The whole work is GPL-3.0-or-later. Dependencies are permissive and are
 # statically linked by cargo, which is compatible in that direction.
-License:        CC-BY-NC-SA-4.0
-# NOTE: Fedora and RHEL do not accept NonCommercial licences into their
-# repositories. This spec is for building locally or for a third-party
-# repository, and cannot be submitted upstream as it stands.
+License:        GPL-3.0-or-later
 URL:            https://github.com/tilas01/veilvoice
 Source0:        https://github.com/tilas01/veilvoice/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

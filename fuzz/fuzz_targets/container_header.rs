@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! The `.veil` container header, coverage-guided.
 //!
 //! This is the parser that reads a file somebody sent you. The properties are

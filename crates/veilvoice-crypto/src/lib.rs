@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! # veilvoice-crypto
 //!
 //! Key derivation, post-quantum-hybrid key agreement, authenticated encryption

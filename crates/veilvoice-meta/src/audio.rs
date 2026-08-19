@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Audio tag removal and replacement.
 //!
 //! Tags are handled through `lofty`, which understands ID3v1/ID3v2, Vorbis

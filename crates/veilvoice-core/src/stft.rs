@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Streaming short-time Fourier transform with overlap-add resynthesis.
 //!
 //! Structure follows the classic FIFO/overlap-add pipeline (as popularised by

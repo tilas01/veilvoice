@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Runs every site test. No framework, no dependencies, no package.json — the
 // same rule the site itself follows, for the same reason: a test suite that

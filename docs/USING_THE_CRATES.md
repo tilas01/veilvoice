@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
 # Using VeilVoice as a library
 
@@ -21,44 +21,19 @@ cargo run -p veilvoice-core --example veil_a_buffer
 
 ## The licence, first, because it decides whether you can
 
-VeilVoice is **CC BY-NC-SA 4.0** (Creative Commons
-Attribution-NonCommercial-ShareAlike 4.0 International). That is not a
-formality, it is not the licence most Rust crates use, and it is not an open
-source licence -- so being blunt about it is the whole point of putting it
-first:
+VeilVoice is **GPL-3.0-or-later**. That is not a formality and it is worth
+being blunt about, because it is not the licence most Rust crates use:
 
-- **You may not use these crates in anything commercial.** Not in a paid
-  product, not in a paid service, not in something whose purpose is commercial
-  advantage. That is the NonCommercial term and it is the reason this section
-  comes before the code samples.
-- **If you build on them and distribute the result, it goes out under this same
-  licence.** ShareAlike.
-- **You must credit the author** (tilas01), link the licence, and say if you
-  changed anything.
-- **If you only ever run it yourself**, none of the distribution obligations
-  apply.
-- **There is no dual licence to fall back on.** If you need different terms,
-  ask -- that is a conversation, not a refusal.
-
-Two things worth knowing before you build on this:
-
-- **This is not open source, and calling it that would be false.** Both the
-  Open Source Definition and the FSF's definition of free software require the
-  freedom to use a work commercially. This licence withholds that. The accurate
-  word is *source-available*: everything is readable, buildable, auditable and
-  checkable, and one freedom is reserved.
-- **Releases up to and including v0.1.9 were GPL-3.0-or-later and stay that
-  way.** A licence already granted cannot be withdrawn. If you are building on
-  one of those tags, you have GPL terms for that version, commercial use
-  included. This section is about what comes after.
+- If you link any of these crates into a program you **distribute**, that
+  program must also be released under the GPL-3.0-or-later, with source.
+- If you only ever run it yourself — internally, on your own machines, not
+  distributed — the GPL places no obligation on you at all.
+- If you need it under different terms, there is no dual licence to fall back
+  on.
 
 Every *dependency* of these crates is permissive (MIT / Apache-2.0 / BSD / ISC /
-Zlib) and keeps its own terms, including its own attribution requirements. The
-restriction comes from VeilVoice itself, deliberately.
-
-One consequence for your own project: this licence cannot be combined with GPL
-code in either direction, so a GPL program cannot link these crates any more
-than these crates can absorb GPL source.
+Zlib), so nothing else complicates this. The obligation comes from VeilVoice
+itself, deliberately.
 
 ## Adding a dependency
 

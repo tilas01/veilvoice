@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Password-based key derivation with Argon2id.
 //!
 //! Argon2id is the memory-hard KDF recommended by RFC 9106 and the OWASP

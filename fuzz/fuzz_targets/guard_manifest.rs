@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! The integrity manifest parser, coverage-guided.
 //!
 //! A text format rather than a packed one, which removes a whole class of

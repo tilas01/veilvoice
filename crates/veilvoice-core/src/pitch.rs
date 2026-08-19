@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Monophonic fundamental-frequency tracker (decimated YIN).
 //!
 //! Accent neutralisation needs to know the speaker's *current* f0 so the

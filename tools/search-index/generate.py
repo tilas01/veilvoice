@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: CC-BY-NC-SA-4.0
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Build the search index for the repository and the website.
 
     python tools/search-index/generate.py           # write the index
@@ -142,7 +142,7 @@ KIND_LABELS = [
 ]
 
 BINARY = re.compile(
-    r"\.(png|jpg|jpeg|gif|ico|rgba|woff2?|ttf|otf|pdf|zip|gz|asc|wav|mp3|flac)$", re.I
+    r"\.(png|jpg|jpeg|gif|ico|icns|rgba|woff2?|ttf|otf|pdf|zip|gz|asc|wav|mp3|flac)$", re.I
 )
 
 # Rust items worth an index entry of their own.

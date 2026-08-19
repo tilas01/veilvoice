@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/main.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 67 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 87 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
 
 ## Contents
 

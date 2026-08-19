@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Entry point for the desktop application: open a window, hand it to
 //! [`veilvoice_gui::VeilVoiceApp`], and get out of the way.
 //!
@@ -43,6 +43,15 @@ const ICON_RGBA: &[u8] = include_bytes!("../../../assets/icon-32.rgba");
 const ICON_SIZE: u32 = 32;
 
 fn main() -> eframe::Result<()> {
+    // First, before anything that can fail.
+    //
+    // This binary has no console (`windows_subsystem = "windows"`) and the
+    // workspace aborts on panic, so without this every failure produces
+    // literally nothing: no message, no dialog, no log, just a window that
+    // never appears. A user has nothing to report but "it crashed", which is
+    // exactly the report that arrived against v0.1.10.
+    veilvoice_gui::crashlog::install();
+
     let mut viewport = egui::ViewportBuilder::default()
         .with_inner_size([720.0, 620.0])
         .with_min_inner_size([560.0, 480.0])
@@ -56,12 +65,23 @@ fn main() -> eframe::Result<()> {
         }));
     }
 
-    eframe::run_native(
+    let result = eframe::run_native(
         "VeilVoice",
         eframe::NativeOptions {
             viewport,
             ..Default::default()
         },
         Box::new(|cc| Ok(Box::new(veilvoice_gui::VeilVoiceApp::new(cc)))),
-    )
+    );
+
+    // `eframe` reports a failed start by returning, not by panicking, so the
+    // hook above never sees it -- and the `Err` a `main` returns is printed to
+    // a stderr that does not exist here. Creating the window is also the most
+    // likely thing to fail on somebody else's machine: this renders through
+    // glow, which is OpenGL, and a virtual machine, a remote desktop session or
+    // hybrid graphics handing over the wrong adapter can all refuse a context.
+    if let Err(error) = &result {
+        veilvoice_gui::crashlog::record_startup_failure(&format!("{error}"));
+    }
+    result
 }

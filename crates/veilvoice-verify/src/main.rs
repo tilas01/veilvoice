@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 #![forbid(unsafe_code)]
 
 //! The portable verifier: check a VeilVoice release without GnuPG installed.
