@@ -42,7 +42,7 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice &mdash; 153 files, 6062 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice &mdash; 154 files, 6077 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
@@ -51,7 +51,7 @@ nav.top a{margin-right:14px}
 <li><a href="#k-rust">Rust source</a> <span class="meta">54 files</span></li>
 <li><a href="#k-test">Tests and fuzzing</a> <span class="meta">10 files</span></li>
 <li><a href="#k-web">Website</a> <span class="meta">15 files</span></li>
-<li><a href="#k-tool">Tools and generators</a> <span class="meta">18 files</span></li>
+<li><a href="#k-tool">Tools and generators</a> <span class="meta">19 files</span></li>
 <li><a href="#k-build">Build and CI</a> <span class="meta">19 files</span></li>
 <li><a href="#k-legal">Licence and legal</a> <span class="meta">4 files</span></li>
 <li><a href="#k-other">Other</a> <span class="meta">21 files</span></li>
@@ -2205,7 +2205,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-guard/src/blame.rs</code> <span class="meta">&mdash; veilvoice-guard, 402 lines, 37 sections</span></summary>
+<summary><code>crates/veilvoice-guard/src/blame.rs</code> <span class="meta">&mdash; veilvoice-guard, 406 lines, 35 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs">open blame.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Best-effort attribution: which program changed a file. # Read this before relying on it **Most of the time this cannot answer, and says so.** Neither Windows nor Linux records who wrote to a file unless auditing has been switched on for</span></li>
@@ -2214,37 +2214,35 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">subsystem. With a watch in place (`auditctl -w &lt;path&gt; -p wa -k veilvoice`), `ausearch` reports the syscall, the pid and the executable name for every write. Reading those records usually needs root as well. - **Windows** -- object access</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">auditing. With a SACL on the file and the &quot;Audit File System&quot; policy enabled, Security event 4663 records the process that opened it for write. `wevtutil` can query that log, though reading the Security log needs elevation. Both are</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">checked for, neither is configured by this crate, and the absence of either is reported rather than hidden. Setting them up is a deliberate act by an administrator, and pretending otherwise would misrepresent what a clean report means.</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 48</span><br><span class="x">Spawn without a console window. On Windows a `Command` for a console program creates a console, and when the parent is a GUI process with none of its own, Windows opens a **window** for it -- appearing and vanishing as the child runs. That</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 48</span><br><span class="x">is what &quot;a cmd prompt flashing randomly&quot; was: once at startup, and again on every poll. `CREATE_NO_WINDOW` suppresses it. `creation_flags` is a **safe** API, so this costs nothing against `#![forbid(unsafe_code)]`. Every `Command::new` in</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 48</span><br><span class="x">this crate goes through here, and a test asserts it -- because &quot;no console window appeared&quot; is not observable from a test, which is exactly why the defect shipped.</span></li>
-<li><span class="sec">const CREATE_NO_WINDOW</span> <span class="meta">line 52</span><br><span class="x"></span></li>
-<li><span class="sec">fn system_tool</span> <span class="meta">line 75</span><br><span class="x">Resolve a system tool to an absolute path, rather than letting the operating system search for it. `Command::new(&quot;wevtutil&quot;)` does **not** mean &quot;the Windows tool&quot;. Rust&#x27;s `Command` resolves a bare name through the platform&#x27;s search order,</span></li>
-<li><span class="sec">fn system_tool</span> <span class="meta">line 75</span><br><span class="x">and on Windows that order includes the **current working directory** before most of `PATH`. Running `veilvoice guard check` inside a directory that happens to contain a file called `wevtutil.exe` therefore ran that file &#8212; as the user, with</span></li>
-<li><span class="sec">fn system_tool</span> <span class="meta">line 75</span><br><span class="x">no prompt. A downloads folder is enough. The same applies to `reg.exe` in `veilvoice-watch`, and to `ausearch` on a Unix box with a writable directory early in `PATH`. Naming the absolute path removes the search entirely. Returning `None`</span></li>
-<li><span class="sec">fn system_tool</span> <span class="meta">line 75</span><br><span class="x">when the tool is not where it should be is the right answer too: this module&#x27;s whole design is to say &quot;I cannot tell you&quot; rather than to guess, and running *something else called `wevtutil`* is the worst possible guess.</span></li>
-<li><span class="sec">enum Blame</span> <span class="meta">line 90</span><br><span class="x">What, if anything, is known about who changed a file.</span></li>
-<li><span class="sec">impl Blame</span> <span class="meta">line 109</span><br><span class="x"></span></li>
-<li><span class="sec">fn describe</span> <span class="meta">line 111</span><br><span class="x">A single line for a terminal, an alert or a log.</span></li>
-<li><span class="sec">fn is_known</span> <span class="meta">line 122</span><br><span class="x">Whether an actual name was found.</span></li>
-<li><span class="sec">fn unconfigured</span> <span class="meta">line 128</span><br><span class="x">Build the &quot;nobody configured auditing&quot; answer for this platform.</span></li>
-<li><span class="sec">fn who_touched</span> <span class="meta">line 147</span><br><span class="x">Try to name the program that last wrote to `path`. Returns [`Blame::Unknown`] far more often than not. That is the correct answer on an unaudited system, and is reported as such rather than guessed at.</span></li>
-<li><span class="sec">mod linux</span> <span class="meta">line 164</span><br><span class="x"></span></li>
-<li><span class="sec">const AUSEARCH_DIRS</span> <span class="meta">line 171</span><br><span class="x">Where a distribution puts `ausearch`. Searched in order, and nowhere else &#8212; see [`super::system_tool`] for why `PATH` is not consulted.</span></li>
-<li><span class="sec">fn who_touched</span> <span class="meta">line 175</span><br><span class="x">Ask `ausearch` what touched the path, if the audit tools are present at all and this process is allowed to read the records.</span></li>
-<li><span class="sec">fn field</span> <span class="meta">line 216</span><br><span class="x">Pull `key=&quot;value&quot;` or `key=value` out of an interpreted audit line.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 228</span><br><span class="x"></span></li>
-<li><span class="sec">fn fields_are_pulled_out_of_an_interpreted_record</span> <span class="meta">line 232</span><br><span class="x"></span></li>
-<li><span class="sec">mod windows</span> <span class="meta">line 242</span><br><span class="x"></span></li>
-<li><span class="sec">fn wevtutil</span> <span class="meta">line 255</span><br><span class="x">Query the Security log for object-access events naming this path. Event 4663 is &quot;an attempt was made to access an object&quot;, and carries the process name. It is only written if a SACL is on the object *and* the audit policy is on, which is</span></li>
-<li><span class="sec">fn wevtutil</span> <span class="meta">line 255</span><br><span class="x">off by default; and reading the Security log needs elevation. All three are ordinary reasons to get nothing. `wevtutil.exe` lives in the system directory and nowhere else. Resolved absolutely rather than searched &#8212; see</span></li>
-<li><span class="sec">fn wevtutil</span> <span class="meta">line 255</span><br><span class="x">[`super::system_tool`].</span></li>
-<li><span class="sec">fn who_touched</span> <span class="meta">line 263</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 329</span><br><span class="x"></span></li>
-<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 338</span><br><span class="x">Every subprocess in this file must be spawned through `no_window`. This reads the file&#x27;s own source rather than exercising the behaviour, because &quot;no console window appeared&quot; cannot be observed from a test -- which is precisely why the</span></li>
-<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 338</span><br><span class="x">defect reached a release. A `Command::new` added later without the wrapper fails here rather than on a desktop.</span></li>
-<li><span class="sec">fn an_unaudited_file_yields_an_honest_unknown</span> <span class="meta">line 363</span><br><span class="x">On an ordinary machine there is no auditing, so this must return a reason rather than a guess -- and must never panic doing it.</span></li>
-<li><span class="sec">fn a_missing_file_does_not_panic</span> <span class="meta">line 380</span><br><span class="x"></span></li>
-<li><span class="sec">fn descriptions_read_sensibly</span> <span class="meta">line 385</span><br><span class="x"></span></li>
+<li><span class="sec">fn no_window</span> <span class="meta">line 52</span><br><span class="x"></span></li>
+<li><span class="sec">const CREATE_NO_WINDOW</span> <span class="meta">line 56</span><br><span class="x"></span></li>
+<li><span class="sec">fn system_tool</span> <span class="meta">line 79</span><br><span class="x">Resolve a system tool to an absolute path, rather than letting the operating system search for it. `Command::new(&quot;wevtutil&quot;)` does **not** mean &quot;the Windows tool&quot;. Rust&#x27;s `Command` resolves a bare name through the platform&#x27;s search order,</span></li>
+<li><span class="sec">fn system_tool</span> <span class="meta">line 79</span><br><span class="x">and on Windows that order includes the **current working directory** before most of `PATH`. Running `veilvoice guard check` inside a directory that happens to contain a file called `wevtutil.exe` therefore ran that file &#8212; as the user, with</span></li>
+<li><span class="sec">fn system_tool</span> <span class="meta">line 79</span><br><span class="x">no prompt. A downloads folder is enough. The same applies to `reg.exe` in `veilvoice-watch`, and to `ausearch` on a Unix box with a writable directory early in `PATH`. Naming the absolute path removes the search entirely. Returning `None`</span></li>
+<li><span class="sec">fn system_tool</span> <span class="meta">line 79</span><br><span class="x">when the tool is not where it should be is the right answer too: this module&#x27;s whole design is to say &quot;I cannot tell you&quot; rather than to guess, and running *something else called `wevtutil`* is the worst possible guess.</span></li>
+<li><span class="sec">enum Blame</span> <span class="meta">line 94</span><br><span class="x">What, if anything, is known about who changed a file.</span></li>
+<li><span class="sec">impl Blame</span> <span class="meta">line 113</span><br><span class="x"></span></li>
+<li><span class="sec">fn describe</span> <span class="meta">line 115</span><br><span class="x">A single line for a terminal, an alert or a log.</span></li>
+<li><span class="sec">fn is_known</span> <span class="meta">line 126</span><br><span class="x">Whether an actual name was found.</span></li>
+<li><span class="sec">fn unconfigured</span> <span class="meta">line 132</span><br><span class="x">Build the &quot;nobody configured auditing&quot; answer for this platform.</span></li>
+<li><span class="sec">fn who_touched</span> <span class="meta">line 151</span><br><span class="x">Try to name the program that last wrote to `path`. Returns [`Blame::Unknown`] far more often than not. That is the correct answer on an unaudited system, and is reported as such rather than guessed at.</span></li>
+<li><span class="sec">mod linux</span> <span class="meta">line 168</span><br><span class="x"></span></li>
+<li><span class="sec">const AUSEARCH_DIRS</span> <span class="meta">line 175</span><br><span class="x">Where a distribution puts `ausearch`. Searched in order, and nowhere else &#8212; see [`super::system_tool`] for why `PATH` is not consulted.</span></li>
+<li><span class="sec">fn who_touched</span> <span class="meta">line 179</span><br><span class="x">Ask `ausearch` what touched the path, if the audit tools are present at all and this process is allowed to read the records.</span></li>
+<li><span class="sec">fn field</span> <span class="meta">line 220</span><br><span class="x">Pull `key=&quot;value&quot;` or `key=value` out of an interpreted audit line.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 232</span><br><span class="x"></span></li>
+<li><span class="sec">fn fields_are_pulled_out_of_an_interpreted_record</span> <span class="meta">line 236</span><br><span class="x"></span></li>
+<li><span class="sec">mod windows</span> <span class="meta">line 246</span><br><span class="x"></span></li>
+<li><span class="sec">fn wevtutil</span> <span class="meta">line 259</span><br><span class="x">Query the Security log for object-access events naming this path. Event 4663 is &quot;an attempt was made to access an object&quot;, and carries the process name. It is only written if a SACL is on the object *and* the audit policy is on, which is</span></li>
+<li><span class="sec">fn wevtutil</span> <span class="meta">line 259</span><br><span class="x">off by default; and reading the Security log needs elevation. All three are ordinary reasons to get nothing. `wevtutil.exe` lives in the system directory and nowhere else. Resolved absolutely rather than searched &#8212; see</span></li>
+<li><span class="sec">fn wevtutil</span> <span class="meta">line 259</span><br><span class="x">[`super::system_tool`].</span></li>
+<li><span class="sec">fn who_touched</span> <span class="meta">line 267</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 333</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 342</span><br><span class="x">Every subprocess in this file must be spawned through `no_window`. This reads the file&#x27;s own source rather than exercising the behaviour, because &quot;no console window appeared&quot; cannot be observed from a test -- which is precisely why the</span></li>
+<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 342</span><br><span class="x">defect reached a release. A `Command::new` added later without the wrapper fails here rather than on a desktop.</span></li>
+<li><span class="sec">fn an_unaudited_file_yields_an_honest_unknown</span> <span class="meta">line 367</span><br><span class="x">On an ordinary machine there is no auditing, so this must return a reason rather than a guess -- and must never panic doing it.</span></li>
+<li><span class="sec">fn a_missing_file_does_not_panic</span> <span class="meta">line 384</span><br><span class="x"></span></li>
+<li><span class="sec">fn descriptions_read_sensibly</span> <span class="meta">line 389</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -2577,7 +2575,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/reduced_motion.rs</code> <span class="meta">&mdash; veilvoice-gui, 325 lines, 29 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/reduced_motion.rs</code> <span class="meta">&mdash; veilvoice-gui, 329 lines, 27 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs">open reduced_motion.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Whether the operating system has been asked to reduce motion. # Why this exists rather than an egui call egui does not surface the platform&#x27;s accessibility preference, so it has to be read here. The website gets this for free -- CSS has</span></li>
@@ -2587,28 +2585,26 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice-guard`. Every tool here is named by absolute path, and an unfound tool answers &quot;I do not know&quot; rather than falling back to a search. # When it cannot tell [`Query::Unknown`] means the platform was not asked or did not answer,</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">and the caller treats that as &quot;no reduction requested&quot; -- because defaulting to *off* would silently disable animation for everybody on a platform this cannot read, which is a worse failure than missing the preference for the few who set</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">it. The settings panel only claims the system asked for reduced motion when it actually saw it say so.</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 52</span><br><span class="x">Spawn without a console window. On Windows a `Command` for a console program creates a console, and when the parent is a GUI process with none of its own, Windows opens a **window** for it -- appearing and vanishing as the child runs. That</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 52</span><br><span class="x">is what &quot;a cmd prompt flashing randomly&quot; was: once at startup, and again on every poll. `CREATE_NO_WINDOW` suppresses it. `creation_flags` is a **safe** API, so this costs nothing against `#![forbid(unsafe_code)]`. Every `Command::new` in</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 52</span><br><span class="x">this crate goes through here, and a test asserts it -- because &quot;no console window appeared&quot; is not observable from a test, which is exactly why the defect shipped.</span></li>
-<li><span class="sec">const CREATE_NO_WINDOW</span> <span class="meta">line 56</span><br><span class="x"></span></li>
-<li><span class="sec">enum Query</span> <span class="meta">line 64</span><br><span class="x">What the platform said.</span></li>
-<li><span class="sec">impl Query</span> <span class="meta">line 73</span><br><span class="x"></span></li>
-<li><span class="sec">fn reduces</span> <span class="meta">line 77</span><br><span class="x">Whether to treat this as a request to reduce motion. `Unknown` is *not* a reduction: see the module note.</span></li>
-<li><span class="sec">fn tool</span> <span class="meta">line 83</span><br><span class="x">Resolve a tool to an absolute path. Never searches `PATH`.</span></li>
-<li><span class="sec">fn query</span> <span class="meta">line 97</span><br><span class="x">Ask the operating system. Called once, at startup.</span></li>
-<li><span class="sec">fn windows_query</span> <span class="meta">line 121</span><br><span class="x">Windows: &quot;Show animations in Windows&quot; lives in the `UserPreferencesMask` under `HKCU\Control Panel\Desktop`. It is a little-endian bit field, and **bit 1 of byte 0** is `CLIENTAREAANIMATION` -- set when animation is wanted, clear when the</span></li>
-<li><span class="sec">fn windows_query</span> <span class="meta">line 121</span><br><span class="x">user has switched it off.</span></li>
-<li><span class="sec">fn parse_user_preferences_mask</span> <span class="meta">line 151</span><br><span class="x">Pull the mask out of `reg query` output and read the animation bit.</span></li>
-<li><span class="sec">fn macos_query</span> <span class="meta">line 175</span><br><span class="x">macOS: the Accessibility &quot;Reduce motion&quot; switch.</span></li>
-<li><span class="sec">fn unix_query</span> <span class="meta">line 200</span><br><span class="x">Linux and the BSDs: GNOME&#x27;s `enable-animations`, which the other major desktops have largely adopted as the common key.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 221</span><br><span class="x"></span></li>
-<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 230</span><br><span class="x">Every subprocess in this file must be spawned through `no_window`. This reads the file&#x27;s own source rather than exercising the behaviour, because &quot;no console window appeared&quot; cannot be observed from a test -- which is precisely why the</span></li>
-<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 230</span><br><span class="x">defect reached a release. A `Command::new` added later without the wrapper fails here rather than on a desktop.</span></li>
-<li><span class="sec">fn the_platform_can_be_asked_without_incident</span> <span class="meta">line 255</span><br><span class="x">Whatever this machine says, it must say it without panicking and without hanging.</span></li>
-<li><span class="sec">fn not_knowing_is_not_a_request_to_reduce</span> <span class="meta">line 272</span><br><span class="x">&quot;I do not know&quot; must not switch animation off for everybody on a platform this cannot read.</span></li>
-<li><span class="sec">fn a_missing_tool_yields_unknown_rather_than_a_search</span> <span class="meta">line 279</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_windows_mask_is_read_from_the_right_bit</span> <span class="meta">line 286</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_real_windows_setting_parses</span> <span class="meta">line 314</span><br><span class="x">The real registry value, on the machine running the test, must parse.</span></li>
+<li><span class="sec">fn no_window</span> <span class="meta">line 56</span><br><span class="x"></span></li>
+<li><span class="sec">const CREATE_NO_WINDOW</span> <span class="meta">line 60</span><br><span class="x"></span></li>
+<li><span class="sec">enum Query</span> <span class="meta">line 68</span><br><span class="x">What the platform said.</span></li>
+<li><span class="sec">impl Query</span> <span class="meta">line 77</span><br><span class="x"></span></li>
+<li><span class="sec">fn reduces</span> <span class="meta">line 81</span><br><span class="x">Whether to treat this as a request to reduce motion. `Unknown` is *not* a reduction: see the module note.</span></li>
+<li><span class="sec">fn tool</span> <span class="meta">line 87</span><br><span class="x">Resolve a tool to an absolute path. Never searches `PATH`.</span></li>
+<li><span class="sec">fn query</span> <span class="meta">line 101</span><br><span class="x">Ask the operating system. Called once, at startup.</span></li>
+<li><span class="sec">fn windows_query</span> <span class="meta">line 125</span><br><span class="x">Windows: &quot;Show animations in Windows&quot; lives in the `UserPreferencesMask` under `HKCU\Control Panel\Desktop`. It is a little-endian bit field, and **bit 1 of byte 0** is `CLIENTAREAANIMATION` -- set when animation is wanted, clear when the</span></li>
+<li><span class="sec">fn windows_query</span> <span class="meta">line 125</span><br><span class="x">user has switched it off.</span></li>
+<li><span class="sec">fn parse_user_preferences_mask</span> <span class="meta">line 155</span><br><span class="x">Pull the mask out of `reg query` output and read the animation bit.</span></li>
+<li><span class="sec">fn macos_query</span> <span class="meta">line 179</span><br><span class="x">macOS: the Accessibility &quot;Reduce motion&quot; switch.</span></li>
+<li><span class="sec">fn unix_query</span> <span class="meta">line 204</span><br><span class="x">Linux and the BSDs: GNOME&#x27;s `enable-animations`, which the other major desktops have largely adopted as the common key.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 225</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 234</span><br><span class="x">Every subprocess in this file must be spawned through `no_window`. This reads the file&#x27;s own source rather than exercising the behaviour, because &quot;no console window appeared&quot; cannot be observed from a test -- which is precisely why the</span></li>
+<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 234</span><br><span class="x">defect reached a release. A `Command::new` added later without the wrapper fails here rather than on a desktop.</span></li>
+<li><span class="sec">fn the_platform_can_be_asked_without_incident</span> <span class="meta">line 259</span><br><span class="x">Whatever this machine says, it must say it without panicking and without hanging.</span></li>
+<li><span class="sec">fn not_knowing_is_not_a_request_to_reduce</span> <span class="meta">line 276</span><br><span class="x">&quot;I do not know&quot; must not switch animation off for everybody on a platform this cannot read.</span></li>
+<li><span class="sec">fn a_missing_tool_yields_unknown_rather_than_a_search</span> <span class="meta">line 283</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_windows_mask_is_read_from_the_right_bit</span> <span class="meta">line 290</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_real_windows_setting_parses</span> <span class="meta">line 318</span><br><span class="x">The real registry value, on the machine running the test, must parse.</span></li>
 </ul>
 </details>
 <details open>
@@ -3067,7 +3063,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-watch/src/windows.rs</code> <span class="meta">&mdash; veilvoice-watch, 413 lines, 46 sections</span></summary>
+<summary><code>crates/veilvoice-watch/src/windows.rs</code> <span class="meta">&mdash; veilvoice-watch, 417 lines, 44 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs">open windows.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Windows detection, via the Capability Access Manager. # Where the answer lives Windows records every application&#x27;s use of the microphone and camera under `HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\</span></li>
@@ -3076,46 +3072,44 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">what the OS itself believes. Desktop programs live under a `NonPackaged` subkey, with their path encoded using `#` in place of each separator. Store apps appear directly, keyed by package family name. # What it cannot give you A PID.</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Windows tracks this per *application*, not per process, so [`DeviceUse::pid`] is `None` here. The trade is worth it: this sees packaged apps, background services and anything else the OS accounts for, which enumerating process handles</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">would miss.</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 45</span><br><span class="x">Spawn without a console window. On Windows a `Command` for a console program creates a console, and when the parent is a GUI process with none of its own, Windows opens a **window** for it -- appearing and vanishing as the child runs. That</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 45</span><br><span class="x">is what &quot;a cmd prompt flashing randomly&quot; was: once at startup, and again on every poll. `CREATE_NO_WINDOW` suppresses it. `creation_flags` is a **safe** API, so this costs nothing against `#![forbid(unsafe_code)]`. Every `Command::new` in</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 45</span><br><span class="x">this crate goes through here, and a test asserts it -- because &quot;no console window appeared&quot; is not observable from a test, which is exactly why the defect shipped.</span></li>
-<li><span class="sec">const CREATE_NO_WINDOW</span> <span class="meta">line 49</span><br><span class="x"></span></li>
-<li><span class="sec">const CONSENT_STORE</span> <span class="meta">line 58</span><br><span class="x">The full hive name, not the `HKCU` abbreviation: `reg query` echoes subkey paths back in long form, and the reply has to be matched against what was asked for. Querying with the short form silently matched nothing.</span></li>
-<li><span class="sec">const FILETIME_TO_UNIX_SECS</span> <span class="meta">line 62</span><br><span class="x">FILETIME counts 100-nanosecond intervals from 1601-01-01; Unix time starts at 1970-01-01. This is the gap, in seconds.</span></li>
-<li><span class="sec">const BACKSLASH</span> <span class="meta">line 65</span><br><span class="x">The registry path separator, as a byte.</span></li>
-<li><span class="sec">fn reg_exe</span> <span class="meta">line 80</span><br><span class="x">The absolute path of `reg.exe`, or `None` if it is not where it should be. **Never `Command::new(&quot;reg&quot;)`.** Rust&#x27;s `Command` resolves a bare program name through the platform search order, and on Windows that order includes the **current</span></li>
-<li><span class="sec">fn reg_exe</span> <span class="meta">line 80</span><br><span class="x">working directory** ahead of most of `PATH`. Running `veilvoice watch` from a directory containing a file named `reg.exe` would have executed it, as the user, with no prompt &#8212; a downloads folder is enough. Naming the system directory</span></li>
-<li><span class="sec">fn reg_exe</span> <span class="meta">line 80</span><br><span class="x">removes the search. Returning `None` rather than falling back to a search is deliberate: this module&#x27;s failure mode is already &quot;report nothing&quot;, and the crate says plainly that an empty list from a blind monitor is not good news. Running</span></li>
-<li><span class="sec">fn reg_exe</span> <span class="meta">line 80</span><br><span class="x">an unknown `reg.exe` would be a far worse answer than no answer.</span></li>
-<li><span class="sec">fn scan</span> <span class="meta">line 96</span><br><span class="x"></span></li>
-<li><span class="sec">fn collect</span> <span class="meta">line 109</span><br><span class="x">Walk one capability&#x27;s subkeys, two levels deep to catch `NonPackaged`.</span></li>
-<li><span class="sec">fn subkeys</span> <span class="meta">line 128</span><br><span class="x">Immediate subkey paths of `key`, or nothing if it does not exist. `reg.exe` is used rather than a registry crate: it ships with every Windows install, keeps this crate dependency-free, and reading two well-known keys does not justify</span></li>
-<li><span class="sec">fn subkeys</span> <span class="meta">line 128</span><br><span class="x">pulling in the Win32 bindings.</span></li>
-<li><span class="sec">fn read_entry</span> <span class="meta">line 155</span><br><span class="x">Read one application&#x27;s entry, returning it only if the device is in use now.</span></li>
-<li><span class="sec">fn read_u64</span> <span class="meta">line 179</span><br><span class="x"></span></li>
-<li><span class="sec">fn decode_path</span> <span class="meta">line 194</span><br><span class="x">Registry keys encode a path with `#` where a separator belongs.</span></li>
-<li><span class="sec">fn friendly_name</span> <span class="meta">line 199</span><br><span class="x">The executable name, or the package family name for a Store app.</span></li>
-<li><span class="sec">fn filetime_to_system</span> <span class="meta">line 209</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 216</span><br><span class="x"></span></li>
-<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 225</span><br><span class="x">Every subprocess in this file must be spawned through `no_window`. This reads the file&#x27;s own source rather than exercising the behaviour, because &quot;no console window appeared&quot; cannot be observed from a test -- which is precisely why the</span></li>
-<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 225</span><br><span class="x">defect reached a release. A `Command::new` added later without the wrapper fails here rather than on a desktop.</span></li>
-<li><span class="sec">fn registry_paths_are_decoded</span> <span class="meta">line 248</span><br><span class="x"></span></li>
-<li><span class="sec">fn names_are_readable</span> <span class="meta">line 256</span><br><span class="x"></span></li>
-<li><span class="sec">fn filetime_converts_to_a_sane_instant</span> <span class="meta">line 265</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_nonsense_filetime_does_not_panic</span> <span class="meta">line 274</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_registry_tool_is_resolved_absolutely_not_searched_for</span> <span class="meta">line 285</span><br><span class="x">Regression: the registry tool must be an absolute path in the system directory, never a bare name the OS searches for &#8212; the Windows search order includes the current working directory, so a planted `reg.exe` would have been run as the user.</span></li>
-<li><span class="sec">fn a_decoy_in_the_working_directory_is_not_picked_up</span> <span class="meta">line 300</span><br><span class="x">And a decoy named `reg.exe` in the working directory must never become the tool we run. Written without a temp-directory crate so this crate stays dependency-free, dev-dependencies included.</span></li>
-<li><span class="sec">fn a_missing_key_yields_nothing_rather_than_failing</span> <span class="meta">line 317</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_registry_parser_reads_a_key_that_always_exists</span> <span class="meta">line 335</span><br><span class="x">Regression, and the important one. `reg query` echoes subkey paths back under the **full** hive name, so asking with the `HKCU` abbreviation matched nothing and the monitor reported an empty machine no matter what was recording &#8212; the worst</span></li>
-<li><span class="sec">fn the_registry_parser_reads_a_key_that_always_exists</span> <span class="meta">line 335</span><br><span class="x">possible failure for this feature, because it looks like good news. Asked against a key every Windows installation has, rather than against the consent store. The consent store is populated by *applications having asked for the</span></li>
-<li><span class="sec">fn the_registry_parser_reads_a_key_that_always_exists</span> <span class="meta">line 335</span><br><span class="x">microphone*, and a headless CI runner with no audio hardware has legitimately never had one ask &#8212; so an empty result there means &quot;nothing has used the microphone on this machine&quot;, which is not the same claim at all. Conflating the two made</span></li>
-<li><span class="sec">fn the_registry_parser_reads_a_key_that_always_exists</span> <span class="meta">line 335</span><br><span class="x">CI fail on a machine where the code was working perfectly, which is its own kind of silently wrong.</span></li>
-<li><span class="sec">fn the_consent_store_is_well_formed_when_this_machine_has_one</span> <span class="meta">line 364</span><br><span class="x">The consent store itself, when this machine has one. Asserts the *shape* of what comes back, never which applications are in it. Both of those are facts about the machine rather than about the code, and both have now failed CI for that</span></li>
-<li><span class="sec">fn the_consent_store_is_well_formed_when_this_machine_has_one</span> <span class="meta">line 364</span><br><span class="x">reason: first the store was empty on a runner where nothing had ever asked for a microphone, and then &#8212; after that was allowed for &#8212; a runner had entries but no `NonPackaged` subkey, which only appears once a *desktop* application has</span></li>
-<li><span class="sec">fn the_consent_store_is_well_formed_when_this_machine_has_one</span> <span class="meta">line 364</span><br><span class="x">asked. A test that fails depending on what software a machine has happened to run is not testing this crate. What is worth asserting is that every entry is a real subkey path under the full hive name, because that is what the parser is</span></li>
-<li><span class="sec">fn the_consent_store_is_well_formed_when_this_machine_has_one</span> <span class="meta">line 364</span><br><span class="x">for. Whether the parser works at all is covered without any of this ambiguity by `the_registry_parser_reads_a_key_that_always_exists`.</span></li>
-<li><span class="sec">fn value_lines_are_not_treated_as_subkeys</span> <span class="meta">line 390</span><br><span class="x">Value lines must never be mistaken for subkeys.</span></li>
-<li><span class="sec">fn scanning_the_real_consent_store_is_well_formed</span> <span class="meta">line 401</span><br><span class="x">Reading the real consent store must work on any Windows machine, and must not report an application that has already released the device.</span></li>
+<li><span class="sec">fn no_window</span> <span class="meta">line 49</span><br><span class="x"></span></li>
+<li><span class="sec">const CREATE_NO_WINDOW</span> <span class="meta">line 53</span><br><span class="x"></span></li>
+<li><span class="sec">const CONSENT_STORE</span> <span class="meta">line 62</span><br><span class="x">The full hive name, not the `HKCU` abbreviation: `reg query` echoes subkey paths back in long form, and the reply has to be matched against what was asked for. Querying with the short form silently matched nothing.</span></li>
+<li><span class="sec">const FILETIME_TO_UNIX_SECS</span> <span class="meta">line 66</span><br><span class="x">FILETIME counts 100-nanosecond intervals from 1601-01-01; Unix time starts at 1970-01-01. This is the gap, in seconds.</span></li>
+<li><span class="sec">const BACKSLASH</span> <span class="meta">line 69</span><br><span class="x">The registry path separator, as a byte.</span></li>
+<li><span class="sec">fn reg_exe</span> <span class="meta">line 84</span><br><span class="x">The absolute path of `reg.exe`, or `None` if it is not where it should be. **Never `Command::new(&quot;reg&quot;)`.** Rust&#x27;s `Command` resolves a bare program name through the platform search order, and on Windows that order includes the **current</span></li>
+<li><span class="sec">fn reg_exe</span> <span class="meta">line 84</span><br><span class="x">working directory** ahead of most of `PATH`. Running `veilvoice watch` from a directory containing a file named `reg.exe` would have executed it, as the user, with no prompt &#8212; a downloads folder is enough. Naming the system directory</span></li>
+<li><span class="sec">fn reg_exe</span> <span class="meta">line 84</span><br><span class="x">removes the search. Returning `None` rather than falling back to a search is deliberate: this module&#x27;s failure mode is already &quot;report nothing&quot;, and the crate says plainly that an empty list from a blind monitor is not good news. Running</span></li>
+<li><span class="sec">fn reg_exe</span> <span class="meta">line 84</span><br><span class="x">an unknown `reg.exe` would be a far worse answer than no answer.</span></li>
+<li><span class="sec">fn scan</span> <span class="meta">line 100</span><br><span class="x"></span></li>
+<li><span class="sec">fn collect</span> <span class="meta">line 113</span><br><span class="x">Walk one capability&#x27;s subkeys, two levels deep to catch `NonPackaged`.</span></li>
+<li><span class="sec">fn subkeys</span> <span class="meta">line 132</span><br><span class="x">Immediate subkey paths of `key`, or nothing if it does not exist. `reg.exe` is used rather than a registry crate: it ships with every Windows install, keeps this crate dependency-free, and reading two well-known keys does not justify</span></li>
+<li><span class="sec">fn subkeys</span> <span class="meta">line 132</span><br><span class="x">pulling in the Win32 bindings.</span></li>
+<li><span class="sec">fn read_entry</span> <span class="meta">line 159</span><br><span class="x">Read one application&#x27;s entry, returning it only if the device is in use now.</span></li>
+<li><span class="sec">fn read_u64</span> <span class="meta">line 183</span><br><span class="x"></span></li>
+<li><span class="sec">fn decode_path</span> <span class="meta">line 198</span><br><span class="x">Registry keys encode a path with `#` where a separator belongs.</span></li>
+<li><span class="sec">fn friendly_name</span> <span class="meta">line 203</span><br><span class="x">The executable name, or the package family name for a Store app.</span></li>
+<li><span class="sec">fn filetime_to_system</span> <span class="meta">line 213</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 220</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 229</span><br><span class="x">Every subprocess in this file must be spawned through `no_window`. This reads the file&#x27;s own source rather than exercising the behaviour, because &quot;no console window appeared&quot; cannot be observed from a test -- which is precisely why the</span></li>
+<li><span class="sec">fn every_subprocess_is_spawned_without_a_console_window</span> <span class="meta">line 229</span><br><span class="x">defect reached a release. A `Command::new` added later without the wrapper fails here rather than on a desktop.</span></li>
+<li><span class="sec">fn registry_paths_are_decoded</span> <span class="meta">line 252</span><br><span class="x"></span></li>
+<li><span class="sec">fn names_are_readable</span> <span class="meta">line 260</span><br><span class="x"></span></li>
+<li><span class="sec">fn filetime_converts_to_a_sane_instant</span> <span class="meta">line 269</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_nonsense_filetime_does_not_panic</span> <span class="meta">line 278</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_registry_tool_is_resolved_absolutely_not_searched_for</span> <span class="meta">line 289</span><br><span class="x">Regression: the registry tool must be an absolute path in the system directory, never a bare name the OS searches for &#8212; the Windows search order includes the current working directory, so a planted `reg.exe` would have been run as the user.</span></li>
+<li><span class="sec">fn a_decoy_in_the_working_directory_is_not_picked_up</span> <span class="meta">line 304</span><br><span class="x">And a decoy named `reg.exe` in the working directory must never become the tool we run. Written without a temp-directory crate so this crate stays dependency-free, dev-dependencies included.</span></li>
+<li><span class="sec">fn a_missing_key_yields_nothing_rather_than_failing</span> <span class="meta">line 321</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_registry_parser_reads_a_key_that_always_exists</span> <span class="meta">line 339</span><br><span class="x">Regression, and the important one. `reg query` echoes subkey paths back under the **full** hive name, so asking with the `HKCU` abbreviation matched nothing and the monitor reported an empty machine no matter what was recording &#8212; the worst</span></li>
+<li><span class="sec">fn the_registry_parser_reads_a_key_that_always_exists</span> <span class="meta">line 339</span><br><span class="x">possible failure for this feature, because it looks like good news. Asked against a key every Windows installation has, rather than against the consent store. The consent store is populated by *applications having asked for the</span></li>
+<li><span class="sec">fn the_registry_parser_reads_a_key_that_always_exists</span> <span class="meta">line 339</span><br><span class="x">microphone*, and a headless CI runner with no audio hardware has legitimately never had one ask &#8212; so an empty result there means &quot;nothing has used the microphone on this machine&quot;, which is not the same claim at all. Conflating the two made</span></li>
+<li><span class="sec">fn the_registry_parser_reads_a_key_that_always_exists</span> <span class="meta">line 339</span><br><span class="x">CI fail on a machine where the code was working perfectly, which is its own kind of silently wrong.</span></li>
+<li><span class="sec">fn the_consent_store_is_well_formed_when_this_machine_has_one</span> <span class="meta">line 368</span><br><span class="x">The consent store itself, when this machine has one. Asserts the *shape* of what comes back, never which applications are in it. Both of those are facts about the machine rather than about the code, and both have now failed CI for that</span></li>
+<li><span class="sec">fn the_consent_store_is_well_formed_when_this_machine_has_one</span> <span class="meta">line 368</span><br><span class="x">reason: first the store was empty on a runner where nothing had ever asked for a microphone, and then &#8212; after that was allowed for &#8212; a runner had entries but no `NonPackaged` subkey, which only appears once a *desktop* application has</span></li>
+<li><span class="sec">fn the_consent_store_is_well_formed_when_this_machine_has_one</span> <span class="meta">line 368</span><br><span class="x">asked. A test that fails depending on what software a machine has happened to run is not testing this crate. What is worth asserting is that every entry is a real subkey path under the full hive name, because that is what the parser is</span></li>
+<li><span class="sec">fn the_consent_store_is_well_formed_when_this_machine_has_one</span> <span class="meta">line 368</span><br><span class="x">for. Whether the parser works at all is covered without any of this ambiguity by `the_registry_parser_reads_a_key_that_always_exists`.</span></li>
+<li><span class="sec">fn value_lines_are_not_treated_as_subkeys</span> <span class="meta">line 394</span><br><span class="x">Value lines must never be mistaken for subkeys.</span></li>
+<li><span class="sec">fn scanning_the_real_consent_store_is_well_formed</span> <span class="meta">line 405</span><br><span class="x">Reading the real consent store must work on any Windows machine, and must not report an application that has already released the device.</span></li>
 </ul>
 </details>
 <h2 id="k-test">Tests and fuzzing <span class="meta">(10)</span></h2>
@@ -4165,7 +4159,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">FAQ</span> <span class="meta">line 324</span><br><span class="x">8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A</span></li>
 </ul>
 </details>
-<h2 id="k-tool">Tools and generators <span class="meta">(18)</span></h2>
+<h2 id="k-tool">Tools and generators <span class="meta">(19)</span></h2>
 <details open>
 <summary><code>assets/generate.py</code> <span class="meta">&mdash; assets, 1063 lines, 170 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/assets/generate.py">open generate.py</a></p>
@@ -5436,6 +5430,32 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 481</span> <span class="meta">line 481</span><br><span class="x">live and static&quot; }; if (require.main === module) { run().then(f =&gt; process.exit(f ? 1 : 0)); }</span></li>
 </ul>
 </details>
+<details open>
+<summary><code>tools/verify.py</code> <span class="meta">&mdash; tools, 124 lines, 20 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/tools/verify.py">open verify.py</a></p>
+<ul>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">#!/usr/bin/env python3 # SPDX-License-Identifier: GPL-3.0-or-later &quot;&quot;&quot;Regenerate everything generated, then run every check, in the right order. python tools/verify.py # regenerate, then check python tools/verify.py --check # check only,</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">exactly as CI does # Why this exists Four generators write into this tree, and three of them read files the others write. Run them in the wrong order, or edit a source file after running them, and the committed output is one change behind</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">-- which is not a visible fault. It is a green local run and a red CI run ten minutes later. That happened twice in one afternoon, both times the same way: edit a source file, regenerate, edit another source file, commit. The search index</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">is built from *every tracked file*, so it goes stale when anything at all changes after it is written. The order below is the dependency order, and it is the whole point of the file: 1. `assets/generate.py` -- artwork, from nothing but</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">itself 2. `tools/docs/generate.py` -- reads the Rust doc comments, writes 371 files 3. `tools/search-index/generate.py` -- reads *everything*, so it goes last 4. the checks, which must all see the same tree Anything that regenerates has to</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">be staged before the index runs, because the index walks `git ls-files` and a file git has never heard of is not in it. &quot;&quot;&quot; import os import subprocess import sys def repo_root(): here = os.path.dirname(os.path.abspath(__file__)) return</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">os.path.abspath(os.path.join(here, &quot;..&quot;))</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">def run(root, label, command, capture=True): &quot;&quot;&quot;Run one step. Returns (ok, output).&quot;&quot;&quot; try: result = subprocess.run( command, cwd=root, shell=isinstance(command, str), stdout=subprocess.PIPE if capture else None, stderr=subprocess.STDOUT</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">if capture else None, ) except OSError as error: return False, &quot;%s: could not run (%s)&quot; % (label, error) output = (result.stdout or b&quot;&quot;).decode(&quot;utf-8&quot;, &quot;replace&quot;) return result.returncode == 0, output def stage(root): &quot;&quot;&quot;Stage everything,</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">so the index walk sees newly written files. `git ls-files` lists *tracked* files. A generator that has just written a new page leaves it untracked, so the index built immediately afterwards does not contain it -- and CI, regenerating from</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">the committed tree, finds one more file and fails with a message about drift that says nothing about why. &quot;&quot;&quot; subprocess.run([&quot;git&quot;, &quot;add&quot;, &quot;-A&quot;], cwd=root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) GENERATORS = [ (&quot;artwork&quot;,</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">[sys.executable, &quot;assets/generate.py&quot;]), (&quot;documentation&quot;, [sys.executable, &quot;tools/docs/generate.py&quot;]), (&quot;search index&quot;, [sys.executable, &quot;tools/search-index/generate.py&quot;]), ] CHECKS = [ (&quot;artwork matches its generator&quot;, [sys.executable,</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">&quot;assets/generate.py&quot;, &quot;--check&quot;]), (&quot;documentation matches the source&quot;, [sys.executable, &quot;tools/docs/generate.py&quot;, &quot;--check&quot;]), (&quot;search index matches the tree&quot;, [sys.executable, &quot;tools/search-index/generate.py&quot;, &quot;--check&quot;]), (&quot;website</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">suites&quot;, [&quot;node&quot;, &quot;tools/site-tests/run.js&quot;]), ]</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">CARGO = [ (&quot;formatting&quot;, [&quot;cargo&quot;, &quot;fmt&quot;, &quot;--all&quot;, &quot;--check&quot;]), (&quot;clippy&quot;, [&quot;cargo&quot;, &quot;clippy&quot;, &quot;--workspace&quot;, &quot;--all-targets&quot;]), (&quot;tests&quot;, [&quot;cargo&quot;, &quot;test&quot;, &quot;--workspace&quot;]), ] def main(): root = repo_root() check_only = &quot;--check&quot; in</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">sys.argv failed = [] if not check_only: print(&quot;regenerating, in dependency order&quot;) for label, command in GENERATORS: stage(root) # so the walk sees anything written by the step before ok, output = run(root, label, command) print(&quot; %-16s</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">%s&quot; % (label, &quot;ok&quot; if ok else &quot;FAILED&quot;)) if not ok: print(output) failed.append(label) stage(root) print() print(&quot;checking&quot;) for label, command in CHECKS + CARGO: ok, output = run(root, label, command) print(&quot; %-34s %s&quot; % (label, &quot;ok&quot; if</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">ok else &quot;FAILED&quot;)) if not ok: failed.append(label) for line in output.strip().splitlines()[-25:]: print(&quot; &quot; + line) print() if failed: print(&quot;%d check(s) failed: %s&quot; % (len(failed), &quot;, &quot;.join(failed))) return 1 print(&quot;everything</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">regenerated and every check passed&quot;) return 0</span></li>
+<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">if __name__ == &quot;__main__&quot;: sys.exit(main())</span></li>
+</ul>
+</details>
 <h2 id="k-build">Build and CI <span class="meta">(19)</span></h2>
 <details open>
 <summary><code>.cargo/audit.toml</code> <span class="meta">&mdash; root, 63 lines, 14 sections</span></summary>
@@ -6580,7 +6600,7 @@ nav.top a{margin-right:14px}
 </details>
 <h2 id="k-other">Other <span class="meta">(21)</span></h2>
 <details open>
-<summary><code>.gitignore</code> <span class="meta">&mdash; root, 65 lines, 10 sections</span></summary>
+<summary><code>.gitignore</code> <span class="meta">&mdash; root, 79 lines, 11 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/.gitignore">open .gitignore</a></p>
 <ul>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x"># Build output (also commonly redirected out of the source tree via # CARGO_TARGET_DIR &#8212; see .cargo/config.toml). /target target/ **/*.rs.bk # Never commit private key material or captured audio. *.key *.pgp *.gpg !*.pub !*public*.asc</span></li>
@@ -6592,7 +6612,8 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">this repository must not contain: the whole claim about the # artwork is that it comes from a script you can read. __pycache__/ *.pyc # Local development files. These are working notes and editor configuration, # not part of what anybody</span></li>
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">downloads, and a public repository is not the place # for either. # # NOTE, because untracking is not deleting: `git rm --cached` stops a file # being published from now on, but every version already committed stays in the # repository&#x27;s</span></li>
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">history and can still be fetched by anyone who clones it. # Removing it from history means rewriting published history and force-pushing, # which is a separate and deliberate act. The public-facing replacement for the # handover notes is</span></li>
-<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">ROADMAP.md, which is written to be read by anybody. HANDOFF.md HANDOVER.md .claude/</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">ROADMAP.md, which is written to be read by anybody. HANDOFF.md HANDOVER.md .claude/ .claude*/ CLAUDE.md **/CLAUDE.md .mcp.json .cursor/ .aider* .vscode/ .idea/ # Agent skills. Installed locally for Rust and security review practice; they #</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">are tooling for whoever is working on this, not part of what anybody # downloads, and several carry their own upstream licences. .claude/skills/ skills/</span></li>
 </ul>
 </details>
 <details open>
