@@ -11,9 +11,11 @@ Estimates are in working days and they are estimates. Where a marker depends on
 something outside this project — a platform's rules, a decision that has not
 been taken — that is written down rather than absorbed into a number.
 
-**Where we are now:** v0.1.9 is released, signed and published for ten
-platforms. v0.1.10 has not been cut. Everything below the line marked *shipped*
-is work in progress.
+**Where we are now:** **v0.1.10 is released**, signed and published for ten
+platforms, and verified by hand after publication -- fingerprint checked, good
+signature, hashes matched, and the shipped verifier checked its own release
+with no GnuPG involved. Everything below the line marked *shipped* is work in
+progress.
 
 ---
 
@@ -59,8 +61,8 @@ is work in progress.
 | 20 | Repository panel no longer shows a README's own markup as text | **done** | — |
 | 21 | Write the missing module documentation for the 14 files that had almost none | **done** | — |
 | 22 | Website split into a page per section, every published link still working | **planned** | 2 d |
-| 23 | Motion and polish — smooth loading and scrolling, hover, CSS-first tooltips | **planned** | 2 d |
-| 24 | Demonstration animation: a voice going in, the mark lighting up, an unidentifiable wave coming out | **planned** | 2 d |
+| 23 | Motion and polish — smooth loading and scrolling, hover, CSS-first tooltips | **done** | — |
+| 24 | Demonstration animation: a voice going in, the mark lighting up, an unidentifiable wave coming out | **done** | — |
 | 25 | Cycling line of project facts, slow enough to read — CSS rather than an image, so it follows the reader's theme and needs no script | **done** | — |
 | 26 | Every website theme in the app, plus user-defined palettes with contrast computed rather than assumed | **done** | — |
 | 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **planned** | 3–4 d |
@@ -68,7 +70,7 @@ is work in progress.
 | 29 | One single binary — the same executable runs as the desktop app or as the command line, installed or portable | **planned** | 2 d |
 | 30 | Windows installer: Tokyo Night, animated, and a **portable** option that installs nothing | **planned** | 4–5 d |
 | 31 | Optional companion setup — VB-CABLE on Windows, PipeWire on Linux, BlackHole on macOS, and Audacity everywhere — detected if present, installed only if confirmed | **planned** | 3–4 d |
-| 32 | The site's search presented as an **index**, and animated | **next** | 1 d |
+| 32 | The site's search presented as an **index**, and animated | **done** | — |
 
 ## Security and monitoring features
 
@@ -94,8 +96,8 @@ it cannot do as plainly as what it can.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 44 | Full audit of the whole tree — every vulnerability class, cryptographic practice, workflow accuracy, and full wiki parity — with every finding written up individually | **planned** | 5–8 d |
-| 45 | Production release | **planned** | 1–2 d |
+| 44 | Fifth audit round — every vulnerability class across the tree, twelve findings written up individually (F-48 to F-59) | **done** | — |
+| 45 | **v0.1.10 released** — ten platforms, signed, and verified by hand after publication | **done** | — |
 
 ---
 
