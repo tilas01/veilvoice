@@ -215,6 +215,18 @@ enum Command {
     /// Show version and build information.
     Info,
 
+    /// Open the desktop application.
+    ///
+    /// Runs `veilvoice-gui` from beside this program. It is a separate
+    /// executable rather than a mode of this one for a reason that cannot be
+    /// engineered around without `unsafe`: a Windows PE declares exactly one
+    /// subsystem. A console binary that opened a window would flash a console
+    /// every time -- which is precisely the defect v0.1.10 shipped -- and a
+    /// windowed binary would send this program's output nowhere when run from
+    /// a terminal. Switching at run time needs `AttachConsole`/`FreeConsole`,
+    /// which is FFI, and every crate here carries `#![forbid(unsafe_code)]`.
+    Gui,
+
     /// Copy VeilVoice somewhere the system can find it, and add it to PATH.
     ///
     /// Entirely optional: VeilVoice runs from wherever it is unpacked, and
@@ -319,6 +331,34 @@ fn run(command: Command) -> Result<(), String> {
         Command::Watch { once, interval } => watch(once, interval),
         Command::Info => {
             info();
+            Ok(())
+        }
+
+        Command::Gui => {
+            let exe = std::env::current_exe()
+                .map_err(|e| format!("cannot find this program on disk: {e}"))?;
+            let name = if cfg!(windows) {
+                "veilvoice-gui.exe"
+            } else {
+                "veilvoice-gui"
+            };
+            let gui = exe
+                .parent()
+                .ok_or_else(|| "this program has no parent directory".to_string())?
+                .join(name);
+            if !gui.exists() {
+                return Err(format!(
+                    "{} is not beside this program.
+                       The desktop application ships in the same archive; if you                      unpacked only the command line, download the full archive.",
+                    gui.display()
+                ));
+            }
+            // Spawned, not waited on: the terminal should come back
+            // immediately, the way every other desktop launcher behaves.
+            std::process::Command::new(&gui)
+                .spawn()
+                .map_err(|e| format!("could not start {}: {e}", gui.display()))?;
+            println!("{}", ok(&format!("started {}", gui.display())));
             Ok(())
         }
 

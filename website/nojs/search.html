@@ -1355,7 +1355,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/main.rs</code> <span class="meta">&mdash; veilvoice-cli, 1202 lines, 48 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/main.rs</code> <span class="meta">&mdash; veilvoice-cli, 1242 lines, 48 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs">open main.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice` &#8212; the command-line interface. Everything VeilVoice does, available without a desktop: it runs over SSH, in a container, and on machines that have no GUI toolkit at all. The same engine backs both this and the graphical app. #</span></li>
@@ -1374,38 +1374,38 @@ nav.top a{margin-right:14px}
 <li><span class="sec">mod theme</span> <span class="meta">line 53</span><br><span class="x"></span></li>
 <li><span class="sec">struct Cli</span> <span class="meta">line 76</span><br><span class="x"></span></li>
 <li><span class="sec">enum Command</span> <span class="meta">line 82</span><br><span class="x"></span></li>
-<li><span class="sec">enum CleanPolicy</span> <span class="meta">line 240</span><br><span class="x"></span></li>
-<li><span class="sec">impl From&lt;CleanPolicy&gt; for Policy</span> <span class="meta">line 247</span><br><span class="x"></span></li>
-<li><span class="sec">fn from</span> <span class="meta">line 248</span><br><span class="x"></span></li>
-<li><span class="sec">fn main</span> <span class="meta">line 256</span><br><span class="x"></span></li>
-<li><span class="sec">fn run</span> <span class="meta">line 267</span><br><span class="x"></span></li>
-<li><span class="sec">struct Tuning</span> <span class="meta">line 432</span><br><span class="x">The engine settings a user can reach from the command line.</span></li>
-<li><span class="sec">fn config</span> <span class="meta">line 438</span><br><span class="x"></span></li>
-<li><span class="sec">fn describe_reseed</span> <span class="meta">line 451</span><br><span class="x">How the seed-rolling setting reads in the output.</span></li>
-<li><span class="sec">struct AtRest</span> <span class="meta">line 460</span><br><span class="x">What to do with the result once it exists.</span></li>
-<li><span class="sec">fn anonymise</span> <span class="meta">line 469</span><br><span class="x"></span></li>
-<li><span class="sec">fn live</span> <span class="meta">line 608</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter</span> <span class="meta">line 694</span><br><span class="x">A small textual level meter.</span></li>
-<li><span class="sec">const WIDTH</span> <span class="meta">line 695</span><br><span class="x"></span></li>
-<li><span class="sec">fn list_devices</span> <span class="meta">line 709</span><br><span class="x"></span></li>
-<li><span class="sec">fn clean</span> <span class="meta">line 741</span><br><span class="x"></span></li>
-<li><span class="sec">fn encrypt</span> <span class="meta">line 758</span><br><span class="x"></span></li>
-<li><span class="sec">fn decrypt</span> <span class="meta">line 787</span><br><span class="x"></span></li>
-<li><span class="sec">fn load_secret_key</span> <span class="meta">line 819</span><br><span class="x">Load a private key file, which is itself a password-locked container.</span></li>
-<li><span class="sec">fn keygen</span> <span class="meta">line 827</span><br><span class="x"></span></li>
-<li><span class="sec">fn watch</span> <span class="meta">line 903</span><br><span class="x">Report, and keep reporting, what is using the microphone and camera.</span></li>
-<li><span class="sec">fn shred</span> <span class="meta">line 993</span><br><span class="x">Destroy a file&#x27;s contents, then delete it. Gated behind a typed confirmation rather than a y/n prompt. There is no undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></li>
-<li><span class="sec">fn info</span> <span class="meta">line 1061</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 1104</span><br><span class="x"></span></li>
-<li><span class="sec">fn cli_definition_is_valid</span> <span class="meta">line 1109</span><br><span class="x"></span></li>
-<li><span class="sec">fn tuning</span> <span class="meta">line 1113</span><br><span class="x"></span></li>
-<li><span class="sec">fn intensity_is_clamped_into_range</span> <span class="meta">line 1122</span><br><span class="x"></span></li>
-<li><span class="sec">fn keep_accent_disables_neutralisation</span> <span class="meta">line 1129</span><br><span class="x"></span></li>
-<li><span class="sec">fn reseed_interval_reaches_the_engine_and_cannot_go_negative</span> <span class="meta">line 1135</span><br><span class="x"></span></li>
-<li><span class="sec">fn recordings_are_encrypted_at_rest_by_default</span> <span class="meta">line 1144</span><br><span class="x">Encryption at rest is a *default*, not a flag the careful user has to find. If someone ever flips this, this test is what stops it shipping.</span></li>
-<li><span class="sec">fn asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span> <span class="meta">line 1170</span><br><span class="x">Refused before anything is read or written, so a contradictory command line cannot half-happen.</span></li>
-<li><span class="sec">fn reseed_setting_reads_clearly</span> <span class="meta">line 1186</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter_scales_and_never_panics</span> <span class="meta">line 1193</span><br><span class="x"></span></li>
+<li><span class="sec">enum CleanPolicy</span> <span class="meta">line 252</span><br><span class="x"></span></li>
+<li><span class="sec">impl From&lt;CleanPolicy&gt; for Policy</span> <span class="meta">line 259</span><br><span class="x"></span></li>
+<li><span class="sec">fn from</span> <span class="meta">line 260</span><br><span class="x"></span></li>
+<li><span class="sec">fn main</span> <span class="meta">line 268</span><br><span class="x"></span></li>
+<li><span class="sec">fn run</span> <span class="meta">line 279</span><br><span class="x"></span></li>
+<li><span class="sec">struct Tuning</span> <span class="meta">line 472</span><br><span class="x">The engine settings a user can reach from the command line.</span></li>
+<li><span class="sec">fn config</span> <span class="meta">line 478</span><br><span class="x"></span></li>
+<li><span class="sec">fn describe_reseed</span> <span class="meta">line 491</span><br><span class="x">How the seed-rolling setting reads in the output.</span></li>
+<li><span class="sec">struct AtRest</span> <span class="meta">line 500</span><br><span class="x">What to do with the result once it exists.</span></li>
+<li><span class="sec">fn anonymise</span> <span class="meta">line 509</span><br><span class="x"></span></li>
+<li><span class="sec">fn live</span> <span class="meta">line 648</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter</span> <span class="meta">line 734</span><br><span class="x">A small textual level meter.</span></li>
+<li><span class="sec">const WIDTH</span> <span class="meta">line 735</span><br><span class="x"></span></li>
+<li><span class="sec">fn list_devices</span> <span class="meta">line 749</span><br><span class="x"></span></li>
+<li><span class="sec">fn clean</span> <span class="meta">line 781</span><br><span class="x"></span></li>
+<li><span class="sec">fn encrypt</span> <span class="meta">line 798</span><br><span class="x"></span></li>
+<li><span class="sec">fn decrypt</span> <span class="meta">line 827</span><br><span class="x"></span></li>
+<li><span class="sec">fn load_secret_key</span> <span class="meta">line 859</span><br><span class="x">Load a private key file, which is itself a password-locked container.</span></li>
+<li><span class="sec">fn keygen</span> <span class="meta">line 867</span><br><span class="x"></span></li>
+<li><span class="sec">fn watch</span> <span class="meta">line 943</span><br><span class="x">Report, and keep reporting, what is using the microphone and camera.</span></li>
+<li><span class="sec">fn shred</span> <span class="meta">line 1033</span><br><span class="x">Destroy a file&#x27;s contents, then delete it. Gated behind a typed confirmation rather than a y/n prompt. There is no undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></li>
+<li><span class="sec">fn info</span> <span class="meta">line 1101</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 1144</span><br><span class="x"></span></li>
+<li><span class="sec">fn cli_definition_is_valid</span> <span class="meta">line 1149</span><br><span class="x"></span></li>
+<li><span class="sec">fn tuning</span> <span class="meta">line 1153</span><br><span class="x"></span></li>
+<li><span class="sec">fn intensity_is_clamped_into_range</span> <span class="meta">line 1162</span><br><span class="x"></span></li>
+<li><span class="sec">fn keep_accent_disables_neutralisation</span> <span class="meta">line 1169</span><br><span class="x"></span></li>
+<li><span class="sec">fn reseed_interval_reaches_the_engine_and_cannot_go_negative</span> <span class="meta">line 1175</span><br><span class="x"></span></li>
+<li><span class="sec">fn recordings_are_encrypted_at_rest_by_default</span> <span class="meta">line 1184</span><br><span class="x">Encryption at rest is a *default*, not a flag the careful user has to find. If someone ever flips this, this test is what stops it shipping.</span></li>
+<li><span class="sec">fn asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span> <span class="meta">line 1210</span><br><span class="x">Refused before anything is read or written, so a contradictory command line cannot half-happen.</span></li>
+<li><span class="sec">fn reseed_setting_reads_clearly</span> <span class="meta">line 1226</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter_scales_and_never_panics</span> <span class="meta">line 1233</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
