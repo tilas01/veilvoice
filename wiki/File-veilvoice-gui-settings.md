@@ -38,24 +38,44 @@ The app lock and the at-rest passphrase have their own tab and stay there.
 A password field sitting between "animations" and "colour scheme" invites
 being treated with the same weight, and it is not the same weight.
 
+## What this file contains
+
+706 lines defining **13 functions** (5 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Page` (line 35) -- Which page of the settings menu is showing.
+- `struct Settings` (line 54) -- The settings tab's own state.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `Settings::load` (line 98) -- Load preferences from this platform's config directory and apply the chosen theme to ctx.
+- `Settings::needs_first_run` (line 129) -- Whether the first-run choice has still to be made.
+- `Settings::first_run_panel` (line 151) -- The first-run panel: offered once, with animation already on.
+  - reaches: `persist`
+- `Settings::tab` (line 211) -- The settings tab.
+  - reaches: `appearance_page`, `motion_page`, `storage_page`, `custom_palette_help`, `persist`, `section`, `swatches`, `motion`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["Settings::default"]
-    n_load(["Settings::load<br/>pub"])
-    n_motion(["Settings::motion<br/>pub"])
-    n_needs_first_run(["Settings::needs_first_run<br/>pub"])
-    n_persist["Settings::persist"]
-    n_first_run_panel(["Settings::first_run_panel<br/>pub"])
-    n_tab(["Settings::tab<br/>pub"])
-    n_custom_palette_help["Settings::custom_palette_help"]
-    n_appearance_page["Settings::appearance_page"]
-    n_motion_page["Settings::motion_page"]
-    n_storage_page["Settings::storage_page"]
-    n_section["section"]
-    n_swatches["swatches"]
+    n_default["Settings::default<br/>line 79"]
+    n_load(["Settings::load<br/>line 98"])
+    n_motion["Settings::motion<br/>line 124"]
+    n_needs_first_run(["Settings::needs_first_run<br/>line 129"])
+    n_persist["Settings::persist<br/>line 133"]
+    n_first_run_panel(["Settings::first_run_panel<br/>line 151"])
+    n_tab(["Settings::tab<br/>line 211"])
+    n_custom_palette_help["Settings::custom_palette_help<br/>line 264"]
+    n_appearance_page["Settings::appearance_page<br/>line 327"]
+    n_motion_page["Settings::motion_page<br/>line 364"]
+    n_storage_page["Settings::storage_page<br/>line 439"]
+    n_section["section<br/>line 500"]
+    n_swatches["swatches<br/>line 508"]
     n_appearance_page --> n_custom_palette_help
     n_appearance_page --> n_persist
     n_appearance_page --> n_section
@@ -69,6 +89,12 @@ flowchart TD
     n_tab --> n_appearance_page
     n_tab --> n_motion_page
     n_tab --> n_storage_page
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_load,n_needs_first_run,n_first_run_panel,n_tab entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_motion api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_default,n_persist,n_custom_palette_help,n_appearance_page,n_motion_page,n_storage_page,n_section,n_swatches helper
 ```
 
 ## Items

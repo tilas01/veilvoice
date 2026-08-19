@@ -54,54 +54,69 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3672 77" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
-<rect x="0" y="0" width="3672" height="77" fill="#16161e" rx="8"/>
-<rect x="20.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="148.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">the_embedded_key_parses_and_i&#8230;</text>
-<rect x="302.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="430.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">the_embedded_key_carries_no_e&#8230;</text>
-<rect x="584.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="712.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">the_fingerprint_constant_is_w&#8230;</text>
-<rect x="866.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="994.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">a_hash_is_found_by_its_file_n&#8230;</text>
-<rect x="1148.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="1276.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">a_binary_mode_star_is_not_par&#8230;</text>
-<rect x="1430.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="1558.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">a_file_that_is_not_listed_is_&#8230;</text>
-<rect x="1712.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="1840.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">a_name_that_merely_contains_t&#8230;</text>
-<rect x="1994.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="2122.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">blank_and_comment_lines_are_s&#8230;</text>
-<rect x="2276.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="2404.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">a_malformed_line_is_skipped_r&#8230;</text>
-<rect x="2558.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="2686.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">digests_compare_case_insensit&#8230;</text>
-<rect x="2840.0" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="2968.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">a_signature_that_is_not_openp&#8230;</text>
-<rect x="3122.0" y="20.0" width="248.4" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="3246.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">an_empty_signature_is_refused</text>
-<rect x="3396.4" y="20.0" width="256.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="3524.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">an_armoured_block_that_is_not&#8230;</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3672 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
+<rect x="0" y="0" width="3672" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<rect x="20.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="148.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">the_embedded_key_parses_and_i&#8230;</text>
+<text x="148.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 19</text>
+<rect x="302.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="430.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">the_embedded_key_carries_no_e&#8230;</text>
+<text x="430.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 25</text>
+<rect x="584.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="712.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">the_fingerprint_constant_is_w&#8230;</text>
+<text x="712.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 40</text>
+<rect x="866.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="994.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_hash_is_found_by_its_file_n&#8230;</text>
+<text x="994.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 53</text>
+<rect x="1148.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="1276.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_binary_mode_star_is_not_par&#8230;</text>
+<text x="1276.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 65</text>
+<rect x="1430.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="1558.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_file_that_is_not_listed_is_&#8230;</text>
+<text x="1558.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 77</text>
+<rect x="1712.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="1840.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_name_that_merely_contains_t&#8230;</text>
+<text x="1840.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 83</text>
+<rect x="1994.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="2122.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">blank_and_comment_lines_are_s&#8230;</text>
+<text x="2122.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
+<rect x="2276.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="2404.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_malformed_line_is_skipped_r&#8230;</text>
+<text x="2404.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 99</text>
+<rect x="2558.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="2686.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">digests_compare_case_insensit&#8230;</text>
+<text x="2686.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
+<rect x="2840.0" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="2968.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_signature_that_is_not_openp&#8230;</text>
+<text x="2968.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 119</text>
+<rect x="3122.0" y="20.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="3246.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">an_empty_signature_is_refused</text>
+<text x="3246.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 126</text>
+<rect x="3396.4" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="3524.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">an_armoured_block_that_is_not&#8230;</text>
+<text x="3524.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_the_embedded_key_parses_and_is_the_expected_one[&quot;the_embedded_key_parses_and_i&#8230;&quot;]
-    n_the_embedded_key_carries_no_email_address[&quot;the_embedded_key_carries_no_e&#8230;&quot;]
-    n_the_fingerprint_constant_is_written_out_not_computed[&quot;the_fingerprint_constant_is_w&#8230;&quot;]
-    n_a_hash_is_found_by_its_file_name[&quot;a_hash_is_found_by_its_file_n&#8230;&quot;]
-    n_a_binary_mode_star_is_not_part_of_the_name[&quot;a_binary_mode_star_is_not_par&#8230;&quot;]
-    n_a_file_that_is_not_listed_is_not_found[&quot;a_file_that_is_not_listed_is_&#8230;&quot;]
-    n_a_name_that_merely_contains_the_wanted_one_does_not_match[&quot;a_name_that_merely_contains_t&#8230;&quot;]
-    n_blank_and_comment_lines_are_skipped[&quot;blank_and_comment_lines_are_s&#8230;&quot;]
-    n_a_malformed_line_is_skipped_rather_than_panicking[&quot;a_malformed_line_is_skipped_r&#8230;&quot;]
-    n_digests_compare_case_insensitively_and_ignore_surrounding_space[&quot;digests_compare_case_insensit&#8230;&quot;]
-    n_a_signature_that_is_not_openpgp_is_refused[&quot;a_signature_that_is_not_openp&#8230;&quot;]
-    n_an_empty_signature_is_refused[&quot;an_empty_signature_is_refused&quot;]
-    n_an_armoured_block_that_is_not_a_signature_is_refused[&quot;an_armoured_block_that_is_not&#8230;&quot;]</code></pre>
+    n_the_embedded_key_parses_and_is_the_expected_one[&quot;the_embedded_key_parses_and_i&#8230;&lt;br/&gt;line 19&quot;]
+    n_the_embedded_key_carries_no_email_address[&quot;the_embedded_key_carries_no_e&#8230;&lt;br/&gt;line 25&quot;]
+    n_the_fingerprint_constant_is_written_out_not_computed[&quot;the_fingerprint_constant_is_w&#8230;&lt;br/&gt;line 40&quot;]
+    n_a_hash_is_found_by_its_file_name[&quot;a_hash_is_found_by_its_file_n&#8230;&lt;br/&gt;line 53&quot;]
+    n_a_binary_mode_star_is_not_part_of_the_name[&quot;a_binary_mode_star_is_not_par&#8230;&lt;br/&gt;line 65&quot;]
+    n_a_file_that_is_not_listed_is_not_found[&quot;a_file_that_is_not_listed_is_&#8230;&lt;br/&gt;line 77&quot;]
+    n_a_name_that_merely_contains_the_wanted_one_does_not_match[&quot;a_name_that_merely_contains_t&#8230;&lt;br/&gt;line 83&quot;]
+    n_blank_and_comment_lines_are_skipped[&quot;blank_and_comment_lines_are_s&#8230;&lt;br/&gt;line 90&quot;]
+    n_a_malformed_line_is_skipped_rather_than_panicking[&quot;a_malformed_line_is_skipped_r&#8230;&lt;br/&gt;line 99&quot;]
+    n_digests_compare_case_insensitively_and_ignore_surrounding_space[&quot;digests_compare_case_insensit&#8230;&lt;br/&gt;line 110&quot;]
+    n_a_signature_that_is_not_openpgp_is_refused[&quot;a_signature_that_is_not_openp&#8230;&lt;br/&gt;line 119&quot;]
+    n_an_empty_signature_is_refused[&quot;an_empty_signature_is_refused&lt;br/&gt;line 126&quot;]
+    n_an_armoured_block_that_is_not_a_signature_is_refused[&quot;an_armoured_block_that_is_not&#8230;&lt;br/&gt;line 132&quot;]
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_the_embedded_key_parses_and_is_the_expected_one,n_the_embedded_key_carries_no_email_address,n_the_fingerprint_constant_is_written_out_not_computed,n_a_hash_is_found_by_its_file_name,n_a_binary_mode_star_is_not_part_of_the_name,n_a_file_that_is_not_listed_is_not_found,n_a_name_that_merely_contains_the_wanted_one_does_not_match,n_blank_and_comment_lines_are_skipped,n_a_malformed_line_is_skipped_rather_than_panicking,n_digests_compare_case_insensitively_and_ignore_surrounding_space,n_a_signature_that_is_not_openpgp_is_refused,n_an_empty_signature_is_refused,n_an_armoured_block_that_is_not_a_signature_is_refused helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

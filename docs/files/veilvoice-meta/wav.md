@@ -17,6 +17,7 @@
 
 - [Why WAV gets its own path](#why-wav-gets-its-own-path)
 - [Whitelist, not blacklist](#whitelist-not-blacklist)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -43,6 +44,15 @@ everything else. Anything unrecognised is discarded by default, which is the
 right bias for a privacy tool: the worst case is a lost non-essential chunk,
 not a leaked identity.
 
+## What this file contains
+
+332 lines defining **4 functions** (2 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `clean_wav_bytes` (line 47) -- Rewrite a WAV, keeping only the chunks needed to decode it.
+  - reaches: `info_chunk`, `is_wav`, `show`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -51,16 +61,24 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_is_wav(["is_wav<br/>pub"])
-    n_clean_wav_bytes(["clean_wav_bytes<br/>pub"])
-    n_info_chunk["info_chunk"]
-    n_show["show"]
+    n_is_wav["is_wav<br/>line 42"]
+    n_clean_wav_bytes(["clean_wav_bytes<br/>line 47"])
+    n_info_chunk["info_chunk<br/>line 131"]
+    n_show["show<br/>line 150"]
     n_clean_wav_bytes --> n_info_chunk
     n_clean_wav_bytes --> n_is_wav
     n_clean_wav_bytes --> n_show
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_clean_wav_bytes entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_is_wav api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_info_chunk,n_show helper
 ```
 
 ## Items

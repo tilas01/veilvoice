@@ -16,6 +16,7 @@
 ## Contents
 
 - [Voiced frames: an explicit harmonic comb](#voiced-frames-an-explicit-harmonic-comb)
+- [What this file contains](#what-this-file-contains)
 - [What calls what](#what-calls-what)
 - [Items](#items)
 
@@ -77,6 +78,21 @@ rotates the warped envelope toward a canonical spectral tilt.
 The measured phase is never reused, so no amount of downstream processing can
 reconstruct the original excitation phase — the transform is one-way.
 
+## What this file contains
+
+428 lines defining **5 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct SpectralState` (line 66) -- Persistent per-instance state for the spectral transform.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `SpectralState::new` (line 90) -- n = FFT size, hop = analysis/synthesis hop, rand_phase = fixed per-bin phase offsets in radians (length n/2+1) drawn from the CSPRNG.
+- `SpectralState::retarget_phase_offsets` (line 131) -- Aim the per-bin phase offsets at fresh values.
+- `SpectralState::transform` (line 145) -- Rewrite spec (length n/2+1) in place, given the current modulation.
+  - reaches: `box_smooth`, `resample_linear`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -85,16 +101,22 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new(["SpectralState::new<br/>pub"])
-    n_retarget_phase_offsets(["SpectralState::retarget_phase…<br/>pub"])
-    n_transform(["SpectralState::transform<br/>pub"])
-    n_resample_linear["resample_linear"]
-    n_box_smooth["box_smooth"]
+    n_new(["SpectralState::new<br/>line 90"])
+    n_retarget_phase_offsets(["SpectralState::retarget_phase…<br/>line 131"])
+    n_transform(["SpectralState::transform<br/>line 145"])
+    n_resample_linear["resample_linear<br/>line 279"]
+    n_box_smooth["box_smooth<br/>line 300"]
     n_transform --> n_box_smooth
     n_transform --> n_resample_linear
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_new,n_retarget_phase_offsets,n_transform entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_resample_linear,n_box_smooth helper
 ```
 
 ## Items

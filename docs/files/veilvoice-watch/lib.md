@@ -17,6 +17,7 @@
 
 - [Why this belongs in a voice-privacy tool](#why-this-belongs-in-a-voice-privacy-tool)
 - [What it can actually see, per platform](#what-it-can-actually-see-per-platform)
+- [What this file contains](#what-this-file-contains)
 - [What calls what](#what-calls-what)
 - [Items](#items)
 
@@ -50,6 +51,31 @@ On Linux you see every process you have permission to inspect. Without root
 that means your own; other users' processes are invisible, and that is a
 kernel permission boundary rather than something this crate can work around.
 
+## What this file contains
+
+401 lines defining **13 functions** (9 public), **6 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum DeviceKind` (line 49) -- The kind of device being used.
+- `struct DeviceUse` (line 67) -- One application holding one device.
+- `struct Support` (line 101) -- What detection is possible here.
+- `enum Error` (line 149) -- Everything that can go wrong here.
+- `enum Change` (line 194) -- A change between two scans.
+- `struct Monitor` (line 226) -- Watches for changes between scans.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `DeviceUse::key` (line 88) -- A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed.
+- `DeviceUse::held_for` (line 93) -- How long this application has held the device.
+- `support` (line 115) -- Report what this platform can detect.
+- `Change::alert` (line 203) -- A one-line alert suitable for a notification or an overlay.
+- `DeviceUse::describe` (line 213) -- name (pid 1234), or just the name when there is no PID.
+- `Monitor::new` (line 232) -- A monitor that has not yet seen anything.
+- `Monitor::current` (line 237) -- The most recent snapshot.
+- `Monitor::poll` (line 246) -- Scan, and report what changed since the previous call.
+  - reaches: `diff`, `scan`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -58,24 +84,32 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_fmt["DeviceKind::fmt"]
-    n_key(["DeviceUse::key<br/>pub"])
-    n_held_for(["DeviceUse::held_for<br/>pub"])
-    n_support(["support<br/>pub"])
-    n_from["Error::from"]
-    n_fmt["Error::fmt"]
-    n_scan(["scan<br/>pub"])
-    n_alert(["Change::alert<br/>pub"])
-    n_describe(["DeviceUse::describe<br/>pub"])
-    n_new(["Monitor::new<br/>pub"])
-    n_current(["Monitor::current<br/>pub"])
-    n_poll(["Monitor::poll<br/>pub"])
-    n_diff["Monitor::diff"]
+    n_fmt["DeviceKind::fmt<br/>line 57"]
+    n_key(["DeviceUse::key<br/>line 88"])
+    n_held_for(["DeviceUse::held_for<br/>line 93"])
+    n_support(["support<br/>line 115"])
+    n_from["Error::from<br/>line 157"]
+    n_fmt["Error::fmt<br/>line 163"]
+    n_scan["scan<br/>line 177"]
+    n_alert(["Change::alert<br/>line 203"])
+    n_describe(["DeviceUse::describe<br/>line 213"])
+    n_new(["Monitor::new<br/>line 232"])
+    n_current(["Monitor::current<br/>line 237"])
+    n_poll(["Monitor::poll<br/>line 246"])
+    n_diff["Monitor::diff<br/>line 251"]
     n_poll --> n_diff
     n_poll --> n_scan
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_key,n_held_for,n_support,n_alert,n_describe,n_new,n_current,n_poll entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_scan api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_fmt,n_from,n_fmt,n_diff helper
 ```
 
 ## Items

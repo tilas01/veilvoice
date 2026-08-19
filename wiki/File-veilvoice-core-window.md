@@ -51,13 +51,26 @@ degenerate `sum(w^2) == 0` returns unity rather than infinity: this is a
 gain that gets multiplied into every output sample, and one non-finite value
 entering an engine with persistent state is permanent.
 
+## What this file contains
+
+91 lines defining **2 functions** (2 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `hann` (line 47) -- Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design).
+- `ola_gain` (line 63) -- Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop.
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_hann(["hann<br/>pub"])
-    n_ola_gain(["ola_gain<br/>pub"])
+    n_hann(["hann<br/>line 47"])
+    n_ola_gain(["ola_gain<br/>line 63"])
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_hann,n_ola_gain entry
 ```
 
 ## Items

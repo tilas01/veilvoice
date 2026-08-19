@@ -55,35 +55,67 @@ than implying otherwise. What it does is stop a passphrase lingering in a
 heap allocation long after it was needed, where a core dump or a swapped
 page could pick it up.
 
+## What this file contains
+
+1030 lines defining **25 functions** (13 public), **4 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Sealing` (line 67) -- How the recording that comes out of a job is protected.
+- `enum Op` (line 76) -- What a background lock operation was trying to do.
+- `struct Security` (line 87) -- Everything about locking the app and sealing its output.
+- `enum Plan` (line 731) -- What a finished job should do with its bytes.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `Security::load` (line 167) -- Read the lock file for this machine and start locked if one is set.
+  - reaches: `default`
+- `Security::is_locked` (line 195) -- Whether the unlock screen should be shown instead of the app.
+- `Security::blocked_reason` (line 241) -- Why a job cannot start yet, for the button's tooltip.
+  - reaches: `ready_to_write`
+- `Security::plan` (line 255) -- How the next job should protect its output.
+- `Security::is_busy` (line 343) -- Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.
+  - reaches: `busy`
+- `Security::unlock_screen` (line 348) -- The full-window unlock screen.
+  - reaches: `busy`, `poll`, `spawn`, `wipe_form`, `run_op`, `reopen`
+- `Security::tab` (line 447) -- The security tab: manage the lock, and see what it is worth.
+  - reaches: `busy`, `has_lock`, `lock_now`, `password_row`, `poll`, `spawn`, `wipe_secrets`, `wipe_form`, `run_op`, `reopen`
+- `Security::recording_controls` (line 572) -- The at-rest controls that sit inside the file tab.
+  - reaches: `into_secret`, `password_row`
+- `Security::disable_dialogue` (line 679) -- The dialogue shown when the user turns at-rest encryption off.
+- `Plan::write` (line 756) -- Seal wav if the plan says to, and write it.
+
 ## What calls what
 
 _22 of 25 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_into_secret["into_secret"]
-    n_default["Security::default"]
-    n_drop["Security::drop"]
-    n_load(["Security::load<br/>pub"])
-    n_is_locked(["Security::is_locked<br/>pub"])
-    n_has_lock(["Security::has_lock<br/>pub"])
-    n_lock_now(["Security::lock_now<br/>pub"])
-    n_wipe_secrets["Security::wipe_secrets"]
-    n_ready_to_write(["Security::ready_to_write<br/>pub"])
-    n_blocked_reason(["Security::blocked_reason<br/>pub"])
-    n_plan(["Security::plan<br/>pub"])
-    n_spawn["Security::spawn"]
-    n_poll["Security::poll"]
-    n_wipe_form["Security::wipe_form"]
-    n_busy["Security::busy"]
-    n_is_busy(["Security::is_busy<br/>pub"])
-    n_unlock_screen(["Security::unlock_screen<br/>pub"])
-    n_tab(["Security::tab<br/>pub"])
-    n_recording_controls(["Security::recording_controls<br/>pub"])
-    n_run_op["run_op"]
-    n_reopen["reopen"]
-    n_password_row["password_row"]
+    n_into_secret["into_secret<br/>line 58"]
+    n_default["Security::default<br/>line 135"]
+    n_drop["Security::drop<br/>line 160"]
+    n_load(["Security::load<br/>line 167"])
+    n_is_locked(["Security::is_locked<br/>line 195"])
+    n_has_lock["Security::has_lock<br/>line 200"]
+    n_lock_now["Security::lock_now<br/>line 205"]
+    n_wipe_secrets["Security::wipe_secrets<br/>line 213"]
+    n_ready_to_write["Security::ready_to_write<br/>line 230"]
+    n_blocked_reason(["Security::blocked_reason<br/>line 241"])
+    n_plan(["Security::plan<br/>line 255"])
+    n_spawn["Security::spawn<br/>line 274"]
+    n_poll["Security::poll<br/>line 289"]
+    n_wipe_form["Security::wipe_form<br/>line 331"]
+    n_busy["Security::busy<br/>line 337"]
+    n_is_busy(["Security::is_busy<br/>line 343"])
+    n_unlock_screen(["Security::unlock_screen<br/>line 348"])
+    n_tab(["Security::tab<br/>line 447"])
+    n_recording_controls(["Security::recording_controls<br/>line 572"])
+    n_run_op["run_op<br/>line 802"]
+    n_reopen["reopen<br/>line 850"]
+    n_password_row["password_row<br/>line 854"]
     n_blocked_reason --> n_ready_to_write
     n_drop --> n_wipe_secrets
     n_is_busy --> n_busy
@@ -103,6 +135,12 @@ flowchart TD
     n_unlock_screen --> n_busy
     n_unlock_screen --> n_poll
     n_unlock_screen --> n_spawn
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_load,n_is_locked,n_blocked_reason,n_plan,n_is_busy,n_unlock_screen,n_tab,n_recording_controls entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_has_lock,n_lock_now,n_ready_to_write api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_into_secret,n_default,n_drop,n_wipe_secrets,n_spawn,n_poll,n_wipe_form,n_busy,n_run_op,n_reopen,n_password_row helper
 ```
 
 ## Items

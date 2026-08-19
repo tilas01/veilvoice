@@ -227,7 +227,12 @@ jobs:
       - name: Windows binaries must carry their icon
         if: runner.os == 'Windows'
         shell: bash
-        run: python tools/release/check-windows-icons.py target/release
+        # `target/<triple>/release`, not `target/release`: every build here is
+        # an explicit `--target`, so cargo puts the output under the triple.
+        # Pointing at the wrong path made the check report "no Windows binaries
+        # found" and fail the whole release -- which is the right behaviour for
+        # a check that must never pass vacuously, and the wrong path to give it.
+        run: python tools/release/check-windows-icons.py "target/${{ matrix.target }}/release"
 
       - name: Stage the archive
         shell: bash

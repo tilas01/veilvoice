@@ -20,6 +20,7 @@
 - [Forward secrecy, and what reseedsecs is really for](#forward-secrecy-and-what-reseedsecs-is-really-for)
 - [Real-time constraints](#real-time-constraints)
 - [Configuration is validated in one place](#configuration-is-validated-in-one-place)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -117,6 +118,32 @@ read from a file and handed to a library without a bound killed the process
 (F-2, F-3). The engine keeps persistent state, so a bad value is not one bad
 block -- it is every block from then on.
 
+## What this file contains
+
+856 lines defining **16 functions** (12 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct DeidConfig` (line 106) -- User-facing configuration for the de-identifier.
+- `struct ProcessStats` (line 300) -- Rolling performance statistics, surfaced live to the UI.
+- `struct Deidentifier` (line 350) -- The complete, irreversible voice de-identification chain.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `DeidConfig::checked` (line 216) -- Validate and normalise; returns an error string on impossible values.
+  - reaches: `clamp_ratio_bounds`
+- `ProcessStats::last_block_ms` (line 321) -- Most recent block processing time in milliseconds.
+- `ProcessStats::worst_block_ms` (line 325) -- Worst block processing time in milliseconds.
+- `ProcessStats::ema_block_ms` (line 329) -- Smoothed block processing time in milliseconds.
+- `ProcessStats::last_realtime_factor` (line 334) -- Processing time divided by the block's real-time duration.
+- `Deidentifier::new` (line 371) -- Build with a fresh, unpredictable seed from the OS CSPRNG.
+  - reaches: `from_seed`
+- `Deidentifier::latency_samples` (line 436) -- Fixed algorithmic latency in samples.
+- `Deidentifier::stats` (line 441) -- Live performance statistics (copy).
+- `Deidentifier::accent_stats` (line 446) -- Live accent-neutralisation read-out (detected f0, applied ratios).
+- `Deidentifier::process_vec` (line 511) -- Convenience: process a whole buffer and return a new Vec.
+  - reaches: `process`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -125,28 +152,36 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["DeidConfig::default"]
-    n_hop["DeidConfig::hop"]
-    n_scaled["DeidConfig::scaled"]
-    n_checked(["DeidConfig::checked<br/>pub"])
-    n_clamp_ratio_bounds["clamp_ratio_bounds"]
-    n_last_block_ms(["ProcessStats::last_block_ms<br/>pub"])
-    n_worst_block_ms(["ProcessStats::worst_block_ms<br/>pub"])
-    n_ema_block_ms(["ProcessStats::ema_block_ms<br/>pub"])
-    n_last_realtime_factor(["ProcessStats::last_realtime_f…<br/>pub"])
-    n_new(["Deidentifier::new<br/>pub"])
-    n_from_seed(["Deidentifier::from_seed<br/>pub"])
-    n_latency_samples(["Deidentifier::latency_samples<br/>pub"])
-    n_stats(["Deidentifier::stats<br/>pub"])
-    n_accent_stats(["Deidentifier::accent_stats<br/>pub"])
-    n_process(["Deidentifier::process<br/>pub"])
-    n_process_vec(["Deidentifier::process_vec<br/>pub"])
+    n_default["DeidConfig::default<br/>line 150"]
+    n_hop["DeidConfig::hop<br/>line 172"]
+    n_scaled["DeidConfig::scaled<br/>line 177"]
+    n_checked(["DeidConfig::checked<br/>line 216"])
+    n_clamp_ratio_bounds["clamp_ratio_bounds<br/>line 286"]
+    n_last_block_ms(["ProcessStats::last_block_ms<br/>line 321"])
+    n_worst_block_ms(["ProcessStats::worst_block_ms<br/>line 325"])
+    n_ema_block_ms(["ProcessStats::ema_block_ms<br/>line 329"])
+    n_last_realtime_factor(["ProcessStats::last_realtime_f…<br/>line 334"])
+    n_new(["Deidentifier::new<br/>line 371"])
+    n_from_seed["Deidentifier::from_seed<br/>line 378"]
+    n_latency_samples(["Deidentifier::latency_samples<br/>line 436"])
+    n_stats(["Deidentifier::stats<br/>line 441"])
+    n_accent_stats(["Deidentifier::accent_stats<br/>line 446"])
+    n_process["Deidentifier::process<br/>line 452"]
+    n_process_vec(["Deidentifier::process_vec<br/>line 511"])
     n_checked --> n_clamp_ratio_bounds
     n_new --> n_from_seed
     n_process_vec --> n_process
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_checked,n_last_block_ms,n_worst_block_ms,n_ema_block_ms,n_last_realtime_factor,n_new,n_latency_samples,n_stats,n_accent_stats,n_process_vec entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_from_seed,n_process api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_default,n_hop,n_scaled,n_clamp_ratio_bounds helper
 ```
 
 ## Items

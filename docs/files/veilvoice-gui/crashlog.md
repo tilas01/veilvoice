@@ -18,6 +18,7 @@
 - [The problem this exists for](#the-problem-this-exists-for)
 - [What this does about it](#what-this-does-about-it)
 - [What it deliberately does not do](#what-it-deliberately-does-not-do)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -66,6 +67,19 @@ it with even if that changed.
 version and a timestamp. Not the file being processed, not a path the user
 chose, not a passphrase -- nothing that is theirs.
 
+## What this file contains
+
+254 lines defining **7 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `install` (line 124) -- Install the panic hook.
+  - reaches: `default_path`, `previous`, `write`, `stamp`
+- `record_startup_failure` (line 147) -- Record a startup failure that eframe returned rather than panicked.
+  - reaches: `default_path`, `write`, `stamp`
+- `clear` (line 161) -- Forget a previous report.
+  - reaches: `default_path`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -74,16 +88,18 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default_path(["default_path<br/>pub"])
-    n_stamp["stamp"]
-    n_write(["write<br/>pub"])
-    n_install(["install<br/>pub"])
-    n_record_startup_failure(["record_startup_failure<br/>pub"])
-    n_previous(["previous<br/>pub"])
-    n_clear(["clear<br/>pub"])
+    n_default_path["default_path<br/>line 52"]
+    n_stamp["stamp<br/>line 62"]
+    n_write["write<br/>line 75"]
+    n_install(["install<br/>line 124"])
+    n_record_startup_failure(["record_startup_failure<br/>line 147"])
+    n_previous["previous<br/>line 154"]
+    n_clear(["clear<br/>line 161"])
     n_clear --> n_default_path
     n_install --> n_default_path
     n_install --> n_previous
@@ -92,6 +108,12 @@ flowchart TD
     n_record_startup_failure --> n_default_path
     n_record_startup_failure --> n_write
     n_write --> n_stamp
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_install,n_record_startup_failure,n_clear entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_default_path,n_write,n_previous api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_stamp helper
 ```
 
 ## Items

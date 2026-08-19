@@ -56,20 +56,44 @@ are kept different: they are domain-separated in the derivation, so
 unlocking the application does not unseal recordings and one cannot be
 derived from the other.
 
+## What this file contains
+
+387 lines defining **7 functions** (5 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct KdfParams` (line 51) -- Argon2id cost parameters.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `KdfParams::weak_for_tests` (line 78) -- A deliberately cheap profile for tests and low-memory devices.
+- `KdfParams::within` (line 136) -- Check the costs against a caller-chosen memory ceiling as well as the built-in one.
+  - reaches: `checked`
+- `derive_key` (line 202) -- Derive a 32-byte key from password and salt.
+- `random_salt` (line 215) -- Draw a fresh random salt from the OS CSPRNG.
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["KdfParams::default"]
-    n_weak_for_tests(["KdfParams::weak_for_tests<br/>pub"])
-    n_within(["KdfParams::within<br/>pub"])
-    n_checked(["KdfParams::checked<br/>pub"])
-    n_build["KdfParams::build"]
-    n_derive_key(["derive_key<br/>pub"])
-    n_random_salt(["random_salt<br/>pub"])
+    n_default["KdfParams::default<br/>line 65"]
+    n_weak_for_tests(["KdfParams::weak_for_tests<br/>line 78"])
+    n_within(["KdfParams::within<br/>line 136"])
+    n_checked["KdfParams::checked<br/>line 165"]
+    n_build["KdfParams::build<br/>line 185"]
+    n_derive_key(["derive_key<br/>line 202"])
+    n_random_salt(["random_salt<br/>line 215"])
     n_build --> n_checked
     n_within --> n_checked
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_weak_for_tests,n_within,n_derive_key,n_random_salt entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_checked api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_default,n_build helper
 ```
 
 ## Items

@@ -38,21 +38,32 @@ A PID. Windows tracks this per *application*, not per process, so
 apps, background services and anything else the OS accounts for, which
 enumerating process handles would miss.
 
+## What this file contains
+
+416 lines defining **10 functions** (1 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `scan` (line 100)
+  - reaches: `collect`, `read_entry`, `subkeys`, `decode_path`, `filetime_to_system`, `friendly_name`, `read_u64`, `no_window`, `reg_exe`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_no_window["no_window"]
-    n_reg_exe["reg_exe"]
-    n_scan(["scan<br/>pub"])
-    n_collect["collect"]
-    n_subkeys["subkeys"]
-    n_read_entry["read_entry"]
-    n_read_u64["read_u64"]
-    n_decode_path["decode_path"]
-    n_friendly_name["friendly_name"]
-    n_filetime_to_system["filetime_to_system"]
+    n_no_window["no_window<br/>line 49"]
+    n_reg_exe["reg_exe<br/>line 84"]
+    n_scan(["scan<br/>line 100"])
+    n_collect["collect<br/>line 113"]
+    n_subkeys["subkeys<br/>line 132"]
+    n_read_entry["read_entry<br/>line 159"]
+    n_read_u64["read_u64<br/>line 183"]
+    n_decode_path["decode_path<br/>line 198"]
+    n_friendly_name["friendly_name<br/>line 203"]
+    n_filetime_to_system["filetime_to_system<br/>line 213"]
     n_collect --> n_read_entry
     n_collect --> n_subkeys
     n_read_entry --> n_decode_path
@@ -64,6 +75,10 @@ flowchart TD
     n_scan --> n_collect
     n_subkeys --> n_no_window
     n_subkeys --> n_reg_exe
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_scan entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_no_window,n_reg_exe,n_collect,n_subkeys,n_read_entry,n_read_u64,n_decode_path,n_friendly_name,n_filetime_to_system helper
 ```
 
 ## Items

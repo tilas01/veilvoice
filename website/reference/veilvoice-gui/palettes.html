@@ -64,55 +64,65 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 963 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
-<rect x="0" y="0" width="963" height="94" fill="#16161e" rx="8"/>
-<path d="M231.2 47.0 C 253.2 47.0, 253.2 47.0, 119.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M414.4 47.0 C 436.4 47.0, 436.4 47.0, 234.2 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M942.8 47.0 C 964.8 47.0, 964.8 47.0, 723.8 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M942.8 47.0 C 964.8 47.0, 964.8 47.0, 417.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M942.8 47.0 C 964.8 47.0, 964.8 47.0, 631.8 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M628.8 47.0 C 650.8 47.0, 650.8 47.0, 539.8 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<rect x="20.0" y="28.5" width="96.4" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="68.2" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">luminance</text>
-<rect x="142.4" y="20.0" width="88.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="186.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">contrast</text>
-<text x="186.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="257.2" y="20.0" width="157.2" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="335.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">contrast_problems</text>
-<text x="335.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="440.4" y="28.5" width="96.4" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="488.6" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">parse_hex</text>
-<rect x="562.8" y="28.5" width="66.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="595.8" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">parse</text>
-<rect x="654.8" y="28.5" width="66.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="687.8" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">build</text>
-<rect x="746.8" y="20.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="802.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">default_dir</text>
-<text x="802.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="884.4" y="20.0" width="58.4" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="913.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">load</text>
-<text x="913.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1039 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
+<rect x="0" y="0" width="1039" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M231.2 47.0 C 253.2 47.0, 253.2 47.0, 119.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M414.4 47.0 C 436.4 47.0, 436.4 47.0, 234.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1018.8 47.0 C 1040.8 47.0, 1040.8 47.0, 769.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1018.8 47.0 C 1040.8 47.0, 1040.8 47.0, 417.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1018.8 47.0 C 1040.8 47.0, 1040.8 47.0, 654.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M651.6 47.0 C 673.6 47.0, 673.6 47.0, 539.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">luminance</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 85</text>
+<rect x="142.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="186.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">contrast</text>
+<text x="186.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
+<rect x="257.2" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="335.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">contrast_problems</text>
+<text x="335.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 121</text>
+<rect x="440.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="488.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_hex</text>
+<text x="488.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+<rect x="562.8" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="607.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse</text>
+<text x="607.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 171</text>
+<rect x="677.6" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="722.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">build</text>
+<text x="722.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 249</text>
+<rect x="792.4" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="848.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_dir</text>
+<text x="848.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 282</text>
+<rect x="930.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="974.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load</text>
+<text x="974.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_luminance[&quot;luminance&quot;]
-    n_contrast([&quot;contrast&lt;br/&gt;pub&quot;])
-    n_contrast_problems([&quot;contrast_problems&lt;br/&gt;pub&quot;])
-    n_parse_hex[&quot;parse_hex&quot;]
-    n_parse[&quot;parse&quot;]
-    n_build[&quot;build&quot;]
-    n_default_dir([&quot;default_dir&lt;br/&gt;pub&quot;])
-    n_load([&quot;load&lt;br/&gt;pub&quot;])
+    n_luminance[&quot;luminance&lt;br/&gt;line 85&quot;]
+    n_contrast[&quot;contrast&lt;br/&gt;line 101&quot;]
+    n_contrast_problems[&quot;contrast_problems&lt;br/&gt;line 121&quot;]
+    n_parse_hex[&quot;parse_hex&lt;br/&gt;line 154&quot;]
+    n_parse[&quot;parse&lt;br/&gt;line 171&quot;]
+    n_build[&quot;build&lt;br/&gt;line 249&quot;]
+    n_default_dir([&quot;default_dir&lt;br/&gt;line 282&quot;])
+    n_load([&quot;load&lt;br/&gt;line 309&quot;])
     n_contrast --&gt; n_luminance
     n_contrast_problems --&gt; n_contrast
     n_load --&gt; n_build
     n_load --&gt; n_contrast_problems
     n_load --&gt; n_parse
-    n_parse --&gt; n_parse_hex</code></pre>
+    n_parse --&gt; n_parse_hex
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_default_dir,n_load entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_contrast,n_contrast_problems api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_luminance,n_parse_hex,n_parse,n_build helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

@@ -17,6 +17,7 @@
 
 - [Read this before relying on it](#read-this-before-relying-on-it)
 - [Why not 35 passes](#why-not-35-passes)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -57,6 +58,20 @@ random, complement, random — which satisfies the common
 three-pass expectation without pretending that thirty-five would be stronger.
 Time is better spent enabling disk encryption than on passes 4 through 35.
 
+## What this file contains
+
+401 lines defining **3 functions** (1 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Passes` (line 50) -- How thoroughly to overwrite before unlinking.
+- `struct ShredReport` (line 72) -- What actually happened, so the caller can tell the user the truth.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `shred_file` (line 91) -- Overwrite a file's contents, then delete it.
+  - reaches: `caveats`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -65,13 +80,19 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_count["Passes::count"]
-    n_shred_file(["shred_file<br/>pub"])
-    n_caveats["caveats"]
+    n_count["Passes::count<br/>line 61"]
+    n_shred_file(["shred_file<br/>line 91"])
+    n_caveats["caveats<br/>line 176"]
     n_shred_file --> n_caveats
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_shred_file entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_count,n_caveats helper
 ```
 
 ## Items

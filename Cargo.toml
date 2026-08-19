@@ -29,7 +29,19 @@ exclude = ["fuzz"]
 [workspace.package]
 version = "0.1.11"
 edition = "2021"
-rust-version = "1.96"
+# The oldest Rust this actually compiles on, measured rather than assumed.
+#
+# This said 1.96 -- the version that happened to be current when it was
+# written -- and that one line was the *only* thing stopping the OpenBSD build:
+# its packaged Rust is 1.94.1, cargo refused before compiling anything, and the
+# release shipped without an OpenBSD archive for two versions while the
+# documentation explained the platform was behind. It was not. We were.
+#
+# Verified by installing 1.94.0 and checking every crate, including the GUI.
+# `rust-toolchain.toml` still pins the newer toolchain for development and CI;
+# this is the floor, and lowering it costs nothing until something in the tree
+# needs a newer feature -- at which point cargo says so, by name.
+rust-version = "1.94"
 license = "GPL-3.0-or-later"
 authors = ["tilas01"]
 repository = "https://github.com/tilas01/veilvoice"

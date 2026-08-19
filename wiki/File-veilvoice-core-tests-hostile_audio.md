@@ -23,24 +23,30 @@ average, so a single non-finite sample folded into it never washes out. The
 audit found exactly that — one NaN, and every output sample for the rest of
 the session was NaN, silently.
 
+## What this file contains
+
+353 lines defining **13 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
 ## What calls what
+
+_Colour key: **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_speech["speech"]
-    n_engine["engine"]
-    n_a_single_nan_does_not_poison_the_engine_for_ever["a_single_nan_does_not_poison_…"]
-    n_every_flavour_of_non_finite_is_survived["every_flavour_of_non_finite_i…"]
-    n_an_entirely_non_finite_buffer_is_handled["an_entirely_non_finite_buffer…"]
-    n_digital_silence_stays_silent_and_leaves_the_state_usable["digital_silence_stays_silent_…"]
-    n_pathological_but_legal_audio_is_handled["pathological_but_legal_audio_…"]
-    n_hostile_input_is_survived_with_accent_neutralisation_off["hostile_input_is_survived_wit…"]
-    n_a_non_finite_sample_rate_is_refused_rather_than_built["a_non_finite_sample_rate_is_r…"]
-    n_an_absurd_sample_rate_is_refused_rather_than_allocated["an_absurd_sample_rate_is_refu…"]
-    n_an_absurd_frame_size_is_refused["an_absurd_frame_size_is_refus…"]
-    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped["non_finite_parameters_are_ref…"]
-    n_every_configuration_that_builds_produces_finite_audio["every_configuration_that_buil…"]
+    n_speech["speech<br/>line 17"]
+    n_engine["engine<br/>line 30"]
+    n_a_single_nan_does_not_poison_the_engine_for_ever["a_single_nan_does_not_poison_…<br/>line 36"]
+    n_every_flavour_of_non_finite_is_survived["every_flavour_of_non_finite_i…<br/>line 63"]
+    n_an_entirely_non_finite_buffer_is_handled["an_entirely_non_finite_buffer…<br/>line 93"]
+    n_digital_silence_stays_silent_and_leaves_the_state_usable["digital_silence_stays_silent_…<br/>line 105"]
+    n_pathological_but_legal_audio_is_handled["pathological_but_legal_audio_…<br/>line 123"]
+    n_hostile_input_is_survived_with_accent_neutralisation_off["hostile_input_is_survived_wit…<br/>line 162"]
+    n_a_non_finite_sample_rate_is_refused_rather_than_built["a_non_finite_sample_rate_is_r…<br/>line 200"]
+    n_an_absurd_sample_rate_is_refused_rather_than_allocated["an_absurd_sample_rate_is_refu…<br/>line 221"]
+    n_an_absurd_frame_size_is_refused["an_absurd_frame_size_is_refus…<br/>line 260"]
+    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped["non_finite_parameters_are_ref…<br/>line 288"]
+    n_every_configuration_that_builds_produces_finite_audio["every_configuration_that_buil…<br/>line 339"]
     n_a_single_nan_does_not_poison_the_engine_for_ever --> n_engine
     n_a_single_nan_does_not_poison_the_engine_for_ever --> n_speech
     n_an_entirely_non_finite_buffer_is_handled --> n_engine
@@ -52,6 +58,8 @@ flowchart TD
     n_every_flavour_of_non_finite_is_survived --> n_speech
     n_hostile_input_is_survived_with_accent_neutralisation_off --> n_speech
     n_pathological_but_legal_audio_is_handled --> n_engine
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_speech,n_engine,n_a_single_nan_does_not_poison_the_engine_for_ever,n_every_flavour_of_non_finite_is_survived,n_an_entirely_non_finite_buffer_is_handled,n_digital_silence_stays_silent_and_leaves_the_state_usable,n_pathological_but_legal_audio_is_handled,n_hostile_input_is_survived_with_accent_neutralisation_off,n_a_non_finite_sample_rate_is_refused_rather_than_built,n_an_absurd_sample_rate_is_refused_rather_than_allocated,n_an_absurd_frame_size_is_refused,n_non_finite_parameters_are_refused_and_wild_ones_are_clamped,n_every_configuration_that_builds_produces_finite_audio helper
 ```
 
 ## Items
