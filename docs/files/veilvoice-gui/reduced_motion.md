@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/reduced_motion.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 324 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 328 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs)
 
 ## Contents
 
@@ -91,15 +91,15 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `no_window` <sub>fn</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L52) | Spawn without a console window. |
-| `Query` <sub>pub enum</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L64) | What the platform said. |
-| `Query::reduces` <sub>pub fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L77) | Whether to treat this as a request to reduce motion. |
-| `tool` <sub>fn</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L83) | Resolve a tool to an absolute path. |
-| `query` <sub>pub fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L97) | Ask the operating system. |
-| `windows_query` <sub>fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L121) | Windows: "Show animations in Windows" lives in the UserPreferencesMask under HKCU\Control Panel\Desktop. |
-| `parse_user_preferences_mask` <sub>fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L151) | Pull the mask out of reg query output and read the animation bit. |
-| `macos_query` <sub>fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L175) | macOS: the Accessibility "Reduce motion" switch. |
-| `unix_query` <sub>fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L200) | Linux and the BSDs: GNOME's enable-animations, which the other major desktops have largely adopted as the common key. |
+| `no_window` <sub>fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L56) | Spawn without a console window. |
+| `Query` <sub>pub enum</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L68) | What the platform said. |
+| `Query::reduces` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L81) | Whether to treat this as a request to reduce motion. |
+| `tool` <sub>fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L87) | Resolve a tool to an absolute path. |
+| `query` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L101) | Ask the operating system. |
+| `windows_query` <sub>fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L125) | Windows: "Show animations in Windows" lives in the UserPreferencesMask under HKCU\Control Panel\Desktop. |
+| `parse_user_preferences_mask` <sub>fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L155) | Pull the mask out of reg query output and read the animation bit. |
+| `macos_query` <sub>fn</sub> | [179](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L179) | macOS: the Accessibility "Reduce motion" switch. |
+| `unix_query` <sub>fn</sub> | [204](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L204) | Linux and the BSDs: GNOME's enable-animations, which the other major desktops have largely adopted as the common key. |
 
 ---
 

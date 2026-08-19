@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/reduced_motion.svg" alt="reduced_motion.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/reduced_motion.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 324 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 328 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-exists-rather-than-an-egui-call">Why this exists rather than an egui call</a>
@@ -125,15 +125,15 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>no_window</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L52" rel="noopener noreferrer">52</a></td><td>Spawn without a console window.</td></tr>
-<tr><td><code>Query</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L64" rel="noopener noreferrer">64</a></td><td>What the platform said.</td></tr>
-<tr><td><code>Query::reduces</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L77" rel="noopener noreferrer">77</a></td><td>Whether to treat this as a request to reduce motion.</td></tr>
-<tr><td><code>tool</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L83" rel="noopener noreferrer">83</a></td><td>Resolve a tool to an absolute path.</td></tr>
-<tr><td><code>query</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L97" rel="noopener noreferrer">97</a></td><td>Ask the operating system.</td></tr>
-<tr><td><code>windows_query</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L121" rel="noopener noreferrer">121</a></td><td>Windows: &quot;Show animations in Windows&quot; lives in the UserPreferencesMask under HKCU\Control Panel\Desktop.</td></tr>
-<tr><td><code>parse_user_preferences_mask</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L151" rel="noopener noreferrer">151</a></td><td>Pull the mask out of reg query output and read the animation bit.</td></tr>
-<tr><td><code>macos_query</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L175" rel="noopener noreferrer">175</a></td><td>macOS: the Accessibility &quot;Reduce motion&quot; switch.</td></tr>
-<tr><td><code>unix_query</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L200" rel="noopener noreferrer">200</a></td><td>Linux and the BSDs: GNOME&#x27;s enable-animations, which the other major desktops have largely adopted as the common key.</td></tr>
+<tr><td><code>no_window</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L56" rel="noopener noreferrer">56</a></td><td>Spawn without a console window.</td></tr>
+<tr><td><code>Query</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L68" rel="noopener noreferrer">68</a></td><td>What the platform said.</td></tr>
+<tr><td><code>Query::reduces</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L81" rel="noopener noreferrer">81</a></td><td>Whether to treat this as a request to reduce motion.</td></tr>
+<tr><td><code>tool</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L87" rel="noopener noreferrer">87</a></td><td>Resolve a tool to an absolute path.</td></tr>
+<tr><td><code>query</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L101" rel="noopener noreferrer">101</a></td><td>Ask the operating system.</td></tr>
+<tr><td><code>windows_query</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L125" rel="noopener noreferrer">125</a></td><td>Windows: &quot;Show animations in Windows&quot; lives in the UserPreferencesMask under HKCU\Control Panel\Desktop.</td></tr>
+<tr><td><code>parse_user_preferences_mask</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L155" rel="noopener noreferrer">155</a></td><td>Pull the mask out of reg query output and read the animation bit.</td></tr>
+<tr><td><code>macos_query</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L179" rel="noopener noreferrer">179</a></td><td>macOS: the Accessibility &quot;Reduce motion&quot; switch.</td></tr>
+<tr><td><code>unix_query</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L204" rel="noopener noreferrer">204</a></td><td>Linux and the BSDs: GNOME&#x27;s enable-animations, which the other major desktops have largely adopted as the common key.</td></tr>
 </tbody></table>
 </section>
 </div></div>

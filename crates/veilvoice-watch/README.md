@@ -64,7 +64,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>401 lines"])
     n_linux["linux.rs<br/>192 lines"]
-    n_windows["windows.rs<br/>412 lines"]
+    n_windows["windows.rs<br/>416 lines"]
 ```
 
 ## The files
@@ -73,7 +73,7 @@ flowchart TD
 |---|---:|---|
 | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | 401 | Find out which applications are using your microphone and camera, right now. |
 | [`linux.rs`](../../docs/files/veilvoice-watch/linux.md) | 192 | Linux detection, via open file handles in /proc. |
-| [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | 412 | Windows detection, via the Capability Access Manager. |
+| [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | 416 | Windows detection, via the Capability Access Manager. |
 | [`scan_once.rs`](../../docs/files/veilvoice-watch/examples-scan_once.md) | 22 | Print what is using the microphone and camera right now. |
 
 ## Public items

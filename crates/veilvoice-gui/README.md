@@ -77,7 +77,7 @@ flowchart TD
     n_crashlog["crashlog.rs<br/>254 lines"]
     n_palettes["palettes.rs<br/>691 lines"]
     n_prefs["prefs.rs<br/>386 lines"]
-    n_reduced_motion["reduced_motion.rs<br/>324 lines"]
+    n_reduced_motion["reduced_motion.rs<br/>328 lines"]
     n_security["security.rs<br/>1030 lines"]
     n_settings["settings.rs<br/>706 lines"]
     n_soundbar["soundbar.rs<br/>349 lines"]
@@ -113,7 +113,7 @@ flowchart TD
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 87 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 691 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 386 | What the user has chosen about how the app looks and moves. |
-| [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 324 | Whether the operating system has been asked to reduce motion. |
+| [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 328 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1030 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 706 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 349 | The animated mark: a row of bars that rise and fall. |
