@@ -45,6 +45,10 @@ use std::path::Path;
 /// -- because "no console window appeared" is not observable from a test, which
 /// is exactly why the defect shipped.
 #[cfg(any(target_os = "linux", windows))]
+// `mut` is only needed where the body below is compiled in. Everywhere
+// else the parameter is moved straight through, and `-D warnings` in CI
+// rejects the unused `mut` -- which only the Linux runner can see.
+#[cfg_attr(not(windows), allow(unused_mut))]
 fn no_window(mut command: std::process::Command) -> std::process::Command {
     #[cfg(windows)]
     {
