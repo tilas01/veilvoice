@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-guard/blame.svg" alt="blame.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-guard/src/blame.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-guard.html">veilvoice-guard</a> &middot; 401 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-guard.html">veilvoice-guard</a> &middot; 405 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#read-this-before-relying-on-it">Read this before relying on it</a>
@@ -101,15 +101,15 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>no_window</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L48" rel="noopener noreferrer">48</a></td><td>Spawn without a console window.</td></tr>
-<tr><td><code>system_tool</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L75" rel="noopener noreferrer">75</a></td><td>Resolve a system tool to an absolute path, rather than letting the operating system search for it.</td></tr>
-<tr><td><code>Blame</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L90" rel="noopener noreferrer">90</a></td><td>What, if anything, is known about who changed a file.</td></tr>
-<tr><td><code>Blame::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L111" rel="noopener noreferrer">111</a></td><td>A single line for a terminal, an alert or a log.</td></tr>
-<tr><td><code>Blame::is_known</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L122" rel="noopener noreferrer">122</a></td><td>Whether an actual name was found.</td></tr>
-<tr><td><code>unconfigured</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L128" rel="noopener noreferrer">128</a></td><td>Build the &quot;nobody configured auditing&quot; answer for this platform.</td></tr>
-<tr><td><code>who_touched</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L147" rel="noopener noreferrer">147</a></td><td>Try to name the program that last wrote to path.</td></tr>
-<tr><td><code>linux</code> <sub>mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L164" rel="noopener noreferrer">164</a></td><td></td></tr>
-<tr><td><code>windows</code> <sub>mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L242" rel="noopener noreferrer">242</a></td><td></td></tr>
+<tr><td><code>no_window</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L52" rel="noopener noreferrer">52</a></td><td>Spawn without a console window.</td></tr>
+<tr><td><code>system_tool</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L79" rel="noopener noreferrer">79</a></td><td>Resolve a system tool to an absolute path, rather than letting the operating system search for it.</td></tr>
+<tr><td><code>Blame</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L94" rel="noopener noreferrer">94</a></td><td>What, if anything, is known about who changed a file.</td></tr>
+<tr><td><code>Blame::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L115" rel="noopener noreferrer">115</a></td><td>A single line for a terminal, an alert or a log.</td></tr>
+<tr><td><code>Blame::is_known</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L126" rel="noopener noreferrer">126</a></td><td>Whether an actual name was found.</td></tr>
+<tr><td><code>unconfigured</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L132" rel="noopener noreferrer">132</a></td><td>Build the &quot;nobody configured auditing&quot; answer for this platform.</td></tr>
+<tr><td><code>who_touched</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L151" rel="noopener noreferrer">151</a></td><td>Try to name the program that last wrote to path.</td></tr>
+<tr><td><code>linux</code> <sub>mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L168" rel="noopener noreferrer">168</a></td><td></td></tr>
+<tr><td><code>windows</code> <sub>mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L246" rel="noopener noreferrer">246</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

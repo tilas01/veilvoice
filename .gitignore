@@ -62,3 +62,17 @@ __pycache__/
 HANDOFF.md
 HANDOVER.md
 .claude/
+.claude*/
+CLAUDE.md
+**/CLAUDE.md
+.mcp.json
+.cursor/
+.aider*
+.vscode/
+.idea/
+
+# Agent skills. Installed locally for Rust and security review practice; they
+# are tooling for whoever is working on this, not part of what anybody
+# downloads, and several carry their own upstream licences.
+.claude/skills/
+skills/
