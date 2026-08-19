@@ -27,6 +27,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 
 - [[`atrest.rs`|File-veilvoice-cli-atrest]] &mdash; Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
+- [[`install.rs`|File-veilvoice-cli-install]] &mdash; veilvoice install -- put this program somewhere the system can find it.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &mdash; Tokyo Night colouring for the terminal.

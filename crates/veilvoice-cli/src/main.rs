@@ -48,6 +48,7 @@
 
 mod atrest;
 mod guard;
+mod install;
 mod lock;
 mod theme;
 
@@ -213,6 +214,26 @@ enum Command {
     },
     /// Show version and build information.
     Info,
+
+    /// Copy VeilVoice somewhere the system can find it, and add it to PATH.
+    ///
+    /// Entirely optional: VeilVoice runs from wherever it is unpacked, and
+    /// nothing has to be installed. This exists so that typing `veilvoice` in
+    /// a terminal works. Per-user, no administrator, and everything it does is
+    /// undone by `veilvoice uninstall`.
+    Install {
+        /// Report what is installed, and change nothing.
+        #[arg(long)]
+        status: bool,
+    },
+
+    /// Undo what `install` did: the PATH entry, the uninstall entry, and the
+    /// installed copy.
+    Uninstall {
+        /// Do not ask for confirmation.
+        #[arg(long)]
+        yes: bool,
+    },
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
@@ -299,6 +320,109 @@ fn run(command: Command) -> Result<(), String> {
         Command::Info => {
             info();
             Ok(())
+        }
+
+        Command::Install { status } => {
+            let state = install::status();
+            println!("{}", heading("Install"));
+            println!(
+                "{}",
+                field(
+                    "prefix",
+                    &state
+                        .prefix
+                        .as_ref()
+                        .map(|p| p.display().to_string())
+                        .unwrap_or_else(|| "not resolvable on this system".into())
+                )
+            );
+            println!(
+                "{}",
+                field("installed", if state.installed { "yes" } else { "no" })
+            );
+            println!(
+                "{}",
+                field(
+                    "on PATH",
+                    if state.on_path {
+                        "yes, in this terminal"
+                    } else {
+                        "no"
+                    }
+                )
+            );
+            // "Installed" and "you are running the installed copy" are
+            // different facts, and confusing them is how somebody updates a
+            // portable folder and wonders why the installed one is unchanged.
+            println!(
+                "{}",
+                field(
+                    "running",
+                    &match (&state.running_from, state.running_installed) {
+                        (Some(path), true) => format!("the installed copy ({})", path.display()),
+                        (Some(path), false) => format!("a portable copy ({})", path.display()),
+                        (None, _) => "unknown".to_string(),
+                    }
+                )
+            );
+            if status {
+                return Ok(());
+            }
+
+            match install::install() {
+                Ok(report) => {
+                    println!();
+                    for line in report {
+                        println!("{}", ok(&line));
+                    }
+                    println!();
+                    println!("  Open a new terminal for the PATH change to take effect.");
+                    println!();
+                    // Said plainly, once, where somebody installing will read
+                    // it: this program will never tell them an update exists.
+                    println!(
+                        "{}",
+                        warn(
+                            "VeilVoice never checks for updates and cannot tell you                              when one exists -- it has no network code at all.                              Watch the releases page, and verify what you download."
+                        )
+                    );
+                    Ok(())
+                }
+                Err(error) => {
+                    println!("{}", err(&error));
+                    Err("install failed".to_string())
+                }
+            }
+        }
+
+        Command::Uninstall { yes } => {
+            println!("{}", heading("Uninstall"));
+            let state = install::status();
+            if !state.installed {
+                println!("{}", warn("nothing is installed for this user"));
+            }
+            if !yes {
+                println!();
+                println!("  This removes the installed copy, the PATH entry and the");
+                println!("  uninstall entry. Your recordings, keys and settings are");
+                println!("  not touched -- they live elsewhere and are not this");
+                println!("  command's business.");
+                println!();
+                println!("  Re-run with --yes to proceed.");
+                return Ok(());
+            }
+            match install::uninstall() {
+                Ok(report) => {
+                    for line in report {
+                        println!("{}", ok(&line));
+                    }
+                    Ok(())
+                }
+                Err(error) => {
+                    println!("{}", err(&error));
+                    Err("uninstall failed".to_string())
+                }
+            }
         }
     }
 }
