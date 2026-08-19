@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Enumerating audio devices, and guessing which of them are virtual cables.
 //!
 //! # What this is for

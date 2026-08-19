@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
 # Changelog
 
@@ -8,37 +8,12 @@ than a summary written afterwards.
 
 ## v0.1.10
 
-Documentation you cannot outrun, and a licence change.
+Documentation you cannot outrun.
 
 Every crate and **every one of the 63 `.rs` files** in this repository now has a
 page, a flowchart and a banner, generated from the doc comments in the source
 and mirrored to the website and the GitHub wiki. A fifth audit round found
 twelve defects ([`docs/AUDIT.md`](docs/AUDIT.md)); two of them had shipped.
-
-### The licence is now CC BY-NC-SA 4.0
-
-**Read this before upgrading.** VeilVoice up to and including v0.1.9 was
-GPL-3.0-or-later, and **those releases stay under it for ever** -- a licence
-already granted cannot be withdrawn, so if you have one of those versions you
-keep every freedom the GPL gave you, commercial use included. From this release
-onward the terms are
-[Creative Commons Attribution-NonCommercial-ShareAlike 4.0](LICENSE).
-
-You may read it, build it, audit it, modify it, fork it and share it. You may
-not sell it, or use it for commercial advantage.
-
-**This is not an open source licence and this project no longer calls itself
-one.** The NonCommercial term is exactly what both the Open Source Definition
-and the Free Software Foundation's definition of free software forbid. The
-accurate word is *source-available*: everything that made this project
-checkable is unchanged -- public source, reproducible builds, generated artwork
-and documentation, no `unsafe`, no network code -- and one freedom is reserved.
-The word "libre" has been removed from the README, the website, the
-no-JavaScript edition and the licence gate rather than left standing.
-
-A consequence worth knowing: most Linux distributions will not carry
-NonCommercial software in their main repositories, and each packaging
-definition now says so.
 
 ### A page for every file
 

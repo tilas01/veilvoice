@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
 # Installing VeilVoice
 
@@ -173,7 +173,7 @@ untrustworthy.
   whose whole subject is verifying what you run.
 - **Audacity** is a free audio editor, useful for recording and trimming before
   veiling. It is not bundled because it is GPL-2.0-or-later, which cannot be
-  combined with this project's CC BY-NC-SA 4.0.
+  combined with this project's GPL-3.0-or-later.
 - **GnuPG**, where missing, because without it the signature cannot be checked
   at all. If you decline it, the script stops rather than falling back to
   "the hash matched" — a hash checked against an unverified list is not a

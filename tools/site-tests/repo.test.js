@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 // `repo.js` is the only module on this site that puts data from a *third party*
 // into the page. It fetches the GitHub API and raw README.md, and everything it

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: CC-BY-NC-SA-4.0
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # VeilVoice installer for Windows.
 #
@@ -450,7 +450,7 @@ try {
         Write-Say "    Audacity  -- a free audio editor, useful for recording and for"
         Write-Say "                 trimming a file before veiling it. Not bundled: it"
         Write-Say "                 is GPL-2.0-or-later, which cannot be combined with"
-        Write-Say "                 this project's CC BY-NC-SA 4.0."
+        Write-Say "                 this project's GPL-3.0-or-later."
         Write-Say ""
         if (Ask "Open the VB-CABLE download page in your browser?") { $WithVBCable = $true }
         if (Ask "Install Audacity?") { $WithAudacity = $true }

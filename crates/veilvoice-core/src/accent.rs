@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Accent and speaker-trait neutralisation.
 //!
 //! # What an accent is made of, and what a signal-level transform can remove

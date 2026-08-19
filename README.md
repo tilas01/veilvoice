@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
 <!-- The banner is the still image on purpose. The animated version
      exists and is used on the website, but a README is read in a
@@ -269,10 +269,7 @@ writes with no extra work.
   in constant time, and opaque to `Debug`.
 - **Reproducible & verifiable.** Pinned toolchain, committed lockfile,
   path-remapped builds, and a double-build check in CI.
-- **Source-available.** CC BY-NC-SA 4.0. Read it, build it, audit it,
-  fork it, share it -- but not sell it. This is deliberately *not* an
-  open source licence, and this project does not call itself one; see
-  [`LICENSE`](LICENSE) for what that does and does not mean.
+- **Libre.** GPL-3.0-or-later.
 
 ---
 
@@ -325,12 +322,7 @@ Roadmap and open work: [`ROADMAP.md`](ROADMAP.md).
 
 ## Licence
 
-CC BY-NC-SA 4.0. See [`LICENSE`](LICENSE).
-
-Releases up to and including v0.1.9 were published under GPL-3.0-or-later
-and remain under it -- a licence already granted cannot be withdrawn, so
-those versions keep every freedom the GPL gave them, commercial use
-included. The change applies to what is released after it.
+GPL-3.0-or-later. See [`LICENSE`](LICENSE).
 
 Virtual audio routing on Windows is usually provided by
 [VB-CABLE](https://vb-audio.com/Cable/), which is proprietary donationware and

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 // The smallest useful thing you can do with VeilVoice as a library: build the
 // engine, push samples through it, get de-identified samples back.

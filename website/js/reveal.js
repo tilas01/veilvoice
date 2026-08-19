@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Reveal-on-scroll, with one rule that outranks every other consideration:
 // **content must never stay invisible.**
