@@ -116,6 +116,9 @@ flowchart TD
 | [`spectral.rs`](../../docs/files/veilvoice-core/spectral.md) | 428 | Frequency-domain de-identification transform. |
 | [`stft.rs`](../../docs/files/veilvoice-core/stft.md) | 246 | Streaming short-time Fourier transform with overlap-add resynthesis. |
 | [`window.rs`](../../docs/files/veilvoice-core/window.md) | 91 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
+| [`spectrum_report.rs`](../../docs/files/veilvoice-core/examples-spectrum_report.md) | 99 | Where do the output partials actually land? |
+| [`veil_a_buffer.rs`](../../docs/files/veilvoice-core/examples-veil_a_buffer.md) | 45 | _no module documentation yet_ |
+| [`hostile_audio.rs`](../../docs/files/veilvoice-core/tests-hostile_audio.md) | 353 | The engine against input that is not well-behaved audio. |
 
 ## Public items
 

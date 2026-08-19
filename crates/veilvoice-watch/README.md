@@ -74,6 +74,7 @@ flowchart TD
 | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | 401 | Find out which applications are using your microphone and camera, right now. |
 | [`linux.rs`](../../docs/files/veilvoice-watch/linux.md) | 192 | Linux detection, via open file handles in /proc. |
 | [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | 361 | Windows detection, via the Capability Access Manager. |
+| [`scan_once.rs`](../../docs/files/veilvoice-watch/examples-scan_once.md) | 22 | Print what is using the microphone and camera right now. |
 
 ## Public items
 
