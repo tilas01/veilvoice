@@ -19,6 +19,7 @@
 - [Two behaviours that surprise people, on purpose](#two-behaviours-that-surprise-people-on-purpose)
 - [Passphrase prompts cannot be piped](#passphrase-prompts-cannot-be-piped)
 - [A clap ordering rule worth knowing](#a-clap-ordering-rule-worth-knowing)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -68,6 +69,18 @@ subcommand on the command line unless it is marked `global = true`. So
 `veilvoice lock --path X status` parses and `veilvoice lock status --path X`
 does not, except that `--path` is now global specifically so both do.
 
+## What this file contains
+
+1077 lines defining **17 functions** (0 public), **5 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct Cli` (line 75)
+- `enum Command` (line 81)
+- `enum CleanPolicy` (line 219)
+- `struct Tuning` (line 308) -- The engine settings a user can reach from the command line.
+- `struct AtRest` (line 336) -- What to do with the result once it exists.
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -76,26 +89,28 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Policy::from"]
-    n_main["main"]
-    n_run["run"]
-    n_config["config"]
-    n_describe_reseed["describe_reseed"]
-    n_anonymise["anonymise"]
-    n_live["live"]
-    n_meter["meter"]
-    n_list_devices["list_devices"]
-    n_clean["clean"]
-    n_encrypt["encrypt"]
-    n_decrypt["decrypt"]
-    n_load_secret_key["load_secret_key"]
-    n_keygen["keygen"]
-    n_watch["watch"]
-    n_shred["shred"]
-    n_info["info"]
+    n_from["Policy::from<br/>line 227"]
+    n_main["main<br/>line 235"]
+    n_run["run<br/>line 246"]
+    n_config["config<br/>line 314"]
+    n_describe_reseed["describe_reseed<br/>line 327"]
+    n_anonymise["anonymise<br/>line 345"]
+    n_live["live<br/>line 484"]
+    n_meter["meter<br/>line 570"]
+    n_list_devices["list_devices<br/>line 585"]
+    n_clean["clean<br/>line 617"]
+    n_encrypt["encrypt<br/>line 634"]
+    n_decrypt["decrypt<br/>line 663"]
+    n_load_secret_key["load_secret_key<br/>line 695"]
+    n_keygen["keygen<br/>line 703"]
+    n_watch["watch<br/>line 779"]
+    n_shred["shred<br/>line 869"]
+    n_info["info<br/>line 937"]
     n_anonymise --> n_config
     n_anonymise --> n_describe_reseed
     n_decrypt --> n_load_secret_key
@@ -113,6 +128,8 @@ flowchart TD
     n_run --> n_live
     n_run --> n_shred
     n_run --> n_watch
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_from,n_main,n_run,n_config,n_describe_reseed,n_anonymise,n_live,n_meter,n_list_devices,n_clean,n_encrypt,n_decrypt,n_load_secret_key,n_keygen,n_watch,n_shred,n_info helper
 ```
 
 ## Items

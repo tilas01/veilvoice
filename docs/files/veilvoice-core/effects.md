@@ -18,6 +18,7 @@
 - [How little these contribute, said plainly](#how-little-these-contribute-said-plainly)
 - [Why every mix defaults low](#why-every-mix-defaults-low)
 - [Real-time constraints](#real-time-constraints)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -66,6 +67,26 @@ construction: `process` allocates nothing, takes no lock and reads no clock.
 arithmetic, so changing sample rate means building a new one rather than
 resizing a live one.
 
+## What this file contains
+
+214 lines defining **8 functions** (6 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct SoftClip` (line 51) -- Symmetric soft-clip (tanh) waveshaper.
+- `struct DelayVoice` (line 75) -- A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices.
+- `struct Chorus` (line 116) -- Detuned chorus ensemble.
+- `struct Reverb` (line 147) -- Minimal Schroeder-style reverb: one feedback comb + one all-pass.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `SoftClip::new` (line 58)
+- `SoftClip::process` (line 67)
+- `Chorus::new` (line 122)
+- `Chorus::process` (line 135)
+- `Reverb::new` (line 158)
+- `Reverb::process` (line 172)
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -74,17 +95,23 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new(["SoftClip::new<br/>pub"])
-    n_process(["SoftClip::process<br/>pub"])
-    n_new["DelayVoice::new"]
-    n_process["DelayVoice::process"]
-    n_new(["Chorus::new<br/>pub"])
-    n_process(["Chorus::process<br/>pub"])
-    n_new(["Reverb::new<br/>pub"])
-    n_process(["Reverb::process<br/>pub"])
+    n_new(["SoftClip::new<br/>line 58"])
+    n_process(["SoftClip::process<br/>line 67"])
+    n_new["DelayVoice::new<br/>line 85"]
+    n_process["DelayVoice::process<br/>line 99"]
+    n_new(["Chorus::new<br/>line 122"])
+    n_process(["Chorus::process<br/>line 135"])
+    n_new(["Reverb::new<br/>line 158"])
+    n_process(["Reverb::process<br/>line 172"])
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_new,n_process,n_new,n_process,n_new,n_process entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_new,n_process helper
 ```
 
 ## Items

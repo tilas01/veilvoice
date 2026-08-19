@@ -15,6 +15,7 @@
 
 ## Contents
 
+- [What this file contains](#what-this-file-contains)
 - [What calls what](#what-calls-what)
 - [Items](#items)
 
@@ -32,6 +33,10 @@ whether to trust `veilvoice-verify` should be able to see what it was tested
 *against* without cloning the repository, because the whole purpose of that
 binary is to be the thing you check a download with.
 
+## What this file contains
+
+138 lines defining **13 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -40,22 +45,26 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_the_embedded_key_parses_and_is_the_expected_one["the_embedded_key_parses_and_i…"]
-    n_the_embedded_key_carries_no_email_address["the_embedded_key_carries_no_e…"]
-    n_the_fingerprint_constant_is_written_out_not_computed["the_fingerprint_constant_is_w…"]
-    n_a_hash_is_found_by_its_file_name["a_hash_is_found_by_its_file_n…"]
-    n_a_binary_mode_star_is_not_part_of_the_name["a_binary_mode_star_is_not_par…"]
-    n_a_file_that_is_not_listed_is_not_found["a_file_that_is_not_listed_is_…"]
-    n_a_name_that_merely_contains_the_wanted_one_does_not_match["a_name_that_merely_contains_t…"]
-    n_blank_and_comment_lines_are_skipped["blank_and_comment_lines_are_s…"]
-    n_a_malformed_line_is_skipped_rather_than_panicking["a_malformed_line_is_skipped_r…"]
-    n_digests_compare_case_insensitively_and_ignore_surrounding_space["digests_compare_case_insensit…"]
-    n_a_signature_that_is_not_openpgp_is_refused["a_signature_that_is_not_openp…"]
-    n_an_empty_signature_is_refused["an_empty_signature_is_refused"]
-    n_an_armoured_block_that_is_not_a_signature_is_refused["an_armoured_block_that_is_not…"]
+    n_the_embedded_key_parses_and_is_the_expected_one["the_embedded_key_parses_and_i…<br/>line 19"]
+    n_the_embedded_key_carries_no_email_address["the_embedded_key_carries_no_e…<br/>line 25"]
+    n_the_fingerprint_constant_is_written_out_not_computed["the_fingerprint_constant_is_w…<br/>line 40"]
+    n_a_hash_is_found_by_its_file_name["a_hash_is_found_by_its_file_n…<br/>line 53"]
+    n_a_binary_mode_star_is_not_part_of_the_name["a_binary_mode_star_is_not_par…<br/>line 65"]
+    n_a_file_that_is_not_listed_is_not_found["a_file_that_is_not_listed_is_…<br/>line 77"]
+    n_a_name_that_merely_contains_the_wanted_one_does_not_match["a_name_that_merely_contains_t…<br/>line 83"]
+    n_blank_and_comment_lines_are_skipped["blank_and_comment_lines_are_s…<br/>line 90"]
+    n_a_malformed_line_is_skipped_rather_than_panicking["a_malformed_line_is_skipped_r…<br/>line 99"]
+    n_digests_compare_case_insensitively_and_ignore_surrounding_space["digests_compare_case_insensit…<br/>line 110"]
+    n_a_signature_that_is_not_openpgp_is_refused["a_signature_that_is_not_openp…<br/>line 119"]
+    n_an_empty_signature_is_refused["an_empty_signature_is_refused<br/>line 126"]
+    n_an_armoured_block_that_is_not_a_signature_is_refused["an_armoured_block_that_is_not…<br/>line 132"]
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_the_embedded_key_parses_and_is_the_expected_one,n_the_embedded_key_carries_no_email_address,n_the_fingerprint_constant_is_written_out_not_computed,n_a_hash_is_found_by_its_file_name,n_a_binary_mode_star_is_not_part_of_the_name,n_a_file_that_is_not_listed_is_not_found,n_a_name_that_merely_contains_the_wanted_one_does_not_match,n_blank_and_comment_lines_are_skipped,n_a_malformed_line_is_skipped_rather_than_panicking,n_digests_compare_case_insensitively_and_ignore_surrounding_space,n_a_signature_that_is_not_openpgp_is_refused,n_an_empty_signature_is_refused,n_an_armoured_block_that_is_not_a_signature_is_refused helper
 ```
 
 ## Items

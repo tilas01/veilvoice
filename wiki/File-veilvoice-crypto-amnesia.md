@@ -60,29 +60,57 @@ must not abort the process while being dropped. The lock is released
 explicitly instead, and a failure to unlock is ignored: it leaves pages
 pinned, which is harmless, rather than unwinding out of a destructor.
 
+## What this file contains
+
+313 lines defining **13 functions** (9 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct Secret` (line 57) -- A byte buffer holding key material.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `Secret::new` (line 69) -- Wrap bytes, taking ownership and wiping the caller's copy.
+  - reaches: `zeroed`
+- `Secret::random` (line 113) -- Fill len bytes from the operating-system CSPRNG.
+  - reaches: `zeroed`
+- `Secret::is_locked` (line 124) -- Whether the pages were successfully locked out of swap.
+- `Secret::len` (line 129) -- Length in bytes.
+- `Secret::is_empty` (line 134) -- Whether the secret is empty.
+- `Secret::expose_mut` (line 145) -- Borrow mutably, for filling in place.
+- `Secret::wipe` (line 153) -- Wipe the contents now, before the value goes out of scope.
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new(["Secret::new<br/>pub"])
-    n_zeroed(["Secret::zeroed<br/>pub"])
-    n_random(["Secret::random<br/>pub"])
-    n_is_locked(["Secret::is_locked<br/>pub"])
-    n_len(["Secret::len<br/>pub"])
-    n_is_empty(["Secret::is_empty<br/>pub"])
-    n_expose(["Secret::expose<br/>pub"])
-    n_expose_mut(["Secret::expose_mut<br/>pub"])
-    n_wipe(["Secret::wipe<br/>pub"])
-    n_drop["Secret::drop"]
-    n_clone["Secret::clone"]
-    n_eq["Secret::eq"]
-    n_fmt["Secret::fmt"]
+    n_new(["Secret::new<br/>line 69"])
+    n_zeroed["Secret::zeroed<br/>line 77"]
+    n_random(["Secret::random<br/>line 113"])
+    n_is_locked(["Secret::is_locked<br/>line 124"])
+    n_len(["Secret::len<br/>line 129"])
+    n_is_empty(["Secret::is_empty<br/>line 134"])
+    n_expose["Secret::expose<br/>line 140"]
+    n_expose_mut(["Secret::expose_mut<br/>line 145"])
+    n_wipe(["Secret::wipe<br/>line 153"])
+    n_drop["Secret::drop<br/>line 159"]
+    n_clone["Secret::clone<br/>line 170"]
+    n_eq["Secret::eq<br/>line 180"]
+    n_fmt["Secret::fmt<br/>line 189"]
     n_clone --> n_expose
     n_clone --> n_zeroed
     n_eq --> n_expose
     n_new --> n_zeroed
     n_random --> n_zeroed
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_new,n_random,n_is_locked,n_len,n_is_empty,n_expose_mut,n_wipe entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_zeroed,n_expose api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_drop,n_clone,n_eq,n_fmt helper
 ```
 
 ## Items

@@ -61,53 +61,60 @@
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
-<rect x="0" y="0" width="880" height="94" fill="#16161e" rx="8"/>
-<path d="M546.0 47.0 C 568.0 47.0, 568.0 47.0, 311.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M745.2 47.0 C 767.2 47.0, 767.2 47.0, 311.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M653.2 47.0 C 675.2 47.0, 675.2 47.0, 311.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M384.8 47.0 C 406.8 47.0, 406.8 47.0, 311.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M308.0 47.0 C 330.0 47.0, 330.0 47.0, 219.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M469.2 47.0 C 491.2 47.0, 491.2 47.0, 311.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<rect x="134.8" y="28.5" width="81.2" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="175.4" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">enabled</text>
-<rect x="242.0" y="20.0" width="66.0" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="275.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">paint</text>
-<text x="275.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="334.0" y="20.0" width="50.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="359.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">ok</text>
-<text x="359.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="410.8" y="20.0" width="58.4" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="440.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">warn</text>
-<text x="440.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="495.2" y="20.0" width="50.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="520.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">err</text>
-<text x="520.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="572.0" y="20.0" width="81.2" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="612.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">heading</text>
-<text x="612.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="679.2" y="20.0" width="66.0" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="712.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">field</text>
-<text x="712.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
+<rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M584.0 47.0 C 606.0 47.0, 606.0 47.0, 265.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M806.0 47.0 C 828.0 47.0, 828.0 47.0, 265.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M691.2 47.0 C 713.2 47.0, 713.2 47.0, 265.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M369.6 47.0 C 391.6 47.0, 391.6 47.0, 265.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M262.4 47.0 C 284.4 47.0, 284.4 47.0, 158.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M476.8 47.0 C 498.8 47.0, 498.8 47.0, 265.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<rect x="74.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="114.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">enabled</text>
+<text x="114.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 59</text>
+<rect x="181.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="221.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">paint</text>
+<text x="221.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 73</text>
+<rect x="288.4" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="329.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ok</text>
+<text x="329.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 82</text>
+<rect x="395.6" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="436.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">warn</text>
+<text x="436.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
+<rect x="502.8" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="543.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">err</text>
+<text x="543.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<rect x="610.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="650.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">heading</text>
+<text x="650.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 97</text>
+<rect x="717.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="761.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
+<text x="761.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 102</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_enabled[&quot;enabled&quot;]
-    n_paint([&quot;paint&lt;br/&gt;pub&quot;])
-    n_ok([&quot;ok&lt;br/&gt;pub&quot;])
-    n_warn([&quot;warn&lt;br/&gt;pub&quot;])
-    n_err([&quot;err&lt;br/&gt;pub&quot;])
-    n_heading([&quot;heading&lt;br/&gt;pub&quot;])
-    n_field([&quot;field&lt;br/&gt;pub&quot;])
+    n_enabled[&quot;enabled&lt;br/&gt;line 59&quot;]
+    n_paint[&quot;paint&lt;br/&gt;line 73&quot;]
+    n_ok([&quot;ok&lt;br/&gt;line 82&quot;])
+    n_warn([&quot;warn&lt;br/&gt;line 87&quot;])
+    n_err([&quot;err&lt;br/&gt;line 92&quot;])
+    n_heading([&quot;heading&lt;br/&gt;line 97&quot;])
+    n_field([&quot;field&lt;br/&gt;line 102&quot;])
     n_err --&gt; n_paint
     n_field --&gt; n_paint
     n_heading --&gt; n_paint
     n_ok --&gt; n_paint
     n_paint --&gt; n_enabled
-    n_warn --&gt; n_paint</code></pre>
+    n_warn --&gt; n_paint
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_ok,n_warn,n_err,n_heading,n_field entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_paint api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_enabled helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

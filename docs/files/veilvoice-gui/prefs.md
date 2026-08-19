@@ -18,6 +18,7 @@
 - [Nothing here is secret, and nothing here is required](#nothing-here-is-secret-and-nothing-here-is-required)
 - [The format](#the-format)
 - [Animations](#animations)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -56,6 +57,25 @@ has told their operating system they do not want movement has already
 answered this question, and a privacy tool asking again -- and defaulting to
 yes -- would be ignoring them.
 
+## What this file contains
+
+386 lines defining **9 functions** (7 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct Prefs` (line 41) -- Everything the user can choose about presentation.
+- `struct Motion` (line 195) -- Whether movement is allowed, and how much.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `default_path` (line 72) -- Where preferences live: beside the app lock, in this platform's config directory.
+- `Prefs::load` (line 83) -- Read preferences from path.
+  - reaches: `default`, `parse`, `parse_bool`
+- `Prefs::save` (line 167) -- Write preferences to path, creating the directory if needed.
+  - reaches: `to_text`
+- `Motion::resolve` (line 207) -- Resolve for this frame.
+- `Motion::secs` (line 225) -- A duration scaled by whether motion is allowed.
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -64,23 +84,31 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["Prefs::default"]
-    n_default_path(["default_path<br/>pub"])
-    n_load(["Prefs::load<br/>pub"])
-    n_parse(["Prefs::parse<br/>pub"])
-    n_to_text(["Prefs::to_text<br/>pub"])
-    n_save(["Prefs::save<br/>pub"])
-    n_parse_bool["parse_bool"]
-    n_resolve(["Motion::resolve<br/>pub"])
-    n_secs(["Motion::secs<br/>pub"])
+    n_default["Prefs::default<br/>line 56"]
+    n_default_path(["default_path<br/>line 72"])
+    n_load(["Prefs::load<br/>line 83"])
+    n_parse["Prefs::parse<br/>line 96"]
+    n_to_text["Prefs::to_text<br/>line 151"]
+    n_save(["Prefs::save<br/>line 167"])
+    n_parse_bool["parse_bool<br/>line 177"]
+    n_resolve(["Motion::resolve<br/>line 207"])
+    n_secs(["Motion::secs<br/>line 225"])
     n_load --> n_default
     n_load --> n_parse
     n_parse --> n_default
     n_parse --> n_parse_bool
     n_save --> n_to_text
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_default_path,n_load,n_save,n_resolve,n_secs entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_parse,n_to_text api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_default,n_parse_bool helper
 ```
 
 ## Items

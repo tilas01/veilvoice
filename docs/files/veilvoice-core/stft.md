@@ -15,6 +15,7 @@
 
 ## Contents
 
+- [What this file contains](#what-this-file-contains)
 - [What calls what](#what-calls-what)
 - [Items](#items)
 
@@ -33,6 +34,21 @@ useful frame sizes is far too coarse for that — and handing over the frame
 that produced the spectrum keeps the two perfectly aligned. Its newest `hop`
 samples are the tail.
 
+## What this file contains
+
+246 lines defining **4 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct StftEngine` (line 23) -- Reusable streaming STFT engine (single channel).
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `StftEngine::new` (line 47) -- n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4).
+- `StftEngine::latency_samples` (line 85) -- End-to-end algorithmic latency (group delay) in samples.
+- `StftEngine::process` (line 92) -- Process input into output (equal length).
+  - reaches: `process_frame`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -41,14 +57,20 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new(["StftEngine::new<br/>pub"])
-    n_latency_samples(["StftEngine::latency_samples<br/>pub"])
-    n_process(["StftEngine::process<br/>pub"])
-    n_process_frame["StftEngine::process_frame"]
+    n_new(["StftEngine::new<br/>line 47"])
+    n_latency_samples(["StftEngine::latency_samples<br/>line 85"])
+    n_process(["StftEngine::process<br/>line 92"])
+    n_process_frame["StftEngine::process_frame<br/>line 141"]
     n_process --> n_process_frame
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_new,n_latency_samples,n_process entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_process_frame helper
 ```
 
 ## Items

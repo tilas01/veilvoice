@@ -33,20 +33,30 @@ The thresholds below are loose on purpose. They are there to catch a
 with `==`, which shows up as a difference of orders of magnitude — not to
 certify a bound in nanoseconds, which this method cannot honestly do.
 
+## What this file contains
+
+240 lines defining **9 functions** (0 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct Stats` (line 49) -- What a run of samples looked like.
+
 ## What calls what
+
+_Colour key: **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_params["params"]
-    n_summarise["summarise"]
-    n_show["show"]
-    n_time_it["time_it"]
-    n_time_each["time_each"]
-    n_ratio["ratio"]
-    n_opening_a_container_does_not_leak_how_much_of_the_password_was_right["opening_a_container_does_not_…"]
-    n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right["the_app_lock_takes_the_same_t…"]
-    n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended["a_rate_limited_attempt_is_vis…"]
+    n_params["params<br/>line 31"]
+    n_summarise["summarise<br/>line 55"]
+    n_show["show<br/>line 65"]
+    n_time_it["time_it<br/>line 72"]
+    n_time_each["time_each<br/>line 96"]
+    n_ratio["ratio<br/>line 109"]
+    n_opening_a_container_does_not_leak_how_much_of_the_password_was_right["opening_a_container_does_not_…<br/>line 115"]
+    n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right["the_app_lock_takes_the_same_t…<br/>line 159"]
+    n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended["a_rate_limited_attempt_is_vis…<br/>line 211"]
     n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended --> n_params
     n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended --> n_show
     n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended --> n_time_each
@@ -61,6 +71,8 @@ flowchart TD
     n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right --> n_time_each
     n_time_each --> n_summarise
     n_time_it --> n_summarise
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_params,n_summarise,n_show,n_time_it,n_time_each,n_ratio,n_opening_a_container_does_not_leak_how_much_of_the_password_was_right,n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right,n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended helper
 ```
 
 ## Items

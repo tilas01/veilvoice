@@ -17,6 +17,7 @@
 
 - [Why hybrid](#why-hybrid)
 - [The combiner](#the-combiner)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -46,6 +47,32 @@ and prevents an attacker who can substitute one half from steering the
 result. Feeding the full transcript is what makes the combiner robust when
 one KEM's ciphertexts are malleable.
 
+## What this file contains
+
+435 lines defining **15 functions** (10 public), **4 types** and **9 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct PublicKey` (line 63) -- A recipient's public key: an X25519 point plus an ML-KEM-768 encapsulation key.
+- `struct SecretKey` (line 69) -- A recipient's private key.
+- `struct Encapsulation` (line 77) -- The public values a sender transmits so the recipient can recover the shared secret.
+- `struct OsRng` (line 271) -- Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `PublicKey::to_bytes` (line 86) -- Serialise to PUBLIC_KEY_LEN bytes.
+- `PublicKey::from_bytes` (line 94) -- Parse from exactly PUBLIC_KEY_LEN bytes.
+- `Encapsulation::to_bytes` (line 111) -- Serialise to ENCAPSULATION_LEN bytes.
+- `Encapsulation::from_bytes` (line 119) -- Parse from exactly ENCAPSULATION_LEN bytes.
+- `SecretKey::generate` (line 136) -- Generate a fresh key pair from the OS CSPRNG.
+- `SecretKey::to_bytes` (line 157) -- Serialise to SECRET_KEY_LEN bytes.
+- `SecretKey::from_bytes` (line 166) -- Parse from exactly SECRET_KEY_LEN bytes.
+- `SecretKey::public_key` (line 181) -- The matching public key.
+- `SecretKey::decapsulate` (line 189) -- Recover the shared secret from a sender's Encapsulation.
+  - reaches: `combine`
+- `PublicKey::encapsulate` (line 211) -- Produce a shared secret for this recipient, plus the public values they need in order to recover it.
+  - reaches: `combine`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -54,28 +81,34 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_to_bytes(["PublicKey::to_bytes<br/>pub"])
-    n_from_bytes(["PublicKey::from_bytes<br/>pub"])
-    n_to_bytes(["Encapsulation::to_bytes<br/>pub"])
-    n_from_bytes(["Encapsulation::from_bytes<br/>pub"])
-    n_generate(["SecretKey::generate<br/>pub"])
-    n_to_bytes(["SecretKey::to_bytes<br/>pub"])
-    n_from_bytes(["SecretKey::from_bytes<br/>pub"])
-    n_public_key(["SecretKey::public_key<br/>pub"])
-    n_decapsulate(["SecretKey::decapsulate<br/>pub"])
-    n_encapsulate(["PublicKey::encapsulate<br/>pub"])
-    n_combine["combine"]
-    n_next_u32["OsRng::next_u32"]
-    n_next_u64["OsRng::next_u64"]
-    n_fill_bytes["OsRng::fill_bytes"]
-    n_try_fill_bytes["OsRng::try_fill_bytes"]
+    n_to_bytes(["PublicKey::to_bytes<br/>line 86"])
+    n_from_bytes(["PublicKey::from_bytes<br/>line 94"])
+    n_to_bytes(["Encapsulation::to_bytes<br/>line 111"])
+    n_from_bytes(["Encapsulation::from_bytes<br/>line 119"])
+    n_generate(["SecretKey::generate<br/>line 136"])
+    n_to_bytes(["SecretKey::to_bytes<br/>line 157"])
+    n_from_bytes(["SecretKey::from_bytes<br/>line 166"])
+    n_public_key(["SecretKey::public_key<br/>line 181"])
+    n_decapsulate(["SecretKey::decapsulate<br/>line 189"])
+    n_encapsulate(["PublicKey::encapsulate<br/>line 211"])
+    n_combine["combine<br/>line 238"]
+    n_next_u32["OsRng::next_u32<br/>line 274"]
+    n_next_u64["OsRng::next_u64<br/>line 279"]
+    n_fill_bytes["OsRng::fill_bytes<br/>line 284"]
+    n_try_fill_bytes["OsRng::try_fill_bytes<br/>line 287"]
     n_decapsulate --> n_combine
     n_encapsulate --> n_combine
     n_next_u32 --> n_fill_bytes
     n_next_u64 --> n_fill_bytes
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_to_bytes,n_from_bytes,n_to_bytes,n_from_bytes,n_generate,n_to_bytes,n_from_bytes,n_public_key,n_decapsulate,n_encapsulate entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_combine,n_next_u32,n_next_u64,n_fill_bytes,n_try_fill_bytes helper
 ```
 
 ## Items

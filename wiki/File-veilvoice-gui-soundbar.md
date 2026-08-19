@@ -43,16 +43,31 @@ schedules a frame every 16 ms has turned the animation off visually and left
 the battery cost behind. The caller decides by passing a `Motion`, and the
 only way to animate is to ask for it.
 
+## What this file contains
+
+349 lines defining **3 functions** (1 public), **0 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `draw` (line 68) -- Draw the mark at size, returning the response so it can carry a tooltip.
+  - reaches: `colour_for`, `height_fraction`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_height_fraction["height_fraction"]
-    n_draw(["draw<br/>pub"])
-    n_colour_for["colour_for"]
+    n_height_fraction["height_fraction<br/>line 52"]
+    n_draw(["draw<br/>line 68"])
+    n_colour_for["colour_for<br/>line 114"]
     n_draw --> n_colour_for
     n_draw --> n_height_fraction
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_draw entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_height_fraction,n_colour_for helper
 ```
 
 ## Items

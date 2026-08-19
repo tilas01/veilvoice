@@ -65,12 +65,24 @@ assert!(container::open_with_password(b"wrong", &sealed).is_err());
 VeilVoice contains **no `unsafe` code at all** — including the page-locking
 in `amnesia`, which goes through a safe wrapper.
 
+## What this file contains
+
+175 lines defining **1 function** (0 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Error` (line 81) -- Everything that can go wrong in this crate.
+
 ## What calls what
+
+_Colour key: **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_fmt["Error::fmt"]
+    n_fmt["Error::fmt<br/>line 136"]
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_fmt helper
 ```
 
 ## Items

@@ -151,8 +151,10 @@ with the lock file.
 
 ## Platform coverage
 
-Ten targets are built and published today; OpenBSD is attempted and currently
-fails, for the reason below.
+Ten targets are built and published today. OpenBSD failed for two releases
+because of a declared toolchain floor that turned out to be wrong; that is
+fixed, and the next release is the first test of it -- so it is described below
+as expected to work rather than as working, until one has actually shipped.
 
 | Platform | Built | Reproducibility checked |
 |---|---|---|
@@ -163,24 +165,34 @@ fails, for the reason below.
 | Linux arm64 (gnu, musl) | yes | yes |
 | Linux armv7 (Raspberry Pi) | yes | yes |
 | FreeBSD x86_64 | yes | **no** — built once in a VM |
-| OpenBSD x86_64 | **no — see below** | n/a |
+| OpenBSD x86_64 | attempted — see below | n/a |
 | NetBSD x86_64 | yes | **no** — built once in a VM |
 
 Windows 10 and 11 share one executable. They are not split, and will not be
 unless a measurement says they should be: shipping two identical binaries under
 different names is a way of looking thorough rather than being it.
 
-**OpenBSD does not currently build**, and the reason is specific rather than
-flaky: its packaged Rust is 1.94.1, and this workspace declares
-`rust-version = "1.96"`. `cargo` refuses with "rustc 1.94.1 is not supported by
-the following packages" before compiling anything. The job is left in the
-workflow rather than deleted, because it will start working when OpenBSD's
-ports catch up and nothing else needs to change; it is `continue-on-error`, so
-it does not block a release. v0.1.9 shipped without an OpenBSD archive.
+**OpenBSD failed to build for two releases, and the cause was on this side.**
 
-Lowering the MSRV to suit one platform's package lag was considered and
-rejected: the toolchain floor is a property of the code, not of whichever
-distribution is slowest this month.
+Its packaged Rust is 1.94.1, and this workspace declared `rust-version =
+"1.96"` -- so `cargo` refused with "rustc 1.94.1 is not supported by the
+following packages" before compiling a single line. The documentation here
+described that as OpenBSD's ports being behind, and an earlier revision of this
+section recorded that lowering the floor had been "considered and rejected"
+because "the toolchain floor is a property of the code".
+
+That reasoning was sound and the premise was never checked. When it finally
+was -- by installing 1.94.0 and compiling every crate in the workspace,
+including the GUI -- **everything built without a single error**. The declared
+floor was not a property of the code. It was the version that happened to be
+current on the day somebody typed it, and it cost two releases of OpenBSD
+coverage.
+
+`rust-version` is now `1.94`, measured rather than assumed.
+`rust-toolchain.toml` still pins a newer toolchain for development and CI; the
+two are different things, and only the first is a claim about what the code
+needs. If something in the tree ever does need a newer feature, cargo will say
+so by name, which is a better guard than a number nobody re-tests.
 
 The three BSD builds run in emulated VMs on a Linux runner, are the most
 fragile jobs in the workflow, and are allowed to fail without blocking a
