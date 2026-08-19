@@ -40,6 +40,8 @@
 //! binary is not the exception. Fetch the files however you like; this reads
 //! them from disk. It does not install anything, and it writes nothing.
 
+mod fetch;
+
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -91,10 +93,28 @@ USAGE
   veilvoice-verify hash <FILE>
       Print the SHA-256 of a file. Nothing is verified.
 
+  veilvoice-verify release <TAG> [ASSET]
+      Fetch a release and check it, in one step. With no ASSET, downloads and
+      verifies the hash list itself; with one, downloads that file too and
+      checks it against the signed list.
+
+        veilvoice-verify release v0.1.11
+        veilvoice-verify release v0.1.11 veilvoice-v0.1.11-linux-x86_64.tar.gz
+
   veilvoice-verify --explain
       What 'intact' and 'reproducible' each mean, and why they differ.
 
-This program never uses the network. Download the files however you like.
+THE NETWORK
+  Every command above except `release` is entirely offline.
+
+  `release` downloads, and it does so through the tool your operating system
+  already ships -- curl on Windows and macOS, curl or wget elsewhere. This
+  binary contains no HTTP client: VeilVoice has no networking crate anywhere in
+  its dependency graph, which you can check yourself with `cargo tree`.
+
+  Only one host is ever contacted and it is compiled in. There is no way to
+  point this at another, no update check, and nothing is fetched unless you
+  asked for it on this command line.
 ";
 
 const EXPLAIN: &str = "\
@@ -146,6 +166,26 @@ worth something and is not the same as somebody else checking it.
 
 fn good(message: &str) {
     println!("  ok    {message}");
+}
+
+/// A failure that is not a refusal: something did not happen, rather than
+/// something was checked and found wrong.
+///
+/// Kept apart from [`deny`] on purpose. "The download failed" and "the
+/// signature is bad" are different facts and a reader must not have to work out
+/// which one they were told -- the second means somebody may have tampered
+/// with a release, and the first usually means a network hiccup.
+fn fail(reason: &str) -> ExitCode {
+    eprintln!();
+    eprintln!("FAILED: could not complete the check.");
+    for line in reason.lines() {
+        eprintln!("  {line}");
+    }
+    eprintln!();
+    eprintln!("This is not a verification failure -- nothing was checked and");
+    eprintln!("found wrong. Nothing has been proven either. Try again, or");
+    eprintln!("download the files yourself and pass them in.");
+    ExitCode::FAILURE
 }
 
 /// Every refusal goes through here, so every refusal names the check.
@@ -503,6 +543,87 @@ fn take_value(args: &[String], index: usize, flag: &str) -> Result<String, Strin
         .ok_or_else(|| format!("{flag} needs a value"))
 }
 
+/// Fetch a release and check it, in one step.
+///
+/// The order is the same one every other path in this tool takes and the same
+/// one the install scripts take: **the signature over the hash list first**,
+/// then the file against that list. Checking the hash first would prove only
+/// that a download matches a list which might itself have been replaced.
+///
+/// Downloads go to a directory the caller can inspect afterwards. Nothing is
+/// deleted on success: somebody who has just verified a release usually wants
+/// the release.
+fn command_release(tag: &str, asset: Option<&str>) -> ExitCode {
+    if !fetch::valid_tag(tag) {
+        return deny(
+            "that does not look like a release tag",
+            &["veilvoice-verify release v0.1.11"],
+        );
+    }
+    if let Some(name) = asset {
+        if !fetch::valid_asset(name) {
+            return deny(
+                "that does not look like a release file name",
+                &["veilvoice-verify release v0.1.11 veilvoice-v0.1.11-linux-x86_64.tar.gz"],
+            );
+        }
+    }
+
+    // A directory named for the tag, in the working directory rather than a
+    // temporary one: these are files the user asked for and will want to keep,
+    // and writing them somewhere the system may clear is a surprise.
+    let directory = PathBuf::from(format!("veilvoice-{tag}"));
+    if let Err(error) = std::fs::create_dir_all(&directory) {
+        return fail(&format!(
+            "could not create {}: {error}",
+            directory.display()
+        ));
+    }
+
+    println!();
+    println!("  fetching into {}", directory.display());
+
+    let mut fetched = Vec::new();
+    for name in [fetch::SUMS, fetch::SIGNATURE] {
+        let url = fetch::asset_url(tag, name);
+        print!("  {name} ... ");
+        match fetch::download(&url, &directory.join(name)) {
+            Ok(path) => {
+                println!("ok");
+                fetched.push(path);
+            }
+            Err(error) => {
+                println!("failed");
+                return fail(&error);
+            }
+        }
+    }
+
+    let sums = &fetched[0];
+    let signature = &fetched[1];
+
+    let Some(name) = asset else {
+        // No asset named: check the list's signature and stop there, which is
+        // a complete and useful answer on its own.
+        return command_sums(sums, signature);
+    };
+
+    let url = fetch::asset_url(tag, name);
+    print!("  {name} ... ");
+    let archive = match fetch::download(&url, &directory.join(name)) {
+        Ok(path) => {
+            println!("ok");
+            path
+        }
+        Err(error) => {
+            println!("failed");
+            return fail(&error);
+        }
+    };
+
+    command_file_against_sums(&archive, sums, signature)
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.is_empty() || args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
@@ -520,6 +641,14 @@ fn main() -> ExitCode {
 
     match args[0].as_str() {
         "key" => command_key(),
+
+        "release" => match args.get(1) {
+            Some(tag) => command_release(tag, args.get(2).map(String::as_str)),
+            None => deny(
+                "`release` needs a tag",
+                &["veilvoice-verify release v0.1.11"],
+            ),
+        },
 
         "hash" => match args.get(1) {
             Some(path) => command_hash(Path::new(path)),
