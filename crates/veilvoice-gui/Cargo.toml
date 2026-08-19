@@ -27,3 +27,9 @@ zeroize.workspace = true
 
 [dev-dependencies]
 tempfile = "3"
+
+# Embeds the application icon and version block into the Windows executable.
+# A *build* dependency only: it is not in the shipped dependency graph, and the
+# `offline` CI job that forbids network crates is unaffected.
+[target.'cfg(windows)'.build-dependencies]
+winresource = "0.1"

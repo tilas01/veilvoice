@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: CC-BY-NC-SA-4.0 -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
 # VeilVoice — internal audit
 
@@ -103,7 +103,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
 | Secrets in the repository | None. `gpg_secrets/` is gitignored; `*.asc` ignored by default with only the public key allowed back explicitly. |
-| Dependency licences | All permissive (MIT / Apache-2.0 / BSD / ISC / BSL / CC0 / Zlib / Unicode-3.0). No conflict with CC-BY-NC-SA-4.0. Re-checked across the 155 packages rPGP adds. |
+| Dependency licences | All permissive (MIT / Apache-2.0 / BSD / ISC / BSL / CC0 / Zlib / Unicode-3.0). No copyleft conflict with GPL-3.0-or-later. Re-checked across the 155 packages rPGP adds. |
 
 ---
 

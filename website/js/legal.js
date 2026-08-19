@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 // The welcome dialog: licence terms, liability waiver, and the disclosure that
 // this project was built with AI assistance.
@@ -51,8 +51,8 @@
       // one misunderstanding that could actually harm them.
       '  <p>VeilVoice destroys the <b>biometric voiceprint</b> in a recording --',
       '  pitch, formants, timbre, and the melody of an accent -- so the speaker',
-      '  cannot be identified or reconstructed. It is source-available under',
-      '  <b>CC BY-NC-SA 4.0</b> -- you may read, build, change and share it',
+      '  cannot be identified or reconstructed. It is free software under the',
+      '  <b>GNU General Public License v3 or later</b>, and it is provided with',
       '  non-commercially -- and it is provided with',
       '  <b>absolutely no warranty</b>.</p>',
 
@@ -65,7 +65,7 @@
       '  is a maintainer audit: no external firm or independent researcher has',
       '  reviewed this code. It is disclosed so you can judge for yourself how',
       '  much to verify before relying on it -- the whole project is published',
-      '  under a source-available licence precisely so that you can read it.</p>',
+      '  under the GPL precisely so that you can read it.</p>',
 
       '  <details>',
       '    <summary>The rest of the terms, in short</summary>',
@@ -74,8 +74,7 @@
       '      and redistribute it -- including commercially. There is no',
       '      NonCommercial clause.</li>',
       '      <li><b>You must</b> pass on the source, keep the licence notices,',
-      '      state your changes, license derivatives under the same terms, and',
-      '      not use it commercially.</li>',
+      '      state your changes, and license derivatives under the GPL too.</li>',
       '      <li><b>No warranty, no liability.</b> The author disclaims all',
       '      liability for data loss, for a key or passphrase you destroy, and',
       '      for consequences of being identified despite using this.</li>',
@@ -100,7 +99,7 @@
       '  </label>',
       '  <label class="legal-check">',
       '    <input type="checkbox" id="legal-licence">',
-      '    <span>I have read the licence (CC BY-NC-SA 4.0) and will comply with it.</span>',
+      '    <span>I have read the licence (GPL-3.0-or-later) and will comply with it.</span>',
       '  </label>',
 
       // Stated here as well as in the page's <noscript>, because the two

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! # veilvoice-gui
 //!
 //! The VeilVoice desktop application: an egui/eframe front-end, monospace
@@ -43,6 +43,7 @@
 #![warn(missing_docs)]
 
 mod app;
+pub mod crashlog;
 pub mod palettes;
 pub mod prefs;
 pub mod reduced_motion;

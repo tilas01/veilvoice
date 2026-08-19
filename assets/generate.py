@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: CC-BY-NC-SA-4.0
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Generate VeilVoice's icon and banner.
 
 The artwork is *generated*, not committed as opaque binaries, so anyone can see
@@ -13,6 +13,7 @@ Pure standard library — no Pillow, no build step:
 Outputs icon.png, icon.ico and banner.png next to this script.
 """
 
+import io
 import math
 import os
 import struct
@@ -179,13 +180,13 @@ GLYPHS = {
     "0": ["01110", "10001", "10011", "10101", "11001", "10001", "01110"],
     "1": ["00100", "01100", "00100", "00100", "00100", "00100", "01110"],
     "3": ["11110", "00001", "00001", "01110", "00001", "00001", "11110"],
-    # The digit set used to be exactly 0, 1 and 3, because those were the only
-    # ones the two strings on the banner needed. Changing the licence line to
-    # "CC BY-NC-SA 4.0" asked for a `4`, and `text()` silently draws nothing for
-    # a character it does not have -- so the banner would have shipped reading
-    # "CC BY-NC-SA .0", on the social preview card, wrong about its own licence
-    # and with every test passing. That is finding F-37 exactly: a banner
-    # illegible about the project, invisible to the suite, obvious on sight.
+    # The digit set used to be exactly the handful the banner's own strings
+    # happened to need. Editing one of those strings to include a digit outside
+    # that set produced nothing at all where the character should have been --
+    # `text()` silently drew a gap -- so the banner would have shipped with a
+    # hole in a line describing the project, on the social preview card, with
+    # every test passing. That is finding F-37 exactly: a banner wrong about
+    # the project, invisible to the suite, obvious on sight.
     #
     # The whole set is defined now rather than the one digit that was wanted,
     # so the next string to go on the banner cannot reintroduce the same hole.
@@ -217,8 +218,9 @@ def text(pixels, string, x0, y0, colour, scale_factor=1, spacing=1):
     It used to advance the cursor and draw nothing, which meant a string could
     contain a character this font had never defined and the only symptom was a
     blank space in the finished artwork. Changing the licence line to
-    "CC BY-NC-SA 4.0" hit exactly that -- there was no `4` -- and the banner
-    would have gone out reading "CC BY-NC-SA .0" on GitHub's social preview
+    A licence line edited to include a digit the set did not have hit exactly
+    that, and the banner would have gone out with a gap in it on GitHub's
+    social preview
     card, stating the wrong licence, with `--check` passing because the
     generator and the committed file agreed with each other about the same
     mistake.
@@ -536,7 +538,7 @@ def banner():
     text(px, "THE VOICEPRINT IS DESTROYED. THE WORDS STAY READABLE.", 80, 430, COMMENT, 3)
     text(px, "FULLY OFFLINE", 80, 478, GREEN, 3)
     text(px, "SECURE AUDITED RUST CODE", 80, 512, CYAN, 3)
-    text(px, "CC BY-NC-SA 4.0", 80, 546, COMMENT, 3)
+    text(px, "GPL-3.0-OR-LATER", 80, 546, COMMENT, 3)
     # Attribution, in the same green as the offline claim.
     text(px, "BY TILAS01 ON GITHUB", 80, 580, GREEN, 3)
 
@@ -546,6 +548,90 @@ def banner():
 
 
 # --- Windows ICO ------------------------------------------------------------
+
+# --- macOS .icns ------------------------------------------------------------
+#
+# An `.icns` is a flat container: the magic `icns`, the total byte length, then
+# one record per image -- a four-character type, the record length including its
+# own header, and the data. Every type used here is PNG-encoded, which is what
+# every macOS since 10.7 reads, so the same `write_png_bytes` that makes the
+# other artwork makes these too.
+#
+# The type codes are not sizes, they are names for sizes, and getting one wrong
+# produces an icon macOS silently declines to draw. They are listed with the
+# dimension each one means rather than left as four-letter magic.
+ICNS_TYPES = (
+    (b"icp4", 16),
+    (b"icp5", 32),
+    (b"icp6", 64),
+    (b"ic07", 128),
+    (b"ic08", 256),
+    (b"ic09", 512),
+)
+
+
+def write_icns(path, source_32):
+    """Write a macOS icon containing every size the Finder asks for."""
+    records = b""
+    for kind, size in ICNS_TYPES:
+        factor = size // 32
+        pixels = scale(source_32, factor) if factor > 1 else source_32
+        if size < 32:
+            # 16x16 is the one size smaller than the source. Taking every other
+            # pixel keeps the mark's hard edges; averaging turns a two-pixel
+            # bar into two grey ones and the icon into a smudge at the size it
+            # is seen most often.
+            pixels = [row[::2] for row in source_32[::2]]
+        blob = write_png_bytes(pixels)
+        records += kind + struct.pack(">I", len(blob) + 8) + blob
+    out = b"icns" + struct.pack(">I", len(records) + 8) + records
+    with open(path, "wb") as handle:
+        handle.write(out)
+    return out
+
+
+# --- freedesktop icon theme and launcher ------------------------------------
+#
+# Linux and the BSDs find an application's icon through the hicolor theme: a
+# PNG per size under `<prefix>/share/icons/hicolor/<size>x<size>/apps/`, named
+# after the desktop entry. Without them a launcher shows a generic placeholder,
+# which is what VeilVoice has looked like on every one of those platforms.
+FREEDESKTOP_SIZES = (16, 32, 48, 64, 128, 256)
+
+DESKTOP_ENTRY = """[Desktop Entry]
+Type=Application
+Name=VeilVoice
+GenericName=Voice de-identification
+Comment=Destroy the biometric voiceprint in a recording, keeping the words
+Exec=veilvoice-gui
+Icon=veilvoice
+Terminal=false
+Categories=AudioVideo;Audio;Security;
+Keywords=voice;anonymise;anonymize;privacy;audio;de-identification;
+StartupWMClass=VeilVoice
+"""
+
+
+def write_freedesktop(root, source_32):
+    """Icon-theme PNGs and a launcher entry, for Linux and the BSDs."""
+    written = []
+    for size in FREEDESKTOP_SIZES:
+        if size < 32:
+            pixels = [row[::2] for row in source_32[::2]]
+        else:
+            pixels = scale(source_32, size // 32)
+        directory = os.path.join(root, "hicolor", "%dx%d" % (size, size), "apps")
+        os.makedirs(directory, exist_ok=True)
+        path = os.path.join(directory, "veilvoice.png")
+        write_png(path, pixels)
+        written.append(path)
+    path = os.path.join(root, "veilvoice.desktop")
+    with io.open(path, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(DESKTOP_ENTRY)
+    written.append(path)
+    return written
+
+
 def write_ico(path, sizes, source_32):
     """An ICO whose entries are embedded PNGs (supported since Windows Vista)."""
     images = []
@@ -876,6 +962,37 @@ def check(here):
     check_apng(os.path.join(web, "banner-animated.png"),
                "website/assets/banner-animated.png", frames)
 
+    # The platform icons: byte comparison, because these are containers this
+    # script writes end to end rather than images something else re-encodes.
+    for name, produced in (
+        ("icon.icns", write_icns(os.path.join(here, ".icns-check"), mark)),
+    ):
+        try:
+            with open(os.path.join(here, name), "rb") as handle:
+                if handle.read() != produced:
+                    problems.append("%s: differs from the generator output" % name)
+        except OSError as exc:
+            problems.append("%s: cannot read (%s)" % (name, exc))
+    try:
+        os.remove(os.path.join(here, ".icns-check"))
+    except OSError:
+        pass
+
+    for size in FREEDESKTOP_SIZES:
+        rel = os.path.join("linux", "hicolor", "%dx%d" % (size, size), "apps",
+                           "veilvoice.png")
+        pixels = ([row[::2] for row in mark[::2]] if size < 32
+                  else scale(mark, size // 32))
+        check_png(os.path.join(here, rel), rel, pixels)
+
+    desktop = os.path.join(here, "linux", "veilvoice.desktop")
+    try:
+        with io.open(desktop, encoding="utf-8", newline="") as handle:
+            if handle.read().replace("\r\n", "\n") != DESKTOP_ENTRY:
+                problems.append("linux/veilvoice.desktop: differs from the generator")
+    except OSError as exc:
+        problems.append("linux/veilvoice.desktop: cannot read (%s)" % exc)
+
     raw_path = os.path.join(here, "icon-32.rgba")
     want = bytes(b for row in mark for px in row for b in px)
     try:
@@ -911,6 +1028,8 @@ def main():
             for r, g, b, a in row:
                 f.write(bytes((r, g, b, a)))
     write_ico(os.path.join(here, "icon.ico"), [16, 32, 48, 64, 128, 256], mark)
+    write_icns(os.path.join(here, "icon.icns"), mark)
+    write_freedesktop(os.path.join(here, "linux"), mark)
     write_png(os.path.join(here, "banner.png"), banner())
 
     # The animated banner. Frame 0 is byte-for-byte the picture above, so a
@@ -932,7 +1051,7 @@ def main():
             target.write(blob)
 
     for name in ("icon.png", "icon-32.png", "icon-32.rgba", "icon.ico",
-                 "banner.png", "banner-animated.png"):
+                 "icon.icns", "banner.png", "banner-animated.png"):
         size = os.path.getsize(os.path.join(here, name))
         print(f"  {name:<20} {size:>9,} bytes")
     print(f"  copied {len(WEB_COPIES)} of them into website/assets/")

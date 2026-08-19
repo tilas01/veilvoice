@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Analysis and synthesis windowing, and the one constant that keeps
 //! overlap-add honest.
 //!

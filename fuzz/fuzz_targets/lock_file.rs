@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! The app-lock file, coverage-guided.
 //!
 //! Worse than the container in one specific way: this file is parsed **before
