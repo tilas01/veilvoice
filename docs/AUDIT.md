@@ -2,8 +2,8 @@
 
 # VeilVoice — internal audit
 
-**Auditor:** tilas01 (maintainer). **Date:** 2026-08-18. **Version:** 0.1.9,
-covering the whole tree.
+**Auditor:** tilas01 (maintainer). **Date:** 2026-08-19. **Version:** 0.1.10
+(unreleased), covering the whole tree.
 
 ## The standard this is held to
 
@@ -40,10 +40,26 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Eleven defects found and fixed (F-37 to F-47.)** Three had shipped; seven were
-in code written during this round and were caught before release; one (F-47) was
-found after the release was tagged, while verifying it. See section 2.5,
-which keeps those two groups apart rather than counting them together.
+**Twelve defects found and fixed (F-48 to F-59.)** **Two had shipped** -- both
+live on the published site, one of them the appearance of the default theme --
+and ten were caught in code written during this round. Section 2.5 keeps those
+groups apart rather than counting them together.
+
+This round covers what has been added since v0.1.9: a documentation generator
+that writes 366 files including HTML this site publishes, a parser for
+user-written colour palettes, a headless-browser driver, a cycling strip of
+claims on the front page, and a licence change touching 352 files.
+
+**Two findings are the reason to keep building the check before trusting the
+thing.** F-49 -- the default theme's secondary text failing WCAG contrast on
+every surface this project has, including the licence line inside its own
+banner -- was found by writing a contrast rule for *other people's* palettes
+and then pointing it at this project's own. F-50 -- the generator silently
+overwriting the file recording that the fuzz targets have never been run to
+convergence -- was found by reading the diff of a successful run.
+
+*(The previous round: eleven defects, F-37 to F-47, three of which had
+shipped.)*
 
 The round covers what v0.1.9 adds: a search index over the whole repository and
 website, a portable release verifier that needs no GnuPG, install scripts,
@@ -78,10 +94,11 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | Check | Result |
 |---|---|
 | `unsafe` code | **None.** All 9 crates carry `#![forbid(unsafe_code)]`, enforced at compile time. |
+| Generated documentation | 366 files -- a page, banner and flowchart for **every one of the 63 `.rs` files** and every crate -- verified against the source by `python tools/docs/generate.py --check` in CI. |
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 336 tests across 9 crates, plus doctests and 10 site-test suites in `tools/site-tests`. |
+| Test suite | 354 tests across 9 crates, plus doctests and 10 site-test suites in `tools/site-tests`. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -820,7 +837,251 @@ Found while verifying the published release, by asking whether the live search
 page carried the fingerprint -- a check made because the release documentation claims CI
 enforces it. It said so, and it did not.
 
-### 2.5 The new code, audited against the classes
+### 2.5 Found and fixed in the fifth round (F-48 to F-59)
+
+This round covers what has been added since v0.1.9: a documentation generator
+that writes 366 files including HTML this site publishes, a parser for
+user-written colour palettes, a headless-browser driver, a cycling strip of
+claims on the front page, and a licence change touching 352 files.
+
+**Twelve defects. Two had shipped** (F-48 and F-49, both live on the published
+site); ten were caught in code written during the round. That distinction is
+kept because a round counting just-written-and-immediately-fixed defects
+alongside ones a reader could have hit is flattering itself.
+
+**F-48 -- the repository panel rendered a README's own markup as text. Shipped.**
+
+The front page fetches this project's README and renders it. The README opened
+with a centred banner -- `<p align="center"><picture>...</picture></p>`, which
+is GitHub's own idiom -- and the panel displayed *the source of those tags*, as
+a paragraph of escaped tag soup, immediately above the word VeilVoice.
+
+Neither half was broken. `markdown.js` escapes raw HTML on purpose: that is the
+property which makes its output safe to hand to `innerHTML`, and it has been
+through two rounds of hostile-input auditing. A README is entitled to contain
+presentational markup. The two correct behaviours met and produced garbage at
+the top of the page, live, for as long as the panel and that README coexisted.
+
+**Fixed** by stripping block-level HTML from the fetched Markdown *before*
+rendering -- the renderer keeps escaping everything, unchanged -- and by
+switching the README to a plain Markdown image. Fenced code is left alone, so a
+document showing markup as an example still shows it. Regression test added,
+and confirmed to fail without the fix.
+
+The lesson is F-37's again in a different medium: this was not findable from
+the tests, and was obvious the moment somebody looked at the page.
+
+**F-49 -- the default theme's secondary text failed WCAG contrast. Shipped.**
+
+Found by writing a contrast check for *other people's* palettes (see F-51) and
+then pointing it at this project's own themes:
+
+| Theme | `muted` on `bg` | Required |
+|---|---:|---:|
+| tokyo-night | 2.76:1 | 3.0:1 |
+| solarized | 2.79:1 | 3.0:1 |
+
+Below the floor for text of any size. `--muted` is not decoration here: it
+carries the hero tagline, the figure captions, the scope notes stating what the
+app lock is *not*, and the licence line inside the banner image. Tokyo Night is
+the default, so this was the shipped appearance of the website, the desktop
+app, the command line and the artwork.
+
+**Fixed** with each palette's own upstream colour rather than an invented one --
+Tokyo Night's `dark5` (`#737aa2`, 4.10:1) and Solarized's `base00` (`#657b83`,
+3.37:1) -- so both themes stay recognisably themselves. Propagated through
+`themes.css`, the app's theme table, the CLI's escape codes, the no-JavaScript
+edition and `assets/generate.py`, and the artwork regenerated and looked at.
+
+Lowering the threshold until the existing colours passed would have been
+fitting the rule to the defect. That is the move this document keeps catching
+in other people's reasoning and it would have been no better here.
+
+**F-50 -- the documentation generator overwrote a hand-written file.**
+
+Adding `fuzz/` to the documented crates made the generator write
+`fuzz/README.md` -- over a hand-written one explaining how to run the targets
+and recording that they have **not been run to convergence**, a sentence
+section 5.2 of this document cites by name.
+
+Nothing failed. The generator reported success, `--check` compared its output
+against the file it had just written and agreed, and the honesty note was gone.
+That is finding F-41 running in reverse: generated output silently replacing
+the thing it was meant to describe.
+
+**Fixed** by refusing to overwrite any file that does not carry the generator's
+own marker, naming every one, and writing nothing at all until every
+destination has been checked -- so a refusal leaves the tree as it was rather
+than half regenerated. Generated banners and wiki pages now carry the marker
+too, which they should have anyway.
+
+**F-51 -- the theme drift test only ran in one direction.**
+
+The app's themes are asserted against `website/css/themes.css` so the two
+front-ends cannot drift. The test walked the app's `THEMES` and checked each
+against the stylesheet -- which catches a colour changed on either side, and
+**misses a theme added to the website**, because nothing walked the stylesheet
+looking for entries the app had never heard of.
+
+Same shape as the hardcoded page list in `html.test.js` that let `search.html`
+ship unchecked: a check enumerating from a list is only ever as wide as the
+list. **Fixed** by enumerating from the stylesheet as well. Verified by adding
+a fake theme to the CSS and watching the test fail.
+
+**F-52 -- generated pages rendered links without a scheme check.**
+
+`inline_html` escapes everything before inserting markup, so `<script>` in a
+doc comment comes out as text. What it did not do is look at what a link points
+at:
+
+```
+[click](javascript:alert(1))  ->  <a href="javascript:alert(1">click</a>
+```
+
+`website/js/markdown.js` has had `safeUrl` for this since the third round, and
+`website/js/repo.js` states in a comment that the rule is "the renderer's own
+`safeUrl`, deliberately shared rather than copied". The 366 generated reference
+pages were the one part of this site rendering links outside that rule.
+
+Only the maintainer writes these doc comments today, so this was not reachable
+by an outsider. **That is a fact about who has commit access, not a property of
+the code**, and this document's standard is explicitly about the code. **Fixed**
+by copying the rule exactly -- not improving on it, because two subtly different
+link rules on one site is worse than one strict rule in two places.
+
+**F-53 -- a palette file that is not a file hung the application at startup.**
+
+`veilvoice-gui` reads user-written `.palette` files during startup. The size
+bound was applied by calling `metadata()` on the path and then
+`read_to_string()`. A FIFO reports a length of zero, sails past the size check,
+and blocks the read for ever.
+
+This runs **before the window is created**, so the symptom is an application
+that launches and never appears: no error, nothing on screen, and nothing
+pointing at the palettes directory. The same two lines were also a TOCTOU --
+two operations on a path, with the bound applied to what the file *was* rather
+than to what gets read.
+
+**Fixed** by bounding the read instead: open the handle, ask the *handle*
+whether it is a regular file, and take at most `MAX_BYTES + 1` bytes so a file
+that grows between the check and the read cannot get past it. Same shape as the
+release verifier streaming an archive through SHA-256 in fixed chunks.
+
+**F-54 -- duplicate anchor ids in generated HTML.**
+
+`veilvoice-meta/src/lib.rs` has a doc-comment heading called "Items", and so
+does the generated section listing a file's items. Both slugged to `items`, so
+the browser jumped to whichever came first and the table of contents silently
+sent the reader to the wrong place. Caught by `html.test.js`, which is exactly
+the class of hand-written-HTML mistake it exists for. **Fixed** by allocating
+every anchor on a page from one place, in document order, using GitHub's own
+suffix rule so the Markdown and HTML renderings agree about where a link goes.
+
+**F-55 -- the Mermaid theme directive was emitted with its markers halved.**
+
+The init directive `%%{init: ...}%%` is built with `%`-formatting, which turns
+`%%` into `%`. Every one of 366 diagrams shipped with `%{init: ...}%`, which
+Mermaid does not recognise -- so the Tokyo Night theme was silently ignored and
+every diagram on GitHub rendered in default colours.
+
+**F-56 -- derived call graphs contained calls that do not happen.**
+
+The per-file flowchart draws the calls between functions in a file, found by
+asking whether the callee's name appears followed by `(`. That drew an edge
+from `SpectralState::transform` to `SpectralState::new` because the body
+constructs a `Complex::new(..)`.
+
+An edge that is not a call is worse than a missing one: these diagrams are
+offered as *derived from the source*, so a reader has no reason to doubt one.
+**Fixed** by inspecting the qualifier before the name -- nothing, `self.`,
+`Self::` or the owning type is a call; anything else is somebody else's
+function that happens to share a name, which in Rust is most of `new`, `len`,
+`from` and `default`.
+
+**F-57 -- `pub(crate)` was reported as `pub`.**
+
+The item tables and the crate-level "public items" list treated any visibility
+modifier as public, so crate-internal helpers appeared in the published API
+surface of nine crates. A reader deciding what they may depend on was being
+shown items that are not there.
+
+**F-58 -- adding harmonics to the banner cost a fifth of its height.**
+
+Three sinusoids whose amplitudes sum to 1.0 only reach 1.0 if they all peak
+together, and the phase offsets exist precisely so they do not. The waveform's
+peak fell from 62 pixels to 49. The animation still worked, still looped, and
+simply looked smaller; no test could have noticed. **Fixed** by measuring the
+normalisation constant from the same expressions the function uses, at import,
+so editing an amplitude re-measures rather than leaving a stale number behind.
+
+**F-59 -- a component whose resting state is invisible, under a blanket
+reduced-motion rule.**
+
+The cycling strip of project facts animates from `opacity: 0`. The global rule
+at the top of `main.css` collapses every animation to 0.01ms for a reader who
+has asked for less motion -- which would have ended every message at its final
+keyframe, opacity 0, leaving the strip permanently blank with nothing to
+indicate anything was missing.
+
+Caught before shipping by rendering the page with the preference emulated
+rather than by reasoning about it. **Fixed** explicitly: the cycle stops and the
+first fact stays. A blanket rule that neutralises motion has to be checked
+against components whose resting state is invisible, and that is now written
+down here because it will not be the last one.
+
+---
+
+### 2.6 The new code, audited against the classes
+
+**Untrusted input.** Two new parsers. `palettes.rs` reads files a user writes
+by hand: every token validated, every colour required to be a full `#rrggbb`,
+every problem reported rather than the first, and nothing filled in from the
+default theme -- a palette that is *mostly* yours with a few colours from
+somewhere else and no indication which is worse than one that refuses. The id
+is constrained to what survives a round trip through the preferences file, and
+may not collide with a built-in theme's.
+
+**Allocation sized by untrusted input.** The palette loader bounds the number
+of files (40), the bytes read from each (16 KiB, bounded at the read rather
+than by a stat -- F-53), and holds no file in memory beyond that. The
+documentation generator reads only tracked source files.
+
+**Panics reachable from input.** `palettes.rs` has no `unwrap` on user data;
+the one `unwrap_or` is unreachable by construction and falls back to a colour
+rather than panicking, deliberately, because it sits on a path that leads to a
+paint loop.
+
+**Rendering untrusted text into a page.** Covered by F-52. Everything reaches
+the generated pages through an escape-first path, and links now go through the
+same scheme rule as the rest of the site.
+
+**Resource exhaustion.** The generated diagrams are bounded at 22 nodes; past
+that the item table is the better answer and the page says the diagram was
+bounded rather than silently showing a subset. No regular expression in the
+generator is built from file content.
+
+**Concurrency.** The theme table is a `OnceLock` read through one relaxed
+atomic load. No lock was added to the paint path; custom palette strings are
+leaked once at startup, bounded, and the reasoning is written where it is done.
+
+**Error handling that degrades quietly.** The class this round was most alert
+to, and where F-50 and F-53 both landed. The generator now refuses rather than
+overwrites; the palette loader refuses rather than reads; the fact strip fails
+visible rather than blank.
+
+**Dependency risk.** No dependency was added. `tools/render/shot.py` implements
+a WebSocket client in sixty lines of standard library rather than taking a
+package, on the same reasoning as the rest of `tools/`: a repository whose
+argument is that its supply chain can be read should not add to it in order to
+take a screenshot.
+
+**Cryptography.** Untouched this round. No primitive, parameter or construction
+changed.
+
+**Nothing further found in these classes.** That is a result and is recorded as
+one.
+
+### 2.7 The v0.1.9 code, audited against the classes
 
 The standard at the top of this document is a walk of every vulnerability class
 across the whole tree. Applied to what this round adds:
@@ -871,7 +1132,7 @@ single answer, because they prove different things.
 **Nothing found in these classes** beyond the defects listed above. That is a
 result and is recorded as one.
 
-### 2.6 Accepted, with reasoning
+### 2.8 Accepted, with reasoning
 
 **A-1 — Remaining `expect()` sites (6).** Each was reviewed:
 
@@ -1248,13 +1509,21 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Forty-seven defects found and fixed across four audit rounds (F-1 to F-47):**
-eight in the first two, twenty-eight in the third, eleven in this one.
+**Fifty-nine defects found and fixed across five audit rounds (F-1 to F-59):**
+eight in the first two, twenty-eight in the third, eleven in the fourth,
+twelve in this one.
 
-Of this round's ten, **three had shipped** and seven were caught in code written
+Of this round's twelve, **two had shipped** and ten were caught in code written
 during the round. Keeping those apart matters: a round that counts
 just-written-and-immediately-fixed defects alongside ones that were live on the
 published site is flattering itself.
+
+Neither of this round's shipped defects was a confidentiality failure either,
+and both are worth naming for what they were. One rendered this project's own
+README as tag soup at the top of its front page. The other made the secondary
+text of the default theme too low-contrast to meet the accessibility floor --
+on the website, in the desktop application, in the terminal, and inside the
+banner image, where the affected line was the licence.
 
 **No finding in any round has been a confidentiality failure.** Nothing has let
 an attacker recover a voiceprint, read a sealed recording, bypass a password, or

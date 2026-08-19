@@ -338,9 +338,22 @@ pub fn load(dir: &Path) -> (Vec<Theme>, Vec<String>) {
             .to_string_lossy()
             .to_string();
 
-        match std::fs::metadata(&path) {
-            Ok(meta) if meta.len() > MAX_BYTES => {
-                problems.push(format!("{shown}: larger than {MAX_BYTES} bytes, ignored"));
+        // Open first, then ask the *handle* what it is. Calling `metadata` on
+        // the path and then opening it is two operations on something that can
+        // change in between, and it answers the wrong question anyway: a FIFO
+        // reports a length of zero, sails past a size check, and then blocks
+        // `read_to_string` for ever -- during startup, before the window
+        // exists, so the application simply never appears.
+        let handle = match std::fs::File::open(&path) {
+            Ok(handle) => handle,
+            Err(error) => {
+                problems.push(format!("{shown}: {error}"));
+                continue;
+            }
+        };
+        match handle.metadata() {
+            Ok(meta) if !meta.is_file() => {
+                problems.push(format!("{shown}: not a regular file, ignored"));
                 continue;
             }
             Err(error) => {
@@ -350,7 +363,21 @@ pub fn load(dir: &Path) -> (Vec<Theme>, Vec<String>) {
             _ => {}
         }
 
-        let Ok(text) = std::fs::read_to_string(&path) else {
+        // Bound the read rather than the file. One byte past the limit is
+        // enough to know the limit was passed, and nothing larger is ever held
+        // in memory -- so a file that grows between being checked and being
+        // read cannot get past this.
+        let mut bytes = Vec::new();
+        use std::io::Read as _;
+        if let Err(error) = handle.take(MAX_BYTES + 1).read_to_end(&mut bytes) {
+            problems.push(format!("{shown}: {error}"));
+            continue;
+        }
+        if bytes.len() as u64 > MAX_BYTES {
+            problems.push(format!("{shown}: larger than {MAX_BYTES} bytes, ignored"));
+            continue;
+        }
+        let Ok(text) = String::from_utf8(bytes) else {
             problems.push(format!("{shown}: not readable as UTF-8"));
             continue;
         };
@@ -618,6 +645,38 @@ err = #f7768e
         let (themes, _) = load(&scratch.0);
         let ids: Vec<&str> = themes.iter().map(|t| t.id).collect();
         assert_eq!(ids, ["alpha", "mike", "zulu"]);
+    }
+
+    #[test]
+    fn something_that_is_not_a_regular_file_is_refused_not_read() {
+        // A FIFO is the case that mattered -- it reports a length of zero,
+        // passes a size check and then blocks `read_to_string` for ever during
+        // startup. `mkfifo` is not portable, so the rule is exercised with a
+        // directory named like a palette: same path through the loader, same
+        // question asked of the handle, and it must not be read.
+        let scratch = Scratch::new("special");
+        std::fs::create_dir(scratch.0.join("trap.palette")).expect("make a directory");
+
+        let (themes, problems) = load(&scratch.0);
+        assert!(themes.is_empty());
+        assert!(
+            problems.iter().any(|p| p.contains("trap.palette")),
+            "the entry was skipped without a word: {problems:?}"
+        );
+    }
+
+    #[test]
+    fn a_file_over_the_size_bound_is_refused() {
+        let scratch = Scratch::new("huge");
+        let padding = "\n# ".to_string() + &"x".repeat(MAX_BYTES as usize);
+        scratch.write("fat.palette", &(GOOD.to_string() + &padding));
+
+        let (themes, problems) = load(&scratch.0);
+        assert!(themes.is_empty(), "an oversized palette was accepted");
+        assert!(
+            problems.iter().any(|p| p.contains("larger than")),
+            "the size refusal was not reported: {problems:?}"
+        );
     }
 
     #[test]

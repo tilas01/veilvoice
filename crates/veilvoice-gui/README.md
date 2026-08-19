@@ -74,7 +74,7 @@ flowchart TD
     n_lib(["lib.rs<br/>57 lines"])
     n_main(["main.rs<br/>67 lines"])
     n_app["app.rs<br/>1074 lines"]
-    n_palettes["palettes.rs<br/>632 lines"]
+    n_palettes["palettes.rs<br/>691 lines"]
     n_prefs["prefs.rs<br/>386 lines"]
     n_reduced_motion["reduced_motion.rs<br/>273 lines"]
     n_security["security.rs<br/>1030 lines"]
@@ -107,7 +107,7 @@ flowchart TD
 | [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1074 | The VeilVoice desktop application: six tabs, one window, no menus. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 57 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 67 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
-| [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 632 | User-defined colour schemes, and the contrast check that keeps them usable. |
+| [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 691 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 386 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 273 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1030 | The application lock, and the at-rest encryption of what VeilVoice writes. |
