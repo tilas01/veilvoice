@@ -6,6 +6,96 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## v0.1.10
+
+Documentation you cannot outrun, and a licence change.
+
+Every crate and **every one of the 63 `.rs` files** in this repository now has a
+page, a flowchart and a banner, generated from the doc comments in the source
+and mirrored to the website and the GitHub wiki. A fifth audit round found
+twelve defects ([`docs/AUDIT.md`](docs/AUDIT.md)); two of them had shipped.
+
+### The licence is now CC BY-NC-SA 4.0
+
+**Read this before upgrading.** VeilVoice up to and including v0.1.9 was
+GPL-3.0-or-later, and **those releases stay under it for ever** -- a licence
+already granted cannot be withdrawn, so if you have one of those versions you
+keep every freedom the GPL gave you, commercial use included. From this release
+onward the terms are
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0](LICENSE).
+
+You may read it, build it, audit it, modify it, fork it and share it. You may
+not sell it, or use it for commercial advantage.
+
+**This is not an open source licence and this project no longer calls itself
+one.** The NonCommercial term is exactly what both the Open Source Definition
+and the Free Software Foundation's definition of free software forbid. The
+accurate word is *source-available*: everything that made this project
+checkable is unchanged -- public source, reproducible builds, generated artwork
+and documentation, no `unsafe`, no network code -- and one freedom is reserved.
+The word "libre" has been removed from the README, the website, the
+no-JavaScript edition and the licence gate rather than left standing.
+
+A consequence worth knowing: most Linux distributions will not carry
+NonCommercial software in their main repositories, and each packaging
+definition now says so.
+
+### A page for every file
+
+`tools/docs/generate.py` writes 366 files from the `//!` and `///` comments
+already in the tree: a README for each crate, a page for each `.rs` file, a
+generated SVG banner and a Mermaid flowchart for each, a table of contents on
+every page, and the same content rendered again for `website/reference/` and
+for the GitHub wiki.
+
+Four decisions are built into it. Flowcharts are Mermaid, so a diagram stays
+text -- diffable, greppable, reviewable in a pull request. Banners are generated
+SVG rather than 63 more committed binaries. Per-file prose is *extracted from
+the source*, so it cannot disagree with the code; if a page reads thinly the
+fix is to write the doc comment, which improves rustdoc at the same time. And
+the website and wiki come from one generator, not two hand-maintained copies.
+
+The site loads nothing from a third party, so it cannot run Mermaid. The same
+graph is laid out by a small engine in the generator and emitted as inline SVG
+that needs no script at all -- the same nodes and edges, a different picture,
+and the page says so rather than glossing it.
+
+`python tools/docs/generate.py --check` runs in CI and fails if the tree and its
+documentation have parted company. It also refuses to overwrite a file it did
+not write, after doing exactly that to `fuzz/README.md` once.
+
+### Your own colour schemes
+
+Drop a `.palette` file beside your preferences and it appears in the theme
+picker with the nine built-in schemes. All twelve tokens are required, every
+colour must be a full `#rrggbb`, and every problem is reported rather than the
+first -- nothing is quietly filled in from the default theme.
+
+**Contrast is computed, not trusted.** A palette whose text fails the WCAG
+ratio against its own background is refused, with the measured ratio in the
+message so you know how far off it is. `docs/example.palette` is a worked
+example that passes.
+
+Pointing that same check at this project's own themes found that the default
+theme's secondary text was below the accessibility floor -- on the site, in the
+app, in the terminal and inside the banner image. Fixed, using each palette's
+own upstream colour.
+
+### Smaller things
+
+- The front page carries a slowly cycling line of things that are true about
+  this project, several of which are limits rather than boasts. CSS rather than
+  an image, so it follows your theme, needs no script, and can be selected and
+  read aloud.
+- The banner's waveform is summed from three harmonics rather than one
+  sinusoid, so it reads as audio rather than as a test tone.
+- The repository panel no longer shows a README's own markup as text.
+- The site's search is presented as the *index* it is. The URL is unchanged.
+- `tools/render/shot.py` drives headless Edge over the DevTools protocol, with
+  no dependency, so pages can be rendered and looked at before being believed.
+- `ROADMAP.md` is the public answer to "what is coming", with 45 markers and
+  what each depends on.
+
 ## v0.1.9
 
 Getting a genuine copy, and finding your way around one.
