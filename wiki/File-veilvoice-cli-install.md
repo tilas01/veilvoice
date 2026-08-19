@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/install.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 523 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 560 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs)
 
 ## Contents
 
@@ -67,19 +67,20 @@ is finding F-13.
 
 ## What this file contains
 
-523 lines defining **19 functions** (5 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+560 lines defining **19 functions** (5 public), **2 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct Status` (line 131) -- What an installation currently looks like.
+- `enum UserPath` (line 269)
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `status` (line 143) -- Read the current state without changing anything.
   - reaches: `exe_name`, `path_contains`, `prefix`
-- `install` (line 413) -- Install for this user.
+- `install` (line 450) -- Install for this user.
   - reaches: `add_to_path`, `bin_dir`, `copy_programs`, `prefix`, `register_uninstall`, `no_window`, `read_user_path`, `reg_exe`, `exe_name`
-- `uninstall` (line 440) -- Remove what install added.
+- `uninstall` (line 477) -- Remove what install added.
   - reaches: `bin_dir`, `prefix`, `remove_from_path`, `unregister_uninstall`, `no_window`, `read_user_path`, `reg_exe`
 
 ## What calls what
@@ -98,16 +99,16 @@ flowchart TD
     n_path_contains["path_contains<br/>line 177"]
     n_copy_programs["copy_programs<br/>line 185"]
     n_add_to_path["add_to_path<br/>line 227"]
-    n_read_user_path["read_user_path<br/>line 265"]
-    n_add_to_path["add_to_path<br/>line 299"]
-    n_register_uninstall["register_uninstall<br/>line 309"]
-    n_register_uninstall["register_uninstall<br/>line 348"]
-    n_remove_from_path["remove_from_path<br/>line 353"]
-    n_remove_from_path["remove_from_path<br/>line 394"]
-    n_unregister_uninstall["unregister_uninstall<br/>line 399"]
-    n_unregister_uninstall["unregister_uninstall<br/>line 408"]
-    n_install(["install<br/>line 413"])
-    n_uninstall(["uninstall<br/>line 440"])
+    n_read_user_path["read_user_path<br/>line 288"]
+    n_add_to_path["add_to_path<br/>line 332"]
+    n_register_uninstall["register_uninstall<br/>line 342"]
+    n_register_uninstall["register_uninstall<br/>line 381"]
+    n_remove_from_path["remove_from_path<br/>line 386"]
+    n_remove_from_path["remove_from_path<br/>line 431"]
+    n_unregister_uninstall["unregister_uninstall<br/>line 436"]
+    n_unregister_uninstall["unregister_uninstall<br/>line 445"]
+    n_install(["install<br/>line 450"])
+    n_uninstall(["uninstall<br/>line 477"])
     n_add_to_path --> n_no_window
     n_add_to_path --> n_read_user_path
     n_add_to_path --> n_reg_exe
@@ -144,16 +145,16 @@ flowchart TD
     click n_path_contains href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L177" "open the source"
     click n_copy_programs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L185" "open the source"
     click n_add_to_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L227" "open the source"
-    click n_read_user_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L265" "open the source"
-    click n_add_to_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L299" "open the source"
-    click n_register_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L309" "open the source"
-    click n_register_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L348" "open the source"
-    click n_remove_from_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L353" "open the source"
-    click n_remove_from_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L394" "open the source"
-    click n_unregister_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L399" "open the source"
-    click n_unregister_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L408" "open the source"
-    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L413" "open the source"
-    click n_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L440" "open the source"
+    click n_read_user_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L288" "open the source"
+    click n_add_to_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L332" "open the source"
+    click n_register_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L342" "open the source"
+    click n_register_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L381" "open the source"
+    click n_remove_from_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L386" "open the source"
+    click n_remove_from_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L431" "open the source"
+    click n_unregister_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L436" "open the source"
+    click n_unregister_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L445" "open the source"
+    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L450" "open the source"
+    click n_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L477" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_install,n_uninstall entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -178,13 +179,14 @@ flowchart TD
 | `path_contains` <sub>fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L177) | Is dir already on this user's PATH? |
 | `copy_programs` <sub>fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L185) | Copy the binaries into place. |
 | `add_to_path` <sub>fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L227) | Add dir to the user's PATH, if it is not there already. |
-| `read_user_path` <sub>fn</sub> | [265](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L265) |  |
-| `add_to_path` <sub>fn</sub> | [299](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L299) |  |
-| `register_uninstall` <sub>fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L309) | Register with Add/Remove Programs, so the system can list and remove it. |
-| `register_uninstall` <sub>fn</sub> | [348](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L348) |  |
-| `remove_from_path` <sub>fn</sub> | [353](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L353) |  |
-| `remove_from_path` <sub>fn</sub> | [394](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L394) |  |
-| `unregister_uninstall` <sub>fn</sub> | [399](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L399) |  |
-| `unregister_uninstall` <sub>fn</sub> | [408](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L408) |  |
-| `install` <sub>pub fn</sub> | [413](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L413) | Install for this user. |
-| `uninstall` <sub>pub fn</sub> | [440](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L440) | Remove what install added. |
+| `UserPath` <sub>enum</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L269) |  |
+| `read_user_path` <sub>fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L288) | Read this user's PATH, distinguishing "not set" from "could not tell". |
+| `add_to_path` <sub>fn</sub> | [332](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L332) |  |
+| `register_uninstall` <sub>fn</sub> | [342](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L342) | Register with Add/Remove Programs, so the system can list and remove it. |
+| `register_uninstall` <sub>fn</sub> | [381](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L381) |  |
+| `remove_from_path` <sub>fn</sub> | [386](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L386) |  |
+| `remove_from_path` <sub>fn</sub> | [431](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L431) |  |
+| `unregister_uninstall` <sub>fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L436) |  |
+| `unregister_uninstall` <sub>fn</sub> | [445](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L445) |  |
+| `install` <sub>pub fn</sub> | [450](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L450) | Install for this user. |
+| `uninstall` <sub>pub fn</sub> | [477](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L477) | Remove what install added. |
