@@ -1031,6 +1031,47 @@ down here because it will not be the last one.
 
 ---
 
+### 2.6 Found and fixed in the sixth round (F-60)
+
+A short round, covering the code added after v0.1.11: the release fetcher, the
+installer, and the crash log.
+
+**One defect, and it was in the function whose own comment describes it.**
+
+**F-60 -- the installer could replace a user's entire `PATH` with one entry.**
+
+`veilvoice install` appends its directory to `HKCU\Environment\PATH`. It reads
+the existing value first and appends, precisely so that it never writes a
+`PATH` it did not read -- the module's documentation says so at the top, in
+those words.
+
+`read_user_path` returned `Ok(String::new())` on **two different outcomes**:
+the value genuinely not existing, and `reg query` failing for any other reason.
+`add_to_path` treats an empty result as "there is no `PATH` yet" and writes a
+fresh value containing only VeilVoice's directory.
+
+So on a machine where that query failed -- a transient error, an unexpected
+locale, a policy restriction -- installing VeilVoice would have replaced the
+user's entire user `PATH` with a single entry. There is no undo, the damage is
+silent until something stops working, and `uninstall` would have made it worse
+by removing that entry and leaving the value empty.
+
+**Nothing was wrong with the reasoning; the code did not implement it.** The
+comment describing the danger and the function creating it were forty lines
+apart. That is the shape this document keeps recording: the check that is
+believed rather than enforced.
+
+**Fixed** by refusing to conflate "absent" with "unreadable".
+`read_user_path` now returns `Value` or `Absent`, and everything else is an
+error that refuses the write and says why. Only a value that was definitely
+read, or definitely absent, permits a change. Verified by round-tripping a real
+install: six entries, seven, six, and the one that left was the one that
+arrived.
+
+Found by re-reading code written hours earlier, against the classes rather than
+against a list -- which is the only technique in this document that has worked
+every time.
+
 ### 2.6 The new code, audited against the classes
 
 **Untrusted input.** Two new parsers. `palettes.rs` reads files a user writes
@@ -1509,9 +1550,9 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Fifty-nine defects found and fixed across five audit rounds (F-1 to F-59):**
+**Sixty defects found and fixed across six audit rounds (F-1 to F-60):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
-twelve in this one.
+twelve in the fifth, one in the sixth.
 
 Of this round's twelve, **two had shipped** and ten were caught in code written
 during the round. Keeping those apart matters: a round that counts

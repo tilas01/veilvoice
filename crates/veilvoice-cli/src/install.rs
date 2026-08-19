@@ -225,18 +225,22 @@ fn copy_programs(into: &Path) -> Result<Vec<String>, String> {
 /// machine, and there is no undo.
 #[cfg(windows)]
 fn add_to_path(dir: &Path) -> Result<bool, String> {
-    let current = read_user_path()?;
-    if current.split(';').any(|entry| {
-        entry
-            .trim()
-            .eq_ignore_ascii_case(&dir.display().to_string())
-    }) {
-        return Ok(false);
-    }
-    let joined = if current.trim().is_empty() {
-        dir.display().to_string()
-    } else {
-        format!("{};{}", current.trim_end_matches(';'), dir.display())
+    let wanted = dir.display().to_string();
+    let joined = match read_user_path()? {
+        UserPath::Absent => wanted.clone(),
+        UserPath::Value(current) => {
+            if current
+                .split(';')
+                .any(|entry| entry.trim().eq_ignore_ascii_case(&wanted))
+            {
+                return Ok(false);
+            }
+            if current.trim().is_empty() {
+                wanted.clone()
+            } else {
+                format!("{};{}", current.trim_end_matches(';'), wanted)
+            }
+        }
     };
     let output = no_window(Command::new(reg_exe()))
         .args([
@@ -262,14 +266,40 @@ fn add_to_path(dir: &Path) -> Result<bool, String> {
 }
 
 #[cfg(windows)]
-fn read_user_path() -> Result<String, String> {
+enum UserPath {
+    /// Read successfully. This is the value to append to.
+    Value(String),
+    /// `reg` said the value does not exist. Creating it is safe.
+    Absent,
+}
+
+/// Read this user's `PATH`, distinguishing "not set" from "could not tell".
+///
+/// The first version returned an empty string for both, and the caller treats
+/// empty as "there is no PATH yet, write a fresh one" -- so a query that failed
+/// for any reason would have replaced the user's entire `PATH` with a single
+/// entry. The comment at the top of this file already said that was the thing
+/// to avoid; the code did not implement it.
+///
+/// `reg query` exits non-zero for a missing value *and* for every other
+/// failure, so the two are told apart by what it says. Anything not
+/// recognisably "value does not exist" is an error, and an error refuses the
+/// write rather than guessing.
+fn read_user_path() -> Result<UserPath, String> {
     let output = no_window(Command::new(reg_exe()))
         .args(["query", r"HKCU\Environment", "/v", "PATH"])
         .output()
         .map_err(|e| format!("could not run reg.exe: {e}"))?;
     if !output.status.success() {
-        // No user PATH value at all is a normal state, not an error.
-        return Ok(String::new());
+        let complaint = String::from_utf8_lossy(&output.stderr).to_lowercase();
+        if complaint.contains("unable to find") {
+            // Genuinely no value. Creating one is safe.
+            return Ok(UserPath::Absent);
+        }
+        return Err(format!(
+            "could not read your PATH ({}). Refusing to change it: writing a              PATH that could not first be read would replace whatever is there.",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
     }
     let text = String::from_utf8_lossy(&output.stdout);
     for line in text.lines() {
@@ -290,9 +320,12 @@ fn read_user_path() -> Result<String, String> {
         let Some(space) = after.find(char::is_whitespace) else {
             continue;
         };
-        return Ok(after[space..].trim().to_string());
+        return Ok(UserPath::Value(after[space..].trim().to_string()));
     }
-    Ok(String::new())
+    // `reg` succeeded and printed something this cannot parse. That is not
+    // "there is no PATH" -- it is "I do not understand the answer", and the
+    // difference is the whole point of this function.
+    Err("could not parse the PATH value reg.exe printed. Refusing to change it.".to_string())
 }
 
 #[cfg(not(windows))]
@@ -351,7 +384,11 @@ fn register_uninstall(_prefix: &Path) -> Result<(), String> {
 
 #[cfg(windows)]
 fn remove_from_path(dir: &Path) -> Result<bool, String> {
-    let current = read_user_path()?;
+    let current = match read_user_path()? {
+        // Nothing to remove from, and nothing to write.
+        UserPath::Absent => return Ok(false),
+        UserPath::Value(value) => value,
+    };
     if current.trim().is_empty() {
         return Ok(false);
     }
