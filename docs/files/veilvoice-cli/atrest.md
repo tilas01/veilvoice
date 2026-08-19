@@ -81,6 +81,11 @@ flowchart TD
     n_prompt_secret --> n_into_secret
     n_read_new_password --> n_into_secret
     n_seal_to_disk --> n_read_new_password
+    click n_seal_to_disk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L60" "open the source"
+    click n_confirm_plaintext href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L111" "open the source"
+    click n_into_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L154" "open the source"
+    click n_prompt_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L162" "open the source"
+    click n_read_new_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L168" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_seal_to_disk,n_confirm_plaintext,n_prompt_secret entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

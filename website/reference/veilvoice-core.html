@@ -27,7 +27,7 @@
       <a href="../index.html">home</a>
       <a href="../wiki.html">wiki</a>
       <a href="../reference/index.html">reference</a>
-      <a href="../search.html">search</a>
+      <a href="../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -56,9 +56,9 @@
 <h3 id="what-it-guarantees-and-what-it-deliberately-does-not">What it guarantees (and what it deliberately does not)</h3>
 <p>VeilVoice destroys the <em>biometric voiceprint</em> &#8212; fundamental pitch, formant structure, timbre, accent and micro-timing &#8212; so that neither software nor a human can re-identify the speaker or reconstruct the original waveform. It does <strong>not</strong> hide the words: intelligibility is preserved on purpose, because a scrambler you cannot understand or transcribe is useless. &quot;Fill the whole spectrogram with white noise&quot; and &quot;stay transcribable&quot; are mutually exclusive; see <code>docs/WHITEPAPER.md</code> for the full argument.</p>
 <h3 id="accent">Accent</h3>
-<p>[<code>AccentConfig</code>] additionally maps every speaker onto one canonical pitch register, vocal-tract scale and long-term spectrum, so the <em>melody and colour</em> of an accent &#8212; along with two of the strongest biometric features there are &#8212; do not survive. What no signal-level transform can remove is the <strong>segmental</strong> side of an accent: which phonemes were actually produced. At that level the accent and the words are the same thing, and changing it means changing what was said. See [<code>AccentConfig</code>] for the full argument and the limit, which the whitepaper must state rather than overclaim.</p>
+<p><code>AccentConfig</code> additionally maps every speaker onto one canonical pitch register, vocal-tract scale and long-term spectrum, so the <em>melody and colour</em> of an accent &#8212; along with two of the strongest biometric features there are &#8212; do not survive. What no signal-level transform can remove is the <strong>segmental</strong> side of an accent: which phonemes were actually produced. At that level the accent and the words are the same thing, and changing it means changing what was said. See <code>AccentConfig</code> for the full argument and the limit, which the whitepaper must state rather than overclaim.</p>
 <h3 id="why-it-is-one-way">Why it is one-way</h3>
-<p>Every STFT frame has its <strong>measured phase discarded</strong> and resynthesised from scratch (see [<code>spectral</code>]). The original excitation phase &#8212; which encodes the precise waveform and a speaker&#x27;s micro-timing &#8212; is never stored and never reused, so no downstream process can recover it. On top of that, the pitch and formant shifts are driven every frame by a ChaCha20 CSPRNG ([<code>modulation</code>]) whose seed never leaves the process and is zeroized on drop, so there is not even a single fixed transform to invert.</p>
+<p>Every STFT frame has its <strong>measured phase discarded</strong> and resynthesised from scratch (see <code>spectral</code>). The original excitation phase &#8212; which encodes the precise waveform and a speaker&#x27;s micro-timing &#8212; is never stored and never reused, so no downstream process can recover it. On top of that, the pitch and formant shifts are driven every frame by a ChaCha20 CSPRNG (<code>modulation</code>) whose seed never leaves the process and is zeroized on drop, so there is not even a single fixed transform to invert.</p>
 <h3 id="example">Example</h3>
 <pre><code>use veilvoice_core::{Deidentifier, DeidConfig};
 
@@ -86,33 +86,51 @@ let _ms = deid.stats().last_block_ms();</code></pre>
 <path d="M637.2 147.0 C 659.2 147.0, 659.2 47.0, 487.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M637.2 147.0 C 659.2 147.0, 659.2 147.0, 502.6 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M711.4 174.0 C 711.4 194.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="273.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="317.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
 <text x="317.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">68 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs" target="_blank" rel="noopener noreferrer">
 <rect x="388.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="436.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">accent.rs</text>
 <text x="436.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">677 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" target="_blank" rel="noopener noreferrer">
 <rect x="510.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="558.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">chain.rs</text>
 <text x="558.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">856 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs" target="_blank" rel="noopener noreferrer">
 <rect x="120.4" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="172.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">effects.rs</text>
 <text x="172.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">214 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs" target="_blank" rel="noopener noreferrer">
 <rect x="250.4" y="120.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="313.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">modulation.rs</text>
 <text x="313.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">280 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs" target="_blank" rel="noopener noreferrer">
 <rect x="403.2" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="451.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">pitch.rs</text>
 <text x="451.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">274 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs" target="_blank" rel="noopener noreferrer">
 <rect x="525.6" y="120.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="581.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">spectral.rs</text>
 <text x="581.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">428 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" target="_blank" rel="noopener noreferrer">
 <rect x="663.2" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="711.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">stft.rs</text>
 <text x="711.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">246 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs" target="_blank" rel="noopener noreferrer">
 <rect x="391.8" y="220.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="440.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">window.rs</text>
 <text x="440.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">91 lines</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">Every arrow is a <code>crate::</code> or <code>super::</code> path one module actually uses, read out of the source rather than drawn by hand.</p>
@@ -138,7 +156,16 @@ flowchart TD
     n_chain --&gt; n_stft
     n_spectral --&gt; n_accent
     n_spectral --&gt; n_pitch
-    n_stft --&gt; n_window</code></pre>
+    n_stft --&gt; n_window
+    click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs&quot; &quot;open the source&quot;
+    click n_accent href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs&quot; &quot;open the source&quot;
+    click n_chain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs&quot; &quot;open the source&quot;
+    click n_effects href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs&quot; &quot;open the source&quot;
+    click n_modulation href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs&quot; &quot;open the source&quot;
+    click n_pitch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs&quot; &quot;open the source&quot;
+    click n_spectral href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs&quot; &quot;open the source&quot;
+    click n_stft href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs&quot; &quot;open the source&quot;
+    click n_window href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs&quot; &quot;open the source&quot;</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

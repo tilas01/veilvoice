@@ -27,7 +27,7 @@
       <a href="../index.html">home</a>
       <a href="../wiki.html">wiki</a>
       <a href="../reference/index.html">reference</a>
-      <a href="../search.html">search</a>
+      <a href="../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -55,7 +55,7 @@
 <p>VeilVoice protects the audio you choose to send. This answers a different and more basic question: <em>is something listening that you did not choose?</em> A de-identified voice on a call is worth very little if a second program is recording the raw microphone at the same time.</p>
 <p>Operating systems have grown indicators for this &#8212; the orange dot, the taskbar icon &#8212; but they are small, easily missed, and tell you only that <em>something</em> is active, rarely what. This reports the process, its PID and how long it has held the device.</p>
 <h3 id="what-it-can-actually-see-per-platform">What it can actually see, per platform</h3>
-<p>Detection is honest about its limits, because a monitor that quietly sees nothing is worse than no monitor at all &#8212; it produces false confidence. [<code>support</code>] reports what the current platform can do before you rely on it.</p>
+<p>Detection is honest about its limits, because a monitor that quietly sees nothing is worse than no monitor at all &#8212; it produces false confidence. <code>support</code> reports what the current platform can do before you rely on it.</p>
 <p>| Platform | Microphone | Camera | How | |---|---|---|---| | Windows | &#9989; | &#9989; | The same <code>CapabilityAccessManager</code> records the OS privacy indicator uses | | Linux | &#9989; | &#9989; | <code>/proc/*/fd</code> handles open on <code>/dev/snd/pcm*</code> and <code>/dev/video*</code> | | macOS | &#10060; | &#10060; | No public API exposes it; anything claiming otherwise on macOS is guessing |</p>
 <p>On Linux you see every process you have permission to inspect. Without root that means your own; other users&#x27; processes are invisible, and that is a kernel permission boundary rather than something this crate can work around.</p>
 </section>
@@ -65,15 +65,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="265.6" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="313.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
 <text x="313.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">401 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" target="_blank" rel="noopener noreferrer">
 <rect x="388.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="436.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">linux.rs</text>
 <text x="436.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">192 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" target="_blank" rel="noopener noreferrer">
 <rect x="510.4" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="562.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">windows.rs</text>
 <text x="562.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">416 lines</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">Every arrow is a <code>crate::</code> or <code>super::</code> path one module actually uses, read out of the source rather than drawn by hand.</p>
@@ -82,7 +88,10 @@
 flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;401 lines&quot;])
     n_linux[&quot;linux.rs&lt;br/&gt;192 lines&quot;]
-    n_windows[&quot;windows.rs&lt;br/&gt;416 lines&quot;]</code></pre>
+    n_windows[&quot;windows.rs&lt;br/&gt;416 lines&quot;]
+    click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs&quot; &quot;open the source&quot;
+    click n_linux href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs&quot; &quot;open the source&quot;
+    click n_windows href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs&quot; &quot;open the source&quot;</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

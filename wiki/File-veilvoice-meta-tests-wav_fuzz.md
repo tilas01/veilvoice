@@ -79,6 +79,21 @@ flowchart TD
     n_the_realistic_policy_survives_hostile_input --> n_rounds
     n_the_realistic_policy_survives_hostile_input --> n_seed_wav
     n_zero_sized_chunks_do_not_stall_the_walker --> n_check_output
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L25" "open the source"
+    click n_next_u32 href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L28" "open the source"
+    click n_below href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L34" "open the source"
+    click n_byte href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L41" "open the source"
+    click n_rounds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L46" "open the source"
+    click n_seed_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L54" "open the source"
+    click n_mutate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L86" "open the source"
+    click n_check_output href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L160" "open the source"
+    click n_the_chunk_walker_survives_hostile_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L184" "open the source"
+    click n_the_realistic_policy_survives_hostile_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L200" "open the source"
+    click n_pure_noise_is_rejected_or_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L216" "open the source"
+    click n_cleaning_is_idempotent href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L230" "open the source"
+    click n_every_truncation_of_a_valid_file_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L242" "open the source"
+    click n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L257" "open the source"
+    click n_zero_sized_chunks_do_not_stall_the_walker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L274" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_new,n_next_u32,n_below,n_byte,n_rounds,n_seed_wav,n_mutate,n_check_output,n_the_chunk_walker_survives_hostile_input,n_the_realistic_policy_survives_hostile_input,n_pure_noise_is_rejected_or_handled,n_cleaning_is_idempotent,n_every_truncation_of_a_valid_file_is_handled,n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic,n_zero_sized_chunks_do_not_stall_the_walker helper
 ```

@@ -48,6 +48,19 @@ flowchart TD
     n_a_signature_that_is_not_openpgp_is_refused["a_signature_that_is_not_openp…<br/>line 119"]
     n_an_empty_signature_is_refused["an_empty_signature_is_refused<br/>line 126"]
     n_an_armoured_block_that_is_not_a_signature_is_refused["an_armoured_block_that_is_not…<br/>line 132"]
+    click n_the_embedded_key_parses_and_is_the_expected_one href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L19" "open the source"
+    click n_the_embedded_key_carries_no_email_address href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L25" "open the source"
+    click n_the_fingerprint_constant_is_written_out_not_computed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L40" "open the source"
+    click n_a_hash_is_found_by_its_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L53" "open the source"
+    click n_a_binary_mode_star_is_not_part_of_the_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L65" "open the source"
+    click n_a_file_that_is_not_listed_is_not_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L77" "open the source"
+    click n_a_name_that_merely_contains_the_wanted_one_does_not_match href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L83" "open the source"
+    click n_blank_and_comment_lines_are_skipped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L90" "open the source"
+    click n_a_malformed_line_is_skipped_rather_than_panicking href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L99" "open the source"
+    click n_digests_compare_case_insensitively_and_ignore_surrounding_space href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L110" "open the source"
+    click n_a_signature_that_is_not_openpgp_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L119" "open the source"
+    click n_an_empty_signature_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L126" "open the source"
+    click n_an_armoured_block_that_is_not_a_signature_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L132" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_the_embedded_key_parses_and_is_the_expected_one,n_the_embedded_key_carries_no_email_address,n_the_fingerprint_constant_is_written_out_not_computed,n_a_hash_is_found_by_its_file_name,n_a_binary_mode_star_is_not_part_of_the_name,n_a_file_that_is_not_listed_is_not_found,n_a_name_that_merely_contains_the_wanted_one_does_not_match,n_blank_and_comment_lines_are_skipped,n_a_malformed_line_is_skipped_rather_than_panicking,n_digests_compare_case_insensitively_and_ignore_surrounding_space,n_a_signature_that_is_not_openpgp_is_refused,n_an_empty_signature_is_refused,n_an_armoured_block_that_is_not_a_signature_is_refused helper
 ```

@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -45,6 +45,7 @@
   <a href="#structure">Structure</a>
   <a href="#rules-the-callbacks-follow">Rules the callbacks follow</a>
   <a href="#latency">Latency</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -52,11 +53,26 @@
 <section id="s-about">
 <p>Live microphone scrambling.</p>
 <h2 id="structure">Structure</h2>
-<p>Capture and playback run as two independent callbacks driven by the audio hardware, joined by a lock-free SPSC ring buffer. The de-identification runs inside the <em>output</em> callback, which is the shortest path: adding a worker thread would mean a second buffer and a second scheduling delay for no benefit, and [<code>veilvoice_core::Deidentifier::process</code>] is explicitly allocation-free and safe to call from an audio callback.</p>
+<p>Capture and playback run as two independent callbacks driven by the audio hardware, joined by a lock-free SPSC ring buffer. The de-identification runs inside the <em>output</em> callback, which is the shortest path: adding a worker thread would mean a second buffer and a second scheduling delay for no benefit, and <code>veilvoice_core::Deidentifier::process</code> is explicitly allocation-free and safe to call from an audio callback.</p>
 <h2 id="rules-the-callbacks-follow">Rules the callbacks follow</h2>
 <p>An audio callback that blocks produces a dropout, so neither callback ever allocates, locks, or waits. Statistics are published through a mutex the callback only ever <em>tries</em> to take: if the UI thread happens to hold it, the update is skipped rather than the audio stalling.</p>
 <h2 id="latency">Latency</h2>
 <p>Total latency is the input buffer, plus the ring backlog, plus the engine&#x27;s one-frame group delay (~21 ms at the defaults), plus the output buffer. The ring is intentionally short &#8212; enough to absorb jitter between two clocks that are not synchronised, not enough to accumulate a delay the user would notice while speaking.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>237 lines defining <strong>2 functions</strong> (2 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>struct LiveStats</code> <span style="color:var(--muted)">line 41</span> &mdash; A snapshot of what the live path is doing, safe to read from the UI.</li>
+<li><code>struct LiveSession</code> <span style="color:var(--muted)">line 56</span> &mdash; A running live-scramble session.</li>
+<li><code>struct Shared</code> <span style="color:var(--muted)">line 64</span></li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>LiveSession::start</code> <span style="color:var(--muted)">line 76</span> &mdash; Start scrambling from input into output.
+</li>
+<li><code>LiveSession::stats</code> <span style="color:var(--muted)">line 197</span> &mdash; Read the current statistics, resetting the peak meters.
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -64,12 +80,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L76" target="_blank" rel="noopener noreferrer">
 <rect x="262.2" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="344.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LiveSession::start</text>
 <text x="344.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 76</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L197" target="_blank" rel="noopener noreferrer">
 <rect x="453.0" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="535.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LiveSession::stats</text>
 <text x="535.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -78,6 +98,8 @@
 flowchart TD
     n_start([&quot;LiveSession::start&lt;br/&gt;line 76&quot;])
     n_stats([&quot;LiveSession::stats&lt;br/&gt;line 197&quot;])
+    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L76&quot; &quot;open the source&quot;
+    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L197&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start,n_stats entry</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>

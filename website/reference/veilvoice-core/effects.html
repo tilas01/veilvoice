@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -45,6 +45,7 @@
   <a href="#how-little-these-contribute-said-plainly">How little these contribute, said plainly</a>
   <a href="#why-every-mix-defaults-low">Why every mix defaults low</a>
   <a href="#real-time-constraints">Real-time constraints</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -53,13 +54,37 @@
 <p>Light time-domain effects applied after resynthesis.</p>
 <p>These run on the continuous output stream (not per FFT frame) and exist to (a) further decorrelate the signal from the original, and (b) add a few detuned &quot;voices&quot; so the spectrogram is densely filled rather than showing a clean harmonic stack &#8212; without harming intelligibility, so every mix defaults low. None of them are invertible in a way that recovers the source voice.</p>
 <h2 id="how-little-these-contribute-said-plainly">How little these contribute, said plainly</h2>
-<p>It would be easy to read a chorus and a reverb as part of the anonymity argument. They are not, and this crate should not let anybody think they are. <strong>The voiceprint is destroyed in [<code>crate::spectral</code>]</strong> -- by discarding measured phase and by mapping every speaker onto one canonical pitch register and vocal-tract scale. That has already happened before a single sample reaches this file.</p>
+<p>It would be easy to read a chorus and a reverb as part of the anonymity argument. They are not, and this crate should not let anybody think they are. <strong>The voiceprint is destroyed in <code>crate::spectral</code></strong> -- by discarding measured phase and by mapping every speaker onto one canonical pitch register and vocal-tract scale. That has already happened before a single sample reaches this file.</p>
 <p>What these three add is <em>decorrelation at the margins</em>: a denser spectrogram, a few detuned voices where there was a clean harmonic stack, and some odd harmonics smearing whatever residual cues survived. Useful, cheap, and nowhere near sufficient alone. Set all three mixes to zero and the output is exactly as unlinkable as before.</p>
 <p>The reason to be exact about this is that a filter chain of precisely this shape -- clip, chorus, reverb -- is what a <em>voice changer</em> ships, and a voice changer offers no anonymity whatsoever. Everything that separates this project from that one happens upstream of this file.</p>
 <h2 id="why-every-mix-defaults-low">Why every mix defaults low</h2>
 <p>Intelligibility is a requirement, not a preference. Each of these effects trades clarity for density, and past a fairly low mix the words start to cost more than the added decorrelation is worth. The defaults sit where a listener does not notice the effect is there at all; they are a starting point a user may raise, not a recommendation to raise them.</p>
 <h2 id="real-time-constraints">Real-time constraints</h2>
-<p>These run per output sample inside an audio callback, on the continuous stream rather than per FFT frame. Every buffer is allocated once at construction: <code>process</code> allocates nothing, takes no lock and reads no clock. [<code>Chorus</code>] and [<code>Reverb</code>] own their delay lines and index them with wrapping arithmetic, so changing sample rate means building a new one rather than resizing a live one.</p>
+<p>These run per output sample inside an audio callback, on the continuous stream rather than per FFT frame. Every buffer is allocated once at construction: <code>process</code> allocates nothing, takes no lock and reads no clock. <code>Chorus</code> and <code>Reverb</code> own their delay lines and index them with wrapping arithmetic, so changing sample rate means building a new one rather than resizing a live one.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>214 lines defining <strong>8 functions</strong> (6 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>struct SoftClip</code> <span style="color:var(--muted)">line 51</span> &mdash; Symmetric soft-clip (tanh) waveshaper.</li>
+<li><code>struct DelayVoice</code> <span style="color:var(--muted)">line 75</span> &mdash; A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices.</li>
+<li><code>struct Chorus</code> <span style="color:var(--muted)">line 116</span> &mdash; Detuned chorus ensemble.</li>
+<li><code>struct Reverb</code> <span style="color:var(--muted)">line 147</span> &mdash; Minimal Schroeder-style reverb: one feedback comb + one all-pass.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>SoftClip::new</code> <span style="color:var(--muted)">line 58</span>
+</li>
+<li><code>SoftClip::process</code> <span style="color:var(--muted)">line 67</span>
+</li>
+<li><code>Chorus::new</code> <span style="color:var(--muted)">line 122</span>
+</li>
+<li><code>Chorus::process</code> <span style="color:var(--muted)">line 135</span>
+</li>
+<li><code>Reverb::new</code> <span style="color:var(--muted)">line 158</span>
+</li>
+<li><code>Reverb::process</code> <span style="color:var(--muted)">line 172</span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -67,30 +92,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1236 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="1236" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L58" target="_blank" rel="noopener noreferrer">
 <rect x="936.8" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="992.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SoftClip::new</text>
 <text x="992.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 58</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L67" target="_blank" rel="noopener noreferrer">
 <rect x="1074.4" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1145.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SoftClip::process</text>
 <text x="1145.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L85" target="_blank" rel="noopener noreferrer">
 <rect x="936.8" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="992.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DelayVoice::new</text>
 <text x="992.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 85</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L99" target="_blank" rel="noopener noreferrer">
 <rect x="1074.4" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1145.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DelayVoice::process</text>
 <text x="1145.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 99</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L122" target="_blank" rel="noopener noreferrer">
 <rect x="936.8" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="992.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Chorus::new</text>
 <text x="992.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L135" target="_blank" rel="noopener noreferrer">
 <rect x="1074.4" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1145.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Chorus::process</text>
 <text x="1145.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 135</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L158" target="_blank" rel="noopener noreferrer">
 <rect x="936.8" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="992.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reverb::new</text>
 <text x="992.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 158</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L172" target="_blank" rel="noopener noreferrer">
 <rect x="1074.4" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1145.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reverb::process</text>
 <text x="1145.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 172</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -105,6 +146,14 @@ flowchart TD
     n_process([&quot;Chorus::process&lt;br/&gt;line 135&quot;])
     n_new([&quot;Reverb::new&lt;br/&gt;line 158&quot;])
     n_process([&quot;Reverb::process&lt;br/&gt;line 172&quot;])
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L58&quot; &quot;open the source&quot;
+    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L67&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L85&quot; &quot;open the source&quot;
+    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L99&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L122&quot; &quot;open the source&quot;
+    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L135&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L158&quot; &quot;open the source&quot;
+    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L172&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_process,n_new,n_process,n_new,n_process entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

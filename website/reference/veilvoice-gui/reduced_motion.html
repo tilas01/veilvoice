@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -46,6 +46,7 @@
   <a href="#read-once-at-startup">Read once, at startup</a>
   <a href="#absolute-paths-always">Absolute paths, always</a>
   <a href="#when-it-cannot-tell">When it cannot tell</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -59,7 +60,21 @@
 <h2 id="absolute-paths-always">Absolute paths, always</h2>
 <p><code>Command::new(&quot;defaults&quot;)</code> is a <em>search</em>, and on Windows that search includes the current working directory -- which is precisely the defect (F-13) this project fixed in <code>veilvoice-watch</code> and <code>veilvoice-guard</code>. Every tool here is named by absolute path, and an unfound tool answers &quot;I do not know&quot; rather than falling back to a search.</p>
 <h2 id="when-it-cannot-tell">When it cannot tell</h2>
-<p>[<code>Query::Unknown</code>] means the platform was not asked or did not answer, and the caller treats that as &quot;no reduction requested&quot; -- because defaulting to <em>off</em> would silently disable animation for everybody on a platform this cannot read, which is a worse failure than missing the preference for the few who set it. The settings panel only claims the system asked for reduced motion when it actually saw it say so.</p>
+<p><code>Query::Unknown</code> means the platform was not asked or did not answer, and the caller treats that as &quot;no reduction requested&quot; -- because defaulting to <em>off</em> would silently disable animation for everybody on a platform this cannot read, which is a worse failure than missing the preference for the few who set it. The settings panel only claims the system asked for reduced motion when it actually saw it say so.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>328 lines defining <strong>8 functions</strong> (2 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>enum Query</code> <span style="color:var(--muted)">line 68</span> &mdash; What the platform said.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>Query::reduces</code> <span style="color:var(--muted)">line 81</span> &mdash; Whether to treat this as a request to reduce motion.
+</li>
+<li><code>query</code> <span style="color:var(--muted)">line 101</span> &mdash; Ask the operating system.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>macos_query</code>, <code>unix_query</code>, <code>windows_query</code>, <code>no_window</code>, <code>tool</code>, <code>parse_user_preferences_mask</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -77,30 +92,46 @@
 <path d="M369.6 147.0 C 391.6 147.0, 391.6 47.0, 300.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M306.2 174.0 C 306.2 194.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M369.6 147.0 C 586.6 147.0, 586.6 47.0, 567.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L56" target="_blank" rel="noopener noreferrer">
 <rect x="200.6" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="248.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">no_window</text>
 <text x="248.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 56</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L81" target="_blank" rel="noopener noreferrer">
 <rect x="323.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="390.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Query::reduces</text>
 <text x="390.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 81</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L87" target="_blank" rel="noopener noreferrer">
 <rect x="483.4" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="524.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tool</text>
 <text x="524.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L101" target="_blank" rel="noopener noreferrer">
 <rect x="590.6" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="635.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">query</text>
 <text x="635.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L125" target="_blank" rel="noopener noreferrer">
 <rect x="242.8" y="120.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="306.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">windows_query</text>
 <text x="306.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 125</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L155" target="_blank" rel="noopener noreferrer">
 <rect x="323.4" y="220.0" width="233.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="440.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_user_preferences_mask</text>
 <text x="440.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 155</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L179" target="_blank" rel="noopener noreferrer">
 <rect x="395.6" y="120.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="451.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">macos_query</text>
 <text x="451.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L204" target="_blank" rel="noopener noreferrer">
 <rect x="533.2" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="585.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unix_query</text>
 <text x="585.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 204</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -125,6 +156,14 @@ flowchart TD
     n_windows_query --&gt; n_no_window
     n_windows_query --&gt; n_parse_user_preferences_mask
     n_windows_query --&gt; n_tool
+    click n_no_window href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L56&quot; &quot;open the source&quot;
+    click n_reduces href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L81&quot; &quot;open the source&quot;
+    click n_tool href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L87&quot; &quot;open the source&quot;
+    click n_query href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L101&quot; &quot;open the source&quot;
+    click n_windows_query href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L125&quot; &quot;open the source&quot;
+    click n_parse_user_preferences_mask href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L155&quot; &quot;open the source&quot;
+    click n_macos_query href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L179&quot; &quot;open the source&quot;
+    click n_unix_query href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L204&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_reduces,n_query entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

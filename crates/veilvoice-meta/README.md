@@ -70,6 +70,10 @@ flowchart TD
     n_image["image.rs<br/>202 lines"]
     n_wav["wav.rs<br/>332 lines"]
     n_audio --> n_wav
+    click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs" "open the source"
+    click n_audio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" "open the source"
+    click n_image href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs" "open the source"
+    click n_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" "open the source"
 ```
 
 ## The files

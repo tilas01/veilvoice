@@ -69,6 +69,8 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 flowchart TD
     n_hann(["hann<br/>line 47"])
     n_ola_gain(["ola_gain<br/>line 63"])
+    click n_hann href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L47" "open the source"
+    click n_ola_gain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L63" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_hann,n_ola_gain entry
 ```

@@ -63,6 +63,8 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 flowchart TD
     n_start(["LiveSession::start<br/>line 76"])
     n_stats(["LiveSession::stats<br/>line 197"])
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L76" "open the source"
+    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L197" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start,n_stats entry
 ```

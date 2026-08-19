@@ -73,6 +73,10 @@ flowchart TD
     n_clean_wav_bytes --> n_info_chunk
     n_clean_wav_bytes --> n_is_wav
     n_clean_wav_bytes --> n_show
+    click n_is_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L42" "open the source"
+    click n_clean_wav_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L47" "open the source"
+    click n_info_chunk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L131" "open the source"
+    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L150" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_wav_bytes entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
