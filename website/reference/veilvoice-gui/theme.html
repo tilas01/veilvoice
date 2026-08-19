@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/theme.svg" alt="theme.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/theme.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 650 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 745 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#one-palette-three-front-ends">One palette, three front-ends</a>
@@ -51,7 +51,7 @@
 <section id="s-about">
 <p>Colour schemes for the desktop app.</p>
 <h2 id="one-palette-three-front-ends">One palette, three front-ends</h2>
-<p>Every theme here is the same set of twelve tokens the website defines in <code>website/css/themes.css</code>, with the same names and the same hex values, and Tokyo Night additionally matches the escape codes the CLI emits. The three front-ends are meant to read as one program rather than as three tools that happen to share a name, and the way that is kept true is by copying the numbers rather than by approximating them. A test asserts a sample of them against the stylesheet, so the two cannot drift apart unnoticed.</p>
+<p>Every theme here is the same set of twelve tokens the website defines in <code>website/css/themes.css</code>, with the same names and the same hex values, and Tokyo Night additionally matches the escape codes the CLI emits. The three front-ends are meant to read as one program rather than as three tools that happen to share a name, and the way that is kept true is by copying the numbers rather than by approximating them. Tests assert <strong>every token of every theme</strong> against the stylesheet, in <strong>both directions</strong> -- so a colour changed on either side, a theme removed from either side, or a theme added to the website and forgotten here all fail the build rather than shipping as two products that no longer look alike.</p>
 <h2 id="why-the-active-theme-is-an-index-not-a-lock">Why the active theme is an index, not a lock</h2>
 <p>Colours are read on every repaint, from the UI thread, dozens of times a frame. A <code>Mutex</code> around the palette would be a lock taken hundreds of times a second to read a constant, and a poisoned one would take the window with it. Instead the themes are a <code>const</code> array and the selection is a single <code>AtomicUsize</code>: reading is one relaxed load, it cannot fail, and it cannot be poisoned.</p>
 <p>The index is clamped on read as well as on write. A value that somehow got out of range would otherwise panic on a slice index, in a paint loop, which is the worst possible place for it -- so the read saturates to the default instead.</p>
@@ -60,41 +60,53 @@
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 194" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#565f89"/></marker></defs>
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
 <rect x="0" y="0" width="880" height="194" fill="#16161e" rx="8"/>
-<path d="M480.6 147.0 C 502.6 147.0, 502.6 47.0, 212.2 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M744.4 47.0 C 766.4 47.0, 766.4 47.0, 594.6 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M423.6 47.0 C 445.6 47.0, 445.6 47.0, 304.2 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M375.4 74.0 C 375.4 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<rect x="135.6" y="20.0" width="73.6" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="172.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">active</text>
-<text x="172.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
-<rect x="235.2" y="20.0" width="66.0" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="268.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">by_id</text>
-<text x="268.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
-<rect x="327.2" y="20.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="375.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">set_by_id</text>
-<text x="375.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
-<rect x="449.6" y="28.5" width="142.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="520.6" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">user_font_paths</text>
-<rect x="617.6" y="20.0" width="126.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="681.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">install_fonts</text>
-<text x="681.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
-<rect x="399.4" y="120.0" width="81.2" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">install</text>
-<text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
+<path d="M103.6 74.0 C 103.6 94.0, 386.4 100.0, 386.4 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M337.0 74.0 C 337.0 94.0, 386.4 100.0, 386.4 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M530.4 147.0 C 552.4 147.0, 552.4 47.0, 143.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M813.2 47.0 C 835.2 47.0, 835.2 47.0, 663.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M492.4 47.0 C 514.4 47.0, 514.4 47.0, 373.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M444.2 74.0 C 444.2 94.0, 489.8 100.0, 489.8 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="66.8" y="20.0" width="73.6" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
+<text x="103.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">active</text>
+<text x="103.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<rect x="349.6" y="120.0" width="73.6" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
+<text x="386.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">themes</text>
+<text x="386.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<rect x="166.4" y="20.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
+<text x="222.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">load_custom</text>
+<text x="222.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<rect x="304.0" y="20.0" width="66.0" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
+<text x="337.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">by_id</text>
+<text x="337.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<rect x="396.0" y="20.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
+<text x="444.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">set_by_id</text>
+<text x="444.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<rect x="518.4" y="28.5" width="142.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="589.4" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">user_font_paths</text>
+<rect x="686.4" y="20.0" width="126.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
+<text x="749.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">install_fonts</text>
+<text x="749.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<rect x="449.2" y="120.0" width="81.2" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
+<text x="489.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">install</text>
+<text x="489.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
-<pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#565f89&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
+<pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_active([&quot;active&lt;br/&gt;pub&quot;])
+    n_themes([&quot;themes&lt;br/&gt;pub&quot;])
+    n_load_custom([&quot;load_custom&lt;br/&gt;pub&quot;])
     n_by_id([&quot;by_id&lt;br/&gt;pub&quot;])
     n_set_by_id([&quot;set_by_id&lt;br/&gt;pub&quot;])
     n_user_font_paths[&quot;user_font_paths&quot;]
     n_install_fonts([&quot;install_fonts&lt;br/&gt;pub&quot;])
     n_install([&quot;install&lt;br/&gt;pub&quot;])
+    n_active --&gt; n_themes
+    n_by_id --&gt; n_themes
     n_install --&gt; n_active
     n_install_fonts --&gt; n_user_font_paths
     n_set_by_id --&gt; n_by_id
@@ -105,18 +117,21 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Theme</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L36" rel="noopener noreferrer">36</a></td><td>One complete colour scheme.</td></tr>
-<tr><td><code>fn</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L72" rel="noopener noreferrer">72</a></td><td></td></tr>
-<tr><td><code>THEMES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L83" rel="noopener noreferrer">83</a></td><td>Every theme, in the order the picker shows them.</td></tr>
-<tr><td><code>ACTIVE</code> <sub>static</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L240" rel="noopener noreferrer">240</a></td><td>The index of the theme currently in force.</td></tr>
-<tr><td><code>active</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L246" rel="noopener noreferrer">246</a></td><td>The theme currently in force.</td></tr>
-<tr><td><code>by_id</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L252" rel="noopener noreferrer">252</a></td><td>Look a theme up by its stable identifier.</td></tr>
-<tr><td><code>set_by_id</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L259" rel="noopener noreferrer">259</a></td><td>Switch to id, and apply it to ctx.</td></tr>
-<tr><td><code>palette</code> <sub>pub mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L276" rel="noopener noreferrer">276</a></td><td>Shorthand accessors, so call sites read as p::fg() rather than theme::active().fg.</td></tr>
-<tr><td><code>JETBRAINS_MONO_PATHS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L352" rel="noopener noreferrer">352</a></td><td>Places JetBrains Mono is normally installed.</td></tr>
-<tr><td><code>user_font_paths</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L364" rel="noopener noreferrer">364</a></td><td></td></tr>
-<tr><td><code>install_fonts</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L379" rel="noopener noreferrer">379</a></td><td>Load JetBrains Mono if the system has it.</td></tr>
-<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L402" rel="noopener noreferrer">402</a></td><td>Apply the active theme&#x27;s visuals and a monospace-everywhere type scale.</td></tr>
+<tr><td><code>TABLE</code> <sub>static</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L39" rel="noopener noreferrer">39</a></td><td>The theme table, once the user&#x27;s palettes have been folded in.</td></tr>
+<tr><td><code>Theme</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L46" rel="noopener noreferrer">46</a></td><td>One complete colour scheme.</td></tr>
+<tr><td><code>fn</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L82" rel="noopener noreferrer">82</a></td><td></td></tr>
+<tr><td><code>THEMES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L93" rel="noopener noreferrer">93</a></td><td>Every theme, in the order the picker shows them.</td></tr>
+<tr><td><code>ACTIVE</code> <sub>static</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L250" rel="noopener noreferrer">250</a></td><td>The index of the theme currently in force.</td></tr>
+<tr><td><code>active</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L256" rel="noopener noreferrer">256</a></td><td>The theme currently in force.</td></tr>
+<tr><td><code>themes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L273" rel="noopener noreferrer">273</a></td><td>Every theme the picker offers: the built-in ones, then any the user added.</td></tr>
+<tr><td><code>load_custom</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L286" rel="noopener noreferrer">286</a></td><td>Read the user&#x27;s palettes and add them to the table.</td></tr>
+<tr><td><code>by_id</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L300" rel="noopener noreferrer">300</a></td><td>Look a theme up by its stable identifier.</td></tr>
+<tr><td><code>set_by_id</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L307" rel="noopener noreferrer">307</a></td><td>Switch to id, and apply it to ctx.</td></tr>
+<tr><td><code>palette</code> <sub>pub mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L324" rel="noopener noreferrer">324</a></td><td>Shorthand accessors, so call sites read as p::fg() rather than theme::active().fg.</td></tr>
+<tr><td><code>JETBRAINS_MONO_PATHS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L400" rel="noopener noreferrer">400</a></td><td>Places JetBrains Mono is normally installed.</td></tr>
+<tr><td><code>user_font_paths</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L412" rel="noopener noreferrer">412</a></td><td></td></tr>
+<tr><td><code>install_fonts</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L427" rel="noopener noreferrer">427</a></td><td>Load JetBrains Mono if the system has it.</td></tr>
+<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L450" rel="noopener noreferrer">450</a></td><td>Apply the active theme&#x27;s visuals and a monospace-everywhere type scale.</td></tr>
 </tbody></table>
 </section>
 </div></div>

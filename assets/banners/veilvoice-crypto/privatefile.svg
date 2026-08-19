@@ -29,6 +29,6 @@
 <rect x="346.0" y="59.1" width="7.0" height="31.8" rx="3" fill="#bb9af7" opacity="0.71"/>
 <rect x="359.0" y="62.4" width="7.0" height="25.3" rx="3" fill="#bb9af7" opacity="0.67"/>
 <text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">privatefile.rs</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#565f89">Writing a file that only its owner can read.</text>
+<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Writing a file that only its owner can read.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CRYPTO</text>
 </svg>

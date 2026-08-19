@@ -8,8 +8,11 @@
 //! Tokyo Night additionally matches the escape codes the CLI emits. The three
 //! front-ends are meant to read as one program rather than as three tools that
 //! happen to share a name, and the way that is kept true is by copying the
-//! numbers rather than by approximating them. A test asserts a sample of them
-//! against the stylesheet, so the two cannot drift apart unnoticed.
+//! numbers rather than by approximating them. Tests assert **every token of
+//! every theme** against the stylesheet, in **both directions** -- so a colour
+//! changed on either side, a theme removed from either side, or a theme added
+//! to the website and forgotten here all fail the build rather than shipping as
+//! two products that no longer look alike.
 //!
 //! # Why the active theme is an index, not a lock
 //!
@@ -27,6 +30,13 @@
 
 use egui::{Color32, FontFamily, FontId, Rounding, Stroke, TextStyle, Visuals};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::OnceLock;
+
+/// The theme table, once the user's palettes have been folded in.
+///
+/// Empty until [`load_custom`] runs. See [`themes`] for why this is a
+/// `OnceLock` rather than anything that can be written twice.
+static TABLE: OnceLock<Vec<Theme>> = OnceLock::new();
 
 /// One complete colour scheme.
 ///
@@ -90,7 +100,7 @@ pub const THEMES: &[Theme] = &[
         bg_inset: rgb(0x16161e),
         border: rgb(0x2f3549),
         fg: rgb(0xc0caf5),
-        muted: rgb(0x565f89),
+        muted: rgb(0x737aa2),
         accent: rgb(0x7aa2f7),
         accent_2: rgb(0xbb9af7),
         cyan: rgb(0x7dcfff),
@@ -192,7 +202,7 @@ pub const THEMES: &[Theme] = &[
         bg_inset: rgb(0x00212b),
         border: rgb(0x0f4b5c),
         fg: rgb(0x93a1a1),
-        muted: rgb(0x586e75),
+        muted: rgb(0x657b83),
         accent: rgb(0x268bd2),
         accent_2: rgb(0xd33682),
         cyan: rgb(0x2aa198),
@@ -245,12 +255,50 @@ static ACTIVE: AtomicUsize = AtomicUsize::new(0);
 /// index inside the paint loop, which is the worst place for it.
 pub fn active() -> &'static Theme {
     let index = ACTIVE.load(Ordering::Relaxed);
-    &THEMES[index.min(THEMES.len() - 1)]
+    let table = themes();
+    &table[index.min(table.len() - 1)]
+}
+
+/// Every theme the picker offers: the built-in ones, then any the user added.
+///
+/// Returns the `const` array until [`load_custom`] has run, which is what every
+/// test and the first frames of startup see. After it has run, the same array
+/// with the user's palettes appended -- appended rather than merged, so a
+/// built-in theme keeps its index and a preferences file written before a
+/// palette was added still selects the same scheme.
+///
+/// Reading this is a `OnceLock::get`, which is one atomic load. No mutex: this
+/// is on the path of every repaint, and the reason `ACTIVE` is an
+/// `AtomicUsize` in the first place applies just as much here.
+pub fn themes() -> &'static [Theme] {
+    match TABLE.get() {
+        Some(table) => table.as_slice(),
+        None => THEMES,
+    }
+}
+
+/// Read the user's palettes and add them to the table. Returns any complaints.
+///
+/// Called once, during startup, before the first frame. Calling it again is a
+/// no-op that returns no problems -- `OnceLock` accepts one value, and silently
+/// keeping the first is right here: the alternative is a theme table that
+/// changes shape while indices into it are live.
+pub fn load_custom(dir: &std::path::Path) -> Vec<String> {
+    let (custom, problems) = crate::palettes::load(dir);
+    if custom.is_empty() {
+        return problems;
+    }
+    let mut table: Vec<Theme> = THEMES.to_vec();
+    table.extend(custom);
+    // Ignore the error: a second call means the table is already built, and the
+    // themes it holds are still perfectly good ones.
+    let _ = TABLE.set(table);
+    problems
 }
 
 /// Look a theme up by its stable identifier.
 pub fn by_id(id: &str) -> Option<(usize, &'static Theme)> {
-    THEMES.iter().enumerate().find(|(_, t)| t.id == id)
+    themes().iter().enumerate().find(|(_, t)| t.id == id)
 }
 
 /// Switch to `id`, and apply it to `ctx`. Unknown identifiers are ignored, so
@@ -475,7 +523,54 @@ mod tests {
         assert_eq!(palette::blue(), Color32::from_rgb(122, 162, 247));
         assert_eq!(palette::green(), Color32::from_rgb(158, 206, 106));
         assert_eq!(palette::red(), Color32::from_rgb(247, 118, 142));
-        assert_eq!(palette::muted(), Color32::from_rgb(86, 95, 137));
+        assert_eq!(palette::muted(), Color32::from_rgb(115, 122, 162));
+    }
+
+    /// The website must not gain a theme the app has never heard of.
+    ///
+    /// The test below walks `THEMES` and checks each against the stylesheet,
+    /// which catches a theme changed or removed on either side -- and misses a
+    /// theme **added to the website**, because nothing was walking the
+    /// stylesheet looking for entries this crate does not know.
+    ///
+    /// That is the shape of the defect recorded against `html.test.js`: a check
+    /// enumerating from a hardcoded list is only ever as wide as the list, and
+    /// a page added later went unchecked for precisely that reason. So this
+    /// enumerates from the *stylesheet* instead, and the pair of tests closes
+    /// the loop in both directions.
+    ///
+    /// A reader who picks a theme on the website and then opens the app should
+    /// find it there. Silently falling back to the default is a small thing
+    /// that reads as the application being broken.
+    #[test]
+    fn the_website_has_no_theme_the_app_is_missing() {
+        let css = std::fs::read_to_string(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../website/css/themes.css"),
+        )
+        .expect("themes.css should be readable from the crate directory");
+
+        let mut found = Vec::new();
+        let mut rest = css.as_str();
+        while let Some(at) = rest.find("[data-theme=\"") {
+            let after = &rest[at + "[data-theme=\"".len()..];
+            let end = after.find('"').expect("unterminated data-theme selector");
+            found.push(after[..end].to_string());
+            rest = &after[end..];
+        }
+
+        assert!(
+            !found.is_empty(),
+            "no [data-theme] selectors were found -- the parser, not the CSS, \
+             is what changed"
+        );
+
+        for id in &found {
+            assert!(
+                THEMES.iter().any(|t| t.id == id),
+                "the website defines the '{id}' theme and the app does not. \
+                 Add it to THEMES, or remove it from website/css/themes.css."
+            );
+        }
     }
 
     /// The app's themes and the website's are meant to be the same themes, not

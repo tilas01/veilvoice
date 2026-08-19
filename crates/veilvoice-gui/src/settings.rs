@@ -26,7 +26,7 @@
 
 use crate::prefs::{Motion, Prefs};
 use crate::theme::palette as p;
-use crate::theme::THEMES;
+use crate::theme::themes;
 use egui::{RichText, Ui};
 use std::path::PathBuf;
 
@@ -66,6 +66,13 @@ pub struct Settings {
     /// startup. Every platform answers through a subprocess, so asking per
     /// frame is out of the question.
     system_motion: crate::reduced_motion::Query,
+    /// Complaints from reading the user's own palette files, shown verbatim.
+    ///
+    /// Carried here rather than logged because there is nowhere for a desktop
+    /// application to log to that a user will look. Somebody who wrote a
+    /// palette file and sees it missing from the picker needs to be told why,
+    /// in the place they went to look for it.
+    pub palette_problems: Vec<String>,
 }
 
 impl Default for Settings {
@@ -77,6 +84,7 @@ impl Default for Settings {
             save_error: None,
             first_run: false,
             system_motion: crate::reduced_motion::Query::Unknown,
+            palette_problems: Vec::new(),
         }
     }
 }
@@ -102,6 +110,9 @@ impl Settings {
             page: Page::Appearance,
             save_error: None,
             system_motion: crate::reduced_motion::query(),
+            // Filled in by the caller, which reads the palettes before this
+            // runs -- see `VeilVoiceApp::new` for why that order matters.
+            palette_problems: Vec::new(),
         }
     }
 
@@ -242,8 +253,83 @@ impl Settings {
         }
     }
 
+    /// Explain where custom palettes go, and say what was refused and why.
+    ///
+    /// The refusals are the important half. A user who writes a palette file,
+    /// puts it in the right place and sees nothing happen has no way to tell
+    /// whether the application never looked, or looked and disliked it. Every
+    /// complaint from the loader is shown verbatim, including the measured
+    /// contrast ratio, because "muted on bg is 2.4:1 and needs 3.0:1" tells
+    /// somebody exactly what to change and by roughly how much.
+    fn custom_palette_help(&mut self, ui: &mut Ui) {
+        ui.add_space(14.0);
+        ui.label(
+            egui::RichText::new("Your own palettes")
+                .color(crate::theme::palette::fg())
+                .strong(),
+        );
+
+        match crate::palettes::default_dir() {
+            Some(dir) => {
+                ui.label(
+                    egui::RichText::new(format!(
+                        "Drop a .palette file in {} and it appears above.",
+                        dir.display()
+                    ))
+                    .color(crate::theme::palette::muted())
+                    .size(12.0),
+                );
+            }
+            None => {
+                ui.label(
+                    egui::RichText::new(
+                        "No writable configuration directory was found, so custom \
+                         palettes are unavailable on this machine.",
+                    )
+                    .color(crate::theme::palette::muted())
+                    .size(12.0),
+                );
+            }
+        }
+
+        ui.label(
+            egui::RichText::new(
+                "Every one of the twelve tokens must be present, and the colours \
+                 must be readable against each other -- a palette whose text \
+                 fails the contrast check is refused rather than applied.",
+            )
+            .color(crate::theme::palette::muted())
+            .size(12.0),
+        );
+
+        if self.palette_problems.is_empty() {
+            return;
+        }
+
+        ui.add_space(8.0);
+        ui.label(
+            egui::RichText::new(format!(
+                "{} palette problem(s):",
+                self.palette_problems.len()
+            ))
+            .color(crate::theme::palette::yellow())
+            .size(12.0),
+        );
+        for problem in &self.palette_problems {
+            ui.label(
+                egui::RichText::new(format!("  {problem}"))
+                    .color(crate::theme::palette::yellow())
+                    .size(12.0),
+            );
+        }
+    }
+
     fn appearance_page(&mut self, ui: &mut Ui, ctx: &egui::Context) {
-        section(ui, "Colour scheme", "The same schemes the website offers.");
+        section(
+            ui,
+            "Colour scheme",
+            "The same schemes the website offers, plus any of your own.",
+        );
 
         let current = crate::theme::active();
         let mut chosen: Option<&'static str> = None;
@@ -252,7 +338,7 @@ impl Settings {
             .selected_text(current.name)
             .width(220.0)
             .show_ui(ui, |ui| {
-                for theme in THEMES {
+                for theme in themes() {
                     if ui
                         .selectable_label(theme.id == current.id, theme.name)
                         .clicked()
@@ -264,6 +350,8 @@ impl Settings {
 
         ui.add_space(10.0);
         swatches(ui);
+
+        self.custom_palette_help(ui);
 
         if let Some(id) = chosen {
             if crate::theme::set_by_id(ctx, id) {

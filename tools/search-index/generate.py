@@ -560,7 +560,7 @@ def render_static(index):
     add('<link rel="prefetch" href="index.html">')
     add('<link rel="prefetch" href="../index.html">')
     add('<style>')
-    add(':root{--bg:#1a1b26;--fg:#c0caf5;--muted:#565f89;--accent:#7aa2f7;'
+    add(':root{--bg:#1a1b26;--fg:#c0caf5;--muted:#737aa2;--accent:#7aa2f7;'
         '--accent-2:#bb9af7;--border:#414868;--bg-inset:#16161e;color-scheme:dark}')
     add('*{box-sizing:border-box}')
     add('body{background:var(--bg);color:var(--fg);margin:0;padding:20px;'
