@@ -67,7 +67,7 @@ does not, except that `--path` is now global specifically so both do.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1201 lines"])
+    n_main(["main.rs<br/>1241 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
     n_guard["guard.rs<br/>338 lines"]
     n_install["install.rs<br/>513 lines"]
@@ -89,5 +89,5 @@ flowchart TD
 | [[`guard.rs`|File-veilvoice-cli-guard]] | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [[`install.rs`|File-veilvoice-cli-install]] | 513 | veilvoice install -- put this program somewhere the system can find it. |
 | [[`lock.rs`|File-veilvoice-cli-lock]] | 239 | veilvoice lock — manage the application lock from the command line. |
-| [[`main.rs`|File-veilvoice-cli-main]] | 1201 | veilvoice — the command-line interface. |
+| [[`main.rs`|File-veilvoice-cli-main]] | 1241 | veilvoice — the command-line interface. |
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 135 | Tokyo Night colouring for the terminal. |
