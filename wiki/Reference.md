@@ -103,6 +103,7 @@ Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.
 
 Verify a VeilVoice release without GnuPG installed
 
+- [[`fetch.rs`|File-veilvoice-verify-fetch]] &mdash; Download a release, without putting an HTTP client in the dependency graph.
 - [[`main.rs`|File-veilvoice-verify-main]] &mdash; The portable verifier: check a VeilVoice release without GnuPG installed.
 - [[`tests.rs`|File-veilvoice-verify-tests]] &mdash; The verifier's own tests.
 
