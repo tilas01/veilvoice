@@ -71,6 +71,15 @@ flowchart TD
     n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right --> n_time_each
     n_time_each --> n_summarise
     n_time_it --> n_summarise
+    click n_params href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L31" "open the source"
+    click n_summarise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L55" "open the source"
+    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L65" "open the source"
+    click n_time_it href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L72" "open the source"
+    click n_time_each href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L96" "open the source"
+    click n_ratio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L109" "open the source"
+    click n_opening_a_container_does_not_leak_how_much_of_the_password_was_right href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L115" "open the source"
+    click n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L159" "open the source"
+    click n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L211" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_params,n_summarise,n_show,n_time_it,n_time_each,n_ratio,n_opening_a_container_does_not_leak_how_much_of_the_password_was_right,n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right,n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended helper
 ```

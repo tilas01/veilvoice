@@ -52,6 +52,9 @@ flowchart TD
     n_lib(["lib.rs<br/>401 lines"])
     n_linux["linux.rs<br/>192 lines"]
     n_windows["windows.rs<br/>416 lines"]
+    click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" "open the source"
+    click n_linux href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" "open the source"
+    click n_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" "open the source"
 ```
 
 ## The files

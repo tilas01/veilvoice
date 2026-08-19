@@ -86,6 +86,9 @@ flowchart TD
     n_clean_audio_tags(["clean_audio_tags<br/>line 124"])
     n_clean_audio_file --> n_read_head
     n_clean_audio_tags --> n_read_head
+    click n_read_head href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L47" "open the source"
+    click n_clean_audio_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71" "open the source"
+    click n_clean_audio_tags href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L124" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_audio_file,n_clean_audio_tags entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

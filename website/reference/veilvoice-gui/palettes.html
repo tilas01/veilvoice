@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -44,13 +44,14 @@
 <nav class="toc" aria-label="Contents">
   <a href="#a-palette-file-is-untrusted-input">A palette file is untrusted input</a>
   <a href="#contrast-is-computed-not-trusted">Contrast is computed, not trusted</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
 <div>
 <section id="s-about">
 <p>User-defined colour schemes, and the contrast check that keeps them usable.</p>
-<p>A reader can drop a small text file into a <code>palettes/</code> directory beside the preferences file and have it appear in the theme picker alongside the nine built-in schemes. The format is the same <code>key = value</code> shape [<code>crate::prefs</code>] already uses, for the same reason: it is trivial to write by hand, trivial to parse without a dependency, and has no syntax in which something surprising can hide.</p>
+<p>A reader can drop a small text file into a <code>palettes/</code> directory beside the preferences file and have it appear in the theme picker alongside the nine built-in schemes. The format is the same <code>key = value</code> shape <code>crate::prefs</code> already uses, for the same reason: it is trivial to write by hand, trivial to parse without a dependency, and has no syntax in which something surprising can hide.</p>
 <h2 id="a-palette-file-is-untrusted-input">A palette file is untrusted input</h2>
 <p>It arrives from the filesystem, it may have been written by hand at two in the morning, and it may have been copied from a web page by somebody who has never seen a hex colour. So it is parsed like anything else this project reads: every field validated, every failure named, and <strong>refused rather than patched up</strong>.</p>
 <p>Refusing matters more here than it first appears. The obvious lenient design is to fill in whatever is missing from the default theme -- and that produces a palette which is <em>mostly</em> the user&#x27;s, with a few colours from somewhere else, and no indication which. The user sees an application that looks subtly wrong and has nothing to go on. An error naming the missing token is worth more than a window that opens.</p>
@@ -60,6 +61,20 @@
 <p>The thresholds are stated where they are enforced, and they are the standard&#x27;s, not invented here:</p>
 <p>| Pair | Minimum | Why | |---|---|---| | <code>fg</code> on <code>bg</code> | 4.5 | Body text, WCAG AA | | <code>fg</code> on <code>bg_soft</code> | 4.5 | The same text on a raised surface | | <code>muted</code> on <code>bg</code> | 3.0 | Secondary text, AA large-text threshold | | <code>accent</code> on <code>bg</code> | 3.0 | Links and controls, AA non-text contrast | | <code>err</code> on <code>bg</code> | 3.0 | A warning nobody can read is worse than none |</p>
 <p><code>muted</code> is deliberately held to 3.0 rather than 4.5. It is used for secondary text that is meant to recede, every built-in theme would fail at 4.5, and pretending otherwise would mean shipping a rule the project&#x27;s own themes break.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>691 lines defining <strong>8 functions</strong> (4 public), <strong>1 type</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>struct Parsed</code> <span style="color:var(--muted)">line 147</span> &mdash; One parsed colour scheme, before it is accepted.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>default_dir</code> <span style="color:var(--muted)">line 282</span> &mdash; Where palettes live, beside the preferences file.
+</li>
+<li><code>load</code> <span style="color:var(--muted)">line 309</span> &mdash; Read every palette in dir, returning the usable ones and every complaint.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>build</code>, <code>contrast_problems</code>, <code>parse</code>, <code>contrast</code>, <code>parse_hex</code>, <code>luminance</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -73,30 +88,46 @@
 <path d="M1018.8 47.0 C 1040.8 47.0, 1040.8 47.0, 417.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M1018.8 47.0 C 1040.8 47.0, 1040.8 47.0, 654.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M651.6 47.0 C 673.6 47.0, 673.6 47.0, 539.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L85" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">luminance</text>
 <text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 85</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L101" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="186.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">contrast</text>
 <text x="186.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L121" target="_blank" rel="noopener noreferrer">
 <rect x="257.2" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="335.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">contrast_problems</text>
 <text x="335.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 121</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L154" target="_blank" rel="noopener noreferrer">
 <rect x="440.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="488.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_hex</text>
 <text x="488.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L171" target="_blank" rel="noopener noreferrer">
 <rect x="562.8" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="607.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse</text>
 <text x="607.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 171</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L249" target="_blank" rel="noopener noreferrer">
 <rect x="677.6" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="722.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">build</text>
 <text x="722.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 249</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L282" target="_blank" rel="noopener noreferrer">
 <rect x="792.4" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="848.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_dir</text>
 <text x="848.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 282</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L309" target="_blank" rel="noopener noreferrer">
 <rect x="930.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="974.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load</text>
 <text x="974.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -117,6 +148,14 @@ flowchart TD
     n_load --&gt; n_contrast_problems
     n_load --&gt; n_parse
     n_parse --&gt; n_parse_hex
+    click n_luminance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L85&quot; &quot;open the source&quot;
+    click n_contrast href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L101&quot; &quot;open the source&quot;
+    click n_contrast_problems href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L121&quot; &quot;open the source&quot;
+    click n_parse_hex href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L154&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L171&quot; &quot;open the source&quot;
+    click n_build href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L249&quot; &quot;open the source&quot;
+    click n_default_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L282&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L309&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_default_dir,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

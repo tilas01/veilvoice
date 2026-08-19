@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -42,6 +42,7 @@
 <p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 168 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -49,7 +50,21 @@
 <section id="s-about">
 <p>Authenticated encryption with XChaCha20-Poly1305.</p>
 <p>XChaCha20 rather than plain ChaCha20 because its 192-bit nonce can be drawn at random with no practical collision risk. The 96-bit nonce of RFC 8439 ChaCha20-Poly1305 requires a counter and careful state tracking to stay unique across runs; getting that wrong is catastrophic, and a random 192-bit nonce removes the failure mode entirely.</p>
-<p>Every call is authenticated over associated data as well as the plaintext, which is how the container header in [<code>crate::container</code>] is bound to its ciphertext: flipping a bit in the stored KDF parameters produces a decryption failure rather than a silently different key.</p>
+<p>Every call is authenticated over associated data as well as the plaintext, which is how the container header in <code>crate::container</code> is bound to its ciphertext: flipping a bit in the stored KDF parameters produces a decryption failure rather than a silently different key.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>168 lines defining <strong>4 functions</strong> (3 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>random_nonce</code> <span style="color:var(--muted)">line 25</span> &mdash; Draw a fresh random nonce from the OS CSPRNG.
+</li>
+<li><code>seal</code> <span style="color:var(--muted)">line 41</span> &mdash; Encrypt plaintext, authenticating aad alongside it.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>cipher</code></span>
+</li>
+<li><code>open</code> <span style="color:var(--muted)">line 60</span> &mdash; Decrypt and verify.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>cipher</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -59,18 +74,26 @@
 <rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M660.4 47.0 C 682.4 47.0, 682.4 47.0, 449.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M553.2 47.0 C 575.2 47.0, 575.2 47.0, 449.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L25" target="_blank" rel="noopener noreferrer">
 <rect x="219.6" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="279.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">random_nonce</text>
 <text x="279.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 25</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L31" target="_blank" rel="noopener noreferrer">
 <rect x="364.8" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="405.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">cipher</text>
 <text x="405.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 31</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41" target="_blank" rel="noopener noreferrer">
 <rect x="472.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="512.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seal</text>
 <text x="512.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 41</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L60" target="_blank" rel="noopener noreferrer">
 <rect x="579.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="619.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open</text>
 <text x="619.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 60</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -83,6 +106,10 @@ flowchart TD
     n_open([&quot;open&lt;br/&gt;line 60&quot;])
     n_open --&gt; n_cipher
     n_seal --&gt; n_cipher
+    click n_random_nonce href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L25&quot; &quot;open the source&quot;
+    click n_cipher href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L31&quot; &quot;open the source&quot;
+    click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41&quot; &quot;open the source&quot;
+    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L60&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_random_nonce,n_seal,n_open entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

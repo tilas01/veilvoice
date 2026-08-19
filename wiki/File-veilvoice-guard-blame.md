@@ -71,6 +71,12 @@ flowchart TD
     n_unconfigured["unconfigured<br/>line 132"]
     n_who_touched(["who_touched<br/>line 151"])
     n_who_touched --> n_unconfigured
+    click n_no_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L52" "open the source"
+    click n_system_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L79" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L115" "open the source"
+    click n_is_known href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L126" "open the source"
+    click n_unconfigured href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L132" "open the source"
+    click n_who_touched href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L151" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_describe,n_is_known,n_who_touched entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

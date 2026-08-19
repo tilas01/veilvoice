@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -44,21 +44,33 @@
 <nav class="toc" aria-label="Contents">
   <a href="#the-live-feature">The live feature</a>
   <a href="#routing-and-why-a-virtual-cable-matters">Routing, and why a virtual cable matters</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
 <div>
 <section id="s-about">
-<p>Everything between the sound hardware and <a href="../veilvoice-core.html"><code>veilvoice_core</code></a>: device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</p>
+<p>Everything between the sound hardware and <code>veilvoice_core</code>(../veilvoice-core.html): device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</p>
 <ul>
-<li>[<code>io</code>] &#8212; decode any common audio file to mono <code>f32</code>, write 16-bit WAV, or encode one in memory so it can be encrypted without ever landing on disk in the clear.</li>
+<li><code>io</code> &#8212; decode any common audio file to mono <code>f32</code>, write 16-bit WAV, or encode one in memory so it can be encrypted without ever landing on disk in the clear.</li>
 <li><code>devices</code> &#8212; enumerate inputs and outputs, and spot a virtual audio cable.</li>
 <li><code>live</code> &#8212; run the engine live between two devices.</li>
 </ul>
 <h3 id="the-live-feature">The <code>live</code> feature</h3>
 <p><code>devices</code> and <code>live</code> sit behind the default-on <code>live</code> feature. They are the only part of this crate that needs <code>cpal</code>, and <code>cpal</code> has no backend for the BSDs. Everything else &#8212; decoding, encoding, and running the engine over a buffer &#8212; is pure Rust and builds anywhere, so turning the feature off keeps file processing working on platforms that cannot do live capture rather than failing to build at all.</p>
 <h3 id="routing-and-why-a-virtual-cable-matters">Routing, and why a virtual cable matters</h3>
-<p>Scrambling a microphone is only useful if other applications can hear the result. Selecting a virtual audio cable as the output makes the veiled voice appear as an ordinary microphone to any call, stream or recorder on the machine, with no per-application setup. [<code>devices::find_virtual_cable</code>] detects an installed one so the UI can offer it directly.</p>
+<p>Scrambling a microphone is only useful if other applications can hear the result. Selecting a virtual audio cable as the output makes the veiled voice appear as an ordinary microphone to any call, stream or recorder on the machine, with no per-application setup. <code>devices::find_virtual_cable</code> detects an installed one so the UI can offer it directly.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>204 lines defining <strong>5 functions</strong> (1 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 51</span> &mdash; Everything that can go wrong in this crate.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>deidentify</code> <span style="color:var(--muted)">line 110</span> &mdash; De-identify a whole buffer of audio in one call.
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -66,21 +78,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L69" target="_blank" rel="noopener noreferrer">
 <rect x="246.6" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="302.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::from</text>
 <text x="302.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 69</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L75" target="_blank" rel="noopener noreferrer">
 <rect x="246.6" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="302.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::from</text>
 <text x="302.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 75</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L81" target="_blank" rel="noopener noreferrer">
 <rect x="384.2" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="436.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
 <text x="436.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 81</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L96" target="_blank" rel="noopener noreferrer">
 <rect x="514.2" y="20.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="577.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::source</text>
 <text x="577.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 96</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L110" target="_blank" rel="noopener noreferrer">
 <rect x="667.0" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="719.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">deidentify</text>
 <text x="719.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -92,6 +114,11 @@ flowchart TD
     n_fmt[&quot;Error::fmt&lt;br/&gt;line 81&quot;]
     n_source[&quot;Error::source&lt;br/&gt;line 96&quot;]
     n_deidentify([&quot;deidentify&lt;br/&gt;line 110&quot;])
+    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L69&quot; &quot;open the source&quot;
+    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L75&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L81&quot; &quot;open the source&quot;
+    click n_source href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L96&quot; &quot;open the source&quot;
+    click n_deidentify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L110&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_deidentify entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

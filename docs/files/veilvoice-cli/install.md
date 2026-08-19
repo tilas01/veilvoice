@@ -150,6 +150,25 @@ flowchart TD
     n_uninstall --> n_unregister_uninstall
     n_unregister_uninstall --> n_no_window
     n_unregister_uninstall --> n_reg_exe
+    click n_no_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L69" "open the source"
+    click n_reg_exe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L86" "open the source"
+    click n_prefix href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L92" "open the source"
+    click n_bin_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L109" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L133" "open the source"
+    click n_exe_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L153" "open the source"
+    click n_path_contains href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L167" "open the source"
+    click n_copy_programs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L175" "open the source"
+    click n_add_to_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L217" "open the source"
+    click n_read_user_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L255" "open the source"
+    click n_add_to_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L289" "open the source"
+    click n_register_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L299" "open the source"
+    click n_register_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L338" "open the source"
+    click n_remove_from_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L343" "open the source"
+    click n_remove_from_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L384" "open the source"
+    click n_unregister_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L389" "open the source"
+    click n_unregister_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L398" "open the source"
+    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L403" "open the source"
+    click n_uninstall href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L430" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_install,n_uninstall entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

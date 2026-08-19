@@ -27,7 +27,7 @@
       <a href="../index.html">home</a>
       <a href="../wiki.html">wiki</a>
       <a href="../reference/index.html">reference</a>
-      <a href="../search.html">search</a>
+      <a href="../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -68,15 +68,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs" target="_blank" rel="noopener noreferrer">
 <rect x="269.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="317.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main.rs</text>
 <text x="317.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">746 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" target="_blank" rel="noopener noreferrer">
 <rect x="391.8" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="440.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fetch.rs</text>
 <text x="440.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">320 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" target="_blank" rel="noopener noreferrer">
 <rect x="514.2" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="562.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tests.rs</text>
 <text x="562.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">138 lines</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">Every arrow is a <code>crate::</code> or <code>super::</code> path one module actually uses, read out of the source rather than drawn by hand.</p>
@@ -85,7 +91,10 @@
 flowchart TD
     n_main([&quot;main.rs&lt;br/&gt;746 lines&quot;])
     n_fetch[&quot;fetch.rs&lt;br/&gt;320 lines&quot;]
-    n_tests[&quot;tests.rs&lt;br/&gt;138 lines&quot;]</code></pre>
+    n_tests[&quot;tests.rs&lt;br/&gt;138 lines&quot;]
+    click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs&quot; &quot;open the source&quot;
+    click n_fetch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs&quot; &quot;open the source&quot;
+    click n_tests href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs&quot; &quot;open the source&quot;</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

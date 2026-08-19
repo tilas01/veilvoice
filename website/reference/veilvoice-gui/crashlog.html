@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -45,6 +45,7 @@
   <a href="#the-problem-this-exists-for">The problem this exists for</a>
   <a href="#what-this-does-about-it">What this does about it</a>
   <a href="#what-it-deliberately-does-not-do">What it deliberately does not do</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -53,7 +54,7 @@
 <p>Make a failure that produces no output produce some.</p>
 <h2 id="the-problem-this-exists-for">The problem this exists for</h2>
 <p><code>veilvoice-gui</code> is built with <code>windows_subsystem = &quot;windows&quot;</code>, so it has no console, and the workspace builds with <code>panic = &quot;abort&quot;</code>, so a panic does not unwind into anything that could report it. Put together, <strong>every way this application can fail on Windows produces exactly nothing</strong>: no message, no dialog, no log. The window appears or it does not.</p>
-<p>That is not hypothetical. A release shipped and the report was &quot;it flashes a command prompt, loads in an unusable state, and crashes&quot; -- which is all a user <em>can</em> report, because the program tells them nothing. The console flash turned out to be subprocesses (see <code>no_window</code> in [<code>crate::reduced_motion</code>]), and the crash could not be diagnosed at all from what was observable.</p>
+<p>That is not hypothetical. A release shipped and the report was &quot;it flashes a command prompt, loads in an unusable state, and crashes&quot; -- which is all a user <em>can</em> report, because the program tells them nothing. The console flash turned out to be subprocesses (see <code>no_window</code> in <code>crate::reduced_motion</code>), and the crash could not be diagnosed at all from what was observable.</p>
 <h2 id="what-this-does-about-it">What this does about it</h2>
 <p>Two failures are caught and written to a file beside the preferences:</p>
 <ul>
@@ -64,6 +65,21 @@
 <h2 id="what-it-deliberately-does-not-do">What it deliberately does not do</h2>
 <p><strong>It does not report anything anywhere.</strong> The file is written next to the preferences, on the user&#x27;s own disk, and stays there until they delete it or the application clears it. A privacy tool that phones home about its own crashes would be exactly the thing this project spends its documentation refusing to be, and there is no network code in the dependency graph to do it with even if that changed.</p>
 <p><strong>It records no user content.</strong> A panic message, a source location, the version and a timestamp. Not the file being processed, not a path the user chose, not a passphrase -- nothing that is theirs.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>254 lines defining <strong>7 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>install</code> <span style="color:var(--muted)">line 124</span> &mdash; Install the panic hook.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>default_path</code>, <code>previous</code>, <code>write</code>, <code>stamp</code></span>
+</li>
+<li><code>record_startup_failure</code> <span style="color:var(--muted)">line 147</span> &mdash; Record a startup failure that eframe returned rather than panicked.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>default_path</code>, <code>write</code>, <code>stamp</code></span>
+</li>
+<li><code>clear</code> <span style="color:var(--muted)">line 161</span> &mdash; Forget a previous report.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>default_path</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -79,27 +95,41 @@
 <path d="M717.4 47.0 C 739.4 47.0, 739.4 47.0, 170.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M717.4 47.0 C 739.4 47.0, 739.4 47.0, 384.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M381.4 47.0 C 403.4 47.0, 403.4 47.0, 277.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L52" target="_blank" rel="noopener noreferrer">
 <rect x="47.8" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="107.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_path</text>
 <text x="107.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 52</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L62" target="_blank" rel="noopener noreferrer">
 <rect x="193.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="233.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">stamp</text>
 <text x="233.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 62</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L75" target="_blank" rel="noopener noreferrer">
 <rect x="300.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="340.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write</text>
 <text x="340.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 75</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L124" target="_blank" rel="noopener noreferrer">
 <rect x="407.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="451.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
 <text x="451.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L147" target="_blank" rel="noopener noreferrer">
 <rect x="522.2" y="20.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="619.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">record_startup_failure</text>
 <text x="619.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L154" target="_blank" rel="noopener noreferrer">
 <rect x="395.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">previous</text>
 <text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L161" target="_blank" rel="noopener noreferrer">
 <rect x="743.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="787.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clear</text>
 <text x="787.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -121,6 +151,13 @@ flowchart TD
     n_record_startup_failure --&gt; n_default_path
     n_record_startup_failure --&gt; n_write
     n_write --&gt; n_stamp
+    click n_default_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L52&quot; &quot;open the source&quot;
+    click n_stamp href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L62&quot; &quot;open the source&quot;
+    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L75&quot; &quot;open the source&quot;
+    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L124&quot; &quot;open the source&quot;
+    click n_record_startup_failure href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L147&quot; &quot;open the source&quot;
+    click n_previous href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L154&quot; &quot;open the source&quot;
+    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs#L161&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_install,n_record_startup_failure,n_clear entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

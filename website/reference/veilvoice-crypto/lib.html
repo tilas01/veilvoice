@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -45,6 +45,7 @@
   <a href="#what-this-crate-is-for">What this crate is for</a>
   <a href="#threat-model-stated-plainly">Threat model, stated plainly</a>
   <a href="#example">Example</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -52,16 +53,16 @@
 <section id="s-about">
 <p>Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.</p>
 <h3 id="what-this-crate-is-for">What this crate is for</h3>
-<p><a href="../veilvoice-core.html"><code>veilvoice_core</code></a> makes a voice unrecognisable; it does not hide the <em>words</em>, and it is not meant to. When a recording needs to stay secret as well &#8212; at rest on disk, or in transit to someone else &#8212; that is this crate&#x27;s job.</p>
+<p><code>veilvoice_core</code>(../veilvoice-core.html) makes a voice unrecognisable; it does not hide the <em>words</em>, and it is not meant to. When a recording needs to stay secret as well &#8212; at rest on disk, or in transit to someone else &#8212; that is this crate&#x27;s job.</p>
 <ul>
-<li>[<code>kdf</code>] &#8212; Argon2id, for turning a password into a key.</li>
-<li>[<code>hybrid</code>] &#8212; X25519 + ML-KEM-768, so a recording captured today is not readable by a quantum adversary tomorrow.</li>
-<li>[<code>aead</code>] &#8212; XChaCha20-Poly1305, with random nonces and authenticated associated data.</li>
-<li>[<code>container</code>] &#8212; the <code>.veil</code> file format that ties the three together.</li>
-<li>[<code>amnesia</code>] &#8212; page-locked, zeroizing, constant-time-comparable secrets.</li>
-<li>[<code>shred</code>] &#8212; secure erasure, and an honest account of what that is worth on flash storage.</li>
-<li>[<code>privatefile</code>] &#8212; writing a file that is owner-only from the moment it exists, rather than world-readable until a second syscall tightens it.</li>
-<li>[<code>lock</code>] &#8212; the application lock: an Argon2id verifier with a rate limit, which protects against casual access and says so rather than pretending to be tamper-proof.</li>
+<li><code>kdf</code> &#8212; Argon2id, for turning a password into a key.</li>
+<li><code>hybrid</code> &#8212; X25519 + ML-KEM-768, so a recording captured today is not readable by a quantum adversary tomorrow.</li>
+<li><code>aead</code> &#8212; XChaCha20-Poly1305, with random nonces and authenticated associated data.</li>
+<li><code>container</code> &#8212; the <code>.veil</code> file format that ties the three together.</li>
+<li><code>amnesia</code> &#8212; page-locked, zeroizing, constant-time-comparable secrets.</li>
+<li><code>shred</code> &#8212; secure erasure, and an honest account of what that is worth on flash storage.</li>
+<li><code>privatefile</code> &#8212; writing a file that is owner-only from the moment it exists, rather than world-readable until a second syscall tightens it.</li>
+<li><code>lock</code> &#8212; the application lock: an Argon2id verifier with a rate limit, which protects against casual access and says so rather than pretending to be tamper-proof.</li>
 </ul>
 <h3 id="threat-model-stated-plainly">Threat model, stated plainly</h3>
 <p>This crate protects data <strong>at rest and in transit</strong> against an attacker who later obtains the file, including one who stores it until quantum hardware exists. It does <strong>not</strong> protect against an attacker who is already running code as you, or who can read this process&#x27;s memory: page-locking keeps keys out of the swap file, not out of a debugger. Hibernation writes RAM to disk wholesale and defeats locking entirely.</p>
@@ -73,7 +74,14 @@ let params = kdf::KdfParams::weak_for_tests();
 let sealed = container::seal_with_password(b&quot;pass phrase&quot;, b&quot;audio bytes&quot;, params)?;
 assert_eq!(container::open_with_password(b&quot;pass phrase&quot;, &amp;sealed)?, b&quot;audio bytes&quot;);
 assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err());</code></pre>
-<p>VeilVoice contains <strong>no <code>unsafe</code> code at all</strong> &#8212; including the page-locking in [<code>amnesia</code>], which goes through a safe wrapper.</p>
+<p>VeilVoice contains <strong>no <code>unsafe</code> code at all</strong> &#8212; including the page-locking in <code>amnesia</code>, which goes through a safe wrapper.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>175 lines defining <strong>1 function</strong> (0 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 81</span> &mdash; Everything that can go wrong in this crate.</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -81,9 +89,11 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L136" target="_blank" rel="noopener noreferrer">
 <rect x="388.0" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="440.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
 <text x="440.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -91,6 +101,7 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_fmt[&quot;Error::fmt&lt;br/&gt;line 136&quot;]
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L136&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_fmt helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>

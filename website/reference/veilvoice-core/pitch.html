@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -42,19 +42,37 @@
 <p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 274 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
 <div>
 <section id="s-about">
 <p>Monophonic fundamental-frequency tracker (decimated YIN).</p>
-<p>Accent neutralisation needs to know the speaker&#x27;s <em>current</em> f0 so the intonation contour can be replaced with a canonical one (see [<code>crate::accent</code>]).</p>
+<p>Accent neutralisation needs to know the speaker&#x27;s <em>current</em> f0 so the intonation contour can be replaced with a canonical one (see <code>crate::accent</code>).</p>
 <p>Two constraints shape this implementation:</p>
 <ul>
 <li><strong>The STFT frame is too short to resolve f0 directly.</strong> At the default 1024-point FFT / 48 kHz the bin spacing is ~47 Hz, so a spectral peak-pick cannot tell 100 Hz from 140 Hz. This tracker therefore works in the time domain over its own rolling history, which may be longer than one STFT frame without adding any output latency &#8212; the window still <em>ends</em> at the current frame, so it stays causal.</li>
 <li><strong>It must be cheap enough for an audio callback.</strong> The signal is decimated to ~8 kHz first (pitch lives in the low harmonics), which cuts the difference-function cost by the square of the decimation factor. At the default settings it costs on the order of 8 M flops/s &#8212; well under 1 % of one core &#8212; and allocates nothing after construction.</li>
 </ul>
 <p>The algorithm is YIN&#x27;s cumulative mean normalised difference function (de Cheveign&#233; &amp; Kawahara, 2002) with parabolic interpolation, minus the optimisations that only matter for offline accuracy.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>274 lines defining <strong>4 functions</strong> (3 public), <strong>2 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>struct PitchEstimate</code> <span style="color:var(--muted)">line 41</span> &mdash; One f0 measurement.</li>
+<li><code>struct PitchTracker</code> <span style="color:var(--muted)">line 51</span> &mdash; Rolling, allocation-free f0 tracker.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>PitchTracker::new</code> <span style="color:var(--muted)">line 69</span> &mdash; Build a tracker for input at sample_rate hertz.
+</li>
+<li><code>PitchTracker::push</code> <span style="color:var(--muted)">line 91</span> &mdash; Feed new input samples (anti-aliased and decimated internally).
+</li>
+<li><code>PitchTracker::estimate</code> <span style="color:var(--muted)">line 111</span> &mdash; Estimate f0 over the newest history.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>parabolic</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -63,18 +81,26 @@
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M627.0 74.0 C 627.0 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L69" target="_blank" rel="noopener noreferrer">
 <rect x="155.4" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="234.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PitchTracker::new</text>
 <text x="234.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 69</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L91" target="_blank" rel="noopener noreferrer">
 <rect x="338.6" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="421.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PitchTracker::push</text>
 <text x="421.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 91</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L111" target="_blank" rel="noopener noreferrer">
 <rect x="529.4" y="20.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="627.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PitchTracker::estimate</text>
 <text x="627.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L173" target="_blank" rel="noopener noreferrer">
 <rect x="338.6" y="120.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PitchTracker::parabolic</text>
 <text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 173</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -86,6 +112,10 @@ flowchart TD
     n_estimate([&quot;PitchTracker::estimate&lt;br/&gt;line 111&quot;])
     n_parabolic[&quot;PitchTracker::parabolic&lt;br/&gt;line 173&quot;]
     n_estimate --&gt; n_parabolic
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L69&quot; &quot;open the source&quot;
+    click n_push href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L91&quot; &quot;open the source&quot;
+    click n_estimate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L111&quot; &quot;open the source&quot;
+    click n_parabolic href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L173&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_push,n_estimate entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

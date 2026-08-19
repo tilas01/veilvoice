@@ -27,7 +27,7 @@
       <a href="../index.html">home</a>
       <a href="../wiki.html">wiki</a>
       <a href="../reference/index.html">reference</a>
-      <a href="../search.html">search</a>
+      <a href="../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -50,16 +50,16 @@
 </nav>
 <div>
 <section id="s-about">
-<p>Everything between the sound hardware and <a href="veilvoice-core.html"><code>veilvoice_core</code></a>: device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</p>
+<p>Everything between the sound hardware and <code>veilvoice_core</code>(veilvoice-core.html): device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</p>
 <ul>
-<li>[<code>io</code>] &#8212; decode any common audio file to mono <code>f32</code>, write 16-bit WAV, or encode one in memory so it can be encrypted without ever landing on disk in the clear.</li>
+<li><code>io</code> &#8212; decode any common audio file to mono <code>f32</code>, write 16-bit WAV, or encode one in memory so it can be encrypted without ever landing on disk in the clear.</li>
 <li><code>devices</code> &#8212; enumerate inputs and outputs, and spot a virtual audio cable.</li>
 <li><code>live</code> &#8212; run the engine live between two devices.</li>
 </ul>
 <h3 id="the-live-feature">The <code>live</code> feature</h3>
 <p><code>devices</code> and <code>live</code> sit behind the default-on <code>live</code> feature. They are the only part of this crate that needs <code>cpal</code>, and <code>cpal</code> has no backend for the BSDs. Everything else &#8212; decoding, encoding, and running the engine over a buffer &#8212; is pure Rust and builds anywhere, so turning the feature off keeps file processing working on platforms that cannot do live capture rather than failing to build at all.</p>
 <h3 id="routing-and-why-a-virtual-cable-matters">Routing, and why a virtual cable matters</h3>
-<p>Scrambling a microphone is only useful if other applications can hear the result. Selecting a virtual audio cable as the output makes the veiled voice appear as an ordinary microphone to any call, stream or recorder on the machine, with no per-application setup. [<code>devices::find_virtual_cable</code>] detects an installed one so the UI can offer it directly.</p>
+<p>Scrambling a microphone is only useful if other applications can hear the result. Selecting a virtual audio cable as the output makes the veiled voice appear as an ordinary microphone to any call, stream or recorder on the machine, with no per-application setup. <code>devices::find_virtual_cable</code> detects an installed one so the UI can offer it directly.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -67,18 +67,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="204.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="252.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
 <text x="252.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">204 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" target="_blank" rel="noopener noreferrer">
 <rect x="326.8" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="378.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">devices.rs</text>
 <text x="378.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">228 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" target="_blank" rel="noopener noreferrer">
 <rect x="456.8" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="505.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">io.rs</text>
 <text x="505.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">555 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" target="_blank" rel="noopener noreferrer">
 <rect x="579.2" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="627.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">live.rs</text>
 <text x="627.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">237 lines</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">Every arrow is a <code>crate::</code> or <code>super::</code> path one module actually uses, read out of the source rather than drawn by hand.</p>
@@ -88,7 +96,11 @@ flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;204 lines&quot;])
     n_devices[&quot;devices.rs&lt;br/&gt;228 lines&quot;]
     n_io[&quot;io.rs&lt;br/&gt;555 lines&quot;]
-    n_live[&quot;live.rs&lt;br/&gt;237 lines&quot;]</code></pre>
+    n_live[&quot;live.rs&lt;br/&gt;237 lines&quot;]
+    click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs&quot; &quot;open the source&quot;
+    click n_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs&quot; &quot;open the source&quot;
+    click n_io href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs&quot; &quot;open the source&quot;
+    click n_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs&quot; &quot;open the source&quot;</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

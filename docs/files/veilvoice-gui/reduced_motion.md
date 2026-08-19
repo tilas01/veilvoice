@@ -102,6 +102,14 @@ flowchart TD
     n_windows_query --> n_no_window
     n_windows_query --> n_parse_user_preferences_mask
     n_windows_query --> n_tool
+    click n_no_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L56" "open the source"
+    click n_reduces href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L81" "open the source"
+    click n_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L87" "open the source"
+    click n_query href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L101" "open the source"
+    click n_windows_query href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L125" "open the source"
+    click n_parse_user_preferences_mask href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L155" "open the source"
+    click n_macos_query href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L179" "open the source"
+    click n_unix_query href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L204" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_reduces,n_query entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

@@ -90,6 +90,16 @@ flowchart TD
     n_scan --> n_collect
     n_subkeys --> n_no_window
     n_subkeys --> n_reg_exe
+    click n_no_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L49" "open the source"
+    click n_reg_exe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L84" "open the source"
+    click n_scan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L100" "open the source"
+    click n_collect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L113" "open the source"
+    click n_subkeys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L132" "open the source"
+    click n_read_entry href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L159" "open the source"
+    click n_read_u64 href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L183" "open the source"
+    click n_decode_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L198" "open the source"
+    click n_friendly_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L203" "open the source"
+    click n_filetime_to_system href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L213" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_scan entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

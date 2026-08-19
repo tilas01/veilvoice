@@ -105,6 +105,18 @@ flowchart TD
     n_the_container_header_parser_survives_hostile_input --> n_new
     n_the_container_header_parser_survives_hostile_input --> n_rounds
     n_the_container_header_parser_survives_hostile_input --> n_weak
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L44" "open the source"
+    click n_next_u32 href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L47" "open the source"
+    click n_below href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L53" "open the source"
+    click n_byte href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L60" "open the source"
+    click n_rounds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L65" "open the source"
+    click n_mutate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L77" "open the source"
+    click n_weak href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L151" "open the source"
+    click n_cheap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L169" "open the source"
+    click n_the_container_header_parser_survives_hostile_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L174" "open the source"
+    click n_the_app_lock_parser_survives_hostile_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L225" "open the source"
+    click n_both_parsers_survive_pure_noise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L265" "open the source"
+    click n_every_length_around_a_boundary_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L285" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_new,n_next_u32,n_below,n_byte,n_rounds,n_mutate,n_weak,n_cheap,n_the_container_header_parser_survives_hostile_input,n_the_app_lock_parser_survives_hostile_input,n_both_parsers_survive_pure_noise,n_every_length_around_a_boundary_is_handled helper
 ```

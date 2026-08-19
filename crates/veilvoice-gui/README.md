@@ -101,6 +101,17 @@ flowchart TD
     n_soundbar --> n_prefs
     n_soundbar --> n_theme
     n_theme --> n_palettes
+    click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" "open the source"
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" "open the source"
+    click n_app href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" "open the source"
+    click n_crashlog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" "open the source"
+    click n_palettes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs" "open the source"
+    click n_prefs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" "open the source"
+    click n_reduced_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs" "open the source"
+    click n_security href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" "open the source"
+    click n_settings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" "open the source"
+    click n_soundbar href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" "open the source"
+    click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" "open the source"
 ```
 
 ## The files

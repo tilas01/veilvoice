@@ -95,6 +95,15 @@ flowchart TD
     n_privatefile["privatefile.rs<br/>157 lines"]
     n_shred["shred.rs<br/>401 lines"]
     n_lock --> n_privatefile
+    click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" "open the source"
+    click n_aead href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" "open the source"
+    click n_amnesia href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" "open the source"
+    click n_container href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs" "open the source"
+    click n_hybrid href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" "open the source"
+    click n_kdf href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs" "open the source"
+    click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" "open the source"
+    click n_privatefile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" "open the source"
+    click n_shred href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs" "open the source"
 ```
 
 ## The files

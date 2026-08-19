@@ -85,6 +85,9 @@ flowchart TD
     n_write_inner["write_inner<br/>line 59"]
     n_write_owner_only --> n_write_inner
     n_write_owner_only_new --> n_write_inner
+    click n_write_owner_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L44" "open the source"
+    click n_write_owner_only_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L55" "open the source"
+    click n_write_inner href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L59" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_write_owner_only,n_write_owner_only_new entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

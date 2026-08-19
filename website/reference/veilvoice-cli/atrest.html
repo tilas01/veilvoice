@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -44,6 +44,7 @@
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-the-default">Why this is the default</a>
   <a href="#never-through-a-plaintext-file">Never through a plaintext file</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -52,9 +53,26 @@
 <p>Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.</p>
 <h2 id="why-this-is-the-default">Why this is the default</h2>
 <p>De-identification and confidentiality are different problems, and VeilVoice only solves the first: the words survive on purpose, so a veiled recording sitting on disk is still a recording of everything that was said. Writing it in the clear by default would quietly leave the second problem unsolved for everyone who did not think to ask.</p>
-<p>So the result is sealed into a [<code>container</code>] &#8212; Argon2id or the X25519 + ML-KEM-768 hybrid &#8212; unless the user asks for plaintext, and asking for plaintext prints [<code>PLAINTEXT_WARNING</code>] and, on a terminal, waits for an answer.</p>
+<p>So the result is sealed into a <code>container</code> &#8212; Argon2id or the X25519 + ML-KEM-768 hybrid &#8212; unless the user asks for plaintext, and asking for plaintext prints <code>PLAINTEXT_WARNING</code> and, on a terminal, waits for an answer.</p>
 <h2 id="never-through-a-plaintext-file">Never through a plaintext file</h2>
-<p>The WAV is encoded in memory and sealed there. It is never written to disk and then encrypted, because a plaintext file that is created and deleted is precisely what [<code>veilvoice_crypto::shred</code>] explains cannot be reliably taken back on flash storage.</p>
+<p>The WAV is encoded in memory and sealed there. It is never written to disk and then encrypted, because a plaintext file that is created and deleted is precisely what <code>veilvoice_crypto::shred</code> explains cannot be reliably taken back on flash storage.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>275 lines defining <strong>5 functions</strong> (4 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>enum Recipient</code> <span style="color:var(--muted)">line 52</span> &mdash; How a recording is to be sealed.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>seal_to_disk</code> <span style="color:var(--muted)">line 60</span> &mdash; Seal plaintext and write it to &lt;path&gt;.veil, returning where it landed.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>read_new_password</code>, <code>into_secret</code></span>
+</li>
+<li><code>confirm_plaintext</code> <span style="color:var(--muted)">line 111</span> &mdash; Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.
+</li>
+<li><code>prompt_secret</code> <span style="color:var(--muted)">line 162</span> &mdash; Prompt once, without echoing, and keep the answer in a Secret.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>into_secret</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -65,21 +83,31 @@
 <path d="M736.4 47.0 C 758.4 47.0, 758.4 47.0, 586.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M518.6 147.0 C 605.6 147.0, 605.6 47.0, 586.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M203.2 74.0 C 203.2 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L60" target="_blank" rel="noopener noreferrer">
 <rect x="143.6" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="203.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seal_to_disk</text>
 <text x="203.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 60</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L111" target="_blank" rel="noopener noreferrer">
 <rect x="288.8" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="367.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">confirm_plaintext</text>
 <text x="367.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L154" target="_blank" rel="noopener noreferrer">
 <rect x="472.0" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="527.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">into_secret</text>
 <text x="527.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L162" target="_blank" rel="noopener noreferrer">
 <rect x="609.6" y="20.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="673.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">prompt_secret</text>
 <text x="673.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L168" target="_blank" rel="noopener noreferrer">
 <rect x="361.4" y="120.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_new_password</text>
 <text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -94,6 +122,11 @@ flowchart TD
     n_prompt_secret --&gt; n_into_secret
     n_read_new_password --&gt; n_into_secret
     n_seal_to_disk --&gt; n_read_new_password
+    click n_seal_to_disk href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L60&quot; &quot;open the source&quot;
+    click n_confirm_plaintext href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L111&quot; &quot;open the source&quot;
+    click n_into_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L154&quot; &quot;open the source&quot;
+    click n_prompt_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L162&quot; &quot;open the source&quot;
+    click n_read_new_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L168&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_seal_to_disk,n_confirm_plaintext,n_prompt_secret entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

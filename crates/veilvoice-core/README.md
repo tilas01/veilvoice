@@ -101,6 +101,15 @@ flowchart TD
     n_spectral --> n_accent
     n_spectral --> n_pitch
     n_stft --> n_window
+    click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs" "open the source"
+    click n_accent href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs" "open the source"
+    click n_chain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" "open the source"
+    click n_effects href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs" "open the source"
+    click n_modulation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs" "open the source"
+    click n_pitch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs" "open the source"
+    click n_spectral href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs" "open the source"
+    click n_stft href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" "open the source"
+    click n_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs" "open the source"
 ```
 
 ## The files

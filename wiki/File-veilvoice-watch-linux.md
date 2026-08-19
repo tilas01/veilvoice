@@ -67,6 +67,11 @@ flowchart TD
     n_scan --> n_classify
     n_scan --> n_process_name
     n_scan --> n_started_at
+    click n_scan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L37" "open the source"
+    click n_classify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L94" "open the source"
+    click n_process_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L115" "open the source"
+    click n_started_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L126" "open the source"
+    click n_approx_now_minus href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L132" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_scan entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

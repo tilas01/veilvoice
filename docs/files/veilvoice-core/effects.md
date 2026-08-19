@@ -108,6 +108,14 @@ flowchart TD
     n_process(["Chorus::process<br/>line 135"])
     n_new(["Reverb::new<br/>line 158"])
     n_process(["Reverb::process<br/>line 172"])
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L58" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L67" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L85" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L99" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L122" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L135" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L158" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L172" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_process,n_new,n_process,n_new,n_process entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

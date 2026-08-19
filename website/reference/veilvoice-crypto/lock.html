@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -46,6 +46,7 @@
   <a href="#why-a-verifier-and-not-a-key">Why a verifier and not a key</a>
   <a href="#rate-limiting">Rate limiting</a>
   <a href="#separate-from-the-recording-password">Separate from the recording password</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -54,16 +55,62 @@
 <p>The application lock: an Argon2id password verifier with a rate limit.</p>
 <h2 id="what-this-is-worth-stated-before-anything-else">What this is worth, stated before anything else</h2>
 <p><strong>This is not a security boundary against someone holding the disk.</strong> It cannot be. A local application has nowhere to hide a secret from the machine it runs on: whoever can read this file can also delete it, and deleting it removes the lock. That is not a defect in the implementation, it is what a local lock <em>is</em>.</p>
-<p>What it does buy is real and worth having: someone who picks up your unlocked computer &#8212; a flatmate, a colleague, a border officer with your session open &#8212; cannot open VeilVoice, see which files you have processed, or start a live scramble. That is the threat this defends against, and [<code>SCOPE</code>] says so in the words the user sees.</p>
-<p>If the threat is an attacker with the disk, the answer is full-volume encryption (LUKS, BitLocker, FileVault) plus [<code>crate::container</code>] for the recordings themselves. Neither of those is replaced by this module.</p>
+<p>What it does buy is real and worth having: someone who picks up your unlocked computer &#8212; a flatmate, a colleague, a border officer with your session open &#8212; cannot open VeilVoice, see which files you have processed, or start a live scramble. That is the threat this defends against, and <code>SCOPE</code> says so in the words the user sees.</p>
+<p>If the threat is an attacker with the disk, the answer is full-volume encryption (LUKS, BitLocker, FileVault) plus <code>crate::container</code> for the recordings themselves. Neither of those is replaced by this module.</p>
 <h2 id="why-a-verifier-and-not-a-key">Why a verifier and not a key</h2>
-<p>The lock stores <code>Argon2id(domain &#8214; password, salt)</code> and compares it in constant time. It deliberately does <strong>not</strong> derive a key that encrypts anything, because there is nothing here it could usefully encrypt: the recordings have their own password (a <em>different</em> one &#8212; see [<code>crate::container</code>]), and pretending the app lock protected them would be exactly the overclaim this project refuses to make.</p>
+<p>The lock stores <code>Argon2id(domain &#8214; password, salt)</code> and compares it in constant time. It deliberately does <strong>not</strong> derive a key that encrypts anything, because there is nothing here it could usefully encrypt: the recordings have their own password (a <em>different</em> one &#8212; see <code>crate::container</code>), and pretending the app lock protected them would be exactly the overclaim this project refuses to make.</p>
 <p>The stored verifier is therefore a password hash sitting on disk in the clear, and must be treated like one. Argon2id at the default cost (256 MiB, t=3, p=4) makes an offline attack expensive per guess, which matters for a decent passphrase and does not save a bad one.</p>
 <h2 id="rate-limiting">Rate limiting</h2>
 <p>Wrong attempts are counted and the count is <strong>persisted</strong>, so killing the process does not hand an attacker a fresh budget. After three free attempts the wait doubles &#8212; 5 s, 10 s, 20 s &#8230; capped at fifteen minutes.</p>
 <p>The counter is stored in the same unauthenticated file as the verifier, and the wait is measured against the system clock. Someone who can edit the file or move the clock defeats both. Again: casual access, not the disk.</p>
 <h2 id="separate-from-the-recording-password">Separate from the recording password</h2>
 <p>The password that unlocks the app and the password that encrypts recordings are two different passwords, on purpose, so that unlocking the app is not the same act as unsealing everything it has ever written. To make that structural rather than merely conventional, the verifier is derived over a domain- separated input, so the same passphrase used in both places still produces unrelated values.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>732 lines defining <strong>23 functions</strong> (17 public), <strong>2 types</strong> and <strong>8 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>struct AppLock</code> <span style="color:var(--muted)">line 119</span> &mdash; A password verifier plus its attempt history.</li>
+<li><code>struct LockStore</code> <span style="color:var(--muted)">line 303</span> &mdash; An AppLock bound to a file, which is persisted after every attempt.</li>
+</ul>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>AppLock::create</code> <span style="color:var(--muted)">line 133</span> &mdash; Create a lock for password.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>derive_verifier</code></span>
+</li>
+<li><code>AppLock::verify</code> <span style="color:var(--muted)">line 150</span> &mdash; Check password, recording the outcome.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>unix_now</code>, <code>verify_at</code>, <code>cooldown_at</code>, <code>derive_verifier</code>, <code>delay_secs</code></span>
+</li>
+<li><code>AppLock::cooldown</code> <span style="color:var(--muted)">line 171</span> &mdash; Seconds still to wait before another attempt is accepted.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>cooldown_at</code>, <code>unix_now</code>, <code>delay_secs</code></span>
+</li>
+<li><code>AppLock::failures</code> <span style="color:var(--muted)">line 188</span> &mdash; Consecutive failed attempts recorded so far.
+</li>
+<li><code>AppLock::params</code> <span style="color:var(--muted)">line 193</span> &mdash; The Argon2id cost this lock was created with.
+</li>
+<li><code>AppLock::to_bytes</code> <span style="color:var(--muted)">line 217</span> &mdash; Serialise exactly as it appears on disk.
+</li>
+<li><code>LockStore::open</code> <span style="color:var(--muted)">line 314</span> &mdash; Load the lock at path, or Ok(None) if no lock is configured there.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code></span>
+</li>
+<li><code>LockStore::create</code> <span style="color:var(--muted)">line 335</span> &mdash; Create a lock at path, refusing to overwrite one already there.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>derive_verifier</code></span>
+</li>
+<li><code>LockStore::change_password</code> <span style="color:var(--muted)">line 365</span> &mdash; Replace the password, after proving the current one.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>save</code>, <code>unlock</code>, <code>write_private</code></span>
+</li>
+<li><code>LockStore::remove</code> <span style="color:var(--muted)">line 375</span> &mdash; Remove the lock, after proving the password.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>unlock</code>, <code>save</code>, <code>write_private</code></span>
+</li>
+<li><code>LockStore::cooldown</code> <span style="color:var(--muted)">line 381</span> &mdash; Seconds still to wait before another attempt is accepted.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>cooldown_at</code>, <code>unix_now</code>, <code>delay_secs</code></span>
+</li>
+<li><code>LockStore::failures</code> <span style="color:var(--muted)">line 386</span> &mdash; Consecutive failed attempts recorded so far.
+</li>
+<li><code>LockStore::path</code> <span style="color:var(--muted)">line 391</span> &mdash; Where this lock is stored.
+</li>
+<li><code>default_path</code> <span style="color:var(--muted)">line 433</span> &mdash; Where the lock file lives on this platform, if the environment says.
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -85,72 +132,116 @@
 <path d="M519.0 74.0 C 519.0 94.0, 1442.2 100.0, 1442.2 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M1442.2 174.0 C 1442.2 194.0, 1365.8 200.0, 1365.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M1442.2 174.0 C 1442.2 194.0, 1552.8 200.0, 1552.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L94" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="72.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">delay_secs</text>
 <text x="72.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L107" target="_blank" rel="noopener noreferrer">
 <rect x="150.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="194.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unix_now</text>
 <text x="194.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 107</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L133" target="_blank" rel="noopener noreferrer">
 <rect x="1692.4" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1771.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::create</text>
 <text x="1771.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L150" target="_blank" rel="noopener noreferrer">
 <rect x="448.0" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="519.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::verify</text>
 <text x="519.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L154" target="_blank" rel="noopener noreferrer">
 <rect x="1359.8" y="120.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1442.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::verify_at</text>
 <text x="1442.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L171" target="_blank" rel="noopener noreferrer">
 <rect x="2493.6" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2579.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::cooldown</text>
 <text x="2579.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 171</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L175" target="_blank" rel="noopener noreferrer">
 <rect x="1275.8" y="220.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1365.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::cooldown_at</text>
 <text x="1365.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 175</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L188" target="_blank" rel="noopener noreferrer">
 <rect x="2692.0" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2778.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::failures</text>
 <text x="2778.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 188</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L193" target="_blank" rel="noopener noreferrer">
 <rect x="1012.8" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1083.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::params</text>
 <text x="1083.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 193</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L217" target="_blank" rel="noopener noreferrer">
 <rect x="1180.8" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1259.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::to_bytes</text>
 <text x="1259.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 217</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L234" target="_blank" rel="noopener noreferrer">
 <rect x="1364.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="1431.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::parse</text>
 <text x="1431.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 234</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L291" target="_blank" rel="noopener noreferrer">
 <rect x="1481.8" y="220.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1552.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">derive_verifier</text>
 <text x="1552.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 291</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L314" target="_blank" rel="noopener noreferrer">
 <rect x="1524.4" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1595.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::open</text>
 <text x="1595.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 314</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L335" target="_blank" rel="noopener noreferrer">
 <rect x="1692.4" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="1771.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::create</text>
 <text x="1771.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 335</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L355" target="_blank" rel="noopener noreferrer">
 <rect x="1875.6" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="1954.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::unlock</text>
 <text x="1954.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 355</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L365" target="_blank" rel="noopener noreferrer">
 <rect x="2058.8" y="20.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2171.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::change_password</text>
 <text x="2171.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 365</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L375" target="_blank" rel="noopener noreferrer">
 <rect x="2310.4" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2389.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::remove</text>
 <text x="2389.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 375</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L381" target="_blank" rel="noopener noreferrer">
 <rect x="2493.6" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2579.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::cooldown</text>
 <text x="2579.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 381</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L386" target="_blank" rel="noopener noreferrer">
 <rect x="2692.0" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2778.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::failures</text>
 <text x="2778.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 386</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L391" target="_blank" rel="noopener noreferrer">
 <rect x="2890.4" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2961.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::path</text>
 <text x="2961.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 391</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L395" target="_blank" rel="noopener noreferrer">
 <rect x="1550.6" y="120.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1621.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::save</text>
 <text x="1621.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 395</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L417" target="_blank" rel="noopener noreferrer">
 <rect x="1649.8" y="220.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1713.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_private</text>
 <text x="1713.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 417</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 20 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
@@ -193,6 +284,28 @@ flowchart TD
     n_verify --&gt; n_verify_at
     n_verify_at --&gt; n_cooldown_at
     n_verify_at --&gt; n_derive_verifier
+    click n_delay_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L94&quot; &quot;open the source&quot;
+    click n_unix_now href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L107&quot; &quot;open the source&quot;
+    click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L133&quot; &quot;open the source&quot;
+    click n_verify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L150&quot; &quot;open the source&quot;
+    click n_verify_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L154&quot; &quot;open the source&quot;
+    click n_cooldown href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L171&quot; &quot;open the source&quot;
+    click n_cooldown_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L175&quot; &quot;open the source&quot;
+    click n_failures href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L188&quot; &quot;open the source&quot;
+    click n_params href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L193&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L217&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L234&quot; &quot;open the source&quot;
+    click n_derive_verifier href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L291&quot; &quot;open the source&quot;
+    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L314&quot; &quot;open the source&quot;
+    click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L335&quot; &quot;open the source&quot;
+    click n_unlock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L355&quot; &quot;open the source&quot;
+    click n_change_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L365&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L375&quot; &quot;open the source&quot;
+    click n_cooldown href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L381&quot; &quot;open the source&quot;
+    click n_failures href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L386&quot; &quot;open the source&quot;
+    click n_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L391&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L395&quot; &quot;open the source&quot;
+    click n_write_private href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L417&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_create,n_verify,n_cooldown,n_failures,n_params,n_to_bytes,n_open,n_create,n_change_password,n_remove,n_cooldown,n_failures,n_path entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5

@@ -27,7 +27,7 @@
       <a href="../index.html">home</a>
       <a href="../wiki.html">wiki</a>
       <a href="../reference/index.html">reference</a>
-      <a href="../search.html">search</a>
+      <a href="../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -55,16 +55,16 @@
 <p>Tamper <strong>detection</strong> for VeilVoice&#x27;s own files: a manifest of what they should be, a check of what they are, and a best-effort answer to &quot;what changed them&quot;.</p>
 <h3 id="what-this-is-and-the-word-it-deliberately-does-not-use">What this is, and the word it deliberately does not use</h3>
 <p>It is not tamper-<em>proof</em>. Nothing that runs as an ordinary program on your computer can be. A guard running as you can be killed by anything else running as you; a guard running as root can be stopped by root. The only honest verb here is <strong>detect</strong>, and where detection can be defeated that is said rather than glossed.</p>
-<p>This is the same limit the app lock has, for the same reason, and the project answers it the same way: state it plainly, in the place the user reads. See [<code>SCOPE</code>].</p>
+<p>This is the same limit the app lock has, for the same reason, and the project answers it the same way: state it plainly, in the place the user reads. See <code>SCOPE</code>.</p>
 <h3 id="what-it-actually-does">What it actually does</h3>
 <ul>
-<li>[<code>Manifest::of</code>] records each file&#x27;s size and SHA-256.</li>
-<li>[<code>Manifest::check</code>] compares that against what is on disk now and reports what was <strong>modified</strong>, <strong>removed</strong> or <strong>added</strong>.</li>
-<li>[<code>blame</code>] tries to name the process responsible for a change. It usually cannot, and says so instead of guessing.</li>
+<li><code>Manifest::of</code> records each file&#x27;s size and SHA-256.</li>
+<li><code>Manifest::check</code> compares that against what is on disk now and reports what was <strong>modified</strong>, <strong>removed</strong> or <strong>added</strong>.</li>
+<li><code>blame</code> tries to name the process responsible for a change. It usually cannot, and says so instead of guessing.</li>
 </ul>
 <h3 id="the-manifest-is-only-as-trustworthy-as-where-it-is-kept">The manifest is only as trustworthy as where it is kept</h3>
 <p>Written plainly, a manifest detects accidental corruption, an interrupted update, a file swapped by something careless -- and an attacker who did not think to rewrite it. It does not detect one who did, because they can recompute it as easily as this crate can.</p>
-<p>To raise that bar, seal the manifest with [<code>veilvoice_crypto::container::seal_with_password</code>] and keep the passphrase out of the manifest&#x27;s own directory. Then rewriting it undetectably requires the passphrase as well as write access. That is a real improvement and still not proof: an attacker who is present <em>while</em> you type the passphrase has everything. [<code>Manifest::seal</code>] and [<code>Manifest::open_sealed</code>] do this.</p>
+<p>To raise that bar, seal the manifest with <code>veilvoice_crypto::container::seal_with_password</code> and keep the passphrase out of the manifest&#x27;s own directory. Then rewriting it undetectably requires the passphrase as well as write access. That is a real improvement and still not proof: an attacker who is present <em>while</em> you type the passphrase has everything. <code>Manifest::seal</code> and <code>Manifest::open_sealed</code> do this.</p>
 <h3 id="what-a-privileged-helper-would-add-and-why-there-is-not-one-here">What a privileged helper would add, and why there is not one here</h3>
 <p>A root service using <code>fanotify</code> (Linux) or a SACL plus Security event 4663 (Windows) could attribute every write reliably, and <code>fanotify</code> with <code>FAN_OPEN_PERM</code> could even block one. That is genuinely stronger than anything in this crate.</p>
 <p>It is also an installer, a privileged daemon and a much larger attack surface bolted onto a project that currently needs no privileges at all -- and it still could not stop a root-level attacker, only watch one. So the unprivileged half ships first, on its own merits, and <code>ROADMAP.md</code> records what the privileged half would need to be worth adding.</p>
@@ -75,15 +75,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 94" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="261.8" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="310.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
 <text x="310.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">140 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" target="_blank" rel="noopener noreferrer">
 <rect x="384.2" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="432.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">blame.rs</text>
 <text x="432.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">405 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs" target="_blank" rel="noopener noreferrer">
 <rect x="506.6" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="562.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">manifest.rs</text>
 <text x="562.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">539 lines</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">Every arrow is a <code>crate::</code> or <code>super::</code> path one module actually uses, read out of the source rather than drawn by hand.</p>
@@ -92,7 +98,10 @@
 flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;140 lines&quot;])
     n_blame[&quot;blame.rs&lt;br/&gt;405 lines&quot;]
-    n_manifest[&quot;manifest.rs&lt;br/&gt;539 lines&quot;]</code></pre>
+    n_manifest[&quot;manifest.rs&lt;br/&gt;539 lines&quot;]
+    click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs&quot; &quot;open the source&quot;
+    click n_blame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs&quot; &quot;open the source&quot;
+    click n_manifest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs&quot; &quot;open the source&quot;</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

@@ -27,7 +27,7 @@
       <a href="../../index.html">home</a>
       <a href="../../wiki.html">wiki</a>
       <a href="../../reference/index.html">reference</a>
-      <a href="../../search.html">search</a>
+      <a href="../../search.html">index</a>
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">github</a>
     </nav>
     <div class="controls">
@@ -45,6 +45,7 @@
   <a href="#the-same-mark-as-the-website">The same mark as the website</a>
   <a href="#why-it-is-drawn-rather-than-rendered-from-a-gif">Why it is drawn rather than rendered from a GIF</a>
   <a href="#cost-when-it-is-switched-off">Cost when it is switched off</a>
+  <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -57,7 +58,16 @@
 <h2 id="why-it-is-drawn-rather-than-rendered-from-a-gif">Why it is drawn rather than rendered from a GIF</h2>
 <p>An animated image would be a committed binary blob, and this project&#x27;s artwork is generated from source precisely so that nothing in the repository has to be taken on trust. Sixty lines of shape drawing is auditable; a GIF is not.</p>
 <h2 id="cost-when-it-is-switched-off">Cost when it is switched off</h2>
-<p>With motion disabled the bars are drawn once, at rest, and <strong>no repaint is requested</strong>. That is the part that matters: an &quot;off&quot; switch that still schedules a frame every 16 ms has turned the animation off visually and left the battery cost behind. The caller decides by passing a [<code>Motion</code>], and the only way to animate is to ask for it.</p>
+<p>With motion disabled the bars are drawn once, at rest, and <strong>no repaint is requested</strong>. That is the part that matters: an &quot;off&quot; switch that still schedules a frame every 16 ms has turned the animation off visually and left the battery cost behind. The caller decides by passing a <code>Motion</code>, and the only way to animate is to ask for it.</p>
+</section>
+<section id="s-contains">
+<h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
+<p>349 lines defining <strong>3 functions</strong> (1 public), <strong>0 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
+<li><code>draw</code> <span style="color:var(--muted)">line 68</span> &mdash; Draw the mark at size, returning the response so it can carry a tooltip.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>colour_for</code>, <code>height_fraction</code></span>
+</li>
+</ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -67,15 +77,21 @@
 <rect x="0" y="0" width="880" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M524.0 74.0 C 524.0 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M564.6 47.0 C 586.6 47.0, 586.6 47.0, 460.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L52" target="_blank" rel="noopener noreferrer">
 <rect x="315.4" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="386.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">height_fraction</text>
 <text x="386.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 52</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L68" target="_blank" rel="noopener noreferrer">
 <rect x="483.4" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="524.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">draw</text>
 <text x="524.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 68</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L114" target="_blank" rel="noopener noreferrer">
 <rect x="388.0" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">colour_for</text>
 <text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 114</text>
+</a>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -87,6 +103,9 @@ flowchart TD
     n_colour_for[&quot;colour_for&lt;br/&gt;line 114&quot;]
     n_draw --&gt; n_colour_for
     n_draw --&gt; n_height_fraction
+    click n_height_fraction href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L52&quot; &quot;open the source&quot;
+    click n_draw href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L68&quot; &quot;open the source&quot;
+    click n_colour_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L114&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_draw entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5

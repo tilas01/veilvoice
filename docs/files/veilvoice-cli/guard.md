@@ -108,6 +108,15 @@ flowchart TD
     n_run --> n_status
     n_status --> n_print_scope
     n_status --> n_sealed_path
+    click n_manifest_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L67" "open the source"
+    click n_sealed_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L80" "open the source"
+    click n_print_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L84" "open the source"
+    click n_default_targets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L93" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L106" "open the source"
+    click n_init href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L118" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L181" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L194" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L263" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
