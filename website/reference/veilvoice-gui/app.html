@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/app.svg" alt="app.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/app.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1062 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1074 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-six-tabs-and-why-these-six">The six tabs, and why these six</a>
@@ -74,28 +74,28 @@
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1662 260" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#565f89"/></marker></defs>
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
 <rect x="0" y="0" width="1662" height="260" fill="#16161e" rx="8"/>
-<path d="M1532.6 157.0 C 1532.6 177.0, 1094.0 183.0, 1094.0 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1532.6 157.0 C 1532.6 177.0, 1094.0 183.0, 1094.0 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M825.6 47.0 C 847.6 47.0, 847.6 47.0, 340.6 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M825.6 47.0 C 847.6 47.0, 847.6 47.0, 172.6 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M825.6 47.0 C 847.6 47.0, 847.6 47.0, 615.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M444.4 138.5 C 1664.0 138.5, 1664.0 47.0, 1645.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M346.8 157.0 C 346.8 177.0, 544.4 183.0, 544.4 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M568.0 157.0 C 568.0 177.0, 971.6 183.0, 971.6 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M568.0 157.0 C 568.0 177.0, 1094.0 183.0, 1094.0 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M568.0 157.0 C 568.0 177.0, 1186.0 183.0, 1186.0 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M346.8 157.0 C 346.8 177.0, 544.4 183.0, 544.4 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M568.0 157.0 C 568.0 177.0, 971.6 183.0, 971.6 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M568.0 157.0 C 568.0 177.0, 1094.0 183.0, 1094.0 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M568.0 157.0 C 568.0 177.0, 1186.0 183.0, 1186.0 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M665.6 138.5 C 1664.0 138.5, 1664.0 47.0, 1645.0 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M568.0 157.0 C 568.0 177.0, 777.0 183.0, 777.0 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M568.0 157.0 C 568.0 177.0, 777.0 183.0, 777.0 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M645.8 221.5 C 1236.8 221.5, 1236.8 47.0, 1217.8 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M882.2 221.5 C 1236.8 221.5, 1236.8 47.0, 1217.8 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M1330.8 65.5 C 1330.8 85.5, 1532.6 100.0, 1532.6 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1330.8 65.5 C 1330.8 85.5, 346.8 100.0, 346.8 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1330.8 65.5 C 1330.8 85.5, 568.0 100.0, 568.0 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1330.8 65.5 C 1330.8 85.5, 125.6 100.0, 125.6 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1330.8 65.5 C 1330.8 85.5, 796.8 100.0, 796.8 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1330.8 65.5 C 1330.8 85.5, 1052.2 100.0, 1052.2 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1330.8 65.5 C 1330.8 85.5, 1303.8 100.0, 1303.8 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1330.8 65.5 C 1330.8 85.5, 1532.6 100.0, 1532.6 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1330.8 65.5 C 1330.8 85.5, 346.8 100.0, 346.8 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1330.8 65.5 C 1330.8 85.5, 568.0 100.0, 568.0 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1330.8 65.5 C 1330.8 85.5, 125.6 100.0, 125.6 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1330.8 65.5 C 1330.8 85.5, 796.8 100.0, 796.8 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1330.8 65.5 C 1330.8 85.5, 1052.2 100.0, 1052.2 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1330.8 65.5 C 1330.8 85.5, 1303.8 100.0, 1303.8 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
 <rect x="20.0" y="28.5" width="149.6" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="94.8" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">preferred_output</text>
 <rect x="195.6" y="28.5" width="142.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
@@ -106,7 +106,7 @@
 <text x="731.8" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">VeilVoiceApp::default</text>
 <rect x="851.6" y="20.0" width="157.2" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
 <text x="930.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">VeilVoiceApp::new</text>
-<text x="930.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
+<text x="930.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
 <rect x="1034.8" y="28.5" width="180.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="1124.8" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">VeilVoiceApp::config</text>
 <rect x="1240.8" y="28.5" width="180.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
@@ -141,7 +141,7 @@
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
-<pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#565f89&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
+<pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_preferred_output[&quot;preferred_output&quot;]
     n_preferred_input[&quot;preferred_input&quot;]
@@ -197,21 +197,21 @@ flowchart TD
 <tr><td><code>VeilVoiceApp::without_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L194" rel="noopener noreferrer">194</a></td><td>The application with no devices enumerated.</td></tr>
 <tr><td><code>VeilVoiceApp::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L227" rel="noopener noreferrer">227</a></td><td></td></tr>
 <tr><td><code>VeilVoiceApp::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L245" rel="noopener noreferrer">245</a></td><td>Build the app, applying theme and fonts to ctx.</td></tr>
-<tr><td><code>VeilVoiceApp::config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L260" rel="noopener noreferrer">260</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::update</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L274" rel="noopener noreferrer">274</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::poll_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L378" rel="noopener noreferrer">378</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::settings</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L412" rel="noopener noreferrer">412</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::file_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L449" rel="noopener noreferrer">449</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::start_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L529" rel="noopener noreferrer">529</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::live_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L585" rel="noopener noreferrer">585</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::start_live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L676" rel="noopener noreferrer">676</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::poll_watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L690" rel="noopener noreferrer">690</a></td><td>Re-scan on a timer rather than every frame.</td></tr>
-<tr><td><code>VeilVoiceApp::watch_indicator</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L714" rel="noopener noreferrer">714</a></td><td>The always-visible indicator.</td></tr>
-<tr><td><code>VeilVoiceApp::watch_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L743" rel="noopener noreferrer">743</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::about_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L819" rel="noopener noreferrer">819</a></td><td></td></tr>
-<tr><td><code>device_picker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L870" rel="noopener noreferrer">870</a></td><td></td></tr>
-<tr><td><code>field</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L895" rel="noopener noreferrer">895</a></td><td></td></tr>
-<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L902" rel="noopener noreferrer">902</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L272" rel="noopener noreferrer">272</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::update</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L286" rel="noopener noreferrer">286</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::poll_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L390" rel="noopener noreferrer">390</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::settings</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L424" rel="noopener noreferrer">424</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::file_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L461" rel="noopener noreferrer">461</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::start_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L541" rel="noopener noreferrer">541</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::live_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L597" rel="noopener noreferrer">597</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::start_live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L688" rel="noopener noreferrer">688</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::poll_watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L702" rel="noopener noreferrer">702</a></td><td>Re-scan on a timer rather than every frame.</td></tr>
+<tr><td><code>VeilVoiceApp::watch_indicator</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L726" rel="noopener noreferrer">726</a></td><td>The always-visible indicator.</td></tr>
+<tr><td><code>VeilVoiceApp::watch_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L755" rel="noopener noreferrer">755</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::about_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L831" rel="noopener noreferrer">831</a></td><td></td></tr>
+<tr><td><code>device_picker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L882" rel="noopener noreferrer">882</a></td><td></td></tr>
+<tr><td><code>field</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L907" rel="noopener noreferrer">907</a></td><td></td></tr>
+<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L914" rel="noopener noreferrer">914</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

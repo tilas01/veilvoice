@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/app.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1062 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1074 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
 
 ## Contents
 
@@ -110,7 +110,7 @@ type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
 ```mermaid
-%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_preferred_output["preferred_output"]
     n_preferred_input["preferred_input"]
@@ -166,21 +166,21 @@ flowchart TD
 | `VeilVoiceApp::without_devices` <sub>fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L194) | The application with no devices enumerated. |
 | `VeilVoiceApp::default` <sub>fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L227) |  |
 | `VeilVoiceApp::new` <sub>pub fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L245) | Build the app, applying theme and fonts to ctx. |
-| `VeilVoiceApp::config` <sub>fn</sub> | [260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L260) |  |
-| `VeilVoiceApp::update` <sub>fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L274) |  |
-| `VeilVoiceApp::poll_job` <sub>fn</sub> | [378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L378) |  |
-| `VeilVoiceApp::settings` <sub>fn</sub> | [412](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L412) |  |
-| `VeilVoiceApp::file_tab` <sub>fn</sub> | [449](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L449) |  |
-| `VeilVoiceApp::start_job` <sub>fn</sub> | [529](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L529) |  |
-| `VeilVoiceApp::live_tab` <sub>fn</sub> | [585](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L585) |  |
-| `VeilVoiceApp::start_live` <sub>fn</sub> | [676](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L676) |  |
-| `VeilVoiceApp::poll_watch` <sub>fn</sub> | [690](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L690) | Re-scan on a timer rather than every frame. |
-| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [714](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L714) | The always-visible indicator. |
-| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [743](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L743) |  |
-| `VeilVoiceApp::about_tab` <sub>fn</sub> | [819](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L819) |  |
-| `device_picker` <sub>fn</sub> | [870](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L870) |  |
-| `field` <sub>fn</sub> | [895](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L895) |  |
-| `meter` <sub>fn</sub> | [902](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L902) |  |
+| `VeilVoiceApp::config` <sub>fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L272) |  |
+| `VeilVoiceApp::update` <sub>fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L286) |  |
+| `VeilVoiceApp::poll_job` <sub>fn</sub> | [390](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L390) |  |
+| `VeilVoiceApp::settings` <sub>fn</sub> | [424](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L424) |  |
+| `VeilVoiceApp::file_tab` <sub>fn</sub> | [461](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L461) |  |
+| `VeilVoiceApp::start_job` <sub>fn</sub> | [541](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L541) |  |
+| `VeilVoiceApp::live_tab` <sub>fn</sub> | [597](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L597) |  |
+| `VeilVoiceApp::start_live` <sub>fn</sub> | [688](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L688) |  |
+| `VeilVoiceApp::poll_watch` <sub>fn</sub> | [702](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L702) | Re-scan on a timer rather than every frame. |
+| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [726](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L726) | The always-visible indicator. |
+| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [755](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L755) |  |
+| `VeilVoiceApp::about_tab` <sub>fn</sub> | [831](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L831) |  |
+| `device_picker` <sub>fn</sub> | [882](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L882) |  |
+| `field` <sub>fn</sub> | [907](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L907) |  |
+| `meter` <sub>fn</sub> | [914](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L914) |  |
 
 ---
 

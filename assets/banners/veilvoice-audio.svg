@@ -29,6 +29,6 @@
 <rect x="346.0" y="39.0" width="7.0" height="72.0" rx="3" fill="#bb9af7" opacity="0.90"/>
 <rect x="359.0" y="60.2" width="7.0" height="29.6" rx="3" fill="#bb9af7" opacity="0.69"/>
 <text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-audio</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#565f89">Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice.</text>
+<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CRATE</text>
 </svg>

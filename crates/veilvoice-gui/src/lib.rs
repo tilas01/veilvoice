@@ -43,6 +43,7 @@
 #![warn(missing_docs)]
 
 mod app;
+pub mod palettes;
 pub mod prefs;
 pub mod reduced_motion;
 pub mod security;

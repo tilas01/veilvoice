@@ -69,44 +69,51 @@ hand. A dependency that goes away loses its arrow the next time this
 file is written.
 
 ```mermaid
-%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>56 lines"])
+    n_lib(["lib.rs<br/>57 lines"])
     n_main(["main.rs<br/>67 lines"])
-    n_app["app.rs<br/>1062 lines"]
+    n_app["app.rs<br/>1074 lines"]
+    n_palettes["palettes.rs<br/>632 lines"]
     n_prefs["prefs.rs<br/>386 lines"]
     n_reduced_motion["reduced_motion.rs<br/>273 lines"]
     n_security["security.rs<br/>1030 lines"]
-    n_settings["settings.rs<br/>618 lines"]
+    n_settings["settings.rs<br/>706 lines"]
     n_soundbar["soundbar.rs<br/>349 lines"]
-    n_theme["theme.rs<br/>650 lines"]
+    n_theme["theme.rs<br/>745 lines"]
+    n_app --> n_palettes
     n_app --> n_security
     n_app --> n_settings
     n_app --> n_soundbar
     n_app --> n_theme
+    n_palettes --> n_prefs
+    n_palettes --> n_theme
     n_prefs --> n_theme
     n_security --> n_theme
+    n_settings --> n_palettes
     n_settings --> n_prefs
     n_settings --> n_reduced_motion
     n_settings --> n_soundbar
     n_settings --> n_theme
     n_soundbar --> n_prefs
     n_soundbar --> n_theme
+    n_theme --> n_palettes
 ```
 
 ## The files
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1062 | The VeilVoice desktop application: six tabs, one window, no menus. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 56 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1074 | The VeilVoice desktop application: six tabs, one window, no menus. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 57 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 67 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
+| [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 632 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 386 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 273 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1030 | The application lock, and the at-rest encryption of what VeilVoice writes. |
-| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 618 | The settings panel: a menu of pages, each a titled group of choices. |
+| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 706 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 349 | The animated mark: a row of bars that rise and fall. |
-| [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 650 | Colour schemes for the desktop app. |
+| [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 745 | Colour schemes for the desktop app. |
 
 ## Public items
 
@@ -114,6 +121,13 @@ flowchart TD
 |---|---|---|
 | `struct VeilVoiceApp` | [`app.rs`](../../docs/files/veilvoice-gui/app.md) | Application state. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | Crate version string, surfaced in the About panel. |
+| `const REQUIRED` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Every token a palette file has to define. |
+| `const MAX_PALETTES` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | The most palette files that will be read from the directory. |
+| `const MAX_BYTES` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | The largest palette file that will be read. |
+| `fn contrast` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | The WCAG contrast ratio between two colours, from 1.0 to 21.0. |
+| `fn contrast_problems` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Check a palette's contrast, returning one message per failing pair. |
+| `fn default_dir` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Where palettes live, beside the preferences file. |
+| `fn load` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Read every palette in dir, returning the usable ones and every complaint. |
 | `struct Prefs` | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | Everything the user can choose about presentation. |
 | `fn default_path` | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | Where preferences live: beside the app lock, in this platform's config directory. |
 | `struct Motion` | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | Whether movement is allowed, and how much. |
@@ -129,6 +143,8 @@ flowchart TD
 | `struct Theme` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | One complete colour scheme. |
 | `const THEMES` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Every theme, in the order the picker shows them. |
 | `fn active` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | The theme currently in force. |
+| `fn themes` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Every theme the picker offers: the built-in ones, then any the user added. |
+| `fn load_custom` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Read the user's palettes and add them to the table. |
 | `fn by_id` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Look a theme up by its stable identifier. |
 | `fn set_by_id` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Switch to id, and apply it to ctx. |
 | `mod palette` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Shorthand accessors, so call sites read as p::fg() rather than theme::active().fg. |
