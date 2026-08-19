@@ -6,6 +6,79 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## v0.1.12
+
+Fetching and checking a release in one command, installing without an
+installer, and diagrams that open the code.
+
+### Verify a release without downloading it yourself
+
+```
+veilvoice-verify release v0.1.12
+veilvoice-verify release v0.1.12 veilvoice-v0.1.12-linux-x86_64.tar.gz
+```
+
+Fetches the hash list and its signature, checks the signature **first**, then
+checks the file against the list. The order is deliberate: checking a hash
+first would prove only that a download matches a list which might itself have
+been replaced.
+
+**This program still contains no HTTP client.** VeilVoice has no networking
+crate anywhere in its dependency graph — a property you can check yourself with
+`cargo tree`, and one CI fails the build over. The download is done by the tool
+your operating system already ships: `curl.exe` on Windows, curl or wget
+elsewhere. Only one host is ever contacted and it is compiled in; there is no
+way to point this at another, no update check, and nothing is fetched unless
+you asked for it on the command line.
+
+### Install, or don't
+
+```
+veilvoice install          # copy, add to PATH, register for removal
+veilvoice install --status # what is installed, and which copy is running
+veilvoice uninstall --yes  # undo exactly those three things
+veilvoice gui              # open the desktop application
+```
+
+**Portable remains the default.** VeilVoice runs from wherever you unpack it
+and nothing has to be installed. This exists so that typing `veilvoice` in a
+terminal works.
+
+Everything is **per-user**: no administrator, no system directory, no service.
+The PATH entry is appended to the value that is already there and removed
+without touching anything else — an uninstaller that rewrites PATH from a
+template destroys whatever else you had, at the moment you are least likely to
+check.
+
+Installing tells you, once: this program never checks for updates and cannot
+tell you when one exists, because it has no network code. Watch the releases
+page, and verify what you download.
+
+### Diagrams that take you to the code
+
+Every box in every flowchart is now a link to the exact line it stands for, in
+both the Markdown on GitHub and the SVG on the website. Nodes carry their line
+number, and are coloured by role — a way in, a public function also used
+internally, or a private helper — with a legend saying which is which.
+
+Each page also opens with **what the file contains**: how many functions, types
+and constants; the types it owns; and the ways in, with what calling each one
+reaches. All of it read out of the source, so none of it can disagree with the
+code.
+
+The diagrams on the website are painted with the site's own colour tokens, so
+they follow whichever of the nine themes you chose — or one you wrote yourself
+— instead of being Tokyo Night in the middle of somebody's Gruvbox.
+
+### Fixed
+
+- Rustdoc's `[`name`]` links rendered with their brackets showing, on 63
+  generated pages.
+- The generated pages' navigation still said "search" after the site renamed it
+  to "index".
+- The website was missing a section the Markdown had, while both claimed
+  parity.
+
 ## v0.1.11
 
 **If you have v0.1.10 on Windows, replace it.** The desktop application flashed
