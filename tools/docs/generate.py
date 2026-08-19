@@ -79,6 +79,7 @@ import sys
 # fails the `--check` in CI against ALL_CRATES below, rather than silently
 # documenting whatever happens to be on disk.
 CRATES = (
+    "fuzz",
     "veilvoice-audio",
     "veilvoice-cli",
     "veilvoice-core",
@@ -94,6 +95,7 @@ CRATES = (
 # covering rather than quietly covering less than the tree contains. A silent
 # partial pass is exactly the failure mode section 4.5 of the audit describes.
 ALL_CRATES = (
+    "fuzz",
     "veilvoice-audio",
     "veilvoice-cli",
     "veilvoice-core",
@@ -158,25 +160,70 @@ def read(path):
 
 def crate_description(root, crate):
     """The one-line description from the crate's own `Cargo.toml`."""
-    text = read(os.path.join(root, "crates", crate, "Cargo.toml"))
+    text = read(os.path.join(root, crate_dir(crate).replace("/", os.sep), "Cargo.toml"))
     match = re.search(r'^description\s*=\s*"([^"]*)"', text, re.M)
     return match.group(1) if match else ""
 
 
-def source_files(root, crate):
-    """Every `src/*.rs` in a crate, in sorted order.
+# Where a crate keeps Rust, and what each location means.
+#
+# `src` is the crate itself. The other two are real code that ships in the
+# repository and that a reader may well be looking for -- an example is often
+# the fastest way to understand an API, and a fuzz target says exactly which
+# parsers are considered to read untrusted bytes.
+#
+# They are documented, and they are kept out of the crate's module graph: an
+# example is not something the crate depends on, and drawing it as one would
+# make the flowchart say something untrue about the crate's shape.
+AREAS = (
+    ("src", "src", True),
+    ("examples", "example", False),
+    ("tests", "test", False),
+)
 
-    `src` only. `examples/` and `tests/` are real code and are indexed by the
-    search generator, but they are not part of the crate's own structure and
-    documenting them here would put a fixture beside a module as though the two
-    were the same kind of thing. The count this produces is the 48 that
-    HANDOFF section 9.7 measured.
+# Where a crate's directory is, and which areas it has.
+#
+# `fuzz/` is a crate too: its own `Cargo.toml`, its own six Rust files, and
+# arguably the most informative one in the repository -- the set of fuzz
+# targets is this project's own answer to "which parsers here read bytes
+# somebody else produced". It simply does not live under `crates/`, so the
+# layout is a lookup rather than an assumption.
+LAYOUT = {
+    "fuzz": ("fuzz", (("fuzz_targets", "fuzz", False),)),
+}
+
+# Crates whose `README.md` is written by hand and must not be generated over.
+#
+# `fuzz/README.md` explains how to run the targets and records that they have
+# **not** been run to convergence -- a sentence `docs/AUDIT.md` cites by name.
+# Generating over it lost that, silently, with every check still passing.
+HAND_WRITTEN_README = frozenset({"fuzz"})
+
+
+def crate_dir(crate):
+    return LAYOUT.get(crate, ("crates/" + crate, AREAS))[0]
+
+
+def crate_areas(crate):
+    return LAYOUT.get(crate, ("crates/" + crate, AREAS))[1]
+
+
+def source_files(root, crate):
+    """Every `.rs` file in a crate, as (subdirectory, filename, kind, in_graph).
+
+    Sorted within each area, and the areas in a fixed order, so the output is
+    identical on every machine -- `os.listdir` guarantees no order at all, and
+    a generator whose output depends on filesystem ordering fails `--check` on
+    somebody else's computer for no reason they can see.
     """
-    base = os.path.join(root, "crates", crate, "src")
     out = []
-    for name in sorted(os.listdir(base)):
-        if name.endswith(".rs"):
-            out.append(name)
+    for subdir, kind, in_graph in crate_areas(crate):
+        base = os.path.join(root, crate_dir(crate).replace("/", os.sep), subdir)
+        if not os.path.isdir(base):
+            continue
+        for name in sorted(os.listdir(base)):
+            if name.endswith(".rs"):
+                out.append((subdir, name, kind, in_graph))
     return out
 
 
@@ -493,11 +540,13 @@ def module_edges(root, crate, files):
     next time this runs, with no chance for the picture to keep asserting a
     relationship the code gave up.
     """
-    stems = {name[:-3] for name in files} - {"lib", "main"}
+    src = [name for subdir, name, _, in_graph in files if in_graph and subdir == "src"]
+    stems = {name[:-3] for name in src} - {"lib", "main"}
     edges = []
-    for name in files:
+    for name in src:
         stem = name[:-3]
-        text = strip_code_noise(read(os.path.join(root, "crates", crate, "src", name)))
+        text = strip_code_noise(
+            read(os.path.join(root, crate_dir(crate).replace("/", os.sep), "src", name)))
         for target in sorted(set(USE_CRATE.findall(text))):
             if target in stems and target != stem:
                 edges.append((stem, target))
@@ -563,12 +612,12 @@ def link_targets(known):
     def readme(label, crate, stem):
         if stem:
             return "[%s](../../docs/files/%s/%s.md)" % (label, crate, stem)
-        return "[%s](../%s/README.md)" % (label, crate)
+        return "[%s](../%s/README.md)" % (label, crate_dir(crate).split("/")[-1])
 
     def filepage(label, crate, stem):
         if stem:
             return "[%s](../%s/%s.md)" % (label, crate, stem)
-        return "[%s](../../../crates/%s/README.md)" % (label, crate)
+        return "[%s](../../../%s/README.md)" % (label, crate_dir(crate))
 
     def site_crate(label, crate, stem):
         if stem:
@@ -738,15 +787,22 @@ def build(root, crate):
     """Everything the renderers need, gathered once."""
     files = source_files(root, crate)
     entries = []
-    for name in files:
-        path = os.path.join(root, "crates", crate, "src", name)
+    for subdir, name, kind, in_graph in files:
+        path = os.path.join(root, crate_dir(crate).replace("/", os.sep), subdir, name)
         text = read(path)
         doc = module_doc(text)
         parsed = parse_file(text)
+        # Page names have to be unique within a crate, and `src/lib.rs` and a
+        # test called `lib.rs` would otherwise collide. Only `src` keeps the
+        # bare stem, so existing page addresses do not move.
+        stem = name[:-3] if subdir == "src" else "%s-%s" % (subdir, name[:-3])
         entries.append({
             "name": name,
-            "stem": name[:-3],
-            "rel": "crates/%s/src/%s" % (crate, name),
+            "stem": stem,
+            "kind": kind,
+            "in_graph": in_graph,
+            "area": subdir,
+            "rel": "%s/%s/%s" % (crate_dir(crate), subdir, name),
             "lines": text.count("\n") + (0 if text.endswith("\n") else 1),
             "doc": doc,
             "summary": first_sentence(doc),
@@ -765,13 +821,14 @@ def build(root, crate):
 
 def crate_graph(model):
     """Nodes and edges for the crate-level flowchart."""
-    by_stem = {entry["stem"]: entry for entry in model["files"]}
+    by_stem = {entry["stem"]: entry for entry in model["files"]
+               if entry.get("in_graph")}
     order = []
     for preferred in ("lib", "main"):
         if preferred in by_stem:
             order.append(preferred)
     order += [entry["stem"] for entry in model["files"]
-              if entry["stem"] not in order]
+              if entry.get("in_graph") and entry["stem"] not in order]
     nodes = []
     for stem in order:
         entry = by_stem[stem]
@@ -930,6 +987,10 @@ def banner_svg(colours, title, subtitle, kind):
     add('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" '
         'width="%d" height="%d" role="img" aria-label="%s">'
         % (BANNER_W, BANNER_H, BANNER_W, BANNER_H, esc(title)))
+    # Every generated document says so, in a form the writer can read back.
+    # Without it the no-clobber guard cannot tell a banner it wrote from one
+    # somebody drew by hand, and refuses to run at all.
+    add('<!-- GENERATED by tools/docs/generate.py. Do not edit. -->')
     add('<title>%s</title>' % esc(title))
     add('<rect x="0" y="0" width="%d" height="%d" rx="10" fill="%s"/>'
         % (BANNER_W, BANNER_H, colours["bg"]))
@@ -1205,9 +1266,9 @@ def markdown_file(colours, model, entry, links):
                '  <img src="../../../assets/banners/%s/%s.svg" alt="%s" width="100%%">\n'
                '</p>\n' % (crate, entry["stem"], entry["name"]))
     out.append("# `%s`\n" % entry["rel"])
-    out.append("[`%s`](../../../crates/%s/README.md) &middot; %d lines &middot; "
+    out.append("[`%s`](../../../%s/README.md) &middot; %d lines &middot; "
                "[read the source](https://github.com/%s/blob/%s/%s)\n"
-               % (crate, crate, entry["lines"], REPO, REF, entry["rel"]))
+               % (crate, crate_dir(crate), entry["lines"], REPO, REF, entry["rel"]))
 
     TOC_AT = len(out)
     out.append("")
@@ -1471,9 +1532,9 @@ def html_crate(colours, model, fingerprint, links):
     if model["description"]:
         body.append('<p class="lede">%s</p>' % esc(model["description"]))
     body.append('<p style="color:var(--muted)"><a href="index.html">reference</a> '
-                '&middot; <a href="https://github.com/%s/blob/%s/crates/%s/README.md" '
+                '&middot; <a href="https://github.com/%s/blob/%s/%s/README.md" '
                 'rel="noopener noreferrer">the same page on GitHub</a></p>'
-                % (REPO, REF, crate))
+                % (REPO, REF, crate_dir(crate)))
 
     doc_lines = lib["doc"] if lib else []
     sections = sections_for_page(
@@ -1674,14 +1735,15 @@ def wiki_crate(colours, model, links):
                 if entry["stem"] in ("lib", "main")), None)
 
     out = []
+    out.append("<!-- GENERATED by tools/docs/generate.py from the doc comments in the source. Do not edit: edit the .rs file and run the generator. -->")
     out.append("![%s](%sassets/banners/%s.svg)\n" % (crate, RAW, crate))
     out.append("# %s\n" % crate)
     if model["description"]:
         out.append("> %s\n" % model["description"])
     out.append("[[Reference]] &middot; "
                "[the same page in the repository]"
-               "(https://github.com/%s/blob/%s/crates/%s/README.md)\n"
-               % (REPO, REF, crate))
+               "(https://github.com/%s/blob/%s/%s/README.md)\n"
+               % (REPO, REF, crate_dir(crate)))
 
     sections = sections_for_page(
         lib["doc"] if lib else [],
@@ -1712,6 +1774,7 @@ def wiki_file(colours, model, entry, links):
     nodes, edges, truncated, total = file_graph(entry)
 
     out = []
+    out.append("<!-- GENERATED by tools/docs/generate.py from the doc comments in the source. Do not edit: edit the .rs file and run the generator. -->")
     out.append("![%s](%sassets/banners/%s/%s.svg)\n"
                % (entry["name"], RAW, crate, entry["stem"]))
     out.append("# `%s`\n" % entry["rel"])
@@ -1759,6 +1822,7 @@ def wiki_file(colours, model, entry, links):
 
 def wiki_index(models):
     out = ["# Reference\n"]
+    out.append("<!-- GENERATED by tools/docs/generate.py from the doc comments in the source. Do not edit: edit the .rs file and run the generator. -->")
     out.append("Every crate and every source file, generated from the doc "
                "comments in the code by `tools/docs/generate.py`. The same "
                "pages are in the repository and on the website; all three come "
@@ -1799,9 +1863,10 @@ def outputs(root):
 
         files["assets/banners/%s.svg" % crate] = banner_svg(
             colours, crate, model["description"], "crate")
-        files["crates/%s/README.md" % crate] = markdown_crate(
-            colours, model, (known, spellings["readme"])
-        ).replace(FINGERPRINT_PLACEHOLDER, fingerprint)
+        if crate not in HAND_WRITTEN_README:
+            files["%s/README.md" % crate_dir(crate)] = markdown_crate(
+                colours, model, (known, spellings["readme"])
+            ).replace(FINGERPRINT_PLACEHOLDER, fingerprint)
         files["website/reference/%s.html" % crate] = html_crate(
             colours, model, fingerprint, (known, spellings["site_crate"]))
         files["wiki/%s.md" % wiki_crate_page(crate)] = wiki_crate(
@@ -1838,7 +1903,46 @@ def outputs(root):
     return files
 
 
+# The string every generated document carries, and the writer's only way of
+# telling its own output from somebody's work.
+MARKER = "GENERATED by tools/docs/generate.py"
+
+
+def is_ours(path):
+    """Did this generator write the file already there?
+
+    Only the head is read: the marker is in the first few lines of everything
+    this script produces, and a file large enough to matter should not be read
+    whole to answer a yes/no question.
+    """
+    try:
+        with io.open(path, encoding="utf-8", errors="replace") as handle:
+            return MARKER in handle.read(2048)
+    except OSError:
+        return False
+
+
 def write(root, files):
+    # Nothing is written until every destination has been checked, so a refusal
+    # leaves the tree exactly as it was rather than half-regenerated.
+    clobbered = []
+    for rel in sorted(files):
+        path = os.path.join(root, rel.replace("/", os.sep))
+        if os.path.exists(path) and not is_ours(path):
+            clobbered.append(rel)
+    if clobbered:
+        print()
+        print("  REFUSING to overwrite %d file(s) this generator did not write:"
+              % len(clobbered))
+        for rel in clobbered:
+            print("    %s" % rel)
+        print()
+        print("  Each of these exists and does not carry the generator's marker,")
+        print("  so it is somebody's work rather than a previous run's output.")
+        print("  Either delete it deliberately, or add its crate to")
+        print("  HAND_WRITTEN_README at the top of this file.")
+        return 1
+
     for rel, text in sorted(files.items()):
         path = os.path.join(root, rel.replace("/", os.sep))
         directory = os.path.dirname(path)

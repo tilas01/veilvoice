@@ -40,6 +40,18 @@
 <h1>Reference</h1>
 <p class="lede">Every crate and every source file, generated from the doc comments in the code.</p>
 <p>These pages are written by <code>tools/docs/generate.py</code> from the <code>//!</code> and <code>///</code> comments in the source, so they cannot disagree with it. Regenerate with the same command; CI runs it with <code>--check</code> and fails if the tree and these pages have parted company.</p>
+<section id="fuzz">
+<h2><a href="fuzz.html">fuzz</a></h2>
+<p></p>
+<ul>
+<li><a href="fuzz/fuzz_targets-container_header.html"><code>container_header.rs</code></a> <span style="color:var(--muted)">The .veil container header, coverage-guided.</span></li>
+<li><a href="fuzz/fuzz_targets-guard_manifest.html"><code>guard_manifest.rs</code></a> <span style="color:var(--muted)">The integrity manifest parser, coverage-guided.</span></li>
+<li><a href="fuzz/fuzz_targets-hybrid_keys.html"><code>hybrid_keys.rs</code></a> <span style="color:var(--muted)">Key and encapsulation decoding, coverage-guided.</span></li>
+<li><a href="fuzz/fuzz_targets-lock_file.html"><code>lock_file.rs</code></a> <span style="color:var(--muted)">The app-lock file, coverage-guided.</span></li>
+<li><a href="fuzz/fuzz_targets-wav_chunks.html"><code>wav_chunks.rs</code></a> <span style="color:var(--muted)">The RIFF chunk walker in veilvoice-meta, coverage-guided.</span></li>
+<li><a href="fuzz/fuzz_targets-wav_preflight.html"><code>wav_preflight.rs</code></a> <span style="color:var(--muted)">The WAV pre-flight in veilvoice-audio, coverage-guided.</span></li>
+</ul>
+</section>
 <section id="veilvoice-audio">
 <h2><a href="veilvoice-audio.html">veilvoice-audio</a></h2>
 <p>Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice.</p>
@@ -74,6 +86,9 @@
 <li><a href="veilvoice-core/spectral.html"><code>spectral.rs</code></a> <span style="color:var(--muted)">Frequency-domain de-identification transform.</span></li>
 <li><a href="veilvoice-core/stft.html"><code>stft.rs</code></a> <span style="color:var(--muted)">Streaming short-time Fourier transform with overlap-add resynthesis.</span></li>
 <li><a href="veilvoice-core/window.html"><code>window.rs</code></a> <span style="color:var(--muted)">Analysis and synthesis windowing, and the one constant that keeps overlap-add honest.</span></li>
+<li><a href="veilvoice-core/examples-spectrum_report.html"><code>spectrum_report.rs</code></a> <span style="color:var(--muted)">Where do the output partials actually land?</span></li>
+<li><a href="veilvoice-core/examples-veil_a_buffer.html"><code>veil_a_buffer.rs</code></a> <span style="color:var(--muted)"></span></li>
+<li><a href="veilvoice-core/tests-hostile_audio.html"><code>hostile_audio.rs</code></a> <span style="color:var(--muted)">The engine against input that is not well-behaved audio.</span></li>
 </ul>
 </section>
 <section id="veilvoice-crypto">
@@ -89,6 +104,9 @@
 <li><a href="veilvoice-crypto/lock.html"><code>lock.rs</code></a> <span style="color:var(--muted)">The application lock: an Argon2id password verifier with a rate limit.</span></li>
 <li><a href="veilvoice-crypto/privatefile.html"><code>privatefile.rs</code></a> <span style="color:var(--muted)">Writing a file that only its owner can read.</span></li>
 <li><a href="veilvoice-crypto/shred.html"><code>shred.rs</code></a> <span style="color:var(--muted)">Secure erasure &#8212; the self-destruct.</span></li>
+<li><a href="veilvoice-crypto/examples-seal_and_open.html"><code>seal_and_open.rs</code></a> <span style="color:var(--muted)"></span></li>
+<li><a href="veilvoice-crypto/tests-parser_fuzz.html"><code>parser_fuzz.rs</code></a> <span style="color:var(--muted)">Randomised robustness testing for the two parsers that read untrusted input.</span></li>
+<li><a href="veilvoice-crypto/tests-timing.html"><code>timing.rs</code></a> <span style="color:var(--muted)">Timing measurement of the password paths.</span></li>
 </ul>
 </section>
 <section id="veilvoice-guard">
@@ -124,6 +142,7 @@
 <li><a href="veilvoice-meta/image.html"><code>image.rs</code></a> <span style="color:var(--muted)">Image EXIF/GPS removal.</span></li>
 <li><a href="veilvoice-meta/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Strip or spoof the identifying metadata that rides along with media files.</span></li>
 <li><a href="veilvoice-meta/wav.html"><code>wav.rs</code></a> <span style="color:var(--muted)">Chunk-level RIFF/WAVE metadata removal.</span></li>
+<li><a href="veilvoice-meta/tests-wav_fuzz.html"><code>wav_fuzz.rs</code></a> <span style="color:var(--muted)">Randomised robustness testing for the RIFF chunk walker.</span></li>
 </ul>
 </section>
 <section id="veilvoice-verify">
@@ -141,6 +160,7 @@
 <li><a href="veilvoice-watch/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Find out which applications are using your microphone and camera, right now.</span></li>
 <li><a href="veilvoice-watch/linux.html"><code>linux.rs</code></a> <span style="color:var(--muted)">Linux detection, via open file handles in /proc.</span></li>
 <li><a href="veilvoice-watch/windows.html"><code>windows.rs</code></a> <span style="color:var(--muted)">Windows detection, via the Capability Access Manager.</span></li>
+<li><a href="veilvoice-watch/examples-scan_once.html"><code>scan_once.rs</code></a> <span style="color:var(--muted)">Print what is using the microphone and camera right now.</span></li>
 </ul>
 </section>
 </main>

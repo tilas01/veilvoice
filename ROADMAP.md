@@ -54,15 +54,15 @@ is work in progress.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 18 | Documentation generator — a README, flowchart and banner for every crate and every source file, mirrored to the website and the GitHub wiki | **done** | — |
+| 18 | Documentation generator — a page, flowchart and banner for every crate and **every** `.rs` file, mirrored to the website and the GitHub wiki | **done** | — |
 | 19 | Licence change to CC BY-NC-SA 4.0 across the tree | **done** | — |
 | 20 | Repository panel no longer shows a README's own markup as text | **done** | — |
-| 21 | Write the missing module documentation for the 14 files that have almost none | **next** | 2–3 d |
+| 21 | Write the missing module documentation for the 14 files that had almost none | **done** | — |
 | 22 | Website split into a page per section, every published link still working | **planned** | 2 d |
 | 23 | Motion and polish — smooth loading and scrolling, hover, CSS-first tooltips | **planned** | 2 d |
 | 24 | Demonstration animation: a voice going in, the mark lighting up, an unidentifiable wave coming out | **planned** | 2 d |
-| 25 | Cycling banner — project facts rotating slowly enough to read | **planned** | 1–2 d |
-| 26 | Every website theme available in the app, plus user-defined palettes with contrast checked rather than assumed | **planned** | 3 d |
+| 25 | Cycling line of project facts, slow enough to read — CSS rather than an image, so it follows the reader's theme and needs no script | **done** | — |
+| 26 | Every website theme in the app, plus user-defined palettes with contrast computed rather than assumed | **done** | — |
 | 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **planned** | 3–4 d |
 | 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **planned** | 1–2 d |
 | 29 | One single binary, optimised and still byte-reproducible | **planned** | 2 d |
@@ -78,32 +78,32 @@ it cannot do as plainly as what it can.
 | 30 | Screen-capture detection — application name, PID, when, how often | **planned** | 3 d |
 | 31 | Hide VeilVoice's own window from screen capture and recording | **planned** | 1–2 d |
 | 32 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **planned** | 2–3 d |
-| 33 | `veilvoice-usb` — enumerate and allowlist USB devices, alert on arrival | **planned** | 3–4 d |
-| 34 | BadUSB defence — keystroke-timing detection, payload capture instead of execution | **planned** | 4–5 d |
-| 35 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **planned** | 3–4 d |
-| 36 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
-| 37 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography | **planned** | 2–3 d |
-| 38 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
-| 39 | Alert on driver and kernel-module installation; cross-view checks | **planned** | 3–4 d |
-| 40 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **planned** | 2 d |
-| 41 | Duress and decoy passwords | **planned** | 7–10 d |
-| 42 | Cloud transcription through your own API key | **blocked** | — |
+| 33 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **planned** | 3–4 d |
+| 34 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
+| 35 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography | **planned** | 2–3 d |
+| 36 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
+| 37 | Alert on driver and kernel-module installation; cross-view checks | **planned** | 3–4 d |
+| 38 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **planned** | 2 d |
+| 39 | Duress and decoy passwords | **planned** | 7–10 d |
+| 40 | Cloud transcription through your own API key | **blocked** | — |
 
 ## Finally
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 43 | Full audit of the whole tree — every vulnerability class, cryptographic practice, workflow accuracy, and full wiki parity — with every finding written up individually | **planned** | 5–8 d |
-| 44 | Production release | **planned** | 1–2 d |
+| 41 | Full audit of the whole tree — every vulnerability class, cryptographic practice, workflow accuracy, and full wiki parity — with every finding written up individually | **planned** | 5–8 d |
+| 42 | Production release | **planned** | 1–2 d |
 
 ---
 
 ## The things that are not just work
 
-Four markers above depend on something other than effort, and pretending
-otherwise would make this roadmap a wish list.
+Three of the markers above depend on something other than effort, and
+pretending otherwise would make this roadmap a wish list. They are named rather
+than numbered, because a number changes whenever a row above it does -- which is
+exactly what happened when the USB work was dropped from this list.
 
-**Marker 42 — cloud transcription — is blocked on a decision, not on code.**
+**Cloud transcription is blocked on a decision, not on code.**
 VeilVoice currently talks to no servers at all, and CI fails the build if a
 network client appears anywhere in the dependency graph. That is one of the few
 claims a reader can verify in ten seconds, and it is a large part of why this
@@ -114,7 +114,8 @@ but it is a real trade and it is not made silently. Note also that not every
 named provider accepts audio input; that will be checked before anything is
 built rather than discovered by a user.
 
-**Markers 38 and 39 cannot reach kernel level on Windows or macOS.** Loading a
+**Privileged mode and driver alerting cannot reach kernel level on Windows
+or macOS.** Loading a
 kernel driver on 64-bit Windows requires an EV code-signing certificate issued
 to a verified legal entity and then Microsoft's attestation signing. macOS
 requires an Apple Developer ID and an entitlement Apple grants case by case.
@@ -124,7 +125,7 @@ most of the protection and none of the pretence — and to say plainly that
 kernel-level enforcement is unavailable on those two platforms and why. Linux
 and OpenBSD have no such gate.
 
-**Marker 41 is the most dangerous thing on this list.** A duress password
+**Duress and decoy passwords are the most dangerous thing on this list.** A duress password
 destroys data on purpose, and a decoy system exists to be believed. Neither is
 shipped until the failure modes are handled: what happens when it is typed by
 mistake, what "securely erased" is actually worth on flash storage (the answer
@@ -133,11 +134,16 @@ an attacker who learns the trigger can make it do. It is off by default, it
 takes a deliberate setup, and it will carry the plainest warnings in the
 project.
 
-**Marker 34 has a bound worth stating early.** Keystroke-timing detection
-cannot see `Ctrl`+`Alt`+`Del`, which the kernel reserves, and the classic false
-positives are ordinary software — password managers, text expanders, macro
-keys, KVM switches. So the safe response is to lock, capture and alert.
-Anything more destructive is a setting somebody has to choose.
+---
+
+## What was dropped, and when
+
+A roadmap that quietly loses items is a roadmap nobody can trust, so removals
+are recorded here rather than edited out of history.
+
+- **USB device allowlisting, and BadUSB keystroke-timing defence.** Removed
+  2026-08-19 at the maintainer's request, before any code was written. Nothing
+  in the tree depended on them.
 
 ---
 
@@ -151,5 +157,5 @@ after the thing it describes actually works.
 
 The number that has historically been wrong is the audit. Four rounds have each
 found real defects in code a previous round called clean, and each round was
-larger than the one before. Marker 43's estimate is what the work is expected
+larger than the one before. The audit's estimate is what the work is expected
 to take. It is not a promise that it will find nothing.

@@ -110,6 +110,9 @@ flowchart TD
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 732 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 157 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 401 | Secure erasure — the self-destruct. |
+| [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 70 | _no module documentation yet_ |
+| [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 306 | Randomised robustness testing for the two parsers that read untrusted input. |
+| [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 240 | Timing measurement of the password paths. |
 
 ## Public items
 
