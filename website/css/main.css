@@ -280,6 +280,135 @@ h3[id] { scroll-margin-top: 90px; }
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
+/* ---------- the demonstration ---------- */
+/*
+ * A voice going in, the mark lighting as it passes, an unidentifiable wave
+ * coming out. Pure CSS: it follows the reader's theme, needs no download, and
+ * works in the scripts-off edition.
+ *
+ * Deliberately far below the hero. The banner already animates, and two
+ * waveforms moving at once was a real defect -- each made the other look like
+ * decoration, which is why one of them was removed from the hero in the first
+ * place. These two are never on screen together.
+ */
+.demo { margin: 0; }
+
+.demo-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.demo-side { flex: 1 1 0; min-width: 0; }
+
+.demo-wave {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 78px;
+  /* The bars are the picture, so they get the inset background the rest of the
+   * site uses for a panel rather than sitting on the page. */
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 0 10px;
+}
+
+.demo-wave span {
+  flex: 1 1 0;
+  min-width: 2px;
+  border-radius: 2px;
+  /* A height before the animation starts, and `backwards` so the delay holds
+   * the first keyframe rather than nothing.
+   *
+   * Without both, a bar whose `animation-delay` has not elapsed has no height
+   * at all -- these are flex children in a centred row, so "no height" means
+   * "not drawn". Delays here run to 3.7s, so for the first several seconds
+   * after the page loaded, most of the waveform was simply absent. It looked
+   * like a five-bar picture that mysteriously filled in later, and nothing in
+   * the CSS reads as wrong. Found by photographing the section. */
+  height: 14%;
+  animation: demo-bar var(--t, 2s) ease-in-out infinite backwards;
+  animation-delay: var(--d, 0ms);
+}
+
+/* Left: one animation, one duration, delays increasing by a fixed step, so the
+ * crest walks along the row. That regularity *is* the voiceprint. */
+.demo-clean span { background: var(--accent); }
+
+/* Right: each bar keeps its own duration as well as its own delay, so they
+ * never line up again. Same heights, same energy, no shared structure. */
+.demo-veiled span { background: var(--accent-2); }
+
+@keyframes demo-bar {
+  0%, 100% { height: 14%; opacity: 0.75; }
+  50%      { height: 88%; opacity: 1; }
+}
+
+.demo-core { flex: 0 0 auto; display: grid; place-items: center; }
+
+.demo-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-inset);
+  padding: 4px;
+  animation: demo-glow 2s ease-in-out infinite;
+}
+
+/* The glow is a box-shadow rather than a filter: `filter` on an image forces a
+ * new compositing layer on every frame in several engines, and this is a
+ * decoration that must never cost a reader a dropped frame. */
+@keyframes demo-glow {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  /* Two declarations, and the order matters -- the same rule the sticky header
+   * follows. `color-mix` arrived in 2023; an engine older than that drops the
+   * whole declaration, and with nothing before it the mark simply never lights.
+   * The plain colour is the fallback; newer engines take the second. */
+  50%      { box-shadow: 0 0 18px 2px var(--accent);
+             box-shadow: 0 0 18px 2px color-mix(in srgb, var(--accent) 55%, transparent); }
+}
+
+.demo-label {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+.demo-label-veiled { color: var(--accent-2); }
+
+.demo figcaption { color: var(--muted); max-width: 68ch; }
+.demo figcaption p { margin: 0 0 10px; }
+.demo figcaption strong { color: var(--fg); }
+
+/* On a narrow screen the three parts stack, and the mark turns on its side so
+ * it still reads as "through here" rather than as a third panel. */
+@media (max-width: 640px) {
+  .demo-flow { flex-direction: column; gap: 12px; }
+  .demo-side { width: 100%; }
+  .demo-core { transform: rotate(90deg); }
+}
+
+/* Motion reduced: the bars hold a readable spread of heights and the mark
+ * stops glowing. The picture still makes its point -- one row even, one row
+ * ragged -- because the *arrangement* carries the meaning, not the movement.
+ *
+ * Unlike the fact strip this needs no visibility override: a bar's resting
+ * state is a height, not `opacity: 0`. Stated because the two look alike and
+ * the difference is exactly what made the other one need an exception. */
+@media (prefers-reduced-motion: reduce) {
+  .demo-wave span { animation: none; height: 60%; }
+  .demo-clean span { height: 62%; }
+  .demo-veiled span:nth-child(odd) { height: 34%; }
+  .demo-veiled span:nth-child(3n) { height: 84%; }
+  .demo-veiled span:nth-child(4n) { height: 22%; }
+  .demo-mark { animation: none; }
+}
+
 /* ---------- tooltips ---------- */
 /*
  * `data-tip` on any element, shown on hover and on keyboard focus. No
@@ -460,7 +589,12 @@ h3[id] { scroll-margin-top: 90px; }
   width: 5px;
   border-radius: 2px;
   background: var(--accent);
-  animation: pulse 1.9s ease-in-out infinite;
+  /* Same reason as `.demo-wave span`: without a resting height and
+   * `backwards`, every bar whose delay has not elapsed is undrawn. The delays
+   * here only reach 500 ms so it was half a second of a partial figure rather
+   * than several seconds, which is why it went unnoticed. */
+  height: 16%;
+  animation: pulse 1.9s ease-in-out infinite backwards;
 }
 .veil span.veiled { background: var(--accent-2); opacity: 0.85; }
 
