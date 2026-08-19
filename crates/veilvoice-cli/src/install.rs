@@ -51,9 +51,14 @@
 //! is finding F-13.
 
 use std::path::{Path, PathBuf};
+#[cfg(windows)]
 use std::process::Command;
 
 /// The name of the directory and the uninstall entry.
+///
+/// Windows-only: elsewhere the prefix follows the XDG convention and is
+/// lower-case, so this constant has no reader.
+#[cfg(windows)]
 pub const NAME: &str = "VeilVoice";
 
 /// Files that make up an installation, if they are beside the running binary.
@@ -65,7 +70,12 @@ const PROGRAMS: &[&str] = &["veilvoice", "veilvoice-gui", "veilvoice-verify"];
 /// Windows a `Command` for a console program creates one, and if this is ever
 /// called from the desktop application a window would flash. `creation_flags`
 /// is safe, so this costs nothing against `#![forbid(unsafe_code)]`.
-#[cfg_attr(not(windows), allow(unused_mut))]
+///
+/// Gated to Windows because every caller is: the registry helpers below are
+/// the only ones, and they do not exist elsewhere. Left ungated it is dead
+/// code on every other platform, which CI turns into an error and which only
+/// the Linux and macOS runners can see.
+#[cfg(windows)]
 fn no_window(mut command: Command) -> Command {
     #[cfg(windows)]
     {
