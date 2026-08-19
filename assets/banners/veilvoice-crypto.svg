@@ -29,6 +29,6 @@
 <rect x="346.0" y="49.0" width="7.0" height="52.1" rx="3" fill="#bb9af7" opacity="0.80"/>
 <rect x="359.0" y="50.1" width="7.0" height="49.8" rx="3" fill="#bb9af7" opacity="0.79"/>
 <text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-crypto</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#565f89">Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice.</text>
+<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CRATE</text>
 </svg>

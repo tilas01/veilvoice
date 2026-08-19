@@ -63,89 +63,104 @@
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
 <div class="diagram">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 394" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#565f89"/></marker></defs>
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
 <rect x="0" y="0" width="880" height="394" fill="#16161e" rx="8"/>
-<path d="M402.0 74.0 C 402.0 94.0, 371.2 100.0, 371.2 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M402.0 74.0 C 402.0 94.0, 508.8 100.0, 508.8 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M402.0 74.0 C 402.0 94.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M402.0 74.0 C 402.0 94.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M528.2 74.0 C 528.2 94.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M371.2 174.0 C 371.2 194.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M564.6 147.0 C 598.4 147.0, 598.4 47.0, 579.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M564.6 147.0 C 781.6 147.0, 781.6 47.0, 762.6 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M508.8 174.0 C 508.8 194.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M508.8 174.0 C 508.8 194.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M495.8 247.0 C 598.4 247.0, 598.4 47.0, 579.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M440.0 274.0 C 440.0 294.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<rect x="120.4" y="20.0" width="88.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="164.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">lib.rs</text>
-<text x="164.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">56 lines</text>
-<rect x="235.2" y="20.0" width="88.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="279.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">main.rs</text>
-<text x="279.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">67 lines</text>
-<rect x="350.0" y="20.0" width="104.0" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="402.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">app.rs</text>
-<text x="402.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">1062 lines</text>
-<rect x="480.0" y="20.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="528.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">prefs.rs</text>
-<text x="528.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">386 lines</text>
-<rect x="602.4" y="20.0" width="157.2" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="681.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">reduced_motion.rs</text>
-<text x="681.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">273 lines</text>
-<rect x="315.4" y="120.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="371.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">security.rs</text>
-<text x="371.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">1030 lines</text>
-<rect x="453.0" y="120.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="508.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">settings.rs</text>
-<text x="508.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">618 lines</text>
-<rect x="384.2" y="220.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="440.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">soundbar.rs</text>
-<text x="440.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">349 lines</text>
+<path d="M463.2 74.0 C 463.2 94.0, 302.4 100.0, 302.4 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M463.2 74.0 C 463.2 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M463.2 74.0 C 463.2 94.0, 577.6 100.0, 577.6 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M463.2 74.0 C 463.2 94.0, 501.2 200.0, 501.2 217.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M463.2 74.0 C 463.2 94.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M302.4 174.0 C 302.4 194.0, 371.2 200.0, 371.2 217.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M302.4 174.0 C 302.4 194.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M371.2 274.0 C 371.2 294.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M440.0 174.0 C 440.0 194.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M633.4 147.0 C 655.4 147.0, 655.4 147.0, 361.2 147.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M577.6 174.0 C 577.6 194.0, 371.2 200.0, 371.2 217.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M633.4 147.0 C 720.4 147.0, 720.4 47.0, 701.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M577.6 174.0 C 577.6 194.0, 501.2 200.0, 501.2 217.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M577.6 174.0 C 577.6 194.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M557.0 247.0 C 579.0 247.0, 579.0 247.0, 422.4 247.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M501.2 274.0 C 501.2 294.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M488.2 347.0 C 510.2 347.0, 510.2 147.0, 361.2 147.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<rect x="181.6" y="20.0" width="88.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
+<text x="226.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">lib.rs</text>
+<text x="226.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">57 lines</text>
+<rect x="296.4" y="20.0" width="88.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
+<text x="340.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">main.rs</text>
+<text x="340.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">67 lines</text>
+<rect x="411.2" y="20.0" width="104.0" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="463.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">app.rs</text>
+<text x="463.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">1074 lines</text>
+<rect x="246.6" y="120.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="302.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">palettes.rs</text>
+<text x="302.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">632 lines</text>
+<rect x="323.0" y="220.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="371.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">prefs.rs</text>
+<text x="371.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">386 lines</text>
+<rect x="541.2" y="20.0" width="157.2" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="619.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">reduced_motion.rs</text>
+<text x="619.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">273 lines</text>
+<rect x="384.2" y="120.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">security.rs</text>
+<text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">1030 lines</text>
+<rect x="521.8" y="120.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="577.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">settings.rs</text>
+<text x="577.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">706 lines</text>
+<rect x="445.4" y="220.0" width="111.6" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="501.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">soundbar.rs</text>
+<text x="501.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">349 lines</text>
 <rect x="391.8" y="320.0" width="96.4" height="54.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="440.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">theme.rs</text>
-<text x="440.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">650 lines</text>
+<text x="440.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">745 lines</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">Every arrow is a <code>crate::</code> or <code>super::</code> path one module actually uses, read out of the source rather than drawn by hand.</p>
 <details><summary>The same graph as Mermaid source</summary>
-<pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#565f89&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
+<pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;56 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;57 lines&quot;])
     n_main([&quot;main.rs&lt;br/&gt;67 lines&quot;])
-    n_app[&quot;app.rs&lt;br/&gt;1062 lines&quot;]
+    n_app[&quot;app.rs&lt;br/&gt;1074 lines&quot;]
+    n_palettes[&quot;palettes.rs&lt;br/&gt;632 lines&quot;]
     n_prefs[&quot;prefs.rs&lt;br/&gt;386 lines&quot;]
     n_reduced_motion[&quot;reduced_motion.rs&lt;br/&gt;273 lines&quot;]
     n_security[&quot;security.rs&lt;br/&gt;1030 lines&quot;]
-    n_settings[&quot;settings.rs&lt;br/&gt;618 lines&quot;]
+    n_settings[&quot;settings.rs&lt;br/&gt;706 lines&quot;]
     n_soundbar[&quot;soundbar.rs&lt;br/&gt;349 lines&quot;]
-    n_theme[&quot;theme.rs&lt;br/&gt;650 lines&quot;]
+    n_theme[&quot;theme.rs&lt;br/&gt;745 lines&quot;]
+    n_app --&gt; n_palettes
     n_app --&gt; n_security
     n_app --&gt; n_settings
     n_app --&gt; n_soundbar
     n_app --&gt; n_theme
+    n_palettes --&gt; n_prefs
+    n_palettes --&gt; n_theme
     n_prefs --&gt; n_theme
     n_security --&gt; n_theme
+    n_settings --&gt; n_palettes
     n_settings --&gt; n_prefs
     n_settings --&gt; n_reduced_motion
     n_settings --&gt; n_soundbar
     n_settings --&gt; n_theme
     n_soundbar --&gt; n_prefs
-    n_soundbar --&gt; n_theme</code></pre>
+    n_soundbar --&gt; n_theme
+    n_theme --&gt; n_palettes</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-files">
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
-<tr><td><a href="veilvoice-gui/app.html"><code>app.rs</code></a></td><td>1062</td><td>The VeilVoice desktop application: six tabs, one window, no menus.</td></tr>
-<tr><td><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a></td><td>56</td><td>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</td></tr>
+<tr><td><a href="veilvoice-gui/app.html"><code>app.rs</code></a></td><td>1074</td><td>The VeilVoice desktop application: six tabs, one window, no menus.</td></tr>
+<tr><td><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a></td><td>57</td><td>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</td></tr>
 <tr><td><a href="veilvoice-gui/main.html"><code>main.rs</code></a></td><td>67</td><td>Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.</td></tr>
+<tr><td><a href="veilvoice-gui/palettes.html"><code>palettes.rs</code></a></td><td>632</td><td>User-defined colour schemes, and the contrast check that keeps them usable.</td></tr>
 <tr><td><a href="veilvoice-gui/prefs.html"><code>prefs.rs</code></a></td><td>386</td><td>What the user has chosen about how the app looks and moves.</td></tr>
 <tr><td><a href="veilvoice-gui/reduced_motion.html"><code>reduced_motion.rs</code></a></td><td>273</td><td>Whether the operating system has been asked to reduce motion.</td></tr>
 <tr><td><a href="veilvoice-gui/security.html"><code>security.rs</code></a></td><td>1030</td><td>The application lock, and the at-rest encryption of what VeilVoice writes.</td></tr>
-<tr><td><a href="veilvoice-gui/settings.html"><code>settings.rs</code></a></td><td>618</td><td>The settings panel: a menu of pages, each a titled group of choices.</td></tr>
+<tr><td><a href="veilvoice-gui/settings.html"><code>settings.rs</code></a></td><td>706</td><td>The settings panel: a menu of pages, each a titled group of choices.</td></tr>
 <tr><td><a href="veilvoice-gui/soundbar.html"><code>soundbar.rs</code></a></td><td>349</td><td>The animated mark: a row of bars that rise and fall.</td></tr>
-<tr><td><a href="veilvoice-gui/theme.html"><code>theme.rs</code></a></td><td>650</td><td>Colour schemes for the desktop app.</td></tr>
+<tr><td><a href="veilvoice-gui/theme.html"><code>theme.rs</code></a></td><td>745</td><td>Colour schemes for the desktop app.</td></tr>
 </tbody></table>
 </section>
 </div></div>
