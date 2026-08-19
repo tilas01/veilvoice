@@ -42,7 +42,7 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice &mdash; 156 files, 6214 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice &mdash; 156 files, 6215 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
@@ -1283,7 +1283,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/install.rs</code> <span class="meta">&mdash; veilvoice-cli, 514 lines, 42 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/install.rs</code> <span class="meta">&mdash; veilvoice-cli, 524 lines, 43 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs">open install.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice install` -- put this program somewhere the system can find it. # Portable is the default, and installing is the exception VeilVoice runs from wherever it is unpacked. Nothing has to be installed, nothing is written outside the</span></li>
@@ -1297,37 +1297,38 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that overwrites `PATH` wholesale has broken a machine, and doing it during an *uninstall* is worse -- that is the moment somebody is least inclined to check. # Why the registry through `reg.exe` The same reason `veilvoice-watch` reads it</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that way: this workspace carries `#![forbid(unsafe_code)]` in every crate, and the Win32 registry API needs `unsafe` FFI. Shelling out to a system tool keeps that guarantee and costs a subprocess on an operation that runs once. `reg.exe`</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">is resolved by absolute path -- resolving it by name would search the working directory first, which is finding F-13.</span></li>
-<li><span class="sec">const NAME</span> <span class="meta">line 57</span><br><span class="x">The name of the directory and the uninstall entry.</span></li>
-<li><span class="sec">const PROGRAMS</span> <span class="meta">line 60</span><br><span class="x">Files that make up an installation, if they are beside the running binary.</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 69</span><br><span class="x">Spawn without a console window. Same reasoning as the copies in `veilvoice-watch` and `veilvoice-guard`: on Windows a `Command` for a console program creates one, and if this is ever called from the desktop application a window would</span></li>
-<li><span class="sec">fn no_window</span> <span class="meta">line 69</span><br><span class="x">flash. `creation_flags` is safe, so this costs nothing against `#![forbid(unsafe_code)]`.</span></li>
-<li><span class="sec">const CREATE_NO_WINDOW</span> <span class="meta">line 73</span><br><span class="x"></span></li>
-<li><span class="sec">fn reg_exe</span> <span class="meta">line 86</span><br><span class="x">`reg.exe`, by absolute path. Never by bare name: Windows searches the current directory before most of `PATH`, so running this from a folder containing `reg.exe` would run that instead. This is the program that edits `PATH`, so it is a</span></li>
-<li><span class="sec">fn reg_exe</span> <span class="meta">line 86</span><br><span class="x">poor place to be relaxed about which binary is doing it.</span></li>
-<li><span class="sec">fn prefix</span> <span class="meta">line 92</span><br><span class="x">Where an installation goes, for this user only.</span></li>
-<li><span class="sec">fn bin_dir</span> <span class="meta">line 109</span><br><span class="x">The directory a `PATH` entry should point at.</span></li>
-<li><span class="sec">struct Status</span> <span class="meta">line 121</span><br><span class="x">What an installation currently looks like.</span></li>
-<li><span class="sec">fn status</span> <span class="meta">line 133</span><br><span class="x">Read the current state without changing anything.</span></li>
-<li><span class="sec">fn exe_name</span> <span class="meta">line 153</span><br><span class="x"></span></li>
-<li><span class="sec">fn path_contains</span> <span class="meta">line 167</span><br><span class="x">Is `dir` already on this user&#x27;s `PATH`? Reads the *current process* environment, which is what &quot;will typing `veilvoice` work in this terminal&quot; actually depends on. A registry value that a new terminal would pick up is a different question,</span></li>
-<li><span class="sec">fn path_contains</span> <span class="meta">line 167</span><br><span class="x">and the report says which one it answered.</span></li>
-<li><span class="sec">fn copy_programs</span> <span class="meta">line 175</span><br><span class="x">Copy the binaries into place. Returns what was copied.</span></li>
-<li><span class="sec">fn add_to_path</span> <span class="meta">line 217</span><br><span class="x">Add `dir` to the user&#x27;s `PATH`, if it is not there already. Reads the existing value and appends. Never writes a `PATH` it did not first read: replacing that variable wholesale is how a tool breaks a machine, and there is no undo.</span></li>
-<li><span class="sec">fn read_user_path</span> <span class="meta">line 255</span><br><span class="x"></span></li>
-<li><span class="sec">fn add_to_path</span> <span class="meta">line 289</span><br><span class="x"></span></li>
-<li><span class="sec">fn register_uninstall</span> <span class="meta">line 299</span><br><span class="x">Register with Add/Remove Programs, so the system can list and remove it.</span></li>
-<li><span class="sec">fn register_uninstall</span> <span class="meta">line 338</span><br><span class="x"></span></li>
-<li><span class="sec">fn remove_from_path</span> <span class="meta">line 343</span><br><span class="x"></span></li>
-<li><span class="sec">fn remove_from_path</span> <span class="meta">line 384</span><br><span class="x"></span></li>
-<li><span class="sec">fn unregister_uninstall</span> <span class="meta">line 389</span><br><span class="x"></span></li>
-<li><span class="sec">fn unregister_uninstall</span> <span class="meta">line 398</span><br><span class="x"></span></li>
-<li><span class="sec">fn install</span> <span class="meta">line 403</span><br><span class="x">Install for this user. Returns the lines to report.</span></li>
-<li><span class="sec">fn uninstall</span> <span class="meta">line 430</span><br><span class="x">Remove what `install` added.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 470</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_prefix_is_found_on_this_platform</span> <span class="meta">line 474</span><br><span class="x"></span></li>
-<li><span class="sec">fn status_reads_without_changing_anything</span> <span class="meta">line 482</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_executable_name_matches_the_platform</span> <span class="meta">line 493</span><br><span class="x"></span></li>
-<li><span class="sec">fn path_membership_is_an_exact_directory_match</span> <span class="meta">line 503</span><br><span class="x"></span></li>
+<li><span class="sec">const NAME</span> <span class="meta">line 62</span><br><span class="x">The name of the directory and the uninstall entry. Windows-only: elsewhere the prefix follows the XDG convention and is lower-case, so this constant has no reader.</span></li>
+<li><span class="sec">const PROGRAMS</span> <span class="meta">line 65</span><br><span class="x">Files that make up an installation, if they are beside the running binary.</span></li>
+<li><span class="sec">fn no_window</span> <span class="meta">line 79</span><br><span class="x">Spawn without a console window. Same reasoning as the copies in `veilvoice-watch` and `veilvoice-guard`: on Windows a `Command` for a console program creates one, and if this is ever called from the desktop application a window would</span></li>
+<li><span class="sec">fn no_window</span> <span class="meta">line 79</span><br><span class="x">flash. `creation_flags` is safe, so this costs nothing against `#![forbid(unsafe_code)]`. Gated to Windows because every caller is: the registry helpers below are the only ones, and they do not exist elsewhere. Left ungated it is dead code</span></li>
+<li><span class="sec">fn no_window</span> <span class="meta">line 79</span><br><span class="x">on every other platform, which CI turns into an error and which only the Linux and macOS runners can see.</span></li>
+<li><span class="sec">const CREATE_NO_WINDOW</span> <span class="meta">line 83</span><br><span class="x"></span></li>
+<li><span class="sec">fn reg_exe</span> <span class="meta">line 96</span><br><span class="x">`reg.exe`, by absolute path. Never by bare name: Windows searches the current directory before most of `PATH`, so running this from a folder containing `reg.exe` would run that instead. This is the program that edits `PATH`, so it is a</span></li>
+<li><span class="sec">fn reg_exe</span> <span class="meta">line 96</span><br><span class="x">poor place to be relaxed about which binary is doing it.</span></li>
+<li><span class="sec">fn prefix</span> <span class="meta">line 102</span><br><span class="x">Where an installation goes, for this user only.</span></li>
+<li><span class="sec">fn bin_dir</span> <span class="meta">line 119</span><br><span class="x">The directory a `PATH` entry should point at.</span></li>
+<li><span class="sec">struct Status</span> <span class="meta">line 131</span><br><span class="x">What an installation currently looks like.</span></li>
+<li><span class="sec">fn status</span> <span class="meta">line 143</span><br><span class="x">Read the current state without changing anything.</span></li>
+<li><span class="sec">fn exe_name</span> <span class="meta">line 163</span><br><span class="x"></span></li>
+<li><span class="sec">fn path_contains</span> <span class="meta">line 177</span><br><span class="x">Is `dir` already on this user&#x27;s `PATH`? Reads the *current process* environment, which is what &quot;will typing `veilvoice` work in this terminal&quot; actually depends on. A registry value that a new terminal would pick up is a different question,</span></li>
+<li><span class="sec">fn path_contains</span> <span class="meta">line 177</span><br><span class="x">and the report says which one it answered.</span></li>
+<li><span class="sec">fn copy_programs</span> <span class="meta">line 185</span><br><span class="x">Copy the binaries into place. Returns what was copied.</span></li>
+<li><span class="sec">fn add_to_path</span> <span class="meta">line 227</span><br><span class="x">Add `dir` to the user&#x27;s `PATH`, if it is not there already. Reads the existing value and appends. Never writes a `PATH` it did not first read: replacing that variable wholesale is how a tool breaks a machine, and there is no undo.</span></li>
+<li><span class="sec">fn read_user_path</span> <span class="meta">line 265</span><br><span class="x"></span></li>
+<li><span class="sec">fn add_to_path</span> <span class="meta">line 299</span><br><span class="x"></span></li>
+<li><span class="sec">fn register_uninstall</span> <span class="meta">line 309</span><br><span class="x">Register with Add/Remove Programs, so the system can list and remove it.</span></li>
+<li><span class="sec">fn register_uninstall</span> <span class="meta">line 348</span><br><span class="x"></span></li>
+<li><span class="sec">fn remove_from_path</span> <span class="meta">line 353</span><br><span class="x"></span></li>
+<li><span class="sec">fn remove_from_path</span> <span class="meta">line 394</span><br><span class="x"></span></li>
+<li><span class="sec">fn unregister_uninstall</span> <span class="meta">line 399</span><br><span class="x"></span></li>
+<li><span class="sec">fn unregister_uninstall</span> <span class="meta">line 408</span><br><span class="x"></span></li>
+<li><span class="sec">fn install</span> <span class="meta">line 413</span><br><span class="x">Install for this user. Returns the lines to report.</span></li>
+<li><span class="sec">fn uninstall</span> <span class="meta">line 440</span><br><span class="x">Remove what `install` added.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 480</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_prefix_is_found_on_this_platform</span> <span class="meta">line 484</span><br><span class="x"></span></li>
+<li><span class="sec">fn status_reads_without_changing_anything</span> <span class="meta">line 492</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_executable_name_matches_the_platform</span> <span class="meta">line 503</span><br><span class="x"></span></li>
+<li><span class="sec">fn path_membership_is_an_exact_directory_match</span> <span class="meta">line 513</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
