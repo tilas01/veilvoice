@@ -184,11 +184,11 @@
       </div>
       <div class="card">
         <h3>Encrypt at rest, by default</h3>
-        <p>Every recording is sealed as it is written — X25519 + ML-KEM-768 hybrid, so one captured today is not readable by a quantum adversary tomorrow. Turning that off makes you read why first.</p>
+        <p>Every recording is sealed as it is written — <span class="tip-right" data-tip="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard." aria-label="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard.">X25519 + ML-KEM-768 hybrid</span>, so one captured today is not readable by a quantum adversary tomorrow. Turning that off makes you read why first.</p>
       </div>
       <div class="card">
         <h3>Lock the app</h3>
-        <p>A separate password gates the desktop app, rate limited and Argon2id-derived. It stops someone who picks up your unlocked computer. It is not tamper-proof, and the unlock screen says so.</p>
+        <p>A separate password gates the desktop app, rate limited and <span data-tip="A password-hashing function designed to be slow and memory-hungry, so guessing at scale costs real hardware." aria-label="A password-hashing function designed to be slow and memory-hungry, so guessing at scale costs real hardware.">Argon2id</span>-derived. It stops someone who picks up your unlocked computer. It is not tamper-proof, and the unlock screen says so.</p>
       </div>
       <div class="card">
         <h3>Strip metadata</h3>

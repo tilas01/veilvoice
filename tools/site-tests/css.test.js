@@ -351,6 +351,63 @@ function run() {
     pass(`the front page's defect count (${pageFindings[1]}) matches the audit`);
   }
 
+  // --- 10. tooltips --------------------------------------------------------
+  //
+  // Three rules, each of which is a way tooltips are routinely got wrong and
+  // none of which shows up as a visible fault on the developer's own desktop.
+  const tips = main.slice(main.indexOf("[data-tip]"));
+  if (main.indexOf("[data-tip]") === -1) {
+    fail("main.css: the tooltip styles are gone");
+  } else {
+    // Keyboard reachable. `:hover` alone means a pointer is required, which
+    // is invisible to anybody testing with a mouse in their hand.
+    if (!/\[data-tip\]:focus-visible::after/.test(tips)) {
+      fail("tooltips must appear on :focus-visible, not only on :hover");
+    } else {
+      pass("tooltips appear on keyboard focus as well as hover");
+    }
+
+    // `visibility` has to be in the transition. Without it the box stays in
+    // the accessibility tree and stays hoverable while fully transparent, so a
+    // pointer crossing empty space triggers a tooltip that is not visible.
+    if (!/transition:[^;]*visibility/.test(tips)) {
+      fail("the tooltip transition must include visibility, or an invisible " +
+           "box stays hoverable and stays in the accessibility tree");
+    } else {
+      pass("the tooltip transition covers visibility");
+    }
+
+    // There must be an affordance. A hover-only annotation with nothing
+    // indicating it exists is a secret, not a tooltip.
+    if (!/\[data-tip\]\s*\{[^}]*text-decoration:\s*underline dotted/.test(tips)) {
+      fail("[data-tip] needs a visible affordance, or nothing suggests there " +
+           "is anything to hover");
+    } else {
+      pass("tooltips carry a visible affordance");
+    }
+  }
+
+  // Every tooltip on the pages must also be announced once, and only once:
+  // `data-tip` for sighted readers, `aria-label` carrying the same words, and
+  // no `title` on the same element -- which some screen readers announce in
+  // addition, and some desktops draw as a second box.
+  const tipUses = [...indexHtml.matchAll(/<span([^>]*\bdata-tip="([^"]*)"[^>]*)>/g)];
+  if (tipUses.length === 0) {
+    fail("no tooltip is actually used on the front page");
+  } else {
+    const problems = [];
+    for (const [, attrs, text] of tipUses) {
+      if (!/\baria-label="/.test(attrs)) {
+        problems.push(`a tooltip has no aria-label: ${text.slice(0, 40)}`);
+      }
+      if (/\btitle="/.test(attrs)) {
+        problems.push(`a tooltip also carries title=, so it is announced twice`);
+      }
+    }
+    if (problems.length) { problems.forEach(fail); }
+    else { pass(`${tipUses.length} tooltips are announced exactly once`); }
+  }
+
   return failures;
 }
 
