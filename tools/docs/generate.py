@@ -1397,6 +1397,25 @@ MD_LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
 MD_RUSTDOC_LINK = re.compile(r"\[`([^`\]]+)`\]")
 
 
+# Schemes a generated link may use, copied from `website/js/markdown.js`.
+#
+# Same rule, same behaviour: protocol-relative and backslash-prefixed targets
+# are refused outright, an explicit scheme must be http or https, and a
+# relative path is allowed. Anything else keeps its label and loses its link,
+# so the reader still sees the words rather than a silently vanished sentence.
+SCHEME = re.compile(r"^([a-zA-Z][a-zA-Z0-9+.-]*):")
+
+
+def safe_url(url):
+    """Is this a link target a generated page may emit?"""
+    if url.startswith("//") or url.startswith(chr(92)) or url.startswith("/" + chr(92)):
+        return False
+    match = SCHEME.match(url)
+    if not match:
+        return True
+    return match.group(1).lower() in ("http", "https")
+
+
 def inline_html(text):
     """Render the inline Markdown that appears in Rust doc comments.
 
@@ -1415,7 +1434,8 @@ def inline_html(text):
 
     out = MD_INLINE_CODE.sub(lambda m: park("<code>%s</code>" % m.group(1)), out)
     out = MD_LINK.sub(
-        lambda m: park('<a href="%s">%s</a>' % (m.group(2), m.group(1))), out)
+        lambda m: park('<a href="%s">%s</a>' % (m.group(2), m.group(1)))
+        if safe_url(m.group(2)) else park(m.group(1)), out)
     out = MD_RUSTDOC_LINK.sub(lambda m: park("<code>%s</code>" % m.group(1)), out)
     out = MD_BOLD.sub(lambda m: park("<strong>%s</strong>" % m.group(1)), out)
     out = MD_ITALIC.sub(lambda m: park("<em>%s</em>" % m.group(1)), out)
