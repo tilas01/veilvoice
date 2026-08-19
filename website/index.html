@@ -35,6 +35,7 @@
     <nav class="links">
       <a href="#what">what</a>
       <a href="#download">download</a>
+      <a href="#demo">demo</a>
       <a href="#guide">guide</a>
       <a href="#verify">verify</a>
       <a href="#crypto">security</a>
@@ -406,6 +407,65 @@
       <a class="btn" href="wiki.html#applock">the app lock in detail</a>
       <a class="btn" href="#crypto">how it works</a>
     </div>
+  </div>
+</section>
+
+<!--
+  The demonstration. Left is a voice: bars in step, the crest travelling along
+  them. Right is the same voice afterwards: same energy, no shared phase. The
+  mark between them lights as the signal passes through.
+
+  Everything here is CSS. A GIF would bake in one palette while the site has
+  nine, could not be selected or read aloud, and would cost a download; and the
+  text below is the part that actually makes the argument, so it is text.
+
+  `aria-hidden` on the animation itself: it is an illustration of the sentence
+  underneath, and describing sixty animated bars to a screen reader would be
+  noise in place of the sentence.
+-->
+<section id="demo">
+  <div class="wrap">
+  <h2>WHAT IT SOUNDS LIKE, IN ONE PICTURE</h2>
+
+  <figure class="demo">
+    <div class="demo-flow" aria-hidden="true">
+      <div class="demo-side">
+        <div class="demo-wave demo-clean">
+          <span style="--d:-0ms"></span><span style="--d:-333ms"></span><span style="--d:-666ms"></span><span style="--d:-999ms"></span><span style="--d:-1332ms"></span><span style="--d:-1665ms"></span><span style="--d:-1998ms"></span><span style="--d:-2331ms"></span><span style="--d:-2664ms"></span><span style="--d:-2997ms"></span><span style="--d:-3330ms"></span><span style="--d:-3663ms"></span>
+        </div>
+        <p class="demo-label">Normal voice</p>
+      </div>
+
+      <div class="demo-core">
+        <img class="demo-mark" src="assets/icon-32.png" alt="">
+      </div>
+
+      <div class="demo-side">
+        <div class="demo-wave demo-veiled">
+          <span style="--d:-310ms;--t:1.7s"></span><span style="--d:-80ms;--t:2.3s"></span><span style="--d:-640ms;--t:1.9s"></span><span style="--d:-220ms;--t:2.6s"></span><span style="--d:-900ms;--t:1.6s"></span><span style="--d:-430ms;--t:2.1s"></span><span style="--d:-150ms;--t:2.8s"></span><span style="--d:-760ms;--t:1.8s"></span><span style="--d:-520ms;--t:2.4s"></span><span style="--d:-40ms;--t:2.0s"></span><span style="--d:-680ms;--t:2.7s"></span><span style="--d:-270ms;--t:1.5s"></span>
+        </div>
+        <p class="demo-label demo-label-veiled">Anonymised voice</p>
+      </div>
+    </div>
+
+    <figcaption>
+      <p><strong>The bars on the left are in step with one another.</strong> That
+      shared phase relationship is most of what makes a voice recognisable as
+      <em>yours</em> — the precise waveform, the micro-timing, the way your
+      vocal tract shapes every harmonic.</p>
+
+      <p><strong>The bars on the right carry the same energy and none of the
+      relationship.</strong> The measured phase of every frame is discarded and
+      never stored, and every speaker is mapped onto one canonical pitch
+      register and vocal-tract scale — many voices in, one set of
+      characteristics out. There is no inverse to compute.</p>
+
+      <p><strong>The words survive all of it.</strong> The output is meant to be
+      listened to, shared, understood and transcribed. That is the whole
+      design: a scrambler you cannot understand protects nobody, because
+      nobody uses it.</p>
+    </figcaption>
+  </figure>
   </div>
 </section>
 
