@@ -93,6 +93,12 @@ jobs:
       - name: Committed documentation must match the source
         run: python tools/docs/generate.py --check
 
+      # The per-section pages are derived from website/index.html, so editing
+      # a section without regenerating leaves five pages describing a front
+      # page that has moved on -- the F-41 shape again, in a fifth place.
+      - name: Committed section pages must match the front page
+        run: python tools/site/split.py --check
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a

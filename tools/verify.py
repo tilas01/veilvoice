@@ -81,12 +81,16 @@ def stage(root):
 GENERATORS = [
     ("artwork", [sys.executable, "assets/generate.py"]),
     ("documentation", [sys.executable, "tools/docs/generate.py"]),
+    # Derived from website/index.html, so it must run after anything that could
+    # edit that file and before the index walks the result.
+    ("section pages", [sys.executable, "tools/site/split.py"]),
     ("search index", [sys.executable, "tools/search-index/generate.py"]),
 ]
 
 CHECKS = [
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),
+    ("section pages match index.html", [sys.executable, "tools/site/split.py", "--check"]),
     ("search index matches the tree", [sys.executable, "tools/search-index/generate.py", "--check"]),
     ("website suites", ["node", "tools/site-tests/run.js"]),
 ]
