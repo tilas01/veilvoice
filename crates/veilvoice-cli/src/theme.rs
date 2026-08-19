@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Tokyo Night colouring for the terminal.
 //!
 //! The same palette the GUI uses, so the two halves of VeilVoice look like one

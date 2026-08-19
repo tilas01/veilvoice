@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  SPDX-License-Identifier: CC-BY-NC-SA-4.0
+  SPDX-License-Identifier: GPL-3.0-or-later
 
   WiX v4 source for the Windows installer.
 
@@ -60,7 +60,7 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of VeilVoice is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
-    <!-- The licence has to be accepted, and it is the real licence text. -->
+    <!-- The licence has to be accepted, and it is the real GPL text. -->
     <WixVariable Id="WixUILicenseRtf" Value="packaging/wix/LICENSE.rtf" />
     <ui:WixUI Id="WixUI_FeatureTree" />
 
@@ -99,7 +99,7 @@
     </Feature>
 
     <Feature Id="AudacityLink" Level="1000" Title="Audacity (a link, not the software)"
-             Description="Adds a shortcut to Audacity's download page. Audacity is a free audio editor, useful for recording before veiling. It is not bundled: it is GPL-2.0-or-later, which cannot be combined with this project's CC BY-NC-SA 4.0.">
+             Description="Adds a shortcut to Audacity's download page. Audacity is a free audio editor, useful for recording before veiling. It is not bundled: it is GPL-2.0-or-later, which cannot be combined with this project's GPL-3.0-or-later.">
       <ComponentGroupRef Id="AudacityShortcut" />
     </Feature>
 

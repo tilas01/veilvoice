@@ -1,7 +1,7 @@
 # The portable verifier: one small binary that checks a VeilVoice release
 # without GnuPG installed. See src/main.rs for what it does and does not prove.
 #
-# SPDX-License-Identifier: CC-BY-NC-SA-4.0
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 [package]
 name = "veilvoice-verify"
@@ -33,3 +33,9 @@ sha2 = "0.10"
 
 [dev-dependencies]
 hex = "0.4"
+
+# Embeds the application icon and version block into the Windows executable.
+# A *build* dependency only: it is not in the shipped dependency graph, and the
+# `offline` CI job that forbids network crates is unaffected.
+[target.'cfg(windows)'.build-dependencies]
+winresource = "0.1"

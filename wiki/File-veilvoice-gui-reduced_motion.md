@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/reduced_motion.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 273 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 324 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs)
 
 ## Contents
 
@@ -53,6 +53,7 @@ motion when it actually saw it say so.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
+    n_no_window["no_window"]
     n_reduces(["Query::reduces<br/>pub"])
     n_tool["tool"]
     n_query(["query<br/>pub"])
@@ -60,11 +61,14 @@ flowchart TD
     n_parse_user_preferences_mask["parse_user_preferences_mask"]
     n_macos_query["macos_query"]
     n_unix_query["unix_query"]
+    n_macos_query --> n_no_window
     n_macos_query --> n_tool
     n_query --> n_macos_query
     n_query --> n_unix_query
     n_query --> n_windows_query
+    n_unix_query --> n_no_window
     n_unix_query --> n_tool
+    n_windows_query --> n_no_window
     n_windows_query --> n_parse_user_preferences_mask
     n_windows_query --> n_tool
 ```
@@ -73,11 +77,12 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Query` <sub>pub enum</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L41) | What the platform said. |
-| `Query::reduces` <sub>pub fn</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L54) | Whether to treat this as a request to reduce motion. |
-| `tool` <sub>fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L60) | Resolve a tool to an absolute path. |
-| `query` <sub>pub fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L74) | Ask the operating system. |
-| `windows_query` <sub>fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L98) | Windows: "Show animations in Windows" lives in the UserPreferencesMask under HKCU\Control Panel\Desktop. |
-| `parse_user_preferences_mask` <sub>fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L128) | Pull the mask out of reg query output and read the animation bit. |
-| `macos_query` <sub>fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L152) | macOS: the Accessibility "Reduce motion" switch. |
-| `unix_query` <sub>fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L177) | Linux and the BSDs: GNOME's enable-animations, which the other major desktops have largely adopted as the common key. |
+| `no_window` <sub>fn</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L52) | Spawn without a console window. |
+| `Query` <sub>pub enum</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L64) | What the platform said. |
+| `Query::reduces` <sub>pub fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L77) | Whether to treat this as a request to reduce motion. |
+| `tool` <sub>fn</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L83) | Resolve a tool to an absolute path. |
+| `query` <sub>pub fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L97) | Ask the operating system. |
+| `windows_query` <sub>fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L121) | Windows: "Show animations in Windows" lives in the UserPreferencesMask under HKCU\Control Panel\Desktop. |
+| `parse_user_preferences_mask` <sub>fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L151) | Pull the mask out of reg query output and read the animation bit. |
+| `macos_query` <sub>fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L175) | macOS: the Accessibility "Reduce motion" switch. |
+| `unix_query` <sub>fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs#L200) | Linux and the BSDs: GNOME's enable-animations, which the other major desktops have largely adopted as the common key. |

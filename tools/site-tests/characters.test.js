@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 // No stray characters, anywhere in the repository.
 //
@@ -56,7 +56,7 @@ function trackedFiles() {
 }
 
 /** Legitimately binary, and not text anyone reads. */
-const BINARY = /\.(png|jpg|jpeg|gif|ico|rgba|woff2?|ttf|otf|pdf|zip|gz|asc|wav|mp3|flac)$/i;
+const BINARY = /\.(png|jpg|jpeg|gif|ico|icns|rgba|woff2?|ttf|otf|pdf|zip|gz|asc|wav|mp3|flac)$/i;
 
 const RULES = [
   {

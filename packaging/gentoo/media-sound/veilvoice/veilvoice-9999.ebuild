@@ -1,6 +1,6 @@
 # Copyright 2026 tilas01
 # Distributed under the terms of the GNU General Public License v3 or later
-# SPDX-License-Identifier: CC-BY-NC-SA-4.0
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 EAPI=8
 
@@ -21,12 +21,10 @@ HOMEPAGE="https://tilas01.github.io/veilvoice/"
 EGIT_REPO_URI="https://github.com/tilas01/veilvoice.git"
 EGIT_BRANCH="main"
 
-# The crate itself is CC-BY-NC-SA-4.0, which Gentoo treats as non-free and
-# which therefore needs an ACCEPT_LICENSE entry from the user. Its
-# dependencies are all permissive, which is
+# The crate itself is GPL-3+. Its dependencies are all permissive, which is
 # compatible in that direction; the second list is what Gentoo expects for the
 # vendored crates.
-LICENSE="CC-BY-NC-SA-4.0"
+LICENSE="GPL-3+"
 LICENSE+=" Apache-2.0 BSD BSD-2 ISC MIT Unicode-3.0 ZLIB"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64"

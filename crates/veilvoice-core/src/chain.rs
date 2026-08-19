@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! The assembled de-identification chain and its live performance statistics.
 //!
 //! Every other module in this crate does one job. This is the file that puts

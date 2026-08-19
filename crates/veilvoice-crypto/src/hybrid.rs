@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.
 //!
 //! # Why hybrid

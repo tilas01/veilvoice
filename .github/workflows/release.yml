@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: CC-BY-NC-SA-4.0
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # Build, verify and publish release artefacts for a v* tag.
 #
@@ -220,6 +220,15 @@ jobs:
           echo "${{ matrix.label }}: $status" > "repro-${{ matrix.label }}.txt"
           cp "repro-${{ matrix.label }}.txt" "$SRC_A/"
 
+      # The icon lives in the executable's resource section, and a build that
+      # failed to put it there succeeds silently -- the only symptom is
+      # Explorer drawing a generic glyph. Checked on the artefacts that are
+      # about to be signed.
+      - name: Windows binaries must carry their icon
+        if: runner.os == 'Windows'
+        shell: bash
+        run: python tools/release/check-windows-icons.py target/release
+
       - name: Stage the archive
         shell: bash
         run: |
@@ -254,7 +263,24 @@ jobs:
           # banners travel with the pages they belong to. About 100 KB of text.
           mkdir -p "dist/$out/assets"
           cp -r assets/banners "dist/$out/assets/banners"
-          cp assets/icon.png assets/icon.ico "dist/$out/" 2>/dev/null || true
+          # Platform icons, in the form each system actually reads.
+          #
+          # Windows needs nothing here: `build.rs` embeds `assets/icon.ico` in
+          # each executable's resource section, which is where Explorer, the
+          # taskbar and a pinned shortcut look. Shipping a loose `.ico` beside
+          # the binary -- which is what used to happen -- puts it somewhere
+          # Windows never reads and the user never opens.
+          case "${{ matrix.label }}" in
+            macos-*)
+              # The Finder reads `.icns`, and only from inside a bundle. The
+              # file ships so a user (or a future `.app` recipe) has it; the
+              # bundle itself is not built here and is not claimed to be.
+              cp assets/icon.icns "dist/$out/" ;;
+            linux-*)
+              # freedesktop: a launcher entry plus the hicolor theme sizes.
+              # Without these every Linux and BSD desktop draws a placeholder.
+              cp -r assets/linux "dist/$out/desktop" ;;
+          esac
           echo "STAGE=$out" >> "$GITHUB_ENV"
 
       - name: Archive (zip)
@@ -313,6 +339,9 @@ jobs:
           # banners travel with the pages they belong to. About 100 KB of text.
           mkdir -p "dist/$out/assets"
           cp -r assets/banners "dist/$out/assets/banners"
+          # FreeBSD, OpenBSD and NetBSD use the same freedesktop launcher
+          # conventions as Linux, so they get the same icon set.
+          cp -r assets/linux "dist/$out/desktop"
           {
             echo "This FreeBSD build has no live microphone scrambling: cpal, the"
             echo "audio device library, has no BSD backend. Everything else works —"
@@ -363,6 +392,9 @@ jobs:
           # banners travel with the pages they belong to. About 100 KB of text.
           mkdir -p "dist/$out/assets"
           cp -r assets/banners "dist/$out/assets/banners"
+          # FreeBSD, OpenBSD and NetBSD use the same freedesktop launcher
+          # conventions as Linux, so they get the same icon set.
+          cp -r assets/linux "dist/$out/desktop"
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
             echo "device library, has no BSD backend. Everything else works —"
@@ -417,6 +449,9 @@ jobs:
           # banners travel with the pages they belong to. About 100 KB of text.
           mkdir -p "dist/$out/assets"
           cp -r assets/banners "dist/$out/assets/banners"
+          # FreeBSD, OpenBSD and NetBSD use the same freedesktop launcher
+          # conventions as Linux, so they get the same icon set.
+          cp -r assets/linux "dist/$out/desktop"
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
             echo "device library, has no BSD backend. Everything else works —"

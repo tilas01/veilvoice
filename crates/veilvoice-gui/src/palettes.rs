@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! User-defined colour schemes, and the contrast check that keeps them usable.
 //!
 //! A reader can drop a small text file into a `palettes/` directory beside the

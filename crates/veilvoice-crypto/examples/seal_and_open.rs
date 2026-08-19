@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Sealing a recording into a `.veil` container and opening it again, plus
 // handling a typed passphrase so that it does not linger any longer than it

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Light time-domain effects applied after resynthesis.
 //!
 //! These run on the continuous output stream (not per FFT frame) and exist to

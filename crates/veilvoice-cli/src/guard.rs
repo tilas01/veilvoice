@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! `veilvoice guard` -- record what VeilVoice's files should be, and check them.
 //!
 //! Detection, not prevention. See [`veilvoice_guard::SCOPE`], which every path

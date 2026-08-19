@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Best-effort attribution: which program changed a file.
 //!
 //! # Read this before relying on it
@@ -30,6 +30,30 @@
 //! clean report means.
 
 use std::path::Path;
+
+/// Spawn without a console window.
+///
+/// On Windows a `Command` for a console program creates a console, and when the
+/// parent is a GUI process with none of its own, Windows opens a **window** for
+/// it -- appearing and vanishing as the child runs. That is what "a cmd prompt
+/// flashing randomly" was: once at startup, and again on every poll.
+///
+/// `CREATE_NO_WINDOW` suppresses it. `creation_flags` is a **safe** API, so
+/// this costs nothing against `#![forbid(unsafe_code)]`.
+///
+/// Every `Command::new` in this crate goes through here, and a test asserts it
+/// -- because "no console window appeared" is not observable from a test, which
+/// is exactly why the defect shipped.
+#[cfg(any(target_os = "linux", windows))]
+fn no_window(mut command: std::process::Command) -> std::process::Command {
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        command.creation_flags(CREATE_NO_WINDOW);
+    }
+    command
+}
 
 /// Resolve a system tool to an absolute path, rather than letting the operating
 /// system search for it.
@@ -152,7 +176,7 @@ mod linux {
         let Some(ausearch) = super::system_tool("ausearch", AUSEARCH_DIRS) else {
             return unconfigured("the audit tools (ausearch) are not installed");
         };
-        let Ok(output) = Command::new(ausearch)
+        let Ok(output) = super::no_window(Command::new(ausearch))
             .args(["-f", &path.to_string_lossy(), "-i", "-m", "PATH"])
             .output()
         else {
@@ -263,7 +287,7 @@ mod windows {
         let Some(wevtutil) = wevtutil() else {
             return unconfigured("wevtutil is not available");
         };
-        let Ok(output) = Command::new(wevtutil)
+        let Ok(output) = super::no_window(Command::new(wevtutil))
             .args(["qe", "Security", "/f:text", "/c:1", "/rd:true"])
             .arg(format!("/q:{query}"))
             .output()
@@ -303,6 +327,34 @@ mod windows {
 
 #[cfg(test)]
 mod tests {
+
+    /// Every subprocess in this file must be spawned through `no_window`.
+    ///
+    /// This reads the file's own source rather than exercising the behaviour,
+    /// because "no console window appeared" cannot be observed from a test --
+    /// which is precisely why the defect reached a release. A `Command::new`
+    /// added later without the wrapper fails here rather than on a desktop.
+    #[test]
+    fn every_subprocess_is_spawned_without_a_console_window() {
+        let source = include_str!("blame.rs");
+        let mut bare = Vec::new();
+        for (number, line) in source.lines().enumerate() {
+            let trimmed = line.trim_start();
+            if trimmed.starts_with("//") || trimmed.starts_with('*') {
+                continue; // prose: this rule is discussed in the comments
+            }
+            if !line.contains("Command::new") || line.contains("no_window(") {
+                continue;
+            }
+            bare.push(format!("line {}: {}", number + 1, trimmed));
+        }
+        assert!(
+            bare.is_empty(),
+            "these spawns bypass `no_window`, so each flashes a console window \
+             on Windows:\n{}",
+            bare.join("\n")
+        );
+    }
     use super::*;
 
     /// On an ordinary machine there is no auditing, so this must return a

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! Chunk-level RIFF/WAVE metadata removal.
 //!
 //! # Why WAV gets its own path

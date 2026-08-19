@@ -5,7 +5,7 @@ Project:  VeilVoice -- irreversible voice de-identification
 Author:   tilas01
 Repo:     https://github.com/tilas01/veilvoice
 Site:     https://tilas01.github.io/veilvoice/
-Licence:  CC BY-NC-SA 4.0
+Licence:  GPL-3.0-or-later
 Version:  1.0
 Updated:  2026-08-16
 
@@ -129,7 +129,7 @@ it. AI assistance does not remove the author's responsibility for the result,
 and it is not offered as an excuse for any defect.
 
 The practical consequence for you: read the source. The whole project is
-published precisely so that you can. The cryptography uses
+published under the GPL precisely so that you can. The cryptography uses
 standard, well-reviewed primitives from established libraries rather than
 anything invented for this project, and the de-identification argument can be
 checked by reading two source files.
