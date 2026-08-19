@@ -248,6 +248,12 @@ jobs:
             } > "dist/$out/NOTES.txt"
           fi
           cp -r docs "dist/$out/docs"
+          # The per-file documentation references a generated SVG banner for
+          # every crate and every source file. Shipping the pages without them
+          # gives an offline reader 63 documents of broken images, so the
+          # banners travel with the pages they belong to. About 100 KB of text.
+          mkdir -p "dist/$out/assets"
+          cp -r assets/banners "dist/$out/assets/banners"
           cp assets/icon.png assets/icon.ico "dist/$out/" 2>/dev/null || true
           echo "STAGE=$out" >> "$GITHUB_ENV"
 
@@ -301,6 +307,12 @@ jobs:
           cp target/release/veilvoice "dist/$out/"
           cp README.md LICENSE "dist/$out/"
           cp -r docs "dist/$out/docs"
+          # The per-file documentation references a generated SVG banner for
+          # every crate and every source file. Shipping the pages without them
+          # gives an offline reader 63 documents of broken images, so the
+          # banners travel with the pages they belong to. About 100 KB of text.
+          mkdir -p "dist/$out/assets"
+          cp -r assets/banners "dist/$out/assets/banners"
           {
             echo "This FreeBSD build has no live microphone scrambling: cpal, the"
             echo "audio device library, has no BSD backend. Everything else works —"
@@ -345,6 +357,12 @@ jobs:
           cp target/release/veilvoice-verify "dist/$out/" 2>/dev/null || true
           cp README.md LICENSE "dist/$out/"
           cp -r docs "dist/$out/docs"
+          # The per-file documentation references a generated SVG banner for
+          # every crate and every source file. Shipping the pages without them
+          # gives an offline reader 63 documents of broken images, so the
+          # banners travel with the pages they belong to. About 100 KB of text.
+          mkdir -p "dist/$out/assets"
+          cp -r assets/banners "dist/$out/assets/banners"
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
             echo "device library, has no BSD backend. Everything else works —"
@@ -393,6 +411,12 @@ jobs:
           cp target/release/veilvoice-verify "dist/$out/" 2>/dev/null || true
           cp README.md LICENSE "dist/$out/"
           cp -r docs "dist/$out/docs"
+          # The per-file documentation references a generated SVG banner for
+          # every crate and every source file. Shipping the pages without them
+          # gives an offline reader 63 documents of broken images, so the
+          # banners travel with the pages they belong to. About 100 KB of text.
+          mkdir -p "dist/$out/assets"
+          cp -r assets/banners "dist/$out/assets/banners"
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
             echo "device library, has no BSD backend. Everything else works —"
