@@ -83,7 +83,7 @@ flowchart TD
     n_main(["main.rs<br/>1241 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
     n_guard["guard.rs<br/>338 lines"]
-    n_install["install.rs<br/>513 lines"]
+    n_install["install.rs<br/>523 lines"]
     n_lock["lock.rs<br/>239 lines"]
     n_theme["theme.rs<br/>135 lines"]
     n_atrest --> n_theme
@@ -106,7 +106,7 @@ flowchart TD
 |---|---:|---|
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
-| [`install.rs`](../../docs/files/veilvoice-cli/install.md) | 513 | veilvoice install -- put this program somewhere the system can find it. |
+| [`install.rs`](../../docs/files/veilvoice-cli/install.md) | 523 | veilvoice install -- put this program somewhere the system can find it. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
 | [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1241 | veilvoice — the command-line interface. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 135 | Tokyo Night colouring for the terminal. |
