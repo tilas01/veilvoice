@@ -48,16 +48,33 @@ the tag library does not see it. That is what `crate::wav` is for: a
 chunk-level cleaner that walks the RIFF structure directly. Without it,
 cleaning a WAV reported success and left the identifying block in place.
 
+## What this file contains
+
+268 lines defining **3 functions** (2 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `clean_audio_file` (line 71) -- Strip or replace the tags of an audio file, in place.
+  - reaches: `read_head`
+- `clean_audio_tags` (line 124) -- Report which tag blocks a file carries, without modifying it.
+  - reaches: `read_head`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_read_head["read_head"]
-    n_clean_audio_file(["clean_audio_file<br/>pub"])
-    n_clean_audio_tags(["clean_audio_tags<br/>pub"])
+    n_read_head["read_head<br/>line 47"]
+    n_clean_audio_file(["clean_audio_file<br/>line 71"])
+    n_clean_audio_tags(["clean_audio_tags<br/>line 124"])
     n_clean_audio_file --> n_read_head
     n_clean_audio_tags --> n_read_head
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_clean_audio_file,n_clean_audio_tags entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_read_head helper
 ```
 
 ## Items

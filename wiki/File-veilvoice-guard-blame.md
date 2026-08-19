@@ -42,18 +42,39 @@ of either is reported rather than hidden. Setting them up is a deliberate
 act by an administrator, and pretending otherwise would misrepresent what a
 clean report means.
 
+## What this file contains
+
+405 lines defining **6 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Blame` (line 94) -- What, if anything, is known about who changed a file.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `Blame::describe` (line 115) -- A single line for a terminal, an alert or a log.
+- `Blame::is_known` (line 126) -- Whether an actual name was found.
+- `who_touched` (line 151) -- Try to name the program that last wrote to path.
+  - reaches: `unconfigured`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_no_window["no_window"]
-    n_system_tool["system_tool"]
-    n_describe(["Blame::describe<br/>pub"])
-    n_is_known(["Blame::is_known<br/>pub"])
-    n_unconfigured["unconfigured"]
-    n_who_touched(["who_touched<br/>pub"])
+    n_no_window["no_window<br/>line 52"]
+    n_system_tool["system_tool<br/>line 79"]
+    n_describe(["Blame::describe<br/>line 115"])
+    n_is_known(["Blame::is_known<br/>line 126"])
+    n_unconfigured["unconfigured<br/>line 132"]
+    n_who_touched(["who_touched<br/>line 151"])
     n_who_touched --> n_unconfigured
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_describe,n_is_known,n_who_touched entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_no_window,n_system_tool,n_unconfigured helper
 ```
 
 ## Items

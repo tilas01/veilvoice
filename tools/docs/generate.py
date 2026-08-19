@@ -865,6 +865,12 @@ def file_graph(entry):
     chosen_names = {item["name"] for item in chosen}
     chosen.sort(key=lambda item: item["line"])
 
+    # Which functions nothing else in this file calls. Those are the ways in
+    # -- what a caller outside the file reaches first -- and they are the most
+    # useful thing a reader can be shown, so they are marked rather than left
+    # to be inferred from the arrow directions.
+    called = {b for _, b in calls}
+
     nodes = []
     for item in chosen:
         label = item["name"]
@@ -872,11 +878,23 @@ def file_graph(entry):
             label = "%s::%s" % (item["owner"], item["name"])
         if len(label) > MAX_LABEL:
             label = label[:MAX_LABEL - 1] + "…"
-        lines = [label]
-        if item["public"]:
-            lines.append("pub")
-        nodes.append({"id": item["name"], "label": lines,
-                      "root": item["public"]})
+
+        if item["public"] and item["name"] not in called:
+            role = "entry"      # public, and nothing here calls it: a way in
+        elif item["public"]:
+            role = "api"        # public, but also used internally
+        else:
+            role = "helper"     # private to this file
+
+        nodes.append({
+            "id": item["name"],
+            # The line number is half of "reference the lines": the label
+            # carries it, and the page links to it on GitHub.
+            "label": [label, "line %d" % item["line"]],
+            "line": item["line"],
+            "role": role,
+            "root": role == "entry",
+        })
     edges = [(a, b) for a, b in calls
              if a in chosen_names and b in chosen_names]
     truncated = len(functions) - len(chosen)
@@ -884,6 +902,114 @@ def file_graph(entry):
 
 
 # --- Mermaid ----------------------------------------------------------------
+
+def reachable(start, calls, limit=40):
+    """Everything `start` can reach through the call edges, breadth first.
+
+    Bounded, and the bound is not decoration: a call graph derived
+    syntactically can contain a cycle -- mutual recursion, or two helpers that
+    both reach a third -- and an unbounded walk over one does not terminate.
+    """
+    seen = []
+    queue = [start]
+    visited = {start}
+    while queue and len(seen) < limit:
+        current = queue.pop(0)
+        for a, b in calls:
+            if a == current and b not in visited:
+                visited.add(b)
+                seen.append(b)
+                queue.append(b)
+    return seen
+
+
+def contains(entry):
+    """A structured account of what one file holds, derived from its items.
+
+    Returns (counts, types, ways_in) where `ways_in` pairs each entry point
+    with what calling it reaches. Nothing here is written by hand, so nothing
+    here can drift from the code it describes.
+    """
+    items = entry["items"]
+    functions = [i for i in items if i["kind"] == "fn"]
+    types = [i for i in items if i["kind"] in ("struct", "enum", "trait", "union")]
+    constants = [i for i in items if i["kind"] in ("const", "static")]
+
+    calls = entry["calls"]
+    called = {b for _, b in calls}
+    ways_in = []
+    for item in functions:
+        if not item["public"] or item["name"] in called:
+            continue
+        ways_in.append((item, reachable(item["name"], calls)))
+
+    counts = {
+        "types": len(types),
+        "functions": len(functions),
+        "constants": len(constants),
+        "public": len([i for i in functions if i["public"]]),
+        "lines": entry["lines"],
+    }
+    return counts, types, ways_in
+
+
+def contains_markdown(entry):
+    """The "what is in here" section, as Markdown."""
+    counts, types, ways_in = contains(entry)
+    if not (types or ways_in or counts["functions"]):
+        return []
+
+    out = ["## What this file contains", ""]
+    out.append(
+        "%d lines defining **%d function%s** (%d public), **%d type%s** and "
+        "**%d constant%s**. Everything below is read out of the source, so it "
+        "cannot disagree with the code."
+        % (counts["lines"],
+           counts["functions"], "" if counts["functions"] == 1 else "s",
+           counts["public"],
+           counts["types"], "" if counts["types"] == 1 else "s",
+           counts["constants"], "" if counts["constants"] == 1 else "s"))
+    out.append("")
+
+    if types:
+        out.append("**The types it owns.**")
+        out.append("")
+        for item in types:
+            summary = first_sentence(item["doc"]) or ""
+            out.append("- `%s %s` (line %d)%s"
+                       % (item["kind"], item["name"], item["line"],
+                          " -- " + summary if summary else ""))
+        out.append("")
+
+    if ways_in:
+        out.append("**What happens when it runs.** These are the ways in: "
+                   "public, and nothing else in this file calls them, so they "
+                   "are what an outside caller reaches first.")
+        out.append("")
+        for item, reaches in ways_in:
+            name = ("`%s::%s`" % (item["owner"], item["name"])
+                    if item["owner"] else "`%s`" % item["name"])
+            summary = first_sentence(item["doc"]) or ""
+            out.append("- %s (line %d)%s"
+                       % (name, item["line"], " -- " + summary if summary else ""))
+            if reaches:
+                out.append("  - reaches: %s"
+                           % ", ".join("`%s`" % r for r in reaches[:12]))
+        out.append("")
+    return out
+
+
+def legend_markdown(nodes):
+    """Say what the colours mean. Colouring without a legend is worse than not."""
+    used = {n.get("role") for n in nodes}
+    shown = [(role, why) for role, _, why in ROLES if role in used]
+    if not shown:
+        return []
+    out = ["_Colour key: "]
+    out.append("; ".join("**%s** -- %s" % (role, why) for role, why in shown))
+    out.append("._")
+    return ["".join(out), ""]
+
 
 def mermaid_theme(colours):
     """The init directive, declared once and reused by every diagram."""
@@ -913,6 +1039,18 @@ def mermaid_id(name):
     return "n_" + re.sub(r"[^A-Za-z0-9_]", "_", name)
 
 
+# What each role means, and the colour it is drawn in.
+#
+# Three roles, not seven. A diagram whose legend needs studying has replaced
+# one problem with another, and the useful question a reader asks of a source
+# file is only ever "where does this start, and what does it reach?".
+ROLES = (
+    ("entry",  "accent",   "a way in: public, and nothing in this file calls it"),
+    ("api",    "cyan",     "public, and also used inside this file"),
+    ("helper", "accent-2", "private to this file"),
+)
+
+
 def mermaid(colours, nodes, edges, direction="TD"):
     out = [mermaid_theme(colours), "flowchart %s" % direction]
     for node in nodes:
@@ -921,6 +1059,18 @@ def mermaid(colours, nodes, edges, direction="TD"):
         out.append("    %s%s" % (mermaid_id(node["id"]), shape))
     for src, dst in edges:
         out.append("    %s --> %s" % (mermaid_id(src), mermaid_id(dst)))
+
+    # Roles as classes rather than per-node styling: one declaration each,
+    # readable in the diff, and the same three colours on every page so a
+    # reader learns them once.
+    used = {node.get("role") for node in nodes}
+    for role, token, _ in ROLES:
+        if role not in used:
+            continue
+        out.append("    classDef %s fill:%s,stroke:%s,color:%s"
+                   % (role, colours["bg-soft"], colours[token], colours["fg"]))
+        members = [mermaid_id(n["id"]) for n in nodes if n.get("role") == role]
+        out.append("    class %s %s" % (",".join(members), role))
     return "\n".join(out)
 
 
@@ -1108,9 +1258,15 @@ def diagram_svg(colours, nodes, edges, width=880):
         'aria-label="flowchart">' % (canvas_w, canvas_h))
     add('<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" '
         'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
-        '<path d="M0 0 L8 4 L0 8 z" fill="%s"/></marker></defs>'
+        '<path d="M0 0 L8 4 L0 8 z" fill="var(--muted, %s)"/></marker></defs>'
         % colours["muted"])
-    add('<rect x="0" y="0" width="%.0f" height="%.0f" fill="%s" rx="8"/>'
+    # `var(--token)` rather than a hex: this SVG is inline in the page, so it
+    # inherits the custom properties the stylesheet defines, and the diagram
+    # follows whichever of the nine themes the reader chose -- or one of their
+    # own. The second value in each `var()` is the fallback for a context with
+    # no stylesheet, which is what a raw SVG file opened on its own is.
+    add('<rect x="0" y="0" width="%.0f" height="%.0f" '
+        'fill="var(--bg-inset, %s)" rx="8"/>'
         % (canvas_w, canvas_h, colours["bg-inset"]))
 
     for src, dst in edges:
@@ -1124,7 +1280,7 @@ def diagram_svg(colours, nodes, edges, width=880):
             add('<path d="M%.1f %.1f C %.1f %.1f, %.1f %.1f, %.1f %.1f" '
                 'fill="none" stroke="%s" stroke-width="1.2" marker-end="url(#a)"/>'
                 % (x1, y1, x1, y1 + 20, x2, y2 - 20, x2, y2 - 3,
-                   colours["muted"]))
+                   "var(--muted, %s)" % colours["muted"]))
         else:
             # A back edge, drawn to the side so it cannot be mistaken for a
             # forward one, and kept rather than dropped.
@@ -1134,19 +1290,22 @@ def diagram_svg(colours, nodes, edges, width=880):
                 'stroke-dasharray="4 3" marker-end="url(#a)"/>'
                 % (sx + sw, sy + sh / 2.0, side, sy + sh / 2.0,
                    side, dy + dh / 2.0, dx + dw + 3, dy + dh / 2.0,
-                   colours["border"]))
+                   "var(--border, %s)" % colours["border"]))
 
+    role_token = {role: token for role, token, _ in ROLES}
     for node in nodes:
         x, y, w, h = placed[node["id"]]
-        stroke = colours["accent"] if node.get("root") else colours["border"]
+        token = role_token.get(node.get("role"), "border")
+        stroke = "var(--%s, %s)" % (token, colours.get(token, colours["border"]))
         add('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="7" '
-            'fill="%s" stroke="%s"/>' % (x, y, w, h, colours["bg-soft"], stroke))
+            'fill="var(--bg-soft, %s)" stroke="%s" stroke-width="1.5"/>'
+            % (x, y, w, h, colours["bg-soft"], stroke))
         for number, line in enumerate(node["label"]):
-            fill = colours["fg"] if number == 0 else colours["muted"]
+            token = "fg" if number == 0 else "muted"
             add('<text x="%.1f" y="%.1f" font-family="%s" font-size="13" '
-                'fill="%s" text-anchor="middle">%s</text>'
+                'fill="var(--%s, %s)" text-anchor="middle">%s</text>'
                 % (x + w / 2.0, y + pad_y + LINE_H * (number + 0.75),
-                   MONO, fill, esc(line)))
+                   MONO, token, colours[token], esc(line)))
     add('</svg>')
     return "\n".join(out) + "\n"
 
@@ -1280,11 +1439,16 @@ def markdown_file(colours, model, entry, links):
             "> the source rather than in this page: write the comment in\n"
             "> `%s` and it appears here.\n" % entry["rel"])
 
-    fixed = [(2, "What calls what")]
+    fixed = []
+    if contains_markdown(entry):
+        fixed.append((2, "What this file contains"))
+    fixed.append((2, "What calls what"))
     if entry["items"]:
         fixed.append((2, "Items"))
     sections = sections_for_page(entry["doc"], fixed)
     out.insert(TOC_AT, "\n".join(toc_markdown(sections)))
+
+    out.extend(contains_markdown(entry))
 
     out.append("## What calls what\n")
     if nodes:
@@ -1299,6 +1463,7 @@ def markdown_file(colours, model, entry, links):
                 "_%d of %d functions are drawn; the diagram is bounded at %d so it\n"
                 "stays readable. The full list is in the table below._\n"
                 % (len(nodes), total, MAX_DIAGRAM_NODES))
+        out.extend(legend_markdown(nodes))
         out.append("```mermaid\n%s\n```\n" % mermaid(colours, nodes, edges))
     else:
         out.append("This file defines no functions of its own.\n")
@@ -1814,12 +1979,15 @@ def wiki_file(colours, model, entry, links):
     else:
         out.append("> This file has no `//!` module documentation yet.\n")
 
+    out.extend(contains_markdown(entry))
+
     out.append("## What calls what\n")
     if nodes:
         if truncated:
             out.append("_%d of %d functions are drawn; the diagram is bounded "
                        "at %d so it stays readable._\n"
                        % (len(nodes), total, MAX_DIAGRAM_NODES))
+        out.extend(legend_markdown(nodes))
         out.append("```mermaid\n%s\n```\n" % mermaid(colours, nodes, edges))
     else:
         out.append("This file defines no functions of its own.\n")

@@ -52,27 +52,33 @@ It does not download anything -- this project has no network code and this
 binary is not the exception. Fetch the files however you like; this reads
 them from disk. It does not install anything, and it writes nothing.
 
+## What this file contains
+
+617 lines defining **16 functions** (0 public), **0 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
 ## What calls what
+
+_Colour key: **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_good["good"]
-    n_deny["deny"]
-    n_embedded_key["embedded_key"]
-    n_fingerprint_of["fingerprint_of"]
-    n_sha256_file["sha256_file"]
-    n_digests_match["digests_match"]
-    n_digest_from_sums["digest_from_sums"]
-    n_verify_detached["verify_detached"]
-    n_read_text["read_text"]
-    n_command_key["command_key"]
-    n_command_sums["command_sums"]
-    n_command_file_against_sums["command_file_against_sums"]
-    n_command_file_against_hash["command_file_against_hash"]
-    n_command_hash["command_hash"]
-    n_take_value["take_value"]
-    n_main["main"]
+    n_good["good<br/>line 147"]
+    n_deny["deny<br/>line 152"]
+    n_embedded_key["embedded_key<br/>line 172"]
+    n_fingerprint_of["fingerprint_of<br/>line 185"]
+    n_sha256_file["sha256_file<br/>line 202"]
+    n_digests_match["digests_match<br/>line 231"]
+    n_digest_from_sums["digest_from_sums<br/>line 241"]
+    n_verify_detached["verify_detached<br/>line 264"]
+    n_read_text["read_text<br/>line 286"]
+    n_command_key["command_key<br/>line 290"]
+    n_command_sums["command_sums<br/>line 309"]
+    n_command_file_against_sums["command_file_against_sums<br/>line 347"]
+    n_command_file_against_hash["command_file_against_hash<br/>line 431"]
+    n_command_hash["command_hash<br/>line 483"]
+    n_take_value["take_value<br/>line 500"]
+    n_main["main<br/>line 506"]
     n_command_file_against_hash --> n_deny
     n_command_file_against_hash --> n_digests_match
     n_command_file_against_hash --> n_good
@@ -103,6 +109,8 @@ flowchart TD
     n_main --> n_command_sums
     n_main --> n_deny
     n_main --> n_take_value
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_good,n_deny,n_embedded_key,n_fingerprint_of,n_sha256_file,n_digests_match,n_digest_from_sums,n_verify_detached,n_read_text,n_command_key,n_command_sums,n_command_file_against_sums,n_command_file_against_hash,n_command_hash,n_take_value,n_main helper
 ```
 
 ## Items

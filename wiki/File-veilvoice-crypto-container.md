@@ -38,25 +38,55 @@ decryption fail rather than silently changing behaviour. Unused fields are
 written as zero and are still authenticated, so they cannot be used as a
 covert channel or a downgrade vector.
 
+## What this file contains
+
+479 lines defining **9 functions** (8 public), **2 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Mode` (line 44) -- How a container is locked.
+- `struct Header` (line 53) -- A parsed container header.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `Header::to_bytes` (line 69) -- Serialise exactly as it appears on disk.
+- `veil_path` (line 152) -- The conventional path of the sealed form of path.
+- `seal_with_password` (line 159) -- Encrypt plaintext under a password.
+  - reaches: `finish`
+- `seal_to_public_key` (line 176) -- Encrypt plaintext to a recipient's hybrid public key.
+  - reaches: `finish`
+- `open_with_password` (line 204) -- Decrypt a password-locked container.
+  - reaches: `open_with_password_within`, `parse`
+- `open_with_secret_key` (line 236) -- Decrypt a container addressed to recipient.
+  - reaches: `parse`
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_to_bytes(["Header::to_bytes<br/>pub"])
-    n_parse(["Header::parse<br/>pub"])
-    n_veil_path(["veil_path<br/>pub"])
-    n_seal_with_password(["seal_with_password<br/>pub"])
-    n_seal_to_public_key(["seal_to_public_key<br/>pub"])
-    n_finish["finish"]
-    n_open_with_password(["open_with_password<br/>pub"])
-    n_open_with_password_within(["open_with_password_within<br/>pub"])
-    n_open_with_secret_key(["open_with_secret_key<br/>pub"])
+    n_to_bytes(["Header::to_bytes<br/>line 69"])
+    n_parse["Header::parse<br/>line 89"]
+    n_veil_path(["veil_path<br/>line 152"])
+    n_seal_with_password(["seal_with_password<br/>line 159"])
+    n_seal_to_public_key(["seal_to_public_key<br/>line 176"])
+    n_finish["finish<br/>line 195"]
+    n_open_with_password(["open_with_password<br/>line 204"])
+    n_open_with_password_within["open_with_password_within<br/>line 220"]
+    n_open_with_secret_key(["open_with_secret_key<br/>line 236"])
     n_open_with_password --> n_open_with_password_within
     n_open_with_password_within --> n_parse
     n_open_with_secret_key --> n_parse
     n_seal_to_public_key --> n_finish
     n_seal_with_password --> n_finish
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_to_bytes,n_veil_path,n_seal_with_password,n_seal_to_public_key,n_open_with_password,n_open_with_secret_key entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_parse,n_open_with_password_within api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_finish helper
 ```
 
 ## Items

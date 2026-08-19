@@ -17,6 +17,7 @@
 
 - [A palette file is untrusted input](#a-palette-file-is-untrusted-input)
 - [Contrast is computed, not trusted](#contrast-is-computed-not-trusted)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -74,6 +75,20 @@ secondary text that is meant to recede, every built-in theme would fail at
 4.5, and pretending otherwise would mean shipping a rule the project's own
 themes break.
 
+## What this file contains
+
+691 lines defining **8 functions** (4 public), **1 type** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct Parsed` (line 147) -- One parsed colour scheme, before it is accepted.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `default_dir` (line 282) -- Where palettes live, beside the preferences file.
+- `load` (line 309) -- Read every palette in dir, returning the usable ones and every complaint.
+  - reaches: `build`, `contrast_problems`, `parse`, `contrast`, `parse_hex`, `luminance`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -82,23 +97,31 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_luminance["luminance"]
-    n_contrast(["contrast<br/>pub"])
-    n_contrast_problems(["contrast_problems<br/>pub"])
-    n_parse_hex["parse_hex"]
-    n_parse["parse"]
-    n_build["build"]
-    n_default_dir(["default_dir<br/>pub"])
-    n_load(["load<br/>pub"])
+    n_luminance["luminance<br/>line 85"]
+    n_contrast["contrast<br/>line 101"]
+    n_contrast_problems["contrast_problems<br/>line 121"]
+    n_parse_hex["parse_hex<br/>line 154"]
+    n_parse["parse<br/>line 171"]
+    n_build["build<br/>line 249"]
+    n_default_dir(["default_dir<br/>line 282"])
+    n_load(["load<br/>line 309"])
     n_contrast --> n_luminance
     n_contrast_problems --> n_contrast
     n_load --> n_build
     n_load --> n_contrast_problems
     n_load --> n_parse
     n_parse --> n_parse_hex
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_default_dir,n_load entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_contrast,n_contrast_problems api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_luminance,n_parse_hex,n_parse,n_build helper
 ```
 
 ## Items

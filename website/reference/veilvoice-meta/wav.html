@@ -59,35 +59,43 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 177" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
-<rect x="0" y="0" width="880" height="177" fill="#16161e" rx="8"/>
-<path d="M489.8 74.0 C 489.8 94.0, 397.8 100.0, 397.8 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M560.8 47.0 C 582.8 47.0, 582.8 47.0, 395.8 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M489.8 74.0 C 489.8 94.0, 505.0 100.0, 505.0 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
-<rect x="319.2" y="20.0" width="73.6" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="356.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">is_wav</text>
-<text x="356.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="418.8" y="20.0" width="142.0" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
-<text x="489.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">clean_wav_bytes</text>
-<text x="489.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
-<rect x="345.8" y="120.0" width="104.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="397.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">info_chunk</text>
-<rect x="475.8" y="120.0" width="58.4" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="505.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">show</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 194" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
+<rect x="0" y="0" width="880" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M493.6 74.0 C 493.6 94.0, 382.6 100.0, 382.6 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M564.6 47.0 C 586.6 47.0, 586.6 47.0, 399.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M493.6 74.0 C 493.6 94.0, 505.0 100.0, 505.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="315.4" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="356.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">is_wav</text>
+<text x="356.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 42</text>
+<rect x="422.6" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="493.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean_wav_bytes</text>
+<text x="493.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 47</text>
+<rect x="330.6" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="382.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">info_chunk</text>
+<text x="382.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 131</text>
+<rect x="460.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="505.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">show</text>
+<text x="505.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_is_wav([&quot;is_wav&lt;br/&gt;pub&quot;])
-    n_clean_wav_bytes([&quot;clean_wav_bytes&lt;br/&gt;pub&quot;])
-    n_info_chunk[&quot;info_chunk&quot;]
-    n_show[&quot;show&quot;]
+    n_is_wav[&quot;is_wav&lt;br/&gt;line 42&quot;]
+    n_clean_wav_bytes([&quot;clean_wav_bytes&lt;br/&gt;line 47&quot;])
+    n_info_chunk[&quot;info_chunk&lt;br/&gt;line 131&quot;]
+    n_show[&quot;show&lt;br/&gt;line 150&quot;]
     n_clean_wav_bytes --&gt; n_info_chunk
     n_clean_wav_bytes --&gt; n_is_wav
-    n_clean_wav_bytes --&gt; n_show</code></pre>
+    n_clean_wav_bytes --&gt; n_show
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_clean_wav_bytes entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_is_wav api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_info_chunk,n_show helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

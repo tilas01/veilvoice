@@ -18,6 +18,7 @@
 - [What an accent is made of, and what a signal-level transform can remove](#what-an-accent-is-made-of-and-what-a-signal-level-transform-can-remove)
 - [Why this also strengthens de-identification](#why-this-also-strengthens-de-identification)
 - [Preserving intelligibility](#preserving-intelligibility)
+  - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -66,6 +67,29 @@ the vowels along with the accent. Vocal-tract and tilt corrections therefore
 use multi-second time constants, so they track the speaker and leave the
 phonemes moving freely underneath.
 
+## What this file contains
+
+677 lines defining **13 functions** (8 public), **3 types** and **10 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct AccentConfig` (line 76) -- How aggressively accent and speaker traits are normalised.
+- `struct AccentStats` (line 124) -- Live read-out of what the neutraliser is currently doing, for the UI.
+- `struct AccentNeutralizer` (line 143) -- Maps any speaker onto one canonical pitch register, vocal-tract scale and long-term spectrum.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `AccentNeutralizer::new` (line 169) -- Build for a given spectrum size and sample rate.
+- `AccentNeutralizer::enabled` (line 198) -- Whether neutralisation is active.
+- `AccentNeutralizer::stats` (line 203) -- Live read-out for the UI.
+- `AccentNeutralizer::observe` (line 220) -- Feed this frame's f0 estimate and update the intonation correction.
+- `AccentNeutralizer::prosody_ratio` (line 239) -- Pitch ratio to apply to the excitation this frame.
+- `AccentNeutralizer::measure_envelope` (line 250) -- Measure the speaker's vocal-tract scale from the *unwarped* envelope and update the VTLN ratio.
+  - reaches: `log_centroid`
+- `AccentNeutralizer::vtln_ratio` (line 269) -- Formant ratio to apply to the envelope this frame.
+- `AccentNeutralizer::shape` (line 289) -- Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average.
+  - reaches: `db_to_gain`, `gain_to_db`, `recompute_shape`
+
 ## What calls what
 
 The functions this file defines, and the calls between them. Both
@@ -74,26 +98,32 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["AccentConfig::default"]
-    n_new(["AccentNeutralizer::new<br/>pub"])
-    n_enabled(["AccentNeutralizer::enabled<br/>pub"])
-    n_stats(["AccentNeutralizer::stats<br/>pub"])
-    n_observe(["AccentNeutralizer::observe<br/>pub"])
-    n_prosody_ratio(["AccentNeutralizer::prosody_ra…<br/>pub"])
-    n_measure_envelope(["AccentNeutralizer::measure_en…<br/>pub"])
-    n_vtln_ratio(["AccentNeutralizer::vtln_ratio<br/>pub"])
-    n_shape(["AccentNeutralizer::shape<br/>pub"])
-    n_recompute_shape["AccentNeutralizer::recompute_…"]
-    n_log_centroid["log_centroid"]
-    n_gain_to_db["gain_to_db"]
-    n_db_to_gain["db_to_gain"]
+    n_default["AccentConfig::default<br/>line 106"]
+    n_new(["AccentNeutralizer::new<br/>line 169"])
+    n_enabled(["AccentNeutralizer::enabled<br/>line 198"])
+    n_stats(["AccentNeutralizer::stats<br/>line 203"])
+    n_observe(["AccentNeutralizer::observe<br/>line 220"])
+    n_prosody_ratio(["AccentNeutralizer::prosody_ra…<br/>line 239"])
+    n_measure_envelope(["AccentNeutralizer::measure_en…<br/>line 250"])
+    n_vtln_ratio(["AccentNeutralizer::vtln_ratio<br/>line 269"])
+    n_shape(["AccentNeutralizer::shape<br/>line 289"])
+    n_recompute_shape["AccentNeutralizer::recompute_…<br/>line 332"]
+    n_log_centroid["log_centroid<br/>line 384"]
+    n_gain_to_db["gain_to_db<br/>line 403"]
+    n_db_to_gain["db_to_gain<br/>line 407"]
     n_measure_envelope --> n_log_centroid
     n_shape --> n_db_to_gain
     n_shape --> n_gain_to_db
     n_shape --> n_recompute_shape
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_new,n_enabled,n_stats,n_observe,n_prosody_ratio,n_measure_envelope,n_vtln_ratio,n_shape entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_default,n_recompute_shape,n_log_centroid,n_gain_to_db,n_db_to_gain helper
 ```
 
 ## Items

@@ -93,32 +93,48 @@ if that wording is softened, because a user who over-trusts the app lock is
 left worse off than one who never had it. If you are editing text in this
 file and a test starts failing, it is that rule, and it is working.
 
+## What this file contains
+
+1110 lines defining **21 functions** (1 public), **3 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Tab` (line 90) -- The things VeilVoice does.
+- `enum JobDone` (line 106) -- Result of a background file job.
+- `struct VeilVoiceApp` (line 117) -- Application state.
+
+**What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
+
+- `VeilVoiceApp::new` (line 245) -- Build the app, applying theme and fonts to ctx.
+
 ## What calls what
+
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_preferred_output["preferred_output"]
-    n_preferred_input["preferred_input"]
-    n_without_devices["VeilVoiceApp::without_devices"]
-    n_default["VeilVoiceApp::default"]
-    n_new(["VeilVoiceApp::new<br/>pub"])
-    n_config["VeilVoiceApp::config"]
-    n_update["VeilVoiceApp::update"]
-    n_poll_job["VeilVoiceApp::poll_job"]
-    n_settings["VeilVoiceApp::settings"]
-    n_file_tab["VeilVoiceApp::file_tab"]
-    n_start_job["VeilVoiceApp::start_job"]
-    n_live_tab["VeilVoiceApp::live_tab"]
-    n_start_live["VeilVoiceApp::start_live"]
-    n_poll_watch["VeilVoiceApp::poll_watch"]
-    n_watch_indicator["VeilVoiceApp::watch_indicator"]
-    n_watch_tab["VeilVoiceApp::watch_tab"]
-    n_previous_crash["VeilVoiceApp::previous_crash"]
-    n_about_tab["VeilVoiceApp::about_tab"]
-    n_device_picker["device_picker"]
-    n_field["field"]
-    n_meter["meter"]
+    n_preferred_output["preferred_output<br/>line 171"]
+    n_preferred_input["preferred_input<br/>line 180"]
+    n_without_devices["VeilVoiceApp::without_devices<br/>line 194"]
+    n_default["VeilVoiceApp::default<br/>line 227"]
+    n_new(["VeilVoiceApp::new<br/>line 245"])
+    n_config["VeilVoiceApp::config<br/>line 272"]
+    n_update["VeilVoiceApp::update<br/>line 286"]
+    n_poll_job["VeilVoiceApp::poll_job<br/>line 390"]
+    n_settings["VeilVoiceApp::settings<br/>line 424"]
+    n_file_tab["VeilVoiceApp::file_tab<br/>line 461"]
+    n_start_job["VeilVoiceApp::start_job<br/>line 541"]
+    n_live_tab["VeilVoiceApp::live_tab<br/>line 597"]
+    n_start_live["VeilVoiceApp::start_live<br/>line 688"]
+    n_poll_watch["VeilVoiceApp::poll_watch<br/>line 702"]
+    n_watch_indicator["VeilVoiceApp::watch_indicator<br/>line 726"]
+    n_watch_tab["VeilVoiceApp::watch_tab<br/>line 755"]
+    n_previous_crash["VeilVoiceApp::previous_crash<br/>line 841"]
+    n_about_tab["VeilVoiceApp::about_tab<br/>line 866"]
+    n_device_picker["device_picker<br/>line 918"]
+    n_field["field<br/>line 943"]
+    n_meter["meter<br/>line 950"]
     n_about_tab --> n_field
     n_about_tab --> n_previous_crash
     n_default --> n_preferred_input
@@ -140,6 +156,10 @@ flowchart TD
     n_update --> n_poll_watch
     n_update --> n_watch_indicator
     n_update --> n_watch_tab
+    classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
+    class n_new entry
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_preferred_output,n_preferred_input,n_without_devices,n_default,n_config,n_update,n_poll_job,n_settings,n_file_tab,n_start_job,n_live_tab,n_start_live,n_poll_watch,n_watch_indicator,n_watch_tab,n_previous_crash,n_about_tab,n_device_picker,n_field,n_meter helper
 ```
 
 ## Items
