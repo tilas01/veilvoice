@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/settings.svg" alt="settings.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/settings.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 618 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 706 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-menu-rather-than-one-long-list">Why a menu rather than one long list</a>
@@ -61,55 +61,58 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1357 260" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
-<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#565f89"/></marker></defs>
-<rect x="0" y="0" width="1357" height="260" fill="#16161e" rx="8"/>
-<path d="M570.2 138.5 C 962.4 138.5, 962.4 47.0, 943.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M461.2 157.0 C 461.2 177.0, 621.2 183.0, 621.2 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M461.2 157.0 C 461.2 177.0, 732.2 183.0, 732.2 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1632 260" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
+<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#737aa2"/></marker></defs>
+<rect x="0" y="0" width="1632" height="260" fill="#16161e" rx="8"/>
+<path d="M707.4 138.5 C 1633.6 138.5, 1633.6 47.0, 1614.6 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M707.4 138.5 C 962.4 138.5, 962.4 47.0, 943.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M598.4 157.0 C 598.4 177.0, 758.4 183.0, 758.4 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M598.4 157.0 C 598.4 177.0, 869.4 183.0, 869.4 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M1184.4 47.0 C 1206.4 47.0, 1206.4 47.0, 943.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M783.8 138.5 C 805.8 138.5, 805.8 47.0, 516.2 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M783.8 138.5 C 962.4 138.5, 962.4 47.0, 943.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M690.0 157.0 C 690.0 177.0, 621.2 183.0, 621.2 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1005.0 138.5 C 1027.0 138.5, 1027.0 47.0, 943.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M907.4 157.0 C 907.4 177.0, 621.2 183.0, 621.2 200.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1273.8 74.0 C 1273.8 94.0, 461.2 100.0, 461.2 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1273.8 74.0 C 1273.8 94.0, 690.0 100.0, 690.0 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M1273.8 74.0 C 1273.8 94.0, 907.4 100.0, 907.4 117.0" fill="none" stroke="#565f89" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M921.0 138.5 C 943.0 138.5, 943.0 47.0, 516.2 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M921.0 138.5 C 962.4 138.5, 962.4 47.0, 943.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M827.2 157.0 C 827.2 177.0, 758.4 183.0, 758.4 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1142.2 138.5 C 1164.2 138.5, 1164.2 47.0, 943.4 47.0" fill="none" stroke="#2f3549" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M1044.6 157.0 C 1044.6 177.0, 758.4 183.0, 758.4 200.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1273.8 74.0 C 1273.8 94.0, 598.4 100.0, 598.4 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1273.8 74.0 C 1273.8 94.0, 827.2 100.0, 827.2 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M1273.8 74.0 C 1273.8 94.0, 1044.6 100.0, 1044.6 117.0" fill="none" stroke="#737aa2" stroke-width="1.2" marker-end="url(#a)"/>
 <rect x="20.0" y="28.5" width="157.2" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="98.6" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::default</text>
 <rect x="203.2" y="20.0" width="134.4" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
 <text x="270.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::load</text>
-<text x="270.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
+<text x="270.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
 <rect x="363.6" y="20.0" width="149.6" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
 <text x="438.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::motion</text>
-<text x="438.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
+<text x="438.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
 <rect x="539.2" y="20.0" width="218.0" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
 <text x="648.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::needs_first_run</text>
-<text x="648.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
+<text x="648.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
 <rect x="783.2" y="28.5" width="157.2" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
 <text x="861.8" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::persist</text>
 <rect x="966.4" y="20.0" width="218.0" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
 <text x="1075.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::first_run_panel</text>
-<text x="1075.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
+<text x="1075.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
 <rect x="1210.4" y="20.0" width="126.8" height="54.0" rx="7" fill="#1f2335" stroke="#7aa2f7"/>
 <text x="1273.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::tab</text>
-<text x="1273.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#565f89" text-anchor="middle">pub</text>
-<rect x="352.2" y="120.0" width="218.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="461.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::appearance_page</text>
-<rect x="596.2" y="120.0" width="187.6" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="690.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::motion_page</text>
-<rect x="809.8" y="120.0" width="195.2" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="907.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::storage_page</text>
-<rect x="580.6" y="203.0" width="81.2" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="621.2" y="225.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">section</text>
-<rect x="687.8" y="203.0" width="88.8" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
-<text x="732.2" y="225.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">swatches</text>
+<text x="1273.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#737aa2" text-anchor="middle">pub</text>
+<rect x="1363.2" y="28.5" width="248.4" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="1487.4" y="51.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::custom_palette_help</text>
+<rect x="489.4" y="120.0" width="218.0" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="598.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::appearance_page</text>
+<rect x="733.4" y="120.0" width="187.6" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="827.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::motion_page</text>
+<rect x="947.0" y="120.0" width="195.2" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="1044.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">Settings::storage_page</text>
+<rect x="717.8" y="203.0" width="81.2" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="758.4" y="225.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">section</text>
+<rect x="825.0" y="203.0" width="88.8" height="37.0" rx="7" fill="#1f2335" stroke="#2f3549"/>
+<text x="869.4" y="225.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#c0caf5" text-anchor="middle">swatches</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
-<pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#565f89&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
+<pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_default[&quot;Settings::default&quot;]
     n_load([&quot;Settings::load&lt;br/&gt;pub&quot;])
@@ -118,11 +121,13 @@ flowchart TD
     n_persist[&quot;Settings::persist&quot;]
     n_first_run_panel([&quot;Settings::first_run_panel&lt;br/&gt;pub&quot;])
     n_tab([&quot;Settings::tab&lt;br/&gt;pub&quot;])
+    n_custom_palette_help[&quot;Settings::custom_palette_help&quot;]
     n_appearance_page[&quot;Settings::appearance_page&quot;]
     n_motion_page[&quot;Settings::motion_page&quot;]
     n_storage_page[&quot;Settings::storage_page&quot;]
     n_section[&quot;section&quot;]
     n_swatches[&quot;swatches&quot;]
+    n_appearance_page --&gt; n_custom_palette_help
     n_appearance_page --&gt; n_persist
     n_appearance_page --&gt; n_section
     n_appearance_page --&gt; n_swatches
@@ -144,18 +149,19 @@ flowchart TD
 <tr><td><code>Page</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L35" rel="noopener noreferrer">35</a></td><td>Which page of the settings menu is showing.</td></tr>
 <tr><td><code>Page::ALL</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L46" rel="noopener noreferrer">46</a></td><td>Every page, in menu order, with its label and one-line summary.</td></tr>
 <tr><td><code>Settings</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L54" rel="noopener noreferrer">54</a></td><td>The settings tab&#x27;s own state.</td></tr>
-<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L72" rel="noopener noreferrer">72</a></td><td></td></tr>
-<tr><td><code>Settings::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L90" rel="noopener noreferrer">90</a></td><td>Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.</td></tr>
-<tr><td><code>Settings::motion</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L113" rel="noopener noreferrer">113</a></td><td>How much movement is allowed this frame.</td></tr>
-<tr><td><code>Settings::needs_first_run</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L118" rel="noopener noreferrer">118</a></td><td>Whether the first-run choice has still to be made.</td></tr>
-<tr><td><code>Settings::persist</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L122" rel="noopener noreferrer">122</a></td><td></td></tr>
-<tr><td><code>Settings::first_run_panel</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L140" rel="noopener noreferrer">140</a></td><td>The first-run panel: offered once, with animation already on.</td></tr>
-<tr><td><code>Settings::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L200" rel="noopener noreferrer">200</a></td><td>The settings tab.</td></tr>
-<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L245" rel="noopener noreferrer">245</a></td><td></td></tr>
-<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L276" rel="noopener noreferrer">276</a></td><td></td></tr>
-<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L351" rel="noopener noreferrer">351</a></td><td></td></tr>
-<tr><td><code>section</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L412" rel="noopener noreferrer">412</a></td><td>A titled group with a one-line explanation under it.</td></tr>
-<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L420" rel="noopener noreferrer">420</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
+<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L79" rel="noopener noreferrer">79</a></td><td></td></tr>
+<tr><td><code>Settings::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L98" rel="noopener noreferrer">98</a></td><td>Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.</td></tr>
+<tr><td><code>Settings::motion</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L124" rel="noopener noreferrer">124</a></td><td>How much movement is allowed this frame.</td></tr>
+<tr><td><code>Settings::needs_first_run</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L129" rel="noopener noreferrer">129</a></td><td>Whether the first-run choice has still to be made.</td></tr>
+<tr><td><code>Settings::persist</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L133" rel="noopener noreferrer">133</a></td><td></td></tr>
+<tr><td><code>Settings::first_run_panel</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L151" rel="noopener noreferrer">151</a></td><td>The first-run panel: offered once, with animation already on.</td></tr>
+<tr><td><code>Settings::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L211" rel="noopener noreferrer">211</a></td><td>The settings tab.</td></tr>
+<tr><td><code>Settings::custom_palette_help</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L264" rel="noopener noreferrer">264</a></td><td>Explain where custom palettes go, and say what was refused and why.</td></tr>
+<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L327" rel="noopener noreferrer">327</a></td><td></td></tr>
+<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L364" rel="noopener noreferrer">364</a></td><td></td></tr>
+<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L439" rel="noopener noreferrer">439</a></td><td></td></tr>
+<tr><td><code>section</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L500" rel="noopener noreferrer">500</a></td><td>A titled group with a one-line explanation under it.</td></tr>
+<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L508" rel="noopener noreferrer">508</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
 </tbody></table>
 </section>
 </div></div>

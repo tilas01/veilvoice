@@ -29,6 +29,6 @@
 <rect x="346.0" y="49.3" width="7.0" height="51.3" rx="3" fill="#bb9af7" opacity="0.80"/>
 <rect x="359.0" y="63.2" width="7.0" height="23.5" rx="3" fill="#bb9af7" opacity="0.67"/>
 <text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">audio.rs</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#565f89">Audio tag removal and replacement.</text>
+<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Audio tag removal and replacement.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">META</text>
 </svg>

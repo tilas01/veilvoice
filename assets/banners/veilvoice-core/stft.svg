@@ -29,6 +29,6 @@
 <rect x="346.0" y="39.8" width="7.0" height="70.4" rx="3" fill="#bb9af7" opacity="0.89"/>
 <rect x="359.0" y="39.7" width="7.0" height="70.7" rx="3" fill="#bb9af7" opacity="0.90"/>
 <text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">stft.rs</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#565f89">Streaming short-time Fourier transform with overlap-add resynthesis.</text>
+<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Streaming short-time Fourier transform with overlap-add resynthesis.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CORE</text>
 </svg>

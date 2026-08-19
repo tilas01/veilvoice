@@ -2,7 +2,7 @@
 
 # `crates/veilvoice-gui/src/settings.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 618 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 706 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
 
 ## Contents
 
@@ -40,7 +40,7 @@ being treated with the same weight, and it is not the same weight.
 ## What calls what
 
 ```mermaid
-%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_default["Settings::default"]
     n_load(["Settings::load<br/>pub"])
@@ -49,11 +49,13 @@ flowchart TD
     n_persist["Settings::persist"]
     n_first_run_panel(["Settings::first_run_panel<br/>pub"])
     n_tab(["Settings::tab<br/>pub"])
+    n_custom_palette_help["Settings::custom_palette_help"]
     n_appearance_page["Settings::appearance_page"]
     n_motion_page["Settings::motion_page"]
     n_storage_page["Settings::storage_page"]
     n_section["section"]
     n_swatches["swatches"]
+    n_appearance_page --> n_custom_palette_help
     n_appearance_page --> n_persist
     n_appearance_page --> n_section
     n_appearance_page --> n_swatches
@@ -75,15 +77,16 @@ flowchart TD
 | `Page` <sub>pub enum</sub> | [35](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L35) | Which page of the settings menu is showing. |
 | `Page::ALL` <sub>pub const</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L46) | Every page, in menu order, with its label and one-line summary. |
 | `Settings` <sub>pub struct</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L54) | The settings tab's own state. |
-| `Settings::default` <sub>fn</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L72) |  |
-| `Settings::load` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L90) | Load preferences from this platform's config directory and apply the chosen theme to ctx. |
-| `Settings::motion` <sub>pub fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L113) | How much movement is allowed this frame. |
-| `Settings::needs_first_run` <sub>pub fn</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L118) | Whether the first-run choice has still to be made. |
-| `Settings::persist` <sub>fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L122) |  |
-| `Settings::first_run_panel` <sub>pub fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L140) | The first-run panel: offered once, with animation already on. |
-| `Settings::tab` <sub>pub fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L200) | The settings tab. |
-| `Settings::appearance_page` <sub>fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L245) |  |
-| `Settings::motion_page` <sub>fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L276) |  |
-| `Settings::storage_page` <sub>fn</sub> | [351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L351) |  |
-| `section` <sub>fn</sub> | [412](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L412) | A titled group with a one-line explanation under it. |
-| `swatches` <sub>fn</sub> | [420](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L420) | The active palette, as a row of swatches, so the choice can be seen rather than only read. |
+| `Settings::default` <sub>fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L79) |  |
+| `Settings::load` <sub>pub fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L98) | Load preferences from this platform's config directory and apply the chosen theme to ctx. |
+| `Settings::motion` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L124) | How much movement is allowed this frame. |
+| `Settings::needs_first_run` <sub>pub fn</sub> | [129](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L129) | Whether the first-run choice has still to be made. |
+| `Settings::persist` <sub>fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L133) |  |
+| `Settings::first_run_panel` <sub>pub fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L151) | The first-run panel: offered once, with animation already on. |
+| `Settings::tab` <sub>pub fn</sub> | [211](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L211) | The settings tab. |
+| `Settings::custom_palette_help` <sub>fn</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L264) | Explain where custom palettes go, and say what was refused and why. |
+| `Settings::appearance_page` <sub>fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L327) |  |
+| `Settings::motion_page` <sub>fn</sub> | [364](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L364) |  |
+| `Settings::storage_page` <sub>fn</sub> | [439](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L439) |  |
+| `section` <sub>fn</sub> | [500](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L500) | A titled group with a one-line explanation under it. |
+| `swatches` <sub>fn</sub> | [508](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L508) | The active palette, as a row of swatches, so the choice can be seen rather than only read. |

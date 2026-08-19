@@ -64,6 +64,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`app.rs`|File-veilvoice-gui-app]] &mdash; The VeilVoice desktop application: six tabs, one window, no menus.
 - [[`lib.rs`|File-veilvoice-gui-lib]] &mdash; The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.
 - [[`main.rs`|File-veilvoice-gui-main]] &mdash; Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.
+- [[`palettes.rs`|File-veilvoice-gui-palettes]] &mdash; User-defined colour schemes, and the contrast check that keeps them usable.
 - [[`prefs.rs`|File-veilvoice-gui-prefs]] &mdash; What the user has chosen about how the app looks and moves.
 - [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] &mdash; Whether the operating system has been asked to reduce motion.
 - [[`security.rs`|File-veilvoice-gui-security]] &mdash; The application lock, and the at-rest encryption of what VeilVoice writes.

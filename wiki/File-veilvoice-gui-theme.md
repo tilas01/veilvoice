@@ -2,7 +2,7 @@
 
 # `crates/veilvoice-gui/src/theme.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 650 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 745 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
 
 ## Contents
 
@@ -20,8 +20,11 @@ Every theme here is the same set of twelve tokens the website defines in
 Tokyo Night additionally matches the escape codes the CLI emits. The three
 front-ends are meant to read as one program rather than as three tools that
 happen to share a name, and the way that is kept true is by copying the
-numbers rather than by approximating them. A test asserts a sample of them
-against the stylesheet, so the two cannot drift apart unnoticed.
+numbers rather than by approximating them. Tests assert **every token of
+every theme** against the stylesheet, in **both directions** -- so a colour
+changed on either side, a theme removed from either side, or a theme added
+to the website and forgotten here all fail the build rather than shipping as
+two products that no longer look alike.
 
 # Why the active theme is an index, not a lock
 
@@ -40,14 +43,18 @@ instead.
 ## What calls what
 
 ```mermaid
-%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#565f89","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_active(["active<br/>pub"])
+    n_themes(["themes<br/>pub"])
+    n_load_custom(["load_custom<br/>pub"])
     n_by_id(["by_id<br/>pub"])
     n_set_by_id(["set_by_id<br/>pub"])
     n_user_font_paths["user_font_paths"]
     n_install_fonts(["install_fonts<br/>pub"])
     n_install(["install<br/>pub"])
+    n_active --> n_themes
+    n_by_id --> n_themes
     n_install --> n_active
     n_install_fonts --> n_user_font_paths
     n_set_by_id --> n_by_id
@@ -58,15 +65,18 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Theme` <sub>pub struct</sub> | [36](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L36) | One complete colour scheme. |
-| `fn` <sub>const</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L72) |  |
-| `THEMES` <sub>pub const</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L83) | Every theme, in the order the picker shows them. |
-| `ACTIVE` <sub>static</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L240) | The index of the theme currently in force. |
-| `active` <sub>pub fn</sub> | [246](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L246) | The theme currently in force. |
-| `by_id` <sub>pub fn</sub> | [252](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L252) | Look a theme up by its stable identifier. |
-| `set_by_id` <sub>pub fn</sub> | [259](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L259) | Switch to id, and apply it to ctx. |
-| `palette` <sub>pub mod</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L276) | Shorthand accessors, so call sites read as p::fg() rather than theme::active().fg. |
-| `JETBRAINS_MONO_PATHS` <sub>const</sub> | [352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L352) | Places JetBrains Mono is normally installed. |
-| `user_font_paths` <sub>fn</sub> | [364](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L364) |  |
-| `install_fonts` <sub>pub fn</sub> | [379](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L379) | Load JetBrains Mono if the system has it. |
-| `install` <sub>pub fn</sub> | [402](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L402) | Apply the active theme's visuals and a monospace-everywhere type scale. |
+| `TABLE` <sub>static</sub> | [39](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L39) | The theme table, once the user's palettes have been folded in. |
+| `Theme` <sub>pub struct</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L46) | One complete colour scheme. |
+| `fn` <sub>const</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L82) |  |
+| `THEMES` <sub>pub const</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L93) | Every theme, in the order the picker shows them. |
+| `ACTIVE` <sub>static</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L250) | The index of the theme currently in force. |
+| `active` <sub>pub fn</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L256) | The theme currently in force. |
+| `themes` <sub>pub fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L273) | Every theme the picker offers: the built-in ones, then any the user added. |
+| `load_custom` <sub>pub fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L286) | Read the user's palettes and add them to the table. |
+| `by_id` <sub>pub fn</sub> | [300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L300) | Look a theme up by its stable identifier. |
+| `set_by_id` <sub>pub fn</sub> | [307](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L307) | Switch to id, and apply it to ctx. |
+| `palette` <sub>pub mod</sub> | [324](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L324) | Shorthand accessors, so call sites read as p::fg() rather than theme::active().fg. |
+| `JETBRAINS_MONO_PATHS` <sub>const</sub> | [400](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L400) | Places JetBrains Mono is normally installed. |
+| `user_font_paths` <sub>fn</sub> | [412](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L412) |  |
+| `install_fonts` <sub>pub fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L427) | Load JetBrains Mono if the system has it. |
+| `install` <sub>pub fn</sub> | [450](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L450) | Apply the active theme's visuals and a monospace-everywhere type scale. |

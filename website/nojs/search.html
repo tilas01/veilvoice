@@ -8,7 +8,7 @@
 <link rel="prefetch" href="index.html">
 <link rel="prefetch" href="../index.html">
 <style>
-:root{--bg:#1a1b26;--fg:#c0caf5;--muted:#565f89;--accent:#7aa2f7;--accent-2:#bb9af7;--border:#414868;--bg-inset:#16161e;color-scheme:dark}
+:root{--bg:#1a1b26;--fg:#c0caf5;--muted:#737aa2;--accent:#7aa2f7;--accent-2:#bb9af7;--border:#414868;--bg-inset:#16161e;color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);margin:0;padding:20px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;line-height:1.65}
 main{max-width:900px;margin:0 auto}
@@ -42,19 +42,19 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice &mdash; 145 files, 5419 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice &mdash; 147 files, 5501 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
 <ul class="toc">
 <li><a href="#k-doc">Documentation</a> <span class="meta">12 files</span></li>
-<li><a href="#k-rust">Rust source</a> <span class="meta">52 files</span></li>
+<li><a href="#k-rust">Rust source</a> <span class="meta">53 files</span></li>
 <li><a href="#k-test">Tests and fuzzing</a> <span class="meta">10 files</span></li>
 <li><a href="#k-web">Website</a> <span class="meta">15 files</span></li>
 <li><a href="#k-tool">Tools and generators</a> <span class="meta">16 files</span></li>
 <li><a href="#k-build">Build and CI</a> <span class="meta">19 files</span></li>
 <li><a href="#k-legal">Licence and legal</a> <span class="meta">4 files</span></li>
-<li><a href="#k-other">Other</a> <span class="meta">17 files</span></li>
+<li><a href="#k-other">Other</a> <span class="meta">18 files</span></li>
 </ul>
 <h2 id="k-doc">Documentation <span class="meta">(12)</span></h2>
 <details open>
@@ -995,7 +995,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">packaging/</span> <span class="meta">line 3</span><br><span class="x">permission. | | `homebrew/` | A formula, not a cask: it builds from source. | | `gentoo/` | A live ebuild that builds from this repository. | | `veilvoice.desktop` | Shared desktop entry for the Linux packages. |</span></li>
 </ul>
 </details>
-<h2 id="k-rust">Rust source <span class="meta">(52)</span></h2>
+<h2 id="k-rust">Rust source <span class="meta">(53)</span></h2>
 <details open>
 <summary><code>crates/veilvoice-audio/src/devices.rs</code> <span class="meta">&mdash; veilvoice-audio, 229 lines, 25 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs">open devices.rs</a></p>
@@ -2238,7 +2238,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/app.rs</code> <span class="meta">&mdash; veilvoice-gui, 1063 lines, 57 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/app.rs</code> <span class="meta">&mdash; veilvoice-gui, 1075 lines, 57 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs">open app.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The VeilVoice desktop application: six tabs, one window, no menus. One window, six tabs, no menus and no settings file to hunt for. This file owns the window: the tab strip, the state behind it, and the rules about what the user is allowed</span></li>
@@ -2272,36 +2272,36 @@ nav.top a{margin-right:14px}
 <li><span class="sec">fn default</span> <span class="meta">line 227</span><br><span class="x"></span></li>
 <li><span class="sec">impl VeilVoiceApp</span> <span class="meta">line 240</span><br><span class="x"></span></li>
 <li><span class="sec">fn new</span> <span class="meta">line 245</span><br><span class="x">Build the app, applying theme and fonts to `ctx`. This is where the lock file is read, rather than in `Default`: tests and anything else constructing the app must not touch the real one.</span></li>
-<li><span class="sec">fn config</span> <span class="meta">line 260</span><br><span class="x"></span></li>
-<li><span class="sec">impl eframe::App for VeilVoiceApp</span> <span class="meta">line 273</span><br><span class="x"></span></li>
-<li><span class="sec">fn update</span> <span class="meta">line 274</span><br><span class="x"></span></li>
-<li><span class="sec">impl VeilVoiceApp</span> <span class="meta">line 377</span><br><span class="x"></span></li>
-<li><span class="sec">fn poll_job</span> <span class="meta">line 378</span><br><span class="x"></span></li>
-<li><span class="sec">fn settings</span> <span class="meta">line 412</span><br><span class="x"></span></li>
-<li><span class="sec">fn file_tab</span> <span class="meta">line 449</span><br><span class="x"></span></li>
-<li><span class="sec">fn start_job</span> <span class="meta">line 529</span><br><span class="x"></span></li>
-<li><span class="sec">fn live_tab</span> <span class="meta">line 585</span><br><span class="x"></span></li>
-<li><span class="sec">fn start_live</span> <span class="meta">line 676</span><br><span class="x"></span></li>
-<li><span class="sec">fn poll_watch</span> <span class="meta">line 690</span><br><span class="x">Re-scan on a timer rather than every frame.</span></li>
-<li><span class="sec">fn watch_indicator</span> <span class="meta">line 714</span><br><span class="x">The always-visible indicator.</span></li>
-<li><span class="sec">fn watch_tab</span> <span class="meta">line 743</span><br><span class="x"></span></li>
-<li><span class="sec">fn about_tab</span> <span class="meta">line 819</span><br><span class="x"></span></li>
-<li><span class="sec">fn device_picker</span> <span class="meta">line 870</span><br><span class="x"></span></li>
-<li><span class="sec">fn field</span> <span class="meta">line 895</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter</span> <span class="meta">line 902</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 929</span><br><span class="x"></span></li>
-<li><span class="sec">fn device</span> <span class="meta">line 934</span><br><span class="x">Device selection is tested against synthetic lists, never the machine. See `preferred_output` for why that is not merely tidier.</span></li>
-<li><span class="sec">fn defaults_are_the_safe_ones</span> <span class="meta">line 943</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_job_cannot_start_before_the_at_rest_choice_is_made</span> <span class="meta">line 962</span><br><span class="x">The default is only worth anything if the button honours it: with encryption on and nothing to encrypt with, a job must not start.</span></li>
-<li><span class="sec">fn config_reflects_the_controls</span> <span class="meta">line 969</span><br><span class="x"></span></li>
-<li><span class="sec">fn every_reachable_reseed_setting_is_valid</span> <span class="meta">line 987</span><br><span class="x">The slider&#x27;s whole range must produce a configuration the engine accepts, or a user could drag it into an error.</span></li>
-<li><span class="sec">fn a_virtual_cable_is_preferred_over_the_system_default</span> <span class="meta">line 1000</span><br><span class="x">A virtual cable must win, because routing there is the whole point of live mode. Every arrangement, none of them involving real hardware.</span></li>
-<li><span class="sec">fn the_default_input_is_preferred_then_the_first</span> <span class="meta">line 1033</span><br><span class="x"></span></li>
-<li><span class="sec">fn building_the_app_with_real_device_enumeration_does_not_panic</span> <span class="meta">line 1052</span><br><span class="x">The one test that talks to the machine&#x27;s audio stack. Kept single, and last: enumerating devices from several test threads at once on a headless runner is what produced an access violation in CI.</span></li>
+<li><span class="sec">fn config</span> <span class="meta">line 272</span><br><span class="x"></span></li>
+<li><span class="sec">impl eframe::App for VeilVoiceApp</span> <span class="meta">line 285</span><br><span class="x"></span></li>
+<li><span class="sec">fn update</span> <span class="meta">line 286</span><br><span class="x"></span></li>
+<li><span class="sec">impl VeilVoiceApp</span> <span class="meta">line 389</span><br><span class="x"></span></li>
+<li><span class="sec">fn poll_job</span> <span class="meta">line 390</span><br><span class="x"></span></li>
+<li><span class="sec">fn settings</span> <span class="meta">line 424</span><br><span class="x"></span></li>
+<li><span class="sec">fn file_tab</span> <span class="meta">line 461</span><br><span class="x"></span></li>
+<li><span class="sec">fn start_job</span> <span class="meta">line 541</span><br><span class="x"></span></li>
+<li><span class="sec">fn live_tab</span> <span class="meta">line 597</span><br><span class="x"></span></li>
+<li><span class="sec">fn start_live</span> <span class="meta">line 688</span><br><span class="x"></span></li>
+<li><span class="sec">fn poll_watch</span> <span class="meta">line 702</span><br><span class="x">Re-scan on a timer rather than every frame.</span></li>
+<li><span class="sec">fn watch_indicator</span> <span class="meta">line 726</span><br><span class="x">The always-visible indicator.</span></li>
+<li><span class="sec">fn watch_tab</span> <span class="meta">line 755</span><br><span class="x"></span></li>
+<li><span class="sec">fn about_tab</span> <span class="meta">line 831</span><br><span class="x"></span></li>
+<li><span class="sec">fn device_picker</span> <span class="meta">line 882</span><br><span class="x"></span></li>
+<li><span class="sec">fn field</span> <span class="meta">line 907</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter</span> <span class="meta">line 914</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 941</span><br><span class="x"></span></li>
+<li><span class="sec">fn device</span> <span class="meta">line 946</span><br><span class="x">Device selection is tested against synthetic lists, never the machine. See `preferred_output` for why that is not merely tidier.</span></li>
+<li><span class="sec">fn defaults_are_the_safe_ones</span> <span class="meta">line 955</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_job_cannot_start_before_the_at_rest_choice_is_made</span> <span class="meta">line 974</span><br><span class="x">The default is only worth anything if the button honours it: with encryption on and nothing to encrypt with, a job must not start.</span></li>
+<li><span class="sec">fn config_reflects_the_controls</span> <span class="meta">line 981</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_reachable_reseed_setting_is_valid</span> <span class="meta">line 999</span><br><span class="x">The slider&#x27;s whole range must produce a configuration the engine accepts, or a user could drag it into an error.</span></li>
+<li><span class="sec">fn a_virtual_cable_is_preferred_over_the_system_default</span> <span class="meta">line 1012</span><br><span class="x">A virtual cable must win, because routing there is the whole point of live mode. Every arrangement, none of them involving real hardware.</span></li>
+<li><span class="sec">fn the_default_input_is_preferred_then_the_first</span> <span class="meta">line 1045</span><br><span class="x"></span></li>
+<li><span class="sec">fn building_the_app_with_real_device_enumeration_does_not_panic</span> <span class="meta">line 1064</span><br><span class="x">The one test that talks to the machine&#x27;s audio stack. Kept single, and last: enumerating devices from several test threads at once on a headless runner is what produced an access violation in CI.</span></li>
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/lib.rs</code> <span class="meta">&mdash; veilvoice-gui, 57 lines, 16 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/lib.rs</code> <span class="meta">&mdash; veilvoice-gui, 58 lines, 17 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs">open lib.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x"># veilvoice-gui The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel</span></li>
@@ -2313,13 +2313,14 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">and tests fail the build if that text changes. Documentation nobody opens does not protect anybody. **Animation is a preference that is honoured, not a decoration.** [`reduced_motion`] resolves the platform&#x27;s own setting alongside the</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">user&#x27;s explicit choice, and the whole interface reads that answer rather than each widget deciding for itself.</span></li>
 <li><span class="sec">mod app</span> <span class="meta">line 45</span><br><span class="x"></span></li>
-<li><span class="sec">mod prefs</span> <span class="meta">line 46</span><br><span class="x"></span></li>
-<li><span class="sec">mod reduced_motion</span> <span class="meta">line 47</span><br><span class="x"></span></li>
-<li><span class="sec">mod security</span> <span class="meta">line 48</span><br><span class="x"></span></li>
-<li><span class="sec">mod settings</span> <span class="meta">line 49</span><br><span class="x"></span></li>
-<li><span class="sec">mod soundbar</span> <span class="meta">line 50</span><br><span class="x"></span></li>
-<li><span class="sec">mod theme</span> <span class="meta">line 51</span><br><span class="x"></span></li>
-<li><span class="sec">const VERSION</span> <span class="meta">line 56</span><br><span class="x">Crate version string, surfaced in the About panel.</span></li>
+<li><span class="sec">mod palettes</span> <span class="meta">line 46</span><br><span class="x"></span></li>
+<li><span class="sec">mod prefs</span> <span class="meta">line 47</span><br><span class="x"></span></li>
+<li><span class="sec">mod reduced_motion</span> <span class="meta">line 48</span><br><span class="x"></span></li>
+<li><span class="sec">mod security</span> <span class="meta">line 49</span><br><span class="x"></span></li>
+<li><span class="sec">mod settings</span> <span class="meta">line 50</span><br><span class="x"></span></li>
+<li><span class="sec">mod soundbar</span> <span class="meta">line 51</span><br><span class="x"></span></li>
+<li><span class="sec">mod theme</span> <span class="meta">line 52</span><br><span class="x"></span></li>
+<li><span class="sec">const VERSION</span> <span class="meta">line 57</span><br><span class="x">Crate version string, surfaced in the About panel.</span></li>
 </ul>
 </details>
 <details open>
@@ -2336,6 +2337,67 @@ nav.top a{margin-right:14px}
 <li><span class="sec">const ICON_RGBA</span> <span class="meta">line 42</span><br><span class="x">The window icon, as raw 32x32 RGBA produced by `assets/generate.py`. Raw rather than PNG so the application needs no image decoder just to draw its own title bar.</span></li>
 <li><span class="sec">const ICON_SIZE</span> <span class="meta">line 43</span><br><span class="x"></span></li>
 <li><span class="sec">fn main</span> <span class="meta">line 45</span><br><span class="x"></span></li>
+</ul>
+</details>
+<details open>
+<summary><code>crates/veilvoice-gui/src/palettes.rs</code> <span class="meta">&mdash; veilvoice-gui, 633 lines, 55 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs">open palettes.rs</a></p>
+<ul>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">User-defined colour schemes, and the contrast check that keeps them usable. A reader can drop a small text file into a `palettes/` directory beside the preferences file and have it appear in the theme picker alongside the nine built-in</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">schemes. The format is the same `key = value` shape [`crate::prefs`] already uses, for the same reason: it is trivial to write by hand, trivial to parse without a dependency, and has no syntax in which something surprising can hide. # A</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">palette file is untrusted input It arrives from the filesystem, it may have been written by hand at two in the morning, and it may have been copied from a web page by somebody who has never seen a hex colour. So it is parsed like anything</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">else this project reads: every field validated, every failure named, and **refused rather than patched up**. Refusing matters more here than it first appears. The obvious lenient design is to fill in whatever is missing from the default</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">theme -- and that produces a palette which is *mostly* the user&#x27;s, with a few colours from somewhere else, and no indication which. The user sees an application that looks subtly wrong and has nothing to go on. An error naming the missing</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">token is worth more than a window that opens. # Contrast is computed, not trusted The request that prompted this asked for &quot;whatever colour with correct contrast to read&quot;. Correct contrast is not an aesthetic judgement, it is arithmetic:</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">WCAG 2.1 defines relative luminance and a contrast ratio, and a ratio below 4.5 means body text a substantial number of people cannot read. So a palette whose foreground fails against its own background is **refused with the measured ratio</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">in the message**, rather than accepted and left to produce an application nobody can use. It is the one validation here that is about the user rather than about the parser, and it is the reason this module exists at all rather than the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">fields being read straight into a struct. The thresholds are stated where they are enforced, and they are the standard&#x27;s, not invented here: | Pair | Minimum | Why | |---|---|---| | `fg` on `bg` | 4.5 | Body text, WCAG AA | | `fg` on</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`bg_soft` | 4.5 | The same text on a raised surface | | `muted` on `bg` | 3.0 | Secondary text, AA large-text threshold | | `accent` on `bg` | 3.0 | Links and controls, AA non-text contrast | | `err` on `bg` | 3.0 | A warning nobody can</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">read is worse than none | `muted` is deliberately held to 3.0 rather than 4.5. It is used for secondary text that is meant to recede, every built-in theme would fail at 4.5, and pretending otherwise would mean shipping a rule the project&#x27;s</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">own themes break.</span></li>
+<li><span class="sec">const REQUIRED</span> <span class="meta">line 64</span><br><span class="x">Every token a palette file has to define. Listed rather than derived so that a missing one is named in the error. The order is the order they are reported in.</span></li>
+<li><span class="sec">const MAX_PALETTES</span> <span class="meta">line 75</span><br><span class="x">The most palette files that will be read from the directory. A bound on work driven by the contents of a directory, in the same spirit as the bounds in the search index and the release verifier. Nobody has forty colour schemes; a directory</span></li>
+<li><span class="sec">const MAX_PALETTES</span> <span class="meta">line 75</span><br><span class="x">containing forty thousand files is a mistake or a prank, and either way the application should still start.</span></li>
+<li><span class="sec">const MAX_BYTES</span> <span class="meta">line 78</span><br><span class="x">The largest palette file that will be read.</span></li>
+<li><span class="sec">fn luminance</span> <span class="meta">line 85</span><br><span class="x">Relative luminance, as defined by WCAG 2.1. The channel transfer is the standard&#x27;s, including the 0.03928 knee: it is not the same as a plain gamma of 2.2, and using one would shift every ratio slightly -- enough to pass a palette the</span></li>
+<li><span class="sec">fn luminance</span> <span class="meta">line 85</span><br><span class="x">standard fails.</span></li>
+<li><span class="sec">fn channel</span> <span class="meta">line 86</span><br><span class="x"></span></li>
+<li><span class="sec">fn contrast</span> <span class="meta">line 101</span><br><span class="x">The WCAG contrast ratio between two colours, from 1.0 to 21.0. Symmetric: the order of the arguments does not matter, which is why the lighter of the two is worked out here rather than assumed by the caller.</span></li>
+<li><span class="sec">const PAIRS</span> <span class="meta">line 108</span><br><span class="x">The contrast pairs a palette has to satisfy, with the reason for each.</span></li>
+<li><span class="sec">fn contrast_problems</span> <span class="meta">line 121</span><br><span class="x">Check a palette&#x27;s contrast, returning one message per failing pair. Returns the measured ratio in each message. &quot;Your colours are too similar&quot; is not actionable; &quot;fg on bg is 2.1:1, and body text needs 4.5:1&quot; tells somebody exactly how far</span></li>
+<li><span class="sec">fn contrast_problems</span> <span class="meta">line 121</span><br><span class="x">off they are and which way to move.</span></li>
+<li><span class="sec">struct Parsed</span> <span class="meta">line 147</span><br><span class="x">One parsed colour scheme, before it is accepted.</span></li>
+<li><span class="sec">fn parse_hex</span> <span class="meta">line 154</span><br><span class="x"></span></li>
+<li><span class="sec">fn parse</span> <span class="meta">line 171</span><br><span class="x">Parse a palette file&#x27;s text. Returns the scheme, or every problem found. Every problem, not the first: somebody fixing a hand-written file should learn about all four mistakes in one go rather than rerunning after each.</span></li>
+<li><span class="sec">fn build</span> <span class="meta">line 249</span><br><span class="x"></span></li>
+<li><span class="sec">fn default_dir</span> <span class="meta">line 282</span><br><span class="x">Where palettes live, beside the preferences file.</span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 309</span><br><span class="x">Read every palette in `dir`, returning the usable ones and every complaint. Both halves are returned rather than one or the other. A palette that failed must not silently vanish -- the user wrote a file, put it in the right place, and is</span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 309</span><br><span class="x">entitled to be told why it is not in the picker. The settings tab shows these messages verbatim. # On leaking [`Theme`] holds `&amp;&#x27;static str` for its id and name so that reading the active theme in a paint loop is one relaxed atomic load</span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 309</span><br><span class="x">and a slice index, with no lock and no allocation -- see the module docs on `theme.rs`. Custom palettes therefore leak those two strings. That is a deliberate, bounded, load-once leak: at most [`MAX_PALETTES`] entries, read during startup,</span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 309</span><br><span class="x">never in a loop, and each a few dozen bytes. The alternative -- reference counting or a lock around the palette table -- would put synchronisation into the hottest read in the application to avoid leaking about a kilobyte, once.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 387</span><br><span class="x"></span></li>
+<li><span class="sec">const GOOD</span> <span class="meta">line 390</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_well_formed_palette_is_accepted</span> <span class="meta">line 409</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_contrast_ratio_matches_the_standard</span> <span class="meta">line 417</span><br><span class="x"></span></li>
+<li><span class="sec">fn contrast_is_symmetric</span> <span class="meta">line 433</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_built_in_theme_passes_its_own_contrast_check</span> <span class="meta">line 440</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_unreadable_palette_is_refused_with_the_measured_ratio</span> <span class="meta">line 457</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_missing_token_is_named_rather_than_filled_in</span> <span class="meta">line 471</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_problem_is_reported_not_just_the_first</span> <span class="meta">line 481</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_bad_colour_is_refused_rather_than_guessed</span> <span class="meta">line 494</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_palette_cannot_impersonate_a_built_in_theme</span> <span class="meta">line 505</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_id_that_would_not_survive_the_preferences_file_is_refused</span> <span class="meta">line 512</span><br><span class="x"></span></li>
+<li><span class="sec">struct Scratch</span> <span class="meta">line 527</span><br><span class="x">A scratch directory that cleans up after itself. No `tempfile` dependency for four tests: this project&#x27;s argument is that its supply chain is small enough to read, and a crate pulled in to make a directory would be a poor trade.</span></li>
+<li><span class="sec">impl Scratch</span> <span class="meta">line 529</span><br><span class="x"></span></li>
+<li><span class="sec">fn new</span> <span class="meta">line 530</span><br><span class="x"></span></li>
+<li><span class="sec">fn write</span> <span class="meta">line 543</span><br><span class="x"></span></li>
+<li><span class="sec">impl Drop for Scratch</span> <span class="meta">line 548</span><br><span class="x"></span></li>
+<li><span class="sec">fn drop</span> <span class="meta">line 549</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_palette_file_on_disk_becomes_a_theme</span> <span class="meta">line 555</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_rejected_palette_is_reported_rather_than_dropped_in_silence</span> <span class="meta">line 568</span><br><span class="x"></span></li>
+<li><span class="sec">fn one_bad_palette_does_not_hide_a_good_one</span> <span class="meta">line 585</span><br><span class="x"></span></li>
+<li><span class="sec">fn palettes_load_in_a_stable_order</span> <span class="meta">line 608</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_missing_directory_is_not_an_error</span> <span class="meta">line 624</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -2475,7 +2537,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/settings.rs</code> <span class="meta">&mdash; veilvoice-gui, 619 lines, 35 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/settings.rs</code> <span class="meta">&mdash; veilvoice-gui, 707 lines, 37 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs">open settings.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The settings panel: a menu of pages, each a titled group of choices. # Why a menu rather than one long list There are three kinds of setting here and they answer different questions: what the app *looks* like, how it *moves*, and what it</span></li>
@@ -2487,32 +2549,34 @@ nav.top a{margin-right:14px}
 <li><span class="sec">impl Page</span> <span class="meta">line 44</span><br><span class="x"></span></li>
 <li><span class="sec">const ALL</span> <span class="meta">line 46</span><br><span class="x">Every page, in menu order, with its label and one-line summary.</span></li>
 <li><span class="sec">struct Settings</span> <span class="meta">line 54</span><br><span class="x">The settings tab&#x27;s own state.</span></li>
-<li><span class="sec">impl Default for Settings</span> <span class="meta">line 71</span><br><span class="x"></span></li>
-<li><span class="sec">fn default</span> <span class="meta">line 72</span><br><span class="x"></span></li>
-<li><span class="sec">impl Settings</span> <span class="meta">line 84</span><br><span class="x"></span></li>
-<li><span class="sec">fn load</span> <span class="meta">line 90</span><br><span class="x">Load preferences from this platform&#x27;s config directory and apply the chosen theme to `ctx`. Never fails: an unreadable or unparseable file leaves the defaults in force, and the panel says so.</span></li>
-<li><span class="sec">fn motion</span> <span class="meta">line 113</span><br><span class="x">How much movement is allowed this frame. Takes `&amp;egui::Context` for symmetry with the rest of the UI even though it does not need it: the platform answer is cached from startup, since reading it costs a subprocess.</span></li>
-<li><span class="sec">fn needs_first_run</span> <span class="meta">line 118</span><br><span class="x">Whether the first-run choice has still to be made.</span></li>
-<li><span class="sec">fn persist</span> <span class="meta">line 122</span><br><span class="x"></span></li>
-<li><span class="sec">fn first_run_panel</span> <span class="meta">line 140</span><br><span class="x">The first-run panel: offered once, with animation already on. Shown as a page rather than a modal because it is not urgent and does not gate anything -- the legal notice is the thing that gates, and two blocking dialogues before a user has</span></li>
-<li><span class="sec">fn first_run_panel</span> <span class="meta">line 140</span><br><span class="x">seen the app is one too many.</span></li>
-<li><span class="sec">fn tab</span> <span class="meta">line 200</span><br><span class="x">The settings tab.</span></li>
-<li><span class="sec">fn appearance_page</span> <span class="meta">line 245</span><br><span class="x"></span></li>
-<li><span class="sec">fn motion_page</span> <span class="meta">line 276</span><br><span class="x"></span></li>
-<li><span class="sec">fn storage_page</span> <span class="meta">line 351</span><br><span class="x"></span></li>
-<li><span class="sec">fn section</span> <span class="meta">line 412</span><br><span class="x">A titled group with a one-line explanation under it.</span></li>
-<li><span class="sec">fn swatches</span> <span class="meta">line 420</span><br><span class="x">The active palette, as a row of swatches, so the choice can be seen rather than only read.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 449</span><br><span class="x"></span></li>
-<li><span class="sec">fn render</span> <span class="meta">line 453</span><br><span class="x">Drive the settings tab once, with no window.</span></li>
-<li><span class="sec">fn every_page_renders_without_a_window</span> <span class="meta">line 461</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_first_run_panel_renders</span> <span class="meta">line 470</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_menu_lists_every_page_exactly_once</span> <span class="meta">line 481</span><br><span class="x">The menu has to cover the pages and the pages have to cover the menu, or a page becomes unreachable.</span></li>
-<li><span class="sec">fn the_first_run_is_offered_once</span> <span class="meta">line 494</span><br><span class="x">A first run has not been configured; answering it must stick.</span></li>
-<li><span class="sec">fn animation_is_on_by_default_and_can_be_turned_off</span> <span class="meta">line 510</span><br><span class="x">Defaults are what the request asked for: animation on, offered at the start, switchable afterwards.</span></li>
-<li><span class="sec">fn choosing_a_theme_applies_and_records_it</span> <span class="meta">line 527</span><br><span class="x">Choosing a theme must apply it and record it.</span></li>
-<li><span class="sec">fn a_failed_save_is_reported_rather_than_swallowed</span> <span class="meta">line 556</span><br><span class="x">A save that cannot happen must not be silent, and must not lose the choice for this session either.</span></li>
-<li><span class="sec">fn reset_leaves_the_first_run_answered</span> <span class="meta">line 571</span><br><span class="x">Reset must not touch anything that is not a presentation choice.</span></li>
-<li><span class="sec">fn a_corrupt_file_leaves_a_usable_panel_that_says_so</span> <span class="meta">line 603</span><br><span class="x">Loading must survive a settings file full of nonsense.</span></li>
+<li><span class="sec">impl Default for Settings</span> <span class="meta">line 78</span><br><span class="x"></span></li>
+<li><span class="sec">fn default</span> <span class="meta">line 79</span><br><span class="x"></span></li>
+<li><span class="sec">impl Settings</span> <span class="meta">line 92</span><br><span class="x"></span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 98</span><br><span class="x">Load preferences from this platform&#x27;s config directory and apply the chosen theme to `ctx`. Never fails: an unreadable or unparseable file leaves the defaults in force, and the panel says so.</span></li>
+<li><span class="sec">fn motion</span> <span class="meta">line 124</span><br><span class="x">How much movement is allowed this frame. Takes `&amp;egui::Context` for symmetry with the rest of the UI even though it does not need it: the platform answer is cached from startup, since reading it costs a subprocess.</span></li>
+<li><span class="sec">fn needs_first_run</span> <span class="meta">line 129</span><br><span class="x">Whether the first-run choice has still to be made.</span></li>
+<li><span class="sec">fn persist</span> <span class="meta">line 133</span><br><span class="x"></span></li>
+<li><span class="sec">fn first_run_panel</span> <span class="meta">line 151</span><br><span class="x">The first-run panel: offered once, with animation already on. Shown as a page rather than a modal because it is not urgent and does not gate anything -- the legal notice is the thing that gates, and two blocking dialogues before a user has</span></li>
+<li><span class="sec">fn first_run_panel</span> <span class="meta">line 151</span><br><span class="x">seen the app is one too many.</span></li>
+<li><span class="sec">fn tab</span> <span class="meta">line 211</span><br><span class="x">The settings tab.</span></li>
+<li><span class="sec">fn custom_palette_help</span> <span class="meta">line 264</span><br><span class="x">Explain where custom palettes go, and say what was refused and why. The refusals are the important half. A user who writes a palette file, puts it in the right place and sees nothing happen has no way to tell whether the application never</span></li>
+<li><span class="sec">fn custom_palette_help</span> <span class="meta">line 264</span><br><span class="x">looked, or looked and disliked it. Every complaint from the loader is shown verbatim, including the measured contrast ratio, because &quot;muted on bg is 2.4:1 and needs 3.0:1&quot; tells somebody exactly what to change and by roughly how much.</span></li>
+<li><span class="sec">fn appearance_page</span> <span class="meta">line 327</span><br><span class="x"></span></li>
+<li><span class="sec">fn motion_page</span> <span class="meta">line 364</span><br><span class="x"></span></li>
+<li><span class="sec">fn storage_page</span> <span class="meta">line 439</span><br><span class="x"></span></li>
+<li><span class="sec">fn section</span> <span class="meta">line 500</span><br><span class="x">A titled group with a one-line explanation under it.</span></li>
+<li><span class="sec">fn swatches</span> <span class="meta">line 508</span><br><span class="x">The active palette, as a row of swatches, so the choice can be seen rather than only read.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 537</span><br><span class="x"></span></li>
+<li><span class="sec">fn render</span> <span class="meta">line 541</span><br><span class="x">Drive the settings tab once, with no window.</span></li>
+<li><span class="sec">fn every_page_renders_without_a_window</span> <span class="meta">line 549</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_first_run_panel_renders</span> <span class="meta">line 558</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_menu_lists_every_page_exactly_once</span> <span class="meta">line 569</span><br><span class="x">The menu has to cover the pages and the pages have to cover the menu, or a page becomes unreachable.</span></li>
+<li><span class="sec">fn the_first_run_is_offered_once</span> <span class="meta">line 582</span><br><span class="x">A first run has not been configured; answering it must stick.</span></li>
+<li><span class="sec">fn animation_is_on_by_default_and_can_be_turned_off</span> <span class="meta">line 598</span><br><span class="x">Defaults are what the request asked for: animation on, offered at the start, switchable afterwards.</span></li>
+<li><span class="sec">fn choosing_a_theme_applies_and_records_it</span> <span class="meta">line 615</span><br><span class="x">Choosing a theme must apply it and record it.</span></li>
+<li><span class="sec">fn a_failed_save_is_reported_rather_than_swallowed</span> <span class="meta">line 644</span><br><span class="x">A save that cannot happen must not be silent, and must not lose the choice for this session either.</span></li>
+<li><span class="sec">fn reset_leaves_the_first_run_answered</span> <span class="meta">line 659</span><br><span class="x">Reset must not touch anything that is not a presentation choice.</span></li>
+<li><span class="sec">fn a_corrupt_file_leaves_a_usable_panel_that_says_so</span> <span class="meta">line 691</span><br><span class="x">Loading must survive a settings file full of nonsense.</span></li>
 </ul>
 </details>
 <details open>
@@ -2548,55 +2612,66 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/theme.rs</code> <span class="meta">&mdash; veilvoice-gui, 651 lines, 46 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/theme.rs</code> <span class="meta">&mdash; veilvoice-gui, 746 lines, 57 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs">open theme.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Colour schemes for the desktop app. # One palette, three front-ends Every theme here is the same set of twelve tokens the website defines in `website/css/themes.css`, with the same names and the same hex values, and Tokyo Night</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">additionally matches the escape codes the CLI emits. The three front-ends are meant to read as one program rather than as three tools that happen to share a name, and the way that is kept true is by copying the numbers rather than by</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">approximating them. A test asserts a sample of them against the stylesheet, so the two cannot drift apart unnoticed. # Why the active theme is an index, not a lock Colours are read on every repaint, from the UI thread, dozens of times a</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">frame. A `Mutex` around the palette would be a lock taken hundreds of times a second to read a constant, and a poisoned one would take the window with it. Instead the themes are a `const` array and the selection is a single `AtomicUsize`:</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">reading is one relaxed load, it cannot fail, and it cannot be poisoned. The index is clamped on read as well as on write. A value that somehow got out of range would otherwise panic on a slice index, in a paint loop, which is the worst</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">possible place for it -- so the read saturates to the default instead.</span></li>
-<li><span class="sec">struct Theme</span> <span class="meta">line 36</span><br><span class="x">One complete colour scheme. The field names match the CSS custom properties one for one: `bg` is `--bg`, `accent_2` is `--accent-2`, and so on.</span></li>
-<li><span class="sec">fn rgb</span> <span class="meta">line 72</span><br><span class="x"></span></li>
-<li><span class="sec">const THEMES</span> <span class="meta">line 83</span><br><span class="x">Every theme, in the order the picker shows them. Index 0 is the default and is the one a clamped-out-of-range read lands on.</span></li>
-<li><span class="sec">static ACTIVE</span> <span class="meta">line 240</span><br><span class="x">The index of the theme currently in force.</span></li>
-<li><span class="sec">fn active</span> <span class="meta">line 246</span><br><span class="x">The theme currently in force. Clamped on read: an index out of range would otherwise panic on a slice index inside the paint loop, which is the worst place for it.</span></li>
-<li><span class="sec">fn by_id</span> <span class="meta">line 252</span><br><span class="x">Look a theme up by its stable identifier.</span></li>
-<li><span class="sec">fn set_by_id</span> <span class="meta">line 259</span><br><span class="x">Switch to `id`, and apply it to `ctx`. Unknown identifiers are ignored, so a preferences file naming a theme this build does not have keeps the default rather than failing to start.</span></li>
-<li><span class="sec">mod palette</span> <span class="meta">line 276</span><br><span class="x">Shorthand accessors, so call sites read as `p::fg()` rather than `theme::active().fg`. These were `const` values when there was one theme. They are functions now because the palette is chosen at runtime; the call sites are otherwise</span></li>
-<li><span class="sec">mod palette</span> <span class="meta">line 276</span><br><span class="x">unchanged.</span></li>
-<li><span class="sec">fn bg</span> <span class="meta">line 281</span><br><span class="x">Window and central-panel background.</span></li>
-<li><span class="sec">fn bg_dark</span> <span class="meta">line 285</span><br><span class="x">Deeper background, for inset panels.</span></li>
-<li><span class="sec">fn surface</span> <span class="meta">line 289</span><br><span class="x">Raised surface, for widgets.</span></li>
-<li><span class="sec">fn surface_hi</span> <span class="meta">line 297</span><br><span class="x">Hovered surface: the raised surface, lifted towards the text colour. Derived rather than tabulated, so a new theme cannot be added with a hover state that does not belong to it. `lerp` towards `fg` works for light schemes as well as dark</span></li>
-<li><span class="sec">fn surface_hi</span> <span class="meta">line 297</span><br><span class="x">ones, where simply lightening would not.</span></li>
-<li><span class="sec">fn border</span> <span class="meta">line 302</span><br><span class="x">Borders and separators.</span></li>
-<li><span class="sec">fn fg</span> <span class="meta">line 306</span><br><span class="x">Primary text.</span></li>
-<li><span class="sec">fn muted</span> <span class="meta">line 310</span><br><span class="x">Secondary text.</span></li>
-<li><span class="sec">fn blue</span> <span class="meta">line 314</span><br><span class="x">The project&#x27;s primary colour.</span></li>
-<li><span class="sec">fn cyan</span> <span class="meta">line 318</span><br><span class="x">Values and figures.</span></li>
-<li><span class="sec">fn purple</span> <span class="meta">line 322</span><br><span class="x">The &quot;veiled&quot; half of the mark.</span></li>
-<li><span class="sec">fn green</span> <span class="meta">line 326</span><br><span class="x">Success.</span></li>
-<li><span class="sec">fn yellow</span> <span class="meta">line 330</span><br><span class="x">Warning.</span></li>
-<li><span class="sec">fn red</span> <span class="meta">line 334</span><br><span class="x">Error.</span></li>
-<li><span class="sec">fn blend</span> <span class="meta">line 339</span><br><span class="x">Mix `a` towards `b` by `t` in 0..=1.</span></li>
-<li><span class="sec">const JETBRAINS_MONO_PATHS</span> <span class="meta">line 352</span><br><span class="x">Places JetBrains Mono is normally installed. The font is not vendored: it is Apache-2.0 and redistributable, but shipping a binary blob would undercut the claim that everything here is auditable from source. If it is installed the UI uses</span></li>
-<li><span class="sec">const JETBRAINS_MONO_PATHS</span> <span class="meta">line 352</span><br><span class="x">it; otherwise egui&#x27;s own monospace face stands in, which looks close enough that nothing breaks.</span></li>
-<li><span class="sec">fn user_font_paths</span> <span class="meta">line 364</span><br><span class="x"></span></li>
-<li><span class="sec">fn install_fonts</span> <span class="meta">line 379</span><br><span class="x">Load JetBrains Mono if the system has it. Returns whether it was found.</span></li>
-<li><span class="sec">fn install</span> <span class="meta">line 402</span><br><span class="x">Apply the active theme&#x27;s visuals and a monospace-everywhere type scale.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 463</span><br><span class="x"></span></li>
-<li><span class="sec">fn reset</span> <span class="meta">line 466</span><br><span class="x"></span></li>
-<li><span class="sec">fn palette_matches_the_cli_escape_codes</span> <span class="meta">line 471</span><br><span class="x"></span></li>
-<li><span class="sec">fn every_theme_matches_the_website_stylesheet</span> <span class="meta">line 485</span><br><span class="x">The app&#x27;s themes and the website&#x27;s are meant to be the same themes, not two sets that happen to share names. Parsed straight out of the stylesheet so a change to either side without the other fails here.</span></li>
-<li><span class="sec">fn the_app_offers_the_same_themes_as_the_website</span> <span class="meta">line 558</span><br><span class="x">The website offers exactly these themes, in this order. A theme added to one and not the other is the kind of drift nobody notices.</span></li>
-<li><span class="sec">fn switching_theme_changes_the_palette_and_the_visuals</span> <span class="meta">line 573</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_impossible_index_saturates_instead_of_panicking</span> <span class="meta">line 595</span><br><span class="x">An out-of-range index must saturate rather than panic. This is read inside the paint loop, which is the worst place for an index panic.</span></li>
-<li><span class="sec">fn theme_identifiers_are_unique_and_stable</span> <span class="meta">line 603</span><br><span class="x"></span></li>
-<li><span class="sec">fn font_search_covers_every_supported_platform</span> <span class="meta">line 621</span><br><span class="x"></span></li>
-<li><span class="sec">fn styling_applies_without_a_window</span> <span class="meta">line 635</span><br><span class="x"></span></li>
-<li><span class="sec">fn missing_font_is_not_fatal</span> <span class="meta">line 645</span><br><span class="x">Missing JetBrains Mono must degrade to the built-in face, never panic.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">approximating them. Tests assert **every token of every theme** against the stylesheet, in **both directions** -- so a colour changed on either side, a theme removed from either side, or a theme added to the website and forgotten here all</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">fail the build rather than shipping as two products that no longer look alike. # Why the active theme is an index, not a lock Colours are read on every repaint, from the UI thread, dozens of times a frame. A `Mutex` around the palette</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">would be a lock taken hundreds of times a second to read a constant, and a poisoned one would take the window with it. Instead the themes are a `const` array and the selection is a single `AtomicUsize`: reading is one relaxed load, it</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">cannot fail, and it cannot be poisoned. The index is clamped on read as well as on write. A value that somehow got out of range would otherwise panic on a slice index, in a paint loop, which is the worst possible place for it -- so the</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">read saturates to the default instead.</span></li>
+<li><span class="sec">static TABLE</span> <span class="meta">line 39</span><br><span class="x">The theme table, once the user&#x27;s palettes have been folded in. Empty until [`load_custom`] runs. See [`themes`] for why this is a `OnceLock` rather than anything that can be written twice.</span></li>
+<li><span class="sec">struct Theme</span> <span class="meta">line 46</span><br><span class="x">One complete colour scheme. The field names match the CSS custom properties one for one: `bg` is `--bg`, `accent_2` is `--accent-2`, and so on.</span></li>
+<li><span class="sec">fn rgb</span> <span class="meta">line 82</span><br><span class="x"></span></li>
+<li><span class="sec">const THEMES</span> <span class="meta">line 93</span><br><span class="x">Every theme, in the order the picker shows them. Index 0 is the default and is the one a clamped-out-of-range read lands on.</span></li>
+<li><span class="sec">static ACTIVE</span> <span class="meta">line 250</span><br><span class="x">The index of the theme currently in force.</span></li>
+<li><span class="sec">fn active</span> <span class="meta">line 256</span><br><span class="x">The theme currently in force. Clamped on read: an index out of range would otherwise panic on a slice index inside the paint loop, which is the worst place for it.</span></li>
+<li><span class="sec">fn themes</span> <span class="meta">line 273</span><br><span class="x">Every theme the picker offers: the built-in ones, then any the user added. Returns the `const` array until [`load_custom`] has run, which is what every test and the first frames of startup see. After it has run, the same array with the</span></li>
+<li><span class="sec">fn themes</span> <span class="meta">line 273</span><br><span class="x">user&#x27;s palettes appended -- appended rather than merged, so a built-in theme keeps its index and a preferences file written before a palette was added still selects the same scheme. Reading this is a `OnceLock::get`, which is one atomic</span></li>
+<li><span class="sec">fn themes</span> <span class="meta">line 273</span><br><span class="x">load. No mutex: this is on the path of every repaint, and the reason `ACTIVE` is an `AtomicUsize` in the first place applies just as much here.</span></li>
+<li><span class="sec">fn load_custom</span> <span class="meta">line 286</span><br><span class="x">Read the user&#x27;s palettes and add them to the table. Returns any complaints. Called once, during startup, before the first frame. Calling it again is a no-op that returns no problems -- `OnceLock` accepts one value, and silently keeping the</span></li>
+<li><span class="sec">fn load_custom</span> <span class="meta">line 286</span><br><span class="x">first is right here: the alternative is a theme table that changes shape while indices into it are live.</span></li>
+<li><span class="sec">fn by_id</span> <span class="meta">line 300</span><br><span class="x">Look a theme up by its stable identifier.</span></li>
+<li><span class="sec">fn set_by_id</span> <span class="meta">line 307</span><br><span class="x">Switch to `id`, and apply it to `ctx`. Unknown identifiers are ignored, so a preferences file naming a theme this build does not have keeps the default rather than failing to start.</span></li>
+<li><span class="sec">mod palette</span> <span class="meta">line 324</span><br><span class="x">Shorthand accessors, so call sites read as `p::fg()` rather than `theme::active().fg`. These were `const` values when there was one theme. They are functions now because the palette is chosen at runtime; the call sites are otherwise</span></li>
+<li><span class="sec">mod palette</span> <span class="meta">line 324</span><br><span class="x">unchanged.</span></li>
+<li><span class="sec">fn bg</span> <span class="meta">line 329</span><br><span class="x">Window and central-panel background.</span></li>
+<li><span class="sec">fn bg_dark</span> <span class="meta">line 333</span><br><span class="x">Deeper background, for inset panels.</span></li>
+<li><span class="sec">fn surface</span> <span class="meta">line 337</span><br><span class="x">Raised surface, for widgets.</span></li>
+<li><span class="sec">fn surface_hi</span> <span class="meta">line 345</span><br><span class="x">Hovered surface: the raised surface, lifted towards the text colour. Derived rather than tabulated, so a new theme cannot be added with a hover state that does not belong to it. `lerp` towards `fg` works for light schemes as well as dark</span></li>
+<li><span class="sec">fn surface_hi</span> <span class="meta">line 345</span><br><span class="x">ones, where simply lightening would not.</span></li>
+<li><span class="sec">fn border</span> <span class="meta">line 350</span><br><span class="x">Borders and separators.</span></li>
+<li><span class="sec">fn fg</span> <span class="meta">line 354</span><br><span class="x">Primary text.</span></li>
+<li><span class="sec">fn muted</span> <span class="meta">line 358</span><br><span class="x">Secondary text.</span></li>
+<li><span class="sec">fn blue</span> <span class="meta">line 362</span><br><span class="x">The project&#x27;s primary colour.</span></li>
+<li><span class="sec">fn cyan</span> <span class="meta">line 366</span><br><span class="x">Values and figures.</span></li>
+<li><span class="sec">fn purple</span> <span class="meta">line 370</span><br><span class="x">The &quot;veiled&quot; half of the mark.</span></li>
+<li><span class="sec">fn green</span> <span class="meta">line 374</span><br><span class="x">Success.</span></li>
+<li><span class="sec">fn yellow</span> <span class="meta">line 378</span><br><span class="x">Warning.</span></li>
+<li><span class="sec">fn red</span> <span class="meta">line 382</span><br><span class="x">Error.</span></li>
+<li><span class="sec">fn blend</span> <span class="meta">line 387</span><br><span class="x">Mix `a` towards `b` by `t` in 0..=1.</span></li>
+<li><span class="sec">const JETBRAINS_MONO_PATHS</span> <span class="meta">line 400</span><br><span class="x">Places JetBrains Mono is normally installed. The font is not vendored: it is Apache-2.0 and redistributable, but shipping a binary blob would undercut the claim that everything here is auditable from source. If it is installed the UI uses</span></li>
+<li><span class="sec">const JETBRAINS_MONO_PATHS</span> <span class="meta">line 400</span><br><span class="x">it; otherwise egui&#x27;s own monospace face stands in, which looks close enough that nothing breaks.</span></li>
+<li><span class="sec">fn user_font_paths</span> <span class="meta">line 412</span><br><span class="x"></span></li>
+<li><span class="sec">fn install_fonts</span> <span class="meta">line 427</span><br><span class="x">Load JetBrains Mono if the system has it. Returns whether it was found.</span></li>
+<li><span class="sec">fn install</span> <span class="meta">line 450</span><br><span class="x">Apply the active theme&#x27;s visuals and a monospace-everywhere type scale.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 511</span><br><span class="x"></span></li>
+<li><span class="sec">fn reset</span> <span class="meta">line 514</span><br><span class="x"></span></li>
+<li><span class="sec">fn palette_matches_the_cli_escape_codes</span> <span class="meta">line 519</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_website_has_no_theme_the_app_is_missing</span> <span class="meta">line 546</span><br><span class="x">The website must not gain a theme the app has never heard of. The test below walks `THEMES` and checks each against the stylesheet, which catches a theme changed or removed on either side -- and misses a theme **added to the website**,</span></li>
+<li><span class="sec">fn the_website_has_no_theme_the_app_is_missing</span> <span class="meta">line 546</span><br><span class="x">because nothing was walking the stylesheet looking for entries this crate does not know. That is the shape of the defect recorded against `html.test.js`: a check enumerating from a hardcoded list is only ever as wide as the list, and a</span></li>
+<li><span class="sec">fn the_website_has_no_theme_the_app_is_missing</span> <span class="meta">line 546</span><br><span class="x">page added later went unchecked for precisely that reason. So this enumerates from the *stylesheet* instead, and the pair of tests closes the loop in both directions. A reader who picks a theme on the website and then opens the app should</span></li>
+<li><span class="sec">fn the_website_has_no_theme_the_app_is_missing</span> <span class="meta">line 546</span><br><span class="x">find it there. Silently falling back to the default is a small thing that reads as the application being broken.</span></li>
+<li><span class="sec">fn every_theme_matches_the_website_stylesheet</span> <span class="meta">line 580</span><br><span class="x">The app&#x27;s themes and the website&#x27;s are meant to be the same themes, not two sets that happen to share names. Parsed straight out of the stylesheet so a change to either side without the other fails here.</span></li>
+<li><span class="sec">fn the_app_offers_the_same_themes_as_the_website</span> <span class="meta">line 653</span><br><span class="x">The website offers exactly these themes, in this order. A theme added to one and not the other is the kind of drift nobody notices.</span></li>
+<li><span class="sec">fn switching_theme_changes_the_palette_and_the_visuals</span> <span class="meta">line 668</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_impossible_index_saturates_instead_of_panicking</span> <span class="meta">line 690</span><br><span class="x">An out-of-range index must saturate rather than panic. This is read inside the paint loop, which is the worst place for an index panic.</span></li>
+<li><span class="sec">fn theme_identifiers_are_unique_and_stable</span> <span class="meta">line 698</span><br><span class="x"></span></li>
+<li><span class="sec">fn font_search_covers_every_supported_platform</span> <span class="meta">line 716</span><br><span class="x"></span></li>
+<li><span class="sec">fn styling_applies_without_a_window</span> <span class="meta">line 730</span><br><span class="x"></span></li>
+<li><span class="sec">fn missing_font_is_not_fatal</span> <span class="meta">line 740</span><br><span class="x">Missing JetBrains Mono must degrade to the built-in face, never panic.</span></li>
 </ul>
 </details>
 <details open>
@@ -3248,7 +3323,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">Night is the default and is declared on :root so the page has correct * colours before any JavaScript runs &#8212; including for readers who block it * entirely. The others are opt-in via [data-theme] on &lt;html&gt;. * * Each block also declares</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">`color-scheme`, beside the colours it has to agree * with. That is the one thing CSS custom properties cannot reach: the browser&#x27;s * *native* controls -- the theme `&lt;select&gt;`&#x27;s dropdown list, the verifier&#x27;s * `&lt;progress&gt;` bar, the file</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">picker -- are drawn by the platform, and without * this they are drawn light on a near-black page. Keeping it in the same block * as the palette means a new theme cannot be added with the wrong one. */ :root,</span></li>
-<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">:root[data-theme=&quot;tokyo-night&quot;] { color-scheme: dark; --bg: #1a1b26; --bg-soft: #1f2335; --bg-inset: #16161e; --border: #2f3549; --fg: #c0caf5; --muted: #565f89; --accent: #7aa2f7; /* primary */ --accent-2: #bb9af7; /* secondary */ --cyan:</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">:root[data-theme=&quot;tokyo-night&quot;] { color-scheme: dark; --bg: #1a1b26; --bg-soft: #1f2335; --bg-inset: #16161e; --border: #2f3549; --fg: #c0caf5; --muted: #737aa2; --accent: #7aa2f7; /* primary */ --accent-2: #bb9af7; /* secondary */ --cyan:</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">#7dcfff; --ok: #9ece6a; --warn: #e0af68; --err: #f7768e; } :root[data-theme=&quot;gruvbox&quot;] { color-scheme: dark; --bg: #282828; --bg-soft: #32302f; --bg-inset: #1d2021;</span></li>
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">--border: #504945; --fg: #ebdbb2; --muted: #928374; --accent: #83a598; --accent-2: #d3869b; --cyan: #8ec07c; --ok: #b8bb26; --warn: #fabd2f; --err: #fb4934; } :root[data-theme=&quot;dracula&quot;] { color-scheme: dark; --bg: #282a36; --bg-soft:</span></li>
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">#343746; --bg-inset: #21222c; --border: #44475a; --fg: #f8f8f2; --muted: #6272a4; --accent: #bd93f9; --accent-2: #ff79c6; --cyan: #8be9fd; --ok: #50fa7b; --warn: #f1fa8c; --err: #ff5555; } :root[data-theme=&quot;nord&quot;] { color-scheme: dark;</span></li>
@@ -3256,7 +3331,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">--err: #bf616a; } :root[data-theme=&quot;catppuccin&quot;] { color-scheme: dark; --bg: #1e1e2e; --bg-soft: #313244; --bg-inset: #181825; --border: #45475a; --fg: #cdd6f4; --muted: #7f849c; --accent: #89b4fa; --accent-2: #cba6f7; --cyan: #94e2d5;</span></li>
 <li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">--ok: #a6e3a1; --warn: #f9e2af; --err: #f38ba8; } :root[data-theme=&quot;everforest&quot;] { color-scheme: dark; --bg: #2d353b; --bg-soft: #343f44; --bg-inset: #272e33; --border: #475258; --fg: #d3c6aa; --muted: #859289; --accent: #a7c080;</span></li>
 <li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">--accent-2: #d699b6; --cyan: #83c092; --ok: #a7c080; --warn: #dbbc7f; --err: #e67e80; } :root[data-theme=&quot;solarized&quot;] { color-scheme: dark; --bg: #002b36; --bg-soft: #073642; --bg-inset: #00212b;</span></li>
-<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">--border: #0f4b5c; --fg: #93a1a1; --muted: #586e75; --accent: #268bd2; --accent-2: #d33682; --cyan: #2aa198; --ok: #859900; --warn: #b58900; --err: #dc322f; } :root[data-theme=&quot;rose-pine&quot;] { color-scheme: dark; --bg: #191724; --bg-soft:</span></li>
+<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">--border: #0f4b5c; --fg: #93a1a1; --muted: #657b83; --accent: #268bd2; --accent-2: #d33682; --cyan: #2aa198; --ok: #859900; --warn: #b58900; --err: #dc322f; } :root[data-theme=&quot;rose-pine&quot;] { color-scheme: dark; --bg: #191724; --bg-soft:</span></li>
 <li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">#1f1d2e; --bg-inset: #14121f; --border: #33304a; --fg: #e0def4; --muted: #6e6a86; --accent: #9ccfd8; --accent-2: #c4a7e7; --cyan: #31748f; --ok: #a6da95; --warn: #f6c177; --err: #eb6f92; } /* A light option, because a dark-only site is</span></li>
 <li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">unreadable in bright sun and * some people simply prefer it. Same tokens, inverted relationships. */ :root[data-theme=&quot;paper&quot;] { color-scheme: light; --bg: #faf4ed; --bg-soft: #f2e9e1; --bg-inset: #fffaf3; --border: #dfd8d0; --fg: #575279;</span></li>
 <li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">--muted: #797593; --accent: #286983; --accent-2: #907aa9; --cyan: #56949f;</span></li>
@@ -3916,7 +3991,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">reproduce byte-identical output. That matters for a project whose whole pitch is verifiability: a binary blob in the repository is one more thing a reader has to take on trust. Pure standard library &#8212; no Pillow, no build step: python</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">assets/generate.py Outputs icon.png, icon.ico and banner.png next to this script. &quot;&quot;&quot; import math import os import struct import sys import zlib # --- Tokyo Night ------------------------------------------------------------ BG = (0x1a,</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">0x1b, 0x26, 255) # editor background BG_DARK = (0x16, 0x16, 0x1e, 255) # deeper panel BORDER = (0x41, 0x48, 0x68, 255) # subtle outline FG = (0xc0, 0xca, 0xf5, 255) # foreground text BLUE = (0x7a, 0xa2, 0xf7, 255) # the &quot;clean voice&quot; side</span></li>
-<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">CYAN = (0x7d, 0xcf, 0xff, 255) PURPLE = (0xbb, 0x9a, 0xf7, 255) # the &quot;veiled voice&quot; side GREEN = (0x9e, 0xce, 0x6a, 255) COMMENT = (0x56, 0x5f, 0x89, 255) # muted text NONE = (0, 0, 0, 0) # --- PNG encoding</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">CYAN = (0x7d, 0xcf, 0xff, 255) PURPLE = (0xbb, 0x9a, 0xf7, 255) # the &quot;veiled voice&quot; side GREEN = (0x9e, 0xce, 0x6a, 255) COMMENT = (0x73, 0x7a, 0xa2, 255) # muted text NONE = (0, 0, 0, 0) # --- PNG encoding</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">----------------------------------------------------------- PNG_SIGNATURE = bytes((0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)) def write_png(path, pixels): &quot;&quot;&quot;Write 8-bit RGBA rows (list of list of 4-tuples) as a PNG.&quot;&quot;&quot; height =</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">len(pixels)</span></li>
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">width = len(pixels[0]) raw = bytearray() for row in pixels: raw.append(0) # filter type 0 (None): keeps the output deterministic for r, g, b, a in row: raw += bytes((r, g, b, a)) def chunk(kind, data): return ( struct.pack(&quot;&gt;I&quot;, len(data))</span></li>
@@ -4505,7 +4580,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 521</span> <span class="meta">line 521</span><br><span class="x">len(index[&quot;docs&quot;]) total_secs = len(index[&quot;secs&quot;]) out = [] add = out.append add(&#x27;&lt;!DOCTYPE html&gt;&#x27;) add(&#x27;&lt;html lang=&quot;en&quot;&gt;&#x27;) add(&#x27;&lt;head&gt;&#x27;) add(&#x27;&lt;meta charset=&quot;utf-8&quot;&gt;&#x27;) add(&#x27;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,</span></li>
 <li><span class="sec">line 521</span> <span class="meta">line 521</span><br><span class="x">initial-scale=1&quot;&gt;&#x27;) add(&#x27;&lt;title&gt;Search index &amp;mdash; VeilVoice (no JavaScript)&lt;/title&gt;&#x27;) add(&#x27;&lt;meta name=&quot;description&quot; content=&quot;A complete static index of every &#x27; &#x27;file and section in VeilVoice. No JavaScript required.&quot;&gt;&#x27;) # Markup, not</span></li>
 <li><span class="sec">line 521</span> <span class="meta">line 521</span><br><span class="x">script, so it works in this edition exactly as in the other. add(&#x27;&lt;link rel=&quot;prefetch&quot; href=&quot;index.html&quot;&gt;&#x27;)</span></li>
-<li><span class="sec">line 561</span> <span class="meta">line 561</span><br><span class="x">add(&#x27;&lt;link rel=&quot;prefetch&quot; href=&quot;../index.html&quot;&gt;&#x27;) add(&#x27;&lt;style&gt;&#x27;) add(&#x27;:root{--bg:#1a1b26;--fg:#c0caf5;--muted:#565f89;--accent:#7aa2f7;&#x27; &#x27;--accent-2:#bb9af7;--border:#414868;--bg-inset:#16161e;color-scheme:dark}&#x27;)</span></li>
+<li><span class="sec">line 561</span> <span class="meta">line 561</span><br><span class="x">add(&#x27;&lt;link rel=&quot;prefetch&quot; href=&quot;../index.html&quot;&gt;&#x27;) add(&#x27;&lt;style&gt;&#x27;) add(&#x27;:root{--bg:#1a1b26;--fg:#c0caf5;--muted:#737aa2;--accent:#7aa2f7;&#x27; &#x27;--accent-2:#bb9af7;--border:#414868;--bg-inset:#16161e;color-scheme:dark}&#x27;)</span></li>
 <li><span class="sec">line 561</span> <span class="meta">line 561</span><br><span class="x">add(&#x27;*{box-sizing:border-box}&#x27;) add(&#x27;body{background:var(--bg);color:var(--fg);margin:0;padding:20px;&#x27; &#x27;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;&#x27; &#x27;font-size:14px;line-height:1.65}&#x27;)</span></li>
 <li><span class="sec">line 561</span> <span class="meta">line 561</span><br><span class="x">add(&#x27;main{max-width:900px;margin:0 auto}&#x27;) add(&#x27;a{color:var(--accent)}&#x27;) add(&#x27;h1{font-size:24px;margin:8px 0 4px;letter-spacing:.04em}&#x27;) add(&#x27;h2{font-size:16px;color:var(--accent);margin:30px 0 8px;&#x27; &#x27;border-bottom:1px solid</span></li>
 <li><span class="sec">line 561</span> <span class="meta">line 561</span><br><span class="x">var(--border);padding-bottom:6px}&#x27;) add(&#x27;p.lead{color:var(--muted);margin:6px 0 18px}&#x27;) add(&#x27;details{border:1px solid var(--border);border-radius:8px;&#x27; &#x27;background:var(--bg-inset);margin:8px 0;padding:6px 12px}&#x27;)</span></li>
@@ -5948,7 +6023,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">contain the source-code and distribution terms software licences usually carry. This licence was chosen with that known and is recorded here rather than left for a reader to discover.</span></li>
 </ul>
 </details>
-<h2 id="k-other">Other <span class="meta">(17)</span></h2>
+<h2 id="k-other">Other <span class="meta">(18)</span></h2>
 <details open>
 <summary><code>.gitignore</code> <span class="meta">&mdash; root, 65 lines, 10 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/.gitignore">open .gitignore</a></p>
@@ -5963,6 +6038,25 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">downloads, and a public repository is not the place # for either. # # NOTE, because untracking is not deleting: `git rm --cached` stops a file # being published from now on, but every version already committed stays in the # repository&#x27;s</span></li>
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">history and can still be fetched by anyone who clones it. # Removing it from history means rewriting published history and force-pushing, # which is a separate and deliberate act. The public-facing replacement for the # handover notes is</span></li>
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">ROADMAP.md, which is written to be read by anybody. HANDOFF.md HANDOVER.md .claude/</span></li>
+</ul>
+</details>
+<details open>
+<summary><code>docs/example.palette</code> <span class="meta">&mdash; docs, 73 lines, 13 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/docs/example.palette">open example.palette</a></p>
+<ul>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x"># An example VeilVoice palette. # # Copy this to the `palettes` directory beside your preferences file, rename it # to whatever you like, and it appears in the theme picker next time the app # starts. The settings tab shows you the exact</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">path on your machine. # # Windows %APPDATA%\veilvoice\palettes\ # Linux ~/.config/veilvoice/palettes/ # macOS ~/Library/Application Support/veilvoice/palettes/ # # The file must be named `something.palette`. Anything else in the directory</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">is # ignored rather than complained about. # # --------------------------------------------------------------------------- # Two rules, and the second one is the one people hit #</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">--------------------------------------------------------------------------- # # 1. All twelve colour tokens must be present. A missing one is an error naming # the token, not a colour quietly borrowed from the default theme -- a # palette</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">that is *mostly* yours with a few colours from somewhere else, and # no indication which, is worse than one that refuses to load. # # 2. The colours must be readable against each other. VeilVoice computes the # WCAG contrast ratio and</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">refuses a palette that fails, telling you the # measured ratio so you know how far off it is: # # fg on bg at least 4.5:1 body text # fg on bg-soft at least 4.5:1 the same text on a raised panel # muted on bg at least 3.0:1 secondary text</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x"># accent on bg at least 3.0:1 links and controls # err on bg at least 3.0:1 a warning nobody can read is # worse than no warning # # This is arithmetic rather than taste. If a palette is rejected, lighten # (on a dark scheme) or darken (on</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">a light one) the colour it names until it # passes -- usually a small move is enough. # # Every value is a six-digit hex colour with a leading `#`. Short forms like # `#fff`, named colours like `red`, and `0x112233` are all refused rather</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">than # guessed at.</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x"># The id is written into your preferences file, so it must never change once # you have selected the palette. Lower-case letters, digits and hyphens only, # and it may not be the id of a built-in theme. id = example # What the picker</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">shows. Anything you like. name = Example # `true` for a light scheme, which changes egui&#x27;s base widget styling. light = false # --- backgrounds ------------------------------------------------------------ bg = #101014 bg-soft = #1a1a22</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">bg-inset = #0b0b0e border = #2f2f3a # --- text ------------------------------------------------------------------- fg = #e6e6f0 muted = #9a9ab0 # --- the project&#x27;s own two colours ------------------------------------------ # `accent` is</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">the primary; `accent-2` is the &quot;veiled&quot; half of the mark. accent = #7aa2f7 accent-2 = #bb9af7 # --- meaning ---------------------------------------------------------------- cyan = #7dcfff ok = #9ece6a warn = #e0af68 err = #f7768e</span></li>
 </ul>
 </details>
 <details open>

@@ -1,0 +1,72 @@
+# An example VeilVoice palette.
+#
+# Copy this to the `palettes` directory beside your preferences file, rename it
+# to whatever you like, and it appears in the theme picker next time the app
+# starts. The settings tab shows you the exact path on your machine.
+#
+#   Windows   %APPDATA%\veilvoice\palettes\
+#   Linux     ~/.config/veilvoice/palettes/
+#   macOS     ~/Library/Application Support/veilvoice/palettes/
+#
+# The file must be named `something.palette`. Anything else in the directory is
+# ignored rather than complained about.
+#
+# ---------------------------------------------------------------------------
+# Two rules, and the second one is the one people hit
+# ---------------------------------------------------------------------------
+#
+# 1. All twelve colour tokens must be present. A missing one is an error naming
+#    the token, not a colour quietly borrowed from the default theme -- a
+#    palette that is *mostly* yours with a few colours from somewhere else, and
+#    no indication which, is worse than one that refuses to load.
+#
+# 2. The colours must be readable against each other. VeilVoice computes the
+#    WCAG contrast ratio and refuses a palette that fails, telling you the
+#    measured ratio so you know how far off it is:
+#
+#      fg      on bg        at least 4.5:1     body text
+#      fg      on bg-soft   at least 4.5:1     the same text on a raised panel
+#      muted   on bg        at least 3.0:1     secondary text
+#      accent  on bg        at least 3.0:1     links and controls
+#      err     on bg        at least 3.0:1     a warning nobody can read is
+#                                              worse than no warning
+#
+#    This is arithmetic rather than taste. If a palette is rejected, lighten
+#    (on a dark scheme) or darken (on a light one) the colour it names until it
+#    passes -- usually a small move is enough.
+#
+# Every value is a six-digit hex colour with a leading `#`. Short forms like
+# `#fff`, named colours like `red`, and `0x112233` are all refused rather than
+# guessed at.
+
+# The id is written into your preferences file, so it must never change once
+# you have selected the palette. Lower-case letters, digits and hyphens only,
+# and it may not be the id of a built-in theme.
+id = example
+
+# What the picker shows. Anything you like.
+name = Example
+
+# `true` for a light scheme, which changes egui's base widget styling.
+light = false
+
+# --- backgrounds ------------------------------------------------------------
+bg       = #101014
+bg-soft  = #1a1a22
+bg-inset = #0b0b0e
+border   = #2f2f3a
+
+# --- text -------------------------------------------------------------------
+fg       = #e6e6f0
+muted    = #9a9ab0
+
+# --- the project's own two colours ------------------------------------------
+# `accent` is the primary; `accent-2` is the "veiled" half of the mark.
+accent   = #7aa2f7
+accent-2 = #bb9af7
+
+# --- meaning ----------------------------------------------------------------
+cyan     = #7dcfff
+ok       = #9ece6a
+warn     = #e0af68
+err      = #f7768e

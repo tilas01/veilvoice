@@ -39,7 +39,7 @@ use std::sync::OnceLock;
 #[allow(dead_code)]
 pub mod colour {
     /// Muted comment grey — secondary text.
-    pub const MUTED: &str = "\x1b[38;2;86;95;137m";
+    pub const MUTED: &str = "\x1b[38;2;115;122;162m";
     /// Foreground blue — headings and prompts.
     pub const BLUE: &str = "\x1b[38;2;122;162;247m";
     /// Cyan — values and figures.

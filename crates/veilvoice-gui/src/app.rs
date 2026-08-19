@@ -244,10 +244,22 @@ impl VeilVoiceApp {
     /// anything else constructing the app must not touch the real one.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         let jetbrains = crate::theme::install_fonts(&cc.egui_ctx);
-        // Preferences first: `Settings::load` applies the chosen colour scheme,
-        // so the window opens in it rather than flashing the default for a
-        // frame and then switching.
-        let preferences = crate::settings::Settings::load(&cc.egui_ctx);
+
+        // The user's own palettes are read **before** preferences are applied,
+        // and the order is load-bearing. `Settings::load` selects the theme
+        // named in the preferences file; if that names a custom palette and the
+        // table does not hold it yet, the lookup fails, the default is kept,
+        // and the user's choice is quietly discarded -- on every single launch,
+        // with nothing to indicate why.
+        let palette_problems = crate::palettes::default_dir()
+            .map(|dir| crate::theme::load_custom(&dir))
+            .unwrap_or_default();
+
+        // Preferences second: `Settings::load` applies the chosen colour
+        // scheme, so the window opens in it rather than flashing the default
+        // for a frame and then switching.
+        let mut preferences = crate::settings::Settings::load(&cc.egui_ctx);
+        preferences.palette_problems = palette_problems;
         crate::theme::install(&cc.egui_ctx);
         Self {
             jetbrains,

@@ -1,0 +1,105 @@
+![palettes.rs](https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/banners/veilvoice-gui/palettes.svg)
+
+# `crates/veilvoice-gui/src/palettes.rs`
+
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 632 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs)
+
+## Contents
+
+- [A palette file is untrusted input](#a-palette-file-is-untrusted-input)
+- [Contrast is computed, not trusted](#contrast-is-computed-not-trusted)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
+
+User-defined colour schemes, and the contrast check that keeps them usable.
+
+A reader can drop a small text file into a `palettes/` directory beside the
+preferences file and have it appear in the theme picker alongside the nine
+built-in schemes. The format is the same `key = value` shape
+`crate::prefs` already uses, for the same reason: it is trivial to write
+by hand, trivial to parse without a dependency, and has no syntax in which
+something surprising can hide.
+
+# A palette file is untrusted input
+
+It arrives from the filesystem, it may have been written by hand at two in
+the morning, and it may have been copied from a web page by somebody who has
+never seen a hex colour. So it is parsed like anything else this project
+reads: every field validated, every failure named, and **refused rather than
+patched up**.
+
+Refusing matters more here than it first appears. The obvious lenient design
+is to fill in whatever is missing from the default theme -- and that produces
+a palette which is *mostly* the user's, with a few colours from somewhere
+else, and no indication which. The user sees an application that looks
+subtly wrong and has nothing to go on. An error naming the missing token is
+worth more than a window that opens.
+
+# Contrast is computed, not trusted
+
+The request that prompted this asked for "whatever colour with correct
+contrast to read". Correct contrast is not an aesthetic judgement, it is
+arithmetic: WCAG 2.1 defines relative luminance and a contrast ratio, and a
+ratio below 4.5 means body text a substantial number of people cannot read.
+
+So a palette whose foreground fails against its own background is **refused
+with the measured ratio in the message**, rather than accepted and left to
+produce an application nobody can use. It is the one validation here that
+is about the user rather than about the parser, and it is the reason this
+module exists at all rather than the fields being read straight into a
+struct.
+
+The thresholds are stated where they are enforced, and they are the
+standard's, not invented here:
+
+| Pair | Minimum | Why |
+|---|---|---|
+| `fg` on `bg` | 4.5 | Body text, WCAG AA |
+| `fg` on `bg_soft` | 4.5 | The same text on a raised surface |
+| `muted` on `bg` | 3.0 | Secondary text, AA large-text threshold |
+| `accent` on `bg` | 3.0 | Links and controls, AA non-text contrast |
+| `err` on `bg` | 3.0 | A warning nobody can read is worse than none |
+
+`muted` is deliberately held to 3.0 rather than 4.5. It is used for
+secondary text that is meant to recede, every built-in theme would fail at
+4.5, and pretending otherwise would mean shipping a rule the project's own
+themes break.
+
+## What calls what
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
+flowchart TD
+    n_luminance["luminance"]
+    n_contrast(["contrast<br/>pub"])
+    n_contrast_problems(["contrast_problems<br/>pub"])
+    n_parse_hex["parse_hex"]
+    n_parse["parse"]
+    n_build["build"]
+    n_default_dir(["default_dir<br/>pub"])
+    n_load(["load<br/>pub"])
+    n_contrast --> n_luminance
+    n_contrast_problems --> n_contrast
+    n_load --> n_build
+    n_load --> n_contrast_problems
+    n_load --> n_parse
+    n_parse --> n_parse_hex
+```
+
+## Items
+
+| Item | Line | Documentation |
+|---|---:|---|
+| `REQUIRED` <sub>pub const</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L64) | Every token a palette file has to define. |
+| `MAX_PALETTES` <sub>pub const</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L75) | The most palette files that will be read from the directory. |
+| `MAX_BYTES` <sub>pub const</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L78) | The largest palette file that will be read. |
+| `luminance` <sub>fn</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L85) | Relative luminance, as defined by WCAG 2.1. |
+| `contrast` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L101) | The WCAG contrast ratio between two colours, from 1.0 to 21.0. |
+| `PAIRS` <sub>const</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L108) | The contrast pairs a palette has to satisfy, with the reason for each. |
+| `contrast_problems` <sub>pub fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L121) | Check a palette's contrast, returning one message per failing pair. |
+| `Parsed` <sub>struct</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L147) | One parsed colour scheme, before it is accepted. |
+| `parse_hex` <sub>fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L154) |  |
+| `parse` <sub>fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L171) | Parse a palette file's text. |
+| `build` <sub>fn</sub> | [249](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L249) |  |
+| `default_dir` <sub>pub fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L282) | Where palettes live, beside the preferences file. |
+| `load` <sub>pub fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L309) | Read every palette in dir, returning the usable ones and every complaint. |
