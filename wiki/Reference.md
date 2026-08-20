@@ -121,6 +121,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`setup.rs`|File-veilvoice-gui-setup]] &mdash; The setup tab: install this copy, undo that, and the optional companions.
 - [[`soundbar.rs`|File-veilvoice-gui-soundbar]] &mdash; The animated mark: a row of bars that rise and fall.
 - [[`theme.rs`|File-veilvoice-gui-theme]] &mdash; Colour schemes for the desktop app.
+- [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] &mdash; The device monitor, moved off the thread that paints.
 
 ## [[veilvoice-meta|Crate-veilvoice-meta]]
 
@@ -162,6 +163,16 @@ Verify a VeilVoice release without GnuPG installed
 - [[`fetch.rs`|File-veilvoice-verify-fetch]] &mdash; Download a release, without putting an HTTP client in the dependency graph.
 - [[`main.rs`|File-veilvoice-verify-main]] &mdash; The portable verifier: check a VeilVoice release without GnuPG installed.
 - [[`tests.rs`|File-veilvoice-verify-tests]] &mdash; The verifier's own tests.
+
+## [[veilvoice-video|Crate-veilvoice-video]]
+
+A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg.
+
+- [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] &mdash; The video file, which needs a codec this project does not ship.
+- [[`lib.rs`|File-veilvoice-video-lib]] &mdash; A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background.
+- [[`page.rs`|File-veilvoice-video-page]] &mdash; The picture: one still for a preview, and one page that plays.
+- [[`palette.rs`|File-veilvoice-video-palette]] &mdash; Colours: the site's own tokens, and one per speaker.
+- [[`waveform.rs`|File-veilvoice-video-waveform]] &mdash; The shape of the audio, reduced to something a page can draw.
 
 ## [[veilvoice-watch|Crate-veilvoice-watch]]
 

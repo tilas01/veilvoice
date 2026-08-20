@@ -4971,6 +4971,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "veilvoice-video"
+version = "0.1.12"
+dependencies = [
+ "tempfile",
+ "veilvoice-conversation",
+]
+
+[[package]]
 name = "veilvoice-watch"
 version = "0.1.12"
 

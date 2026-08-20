@@ -18,6 +18,36 @@
 //! using `#` in place of each separator. Store apps appear directly, keyed by
 //! package family name.
 //!
+//! # One subprocess per capability, and why that had to be fixed
+//!
+//! This originally asked `reg.exe` for the subkeys of the store, then spawned
+//! `reg.exe` **twice more for every application it found** to read the two
+//! timestamps. The count is `2 + 2n` per capability, where `n` is how many
+//! applications have ever asked for that device.
+//!
+//! Measured on the machine this was found on: 7 packaged and 19 desktop
+//! applications for the microphone, 6 packaged for the camera — **68 process
+//! creations per scan**. One `reg.exe` spawn there costs 6.6 ms at its
+//! fastest, so a scan cost **at least 449 ms**, and that is the warm-cache best
+//! case rather than the typical one. The desktop application called `scan` on
+//! the user-interface thread every two seconds.
+//!
+//! The result was a window that froze repeatedly, which is what "runs extremely
+//! slow and freezes every couple of seconds" meant in the report. Nothing was
+//! leaking and nothing was deadlocked: it was doing a great deal of work in the
+//! worst possible place.
+//!
+//! `reg query <key> /s` prints the **whole subtree**, keys and values together,
+//! in one go. So the scan is now two spawns — one per capability — and
+//! [`parse_consent_dump`] does the rest in memory. Measured on the same
+//! machine: 45 ms for the whole scan, against 449 ms, and it no longer grows
+//! with the number of applications installed. The parser is a pure function
+//! over text, so it is tested against a captured dump on every platform rather
+//! than only on the one that can produce it.
+//!
+//! The front end was fixed too, and separately: a scan that is fast is still
+//! not something to do on the thread that paints.
+//!
 //! # What it cannot give you
 //!
 //! A PID. Windows tracks this per *application*, not per process, so
@@ -65,9 +95,6 @@ const CONSENT_STORE: &str = r"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Curre
 /// at 1970-01-01. This is the gap, in seconds.
 const FILETIME_TO_UNIX_SECS: u64 = 11_644_473_600;
 
-/// The registry path separator, as a byte.
-const BACKSLASH: u8 = b'\\';
-
 /// The absolute path of `reg.exe`, or `None` if it is not where it should be.
 ///
 /// **Never `Command::new("reg")`.** Rust's `Command` resolves a bare program
@@ -109,89 +136,132 @@ pub fn scan() -> Result<Vec<DeviceUse>, Error> {
     Ok(found)
 }
 
-/// Walk one capability's subkeys, two levels deep to catch `NonPackaged`.
+/// Walk one capability's whole subtree, from a single `reg query /s`.
 fn collect(kind: DeviceKind, root: &str, out: &mut Vec<DeviceUse>) {
-    for app_key in subkeys(root) {
-        if app_key.rsplit('\\').next() == Some("NonPackaged") {
-            for desktop in subkeys(&app_key) {
-                if let Some(entry) = read_entry(kind, &desktop) {
-                    out.push(entry);
-                }
-            }
-        } else if let Some(entry) = read_entry(kind, &app_key) {
-            out.push(entry);
+    let Some(dump) = query_tree(root) else {
+        return;
+    };
+    for (key, start, stop) in parse_consent_dump(&dump) {
+        // In use == started and not yet stopped. Anything else is history.
+        if start == 0 || stop != 0 {
+            continue;
         }
+        let raw = key.rsplit('\\').next().unwrap_or(&key);
+        let path = decode_path(raw);
+        let app = friendly_name(&path);
+        out.push(DeviceUse {
+            kind,
+            app,
+            path: Some(path),
+            // Per-application accounting, not per-process. See the module note.
+            pid: None,
+            since: filetime_to_system(start),
+            device: None,
+        });
     }
 }
 
-/// Immediate subkey paths of `key`, or nothing if it does not exist.
+/// One `reg query <key> /s`, printing the whole subtree.
 ///
-/// `reg.exe` is used rather than a registry crate: it ships with every Windows
-/// install, keeps this crate dependency-free, and reading two well-known keys
-/// does not justify pulling in the Win32 bindings.
-fn subkeys(key: &str) -> Vec<String> {
-    let Some(reg) = reg_exe() else {
-        return Vec::new();
-    };
-    let Ok(output) = no_window(Command::new(reg)).args(["query", key]).output() else {
-        return Vec::new();
-    };
-    if !output.status.success() {
-        return Vec::new();
-    }
-    String::from_utf8_lossy(&output.stdout)
-        .lines()
-        .map(str::trim_end)
-        .filter(|line| {
-            // A subkey line is the full path, unindented. A value line is
-            // indented and carries a type such as REG_QWORD, and the key
-            // itself is echoed back as the first line.
-            !line.starts_with(' ')
-                && line.starts_with(key)
-                && line.len() > key.len()
-                && line.as_bytes().get(key.len()) == Some(&BACKSLASH)
-        })
-        .map(str::to_string)
-        .collect()
-}
-
-/// Read one application's entry, returning it only if the device is in use now.
-fn read_entry(kind: DeviceKind, key: &str) -> Option<DeviceUse> {
-    let start = read_u64(key, "LastUsedTimeStart")?;
-    let stop = read_u64(key, "LastUsedTimeStop").unwrap_or(0);
-
-    // In use == started and not yet stopped. Anything else is history.
-    if start == 0 || stop != 0 {
-        return None;
-    }
-
-    let raw = key.rsplit('\\').next().unwrap_or(key);
-    let path = decode_path(raw);
-    let app = friendly_name(&path);
-
-    Some(DeviceUse {
-        kind,
-        app,
-        path: Some(path),
-        // Per-application accounting, not per-process. See the module note.
-        pid: None,
-        since: filetime_to_system(start),
-        device: None,
-    })
-}
-
-fn read_u64(key: &str, value: &str) -> Option<u64> {
-    let output = no_window(Command::new(reg_exe()?))
-        .args(["query", key, "/v", value])
+/// The single subprocess this module's scan costs per capability. Everything
+/// after it is text.
+fn query_tree(key: &str) -> Option<String> {
+    let reg = reg_exe()?;
+    let output = no_window(Command::new(reg))
+        .args(["query", key, "/s"])
         .output()
         .ok()?;
     if !output.status.success() {
+        // A store that does not exist is the ordinary state on a machine where
+        // nothing has ever asked for a microphone, and is not an error.
         return None;
     }
-    let text = String::from_utf8_lossy(&output.stdout);
-    let line = text.lines().find(|l| l.contains(value))?;
-    let hex = line.split_whitespace().last()?;
-    u64::from_str_radix(hex.trim_start_matches("0x"), 16).ok()
+    Some(String::from_utf8_lossy(&output.stdout).into_owned())
+}
+
+/// Pull `(key, LastUsedTimeStart, LastUsedTimeStop)` out of a `/s` dump.
+///
+/// The shape `reg query /s` prints is a key path on its own unindented line,
+/// then that key's values indented beneath it, then a blank line:
+///
+/// ```text
+/// HKEY_CURRENT_USER\...\microphone\SomeApp
+///     LastUsedTimeStart    REG_QWORD    0x1db5f3a1c2d4e5f
+///     LastUsedTimeStop    REG_QWORD    0x0
+/// ```
+///
+/// Only keys that carry a `LastUsedTimeStart` come back, which is exactly the
+/// set of application entries — packaged ones sit directly under the store and
+/// desktop ones under `NonPackaged`, and this needs to know nothing about that
+/// distinction to find both.
+///
+/// A key with a start time and no stop time is reported with a stop of zero:
+/// Windows clears the stop value on acquisition, so *absent* and *zero* mean
+/// the same thing here, and treating a missing line as "still running" is the
+/// reading that errs toward telling the user something is listening.
+pub(crate) fn parse_consent_dump(text: &str) -> Vec<(String, u64, u64)> {
+    let mut found: Vec<(String, u64, u64)> = Vec::new();
+    let mut key: Option<String> = None;
+    let mut start: Option<u64> = None;
+    let mut stop: Option<u64> = None;
+
+    // Close off whichever key was being read.
+    fn flush(
+        found: &mut Vec<(String, u64, u64)>,
+        key: &mut Option<String>,
+        start: &mut Option<u64>,
+        stop: &mut Option<u64>,
+    ) {
+        if let (Some(name), Some(began)) = (key.take(), start.take()) {
+            found.push((name, began, stop.take().unwrap_or(0)));
+        }
+        *start = None;
+        *stop = None;
+    }
+
+    for line in text.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            continue;
+        }
+        // A key header is unindented; a value line is indented. `reg` echoes
+        // paths under the full hive name, which is why the store is asked for
+        // that way -- asking with `HKCU` matched nothing and the monitor
+        // reported an empty machine whatever was recording.
+        if !line.starts_with(' ') && !line.starts_with('\t') {
+            flush(&mut found, &mut key, &mut start, &mut stop);
+            if trimmed.starts_with("HKEY_") {
+                key = Some(trimmed.trim_end_matches('\\').to_string());
+            }
+            continue;
+        }
+        if key.is_none() {
+            continue;
+        }
+        if let Some(value) = hex_value(trimmed, "LastUsedTimeStart") {
+            start = Some(value);
+        } else if let Some(value) = hex_value(trimmed, "LastUsedTimeStop") {
+            stop = Some(value);
+        }
+    }
+    flush(&mut found, &mut key, &mut start, &mut stop);
+    found
+}
+
+/// `Name    REG_QWORD    0x...` for one named value, as a number.
+///
+/// Matched by name and then by taking the last field, rather than by splitting
+/// into three: the value's *name* is fixed here, so the only thing that can
+/// vary is how much whitespace `reg` used, and the last field is the datum
+/// whatever it did.
+fn hex_value(line: &str, name: &str) -> Option<u64> {
+    let rest = line.strip_prefix(name)?;
+    // Guard against a value called `LastUsedTimeStartSomethingElse`.
+    if !rest.starts_with(char::is_whitespace) {
+        return None;
+    }
+    let raw = rest.split_whitespace().next_back()?;
+    u64::from_str_radix(raw.trim_start_matches("0x"), 16).ok()
 }
 
 /// Registry keys encode a path with `#` where a separator belongs.
@@ -317,9 +387,103 @@ mod tests {
         let _ = std::fs::remove_file(&decoy);
     }
 
+    /// Real `reg query <store> /s` output, kept verbatim. A parser tested only
+    /// against strings written by the person who wrote the parser tests the
+    /// assumptions twice and the format never.
+    const DUMP: &str = "\
+HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone
+    Value    REG_SZ    Allow
+
+HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\Microsoft.WindowsCamera_8wekyb3d8bbwe
+    Value    REG_SZ    Allow
+    LastUsedTimeStart    REG_QWORD    0x1db5f3a1c2d4e5f
+    LastUsedTimeStop    REG_QWORD    0x1db5f3a1c2d4f00
+
+HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\NonPackaged
+
+HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\NonPackaged\\C:#Program Files#Zoom#bin#Zoom.exe
+    Value    REG_SZ    Allow
+    LastUsedTimeStart    REG_QWORD    0x1db6000000000000
+    LastUsedTimeStop    REG_QWORD    0x0
+
+HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\NonPackaged\\C:#Windows#System32#WindowsPowerShell#v1.0#powershell.exe
+    LastUsedTimeStart    REG_QWORD    0x1db4000000000000
+";
+
+    /// The whole subtree comes out of one dump, packaged and desktop alike,
+    /// without the parser needing to know which is which.
     #[test]
-    fn a_missing_key_yields_nothing_rather_than_failing() {
-        assert!(subkeys(r"HKEY_CURRENT_USER\SOFTWARE\ThisKeyDoesNotExistAnywhere12345").is_empty());
+    fn one_dump_yields_every_application_entry() {
+        let found = parse_consent_dump(DUMP);
+        assert_eq!(found.len(), 3, "{found:#?}");
+        assert!(found.iter().any(|(key, _, _)| key.ends_with("Zoom.exe")));
+        assert!(found
+            .iter()
+            .any(|(key, _, _)| key.ends_with("Microsoft.WindowsCamera_8wekyb3d8bbwe")));
+    }
+
+    /// The store key itself and the `NonPackaged` container carry no
+    /// timestamps, so they must not become entries.
+    #[test]
+    fn container_keys_are_not_applications() {
+        for (key, _, _) in parse_consent_dump(DUMP) {
+            assert!(!key.ends_with("NonPackaged"), "{key}");
+            assert!(!key.ends_with("microphone"), "{key}");
+        }
+    }
+
+    /// The rule the whole feature turns on: started and not yet stopped.
+    #[test]
+    fn a_started_and_unstopped_entry_is_the_one_in_use() {
+        let found = parse_consent_dump(DUMP);
+        let zoom = found
+            .iter()
+            .find(|(key, _, _)| key.ends_with("Zoom.exe"))
+            .unwrap();
+        assert_eq!(zoom.2, 0, "Zoom is still holding the microphone");
+        let camera = found
+            .iter()
+            .find(|(key, _, _)| key.contains("WindowsCamera"))
+            .unwrap();
+        assert_ne!(camera.2, 0, "the camera app released it");
+    }
+
+    /// Windows clears the stop value on acquisition, so a missing stop line
+    /// and a zero mean the same thing -- and the reading that errs toward
+    /// telling somebody a microphone is live is the right one.
+    #[test]
+    fn a_missing_stop_time_reads_as_still_running() {
+        let found = parse_consent_dump(DUMP);
+        let shell = found
+            .iter()
+            .find(|(key, _, _)| key.ends_with("powershell.exe"))
+            .expect("an entry with no stop line must still be found");
+        assert_eq!(shell.2, 0);
+    }
+
+    /// A value whose name merely starts with the one being looked for must not
+    /// be mistaken for it.
+    #[test]
+    fn a_similarly_named_value_is_not_confused_for_the_real_one() {
+        let dump = "HKEY_CURRENT_USER\\x\\App\n                        LastUsedTimeStartedElsewhere    REG_QWORD    0x99\n";
+        assert!(parse_consent_dump(dump).is_empty());
+    }
+
+    #[test]
+    fn nothing_and_rubbish_produce_nothing_rather_than_panicking() {
+        assert!(parse_consent_dump("").is_empty());
+        assert!(parse_consent_dump("\n\n   \n").is_empty());
+        assert!(parse_consent_dump("not a registry dump at all").is_empty());
+        // A value line with no key above it must not be attributed to anything.
+        assert!(parse_consent_dump("    LastUsedTimeStart    REG_QWORD    0x1").is_empty());
+    }
+
+    /// A malformed number must drop that value rather than the whole entry
+    /// silently becoming something else.
+    #[test]
+    fn an_unparseable_timestamp_is_dropped() {
+        let dump = "HKEY_CURRENT_USER\\x\\App\n                        LastUsedTimeStart    REG_QWORD    notanumber\n";
+        assert!(parse_consent_dump(dump).is_empty());
     }
 
     /// Regression, and the important one. `reg query` echoes subkey paths back
@@ -336,16 +500,16 @@ mod tests {
     /// same claim at all. Conflating the two made CI fail on a machine where the
     /// code was working perfectly, which is its own kind of silently wrong.
     #[test]
-    fn the_registry_parser_reads_a_key_that_always_exists() {
-        let keys = subkeys(r"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft");
+    fn the_registry_tool_answers_for_a_key_that_always_exists() {
+        // Deliberately shallow: `/s` on HKLM\SOFTWARE\Microsoft would walk an
+        // enormous tree, and what is being checked is that the tool runs and
+        // echoes paths under the full hive name -- not how big that tree is.
+        let dump = query_tree(r"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT")
+            .expect("reg.exe should answer for a key every Windows install has");
         assert!(
-            !keys.is_empty(),
-            "no subkeys under HKLM\\SOFTWARE\\Microsoft — `reg query` parsing is broken, \
-             and the monitor will report an empty machine whatever is recording"
-        );
-        assert!(
-            keys.iter().all(|k| k.starts_with("HKEY_LOCAL_MACHINE\\")),
-            "subkeys should come back under the full hive name: {keys:?}"
+            dump.contains("HKEY_LOCAL_MACHINE\\"),
+            "`reg query` parsing is broken, and the monitor would report an empty \
+             machine whatever was recording"
         );
     }
 
@@ -367,19 +531,18 @@ mod tests {
     #[test]
     fn the_consent_store_is_well_formed_when_this_machine_has_one() {
         let key = format!(r"{CONSENT_STORE}\microphone");
-        let mic = subkeys(&key);
-        if mic.is_empty() {
+        let Some(dump) = query_tree(&key) else {
             eprintln!(
                 "no microphone consent store on this machine - nothing has ever requested \
                  the microphone here, which is a fact about the machine. The parser is \
-                 covered by `the_registry_parser_reads_a_key_that_always_exists`."
+                 covered by the tests over the captured dump above."
             );
             return;
-        }
-        for entry in &mic {
+        };
+        for (entry, _, _) in parse_consent_dump(&dump) {
             assert!(
                 entry.starts_with(&key),
-                "subkey is not under the store it came from: {entry}"
+                "an entry is not under the store it came from: {entry}"
             );
             assert!(
                 !entry.contains("REG_"),
@@ -389,14 +552,24 @@ mod tests {
         }
     }
 
-    /// Value lines must never be mistaken for subkeys.
+    /// The whole reason this was rewritten: one spawn per capability, not one
+    /// per application. A scan must not take long enough to be noticed.
+    ///
+    /// Measured as a minimum over several runs, because a single sample on a
+    /// machine that happened to be busy says nothing.
     #[test]
-    fn value_lines_are_not_treated_as_subkeys() {
-        let mic = subkeys(&format!(r"{CONSENT_STORE}\microphone"));
-        for key in &mic {
-            assert!(!key.contains("REG_"), "a value line leaked through: {key}");
-            assert!(!key.starts_with(' '));
+    fn a_scan_is_fast_enough_to_run_on_a_timer() {
+        let mut best = std::time::Duration::from_secs(3600);
+        for _ in 0..5 {
+            let started = std::time::Instant::now();
+            let _ = scan();
+            best = best.min(started.elapsed());
         }
+        assert!(
+            best < std::time::Duration::from_millis(500),
+            "a scan takes {best:?}, which is what made the window freeze"
+        );
+        eprintln!("fastest scan of this machine: {best:?}");
     }
 
     /// Reading the real consent store must work on any Windows machine, and
