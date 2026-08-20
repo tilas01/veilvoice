@@ -47,11 +47,13 @@
 //! | Module | What it owns |
 //! |---|---|
 //! | [`plan`] | Who is in the recording, when they speak, and the text format |
+//! | [`render`] | One engine per speaker, spliced back onto the timeline |
 //! | [`subtitles`] | WebVTT and SubRip, from the same plan |
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
 pub mod plan;
+pub mod render;
 pub mod subtitles;
 
 pub use plan::{Conversation, Speaker, Turn};

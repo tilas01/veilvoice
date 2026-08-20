@@ -35,6 +35,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 
 - [[`atrest.rs`|File-veilvoice-cli-atrest]] &mdash; Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.
 - [[`capture.rs`|File-veilvoice-cli-capture]] &mdash; veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.
+- [[`conversation.rs`|File-veilvoice-cli-conversation]] &mdash; veilvoice conversation -- several speakers, a voice each, and subtitles.
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
@@ -48,6 +49,7 @@ Several speakers in one recording: who spoke when, a distinct voice for each, na
 
 - [[`lib.rs`|File-veilvoice-conversation-lib]] &mdash; Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names.
 - [[`plan.rs`|File-veilvoice-conversation-plan]] &mdash; Who is in the recording, and who is speaking when.
+- [[`render.rs`|File-veilvoice-conversation-render]] &mdash; Turning a plan and a recording into veiled audio, one engine per speaker.
 - [[`subtitles.rs`|File-veilvoice-conversation-subtitles]] &mdash; Subtitles, from the same plan the audio is rendered from.
 
 ## [[veilvoice-core|Crate-veilvoice-core]]

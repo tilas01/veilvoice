@@ -32,10 +32,10 @@ engine backs both this and the graphical app.
 
 # What is here
 
-Nineteen subcommands, and they divide into five groups:
+Twenty subcommands, and they divide into five groups:
 
 * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
-`devices`.
+`devices`, `conversation` for a recording with several people in it.
 * **Privacy of the files themselves** -- `clean` metadata, `encrypt`,
 `decrypt`, `keygen`, `shred`.
 * **Watching the machine** -- `watch` the microphone and camera, `guard`
@@ -90,9 +90,10 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1746 lines"])
+    n_main(["main.rs<br/>1827 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
     n_capture["capture.rs<br/>240 lines"]
+    n_conversation["conversation.rs<br/>360 lines"]
     n_guard["guard.rs<br/>338 lines"]
     n_lock["lock.rs<br/>239 lines"]
     n_policy["policy.rs<br/>236 lines"]
@@ -102,6 +103,8 @@ flowchart TD
     n_capture --> n_policy
     n_capture --> n_sentry
     n_capture --> n_theme
+    n_conversation --> n_sentry
+    n_conversation --> n_theme
     n_guard --> n_atrest
     n_guard --> n_lock
     n_guard --> n_theme
@@ -114,6 +117,7 @@ flowchart TD
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" "open the source"
     click n_atrest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" "open the source"
     click n_capture href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs" "open the source"
+    click n_conversation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs" "open the source"
     click n_guard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" "open the source"
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" "open the source"
@@ -127,9 +131,10 @@ flowchart TD
 |---|---:|---|
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | 240 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
+| [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 360 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1746 | veilvoice — the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1827 | veilvoice — the command-line interface. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 236 | veilvoice policy -- settings that can only be tightened. |
 | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 376 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 135 | Tokyo Night colouring for the terminal. |
@@ -150,6 +155,8 @@ flowchart TD
 | `fn allow` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | Stop notifying about one program. |
 | `fn deny` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | Start notifying about one program again. |
 | `fn check` | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | Look now, and let the exit code answer. |
+| `fn inspect` | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | Show a plan without rendering anything. |
+| `fn run` | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | Render a recording according to a plan. |
 | `enum Action` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
 | `fn run` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
 | `enum Action` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
