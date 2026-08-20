@@ -84,7 +84,7 @@ it cannot do as plainly as what it can.
 | 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **planned** | 2–3 d |
 | 36 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **done** | — |
 | 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
-| 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography | **planned** | 2–3 d |
+| 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | — |
 | 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
 | 40 | Alert on driver and kernel-module installation; cross-view checks | **planned** | 3–4 d |
 | 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **planned** | 2 d |

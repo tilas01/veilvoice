@@ -29,6 +29,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
+- [[`policy.rs`|File-veilvoice-cli-policy]] &mdash; veilvoice policy -- settings that can only be tightened.
 - [[`sentry.rs`|File-veilvoice-cli-sentry]] &mdash; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &mdash; Tokyo Night colouring for the terminal.
 
@@ -83,6 +84,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`lib.rs`|File-veilvoice-gui-lib]] &mdash; The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.
 - [[`main.rs`|File-veilvoice-gui-main]] &mdash; Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.
 - [[`palettes.rs`|File-veilvoice-gui-palettes]] &mdash; User-defined colour schemes, and the contrast check that keeps them usable.
+- [[`policy.rs`|File-veilvoice-gui-policy]] &mdash; The policy in force, and what the interface does about it.
 - [[`prefs.rs`|File-veilvoice-gui-prefs]] &mdash; What the user has chosen about how the app looks and moves.
 - [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] &mdash; Whether the operating system has been asked to reduce motion.
 - [[`security.rs`|File-veilvoice-gui-security]] &mdash; The application lock, and the at-rest encryption of what VeilVoice writes.
@@ -100,6 +102,13 @@ Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.
 - [[`lib.rs`|File-veilvoice-meta-lib]] &mdash; Strip or spoof the identifying metadata that rides along with media files.
 - [[`wav.rs`|File-veilvoice-meta-wav]] &mdash; Chunk-level RIFF/WAVE metadata removal.
 - [[`wav_fuzz.rs`|File-veilvoice-meta-tests-wav_fuzz]] &mdash; Randomised robustness testing for the RIFF chunk walker.
+
+## [[veilvoice-policy|Crate-veilvoice-policy]]
+
+Settings that can only be tightened, sealed with the project's own post-quantum cryptography.
+
+- [[`lib.rs`|File-veilvoice-policy-lib]] &mdash; Settings somebody else decided, sealed so they cannot be edited without a passphrase — and, more importantly, built so that editing them without one buys nothing worth having.
+- [[`policy.rs`|File-veilvoice-policy-policy]] &mdash; The policy itself: what can be required, and what requiring it does.
 
 ## [[veilvoice-sentry|Crate-veilvoice-sentry]]
 

@@ -94,6 +94,47 @@ Windows that needs a code-signing identity issued to a verified legal entity --
 which conflicts with publishing under a pseudonym. That remains a decision
 rather than an omission.
 
+### `veilvoice-policy`: settings that can only be tightened
+
+The second security crate, and the design turns on one problem.
+
+To *apply* a policy at every launch, VeilVoice has to be able to read it at
+every launch. If reading it needs a passphrase, you type one every time; if it
+does not, anybody who can write the file can rewrite the policy. The usual
+answers are a privileged daemon holding the key or a key hidden in the binary,
+and neither is honest here -- this project needs no privileges, and a key
+inside a binary anybody can download is not a key.
+
+So the constraint went into the shape of the data instead. **Every requirement
+a policy can express makes VeilVoice stricter.** There is no requirement that
+turns encryption off, none that lowers the de-identification floor, none that
+disables the app lock, and no room in the format to write one. Somebody who
+edits the plain file without the passphrase can therefore do exactly one thing:
+make this machine's VeilVoice *more* restrictive than its owner asked for. That
+is a nuisance and not a privacy failure, which is why the plain file is read and
+applied without a passphrase and reported honestly as "seal not checked".
+
+```
+veilvoice policy seal --encrypt-recordings --minimum-intensity 80 \
+    --note "Set by whoever set it. Ask before changing."
+veilvoice policy status    # what is fixed, and why each one is fixed
+veilvoice policy verify    # needs the passphrase; proves the seal matches
+```
+
+The desktop application draws every fixed control disabled with the reason
+underneath, because a disabled control with no explanation is a bug report. The
+*enforcement* is not the drawing code: the values a job actually uses come from
+a constrained posture, so a policy holds even if a control is drawn wrongly --
+the same rule the at-rest dialogue has always followed.
+
+Two things a policy will not do. It will not set your app lock, because that
+needs a passphrase only you have; a required lock is announced beside the
+control that satisfies it and the application stays usable. And `veilvoice
+policy remove` does not ask for the passphrase, because it could not usefully:
+anybody who can run that command can delete the same two files with a file
+manager, and pretending otherwise would teach you something false about what
+this program does.
+
 ### Also
 
 - `veilvoice-setup` is usable on its own: no dependencies, no `unsafe`, and
