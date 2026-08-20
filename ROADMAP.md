@@ -86,10 +86,28 @@ it cannot do as plainly as what it can.
 | 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
 | 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | — |
 | 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
-| 40 | Alert on driver and kernel-module installation; cross-view checks | **planned** | 3–4 d |
+| 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | — |
 | 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **planned** | 2 d |
 | 42 | Duress and decoy passwords | **planned** | 7–10 d |
 | 43 | Cloud transcription through your own API key | **blocked** | — |
+
+## Conversations, subtitles and video
+
+Asked for after v0.1.12. One recording, several speakers, each given a
+different voice and each voiceprint destroyed just as thoroughly; names and
+subtitles; and an optional video of the result.
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 46 | **Conversation mode** — tell the engine a recording holds more than one speaker, and give each a distinct voice while destroying every voiceprint | **next** | 4–6 d |
+| 47 | Up to ten speakers, each with a name, carried into the audio and into subtitles | **planned** | 2–3 d |
+| 48 | A rolling seed **per speaker**, at a randomised interval inside a range the user sets, with no interval hardcoded and a fresh one at every launch | **planned** | 2 d |
+| 49 | **Video output** — the waveform, a circle per speaker in their palette colour or their own picture inside a coloured ring, a title, and a black or image background with padding | **planned** | 6–8 d |
+| 50 | A **preview** of the video and of the voices before anything is generated | **planned** | 2–3 d |
+| 51 | An **asynchronous pipeline**, every stage running at once rather than in sequence | **planned** | 3–4 d |
+| 52 | Every crate and every `.rs` file explained: the technical workflow in a paragraph, then the same thing in plain words | **planned** | 3–4 d |
+| 53 | The website on mobile, and on every engine — not only the one it was written in | **planned** | 2–3 d |
+| 54 | **Seventh audit round** across the whole tree, then the production deploy | **planned** | 5–7 d |
 
 ## Finally
 
@@ -128,6 +146,30 @@ purpose. **The decision taken is to ship the administrator version** — which i
 most of the protection and none of the pretence — and to say plainly that
 kernel-level enforcement is unavailable on those two platforms and why. Linux
 and OpenBSD have no such gate.
+
+**A seed cannot roll faster than a frame, and a frame is 5.3 ms.** The
+request was for a rolling interval between 0.7 ms and 2.7 ms. The engine
+analyses audio in frames of 1024 samples with 75 % overlap, so it produces one
+set of modulation parameters every 256 samples -- 5.33 ms at 48 kHz. Rolling
+the seed more often than that changes nothing, because there is nothing in
+between to change. Making the frame short enough would mean a 128-point
+transform, which is 375 Hz per bin: too coarse to find a formant, which is the
+thing being moved. So the interval will be settable in milliseconds and
+randomised inside the range asked for, it will be **quantised to whole frames**,
+and the interface will report the interval that is actually in force rather
+than the one that was typed. Rolling every single frame is what the whole
+requested range comes to, and that is already the fastest this can honestly go.
+
+**Video needs an encoder, and this project ships no codec.** A window of
+waveform and circles is straightforward to draw; turning a few thousand frames
+into a file somebody can play is not, and writing an H.264 encoder is not a
+sensible thing for this project to do. The plan is to render the frames here
+and produce the video through `ffmpeg` when it is present -- detected and
+offered exactly as the other companions are, never bundled, never installed
+without an explicit yes -- and to always write a self-contained animation that
+needs nothing else installed, so the feature still produces something on a
+machine without it. What will not happen is a silent dependency on a program
+the user did not know they were running.
 
 **Duress and decoy passwords are the most dangerous thing on this list.** A duress password
 destroys data on purpose, and a decoy system exists to be believed. Neither is

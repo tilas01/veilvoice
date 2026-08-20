@@ -1,0 +1,14 @@
+[package]
+name = "veilvoice-drivers"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Notice when a kernel driver or module appears, with a cross-view check and an honest account of what hiding defeats."
+
+[dependencies]
+
+[dev-dependencies]
+tempfile = "3"
