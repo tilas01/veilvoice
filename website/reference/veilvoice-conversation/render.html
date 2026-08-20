@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-conversation/render.svg" alt="render.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-conversation/src/render.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 688 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 836 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#one-engine-each-and-why-that-is-not-merely-convenient">One engine each, and why that is not merely convenient</a>
@@ -47,6 +47,7 @@
   <a href="#audio-nobody-claimed-is-silenced-and-the-amount-is-reported">Audio nobody claimed is silenced, and the amount is reported</a>
   <a href="#latency-is-removed-so-a-turn-lands-where-the-plan-said">Latency is removed, so a turn lands where the plan said</a>
   <a href="#boundaries-are-faded-because-a-splice-is-a-click">Boundaries are faded, because a splice is a click</a>
+  <a href="#every-speaker-renders-at-the-same-time">Every speaker renders at the same time</a>
   <a href="#overlaps-are-mixed-and-the-mixing-is-admitted">Overlaps are mixed, and the mixing is admitted</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
@@ -75,20 +76,24 @@
 <p>The engine has a fixed algorithmic latency &#8212; the STFT cannot emit a sample until it has a frame around it. Each span is therefore processed with a tail of silence and the first <code>latency_samples</code> of output are dropped, which puts the veiled audio back exactly where the original was. Without this every turn would drift later than the subtitle describing it, by about 16 ms at the default frame size, and a subtitle 16 ms late is a subtitle that looks wrong.</p>
 <h2 id="boundaries-are-faded-because-a-splice-is-a-click">Boundaries are faded, because a splice is a click</h2>
 <p>Cutting audio at an arbitrary sample and starting different audio there produces a step, and a step is broadband noise. Each rendered span is faded in and out over a few milliseconds. Short enough not to swallow a syllable, long enough to remove the click.</p>
+<h2 id="every-speaker-renders-at-the-same-time">Every speaker renders at the same time</h2>
+<p>Speakers are independent by construction &#8212; a separate engine, a separate seed, a separate destination &#8212; so there is nothing to share between them and nothing to lock. Each one is given a thread and they all run at once, which on an ordinary machine turns a four-person recording into roughly the work of one.</p>
+<p><code>std::thread::scope</code> rather than a pool or an async runtime. The number of threads is bounded by <code>veilvoice_core::MAX_VOICES</code>, which is ten, so there is nothing for a pool to schedule; and a scoped thread can borrow the input slice directly, so nothing is copied to hand it over. It also needs no dependency, which for this project is not a small consideration: the <code>offline</code> CI job that checks what is in the dependency graph is part of what the front page is claiming.</p>
+<p>Each thread writes into its own buffer and the merge happens afterwards, in slot order. That is what makes the result <strong>identical to the sequential one, bit for bit</strong> &#8212; floating-point addition is not associative, so a merge in completion order would give a different file on every run and the render would stop being reproducible from its seeds. A test holds it.</p>
 <h2 id="overlaps-are-mixed-and-the-mixing-is-admitted">Overlaps are mixed, and the mixing is admitted</h2>
 <p>Two people talking at once is two engines writing into the same samples, so their outputs are summed. A sum can exceed full scale; when it does, the whole output is scaled down by one factor and <code>Rendered::gain_applied</code> records it. One factor for the whole file rather than a limiter that acts only where it clipped, because a limiter changes the relative loudness of the speakers and this crate has just spent considerable effort making them distinguishable.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>688 lines defining <strong>6 functions</strong> (2 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>836 lines defining <strong>6 functions</strong> (2 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Settings</code> <span style="color:var(--muted)">line 93</span> &mdash; How to render.</li>
-<li><code>struct Rendered</code> <span style="color:var(--muted)">line 117</span> &mdash; What came back.</li>
+<li><code>struct Settings</code> <span style="color:var(--muted)">line 122</span> &mdash; How to render.</li>
+<li><code>struct Rendered</code> <span style="color:var(--muted)">line 146</span> &mdash; What came back.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Rendered::has_unassigned</code> <span style="color:var(--muted)">line 139</span> &mdash; Whether some of the recording was silenced because no turn claimed it.
+<li><code>Rendered::has_unassigned</code> <span style="color:var(--muted)">line 168</span> &mdash; Whether some of the recording was silenced because no turn claimed it.
 </li>
-<li><code>render</code> <span style="color:var(--muted)">line 150</span> &mdash; Render input according to plan.
+<li><code>render</code> <span style="color:var(--muted)">line 179</span> &mdash; Render input according to plan.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>fade_ends</code>, <code>process_span</code>, <code>seconds_to_index</code></span>
 </li>
 </ul>
@@ -102,35 +107,35 @@
 <path d="M649.8 74.0 C 649.8 94.0, 600.4 100.0, 600.4 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M649.8 74.0 C 649.8 94.0, 466.6 100.0, 466.6 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M649.8 74.0 C 649.8 94.0, 306.2 100.0, 306.2 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L105" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L134" target="_blank" rel="noopener noreferrer">
 <rect x="185.8" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="264.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::default</text>
-<text x="264.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
+<text x="264.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L139" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L168" target="_blank" rel="noopener noreferrer">
 <rect x="369.0" y="20.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="474.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Rendered::has_unassigned</text>
-<text x="474.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 139</text>
+<text x="474.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L150" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L179" target="_blank" rel="noopener noreferrer">
 <rect x="605.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="649.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">render</text>
-<text x="649.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
+<text x="649.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L289" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L354" target="_blank" rel="noopener noreferrer">
 <rect x="231.4" y="120.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="306.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seconds_to_index</text>
-<text x="306.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
+<text x="306.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 354</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L306" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L371" target="_blank" rel="noopener noreferrer">
 <rect x="407.0" y="120.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="466.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">process_span</text>
-<text x="466.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 306</text>
+<text x="466.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 371</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L321" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L386" target="_blank" rel="noopener noreferrer">
 <rect x="552.2" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="600.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fade_ends</text>
-<text x="600.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
+<text x="600.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 386</text>
 </a>
 </svg>
 </div>
@@ -138,21 +143,21 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_default[&quot;Settings::default&lt;br/&gt;line 105&quot;]
-    n_has_unassigned([&quot;Rendered::has_unassigned&lt;br/&gt;line 139&quot;])
-    n_render([&quot;render&lt;br/&gt;line 150&quot;])
-    n_seconds_to_index[&quot;seconds_to_index&lt;br/&gt;line 289&quot;]
-    n_process_span[&quot;process_span&lt;br/&gt;line 306&quot;]
-    n_fade_ends[&quot;fade_ends&lt;br/&gt;line 321&quot;]
+    n_default[&quot;Settings::default&lt;br/&gt;line 134&quot;]
+    n_has_unassigned([&quot;Rendered::has_unassigned&lt;br/&gt;line 168&quot;])
+    n_render([&quot;render&lt;br/&gt;line 179&quot;])
+    n_seconds_to_index[&quot;seconds_to_index&lt;br/&gt;line 354&quot;]
+    n_process_span[&quot;process_span&lt;br/&gt;line 371&quot;]
+    n_fade_ends[&quot;fade_ends&lt;br/&gt;line 386&quot;]
     n_render --&gt; n_fade_ends
     n_render --&gt; n_process_span
     n_render --&gt; n_seconds_to_index
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L105&quot; &quot;open the source&quot;
-    click n_has_unassigned href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L139&quot; &quot;open the source&quot;
-    click n_render href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L150&quot; &quot;open the source&quot;
-    click n_seconds_to_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L289&quot; &quot;open the source&quot;
-    click n_process_span href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L306&quot; &quot;open the source&quot;
-    click n_fade_ends href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L321&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L134&quot; &quot;open the source&quot;
+    click n_has_unassigned href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L168&quot; &quot;open the source&quot;
+    click n_render href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L179&quot; &quot;open the source&quot;
+    click n_seconds_to_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L354&quot; &quot;open the source&quot;
+    click n_process_span href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L371&quot; &quot;open the source&quot;
+    click n_fade_ends href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L386&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_has_unassigned,n_render entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -163,14 +168,15 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Settings</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L93" rel="noopener noreferrer">93</a></td><td>How to render.</td></tr>
-<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L105" rel="noopener noreferrer">105</a></td><td></td></tr>
-<tr><td><code>Rendered</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L117" rel="noopener noreferrer">117</a></td><td>What came back.</td></tr>
-<tr><td><code>Rendered::has_unassigned</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L139" rel="noopener noreferrer">139</a></td><td>Whether some of the recording was silenced because no turn claimed it.</td></tr>
-<tr><td><code>render</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L150" rel="noopener noreferrer">150</a></td><td>Render input according to plan.</td></tr>
-<tr><td><code>seconds_to_index</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L289" rel="noopener noreferrer">289</a></td><td>A time in seconds as a sample index, clamped into the recording.</td></tr>
-<tr><td><code>process_span</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L306" rel="noopener noreferrer">306</a></td><td>Run one span through one engine and give back audio aligned with the input.</td></tr>
-<tr><td><code>fade_ends</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L321" rel="noopener noreferrer">321</a></td><td>Fade the first and last fade samples, so a splice is not a click.</td></tr>
+<tr><td><code>SpeakerSpans</code> <sub>type</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L118" rel="noopener noreferrer">118</a></td><td>One speaker&#x27;s finished spans: where each starts, and the veiled samples.</td></tr>
+<tr><td><code>Settings</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L122" rel="noopener noreferrer">122</a></td><td>How to render.</td></tr>
+<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L134" rel="noopener noreferrer">134</a></td><td></td></tr>
+<tr><td><code>Rendered</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L146" rel="noopener noreferrer">146</a></td><td>What came back.</td></tr>
+<tr><td><code>Rendered::has_unassigned</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L168" rel="noopener noreferrer">168</a></td><td>Whether some of the recording was silenced because no turn claimed it.</td></tr>
+<tr><td><code>render</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L179" rel="noopener noreferrer">179</a></td><td>Render input according to plan.</td></tr>
+<tr><td><code>seconds_to_index</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L354" rel="noopener noreferrer">354</a></td><td>A time in seconds as a sample index, clamped into the recording.</td></tr>
+<tr><td><code>process_span</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L371" rel="noopener noreferrer">371</a></td><td>Run one span through one engine and give back audio aligned with the input.</td></tr>
+<tr><td><code>fade_ends</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs#L386" rel="noopener noreferrer">386</a></td><td>Fade the first and last fade samples, so a splice is not a click.</td></tr>
 </tbody></table>
 </section>
 </div></div>
