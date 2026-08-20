@@ -54,6 +54,46 @@ installs, or could not tell and here is why. The middle one is a statement
 about where VeilVoice looked, not a claim about your machine, and the wording
 says so.
 
+### `veilvoice-sentry`: an early warning that says what it cannot do
+
+The first of the security crates. Two signals, and the honest account of each:
+
+**Canaries.** A file VeilVoice writes and nothing reads. If it ever changes,
+something walked that folder and wrote to everything in it. Very few false
+positives, and one large hole: it only fires if whatever is running *reaches*
+that folder, so a quiet canary is not evidence that nothing happened, and the
+wording never lets it read as one.
+
+**Churn.** Record what a directory holds, look again later, and report how much
+changed and how fast. No blind spot, and much weaker evidence: a backup
+restore, a photo import, an archive extraction and a compiler all produce
+exactly this shape, because they are all mass rewrites. The output is numbers
+and a level against thresholds **you** set, and the highest level is called
+"high concern" and phrased as a question -- "was that you?" -- because that is
+a question the person at the keyboard can answer in a second and no amount of
+file counting ever can.
+
+```
+veilvoice sentry plant ~/Documents     # a canary, and a note on its limits
+veilvoice sentry baseline ~/Documents  # what is there now
+veilvoice sentry check                 # both, against thresholds you set
+```
+
+`check` exits non-zero only when a **canary** tripped, which is a fact. Churn
+never fails the command at any level: a check that fails every time somebody
+copies a folder is a check somebody deletes from their scheduled task.
+
+Entropy is reported for a rewritten canary and is described as what it is. Near
+8.0 bits per byte means incompressible, which is true of encrypted data and
+equally true of every JPEG and `.zip` on the machine, so the line says both.
+It is used only for a file this crate planted and therefore knows was prose.
+
+Nothing here names the program responsible, and nothing here stops anything.
+Stopping a process mid-run needs an interposition point in the kernel, and on
+Windows that needs a code-signing identity issued to a verified legal entity --
+which conflicts with publishing under a pseudonym. That remains a decision
+rather than an omission.
+
 ### Also
 
 - `veilvoice-setup` is usable on its own: no dependencies, no `unsafe`, and

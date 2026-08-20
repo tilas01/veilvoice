@@ -70,6 +70,7 @@
 <li><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a> <span style="color:var(--muted)">veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</span></li>
 <li><a href="veilvoice-cli/lock.html"><code>lock.rs</code></a> <span style="color:var(--muted)">veilvoice lock &#8212; manage the application lock from the command line.</span></li>
 <li><a href="veilvoice-cli/main.html"><code>main.rs</code></a> <span style="color:var(--muted)">veilvoice &#8212; the command-line interface.</span></li>
+<li><a href="veilvoice-cli/sentry.html"><code>sentry.rs</code></a> <span style="color:var(--muted)">veilvoice sentry -- canaries, baselines, and what changed since.</span></li>
 <li><a href="veilvoice-cli/theme.html"><code>theme.rs</code></a> <span style="color:var(--muted)">Tokyo Night colouring for the terminal.</span></li>
 </ul>
 </section>
@@ -145,6 +146,15 @@
 <li><a href="veilvoice-meta/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Strip or spoof the identifying metadata that rides along with media files.</span></li>
 <li><a href="veilvoice-meta/wav.html"><code>wav.rs</code></a> <span style="color:var(--muted)">Chunk-level RIFF/WAVE metadata removal.</span></li>
 <li><a href="veilvoice-meta/tests-wav_fuzz.html"><code>wav_fuzz.rs</code></a> <span style="color:var(--muted)">Randomised robustness testing for the RIFF chunk walker.</span></li>
+</ul>
+</section>
+<section id="veilvoice-sentry">
+<h2><a href="veilvoice-sentry.html">veilvoice-sentry</a></h2>
+<p>Ransomware canaries and mass-change rate detection: an early warning that says plainly what it cannot do.</p>
+<ul>
+<li><a href="veilvoice-sentry/canary.html"><code>canary.rs</code></a> <span style="color:var(--muted)">Decoy files that should never change, and a record of what they were.</span></li>
+<li><a href="veilvoice-sentry/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing.</span></li>
+<li><a href="veilvoice-sentry/rate.html"><code>rate.rs</code></a> <span style="color:var(--muted)">How much of a directory tree changed, and how fast.</span></li>
 </ul>
 </section>
 <section id="veilvoice-setup">
