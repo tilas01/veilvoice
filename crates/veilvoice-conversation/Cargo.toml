@@ -1,0 +1,15 @@
+[package]
+name = "veilvoice-conversation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles."
+
+[dependencies]
+veilvoice-core = { path = "../veilvoice-core" }
+
+[dev-dependencies]
+tempfile = "3"

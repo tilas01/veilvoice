@@ -33,6 +33,14 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`sentry.rs`|File-veilvoice-cli-sentry]] &mdash; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &mdash; Tokyo Night colouring for the terminal.
 
+## [[veilvoice-conversation|Crate-veilvoice-conversation]]
+
+Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles.
+
+- [[`lib.rs`|File-veilvoice-conversation-lib]] &mdash; Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names.
+- [[`plan.rs`|File-veilvoice-conversation-plan]] &mdash; Who is in the recording, and who is speaking when.
+- [[`subtitles.rs`|File-veilvoice-conversation-subtitles]] &mdash; Subtitles, from the same plan the audio is rendered from.
+
 ## [[veilvoice-core|Crate-veilvoice-core]]
 
 Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility.
