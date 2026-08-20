@@ -7,7 +7,7 @@
 //!
 //! # What is here
 //!
-//! Seventeen subcommands, and they divide into five groups:
+//! Eighteen subcommands, and they divide into five groups:
 //!
 //! * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
 //!   `devices`.
@@ -16,7 +16,8 @@
 //! * **Watching the machine** -- `watch` the microphone and camera, `guard`
 //!   VeilVoice's own files against tampering, `sentry` for canaries and how
 //!   fast a folder is changing.
-//! * **The app lock** -- `lock set|status|change|remove`.
+//! * **The app lock** -- `lock set|status|change|remove`, and `policy` for
+//!   settings somebody has fixed so the interface cannot turn them off.
 //! * **Getting it onto the machine** -- `install`, `uninstall`, `companions`,
 //!   and `gui` to open the desktop application.
 //!
@@ -57,6 +58,7 @@
 mod atrest;
 mod guard;
 mod lock;
+mod policy;
 mod sentry;
 mod theme;
 
@@ -71,6 +73,7 @@ use veilvoice_audio::io as audio_io;
 use veilvoice_core::{AccentConfig, DeidConfig};
 use veilvoice_crypto::{container, hybrid, kdf};
 use veilvoice_meta::Policy;
+use veilvoice_policy::Requirement;
 use veilvoice_sentry::rate::{Limits, Threshold};
 use veilvoice_setup::{companions, install};
 
@@ -257,6 +260,24 @@ enum Command {
         yes: bool,
     },
 
+    /// Settings fixed so the interface cannot turn them off.
+    ///
+    /// **Every setting a policy can reach makes VeilVoice stricter.** There is
+    /// nothing here that turns protection off, no requirement that lowers the
+    /// de-identification floor, and no room in the format to write one. That is
+    /// why the policy is read at every launch without a passphrase: the worst
+    /// an edited policy file can do is restrict this machine further than its
+    /// owner intended, which is a nuisance rather than a privacy failure.
+    ///
+    /// The passphrase seals a copy, so anybody who has it can prove the policy
+    /// in force is the one that was written. It is not enforcement: anything
+    /// that can replace VeilVoice's own executable can ignore all of this, and
+    /// anything running as you can delete the file.
+    Policy {
+        #[command(subcommand)]
+        what: PolicyCommand,
+    },
+
     /// Canaries, and how fast a folder is changing.
     ///
     /// Two early warnings that something is going through your files. Neither
@@ -292,6 +313,59 @@ enum Command {
         /// Install one, by name. Without this, nothing is installed.
         #[arg(long, value_name = "NAME")]
         install: Option<String>,
+    },
+}
+
+/// What `veilvoice policy` can do.
+#[derive(Subcommand)]
+enum PolicyCommand {
+    /// What is in force, and what is known about the seal.
+    Status,
+
+    /// Write a policy and seal a copy of it under a passphrase.
+    ///
+    /// Name at least one requirement. Each one fixes a setting on; none of
+    /// them can fix one off.
+    Seal {
+        /// Recordings must be encrypted at rest.
+        #[arg(long)]
+        encrypt_recordings: bool,
+        /// Metadata must be stripped from what VeilVoice writes.
+        #[arg(long)]
+        clean_metadata: bool,
+        /// Accent neutralisation must stay on.
+        #[arg(long)]
+        neutralise_accent: bool,
+        /// The app lock must be set before VeilVoice can be used.
+        #[arg(long)]
+        app_lock: bool,
+        /// A floor for the de-identification intensity, from 0 to 100.
+        #[arg(long, value_name = "0-100")]
+        minimum_intensity: Option<u8>,
+        /// A line shown beside every control the policy has fixed.
+        #[arg(long)]
+        note: Option<String>,
+        /// Write over a policy that is already in force.
+        #[arg(long)]
+        replace: bool,
+    },
+
+    /// Check the policy in force against its sealed copy.
+    ///
+    /// The only thing here that needs the passphrase, and nothing calls it at
+    /// launch. Exits non-zero if the seal does not match, is missing, or the
+    /// plain file has gone.
+    Verify,
+
+    /// Delete both policy files.
+    ///
+    /// Deliberately does not ask for the passphrase, because it could not
+    /// usefully: anybody who can run this can delete the same two files with a
+    /// file manager.
+    Remove {
+        /// Do not ask for confirmation.
+        #[arg(long)]
+        yes: bool,
     },
 }
 
@@ -573,6 +647,54 @@ fn run(command: Command) -> Result<(), String> {
                 }
             }
         }
+
+        Command::Policy { what } => match what {
+            PolicyCommand::Status => policy::status(),
+            PolicyCommand::Seal {
+                encrypt_recordings,
+                clean_metadata,
+                neutralise_accent,
+                app_lock,
+                minimum_intensity,
+                note,
+                replace,
+            } => {
+                let mut wanted = Vec::new();
+                if encrypt_recordings {
+                    wanted.push(Requirement::EncryptRecordings);
+                }
+                if clean_metadata {
+                    wanted.push(Requirement::CleanMetadata);
+                }
+                if neutralise_accent {
+                    wanted.push(Requirement::NeutraliseAccent);
+                }
+                if app_lock {
+                    wanted.push(Requirement::AppLock);
+                }
+                if let Some(hundredths) = minimum_intensity {
+                    // Refused rather than clamped, for the reason the whole
+                    // project refuses rather than clamps: a user who typed 150
+                    // meant something, and quietly turning it into 100 makes
+                    // the policy say something they did not write.
+                    if hundredths > 100 {
+                        return Err(format!(
+                            "--minimum-intensity is a percentage from 0 to 100, not {hundredths}"
+                        ));
+                    }
+                    wanted.push(Requirement::MinimumIntensity(hundredths));
+                }
+                policy::seal(wanted, note, replace)
+            }
+            PolicyCommand::Verify => {
+                if policy::verify()? {
+                    Err("the policy does not match its seal".to_string())
+                } else {
+                    Ok(())
+                }
+            }
+            PolicyCommand::Remove { yes } => policy::remove(yes),
+        },
 
         Command::Sentry { what } => match what {
             SentryCommand::Status => sentry::status(),

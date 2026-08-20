@@ -4840,6 +4840,7 @@ dependencies = [
  "veilvoice-crypto",
  "veilvoice-guard",
  "veilvoice-meta",
+ "veilvoice-policy",
  "veilvoice-sentry",
  "veilvoice-setup",
  "veilvoice-watch",
@@ -4898,6 +4899,7 @@ dependencies = [
  "veilvoice-core",
  "veilvoice-crypto",
  "veilvoice-meta",
+ "veilvoice-policy",
  "veilvoice-setup",
  "veilvoice-watch",
  "winresource",
@@ -4912,6 +4914,14 @@ dependencies = [
  "img-parts",
  "lofty",
  "tempfile",
+]
+
+[[package]]
+name = "veilvoice-policy"
+version = "0.1.12"
+dependencies = [
+ "tempfile",
+ "veilvoice-crypto",
 ]
 
 [[package]]

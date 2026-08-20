@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/lib.svg" alt="lib.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 60 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 62 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-modules">The modules</a>
@@ -53,7 +53,7 @@
 <p>The binary lives in <code>main.rs</code>; this library exists so the UI logic can be unit tested without opening a window.</p>
 <p>That split is worth stating plainly, because it is the reason this crate has tests at all: a binary crate cannot be unit tested, so everything with logic in it -- the app lock&#x27;s state machine, preference loading, palette resolution, the reduced-motion decision -- lives here where a test can reach it without a display server. <code>main.rs</code> holds only what genuinely needs a window.</p>
 <h2 id="the-modules">The modules</h2>
-<p>| Module | What it owns | |---|---| | <code>security</code> | The unlock screen, the lock tab, and the at-rest controls | | <code>prefs</code> | Preferences, and recovering from a corrupt preferences file | | <code>settings</code> | The settings tab | | <code>setup</code> | Installing this copy, and the optional companions | | <code>theme</code> | The palette, shared with the command-line front end | | <code>soundbar</code> | The animated level meter | | <code>reduced_motion</code> | Whether to animate at all |</p>
+<p>| Module | What it owns | |---|---| | <code>security</code> | The unlock screen, the lock tab, and the at-rest controls | | <code>prefs</code> | Preferences, and recovering from a corrupt preferences file | | <code>policy</code> | Settings somebody has fixed, and the reason beside each one | | <code>settings</code> | The settings tab | | <code>setup</code> | Installing this copy, and the optional companions | | <code>theme</code> | The palette, shared with the command-line front end | | <code>soundbar</code> | The animated level meter | | <code>reduced_motion</code> | Whether to animate at all |</p>
 <h2 id="two-rules-this-crate-keeps">Two rules this crate keeps</h2>
 <p><strong>The user interface never softens a scope note.</strong> Where a control has a bound -- the app lock is a verifier and not disk encryption, tamper detection detects rather than prevents -- the interface says so next to the control, and tests fail the build if that text changes. Documentation nobody opens does not protect anybody.</p>
 <p><strong>Animation is a preference that is honoured, not a decoration.</strong> <code>reduced_motion</code> resolves the platform&#x27;s own setting alongside the user&#x27;s explicit choice, and the whole interface reads that answer rather than each widget deciding for itself.</p>
@@ -65,7 +65,7 @@
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L60" rel="noopener noreferrer">60</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
+<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L62" rel="noopener noreferrer">62</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
 </tbody></table>
 </section>
 </div></div>
