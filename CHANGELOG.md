@@ -6,6 +6,62 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## Unreleased
+
+### The installer has a window, and the companions are asked about properly
+
+`veilvoice install` did the work already; it simply had no interface but a
+terminal. The desktop application now has an **install** tab that calls the
+same code — not a second implementation of it. The logic moved out of the
+`veilvoice-cli` binary into a new library crate, `veilvoice-setup`, because a
+binary crate has no consumers and two programs editing `PATH` independently is
+how a machine gets broken.
+
+The tab states what you already have before it offers to change anything:
+portable is the normal case and is described as one. Beside the button is the
+exact list of what an install touches — a copy into your own program
+directory, a `PATH` entry appended to the value it first read, an Apps &
+features entry on Windows, and nothing else. No administrator rights, no
+service, no system directory.
+
+### Companion software: detected, described, and never assumed
+
+New in both front ends: VB-CABLE, BlackHole, PipeWire and Audacity are looked
+for, and each is shown with who wrote it and under what licence **before** you
+are asked anything.
+
+```
+veilvoice companions                      # report only
+veilvoice companions --install audacity   # the explicit yes
+```
+
+Three rules, enforced in the library so no front end can be more permissive
+than another:
+
+- **Nothing is ticked, because there is nothing to tick.** Each is one button
+  for one named program.
+- **VeilVoice never runs somebody else's installer.** VB-CABLE is proprietary
+  donationware and a driver, so the offer is to open VB-Audio's page and
+  nothing more. Downloading and executing an unverified third-party binary
+  would be a strange thing for a program whose subject is verifying what you
+  run.
+- **Privilege is reported, never requested.** A package manager that needs
+  root has its command printed, not run. A window cannot honestly collect a
+  `sudo` password.
+
+Detection has three answers rather than two: found, not found where it usually
+installs, or could not tell and here is why. The middle one is a statement
+about where VeilVoice looked, not a claim about your machine, and the wording
+says so.
+
+### Also
+
+- `veilvoice-setup` is usable on its own: no dependencies, no `unsafe`, and
+  the Windows registry reached through `reg.exe` as everywhere else.
+- The setup tab's progress strip claims no percentage. `reg.exe` and a package
+  manager report no progress, and a bar that fills to 90% and waits is a lie
+  with a shape.
+
 ## v0.1.12
 
 Fetching and checking a release in one command, installing without an

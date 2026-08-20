@@ -197,6 +197,7 @@ veilvoice-audio = { git = "https://github.com/tilas01/veilvoice" }
 | `veilvoice-meta` | Metadata stripping for audio and images. |
 | `veilvoice-watch` | Microphone and camera use, by application. Zero dependencies. |
 | `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files. |
+| `veilvoice-setup` | Per-user install and its exact reversal, and detection of the optional companion software. |
 
 The engine itself is small enough to drop into an audio callback:
 
@@ -282,6 +283,7 @@ writes with no extra work.
 | `veilvoice-audio`  | Capture/playback (cpal), virtual-cable routing, file import/export. |
 | `veilvoice-meta`   | Metadata strip/spoof for audio and image EXIF/GPS. |
 | `veilvoice-watch`  | Which applications are using the microphone and camera, and alerts on change. |
+| `veilvoice-setup`  | Per-user install, PATH, removal, and companion detection — shared by both front ends. |
 | `veilvoice-cli`    | The `veilvoice` command-line tool. |
 | `veilvoice-gui`    | The desktop app (egui, Tokyo Night). |
 
