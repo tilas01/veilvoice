@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 60 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 62 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -33,6 +33,7 @@ window.
 |---|---|
 | `security` | The unlock screen, the lock tab, and the at-rest controls |
 | `prefs` | Preferences, and recovering from a corrupt preferences file |
+| `policy` | Settings somebody has fixed, and the reason beside each one |
 | `settings` | The settings tab |
 | `setup` | Installing this copy, and the optional companions |
 | `theme` | The palette, shared with the command-line front end |
@@ -60,4 +61,4 @@ This file defines no functions of its own.
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L60) | Crate version string, surfaced in the About panel. |
+| `VERSION` <sub>pub const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L62) | Crate version string, surfaced in the About panel. |

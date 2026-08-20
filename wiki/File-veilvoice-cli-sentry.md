@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/sentry.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 373 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 376 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs)
 
 ## Contents
 
@@ -50,7 +50,7 @@ here, so there is one wording and the tests guard it.
 
 ## What this file contains
 
-373 lines defining **11 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+376 lines defining **11 functions** (7 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -82,7 +82,7 @@ flowchart TD
     n_pull_up(["pull_up<br/>line 186"])
     n_baseline(["baseline<br/>line 197"])
     n_check(["check<br/>line 233"])
-    n_wrap["wrap<br/>line 308"]
+    n_wrap["wrap<br/>line 311"]
     n_baseline --> n_state_dir
     n_baselines --> n_state_dir
     n_check --> n_baselines
@@ -107,13 +107,13 @@ flowchart TD
     click n_pull_up href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L186" "open the source"
     click n_baseline href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L197" "open the source"
     click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L233" "open the source"
-    click n_wrap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L308" "open the source"
+    click n_wrap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L311" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_plant,n_pull_up,n_baseline,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_state_dir api
+    class n_state_dir,n_wrap api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_nest_path,n_load_nest,n_save_nest,n_baselines,n_wrap helper
+    class n_nest_path,n_load_nest,n_save_nest,n_baselines helper
 ```
 
 ## Items
@@ -130,4 +130,4 @@ flowchart TD
 | `pull_up` <sub>pub fn</sub> | [186](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L186) | Stop watching a canary, and delete it. |
 | `baseline` <sub>pub fn</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L197) | Record what dir holds now, as the thing to compare against later. |
 | `check` <sub>pub fn</sub> | [233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L233) | Look at every canary and every baseline. |
-| `wrap` <sub>fn</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L308) | Wrap text to width columns on spaces, for the scope note. |
+| `wrap` <sub>pub fn</sub> | [311](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L311) | Wrap text to width columns on spaces, for the scope note. |

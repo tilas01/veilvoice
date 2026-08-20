@@ -126,6 +126,20 @@ pub struct Security {
     passphrase_repeat: String,
     /// Whether the "write it unencrypted?" dialogue is open.
     confirm_disable: bool,
+    /// A policy requires encryption at rest, so it cannot be turned off here.
+    ///
+    /// Set once from [`crate::policy::InForce`]. When true the checkbox is
+    /// disabled *and* [`Self::encrypt_recordings`] is forced on, because a
+    /// disabled checkbox is a claim about pixels and this is a claim about
+    /// behaviour.
+    pub encryption_pinned: bool,
+    /// A policy requires the app lock to be set. Shown on the lock tab when it
+    /// is not; never used to refuse entry.
+    ///
+    /// Refusing would lock somebody out of their own recordings because of a
+    /// file in their own configuration directory, which is a worse outcome
+    /// than an unlocked application saying plainly that it should be locked.
+    pub lock_required: bool,
 }
 
 impl Default for Security {
@@ -152,6 +166,8 @@ impl Default for Security {
             passphrase_set: false,
             passphrase_repeat: String::new(),
             confirm_disable: false,
+            encryption_pinned: false,
+            lock_required: false,
         }
     }
 }
@@ -470,6 +486,30 @@ impl Security {
             }
         }
 
+        // A policy can require a lock and cannot impose one: setting it needs a
+        // passphrase only the user has. So the requirement is stated, loudly,
+        // beside the control that satisfies it -- and the application stays
+        // usable, because refusing to open would lock somebody out of their own
+        // recordings over a file in their own configuration directory.
+        if self.lock_required && !self.has_lock() {
+            ui.add_space(6.0);
+            ui.label(
+                RichText::new(format!(
+                    "fixed by policy: {}",
+                    veilvoice_policy::Requirement::AppLock.describe()
+                ))
+                .color(p::yellow()),
+            );
+            ui.label(
+                RichText::new(
+                    "No lock is set. VeilVoice cannot set one for you -- it needs a                      passphrase only you have -- so it says so here instead of refusing                      to open.",
+                )
+                .small()
+                .color(p::yellow()),
+            );
+            ui.add_space(6.0);
+        }
+
         let busy = self.busy();
         if self.has_lock() {
             ui.label(RichText::new("a lock is set").color(p::green()));
@@ -572,17 +612,39 @@ impl Security {
     pub fn recording_controls(&mut self, ui: &mut egui::Ui) {
         ui.label(RichText::new("AT REST").color(p::blue()).small());
 
+        if self.encryption_pinned {
+            // Forced here as well as drawn disabled. The dialogue that turns
+            // this off is reachable from more than one frame's worth of state,
+            // and a policy that held only while the checkbox was drawn would
+            // not be a policy.
+            self.encrypt_recordings = true;
+            self.confirm_disable = false;
+        }
+
         let mut wanted = self.encrypt_recordings;
-        if ui
-            .checkbox(&mut wanted, "encrypt the result at rest")
-            .changed()
-        {
+        let changed = ui
+            .add_enabled(
+                !self.encryption_pinned,
+                egui::Checkbox::new(&mut wanted, "encrypt the result at rest"),
+            )
+            .changed();
+        if changed && !self.encryption_pinned {
             if wanted {
                 self.encrypt_recordings = true;
             } else {
                 // Stay on until the warning has been read and answered.
                 self.confirm_disable = true;
             }
+        }
+        if self.encryption_pinned {
+            ui.label(
+                RichText::new(format!(
+                    "fixed by policy: {}",
+                    veilvoice_policy::Requirement::EncryptRecordings.describe()
+                ))
+                .small()
+                .color(p::yellow()),
+            );
         }
 
         if !self.encrypt_recordings {

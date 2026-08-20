@@ -43,6 +43,7 @@ window.
 |---|---|
 | `security` | The unlock screen, the lock tab, and the at-rest controls |
 | `prefs` | Preferences, and recovering from a corrupt preferences file |
+| `policy` | Settings somebody has fixed, and the reason beside each one |
 | `settings` | The settings tab |
 | `setup` | Installing this copy, and the optional companions |
 | `theme` | The palette, shared with the command-line front end |
@@ -72,20 +73,22 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>60 lines"])
+    n_lib(["lib.rs<br/>62 lines"])
     n_main(["main.rs<br/>87 lines"])
-    n_app["app.rs<br/>1129 lines"]
+    n_app["app.rs<br/>1348 lines"]
     n_crashlog["crashlog.rs<br/>254 lines"]
     n_palettes["palettes.rs<br/>691 lines"]
+    n_policy["policy.rs<br/>311 lines"]
     n_prefs["prefs.rs<br/>386 lines"]
     n_reduced_motion["reduced_motion.rs<br/>328 lines"]
-    n_security["security.rs<br/>1030 lines"]
+    n_security["security.rs<br/>1092 lines"]
     n_settings["settings.rs<br/>706 lines"]
     n_setup["setup.rs<br/>707 lines"]
     n_soundbar["soundbar.rs<br/>349 lines"]
     n_theme["theme.rs<br/>745 lines"]
     n_app --> n_crashlog
     n_app --> n_palettes
+    n_app --> n_policy
     n_app --> n_security
     n_app --> n_settings
     n_app --> n_setup
@@ -94,6 +97,7 @@ flowchart TD
     n_crashlog --> n_prefs
     n_palettes --> n_prefs
     n_palettes --> n_theme
+    n_policy --> n_theme
     n_prefs --> n_theme
     n_security --> n_theme
     n_settings --> n_palettes
@@ -111,6 +115,7 @@ flowchart TD
     click n_app href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" "open the source"
     click n_crashlog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" "open the source"
     click n_palettes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs" "open the source"
+    click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs" "open the source"
     click n_prefs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" "open the source"
     click n_reduced_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs" "open the source"
     click n_security href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" "open the source"
@@ -124,14 +129,15 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1129 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1348 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 254 | Make a failure that produces no output produce some. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 60 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 62 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 87 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 691 | User-defined colour schemes, and the contrast check that keeps them usable. |
+| [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 311 | The policy in force, and what the interface does about it. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 386 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 328 | Whether the operating system has been asked to reduce motion. |
-| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1030 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1092 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 706 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 707 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 349 | The animated mark: a row of bars that rise and fall. |
@@ -156,6 +162,8 @@ flowchart TD
 | `fn contrast_problems` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Check a palette's contrast, returning one message per failing pair. |
 | `fn default_dir` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Where palettes live, beside the preferences file. |
 | `fn load` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Read every palette in dir, returning the usable ones and every complaint. |
+| `struct InForce` | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | The policy this machine is running under, if any. |
+| `fn default_dir` | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | Where the policy files live, beside everything else VeilVoice keeps. |
 | `struct Prefs` | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | Everything the user can choose about presentation. |
 | `fn default_path` | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | Where preferences live: beside the app lock, in this platform's config directory. |
 | `struct Motion` | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | Whether movement is allowed, and how much. |

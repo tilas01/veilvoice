@@ -22,6 +22,7 @@
 //! |---|---|
 //! | [`security`] | The unlock screen, the lock tab, and the at-rest controls |
 //! | [`prefs`] | Preferences, and recovering from a corrupt preferences file |
+//! | [`policy`] | Settings somebody has fixed, and the reason beside each one |
 //! | [`settings`] | The settings tab |
 //! | [`setup`] | Installing this copy, and the optional companions |
 //! | [`theme`] | The palette, shared with the command-line front end |
@@ -46,6 +47,7 @@
 mod app;
 pub mod crashlog;
 pub mod palettes;
+pub mod policy;
 pub mod prefs;
 pub mod reduced_motion;
 pub mod security;

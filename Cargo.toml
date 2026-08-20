@@ -18,6 +18,7 @@ members = [
     "crates/veilvoice-cli",
     "crates/veilvoice-watch",
     "crates/veilvoice-guard",
+    "crates/veilvoice-policy",
     "crates/veilvoice-sentry",
     "crates/veilvoice-setup",
     "crates/veilvoice-verify",
