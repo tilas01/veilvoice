@@ -55,6 +55,7 @@ argument is that you can check what you are running.
 | `veilvoice-meta` | stripping tags, EXIF and GPS |
 | `veilvoice-guard` | file-integrity manifests and tamper reporting |
 | `veilvoice-watch` | which applications hold the microphone or camera |
+| `veilvoice-setup` | a per-user install that is reversible, and detection of optional companion software |
 | `veilvoice-verify` | a binary, not a library — see [INSTALL.md](INSTALL.md) |
 
 ---

@@ -281,6 +281,79 @@ If you want a binary you can compare against the published one, see
 
 ---
 
+## 4. After you have it: portable, or installed
+
+Once VeilVoice is unpacked it runs. Nothing has to be installed, nothing is
+written outside the folder, and deleting the folder removes it. **Portable is
+the normal case**, not a lesser one.
+
+Installing exists for one reason: so that typing `veilvoice` in a terminal
+works. It is per-user, needs no administrator, and is reversed exactly.
+
+```
+veilvoice install          # copy, add to PATH, register for removal
+veilvoice install --status # what is installed, and which copy is running
+veilvoice uninstall --yes  # undo exactly those three things
+```
+
+The desktop application has the same thing on its **install** tab, with the
+list of what will change printed beside the button. Both call the same code --
+`veilvoice-setup` -- rather than each having its own idea of how to edit
+`PATH`. A `PATH` edit is the one operation here that can damage a machine, so
+there is one implementation of it and one set of tests over it.
+
+"Installed" and "you are running the installed copy" are reported separately,
+because they are different facts and confusing them is how somebody edits a
+portable folder and wonders why the installed one did not change.
+
+### Companion software
+
+Four programs make VeilVoice easier to live with. **None of them is part of
+VeilVoice and none of them is required.**
+
+| | What it is | Who makes it | Licence |
+|---|---|---|---|
+| VB-CABLE | a virtual audio cable for Windows | VB-Audio Software | proprietary donationware |
+| BlackHole | the same, for macOS | Existential Audio | MIT |
+| PipeWire | the audio server most Linux distributions already run | the PipeWire project | MIT |
+| Audacity | a free audio editor and recorder | the Audacity team | GPL-2.0-or-later |
+
+A virtual cable is what lets live mode feed a veiled microphone into a call.
+Without one live mode still runs; you simply have nowhere useful to send it.
+Audacity is a convenience for recording and trimming, and is **recommended,
+never embedded** -- GPL-2.0-or-later cannot be combined with this project's
+GPL-3.0-or-later.
+
+```
+veilvoice companions                      # report only: what is here, and what is not
+veilvoice companions --install audacity   # the explicit yes, one named program
+```
+
+The same list is on the desktop application's install tab, one row each.
+
+Three rules, and they are enforced in the shared library rather than in each
+front end, so neither can be more permissive than the other:
+
+- **Nothing is ticked, because there is nothing to tick.** There is no
+  "install recommended extras" control, because that is the control through
+  which unwanted software has historically arrived.
+- **VeilVoice never runs somebody else's installer.** VB-CABLE is proprietary
+  and is a driver, so what is offered is to open VB-Audio's page -- their
+  licence for you to accept, their installer for you to run. Fetching and
+  executing an unverified third-party binary would be a strange thing for a
+  program whose whole subject is verifying what you run.
+- **Privilege is reported, never requested.** A package manager that needs
+  root has its command printed for you to run in a terminal. Neither front end
+  will ask you for a `sudo` password.
+
+Detection has three answers and not two: found (with the path it was found
+at), not found where it usually installs, or could not tell and here is why.
+The middle answer is a statement about where VeilVoice looked, not a claim
+about your machine -- if you keep Audacity somewhere unusual it will say "not
+found", and that is exactly what the words mean.
+
+---
+
 ## Where things get installed
 
 | Platform | Default location |
@@ -292,9 +365,12 @@ Both are per-user and need no administrator or `sudo`. Nothing is written
 outside them, no service is installed, no registry key is created beyond the
 user `PATH` entry on Windows, and nothing runs at startup.
 
-To uninstall, delete that directory. VeilVoice keeps its own configuration
-under the usual per-user location for the platform; `veilvoice lock status`
-names the lock file's path if you have set one.
+To uninstall, run `veilvoice uninstall --yes`, or use the desktop
+application's install tab, or simply delete that directory -- the first two
+also remove the `PATH` entry and the Apps & features registration, which
+deleting the directory does not. VeilVoice keeps its own configuration under
+the usual per-user location for the platform; `veilvoice lock status` names
+the lock file's path if you have set one.
 
 ---
 
