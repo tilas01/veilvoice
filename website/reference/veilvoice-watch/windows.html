@@ -39,10 +39,11 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-watch/windows.svg" alt="windows.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-watch/src/windows.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 416 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 589 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#where-the-answer-lives">Where the answer lives</a>
+  <a href="#one-subprocess-per-capability-and-why-that-had-to-be-fixed">One subprocess per capability, and why that had to be fixed</a>
   <a href="#what-it-cannot-give-you">What it cannot give you</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
@@ -55,15 +56,21 @@
 <p>Windows records every application&#x27;s use of the microphone and camera under <code>HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ ConsentStore\{microphone,webcam}</code>. Each application gets a subkey holding <code>LastUsedTimeStart</code> and <code>LastUsedTimeStop</code> as FILETIME values.</p>
 <p>The rule that makes this a <em>live</em> view rather than a history: an application is using the device right now when its start time is non-zero and its stop time is zero. Windows clears the stop value on acquisition and writes it on release. This is the same bookkeeping that drives the taskbar privacy indicator, so what this reports is exactly what the OS itself believes.</p>
 <p>Desktop programs live under a <code>NonPackaged</code> subkey, with their path encoded using <code>#</code> in place of each separator. Store apps appear directly, keyed by package family name.</p>
+<h2 id="one-subprocess-per-capability-and-why-that-had-to-be-fixed">One subprocess per capability, and why that had to be fixed</h2>
+<p>This originally asked <code>reg.exe</code> for the subkeys of the store, then spawned <code>reg.exe</code> <strong>twice more for every application it found</strong> to read the two timestamps. The count is <code>2 + 2n</code> per capability, where <code>n</code> is how many applications have ever asked for that device.</p>
+<p>Measured on the machine this was found on: 7 packaged and 19 desktop applications for the microphone, 6 packaged for the camera &#8212; <strong>68 process creations per scan</strong>. One <code>reg.exe</code> spawn there costs 6.6 ms at its fastest, so a scan cost <strong>at least 449 ms</strong>, and that is the warm-cache best case rather than the typical one. The desktop application called <code>scan</code> on the user-interface thread every two seconds.</p>
+<p>The result was a window that froze repeatedly, which is what &quot;runs extremely slow and freezes every couple of seconds&quot; meant in the report. Nothing was leaking and nothing was deadlocked: it was doing a great deal of work in the worst possible place.</p>
+<p><code>reg query &lt;key&gt; /s</code> prints the <strong>whole subtree</strong>, keys and values together, in one go. So the scan is now two spawns &#8212; one per capability &#8212; and <code>parse_consent_dump</code> does the rest in memory. Measured on the same machine: 45 ms for the whole scan, against 449 ms, and it no longer grows with the number of applications installed. The parser is a pure function over text, so it is tested against a captured dump on every platform rather than only on the one that can produce it.</p>
+<p>The front end was fixed too, and separately: a scan that is fast is still not something to do on the thread that paints.</p>
 <h2 id="what-it-cannot-give-you">What it cannot give you</h2>
 <p>A PID. Windows tracks this per <em>application</em>, not per process, so <code>DeviceUse::pid</code> is <code>None</code> here. The trade is worth it: this sees packaged apps, background services and anything else the OS accounts for, which enumerating process handles would miss.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>416 lines defining <strong>10 functions</strong> (1 public), <strong>0 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>589 lines defining <strong>10 functions</strong> (1 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>scan</code> <span style="color:var(--muted)">line 100</span>
-<br><span style="color:var(--muted);font-size:12px">reaches <code>collect</code>, <code>read_entry</code>, <code>subkeys</code>, <code>decode_path</code>, <code>filetime_to_system</code>, <code>friendly_name</code>, <code>read_u64</code>, <code>no_window</code>, <code>reg_exe</code></span>
+<li><code>scan</code> <span style="color:var(--muted)">line 127</span>
+<br><span style="color:var(--muted);font-size:12px">reaches <code>collect</code>, <code>decode_path</code>, <code>filetime_to_system</code>, <code>friendly_name</code>, <code>parse_consent_dump</code>, <code>query_tree</code>, <code>hex_value</code>, <code>no_window</code>, <code>reg_exe</code></span>
 </li>
 </ul>
 </section>
@@ -73,66 +80,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 394" width="100%" preserveAspectRatio="xMidYMin meet" role="img" aria-label="flowchart">
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="880" height="394" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M440.0 174.0 C 440.0 194.0, 497.4 200.0, 497.4 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M440.0 174.0 C 440.0 194.0, 375.0 200.0, 375.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M497.4 274.0 C 497.4 294.0, 325.6 300.0, 325.6 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M497.4 274.0 C 497.4 294.0, 642.6 300.0, 642.6 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M497.4 274.0 C 497.4 294.0, 470.8 300.0, 470.8 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M497.4 274.0 C 497.4 294.0, 199.4 300.0, 199.4 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M243.8 347.0 C 399.2 347.0, 399.2 47.0, 380.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M243.8 347.0 C 506.4 347.0, 506.4 47.0, 487.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M554.8 74.0 C 554.8 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M419.4 247.0 C 441.4 247.0, 441.4 47.0, 380.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M419.4 247.0 C 506.4 247.0, 506.4 47.0, 487.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L49" target="_blank" rel="noopener noreferrer">
-<rect x="280.8" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="329.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">no_window</text>
-<text x="329.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 49</text>
+<path d="M440.0 174.0 C 440.0 194.0, 428.6 200.0, 428.6 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M440.0 174.0 C 440.0 194.0, 745.6 200.0, 745.6 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M440.0 174.0 C 440.0 194.0, 573.8 200.0, 573.8 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M440.0 174.0 C 440.0 194.0, 264.4 200.0, 264.4 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M440.0 174.0 C 440.0 194.0, 104.0 200.0, 104.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M264.4 274.0 C 264.4 294.0, 440.0 300.0, 440.0 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M156.0 247.0 C 395.4 247.0, 395.4 47.0, 376.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M156.0 247.0 C 510.2 247.0, 510.2 47.0, 491.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M558.6 74.0 C 558.6 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L79" target="_blank" rel="noopener noreferrer">
+<rect x="277.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="325.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">no_window</text>
+<text x="325.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 79</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L84" target="_blank" rel="noopener noreferrer">
-<rect x="403.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L111" target="_blank" rel="noopener noreferrer">
+<rect x="399.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="443.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reg_exe</text>
-<text x="443.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 84</text>
+<text x="443.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L100" target="_blank" rel="noopener noreferrer">
-<rect x="510.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="554.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">scan</text>
-<text x="554.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 100</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L127" target="_blank" rel="noopener noreferrer">
+<rect x="514.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="558.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">scan</text>
+<text x="558.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 127</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L113" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L140" target="_blank" rel="noopener noreferrer">
 <rect x="395.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">collect</text>
-<text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 113</text>
+<text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L132" target="_blank" rel="noopener noreferrer">
-<rect x="330.6" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="375.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">subkeys</text>
-<text x="375.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L168" target="_blank" rel="noopener noreferrer">
+<rect x="52.0" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="104.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">query_tree</text>
+<text x="104.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L159" target="_blank" rel="noopener noreferrer">
-<rect x="445.4" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="497.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_entry</text>
-<text x="497.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 159</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L202" target="_blank" rel="noopener noreferrer">
+<rect x="182.0" y="220.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="264.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_consent_dump</text>
+<text x="264.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L183" target="_blank" rel="noopener noreferrer">
-<rect x="155.0" y="320.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="199.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_u64</text>
-<text x="199.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 183</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L257" target="_blank" rel="noopener noreferrer">
+<rect x="391.8" y="320.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="440.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hex_value</text>
+<text x="440.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L198" target="_blank" rel="noopener noreferrer">
-<rect x="269.8" y="320.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="325.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decode_path</text>
-<text x="325.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 198</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L268" target="_blank" rel="noopener noreferrer">
+<rect x="372.8" y="220.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="428.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decode_path</text>
+<text x="428.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 268</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L203" target="_blank" rel="noopener noreferrer">
-<rect x="407.4" y="320.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="470.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">friendly_name</text>
-<text x="470.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 203</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L273" target="_blank" rel="noopener noreferrer">
+<rect x="510.4" y="220.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="573.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">friendly_name</text>
+<text x="573.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 273</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L213" target="_blank" rel="noopener noreferrer">
-<rect x="560.2" y="320.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="642.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">filetime_to_system</text>
-<text x="642.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 213</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L283" target="_blank" rel="noopener noreferrer">
+<rect x="663.2" y="220.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="745.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">filetime_to_system</text>
+<text x="745.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 283</text>
 </a>
 </svg>
 </div>
@@ -140,60 +145,57 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_no_window[&quot;no_window&lt;br/&gt;line 49&quot;]
-    n_reg_exe[&quot;reg_exe&lt;br/&gt;line 84&quot;]
-    n_scan([&quot;scan&lt;br/&gt;line 100&quot;])
-    n_collect[&quot;collect&lt;br/&gt;line 113&quot;]
-    n_subkeys[&quot;subkeys&lt;br/&gt;line 132&quot;]
-    n_read_entry[&quot;read_entry&lt;br/&gt;line 159&quot;]
-    n_read_u64[&quot;read_u64&lt;br/&gt;line 183&quot;]
-    n_decode_path[&quot;decode_path&lt;br/&gt;line 198&quot;]
-    n_friendly_name[&quot;friendly_name&lt;br/&gt;line 203&quot;]
-    n_filetime_to_system[&quot;filetime_to_system&lt;br/&gt;line 213&quot;]
-    n_collect --&gt; n_read_entry
-    n_collect --&gt; n_subkeys
-    n_read_entry --&gt; n_decode_path
-    n_read_entry --&gt; n_filetime_to_system
-    n_read_entry --&gt; n_friendly_name
-    n_read_entry --&gt; n_read_u64
-    n_read_u64 --&gt; n_no_window
-    n_read_u64 --&gt; n_reg_exe
+    n_no_window[&quot;no_window&lt;br/&gt;line 79&quot;]
+    n_reg_exe[&quot;reg_exe&lt;br/&gt;line 111&quot;]
+    n_scan([&quot;scan&lt;br/&gt;line 127&quot;])
+    n_collect[&quot;collect&lt;br/&gt;line 140&quot;]
+    n_query_tree[&quot;query_tree&lt;br/&gt;line 168&quot;]
+    n_parse_consent_dump[&quot;parse_consent_dump&lt;br/&gt;line 202&quot;]
+    n_hex_value[&quot;hex_value&lt;br/&gt;line 257&quot;]
+    n_decode_path[&quot;decode_path&lt;br/&gt;line 268&quot;]
+    n_friendly_name[&quot;friendly_name&lt;br/&gt;line 273&quot;]
+    n_filetime_to_system[&quot;filetime_to_system&lt;br/&gt;line 283&quot;]
+    n_collect --&gt; n_decode_path
+    n_collect --&gt; n_filetime_to_system
+    n_collect --&gt; n_friendly_name
+    n_collect --&gt; n_parse_consent_dump
+    n_collect --&gt; n_query_tree
+    n_parse_consent_dump --&gt; n_hex_value
+    n_query_tree --&gt; n_no_window
+    n_query_tree --&gt; n_reg_exe
     n_scan --&gt; n_collect
-    n_subkeys --&gt; n_no_window
-    n_subkeys --&gt; n_reg_exe
-    click n_no_window href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L49&quot; &quot;open the source&quot;
-    click n_reg_exe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L84&quot; &quot;open the source&quot;
-    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L100&quot; &quot;open the source&quot;
-    click n_collect href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L113&quot; &quot;open the source&quot;
-    click n_subkeys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L132&quot; &quot;open the source&quot;
-    click n_read_entry href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L159&quot; &quot;open the source&quot;
-    click n_read_u64 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L183&quot; &quot;open the source&quot;
-    click n_decode_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L198&quot; &quot;open the source&quot;
-    click n_friendly_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L203&quot; &quot;open the source&quot;
-    click n_filetime_to_system href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L213&quot; &quot;open the source&quot;
+    click n_no_window href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L79&quot; &quot;open the source&quot;
+    click n_reg_exe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L111&quot; &quot;open the source&quot;
+    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L127&quot; &quot;open the source&quot;
+    click n_collect href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L140&quot; &quot;open the source&quot;
+    click n_query_tree href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L168&quot; &quot;open the source&quot;
+    click n_parse_consent_dump href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L202&quot; &quot;open the source&quot;
+    click n_hex_value href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L257&quot; &quot;open the source&quot;
+    click n_decode_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L268&quot; &quot;open the source&quot;
+    click n_friendly_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L273&quot; &quot;open the source&quot;
+    click n_filetime_to_system href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L283&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_scan entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_no_window,n_reg_exe,n_collect,n_subkeys,n_read_entry,n_read_u64,n_decode_path,n_friendly_name,n_filetime_to_system helper</code></pre>
+    class n_no_window,n_reg_exe,n_collect,n_query_tree,n_parse_consent_dump,n_hex_value,n_decode_path,n_friendly_name,n_filetime_to_system helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>no_window</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L49" rel="noopener noreferrer">49</a></td><td>Spawn without a console window.</td></tr>
-<tr><td><code>CONSENT_STORE</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L62" rel="noopener noreferrer">62</a></td><td>The full hive name, not the HKCU abbreviation: reg query echoes subkey paths back in long form, and the reply has to be matched against what was asked for.</td></tr>
-<tr><td><code>FILETIME_TO_UNIX_SECS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L66" rel="noopener noreferrer">66</a></td><td>FILETIME counts 100-nanosecond intervals from 1601-01-01; Unix time starts at 1970-01-01.</td></tr>
-<tr><td><code>BACKSLASH</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L69" rel="noopener noreferrer">69</a></td><td>The registry path separator, as a byte.</td></tr>
-<tr><td><code>reg_exe</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L84" rel="noopener noreferrer">84</a></td><td>The absolute path of reg.exe, or None if it is not where it should be.</td></tr>
-<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L100" rel="noopener noreferrer">100</a></td><td></td></tr>
-<tr><td><code>collect</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L113" rel="noopener noreferrer">113</a></td><td>Walk one capability&#x27;s subkeys, two levels deep to catch NonPackaged.</td></tr>
-<tr><td><code>subkeys</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L132" rel="noopener noreferrer">132</a></td><td>Immediate subkey paths of key, or nothing if it does not exist.</td></tr>
-<tr><td><code>read_entry</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L159" rel="noopener noreferrer">159</a></td><td>Read one application&#x27;s entry, returning it only if the device is in use now.</td></tr>
-<tr><td><code>read_u64</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L183" rel="noopener noreferrer">183</a></td><td></td></tr>
-<tr><td><code>decode_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L198" rel="noopener noreferrer">198</a></td><td>Registry keys encode a path with # where a separator belongs.</td></tr>
-<tr><td><code>friendly_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L203" rel="noopener noreferrer">203</a></td><td>The executable name, or the package family name for a Store app.</td></tr>
-<tr><td><code>filetime_to_system</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L213" rel="noopener noreferrer">213</a></td><td></td></tr>
+<tr><td><code>no_window</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L79" rel="noopener noreferrer">79</a></td><td>Spawn without a console window.</td></tr>
+<tr><td><code>CONSENT_STORE</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L92" rel="noopener noreferrer">92</a></td><td>The full hive name, not the HKCU abbreviation: reg query echoes subkey paths back in long form, and the reply has to be matched against what was asked for.</td></tr>
+<tr><td><code>FILETIME_TO_UNIX_SECS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L96" rel="noopener noreferrer">96</a></td><td>FILETIME counts 100-nanosecond intervals from 1601-01-01; Unix time starts at 1970-01-01.</td></tr>
+<tr><td><code>reg_exe</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L111" rel="noopener noreferrer">111</a></td><td>The absolute path of reg.exe, or None if it is not where it should be.</td></tr>
+<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L127" rel="noopener noreferrer">127</a></td><td></td></tr>
+<tr><td><code>collect</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L140" rel="noopener noreferrer">140</a></td><td>Walk one capability&#x27;s whole subtree, from a single reg query /s.</td></tr>
+<tr><td><code>query_tree</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L168" rel="noopener noreferrer">168</a></td><td>One reg query &lt;key&gt; /s, printing the whole subtree.</td></tr>
+<tr><td><code>parse_consent_dump</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L202" rel="noopener noreferrer">202</a></td><td>Pull (key, LastUsedTimeStart, LastUsedTimeStop) out of a /s dump.</td></tr>
+<tr><td><code>hex_value</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L257" rel="noopener noreferrer">257</a></td><td>Name    REG_QWORD    0x...</td></tr>
+<tr><td><code>decode_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L268" rel="noopener noreferrer">268</a></td><td>Registry keys encode a path with # where a separator belongs.</td></tr>
+<tr><td><code>friendly_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L273" rel="noopener noreferrer">273</a></td><td>The executable name, or the package family name for a Store app.</td></tr>
+<tr><td><code>filetime_to_system</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L283" rel="noopener noreferrer">283</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

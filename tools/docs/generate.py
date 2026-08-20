@@ -94,6 +94,7 @@ CRATES = (
     "veilvoice-sentry",
     "veilvoice-setup",
     "veilvoice-verify",
+    "veilvoice-video",
     "veilvoice-watch",
 )
 
@@ -116,6 +117,7 @@ ALL_CRATES = (
     "veilvoice-sentry",
     "veilvoice-setup",
     "veilvoice-verify",
+    "veilvoice-video",
     "veilvoice-watch",
 )
 

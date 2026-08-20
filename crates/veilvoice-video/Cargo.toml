@@ -1,0 +1,15 @@
+[package]
+name = "veilvoice-video"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg."
+
+[dependencies]
+veilvoice-conversation = { path = "../veilvoice-conversation" }
+
+[dev-dependencies]
+tempfile = "3"

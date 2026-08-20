@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 62 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 64 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -39,6 +39,7 @@ window.
 | `theme` | The palette, shared with the command-line front end |
 | `soundbar` | The animated level meter |
 | `reduced_motion` | Whether to animate at all |
+| `watchfeed` | The device monitor, on a thread that is not this one |
 
 # Two rules this crate keeps
 
@@ -61,4 +62,4 @@ This file defines no functions of its own.
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L62) | Crate version string, surfaced in the About panel. |
+| `VERSION` <sub>pub const</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L64) | Crate version string, surfaced in the About panel. |
