@@ -11,11 +11,11 @@ Estimates are in working days and they are estimates. Where a marker depends on
 something outside this project — a platform's rules, a decision that has not
 been taken — that is written down rather than absorbed into a number.
 
-**Where we are now:** **v0.1.10 is released**, signed and published for ten
-platforms, and verified by hand after publication -- fingerprint checked, good
-signature, hashes matched, and the shipped verifier checked its own release
-with no GnuPG involved. Everything below the line marked *shipped* is work in
-progress.
+**Where we are now:** **v0.1.12 is released**, signed and published for eleven
+platforms -- OpenBSD included since v0.1.11 -- and verified by hand after
+publication: fingerprint checked, good signature, hashes matched, and the
+shipped verifier checked its own release with no GnuPG involved. Everything
+below the line marked *shipped* is work in progress.
 
 ---
 
@@ -67,8 +67,8 @@ progress.
 | 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **planned** | 3–4 d |
 | 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **planned** | 1–2 d |
 | 29 | One single binary — the same executable runs as the desktop app or as the command line, installed or portable | **planned** | 2 d |
-| 30 | Windows installer: Tokyo Night, animated, and a **portable** option that installs nothing | **planned** | 4–5 d |
-| 31 | Optional companion setup — VB-CABLE on Windows, PipeWire on Linux, BlackHole on macOS, and Audacity everywhere — detected if present, installed only if confirmed | **planned** | 3–4 d |
+| 30 | Installer with a window: Tokyo Night, animated, and **portable** described as the normal case rather than as something missing | **done** | — |
+| 31 | Optional companion setup — VB-CABLE on Windows, PipeWire on Linux, BlackHole on macOS, and Audacity everywhere — detected if present, installed only if confirmed | **done** | — |
 | 32 | The site's search presented as an **index**, and animated | **done** | — |
 
 ## Security and monitoring features
