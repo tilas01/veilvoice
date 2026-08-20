@@ -4849,6 +4849,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "veilvoice-conversation"
+version = "0.1.12"
+dependencies = [
+ "tempfile",
+ "veilvoice-core",
+]
+
+[[package]]
 name = "veilvoice-core"
 version = "0.1.12"
 dependencies = [
