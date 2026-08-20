@@ -64,6 +64,30 @@
 //! at all. Setting `reseed_secs` to `0.0` keeps one stream for the session and
 //! the output is exactly as unlinkable as before.
 //!
+//! # A roll cannot happen faster than a frame, and the interface must say so
+//!
+//! [`DeidConfig::reseed_range_ms`] asks for the interval to be drawn fresh from
+//! a range at every roll, in milliseconds, rather than fixed. The gap is drawn
+//! from the modulation stream itself, so it is unpredictable and costs neither
+//! a syscall nor an allocation.
+//!
+//! It is **quantised to whole frames**, and the grain is coarser than people
+//! expect. The engine produces one set of modulation parameters per STFT hop:
+//! 256 samples at the default frame size, which is 5.33 ms at 48 kHz. There is
+//! nothing between two frames to change, so a request for a 0.7 ms interval
+//! does not roll seven times inside a frame -- it rolls once, at the frame
+//! boundary, exactly as a request for 5 ms would.
+//!
+//! Making the frame short enough for a sub-millisecond roll would mean a
+//! 128-point transform, which is 375 Hz per bin: too coarse to locate a
+//! formant, and moving formants is the thing being done. The trade is not
+//! available.
+//!
+//! So [`DeidConfig::effective_reseed_range_ms`] reports what a requested range
+//! actually comes to on this configuration, and a front end shows that rather
+//! than the number that was typed. Quietly accepting 0.7 ms and rolling at
+//! 5.33 ms would be a setting that lies about itself.
+//!
 //! The roll is deliberately cheap: no syscall, no allocation, no lock. It has
 //! to be, because it happens inside an audio callback.
 //!
@@ -143,7 +167,26 @@ pub struct DeidConfig {
     /// small and far too slow to hear — the parameters glide across a roll and
     /// the phase offsets ease to their new values over about half a second.
     /// Set to `0.0` to keep a single stream for the whole session.
+    ///
+    /// Ignored when [`DeidConfig::reseed_range_ms`] is set.
     pub reseed_secs: f32,
+    /// Draw the interval before each roll from this range, in **milliseconds**.
+    ///
+    /// `Some((lo, hi))` replaces the fixed [`DeidConfig::reseed_secs`] with a
+    /// gap drawn fresh from the modulation stream at every roll, so the ratchet
+    /// has no period to observe. `None` keeps the fixed interval.
+    ///
+    /// **Quantised to whole frames.** One frame is
+    /// [`DeidConfig::frame_ms`] -- 5.33 ms at the default settings and 48 kHz
+    /// -- and nothing can happen between two of them.
+    /// [`DeidConfig::effective_reseed_range_ms`] is what the range comes to,
+    /// and it is what an interface should display.
+    ///
+    /// Not part of [`DeidConfig::default`], which stays deterministic so the
+    /// test suite does. The front ends call
+    /// [`DeidConfig::with_random_reseed_range`] at launch, which is what makes
+    /// the shipped interval something other than a number compiled in.
+    pub reseed_range_ms: Option<(f32, f32)>,
 }
 
 impl Default for DeidConfig {
@@ -164,13 +207,102 @@ impl Default for DeidConfig {
             intensity: 1.0,
             accent: AccentConfig::default(),
             reseed_secs: 2.0,
+            reseed_range_ms: None,
         }
     }
 }
 
+/// The narrowest randomised roll range this engine will accept, in
+/// milliseconds. Below one frame the range has no room to vary in.
+const MIN_RESEED_MS: f32 = 0.05;
+/// The widest, in milliseconds. Ten minutes is far past any use for a ratchet
+/// and stops an absurd value producing a frame count that overflows.
+const MAX_RESEED_MS: f32 = 600_000.0;
+
 impl DeidConfig {
     fn hop(&self) -> usize {
         (self.frame_size / self.overlap.max(1)).max(1)
+    }
+
+    /// How long one analysis frame is, in milliseconds.
+    ///
+    /// The grain of everything the modulation does. No parameter can change
+    /// more often than this, because only one set of them exists per frame.
+    pub fn frame_ms(&self) -> f32 {
+        if self.sample_rate > 0.0 {
+            self.hop() as f32 * 1000.0 / self.sample_rate
+        } else {
+            0.0
+        }
+    }
+
+    /// The number of frames a millisecond interval comes to, at least one.
+    fn frames_for_ms(&self, ms: f32) -> u32 {
+        let frame = self.frame_ms();
+        if frame <= 0.0 {
+            return 1;
+        }
+        ((ms / frame).round() as i64).clamp(1, u32::MAX as i64) as u32
+    }
+
+    /// What [`DeidConfig::reseed_range_ms`] actually comes to on this
+    /// configuration, after quantising to whole frames.
+    ///
+    /// Show this, not the number the user typed. A request for 0.7 ms to
+    /// 2.7 ms comes back as 5.33 ms to 5.33 ms at the default frame size,
+    /// because a frame is the grain and the whole requested range is finer than
+    /// one. That is not a failure -- it is the fastest this can honestly roll --
+    /// but an interface that displayed "0.7 ms" would be claiming something
+    /// that is not happening.
+    pub fn effective_reseed_range_ms(&self) -> Option<(f32, f32)> {
+        let (lo, hi) = self.reseed_range_ms?;
+        let frame = self.frame_ms();
+        Some((
+            self.frames_for_ms(lo) as f32 * frame,
+            self.frames_for_ms(hi) as f32 * frame,
+        ))
+    }
+
+    /// Whether the requested range is finer than one frame, so the whole of it
+    /// collapses onto a single interval.
+    ///
+    /// A front end should say so where the control is, rather than leaving
+    /// somebody to wonder why moving the slider changes nothing.
+    pub fn reseed_range_is_finer_than_a_frame(&self) -> bool {
+        match self.reseed_range_ms {
+            Some((lo, hi)) => self.frames_for_ms(lo) == self.frames_for_ms(hi),
+            None => false,
+        }
+    }
+
+    /// This configuration with a roll range drawn from the OS CSPRNG.
+    ///
+    /// The shipped interval is then a property of this launch rather than a
+    /// number compiled into the binary -- which is the point: a fixed ratchet
+    /// period is a fixed thing to observe, and every copy of VeilVoice having
+    /// the same one makes it a property of the *program* rather than of the
+    /// session.
+    ///
+    /// The range is centred somewhere between one frame and about two seconds,
+    /// and both ends are drawn, so neither the period nor the spread is the
+    /// same twice. Falls back to leaving the configuration alone if the OS
+    /// CSPRNG cannot be read, because a de-identifier that refuses to start
+    /// over the *ratchet* -- which is forward secrecy, not irreversibility --
+    /// would be trading the whole feature for a nicety.
+    pub fn with_random_reseed_range(mut self) -> Self {
+        let mut bytes = [0u8; 4];
+        if getrandom::getrandom(&mut bytes).is_err() {
+            return self;
+        }
+        let a = u16::from_le_bytes([bytes[0], bytes[1]]) as f32 / u16::MAX as f32;
+        let b = u16::from_le_bytes([bytes[2], bytes[3]]) as f32 / u16::MAX as f32;
+        let frame = self.frame_ms().max(MIN_RESEED_MS);
+        // One frame at the fast end, two seconds at the slow end, and the two
+        // draws sorted so the range is never reversed.
+        let span = (2000.0f32 - frame).max(frame);
+        let (lo, hi) = if a <= b { (a, b) } else { (b, a) };
+        self.reseed_range_ms = Some((frame + lo * span, frame + hi * span));
+        self
     }
 
     /// Scale a `(lo, hi)` ratio range toward 1.0 by `intensity`.
@@ -247,6 +379,26 @@ impl DeidConfig {
         if !self.reseed_secs.is_finite() || self.reseed_secs < 0.0 {
             return Err("reseed_secs must be zero or a positive number of seconds".into());
         }
+        // Refused rather than clamped, and refused rather than silently
+        // reordered. A reversed range is a typo, and a caller who wrote one
+        // believes something about what their recording is doing.
+        if let Some((lo, hi)) = self.reseed_range_ms {
+            if !lo.is_finite() || !hi.is_finite() {
+                return Err("reseed_range_ms must be two real numbers".into());
+            }
+            if lo > hi {
+                return Err(format!(
+                    "reseed_range_ms is {lo} to {hi} ms, which is backwards. Give the \
+                     shorter interval first."
+                ));
+            }
+            if lo < MIN_RESEED_MS || hi > MAX_RESEED_MS {
+                return Err(format!(
+                    "reseed_range_ms {lo} to {hi} ms is outside {MIN_RESEED_MS} to \
+                     {MAX_RESEED_MS} ms"
+                ));
+            }
+        }
         // The remaining floats are all clamped rather than refused, because
         // every one of them has a meaningful nearest legal value — but a `NaN`
         // does not clamp, it propagates, so it is refused by name.
@@ -314,6 +466,17 @@ pub struct ProcessStats {
     pub sample_rate: f32,
     /// Fixed algorithmic latency of the STFT, milliseconds.
     pub algorithmic_latency_ms: f64,
+    /// Frames until the next seed roll, as last drawn.
+    ///
+    /// With a randomised range this changes at every roll; with a fixed
+    /// interval it is constant, and it is zero when rolling is off.
+    pub reseed_frames: u32,
+    /// The same figure in milliseconds -- the interval **actually** in force.
+    ///
+    /// This is the number to show a user, not the one they typed: the request
+    /// is quantised to whole frames, and at the default frame size a frame is
+    /// 5.33 ms.
+    pub reseed_interval_ms: f64,
 }
 
 impl ProcessStats {
@@ -359,8 +522,17 @@ pub struct Deidentifier {
     stats: ProcessStats,
     latency_samples: usize,
     hop: usize,
+    /// One frame in milliseconds, kept so the per-block statistics need no
+    /// division by a sample rate inside the hot path.
+    frame_ms: f64,
     /// Frames between seed rolls; 0 disables rolling entirely.
+    ///
+    /// With a randomised range this is the *last drawn* interval rather than a
+    /// constant, and `reseed_span` is the range each new one is drawn from.
     reseed_frames: u32,
+    /// The inclusive frame range each interval is drawn from, or `None` for a
+    /// fixed interval.
+    reseed_span: Option<(u32, u32)>,
     frames_until_reseed: u32,
     /// Pre-allocated, so a roll never allocates inside an audio callback.
     phase_scratch: Vec<f32>,
@@ -400,17 +572,25 @@ impl Deidentifier {
         let pitch = PitchTracker::new(config.sample_rate);
 
         // Rolls are counted in frames so the audio thread never touches a clock.
-        let reseed_frames = if config.reseed_secs > 0.0 {
-            ((config.reseed_secs * config.sample_rate) / hop as f32)
+        let reseed_span = config
+            .reseed_range_ms
+            .map(|(lo, hi)| (config.frames_for_ms(lo), config.frames_for_ms(hi)));
+        let reseed_frames = match reseed_span {
+            // The first interval is drawn like every other one, so the very
+            // first roll is no more predictable than the rest.
+            Some((lo, hi)) => modulator.draw_frames(lo, hi),
+            None if config.reseed_secs > 0.0 => ((config.reseed_secs * config.sample_rate)
+                / hop as f32)
                 .round()
-                .max(1.0) as u32
-        } else {
-            0
+                .max(1.0) as u32,
+            None => 0,
         };
 
         let stats = ProcessStats {
             sample_rate: config.sample_rate,
             algorithmic_latency_ms: latency_samples as f64 / config.sample_rate as f64 * 1000.0,
+            reseed_frames,
+            reseed_interval_ms: reseed_frames as f64 * config.frame_ms() as f64,
             ..Default::default()
         };
 
@@ -426,7 +606,9 @@ impl Deidentifier {
             stats,
             latency_samples,
             hop,
+            frame_ms: config.frame_ms() as f64,
             reseed_frames,
+            reseed_span,
             frames_until_reseed: reseed_frames,
             phase_scratch: phase,
         })
@@ -460,19 +642,29 @@ impl Deidentifier {
         let accent = &mut self.accent;
         let tracker = &mut self.pitch;
         let hop = self.hop;
-        let reseed_frames = self.reseed_frames;
+        let reseed_span = self.reseed_span;
+        let interval = &mut self.reseed_frames;
         let countdown = &mut self.frames_until_reseed;
         let phase_scratch = &mut self.phase_scratch;
         self.stft.process(input, output, |spec, frame| {
             // Roll the stream forward. Cheap, allocation-free and syscall-free:
-            // the new seed is drawn from the stream it replaces.
-            if reseed_frames > 0 {
+            // the new seed is drawn from the stream it replaces, and so is the
+            // gap before the next roll.
+            if *interval > 0 {
                 *countdown = countdown.saturating_sub(1);
                 if *countdown == 0 {
                     modulator.reseed();
                     modulator.fill_phase_offsets(phase_scratch);
                     spectral.retarget_phase_offsets(phase_scratch);
-                    *countdown = reseed_frames;
+                    // Drawn *after* the roll, so the next gap comes from the new
+                    // stream. Drawing it before would leave the timing of every
+                    // future roll recoverable from a seed that the roll was
+                    // supposed to have closed off.
+                    *interval = match reseed_span {
+                        Some((lo, hi)) => modulator.draw_frames(lo, hi),
+                        None => *interval,
+                    };
+                    *countdown = *interval;
                 }
             }
 
@@ -493,6 +685,9 @@ impl Deidentifier {
             y = self.reverb.process(y);
             *s = y;
         }
+
+        self.stats.reseed_frames = self.reseed_frames;
+        self.stats.reseed_interval_ms = self.reseed_frames as f64 * self.frame_ms;
 
         let us = start.elapsed().as_nanos() as f64 / 1000.0;
         self.stats.blocks += 1;
@@ -524,6 +719,211 @@ mod tests {
             return 0.0;
         }
         (x.iter().map(|v| v * v).sum::<f32>() / x.len() as f32).sqrt()
+    }
+
+    /// One frame is the grain of everything the modulation does, and the
+    /// documented figure -- 5.33 ms at 48 kHz and the default frame size -- is
+    /// the number every claim about roll intervals rests on.
+    #[test]
+    fn a_frame_is_the_documented_length() {
+        let config = DeidConfig::default();
+        assert_eq!(config.frame_size, 1024);
+        assert_eq!(config.overlap, 4);
+        assert!(
+            (config.frame_ms() - 5.333).abs() < 0.01,
+            "a frame is {} ms, not the 5.33 ms the documentation claims",
+            config.frame_ms()
+        );
+    }
+
+    /// The request that started this: 0.7 ms to 2.7 ms. The whole range is
+    /// finer than one frame, so it collapses onto exactly one interval -- and
+    /// the engine must say so rather than displaying the number typed.
+    #[test]
+    fn a_range_finer_than_a_frame_collapses_and_admits_it() {
+        let config = DeidConfig {
+            reseed_range_ms: Some((0.7, 2.7)),
+            ..DeidConfig::default()
+        };
+        let (lo, hi) = config
+            .effective_reseed_range_ms()
+            .expect("a range was asked for");
+        assert!((lo - config.frame_ms()).abs() < 1e-3, "{lo}");
+        assert!((hi - config.frame_ms()).abs() < 1e-3, "{hi}");
+        assert!(
+            config.reseed_range_is_finer_than_a_frame(),
+            "the collapse must be reportable, or the control lies about itself"
+        );
+    }
+
+    /// A range wide enough to hold several frames keeps its width.
+    #[test]
+    fn a_range_wider_than_a_frame_survives_quantisation() {
+        let config = DeidConfig {
+            reseed_range_ms: Some((20.0, 200.0)),
+            ..DeidConfig::default()
+        };
+        let (lo, hi) = config.effective_reseed_range_ms().unwrap();
+        assert!(hi > lo * 5.0, "{lo} to {hi} lost its width");
+        assert!(!config.reseed_range_is_finer_than_a_frame());
+        // And both ends are whole frames.
+        for value in [lo, hi] {
+            let frames = value / config.frame_ms();
+            assert!(
+                (frames - frames.round()).abs() < 1e-3,
+                "{value} ms is not a whole number of frames"
+            );
+        }
+    }
+
+    /// A reversed range is a typo about what a recording is doing, so it is
+    /// refused rather than quietly sorted.
+    #[test]
+    fn a_backwards_range_is_refused_rather_than_reordered() {
+        let error = DeidConfig {
+            reseed_range_ms: Some((200.0, 20.0)),
+            ..DeidConfig::default()
+        }
+        .checked()
+        .expect_err("backwards must be refused");
+        assert!(error.contains("backwards"), "{error}");
+
+        assert!(DeidConfig {
+            reseed_range_ms: Some((f32::NAN, 20.0)),
+            ..DeidConfig::default()
+        }
+        .checked()
+        .is_err());
+        assert!(
+            DeidConfig {
+                reseed_range_ms: Some((0.0, 20.0)),
+                ..DeidConfig::default()
+            }
+            .checked()
+            .is_err(),
+            "zero is below the floor and must be refused"
+        );
+        assert!(DeidConfig {
+            reseed_range_ms: Some((1.0, 1e9)),
+            ..DeidConfig::default()
+        }
+        .checked()
+        .is_err());
+    }
+
+    /// The interval in force is reported, and with a randomised range it
+    /// actually changes as the recording runs. Without that, the feature is a
+    /// setting that does nothing.
+    #[test]
+    fn a_randomised_interval_changes_as_the_audio_runs() {
+        let config = DeidConfig {
+            // Wide enough in frames that two consecutive draws being equal by
+            // chance is unlikely, and short enough that a second of audio
+            // contains many rolls.
+            reseed_range_ms: Some((10.0, 120.0)),
+            ..DeidConfig::default()
+        };
+        let mut deid = Deidentifier::from_seed(config, [7u8; 32]).unwrap();
+        let block = vec![0.05f32; 4096];
+        let mut out = vec![0.0f32; 4096];
+        let mut seen = std::collections::BTreeSet::new();
+        for _ in 0..40 {
+            deid.process(&block, &mut out);
+            seen.insert(deid.stats().reseed_frames);
+        }
+        assert!(
+            seen.len() > 1,
+            "the interval never changed: {seen:?} -- the range is not being drawn from"
+        );
+        for frames in &seen {
+            let ms = *frames as f64 * DeidConfig::default().frame_ms() as f64;
+            assert!(
+                (9.0..=125.0).contains(&ms),
+                "{ms} ms is outside the range that was asked for"
+            );
+        }
+    }
+
+    /// A fixed interval must still report itself, and must not wander.
+    #[test]
+    fn a_fixed_interval_is_reported_and_stays_put() {
+        let config = DeidConfig {
+            reseed_secs: 0.1,
+            ..DeidConfig::default()
+        };
+        let mut deid = Deidentifier::from_seed(config, [9u8; 32]).unwrap();
+        let block = vec![0.05f32; 4096];
+        let mut out = vec![0.0f32; 4096];
+        let mut seen = std::collections::BTreeSet::new();
+        for _ in 0..20 {
+            deid.process(&block, &mut out);
+            seen.insert(deid.stats().reseed_frames);
+        }
+        assert_eq!(seen.len(), 1, "a fixed interval moved: {seen:?}");
+        let frames = *seen.iter().next().unwrap();
+        assert!(
+            (frames as f32 * DeidConfig::default().frame_ms() - 100.0).abs() < 6.0,
+            "{frames} frames is not about 100 ms"
+        );
+    }
+
+    /// Rolling off means no interval at all, not an interval of zero length.
+    #[test]
+    fn rolling_off_reports_no_interval() {
+        let config = DeidConfig {
+            reseed_secs: 0.0,
+            ..DeidConfig::default()
+        };
+        let mut deid = Deidentifier::from_seed(config, [3u8; 32]).unwrap();
+        let block = vec![0.05f32; 2048];
+        let mut out = vec![0.0f32; 2048];
+        deid.process(&block, &mut out);
+        assert_eq!(deid.stats().reseed_frames, 0);
+        assert_eq!(deid.stats().reseed_interval_ms, 0.0);
+    }
+
+    /// A randomised range is still deterministic from a seed, or the test
+    /// suite could not hold anything about it.
+    #[test]
+    fn the_same_seed_draws_the_same_intervals() {
+        let config = DeidConfig {
+            reseed_range_ms: Some((10.0, 120.0)),
+            ..DeidConfig::default()
+        };
+        let run = || {
+            let mut deid = Deidentifier::from_seed(config, [42u8; 32]).unwrap();
+            let block = vec![0.05f32; 4096];
+            let mut out = vec![0.0f32; 4096];
+            let mut intervals = Vec::new();
+            for _ in 0..20 {
+                deid.process(&block, &mut out);
+                intervals.push(deid.stats().reseed_frames);
+            }
+            intervals
+        };
+        assert_eq!(run(), run());
+    }
+
+    /// The launch-time randomiser must produce something the engine accepts,
+    /// every time, and something that is not the same on two calls.
+    #[test]
+    fn a_randomised_launch_range_is_valid_and_not_a_constant() {
+        let mut seen = std::collections::BTreeSet::new();
+        for _ in 0..12 {
+            let config = DeidConfig::default().with_random_reseed_range();
+            let checked = config
+                .checked()
+                .expect("the launch randomiser must produce a legal range");
+            let (lo, hi) = checked.reseed_range_ms.expect("a range was set");
+            assert!(lo <= hi, "{lo} to {hi}");
+            assert!(lo >= checked.frame_ms() - 1e-3, "{lo} is below one frame");
+            Deidentifier::from_seed(checked, [1u8; 32]).expect("and one the engine can build from");
+            seen.insert(format!("{lo:.3}-{hi:.3}"));
+        }
+        assert!(
+            seen.len() > 1,
+            "the launch randomiser returned the same range every time"
+        );
     }
 
     #[test]
