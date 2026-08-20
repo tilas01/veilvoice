@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/install.svg" alt="install.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/install.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 560 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 561 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#portable-is-the-default-and-installing-is-the-exception">Portable is the default, and installing is the exception</a>
@@ -67,7 +67,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>560 lines defining <strong>19 functions</strong> (5 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>561 lines defining <strong>19 functions</strong> (5 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Status</code> <span style="color:var(--muted)">line 131</span> &mdash; What an installation currently looks like.</li>
 <li><code>enum UserPath</code> <span style="color:var(--muted)">line 269</span></li>
@@ -76,10 +76,10 @@
 <li><code>status</code> <span style="color:var(--muted)">line 143</span> &mdash; Read the current state without changing anything.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>exe_name</code>, <code>path_contains</code>, <code>prefix</code></span>
 </li>
-<li><code>install</code> <span style="color:var(--muted)">line 450</span> &mdash; Install for this user.
+<li><code>install</code> <span style="color:var(--muted)">line 451</span> &mdash; Install for this user.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>add_to_path</code>, <code>bin_dir</code>, <code>copy_programs</code>, <code>prefix</code>, <code>register_uninstall</code>, <code>no_window</code>, <code>read_user_path</code>, <code>reg_exe</code>, <code>exe_name</code></span>
 </li>
-<li><code>uninstall</code> <span style="color:var(--muted)">line 477</span> &mdash; Remove what install added.
+<li><code>uninstall</code> <span style="color:var(--muted)">line 478</span> &mdash; Remove what install added.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>bin_dir</code>, <code>prefix</code>, <code>remove_from_path</code>, <code>unregister_uninstall</code>, <code>no_window</code>, <code>read_user_path</code>, <code>reg_exe</code></span>
 </li>
 </ul>
@@ -162,55 +162,55 @@
 <text x="1100.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">add_to_path</text>
 <text x="1100.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L288" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L289" target="_blank" rel="noopener noreferrer">
 <rect x="884.4" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="951.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_user_path</text>
-<text x="951.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 288</text>
+<text x="951.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L332" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L333" target="_blank" rel="noopener noreferrer">
 <rect x="1044.8" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1100.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">add_to_path</text>
-<text x="1100.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 332</text>
+<text x="1100.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 333</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L342" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L343" target="_blank" rel="noopener noreferrer">
 <rect x="1373.2" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1455.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">register_uninstall</text>
-<text x="1455.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 342</text>
+<text x="1455.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 343</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L381" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L382" target="_blank" rel="noopener noreferrer">
 <rect x="1373.2" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1455.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">register_uninstall</text>
-<text x="1455.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 381</text>
+<text x="1455.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 382</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L386" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L387" target="_blank" rel="noopener noreferrer">
 <rect x="1739.6" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1814.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove_from_path</text>
-<text x="1814.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 386</text>
+<text x="1814.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 387</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L431" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L432" target="_blank" rel="noopener noreferrer">
 <rect x="1739.6" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="1814.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove_from_path</text>
-<text x="1814.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 431</text>
+<text x="1814.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 432</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L436" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L437" target="_blank" rel="noopener noreferrer">
 <rect x="2121.2" y="20.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="2211.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unregister_uninstall</text>
-<text x="2211.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 436</text>
+<text x="2211.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 437</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L445" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L446" target="_blank" rel="noopener noreferrer">
 <rect x="2121.2" y="20.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="2211.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unregister_uninstall</text>
-<text x="2211.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 445</text>
+<text x="2211.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 446</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L450" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L451" target="_blank" rel="noopener noreferrer">
 <rect x="2327.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2371.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
-<text x="2371.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 450</text>
+<text x="2371.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 451</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L477" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L478" target="_blank" rel="noopener noreferrer">
 <rect x="2442.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="2490.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">uninstall</text>
-<text x="2490.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 477</text>
+<text x="2490.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 478</text>
 </a>
 </svg>
 </div>
@@ -227,16 +227,16 @@ flowchart TD
     n_path_contains[&quot;path_contains&lt;br/&gt;line 177&quot;]
     n_copy_programs[&quot;copy_programs&lt;br/&gt;line 185&quot;]
     n_add_to_path[&quot;add_to_path&lt;br/&gt;line 227&quot;]
-    n_read_user_path[&quot;read_user_path&lt;br/&gt;line 288&quot;]
-    n_add_to_path[&quot;add_to_path&lt;br/&gt;line 332&quot;]
-    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 342&quot;]
-    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 381&quot;]
-    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 386&quot;]
-    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 431&quot;]
-    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 436&quot;]
-    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 445&quot;]
-    n_install([&quot;install&lt;br/&gt;line 450&quot;])
-    n_uninstall([&quot;uninstall&lt;br/&gt;line 477&quot;])
+    n_read_user_path[&quot;read_user_path&lt;br/&gt;line 289&quot;]
+    n_add_to_path[&quot;add_to_path&lt;br/&gt;line 333&quot;]
+    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 343&quot;]
+    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 382&quot;]
+    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 387&quot;]
+    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 432&quot;]
+    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 437&quot;]
+    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 446&quot;]
+    n_install([&quot;install&lt;br/&gt;line 451&quot;])
+    n_uninstall([&quot;uninstall&lt;br/&gt;line 478&quot;])
     n_add_to_path --&gt; n_no_window
     n_add_to_path --&gt; n_read_user_path
     n_add_to_path --&gt; n_reg_exe
@@ -273,16 +273,16 @@ flowchart TD
     click n_path_contains href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L177&quot; &quot;open the source&quot;
     click n_copy_programs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L185&quot; &quot;open the source&quot;
     click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L227&quot; &quot;open the source&quot;
-    click n_read_user_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L288&quot; &quot;open the source&quot;
-    click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L332&quot; &quot;open the source&quot;
-    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L342&quot; &quot;open the source&quot;
-    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L381&quot; &quot;open the source&quot;
-    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L386&quot; &quot;open the source&quot;
-    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L431&quot; &quot;open the source&quot;
-    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L436&quot; &quot;open the source&quot;
-    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L445&quot; &quot;open the source&quot;
-    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L450&quot; &quot;open the source&quot;
-    click n_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L477&quot; &quot;open the source&quot;
+    click n_read_user_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L289&quot; &quot;open the source&quot;
+    click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L333&quot; &quot;open the source&quot;
+    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L343&quot; &quot;open the source&quot;
+    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L382&quot; &quot;open the source&quot;
+    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L387&quot; &quot;open the source&quot;
+    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L432&quot; &quot;open the source&quot;
+    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L437&quot; &quot;open the source&quot;
+    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L446&quot; &quot;open the source&quot;
+    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L451&quot; &quot;open the source&quot;
+    click n_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L478&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_install,n_uninstall entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -308,16 +308,16 @@ flowchart TD
 <tr><td><code>copy_programs</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L185" rel="noopener noreferrer">185</a></td><td>Copy the binaries into place.</td></tr>
 <tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L227" rel="noopener noreferrer">227</a></td><td>Add dir to the user&#x27;s PATH, if it is not there already.</td></tr>
 <tr><td><code>UserPath</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L269" rel="noopener noreferrer">269</a></td><td></td></tr>
-<tr><td><code>read_user_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L288" rel="noopener noreferrer">288</a></td><td>Read this user&#x27;s PATH, distinguishing &quot;not set&quot; from &quot;could not tell&quot;.</td></tr>
-<tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L332" rel="noopener noreferrer">332</a></td><td></td></tr>
-<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L342" rel="noopener noreferrer">342</a></td><td>Register with Add/Remove Programs, so the system can list and remove it.</td></tr>
-<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L381" rel="noopener noreferrer">381</a></td><td></td></tr>
-<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L386" rel="noopener noreferrer">386</a></td><td></td></tr>
-<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L431" rel="noopener noreferrer">431</a></td><td></td></tr>
-<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L436" rel="noopener noreferrer">436</a></td><td></td></tr>
-<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L445" rel="noopener noreferrer">445</a></td><td></td></tr>
-<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L450" rel="noopener noreferrer">450</a></td><td>Install for this user.</td></tr>
-<tr><td><code>uninstall</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L477" rel="noopener noreferrer">477</a></td><td>Remove what install added.</td></tr>
+<tr><td><code>read_user_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L289" rel="noopener noreferrer">289</a></td><td>Read this user&#x27;s PATH, distinguishing &quot;not set&quot; from &quot;could not tell&quot;.</td></tr>
+<tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L333" rel="noopener noreferrer">333</a></td><td></td></tr>
+<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L343" rel="noopener noreferrer">343</a></td><td>Register with Add/Remove Programs, so the system can list and remove it.</td></tr>
+<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L382" rel="noopener noreferrer">382</a></td><td></td></tr>
+<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L387" rel="noopener noreferrer">387</a></td><td></td></tr>
+<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L432" rel="noopener noreferrer">432</a></td><td></td></tr>
+<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L437" rel="noopener noreferrer">437</a></td><td></td></tr>
+<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L446" rel="noopener noreferrer">446</a></td><td></td></tr>
+<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L451" rel="noopener noreferrer">451</a></td><td>Install for this user.</td></tr>
+<tr><td><code>uninstall</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs#L478" rel="noopener noreferrer">478</a></td><td>Remove what install added.</td></tr>
 </tbody></table>
 </section>
 </div></div>

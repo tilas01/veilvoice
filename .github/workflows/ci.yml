@@ -48,6 +48,19 @@ jobs:
       - name: Clippy
         run: cargo clippy --workspace --all-targets --locked
 
+      # Platform-gated code is only compiled on the platform it is gated to, so
+      # a helper left ungated -- or gated to the wrong thing -- is invisible
+      # everywhere else and an error here. Three separate CI failures in one
+      # day came through that gap: an unused `mut`, a dead enum variant, and a
+      # `#[cfg(windows)]` that attached to the item above the one it was meant
+      # for. Each was clean on the author's Windows machine.
+      #
+      # This is the same clippy run; it is called out as its own step so that
+      # when it fails, the reason is named rather than looking like a generic
+      # lint failure on a machine nobody has.
+      - name: Clippy (platform-gated code compiles on this platform too)
+        run: cargo clippy --workspace --all-targets --locked --tests
+
       - name: Tests
         run: cargo test --workspace --locked
 
