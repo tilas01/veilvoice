@@ -29,6 +29,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
+- [[`sentry.rs`|File-veilvoice-cli-sentry]] &mdash; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &mdash; Tokyo Night colouring for the terminal.
 
 ## [[veilvoice-core|Crate-veilvoice-core]]
@@ -99,6 +100,14 @@ Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.
 - [[`lib.rs`|File-veilvoice-meta-lib]] &mdash; Strip or spoof the identifying metadata that rides along with media files.
 - [[`wav.rs`|File-veilvoice-meta-wav]] &mdash; Chunk-level RIFF/WAVE metadata removal.
 - [[`wav_fuzz.rs`|File-veilvoice-meta-tests-wav_fuzz]] &mdash; Randomised robustness testing for the RIFF chunk walker.
+
+## [[veilvoice-sentry|Crate-veilvoice-sentry]]
+
+Ransomware canaries and mass-change rate detection: an early warning that says plainly what it cannot do.
+
+- [[`canary.rs`|File-veilvoice-sentry-canary]] &mdash; Decoy files that should never change, and a record of what they were.
+- [[`lib.rs`|File-veilvoice-sentry-lib]] &mdash; An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing.
+- [[`rate.rs`|File-veilvoice-sentry-rate]] &mdash; How much of a directory tree changed, and how fast.
 
 ## [[veilvoice-setup|Crate-veilvoice-setup]]
 

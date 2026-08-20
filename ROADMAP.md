@@ -82,7 +82,7 @@ it cannot do as plainly as what it can.
 | 33 | Screen-capture detection — application name, PID, when, how often | **planned** | 3 d |
 | 34 | Hide VeilVoice's own window from screen capture and recording | **planned** | 1–2 d |
 | 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **planned** | 2–3 d |
-| 36 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **planned** | 3–4 d |
+| 36 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **done** | — |
 | 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
 | 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography | **planned** | 2–3 d |
 | 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
