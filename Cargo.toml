@@ -10,6 +10,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/veilvoice-conversation",
     "crates/veilvoice-core",
     "crates/veilvoice-crypto",
     "crates/veilvoice-audio",
