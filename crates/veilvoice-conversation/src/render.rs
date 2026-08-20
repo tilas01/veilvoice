@@ -75,6 +75,28 @@
 //! in and out over a few milliseconds. Short enough not to swallow a syllable,
 //! long enough to remove the click.
 //!
+//! # Every speaker renders at the same time
+//!
+//! Speakers are independent by construction — a separate engine, a separate
+//! seed, a separate destination — so there is nothing to share between them and
+//! nothing to lock. Each one is given a thread and they all run at once, which
+//! on an ordinary machine turns a four-person recording into roughly the work
+//! of one.
+//!
+//! [`std::thread::scope`] rather than a pool or an async runtime. The number of
+//! threads is bounded by [`veilvoice_core::MAX_VOICES`], which is ten, so
+//! there is nothing for a pool to schedule; and a scoped thread can borrow the
+//! input slice directly, so nothing is copied to hand it over. It also needs no
+//! dependency, which for this project is not a small consideration: the
+//! `offline` CI job that checks what is in the dependency graph is part of what
+//! the front page is claiming.
+//!
+//! Each thread writes into its own buffer and the merge happens afterwards, in
+//! slot order. That is what makes the result **identical to the sequential one,
+//! bit for bit** — floating-point addition is not associative, so a merge in
+//! completion order would give a different file on every run and the render
+//! would stop being reproducible from its seeds. A test holds it.
+//!
 //! # Overlaps are mixed, and the mixing is admitted
 //!
 //! Two people talking at once is two engines writing into the same samples, so
@@ -87,6 +109,13 @@
 
 use crate::{Conversation, Error};
 use veilvoice_core::{DeidConfig, Deidentifier};
+
+/// One speaker's finished spans: where each starts, and the veiled samples.
+///
+/// Named rather than written out at the call site, which clippy asks for and
+/// which is the right ask -- the shape is the contract between the threads and
+/// the merge, and it is worth being able to point at.
+type SpeakerSpans = Vec<(usize, Vec<f32>)>;
 
 /// How to render.
 #[derive(Clone, Copy, Debug)]
@@ -174,28 +203,11 @@ pub fn render(
         }
     }
 
-    // One engine per speaker, each with their own destination voice and their
-    // own stream. Built once and kept, so a speaker's accent neutraliser
-    // converges over the whole recording rather than per turn.
-    let mut engines = Vec::with_capacity(plan.len());
-    for slot in 0..plan.len() {
-        let mut config = settings.config;
-        config.accent = plan.voice(slot).applied_to(config.accent);
-        let engine = match seeds {
-            Some(seeds) => Deidentifier::from_seed(config, seeds[slot]),
-            None => Deidentifier::new(config),
-        }
-        .map_err(Error::Malformed)?;
-        engines.push(engine);
-    }
-
-    let mut output = vec![0.0f32; input.len()];
-    let mut claimed = vec![false; input.len()];
-    let mut per_speaker_secs = vec![0.0f64; plan.len()];
+    // Each speaker's spans, resolved to sample indices before any thread
+    // starts. Doing it here rather than inside a thread keeps the one piece of
+    // arithmetic that decides *where* audio lands in a single place.
+    let mut work: Vec<Vec<(usize, usize)>> = vec![Vec::new(); plan.len()];
     let mut notes = Vec::new();
-
-    let fade = ((settings.fade_ms / 1000.0) * sample_rate).round().max(1.0) as usize;
-
     for turn in plan.turns() {
         let start = seconds_to_index(turn.start, sample_rate, input.len());
         let end = seconds_to_index(turn.end, sample_rate, input.len());
@@ -212,18 +224,71 @@ pub fn render(
             ));
             continue;
         }
+        work[turn.speaker].push((start, end));
+    }
 
-        let span = &input[start..end];
-        let veiled = process_span(&mut engines[turn.speaker], span);
-        let faded = fade_ends(veiled, fade);
-        for (offset, sample) in faded.iter().enumerate() {
-            // Summed, not overwritten: two people talking at once is two
-            // engines writing here, and picking a winner would delete one of
-            // them from the recording.
-            output[start + offset] += sample;
-            claimed[start + offset] = true;
+    let fade = ((settings.fade_ms / 1000.0) * sample_rate).round().max(1.0) as usize;
+
+    // Every speaker at once. They share nothing: a separate engine, a separate
+    // seed, a separate destination, and a separate output buffer. See the
+    // module note on why the merge afterwards is in slot order.
+    let base = settings.config;
+    let rendered_spans: Vec<Result<SpeakerSpans, String>> = std::thread::scope(|scope| {
+        let mut handles = Vec::with_capacity(plan.len());
+        for (slot, spans) in work.iter().enumerate() {
+            let mut config = base;
+            config.accent = plan.voice(slot).applied_to(config.accent);
+            let seed = seeds.map(|seeds| seeds[slot]);
+            let input = &input;
+            handles.push(scope.spawn(move || {
+                // Built inside the thread, so ten Argon2-free but still
+                // FFT-plan-allocating constructions happen in parallel too.
+                let mut engine = match seed {
+                    Some(seed) => Deidentifier::from_seed(config, seed),
+                    None => Deidentifier::new(config),
+                }?;
+                let mut done = Vec::with_capacity(spans.len());
+                for (start, end) in spans {
+                    // In order within a speaker, always: the engine keeps
+                    // state, so processing one person's turns out of order
+                    // would give them a different voice at each end of the
+                    // recording.
+                    let veiled = process_span(&mut engine, &input[*start..*end]);
+                    done.push((*start, fade_ends(veiled, fade)));
+                }
+                Ok(done)
+            }));
         }
-        per_speaker_secs[turn.speaker] += (end - start) as f64 / sample_rate as f64;
+        handles
+            .into_iter()
+            .map(|handle| {
+                handle.join().unwrap_or_else(|_| {
+                    Err("a speaker's render thread stopped without finishing".to_string())
+                })
+            })
+            .collect()
+    });
+
+    let mut output = vec![0.0f32; input.len()];
+    let mut claimed = vec![false; input.len()];
+    let mut per_speaker_secs = vec![0.0f64; plan.len()];
+
+    // Merged in slot order, not completion order. Floating-point addition is
+    // not associative, so summing overlapping speakers in whatever order their
+    // threads happened to finish would give a different file on every run --
+    // and a render that cannot be reproduced from its seeds cannot be checked
+    // by anybody, including its author.
+    for (slot, result) in rendered_spans.into_iter().enumerate() {
+        for (start, faded) in result.map_err(Error::Malformed)? {
+            for (offset, sample) in faded.iter().enumerate() {
+                // Summed, not overwritten: two people talking at once is two
+                // engines writing here, and picking a winner would delete one
+                // of them from the recording.
+                output[start + offset] += sample;
+                claimed[start + offset] = true;
+            }
+            per_speaker_secs[slot] += faded.len() as f64 / sample_rate as f64;
+        }
     }
 
     // A speaker who never gets enough audio to finish the accent ramp never
@@ -494,6 +559,89 @@ mod tests {
         assert!(
             difference > 1e-4,
             "slot 0 and slot 1 produced near-identical audio ({difference})"
+        );
+    }
+
+    /// The merge is in slot order, so the result does not depend on which
+    /// thread finished first. Floating-point addition is not associative, and a
+    /// render that changes between runs cannot be checked by anybody.
+    ///
+    /// Run repeatedly, with heavy overlap so that the summation order is what
+    /// would differ, and every run must agree bit for bit.
+    #[test]
+    fn rendering_in_parallel_is_still_reproducible() {
+        let mut plan = Conversation::new();
+        for index in 0..4 {
+            plan.add_speaker(Speaker::named(&format!("Person {index}")))
+                .unwrap();
+        }
+        for speaker in 0..4 {
+            // All four talking over each other for the whole recording, which
+            // is the arrangement where the merge order matters most.
+            plan.add_turn(Turn {
+                start: 0.0,
+                end: 2.0,
+                speaker,
+                text: None,
+            })
+            .unwrap();
+        }
+        let input = tone(2.0);
+        let seeds = seeds(4);
+        let first = render(&plan, &input, &settings(), Some(&seeds)).unwrap();
+        for run in 0..6 {
+            let again = render(&plan, &input, &settings(), Some(&seeds)).unwrap();
+            assert_eq!(
+                first.samples, again.samples,
+                "run {run} differed: the merge depends on thread completion order"
+            );
+        }
+    }
+
+    /// A speaker's own turns must be processed in time order, because the
+    /// engine keeps state -- out of order they would arrive at their voice at
+    /// the wrong end of the recording.
+    #[test]
+    fn one_speakers_turns_are_processed_in_order() {
+        let mut forwards = Conversation::new();
+        forwards.add_speaker(Speaker::named("Alex")).unwrap();
+        for index in 0..4 {
+            forwards
+                .add_turn(Turn {
+                    start: index as f64 * 0.5,
+                    end: index as f64 * 0.5 + 0.5,
+                    speaker: 0,
+                    text: None,
+                })
+                .unwrap();
+        }
+        let spliced = render(&forwards, &tone(2.0), &settings(), Some(&[[5u8; 32]])).unwrap();
+
+        // The same audio as one unbroken turn, give or take the fades at each
+        // splice. If the turns were processed out of order the engine's state
+        // would be wrong and the two would diverge badly.
+        let mut whole = Conversation::new();
+        whole.add_speaker(Speaker::named("Alex")).unwrap();
+        whole
+            .add_turn(Turn {
+                start: 0.0,
+                end: 2.0,
+                speaker: 0,
+                text: None,
+            })
+            .unwrap();
+        let unbroken = render(&whole, &tone(2.0), &settings(), Some(&[[5u8; 32]])).unwrap();
+
+        let difference: f32 = spliced
+            .samples
+            .iter()
+            .zip(&unbroken.samples)
+            .map(|(a, b)| (a - b).abs())
+            .sum::<f32>()
+            / spliced.samples.len() as f32;
+        assert!(
+            difference < 0.05,
+            "splitting one speaker's audio into four turns changed it by {difference}"
         );
     }
 

@@ -104,7 +104,7 @@ subtitles; and an optional video of the result.
 | 48 | A rolling seed **per speaker**, at a randomised interval inside a range the user sets, with no interval hardcoded and a fresh one at every launch | **planned** | 2 d |
 | 49 | **Video output** — the waveform, a circle per speaker in their palette colour or their own picture inside a coloured ring, a title, and a black or image background with padding | **planned** | 6–8 d |
 | 50 | A **preview** of the video and of the voices before anything is generated | **planned** | 2–3 d |
-| 51 | An **asynchronous pipeline**, every stage running at once rather than in sequence | **planned** | 3–4 d |
+| 51 | An **asynchronous pipeline**, every speaker rendering at once rather than in sequence | **done** | — |
 | 52 | Every crate and every `.rs` file explained: the technical workflow in a paragraph, then the same thing in plain words | **planned** | 3–4 d |
 | 53 | The website on mobile, and on every engine — not only the one it was written in | **planned** | 2–3 d |
 | 54 | **Seventh audit round** across the whole tree, then the production deploy | **planned** | 5–7 d |
