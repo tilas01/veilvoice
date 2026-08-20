@@ -62,11 +62,21 @@
 <li><a href="veilvoice-audio/live.html"><code>live.rs</code></a> <span style="color:var(--muted)">Live microphone scrambling.</span></li>
 </ul>
 </section>
+<section id="veilvoice-capture">
+<h2><a href="veilvoice-capture.html">veilvoice-capture</a></h2>
+<p>Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of what cannot be seen.</p>
+<ul>
+<li><a href="veilvoice-capture/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do.</span></li>
+<li><a href="veilvoice-capture/processes.html"><code>processes.rs</code></a> <span style="color:var(--muted)">Listing the processes that are running, per platform.</span></li>
+<li><a href="veilvoice-capture/programs.html"><code>programs.rs</code></a> <span style="color:var(--muted)">The programs this build knows can capture a screen.</span></li>
+</ul>
+</section>
 <section id="veilvoice-cli">
 <h2><a href="veilvoice-cli.html">veilvoice-cli</a></h2>
 <p>Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings.</p>
 <ul>
 <li><a href="veilvoice-cli/atrest.html"><code>atrest.rs</code></a> <span style="color:var(--muted)">Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.</span></li>
+<li><a href="veilvoice-cli/capture.html"><code>capture.rs</code></a> <span style="color:var(--muted)">veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.</span></li>
 <li><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a> <span style="color:var(--muted)">veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</span></li>
 <li><a href="veilvoice-cli/lock.html"><code>lock.rs</code></a> <span style="color:var(--muted)">veilvoice lock &#8212; manage the application lock from the command line.</span></li>
 <li><a href="veilvoice-cli/main.html"><code>main.rs</code></a> <span style="color:var(--muted)">veilvoice &#8212; the command-line interface.</span></li>

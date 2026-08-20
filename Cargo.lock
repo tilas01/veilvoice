@@ -4829,6 +4829,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "veilvoice-capture"
+version = "0.1.12"
+dependencies = [
+ "tempfile",
+]
+
+[[package]]
 name = "veilvoice-cli"
 version = "0.1.12"
 dependencies = [
@@ -4836,6 +4843,7 @@ dependencies = [
  "rpassword",
  "tempfile",
  "veilvoice-audio",
+ "veilvoice-capture",
  "veilvoice-core",
  "veilvoice-crypto",
  "veilvoice-guard",
