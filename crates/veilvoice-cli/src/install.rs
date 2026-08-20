@@ -285,6 +285,7 @@ enum UserPath {
 /// failure, so the two are told apart by what it says. Anything not
 /// recognisably "value does not exist" is an error, and an error refuses the
 /// write rather than guessing.
+#[cfg(windows)]
 fn read_user_path() -> Result<UserPath, String> {
     let output = no_window(Command::new(reg_exe()))
         .args(["query", r"HKCU\Environment", "/v", "PATH"])
@@ -297,7 +298,7 @@ fn read_user_path() -> Result<UserPath, String> {
             return Ok(UserPath::Absent);
         }
         return Err(format!(
-            "could not read your PATH ({}). Refusing to change it: writing a              PATH that could not first be read would replace whatever is there.",
+            "could not read your PATH ({}). Refusing to change it: writing a PATH \n             that could not first be read would replace whatever is there.",
             String::from_utf8_lossy(&output.stderr).trim()
         ));
     }
