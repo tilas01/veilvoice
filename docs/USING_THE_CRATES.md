@@ -58,6 +58,7 @@ argument is that you can check what you are running.
 | `veilvoice-setup` | a per-user install that is reversible, and detection of optional companion software |
 | `veilvoice-sentry` | canary files, and how much of a directory changed between two looks |
 | `veilvoice-policy` | settings somebody else fixed, sealed under a passphrase, and only ever stricter |
+| `veilvoice-drivers` | the loaded kernel drivers, and what changed since you last looked |
 | `veilvoice-verify` | a binary, not a library — see [INSTALL.md](INSTALL.md) |
 
 ---

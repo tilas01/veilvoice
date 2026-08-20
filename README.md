@@ -200,6 +200,7 @@ veilvoice-audio = { git = "https://github.com/tilas01/veilvoice" }
 | `veilvoice-setup` | Per-user install and its exact reversal, and detection of the optional companion software. |
 | `veilvoice-sentry` | Ransomware canaries and directory churn measurement. Detects; stops nothing. |
 | `veilvoice-policy` | Settings that can only be tightened, sealed with the same post-quantum container. |
+| `veilvoice-drivers` | What is loaded in the kernel, compared against last time, with a cross-view check. |
 
 The engine itself is small enough to drop into an audio callback:
 
@@ -285,6 +286,7 @@ writes with no extra work.
 | `veilvoice-audio`  | Capture/playback (cpal), virtual-cable routing, file import/export. |
 | `veilvoice-meta`   | Metadata strip/spoof for audio and image EXIF/GPS. |
 | `veilvoice-watch`  | Which applications are using the microphone and camera, and alerts on change. |
+| `veilvoice-drivers` | Loaded kernel drivers and modules, recorded and compared. Detects carelessness, not rootkits. |
 | `veilvoice-policy` | Settings fixed so the interface cannot turn them off. Every one of them tightens. |
 | `veilvoice-sentry` | Canaries and churn measurement over a directory — an early warning, never a preventer. |
 | `veilvoice-setup`  | Per-user install, PATH, removal, and companion detection — shared by both front ends. |
