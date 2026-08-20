@@ -4844,6 +4844,7 @@ dependencies = [
  "tempfile",
  "veilvoice-audio",
  "veilvoice-capture",
+ "veilvoice-conversation",
  "veilvoice-core",
  "veilvoice-crypto",
  "veilvoice-guard",

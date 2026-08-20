@@ -66,7 +66,14 @@ const TAU_VTLN_S: f32 = 3.0;
 /// Time constant for the long-term average spectrum, in seconds.
 const TAU_LTAS_S: f32 = 2.0;
 /// Seconds of voiced audio over which corrections fade in from nothing.
-const WARMUP_S: f32 = 0.75;
+/// Seconds of **voiced** audio before the corrections reach full strength.
+///
+/// Public because it is load-bearing outside this crate: a speaker who is only
+/// given a second of audio never arrives at their canonical register, and
+/// anything splicing several speakers together needs to be able to say so.
+/// Counted in voiced frames, not wall clock, so real speech takes longer than
+/// this in seconds -- silence and unvoiced consonants do not advance it.
+pub const WARMUP_S: f32 = 0.75;
 
 /// How aggressively accent and speaker traits are normalised.
 ///
