@@ -171,6 +171,55 @@ zeroed for an unprivileged reader on a machine with kernel-pointer restriction,
 and change at every boot on one without. Recording them would report every
 module as altered after a restart, which is a report nobody opens twice.
 
+### `veilvoice-capture`: you can record VeilVoice, and it will stop nagging
+
+Asked for directly: notice when something like OBS is recording, let the
+notification be switched off for a program you meant to run, and **do not get
+in the way of recording VeilVoice itself**.
+
+**The last one first, because it is the question people actually have.** You
+can record this application with OBS or anything else. Screen capture of the
+VeilVoice window is not blocked, not degraded and not treated as an attack. If
+you are making a video about it, or streaming while you use it, it appears on
+the recording like any other window.
+
+That is a choice and also a limit. Excluding a window from capture means
+`SetWindowDisplayAffinity` on Windows and its equivalents elsewhere, which is
+FFI, and every crate in this workspace carries `#![forbid(unsafe_code)]` --
+which is a front-page claim. So the exclusion is **not built**, ROADMAP marker
+34 is now marked blocked rather than planned, and anybody who needs a window
+that cannot be recorded should know they do not have one here.
+
+```
+veilvoice capture status         what is running, what is allowed
+veilvoice capture list           every program this build knows
+veilvoice capture allow obs      stop notifying about that one
+veilvoice capture check          exits non-zero if something unallowed is running
+```
+
+**Allowed means muted, not hidden.** An allowed program still appears in
+`status`; only a notification filters on it. Something that vanished from the
+interface entirely would be a setting for lying to yourself. Allowing a key
+this build does not know is refused, with the known keys printed -- a
+misspelled entry would silently allow nothing while you believed a
+notification was off.
+
+Two more limits, both in `SCOPE` with tests holding the wording:
+
+- It only knows the programs in its table, so an **empty report is not evidence
+  that nothing is recording**. Something written to record a screen quietly
+  would not be called `obs64.exe`.
+- **Running is not recording.** Zoom being open is not somebody watching your
+  screen, and the table separates a program whose job is recording from one
+  that merely can share. Telling the difference needs the compositor to say who
+  holds a capture session, which is FFI again.
+
+Linux reads `/proc/<pid>/comm` and spawns nothing; Windows and macOS ask
+`tasklist` and `ps`. Two entries in the table carry both their full name and
+the fifteen-character form the Linux kernel truncates `comm` to -- listing one
+would have matched on one platform and silently not on the other, which is the
+shape of bug this project keeps finding in itself.
+
 ### Also
 
 - `veilvoice-setup` is usable on its own: no dependencies, no `unsafe`, and

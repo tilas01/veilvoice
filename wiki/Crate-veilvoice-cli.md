@@ -24,7 +24,7 @@ engine backs both this and the graphical app.
 
 # What is here
 
-Eighteen subcommands, and they divide into five groups:
+Nineteen subcommands, and they divide into five groups:
 
 * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
 `devices`.
@@ -32,7 +32,8 @@ Eighteen subcommands, and they divide into five groups:
 `decrypt`, `keygen`, `shred`.
 * **Watching the machine** -- `watch` the microphone and camera, `guard`
 VeilVoice's own files against tampering, `sentry` for canaries and how
-fast a folder is changing.
+fast a folder is changing, `capture` for which screen recorders are
+running.
 * **The app lock** -- `lock set|status|change|remove`, and `policy` for
 settings somebody has fixed so the interface cannot turn them off.
 * **Getting it onto the machine** -- `install`, `uninstall`, `companions`,
@@ -76,14 +77,18 @@ does not, except that `--path` is now global specifically so both do.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1676 lines"])
+    n_main(["main.rs<br/>1746 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
+    n_capture["capture.rs<br/>240 lines"]
     n_guard["guard.rs<br/>338 lines"]
     n_lock["lock.rs<br/>239 lines"]
     n_policy["policy.rs<br/>236 lines"]
     n_sentry["sentry.rs<br/>376 lines"]
     n_theme["theme.rs<br/>135 lines"]
     n_atrest --> n_theme
+    n_capture --> n_policy
+    n_capture --> n_sentry
+    n_capture --> n_theme
     n_guard --> n_atrest
     n_guard --> n_lock
     n_guard --> n_theme
@@ -95,6 +100,7 @@ flowchart TD
     n_sentry --> n_theme
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" "open the source"
     click n_atrest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" "open the source"
+    click n_capture href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs" "open the source"
     click n_guard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" "open the source"
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" "open the source"
@@ -107,9 +113,10 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`atrest.rs`|File-veilvoice-cli-atrest]] | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
+| [[`capture.rs`|File-veilvoice-cli-capture]] | 240 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [[`guard.rs`|File-veilvoice-cli-guard]] | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [[`lock.rs`|File-veilvoice-cli-lock]] | 239 | veilvoice lock — manage the application lock from the command line. |
-| [[`main.rs`|File-veilvoice-cli-main]] | 1676 | veilvoice — the command-line interface. |
+| [[`main.rs`|File-veilvoice-cli-main]] | 1746 | veilvoice — the command-line interface. |
 | [[`policy.rs`|File-veilvoice-cli-policy]] | 236 | veilvoice policy -- settings that can only be tightened. |
 | [[`sentry.rs`|File-veilvoice-cli-sentry]] | 376 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 135 | Tokyo Night colouring for the terminal. |
