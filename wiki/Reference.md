@@ -67,6 +67,15 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] &mdash; Randomised robustness testing for the two parsers that read untrusted input.
 - [[`timing.rs`|File-veilvoice-crypto-tests-timing]] &mdash; Timing measurement of the password paths.
 
+## [[veilvoice-drivers|Crate-veilvoice-drivers]]
+
+Notice when a kernel driver or module appears, with a cross-view check and an honest account of what hiding defeats.
+
+- [[`lib.rs`|File-veilvoice-drivers-lib]] &mdash; What is loaded into the kernel, recorded, and compared later.
+- [[`linux.rs`|File-veilvoice-drivers-linux]] &mdash; Linux: /proc/modules, cross-checked against /sys/module.
+- [[`macos.rs`|File-veilvoice-drivers-macos]] &mdash; macOS: kmutil showloaded, falling back to kextstat.
+- [[`windows.rs`|File-veilvoice-drivers-windows]] &mdash; Windows: driverquery.exe, which the system already ships.
+
 ## [[veilvoice-guard|Crate-veilvoice-guard]]
 
 Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them.
