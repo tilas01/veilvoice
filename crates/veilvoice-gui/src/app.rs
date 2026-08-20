@@ -57,6 +57,20 @@
 //! be deleted afterwards. Deleting a file does not remove its contents from a
 //! flash device; not writing it does.
 //!
+//! # Nothing that talks to the operating system runs on this thread
+//!
+//! The device monitor is the one that got this wrong and shipped. It was polled
+//! straight from `update`, and asking Windows which applications hold the
+//! microphone cost about a hundred and ninety subprocesses -- so the window
+//! froze for seconds at a time, every two seconds. Both halves are fixed:
+//! `veilvoice-watch` now costs two subprocesses, and [`crate::watchfeed`] keeps
+//! even that on a thread of its own.
+//!
+//! The rule this file keeps, and the reason the defect is worth a paragraph:
+//! **`update` may read state and paint it, and may start work, and may never
+//! wait for any.** A job, a lock operation, a monitor scan and an install all
+//! go to a worker and come back through a channel.
+//!
 //! # The monitor indicator
 //!
 //! [`VeilVoiceApp::watch_indicator`] shows, in the header, whether anything is
@@ -91,6 +105,7 @@ use crate::policy::InForce;
 use crate::security::Security;
 use crate::setup::Setup;
 use crate::theme::palette as p;
+use crate::watchfeed::WatchFeed;
 use egui::{Color32, RichText};
 use std::path::PathBuf;
 use std::sync::mpsc;
@@ -170,12 +185,8 @@ pub struct VeilVoiceApp {
     // on construction and changes nothing until a button is pressed.
     setup: Setup,
 
-    // Device monitor.
-    watch: veilvoice_watch::Monitor,
-    watch_support: veilvoice_watch::Support,
-    watch_error: Option<String>,
-    watch_log: Vec<String>,
-    watch_next_poll: f64,
+    // Device monitor, on a thread of its own. Never polled from here.
+    watch: WatchFeed,
 }
 
 /// Pick the output to start on: a virtual cable if the machine has one,
@@ -240,11 +251,9 @@ impl VeilVoiceApp {
             // exactly as it does for the app lock.
             policy: InForce::none(),
             setup: Setup::new(),
-            watch: veilvoice_watch::Monitor::new(),
-            watch_support: veilvoice_watch::support(),
-            watch_error: None,
-            watch_log: Vec::new(),
-            watch_next_poll: 0.0,
+            // Idle here, so `without_devices` and `Default` start no thread
+            // and touch no machine. `VeilVoiceApp::new` starts the real one.
+            watch: WatchFeed::idle(),
         }
     }
 }
@@ -294,6 +303,10 @@ impl VeilVoiceApp {
             security: Security::load(),
             preferences,
             policy,
+            // The one place the monitor thread is started. Everything else
+            // constructs an idle feed, so no test and no `Default` reaches the
+            // machine.
+            watch: WatchFeed::start(),
             ..Default::default()
         };
         app.apply_policy();
@@ -449,7 +462,7 @@ impl eframe::App for VeilVoiceApp {
             });
         });
 
-        self.poll_watch(ctx.input(|i| i.time));
+        self.watch.drain();
 
         // The live meters only move if something repaints them, and the
         // monitor has to keep ticking even while the window is idle.
@@ -459,7 +472,10 @@ impl eframe::App for VeilVoiceApp {
             || self.setup.is_busy()
         {
             ctx.request_repaint_after(std::time::Duration::from_millis(50));
-        } else if self.watch_support.microphone || self.watch_support.camera {
+        } else if self.watch.is_watching() {
+            // Only often enough to notice an update that has arrived. The work
+            // itself happens elsewhere, so this is a cheap wake rather than a
+            // scan.
             ctx.request_repaint_after(std::time::Duration::from_millis(500));
         }
     }
@@ -816,35 +832,13 @@ impl VeilVoiceApp {
     }
 
     /// Re-scan on a timer rather than every frame.
-    fn poll_watch(&mut self, now: f64) {
-        if !(self.watch_support.microphone || self.watch_support.camera) {
-            return;
-        }
-        if now < self.watch_next_poll {
-            return;
-        }
-        self.watch_next_poll = now + 2.0;
-
-        match self.watch.poll() {
-            Ok(changes) => {
-                self.watch_error = None;
-                for change in changes {
-                    self.watch_log.push(change.alert());
-                }
-                // A log that grows without bound is a memory leak with a UI.
-                let overflow = self.watch_log.len().saturating_sub(50);
-                self.watch_log.drain(..overflow);
-            }
-            Err(e) => self.watch_error = Some(e.to_string()),
-        }
-    }
-
     /// The always-visible indicator.
     fn watch_indicator(&mut self, ui: &mut egui::Ui) {
-        if !(self.watch_support.microphone || self.watch_support.camera) {
+        let support = self.watch.support();
+        if !(support.microphone || support.camera) {
             return;
         }
-        let active = self.watch.current();
+        let active = self.watch.active();
         if active.is_empty() {
             return;
         }
@@ -872,15 +866,12 @@ impl VeilVoiceApp {
     fn watch_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
         ui.label(RichText::new("WHAT IS LISTENING").color(p::blue()).small());
-        ui.label(
-            RichText::new(self.watch_support.explanation)
-                .color(p::muted())
-                .small(),
-        );
+        let support = self.watch.support();
+        ui.label(RichText::new(support.explanation).color(p::muted()).small());
 
         // An empty list from a platform that cannot see is not good news, and
         // must never be allowed to read like it.
-        if !(self.watch_support.microphone || self.watch_support.camera) {
+        if !(support.microphone || support.camera) {
             ui.add_space(10.0);
             ui.label(
                 RichText::new(
@@ -893,12 +884,12 @@ impl VeilVoiceApp {
             return;
         }
 
-        if let Some(e) = &self.watch_error {
-            ui.label(RichText::new(e).color(p::red()));
+        if let Some(problem) = self.watch.error() {
+            ui.label(RichText::new(problem).color(p::red()));
         }
 
         ui.add_space(10.0);
-        let active: Vec<_> = self.watch.current().to_vec();
+        let active: Vec<_> = self.watch.active().to_vec();
         if active.is_empty() {
             ui.label(RichText::new("Nothing is using the microphone or camera.").color(p::green()));
         } else {
@@ -931,14 +922,14 @@ impl VeilVoiceApp {
             }
         }
 
-        if !self.watch_log.is_empty() {
+        if !self.watch.log().is_empty() {
             ui.add_space(14.0);
             ui.separator();
             ui.label(RichText::new("RECENT").color(p::blue()).small());
             egui::ScrollArea::vertical()
                 .max_height(160.0)
                 .show(ui, |ui| {
-                    for line in self.watch_log.iter().rev() {
+                    for line in self.watch.log().iter().rev() {
                         ui.label(RichText::new(line).color(p::muted()).small());
                     }
                 });

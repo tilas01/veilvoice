@@ -64,7 +64,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>401 lines"])
     n_linux["linux.rs<br/>192 lines"]
-    n_windows["windows.rs<br/>416 lines"]
+    n_windows["windows.rs<br/>589 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" "open the source"
     click n_linux href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" "open the source"
     click n_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" "open the source"
@@ -76,7 +76,7 @@ flowchart TD
 |---|---:|---|
 | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | 401 | Find out which applications are using your microphone and camera, right now. |
 | [`linux.rs`](../../docs/files/veilvoice-watch/linux.md) | 192 | Linux detection, via open file handles in /proc. |
-| [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | 416 | Windows detection, via the Capability Access Manager. |
+| [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | 589 | Windows detection, via the Capability Access Manager. |
 | [`scan_once.rs`](../../docs/files/veilvoice-watch/examples-scan_once.md) | 22 | Print what is using the microphone and camera right now. |
 
 ## Public items

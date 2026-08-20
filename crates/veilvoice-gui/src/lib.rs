@@ -28,6 +28,7 @@
 //! | [`theme`] | The palette, shared with the command-line front end |
 //! | [`soundbar`] | The animated level meter |
 //! | [`reduced_motion`] | Whether to animate at all |
+//! | [`watchfeed`] | The device monitor, on a thread that is not this one |
 //!
 //! # Two rules this crate keeps
 //!
@@ -55,6 +56,7 @@ pub mod settings;
 pub mod setup;
 pub mod soundbar;
 pub mod theme;
+pub mod watchfeed;
 
 pub use app::VeilVoiceApp;
 
