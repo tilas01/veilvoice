@@ -87,6 +87,7 @@ CRATES = (
     "veilvoice-guard",
     "veilvoice-gui",
     "veilvoice-meta",
+    "veilvoice-setup",
     "veilvoice-verify",
     "veilvoice-watch",
 )
@@ -103,6 +104,7 @@ ALL_CRATES = (
     "veilvoice-guard",
     "veilvoice-gui",
     "veilvoice-meta",
+    "veilvoice-setup",
     "veilvoice-verify",
     "veilvoice-watch",
 )

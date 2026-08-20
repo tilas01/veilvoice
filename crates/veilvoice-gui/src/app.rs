@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! The VeilVoice desktop application: six tabs, one window, no menus.
+//! The VeilVoice desktop application: seven tabs, one window, no menus.
 //!
-//! One window, six tabs, no menus and no settings file to hunt for. This file
+//! One window, seven tabs, no menus and no settings file to hunt for. This file
 //! owns the window: the tab strip, the state behind it, and the rules about
 //! what the user is allowed to do before they have answered the questions that
 //! matter. The tabs themselves live partly here and partly in siblings --
 //! [`crate::security`] draws the lock tab and the unlock screen,
 //! [`crate::prefs`] draws settings.
 //!
-//! # The six tabs, and why these six
+//! # The seven tabs, and why these seven
 //!
 //! | Tab | What it is |
 //! |---|---|
@@ -17,6 +17,7 @@
 //! | **monitor** | Which applications currently hold the microphone and camera. |
 //! | **lock** | The app lock, and a plain statement of what it is worth. |
 //! | **settings** | Colour scheme, animation, and where those choices are kept. |
+//! | **install** | Whether this copy is portable or installed, and the optional companions. |
 //! | **about** | Versions, licence, and the honest scope. |
 //!
 //! There is no "advanced" tab and no hidden pane. Everything the program can
@@ -78,6 +79,7 @@
 //! file and a test starts failing, it is that rule, and it is working.
 
 use crate::security::Security;
+use crate::setup::Setup;
 use crate::theme::palette as p;
 use egui::{Color32, RichText};
 use std::path::PathBuf;
@@ -98,6 +100,8 @@ enum Tab {
     Security,
     /// Colour scheme, animation, and where those choices are kept.
     Preferences,
+    /// Portable or installed, and the optional third-party companions.
+    Setup,
     /// Versions, licence and honest scope.
     About,
 }
@@ -148,6 +152,10 @@ pub struct VeilVoiceApp {
     // because this type already has a `settings` method, which is the engine's
     // intensity and accent controls -- a different thing entirely.
     preferences: crate::settings::Settings,
+
+    // Portable or installed, and the optional companions. Reads the machine
+    // on construction and changes nothing until a button is pressed.
+    setup: Setup,
 
     // Device monitor.
     watch: veilvoice_watch::Monitor,
@@ -214,6 +222,7 @@ impl VeilVoiceApp {
             meter_out: 0.0,
             security: Security::default(),
             preferences: crate::settings::Settings::default(),
+            setup: Setup::new(),
             watch: veilvoice_watch::Monitor::new(),
             watch_support: veilvoice_watch::support(),
             watch_error: None,
@@ -340,6 +349,7 @@ impl eframe::App for VeilVoiceApp {
                     (Tab::Watch, "monitor"),
                     (Tab::Security, "lock"),
                     (Tab::Preferences, "settings"),
+                    (Tab::Setup, "install"),
                     (Tab::About, "about"),
                 ] {
                     let selected = self.tab == tab;
@@ -353,6 +363,10 @@ impl eframe::App for VeilVoiceApp {
             ui.add_space(6.0);
         });
 
+        // Resolved once above for the header mark, and read again here so
+        // the setup tab's progress strip obeys the same answer rather than
+        // asking the question a second time in the same frame.
+        let motion = self.preferences.motion(ctx);
         egui::CentralPanel::default().show(ctx, |ui| {
             // While the "unencrypted?" question is open, clicks must not land
             // on the window behind it.
@@ -369,6 +383,7 @@ impl eframe::App for VeilVoiceApp {
                     Tab::Watch => self.watch_tab(ui),
                     Tab::Security => self.security.tab(ui),
                     Tab::Preferences => self.preferences.tab(ui, ctx),
+                    Tab::Setup => self.setup.tab(ui, motion),
                     Tab::About => self.about_tab(ui),
                 }
             });
@@ -378,7 +393,11 @@ impl eframe::App for VeilVoiceApp {
 
         // The live meters only move if something repaints them, and the
         // monitor has to keep ticking even while the window is idle.
-        if self.session.is_some() || self.job.is_some() || self.security.is_busy() {
+        if self.session.is_some()
+            || self.job.is_some()
+            || self.security.is_busy()
+            || self.setup.is_busy()
+        {
             ctx.request_repaint_after(std::time::Duration::from_millis(50));
         } else if self.watch_support.microphone || self.watch_support.camera {
             ctx.request_repaint_after(std::time::Duration::from_millis(500));
