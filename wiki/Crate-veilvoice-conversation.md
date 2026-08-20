@@ -72,7 +72,7 @@ comes from the user — a channel per person, or a list of turns. See
 flowchart TD
     n_lib(["lib.rs<br/>165 lines"])
     n_plan["plan.rs<br/>737 lines"]
-    n_render["render.rs<br/>688 lines"]
+    n_render["render.rs<br/>836 lines"]
     n_subtitles["subtitles.rs<br/>263 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs" "open the source"
     click n_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" "open the source"
@@ -86,5 +86,5 @@ flowchart TD
 |---|---:|---|
 | [[`lib.rs`|File-veilvoice-conversation-lib]] | 165 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
 | [[`plan.rs`|File-veilvoice-conversation-plan]] | 737 | Who is in the recording, and who is speaking when. |
-| [[`render.rs`|File-veilvoice-conversation-render]] | 688 | Turning a plan and a recording into veiled audio, one engine per speaker. |
+| [[`render.rs`|File-veilvoice-conversation-render]] | 836 | Turning a plan and a recording into veiled audio, one engine per speaker. |
 | [[`subtitles.rs`|File-veilvoice-conversation-subtitles]] | 263 | Subtitles, from the same plan the audio is rendered from. |
