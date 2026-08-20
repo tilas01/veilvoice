@@ -60,7 +60,7 @@ mod stft;
 pub mod voices;
 mod window;
 
-pub use accent::{AccentConfig, AccentNeutralizer, AccentStats};
+pub use accent::{AccentConfig, AccentNeutralizer, AccentStats, WARMUP_S};
 pub use chain::{DeidConfig, Deidentifier, ProcessStats};
 pub use modulation::{ModValues, Modulator};
 pub use pitch::PitchEstimate;

@@ -42,13 +42,13 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice &mdash; 191 files, 7406 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice &mdash; 193 files, 7510 sections &mdash; listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
 <ul class="toc">
 <li><a href="#k-doc">Documentation</a> <span class="meta">12 files</span></li>
-<li><a href="#k-rust">Rust source</a> <span class="meta">79 files</span></li>
+<li><a href="#k-rust">Rust source</a> <span class="meta">81 files</span></li>
 <li><a href="#k-test">Tests and fuzzing</a> <span class="meta">10 files</span></li>
 <li><a href="#k-web">Website</a> <span class="meta">20 files</span></li>
 <li><a href="#k-tool">Tools and generators</a> <span class="meta">20 files</span></li>
@@ -1203,7 +1203,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">packaging/</span> <span class="meta">line 3</span><br><span class="x">permission. | | `homebrew/` | A formula, not a cask: it builds from source. | | `gentoo/` | A live ebuild that builds from this repository. | | `veilvoice.desktop` | Shared desktop entry for the Linux packages. |</span></li>
 </ul>
 </details>
-<h2 id="k-rust">Rust source <span class="meta">(79)</span></h2>
+<h2 id="k-rust">Rust source <span class="meta">(81)</span></h2>
 <details open>
 <summary><code>crates/veilvoice-audio/src/devices.rs</code> <span class="meta">&mdash; veilvoice-audio, 229 lines, 25 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs">open devices.rs</a></p>
@@ -1521,6 +1521,32 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
+<summary><code>crates/veilvoice-cli/src/conversation.rs</code> <span class="meta">&mdash; veilvoice-cli, 361 lines, 20 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs">open conversation.rs</a></p>
+<ul>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice conversation` -- several speakers, a voice each, and subtitles. The command-line front end to [`veilvoice_conversation`]. That crate holds the plan, the renderer and the honest account of what a conversation keeps; this file</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">reads the audio, writes the results and prints what happened. # What comes out Three files beside the output you name: ```text out.veiled.wav the audio, one destination voice per speaker out.veiled.vtt subtitles for a browser</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">out.veiled.srt subtitles for everything else ``` The subtitles are written whether or not anybody wrote down the words. With every voice replaced, a caption track saying *who* is talking is often the only way to follow a recording at all.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x"># The one warning this command will not let you miss Audio no turn claims is **silenced**, never passed through. A gap in the plan is a span nobody assigned to a speaker, so it has not been veiled, and putting it into the result would</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">place a real voice inside a file whose whole purpose is that it contains none. The amount is printed, loudly, because a plan with a hole in it is something to fix rather than something to discover later. # This does not encrypt what it</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">writes Unlike `anonymise`, which seals its output at rest by default. A conversation render produces a set of files -- audio and two subtitle tracks -- and the container this project uses seals one thing. Rather than invent a half-answer,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the files are written in the clear and the command says so: `veilvoice encrypt` seals the audio afterwards, and the subtitles hold whatever names were typed and are not veiled by anything.</span></li>
+<li><span class="sec">fn inspect</span> <span class="meta">line 49</span><br><span class="x">Show a plan without rendering anything.</span></li>
+<li><span class="sec">fn run</span> <span class="meta">line 109</span><br><span class="x">Render a recording according to a plan.</span></li>
+<li><span class="sec">fn load_plan</span> <span class="meta">line 224</span><br><span class="x">Read a plan, and say where it went wrong rather than only that it did.</span></li>
+<li><span class="sec">fn with_extension</span> <span class="meta">line 229</span><br><span class="x">Replace the last extension, keeping any `.veiled` before it.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 236</span><br><span class="x"></span></li>
+<li><span class="sec">fn plan_file</span> <span class="meta">line 240</span><br><span class="x"></span></li>
+<li><span class="sec">fn wav_file</span> <span class="meta">line 264</span><br><span class="x"></span></li>
+<li><span class="sec">fn inspecting_a_plan_needs_no_audio</span> <span class="meta">line 283</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_missing_plan_says_which_file</span> <span class="meta">line 289</span><br><span class="x"></span></li>
+<li><span class="sec">fn rendering_writes_the_audio_and_both_subtitle_tracks</span> <span class="meta">line 297</span><br><span class="x">The whole command, end to end: audio in, audio and two subtitle tracks out, and the output the same length as the input.</span></li>
+<li><span class="sec">fn the_default_output_sits_beside_the_input</span> <span class="meta">line 329</span><br><span class="x">The output name is derived from the input when none is given.</span></li>
+<li><span class="sec">fn a_plan_with_no_speakers_is_refused_before_the_audio_is_read</span> <span class="meta">line 338</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_subtitle_names_follow_the_audio_extension</span> <span class="meta">line 353</span><br><span class="x"></span></li>
+</ul>
+</details>
+<details open>
 <summary><code>crates/veilvoice-cli/src/guard.rs</code> <span class="meta">&mdash; veilvoice-cli, 339 lines, 23 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs">open guard.rs</a></p>
 <ul>
@@ -1574,68 +1600,71 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/main.rs</code> <span class="meta">&mdash; veilvoice-cli, 1747 lines, 59 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/main.rs</code> <span class="meta">&mdash; veilvoice-cli, 1828 lines, 62 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs">open main.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice` &#8212; the command-line interface. Everything VeilVoice does, available without a desktop: it runs over SSH, in a container, and on machines that have no GUI toolkit at all. The same engine backs both this and the graphical app. #</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">What is here Nineteen subcommands, and they divide into five groups: * **Audio** -- `anonymise` a file, `live` scramble a microphone, list `devices`. * **Privacy of the files themselves** -- `clean` metadata, `encrypt`, `decrypt`,</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`keygen`, `shred`. * **Watching the machine** -- `watch` the microphone and camera, `guard` VeilVoice&#x27;s own files against tampering, `sentry` for canaries and how fast a folder is changing, `capture` for which screen recorders are running.</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">* **The app lock** -- `lock set|status|change|remove`, and `policy` for settings somebody has fixed so the interface cannot turn them off. * **Getting it onto the machine** -- `install`, `uninstall`, `companions`, and `gui` to open the</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">desktop application. That last group is a front end over [`veilvoice_setup`], which the desktop application&#x27;s setup tab also calls. The careful part -- editing `PATH` -- has one implementation and one set of tests, rather than one per</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">front end. # Two behaviours that surprise people, on purpose **`anonymise` writes `&lt;out&gt;.veil`, not a bare WAV.** Recordings are encrypted at rest by default. `--encrypt=false` opts out and requires `--yes`, because an unsealed recording</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">is the thing somebody later wishes they had not produced. The wiki explains where the WAV went. **The front-ends refuse rather than downgrade.** Asked to encrypt with nothing to encrypt with, this exits with an error instead of writing</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">plain audio and mentioning it. Quiet degradation to a weaker posture is the defect class this project has found in itself most often. # Passphrase prompts cannot be piped `rpassword` needs a real console; piping a passphrase in blocks on</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`CONIN$` rather than reading it. That is a property of terminal input, not a bug here, and it means anything that prompts cannot be smoke-tested from a non-interactive shell. The layer *beneath* each prompt is therefore tested instead --</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">see [`crate::atrest`] and [`crate::lock`], where the logic lives precisely so it can be reached without a terminal. # A clap ordering rule worth knowing An argument declared beside `#[command(subcommand)]` must precede the subcommand on</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the command line unless it is marked `global = true`. So `veilvoice lock --path X status` parses and `veilvoice lock status --path X` does not, except that `--path` is now global specifically so both do.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">What is here Twenty subcommands, and they divide into five groups: * **Audio** -- `anonymise` a file, `live` scramble a microphone, list `devices`, `conversation` for a recording with several people in it. * **Privacy of the files</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">themselves** -- `clean` metadata, `encrypt`, `decrypt`, `keygen`, `shred`. * **Watching the machine** -- `watch` the microphone and camera, `guard` VeilVoice&#x27;s own files against tampering, `sentry` for canaries and how fast a folder is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">changing, `capture` for which screen recorders are running. * **The app lock** -- `lock set|status|change|remove`, and `policy` for settings somebody has fixed so the interface cannot turn them off. * **Getting it onto the machine** --</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`install`, `uninstall`, `companions`, and `gui` to open the desktop application. That last group is a front end over [`veilvoice_setup`], which the desktop application&#x27;s setup tab also calls. The careful part -- editing `PATH` -- has one</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">implementation and one set of tests, rather than one per front end. # Two behaviours that surprise people, on purpose **`anonymise` writes `&lt;out&gt;.veil`, not a bare WAV.** Recordings are encrypted at rest by default. `--encrypt=false` opts</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">out and requires `--yes`, because an unsealed recording is the thing somebody later wishes they had not produced. The wiki explains where the WAV went. **The front-ends refuse rather than downgrade.** Asked to encrypt with nothing to</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">encrypt with, this exits with an error instead of writing plain audio and mentioning it. Quiet degradation to a weaker posture is the defect class this project has found in itself most often. # Passphrase prompts cannot be piped</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`rpassword` needs a real console; piping a passphrase in blocks on `CONIN$` rather than reading it. That is a property of terminal input, not a bug here, and it means anything that prompts cannot be smoke-tested from a non-interactive</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">shell. The layer *beneath* each prompt is therefore tested instead -- see [`crate::atrest`] and [`crate::lock`], where the logic lives precisely so it can be reached without a terminal. # A clap ordering rule worth knowing An argument</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">declared beside `#[command(subcommand)]` must precede the subcommand on the command line unless it is marked `global = true`. So `veilvoice lock --path X status` parses and `veilvoice lock status --path X` does not, except that `--path` is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">now global specifically so both do.</span></li>
 <li><span class="sec">mod atrest</span> <span class="meta">line 59</span><br><span class="x"></span></li>
 <li><span class="sec">mod capture</span> <span class="meta">line 60</span><br><span class="x"></span></li>
-<li><span class="sec">mod guard</span> <span class="meta">line 61</span><br><span class="x"></span></li>
-<li><span class="sec">mod lock</span> <span class="meta">line 62</span><br><span class="x"></span></li>
-<li><span class="sec">mod policy</span> <span class="meta">line 63</span><br><span class="x"></span></li>
-<li><span class="sec">mod sentry</span> <span class="meta">line 64</span><br><span class="x"></span></li>
-<li><span class="sec">mod theme</span> <span class="meta">line 65</span><br><span class="x"></span></li>
-<li><span class="sec">struct Cli</span> <span class="meta">line 91</span><br><span class="x"></span></li>
-<li><span class="sec">enum Command</span> <span class="meta">line 97</span><br><span class="x"></span></li>
-<li><span class="sec">enum CaptureCommand</span> <span class="meta">line 345</span><br><span class="x">What `veilvoice capture` can do.</span></li>
-<li><span class="sec">enum PolicyCommand</span> <span class="meta">line 377</span><br><span class="x">What `veilvoice policy` can do.</span></li>
-<li><span class="sec">enum SentryCommand</span> <span class="meta">line 430</span><br><span class="x">What `veilvoice sentry` can do.</span></li>
-<li><span class="sec">enum CleanPolicy</span> <span class="meta">line 491</span><br><span class="x"></span></li>
-<li><span class="sec">impl From&lt;CleanPolicy&gt; for Policy</span> <span class="meta">line 498</span><br><span class="x"></span></li>
-<li><span class="sec">fn from</span> <span class="meta">line 499</span><br><span class="x"></span></li>
-<li><span class="sec">fn main</span> <span class="meta">line 507</span><br><span class="x"></span></li>
-<li><span class="sec">fn run</span> <span class="meta">line 518</span><br><span class="x"></span></li>
-<li><span class="sec">fn list_companions</span> <span class="meta">line 837</span><br><span class="x">Report every companion that means anything on this platform. Reporting is all this does. The licence and the author are printed beside each one because somebody deciding whether to install software is entitled to both before they decide,</span></li>
-<li><span class="sec">fn list_companions</span> <span class="meta">line 837</span><br><span class="x">not afterwards in a manual.</span></li>
-<li><span class="sec">fn offer_line</span> <span class="meta">line 870</span><br><span class="x">One line describing what VeilVoice can do about a missing companion.</span></li>
-<li><span class="sec">fn install_companion</span> <span class="meta">line 894</span><br><span class="x">Act on one named companion. The name is the explicit yes.</span></li>
-<li><span class="sec">struct Tuning</span> <span class="meta">line 977</span><br><span class="x">The engine settings a user can reach from the command line.</span></li>
-<li><span class="sec">fn config</span> <span class="meta">line 983</span><br><span class="x"></span></li>
-<li><span class="sec">fn describe_reseed</span> <span class="meta">line 996</span><br><span class="x">How the seed-rolling setting reads in the output.</span></li>
-<li><span class="sec">struct AtRest</span> <span class="meta">line 1005</span><br><span class="x">What to do with the result once it exists.</span></li>
-<li><span class="sec">fn anonymise</span> <span class="meta">line 1014</span><br><span class="x"></span></li>
-<li><span class="sec">fn live</span> <span class="meta">line 1153</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter</span> <span class="meta">line 1239</span><br><span class="x">A small textual level meter.</span></li>
-<li><span class="sec">const WIDTH</span> <span class="meta">line 1240</span><br><span class="x"></span></li>
-<li><span class="sec">fn list_devices</span> <span class="meta">line 1254</span><br><span class="x"></span></li>
-<li><span class="sec">fn clean</span> <span class="meta">line 1286</span><br><span class="x"></span></li>
-<li><span class="sec">fn encrypt</span> <span class="meta">line 1303</span><br><span class="x"></span></li>
-<li><span class="sec">fn decrypt</span> <span class="meta">line 1332</span><br><span class="x"></span></li>
-<li><span class="sec">fn load_secret_key</span> <span class="meta">line 1364</span><br><span class="x">Load a private key file, which is itself a password-locked container.</span></li>
-<li><span class="sec">fn keygen</span> <span class="meta">line 1372</span><br><span class="x"></span></li>
-<li><span class="sec">fn watch</span> <span class="meta">line 1448</span><br><span class="x">Report, and keep reporting, what is using the microphone and camera.</span></li>
-<li><span class="sec">fn shred</span> <span class="meta">line 1538</span><br><span class="x">Destroy a file&#x27;s contents, then delete it. Gated behind a typed confirmation rather than a y/n prompt. There is no undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></li>
-<li><span class="sec">fn info</span> <span class="meta">line 1606</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 1649</span><br><span class="x"></span></li>
-<li><span class="sec">fn cli_definition_is_valid</span> <span class="meta">line 1654</span><br><span class="x"></span></li>
-<li><span class="sec">fn tuning</span> <span class="meta">line 1658</span><br><span class="x"></span></li>
-<li><span class="sec">fn intensity_is_clamped_into_range</span> <span class="meta">line 1667</span><br><span class="x"></span></li>
-<li><span class="sec">fn keep_accent_disables_neutralisation</span> <span class="meta">line 1674</span><br><span class="x"></span></li>
-<li><span class="sec">fn reseed_interval_reaches_the_engine_and_cannot_go_negative</span> <span class="meta">line 1680</span><br><span class="x"></span></li>
-<li><span class="sec">fn recordings_are_encrypted_at_rest_by_default</span> <span class="meta">line 1689</span><br><span class="x">Encryption at rest is a *default*, not a flag the careful user has to find. If someone ever flips this, this test is what stops it shipping.</span></li>
-<li><span class="sec">fn asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span> <span class="meta">line 1715</span><br><span class="x">Refused before anything is read or written, so a contradictory command line cannot half-happen.</span></li>
-<li><span class="sec">fn reseed_setting_reads_clearly</span> <span class="meta">line 1731</span><br><span class="x"></span></li>
-<li><span class="sec">fn meter_scales_and_never_panics</span> <span class="meta">line 1738</span><br><span class="x"></span></li>
+<li><span class="sec">mod conversation</span> <span class="meta">line 61</span><br><span class="x"></span></li>
+<li><span class="sec">mod guard</span> <span class="meta">line 62</span><br><span class="x"></span></li>
+<li><span class="sec">mod lock</span> <span class="meta">line 63</span><br><span class="x"></span></li>
+<li><span class="sec">mod policy</span> <span class="meta">line 64</span><br><span class="x"></span></li>
+<li><span class="sec">mod sentry</span> <span class="meta">line 65</span><br><span class="x"></span></li>
+<li><span class="sec">mod theme</span> <span class="meta">line 66</span><br><span class="x"></span></li>
+<li><span class="sec">struct Cli</span> <span class="meta">line 92</span><br><span class="x"></span></li>
+<li><span class="sec">enum Command</span> <span class="meta">line 98</span><br><span class="x"></span></li>
+<li><span class="sec">enum ConversationCommand</span> <span class="meta">line 368</span><br><span class="x">What `veilvoice conversation` can do.</span></li>
+<li><span class="sec">enum CaptureCommand</span> <span class="meta">line 405</span><br><span class="x">What `veilvoice capture` can do.</span></li>
+<li><span class="sec">enum PolicyCommand</span> <span class="meta">line 437</span><br><span class="x">What `veilvoice policy` can do.</span></li>
+<li><span class="sec">enum SentryCommand</span> <span class="meta">line 490</span><br><span class="x">What `veilvoice sentry` can do.</span></li>
+<li><span class="sec">enum CleanPolicy</span> <span class="meta">line 551</span><br><span class="x"></span></li>
+<li><span class="sec">impl From&lt;CleanPolicy&gt; for Policy</span> <span class="meta">line 558</span><br><span class="x"></span></li>
+<li><span class="sec">fn from</span> <span class="meta">line 559</span><br><span class="x"></span></li>
+<li><span class="sec">fn main</span> <span class="meta">line 567</span><br><span class="x"></span></li>
+<li><span class="sec">fn run</span> <span class="meta">line 578</span><br><span class="x"></span></li>
+<li><span class="sec">fn list_companions</span> <span class="meta">line 918</span><br><span class="x">Report every companion that means anything on this platform. Reporting is all this does. The licence and the author are printed beside each one because somebody deciding whether to install software is entitled to both before they decide,</span></li>
+<li><span class="sec">fn list_companions</span> <span class="meta">line 918</span><br><span class="x">not afterwards in a manual.</span></li>
+<li><span class="sec">fn offer_line</span> <span class="meta">line 951</span><br><span class="x">One line describing what VeilVoice can do about a missing companion.</span></li>
+<li><span class="sec">fn install_companion</span> <span class="meta">line 975</span><br><span class="x">Act on one named companion. The name is the explicit yes.</span></li>
+<li><span class="sec">struct Tuning</span> <span class="meta">line 1058</span><br><span class="x">The engine settings a user can reach from the command line.</span></li>
+<li><span class="sec">fn config</span> <span class="meta">line 1064</span><br><span class="x"></span></li>
+<li><span class="sec">fn describe_reseed</span> <span class="meta">line 1077</span><br><span class="x">How the seed-rolling setting reads in the output.</span></li>
+<li><span class="sec">struct AtRest</span> <span class="meta">line 1086</span><br><span class="x">What to do with the result once it exists.</span></li>
+<li><span class="sec">fn anonymise</span> <span class="meta">line 1095</span><br><span class="x"></span></li>
+<li><span class="sec">fn live</span> <span class="meta">line 1234</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter</span> <span class="meta">line 1320</span><br><span class="x">A small textual level meter.</span></li>
+<li><span class="sec">const WIDTH</span> <span class="meta">line 1321</span><br><span class="x"></span></li>
+<li><span class="sec">fn list_devices</span> <span class="meta">line 1335</span><br><span class="x"></span></li>
+<li><span class="sec">fn clean</span> <span class="meta">line 1367</span><br><span class="x"></span></li>
+<li><span class="sec">fn encrypt</span> <span class="meta">line 1384</span><br><span class="x"></span></li>
+<li><span class="sec">fn decrypt</span> <span class="meta">line 1413</span><br><span class="x"></span></li>
+<li><span class="sec">fn load_secret_key</span> <span class="meta">line 1445</span><br><span class="x">Load a private key file, which is itself a password-locked container.</span></li>
+<li><span class="sec">fn keygen</span> <span class="meta">line 1453</span><br><span class="x"></span></li>
+<li><span class="sec">fn watch</span> <span class="meta">line 1529</span><br><span class="x">Report, and keep reporting, what is using the microphone and camera.</span></li>
+<li><span class="sec">fn shred</span> <span class="meta">line 1619</span><br><span class="x">Destroy a file&#x27;s contents, then delete it. Gated behind a typed confirmation rather than a y/n prompt. There is no undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></li>
+<li><span class="sec">fn info</span> <span class="meta">line 1687</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 1730</span><br><span class="x"></span></li>
+<li><span class="sec">fn cli_definition_is_valid</span> <span class="meta">line 1735</span><br><span class="x"></span></li>
+<li><span class="sec">fn tuning</span> <span class="meta">line 1739</span><br><span class="x"></span></li>
+<li><span class="sec">fn intensity_is_clamped_into_range</span> <span class="meta">line 1748</span><br><span class="x"></span></li>
+<li><span class="sec">fn keep_accent_disables_neutralisation</span> <span class="meta">line 1755</span><br><span class="x"></span></li>
+<li><span class="sec">fn reseed_interval_reaches_the_engine_and_cannot_go_negative</span> <span class="meta">line 1761</span><br><span class="x"></span></li>
+<li><span class="sec">fn recordings_are_encrypted_at_rest_by_default</span> <span class="meta">line 1770</span><br><span class="x">Encryption at rest is a *default*, not a flag the careful user has to find. If someone ever flips this, this test is what stops it shipping.</span></li>
+<li><span class="sec">fn asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span> <span class="meta">line 1796</span><br><span class="x">Refused before anything is read or written, so a contradictory command line cannot half-happen.</span></li>
+<li><span class="sec">fn reseed_setting_reads_clearly</span> <span class="meta">line 1812</span><br><span class="x"></span></li>
+<li><span class="sec">fn meter_scales_and_never_panics</span> <span class="meta">line 1819</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -1723,7 +1752,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-conversation/src/lib.rs</code> <span class="meta">&mdash; veilvoice-conversation, 164 lines, 25 sections</span></summary>
+<summary><code>crates/veilvoice-conversation/src/lib.rs</code> <span class="meta">&mdash; veilvoice-conversation, 166 lines, 26 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs">open lib.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x"># veilvoice-conversation Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. ## Why this exists VeilVoice&#x27;s whole argument is that every speaker is</span></li>
@@ -1734,23 +1763,24 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">what makes the result worth listening to &#8212; and it is information about the conversation. * **Names are whatever you type.** A subtitle saying &quot;Alex&quot; contains the string &quot;Alex&quot;. The audio is veiled; a caption is not, and this crate cannot</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">veil a name for you. * **The voiceprints do not survive.** Each speaker is destroyed as thoroughly as in single-speaker mode. ## VeilVoice does not decide who is talking Working that out from audio alone is speaker diarisation and needs a</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">trained model. There is no model here, there is no server to ask, and guessing would be worse than not offering it: a wrong guess either merges two people or invents a third, and neither would be visible in the output. So the plan comes</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">from the user &#8212; a channel per person, or a list of turns. See [`plan`]. ## The modules | Module | What it owns | |---|---| | [`plan`] | Who is in the recording, when they speak, and the text format | | [`subtitles`] | WebVTT and SubRip,</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">from the same plan |</span></li>
-<li><span class="sec">mod plan</span> <span class="meta">line 54</span><br><span class="x"></span></li>
-<li><span class="sec">mod subtitles</span> <span class="meta">line 55</span><br><span class="x"></span></li>
-<li><span class="sec">const VERSION</span> <span class="meta">line 60</span><br><span class="x">Crate version string, surfaced in the About panel.</span></li>
-<li><span class="sec">const SCOPE</span> <span class="meta">line 66</span><br><span class="x">What this crate does to a recording, in the words a front end should show. Single-sourced and asserted by the tests, exactly as every other scope note in this project is, so it cannot quietly turn into a promise.</span></li>
-<li><span class="sec">enum Error</span> <span class="meta">line 78</span><br><span class="x">Everything that can go wrong in this crate.</span></li>
-<li><span class="sec">impl From&lt;std::io::Error&gt; for Error</span> <span class="meta">line 91</span><br><span class="x"></span></li>
-<li><span class="sec">fn from</span> <span class="meta">line 92</span><br><span class="x"></span></li>
-<li><span class="sec">impl std::fmt::Display for Error</span> <span class="meta">line 97</span><br><span class="x"></span></li>
-<li><span class="sec">fn fmt</span> <span class="meta">line 98</span><br><span class="x"></span></li>
-<li><span class="sec">impl std::error::Error for Error</span> <span class="meta">line 112</span><br><span class="x"></span></li>
-<li><span class="sec">fn source</span> <span class="meta">line 113</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 122</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_scope_note_states_what_is_kept_as_well_as_what_is_destroyed</span> <span class="meta">line 128</span><br><span class="x">The claim must keep stating what a conversation costs. If somebody edits this into a promise, this is what stops it shipping.</span></li>
-<li><span class="sec">fn too_many_speakers_explains_why_it_is_refused</span> <span class="meta">line 146</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_io_error_displays_and_keeps_its_source</span> <span class="meta">line 157</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">from the user &#8212; a channel per person, or a list of turns. See [`plan`]. ## The modules | Module | What it owns | |---|---| | [`plan`] | Who is in the recording, when they speak, and the text format | | [`render`] | One engine per speaker,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">spliced back onto the timeline | | [`subtitles`] | WebVTT and SubRip, from the same plan |</span></li>
+<li><span class="sec">mod plan</span> <span class="meta">line 55</span><br><span class="x"></span></li>
+<li><span class="sec">mod render</span> <span class="meta">line 56</span><br><span class="x"></span></li>
+<li><span class="sec">mod subtitles</span> <span class="meta">line 57</span><br><span class="x"></span></li>
+<li><span class="sec">const VERSION</span> <span class="meta">line 62</span><br><span class="x">Crate version string, surfaced in the About panel.</span></li>
+<li><span class="sec">const SCOPE</span> <span class="meta">line 68</span><br><span class="x">What this crate does to a recording, in the words a front end should show. Single-sourced and asserted by the tests, exactly as every other scope note in this project is, so it cannot quietly turn into a promise.</span></li>
+<li><span class="sec">enum Error</span> <span class="meta">line 80</span><br><span class="x">Everything that can go wrong in this crate.</span></li>
+<li><span class="sec">impl From&lt;std::io::Error&gt; for Error</span> <span class="meta">line 93</span><br><span class="x"></span></li>
+<li><span class="sec">fn from</span> <span class="meta">line 94</span><br><span class="x"></span></li>
+<li><span class="sec">impl std::fmt::Display for Error</span> <span class="meta">line 99</span><br><span class="x"></span></li>
+<li><span class="sec">fn fmt</span> <span class="meta">line 100</span><br><span class="x"></span></li>
+<li><span class="sec">impl std::error::Error for Error</span> <span class="meta">line 114</span><br><span class="x"></span></li>
+<li><span class="sec">fn source</span> <span class="meta">line 115</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 124</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_scope_note_states_what_is_kept_as_well_as_what_is_destroyed</span> <span class="meta">line 130</span><br><span class="x">The claim must keep stating what a conversation costs. If somebody edits this into a promise, this is what stops it shipping.</span></li>
+<li><span class="sec">fn too_many_speakers_explains_why_it_is_refused</span> <span class="meta">line 148</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_io_error_displays_and_keeps_its_source</span> <span class="meta">line 159</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -1817,6 +1847,68 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
+<summary><code>crates/veilvoice-conversation/src/render.rs</code> <span class="meta">&mdash; veilvoice-conversation, 689 lines, 56 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs">open render.rs</a></p>
+<ul>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Turning a plan and a recording into veiled audio, one engine per speaker. # One engine each, and why that is not merely convenient Every speaker gets their own [`veilvoice_core::Deidentifier`], built with their slot&#x27;s destination voice and</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">**its own seed**. Three consequences, and all three are the point: * Each speaker arrives at their own canonical register and vocal tract, so the output is followable. * Each speaker&#x27;s modulation stream is independent, so the ratchet in</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">one voice tells an adversary nothing about another. * Each speaker&#x27;s engine keeps its state **across their own turns**. The accent neutraliser needs a few seconds to measure a speaker before its corrections reach full strength; carrying</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">that across the turns of one person means it converges once, rather than warming up again every time they take a breath. # A speaker needs a few seconds before they arrive at their voice The accent neutraliser ramps its corrections in over</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">[`veilvoice_core::WARMUP_S`] of **voiced** audio, from nothing. Until it has finished, a speaker is only partly moved toward their destination register -- so a slot that should sound like 187 Hz sounds like something between the original</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">speaker and 187 Hz. This was found by measuring the fundamental of a rendered file rather than by reading the code: ten slots given one second each came out at three distinct pitches, and the same ten given five seconds each came out at</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">four, exactly where the table says. Nothing was wrong with the table the second time; the first measurement was of the ramp. Keeping one engine per speaker across all of their turns is what makes this bearable -- the ramp happens **once</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">per speaker for the whole recording** rather than once per turn. A speaker whose total time is shorter than the ramp never finishes it, so [`Rendered::notes`] says so by name. What is **not** affected: the phase discard and the CSPRNG</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">modulation are unconditional and full strength from the first frame. Those are the two reasons the transform is one-way. The ramp weakens the *normalisation onto a canonical register* early on, which costs distinguishability between</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">speakers, and leaves some of the original pitch contour in the first couple of seconds. # Audio nobody claimed is silenced, and the amount is reported A gap between turns is a span the plan does not assign to anybody. It is **silenced**,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">never passed through. That is the one decision in this file that is not a trade-off. Passing unassigned audio through unveiled would put somebody&#x27;s real voice into a file whose entire purpose is that it contains no real voice &#8212; because of</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">a gap in a text file, silently, in the middle of an otherwise veiled recording. Silence loses content and can be seen; a raw voice cannot be unheard. [`Rendered::unassigned_secs`] says how much went, so a plan with a hole in it is a thing</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">you find out about rather than a thing you notice later. # Latency is removed, so a turn lands where the plan said The engine has a fixed algorithmic latency &#8212; the STFT cannot emit a sample until it has a frame around it. Each span is</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">therefore processed with a tail of silence and the first `latency_samples` of output are dropped, which puts the veiled audio back exactly where the original was. Without this every turn would drift later than the subtitle describing it,</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">by about 16 ms at the default frame size, and a subtitle 16 ms late is a subtitle that looks wrong. # Boundaries are faded, because a splice is a click Cutting audio at an arbitrary sample and starting different audio there produces a</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">step, and a step is broadband noise. Each rendered span is faded in and out over a few milliseconds. Short enough not to swallow a syllable, long enough to remove the click. # Overlaps are mixed, and the mixing is admitted Two people</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">talking at once is two engines writing into the same samples, so their outputs are summed. A sum can exceed full scale; when it does, the whole output is scaled down by one factor and [`Rendered::gain_applied`] records it. One factor for</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the whole file rather than a limiter that acts only where it clipped, because a limiter changes the relative loudness of the speakers and this crate has just spent considerable effort making them distinguishable.</span></li>
+<li><span class="sec">struct Settings</span> <span class="meta">line 93</span><br><span class="x">How to render.</span></li>
+<li><span class="sec">impl Default for Settings</span> <span class="meta">line 104</span><br><span class="x"></span></li>
+<li><span class="sec">fn default</span> <span class="meta">line 105</span><br><span class="x"></span></li>
+<li><span class="sec">struct Rendered</span> <span class="meta">line 117</span><br><span class="x">What came back.</span></li>
+<li><span class="sec">impl Rendered</span> <span class="meta">line 137</span><br><span class="x"></span></li>
+<li><span class="sec">fn has_unassigned</span> <span class="meta">line 139</span><br><span class="x">Whether some of the recording was silenced because no turn claimed it.</span></li>
+<li><span class="sec">fn render</span> <span class="meta">line 150</span><br><span class="x">Render `input` according to `plan`. `seeds` supplies one seed per speaker for a deterministic render; `None` draws each from the OS CSPRNG, which is what a front end should do. The deterministic form exists so this can be tested at all &#8212; a</span></li>
+<li><span class="sec">fn render</span> <span class="meta">line 150</span><br><span class="x">de-identifier whose output cannot be reproduced cannot be checked.</span></li>
+<li><span class="sec">fn seconds_to_index</span> <span class="meta">line 289</span><br><span class="x">A time in seconds as a sample index, clamped into the recording.</span></li>
+<li><span class="sec">fn process_span</span> <span class="meta">line 306</span><br><span class="x">Run one span through one engine and give back audio aligned with the input. The engine cannot emit a sample until it has a frame around it, so the span is followed by a tail of silence and the leading `latency_samples` of output are</span></li>
+<li><span class="sec">fn process_span</span> <span class="meta">line 306</span><br><span class="x">dropped. What comes back lines up with what went in.</span></li>
+<li><span class="sec">fn fade_ends</span> <span class="meta">line 321</span><br><span class="x">Fade the first and last `fade` samples, so a splice is not a click.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 336</span><br><span class="x"></span></li>
+<li><span class="sec">const RATE</span> <span class="meta">line 340</span><br><span class="x"></span></li>
+<li><span class="sec">fn settings</span> <span class="meta">line 342</span><br><span class="x"></span></li>
+<li><span class="sec">fn tone</span> <span class="meta">line 353</span><br><span class="x">A tone, so a span that was processed is obviously not silence.</span></li>
+<li><span class="sec">fn rms</span> <span class="meta">line 363</span><br><span class="x"></span></li>
+<li><span class="sec">fn two_people</span> <span class="meta">line 370</span><br><span class="x"></span></li>
+<li><span class="sec">fn seeds</span> <span class="meta">line 391</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_output_is_the_same_length_as_the_input</span> <span class="meta">line 396</span><br><span class="x"></span></li>
+<li><span class="sec">fn audio_no_turn_claimed_is_silenced_and_never_passed_through</span> <span class="meta">line 404</span><br><span class="x">The one decision in this file that is not a trade-off.</span></li>
+<li><span class="sec">fn a_plan_that_covers_the_recording_reports_no_gap</span> <span class="meta">line 435</span><br><span class="x">A plan with no gaps leaves nothing unassigned.</span></li>
+<li><span class="sec">fn every_speakers_span_carries_veiled_audio</span> <span class="meta">line 445</span><br><span class="x">Each speaker must actually be processed, and their spans must carry audio rather than silence.</span></li>
+<li><span class="sec">fn two_speakers_do_not_render_alike</span> <span class="meta">line 457</span><br><span class="x">Two speakers must not come out as the same audio. If they did, the whole crate would be pointless.</span></li>
+<li><span class="sec">fn the_same_seeds_render_the_same_audio</span> <span class="meta">line 502</span><br><span class="x">The same seeds must give the same audio, or nothing here is testable.</span></li>
+<li><span class="sec">fn different_seeds_render_different_audio</span> <span class="meta">line 511</span><br><span class="x">Different seeds must not, or the modulation is not doing anything.</span></li>
+<li><span class="sec">fn each_speaker_is_credited_with_their_own_time</span> <span class="meta">line 525</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_overlap_is_mixed_and_kept_inside_full_scale</span> <span class="meta">line 535</span><br><span class="x">Overlapping speech is summed and then kept inside full scale by one factor for the whole file.</span></li>
+<li><span class="sec">fn a_turn_boundary_does_not_step</span> <span class="meta">line 561</span><br><span class="x">A splice must not click. A click is a step, and a step is broadband, so this checks that no single sample-to-sample jump is large.</span></li>
+<li><span class="sec">fn every_rendered_sample_is_finite</span> <span class="meta">line 578</span><br><span class="x">Everything the engine produces must be a real number, whatever the plan.</span></li>
+<li><span class="sec">fn a_turn_beyond_the_recording_is_reported</span> <span class="meta">line 585</span><br><span class="x">A turn past the end of the audio is reported, not silently dropped.</span></li>
+<li><span class="sec">fn a_speaker_with_too_little_audio_is_named</span> <span class="meta">line 605</span><br><span class="x">A speaker given less audio than the accent ramp needs is named, because they arrive somewhere short of their destination register and nothing in the audio shows it.</span></li>
+<li><span class="sec">fn an_empty_plan_is_refused</span> <span class="meta">line 637</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_wrong_number_of_seeds_is_refused</span> <span class="meta">line 644</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_impossible_sample_rate_is_refused</span> <span class="meta">line 656</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_empty_recording_renders_to_nothing</span> <span class="meta">line 665</span><br><span class="x">An empty recording is not an error: a plan can legitimately describe a file that turned out to be empty, and the answer is an empty render.</span></li>
+<li><span class="sec">fn a_very_short_span_is_faded_once_rather_than_twice</span> <span class="meta">line 674</span><br><span class="x">A span shorter than two fades must not be multiplied down twice in the middle.</span></li>
+<li><span class="sec">fn a_time_outside_the_recording_clamps_rather_than_panicking</span> <span class="meta">line 682</span><br><span class="x"></span></li>
+</ul>
+</details>
+<details open>
 <summary><code>crates/veilvoice-conversation/src/subtitles.rs</code> <span class="meta">&mdash; veilvoice-conversation, 264 lines, 28 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs">open subtitles.rs</a></p>
 <ul>
@@ -1870,7 +1962,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-core/src/accent.rs</code> <span class="meta">&mdash; veilvoice-core, 678 lines, 71 sections</span></summary>
+<summary><code>crates/veilvoice-core/src/accent.rs</code> <span class="meta">&mdash; veilvoice-core, 685 lines, 73 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs">open accent.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Accent and speaker-trait neutralisation. # What an accent is made of, and what a signal-level transform can remove Accent is carried by two very different kinds of cue, and they have opposite answers here: * **Suprasegmental cues** &#8212;</span></li>
@@ -1892,58 +1984,60 @@ nav.top a{margin-right:14px}
 <li><span class="sec">const TAU_PROSODY_S</span> <span class="meta">line 62</span><br><span class="x">Time constant for the intonation correction, in seconds.</span></li>
 <li><span class="sec">const TAU_VTLN_S</span> <span class="meta">line 65</span><br><span class="x">Time constant for the vocal-tract estimate, in seconds. Deliberately long: it must track the *speaker*, not the current vowel.</span></li>
 <li><span class="sec">const TAU_LTAS_S</span> <span class="meta">line 67</span><br><span class="x">Time constant for the long-term average spectrum, in seconds.</span></li>
-<li><span class="sec">const WARMUP_S</span> <span class="meta">line 69</span><br><span class="x">Seconds of voiced audio over which corrections fade in from nothing.</span></li>
-<li><span class="sec">struct AccentConfig</span> <span class="meta">line 76</span><br><span class="x">How aggressively accent and speaker traits are normalised. Each strength is in `[0, 1]`, where 0 leaves that trait untouched and 1 maps every speaker fully onto the canonical target.</span></li>
-<li><span class="sec">impl Default for AccentConfig</span> <span class="meta">line 105</span><br><span class="x"></span></li>
-<li><span class="sec">fn default</span> <span class="meta">line 106</span><br><span class="x"></span></li>
-<li><span class="sec">struct AccentStats</span> <span class="meta">line 124</span><br><span class="x">Live read-out of what the neutraliser is currently doing, for the UI.</span></li>
-<li><span class="sec">struct AccentNeutralizer</span> <span class="meta">line 143</span><br><span class="x">Maps any speaker onto one canonical pitch register, vocal-tract scale and long-term spectrum.</span></li>
-<li><span class="sec">impl AccentNeutralizer</span> <span class="meta">line 167</span><br><span class="x"></span></li>
-<li><span class="sec">fn new</span> <span class="meta">line 169</span><br><span class="x">Build for a given spectrum size and sample rate. `half` is `n/2 + 1`.</span></li>
-<li><span class="sec">fn enabled</span> <span class="meta">line 198</span><br><span class="x">Whether neutralisation is active.</span></li>
-<li><span class="sec">fn stats</span> <span class="meta">line 203</span><br><span class="x">Live read-out for the UI.</span></li>
-<li><span class="sec">fn observe</span> <span class="meta">line 220</span><br><span class="x">Feed this frame&#x27;s f0 estimate and update the intonation correction. The estimate is produced by the chain rather than here, because the harmonic-locked resynthesis in [`crate::spectral`] needs the same reading even when accent</span></li>
-<li><span class="sec">fn observe</span> <span class="meta">line 220</span><br><span class="x">neutralisation is switched off.</span></li>
-<li><span class="sec">fn prosody_ratio</span> <span class="meta">line 239</span><br><span class="x">Pitch ratio to apply to the excitation this frame.</span></li>
-<li><span class="sec">fn measure_envelope</span> <span class="meta">line 250</span><br><span class="x">Measure the speaker&#x27;s vocal-tract scale from the *unwarped* envelope and update the VTLN ratio. Uses a multi-second average, so it tracks the speaker rather than the current vowel.</span></li>
-<li><span class="sec">fn vtln_ratio</span> <span class="meta">line 269</span><br><span class="x">Formant ratio to apply to the envelope this frame.</span></li>
-<li><span class="sec">fn shape</span> <span class="meta">line 289</span><br><span class="x">Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average. Measuring *after* the correction closes a slow feedback loop: the stored curve converges on whatever is needed to</span></li>
-<li><span class="sec">fn shape</span> <span class="meta">line 289</span><br><span class="x">put the output&#x27;s long-term tilt on the canonical slope, which automatically accounts for the pitch and formant warping applied upstream. The correction is renormalised to preserve the frame&#x27;s energy exactly. Centring the ramp only makes it</span></li>
-<li><span class="sec">fn shape</span> <span class="meta">line 289</span><br><span class="x">*approximately* level-neutral &#8212; the centroid is an energy-weighted quantity and a dB-symmetric curve is not energy-symmetric &#8212; so the level is pinned explicitly rather than assumed.</span></li>
-<li><span class="sec">fn recompute_shape</span> <span class="meta">line 332</span><br><span class="x">Rebuild the correction curve from the current long-term average. The curve is deliberately **a straight line in log-frequency and nothing more**: the measured long-term spectrum is reduced to a single slope, and the correction is the</span></li>
-<li><span class="sec">fn recompute_shape</span> <span class="meta">line 332</span><br><span class="x">rotation that carries that slope onto the canonical one. This is the strongest form of long-term colour correction that is *structurally incapable* of damaging intelligibility &#8212; a smooth monotone ramp adds the same offset to every</span></li>
-<li><span class="sec">fn recompute_shape</span> <span class="meta">line 332</span><br><span class="x">speaker&#x27;s vowels, so formant-scale contrast passes through untouched. Matching the long-term spectrum bin-by-bin would remove more speaker colour, but it also flattens the per-frame differences that distinguish one vowel from another,</span></li>
-<li><span class="sec">fn recompute_shape</span> <span class="meta">line 332</span><br><span class="x">which is not a trade this project is willing to make.</span></li>
-<li><span class="sec">fn log_centroid</span> <span class="meta">line 384</span><br><span class="x">Energy-weighted geometric-mean frequency of `env` over `[lo, hi]` bins. The geometric (log-frequency) mean is the right measure here: vocal-tract length scales the whole spectrum multiplicatively, so a log-domain centroid moves by a</span></li>
-<li><span class="sec">fn log_centroid</span> <span class="meta">line 384</span><br><span class="x">constant offset when the tract scales, and the ratio of two centroids is exactly the warp factor between two speakers.</span></li>
-<li><span class="sec">fn gain_to_db</span> <span class="meta">line 403</span><br><span class="x"></span></li>
-<li><span class="sec">fn db_to_gain</span> <span class="meta">line 407</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 412</span><br><span class="x"></span></li>
-<li><span class="sec">const SR</span> <span class="meta">line 416</span><br><span class="x"></span></li>
-<li><span class="sec">const N</span> <span class="meta">line 417</span><br><span class="x"></span></li>
-<li><span class="sec">const HOP</span> <span class="meta">line 418</span><br><span class="x"></span></li>
-<li><span class="sec">const HALF</span> <span class="meta">line 419</span><br><span class="x"></span></li>
-<li><span class="sec">struct Rig</span> <span class="meta">line 423</span><br><span class="x">The neutraliser plus the pitch tracker the chain normally drives it with, so tests can feed raw frames the way `Deidentifier` does.</span></li>
-<li><span class="sec">impl Rig</span> <span class="meta">line 428</span><br><span class="x"></span></li>
-<li><span class="sec">fn observe_frame</span> <span class="meta">line 429</span><br><span class="x"></span></li>
-<li><span class="sec">impl std::ops::Deref for Rig</span> <span class="meta">line 436</span><br><span class="x"></span></li>
-<li><span class="sec">type Target</span> <span class="meta">line 437</span><br><span class="x"></span></li>
-<li><span class="sec">fn deref</span> <span class="meta">line 438</span><br><span class="x"></span></li>
-<li><span class="sec">impl std::ops::DerefMut for Rig</span> <span class="meta">line 443</span><br><span class="x"></span></li>
-<li><span class="sec">fn deref_mut</span> <span class="meta">line 444</span><br><span class="x"></span></li>
-<li><span class="sec">fn neutralizer</span> <span class="meta">line 449</span><br><span class="x"></span></li>
-<li><span class="sec">fn voiced_frame</span> <span class="meta">line 458</span><br><span class="x">A voiced frame: sawtooth excitation shaped by a vocal tract of a given scale (`vtl` &gt; 1 = longer tract = lower formants).</span></li>
-<li><span class="sec">fn envelope_of</span> <span class="meta">line 482</span><br><span class="x">Smooth spectral envelope of a frame, matching what the chain feeds in.</span></li>
-<li><span class="sec">fn settle</span> <span class="meta">line 507</span><br><span class="x">Run a synthetic speaker through the neutraliser and report the ratios it settles on, plus the centroid it measured.</span></li>
-<li><span class="sec">fn two_speakers_converge_to_one_pitch_register</span> <span class="meta">line 520</span><br><span class="x"></span></li>
-<li><span class="sec">fn two_speakers_converge_to_one_vocal_tract</span> <span class="meta">line 542</span><br><span class="x"></span></li>
-<li><span class="sec">fn flatten_zero_leaves_intonation_alone</span> <span class="meta">line 557</span><br><span class="x"></span></li>
-<li><span class="sec">fn full_flatten_hits_the_canonical_register</span> <span class="meta">line 567</span><br><span class="x"></span></li>
-<li><span class="sec">fn disabled_is_a_true_bypass</span> <span class="meta">line 584</span><br><span class="x"></span></li>
-<li><span class="sec">fn shaping_is_gain_neutral_and_finite</span> <span class="meta">line 603</span><br><span class="x"></span></li>
-<li><span class="sec">fn per_frame_vowel_contrast_survives</span> <span class="meta">line 628</span><br><span class="x"></span></li>
-<li><span class="sec">fn warmup_ramps_corrections_in_from_nothing</span> <span class="meta">line 652</span><br><span class="x"></span></li>
-<li><span class="sec">fn unvoiced_input_leaves_state_untouched</span> <span class="meta">line 666</span><br><span class="x"></span></li>
+<li><span class="sec">const WARMUP_S</span> <span class="meta">line 76</span><br><span class="x">Seconds of voiced audio over which corrections fade in from nothing. Seconds of **voiced** audio before the corrections reach full strength. Public because it is load-bearing outside this crate: a speaker who is only given a second of</span></li>
+<li><span class="sec">const WARMUP_S</span> <span class="meta">line 76</span><br><span class="x">audio never arrives at their canonical register, and anything splicing several speakers together needs to be able to say so. Counted in voiced frames, not wall clock, so real speech takes longer than this in seconds -- silence and unvoiced</span></li>
+<li><span class="sec">const WARMUP_S</span> <span class="meta">line 76</span><br><span class="x">consonants do not advance it.</span></li>
+<li><span class="sec">struct AccentConfig</span> <span class="meta">line 83</span><br><span class="x">How aggressively accent and speaker traits are normalised. Each strength is in `[0, 1]`, where 0 leaves that trait untouched and 1 maps every speaker fully onto the canonical target.</span></li>
+<li><span class="sec">impl Default for AccentConfig</span> <span class="meta">line 112</span><br><span class="x"></span></li>
+<li><span class="sec">fn default</span> <span class="meta">line 113</span><br><span class="x"></span></li>
+<li><span class="sec">struct AccentStats</span> <span class="meta">line 131</span><br><span class="x">Live read-out of what the neutraliser is currently doing, for the UI.</span></li>
+<li><span class="sec">struct AccentNeutralizer</span> <span class="meta">line 150</span><br><span class="x">Maps any speaker onto one canonical pitch register, vocal-tract scale and long-term spectrum.</span></li>
+<li><span class="sec">impl AccentNeutralizer</span> <span class="meta">line 174</span><br><span class="x"></span></li>
+<li><span class="sec">fn new</span> <span class="meta">line 176</span><br><span class="x">Build for a given spectrum size and sample rate. `half` is `n/2 + 1`.</span></li>
+<li><span class="sec">fn enabled</span> <span class="meta">line 205</span><br><span class="x">Whether neutralisation is active.</span></li>
+<li><span class="sec">fn stats</span> <span class="meta">line 210</span><br><span class="x">Live read-out for the UI.</span></li>
+<li><span class="sec">fn observe</span> <span class="meta">line 227</span><br><span class="x">Feed this frame&#x27;s f0 estimate and update the intonation correction. The estimate is produced by the chain rather than here, because the harmonic-locked resynthesis in [`crate::spectral`] needs the same reading even when accent</span></li>
+<li><span class="sec">fn observe</span> <span class="meta">line 227</span><br><span class="x">neutralisation is switched off.</span></li>
+<li><span class="sec">fn prosody_ratio</span> <span class="meta">line 246</span><br><span class="x">Pitch ratio to apply to the excitation this frame.</span></li>
+<li><span class="sec">fn measure_envelope</span> <span class="meta">line 257</span><br><span class="x">Measure the speaker&#x27;s vocal-tract scale from the *unwarped* envelope and update the VTLN ratio. Uses a multi-second average, so it tracks the speaker rather than the current vowel.</span></li>
+<li><span class="sec">fn vtln_ratio</span> <span class="meta">line 276</span><br><span class="x">Formant ratio to apply to the envelope this frame.</span></li>
+<li><span class="sec">fn shape</span> <span class="meta">line 296</span><br><span class="x">Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average. Measuring *after* the correction closes a slow feedback loop: the stored curve converges on whatever is needed to</span></li>
+<li><span class="sec">fn shape</span> <span class="meta">line 296</span><br><span class="x">put the output&#x27;s long-term tilt on the canonical slope, which automatically accounts for the pitch and formant warping applied upstream. The correction is renormalised to preserve the frame&#x27;s energy exactly. Centring the ramp only makes it</span></li>
+<li><span class="sec">fn shape</span> <span class="meta">line 296</span><br><span class="x">*approximately* level-neutral &#8212; the centroid is an energy-weighted quantity and a dB-symmetric curve is not energy-symmetric &#8212; so the level is pinned explicitly rather than assumed.</span></li>
+<li><span class="sec">fn recompute_shape</span> <span class="meta">line 339</span><br><span class="x">Rebuild the correction curve from the current long-term average. The curve is deliberately **a straight line in log-frequency and nothing more**: the measured long-term spectrum is reduced to a single slope, and the correction is the</span></li>
+<li><span class="sec">fn recompute_shape</span> <span class="meta">line 339</span><br><span class="x">rotation that carries that slope onto the canonical one. This is the strongest form of long-term colour correction that is *structurally incapable* of damaging intelligibility &#8212; a smooth monotone ramp adds the same offset to every</span></li>
+<li><span class="sec">fn recompute_shape</span> <span class="meta">line 339</span><br><span class="x">speaker&#x27;s vowels, so formant-scale contrast passes through untouched. Matching the long-term spectrum bin-by-bin would remove more speaker colour, but it also flattens the per-frame differences that distinguish one vowel from another,</span></li>
+<li><span class="sec">fn recompute_shape</span> <span class="meta">line 339</span><br><span class="x">which is not a trade this project is willing to make.</span></li>
+<li><span class="sec">fn log_centroid</span> <span class="meta">line 391</span><br><span class="x">Energy-weighted geometric-mean frequency of `env` over `[lo, hi]` bins. The geometric (log-frequency) mean is the right measure here: vocal-tract length scales the whole spectrum multiplicatively, so a log-domain centroid moves by a</span></li>
+<li><span class="sec">fn log_centroid</span> <span class="meta">line 391</span><br><span class="x">constant offset when the tract scales, and the ratio of two centroids is exactly the warp factor between two speakers.</span></li>
+<li><span class="sec">fn gain_to_db</span> <span class="meta">line 410</span><br><span class="x"></span></li>
+<li><span class="sec">fn db_to_gain</span> <span class="meta">line 414</span><br><span class="x"></span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 419</span><br><span class="x"></span></li>
+<li><span class="sec">const SR</span> <span class="meta">line 423</span><br><span class="x"></span></li>
+<li><span class="sec">const N</span> <span class="meta">line 424</span><br><span class="x"></span></li>
+<li><span class="sec">const HOP</span> <span class="meta">line 425</span><br><span class="x"></span></li>
+<li><span class="sec">const HALF</span> <span class="meta">line 426</span><br><span class="x"></span></li>
+<li><span class="sec">struct Rig</span> <span class="meta">line 430</span><br><span class="x">The neutraliser plus the pitch tracker the chain normally drives it with, so tests can feed raw frames the way `Deidentifier` does.</span></li>
+<li><span class="sec">impl Rig</span> <span class="meta">line 435</span><br><span class="x"></span></li>
+<li><span class="sec">fn observe_frame</span> <span class="meta">line 436</span><br><span class="x"></span></li>
+<li><span class="sec">impl std::ops::Deref for Rig</span> <span class="meta">line 443</span><br><span class="x"></span></li>
+<li><span class="sec">type Target</span> <span class="meta">line 444</span><br><span class="x"></span></li>
+<li><span class="sec">fn deref</span> <span class="meta">line 445</span><br><span class="x"></span></li>
+<li><span class="sec">impl std::ops::DerefMut for Rig</span> <span class="meta">line 450</span><br><span class="x"></span></li>
+<li><span class="sec">fn deref_mut</span> <span class="meta">line 451</span><br><span class="x"></span></li>
+<li><span class="sec">fn neutralizer</span> <span class="meta">line 456</span><br><span class="x"></span></li>
+<li><span class="sec">fn voiced_frame</span> <span class="meta">line 465</span><br><span class="x">A voiced frame: sawtooth excitation shaped by a vocal tract of a given scale (`vtl` &gt; 1 = longer tract = lower formants).</span></li>
+<li><span class="sec">fn envelope_of</span> <span class="meta">line 489</span><br><span class="x">Smooth spectral envelope of a frame, matching what the chain feeds in.</span></li>
+<li><span class="sec">fn settle</span> <span class="meta">line 514</span><br><span class="x">Run a synthetic speaker through the neutraliser and report the ratios it settles on, plus the centroid it measured.</span></li>
+<li><span class="sec">fn two_speakers_converge_to_one_pitch_register</span> <span class="meta">line 527</span><br><span class="x"></span></li>
+<li><span class="sec">fn two_speakers_converge_to_one_vocal_tract</span> <span class="meta">line 549</span><br><span class="x"></span></li>
+<li><span class="sec">fn flatten_zero_leaves_intonation_alone</span> <span class="meta">line 564</span><br><span class="x"></span></li>
+<li><span class="sec">fn full_flatten_hits_the_canonical_register</span> <span class="meta">line 574</span><br><span class="x"></span></li>
+<li><span class="sec">fn disabled_is_a_true_bypass</span> <span class="meta">line 591</span><br><span class="x"></span></li>
+<li><span class="sec">fn shaping_is_gain_neutral_and_finite</span> <span class="meta">line 610</span><br><span class="x"></span></li>
+<li><span class="sec">fn per_frame_vowel_contrast_survives</span> <span class="meta">line 635</span><br><span class="x"></span></li>
+<li><span class="sec">fn warmup_ramps_corrections_in_from_nothing</span> <span class="meta">line 659</span><br><span class="x"></span></li>
+<li><span class="sec">fn unvoiced_input_leaves_state_untouched</span> <span class="meta">line 673</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -2245,7 +2339,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-core/src/voices.rs</code> <span class="meta">&mdash; veilvoice-core, 427 lines, 50 sections</span></summary>
+<summary><code>crates/veilvoice-core/src/voices.rs</code> <span class="meta">&mdash; veilvoice-core, 644 lines, 72 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs">open voices.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Destination voices: several canonical registers instead of one. # What this is for By default every speaker VeilVoice processes comes out as **the same voice** &#8212; one pitch register, one vocal-tract scale, one long-term spectrum. That is</span></li>
@@ -2257,47 +2351,69 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">are assigned by turn order, and turn order is something the *user* supplies. # What a conversation leaks that a monologue does not Stated plainly, because it is a real cost and nobody should have to work it out for themselves: * **How many</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">people were talking.** Ten voices in the output means ten speakers in the input. * **Who spoke when, and for how long.** Turn-taking structure is preserved on purpose &#8212; it is the thing that makes the result usable &#8212; and turn structure is</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">information about a conversation. Overlaps, interruptions, the length of each answer and the rhythm of the exchange all survive. * **Nothing about who they were.** The voiceprint of each speaker is destroyed exactly as thoroughly as in</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">single-speaker mode: the same phase discard, the same many-to-one normalisation onto the slot&#x27;s canonical values. A single-speaker recording leaks the first two facts too, and they are trivial there. Here they are not, and that is worth a</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">sentence in any front end that offers this. # Ten, and not twenty Twenty was asked for. Ten is what can honestly be delivered, and the arithmetic is short. A destination voice is distinguishable from another by its fundamental and by its</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">vocal-tract scale. The fundamental has to stay inside roughly 100&#8211;210 Hz: below that the resynthesised comb has too few harmonics in the band that carries the vowels, and above it the register stops being a plausible speaking voice. The</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">just-noticeable difference for the fundamental of speech is around five to eight per cent, so about 10 Hz at this register &#8212; and &quot;just noticeable&quot; is far too close together for somebody to *keep track of* over an hour of conversation. Five</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">registers across that range gives steps of about 26 Hz, which is three times the threshold. Two vocal-tract scales, 660 Hz and 840 Hz, are about 25 % apart: a clear difference in apparent speaker size, and both still inside the range where</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">the vowels stay natural. Five registers times two tracts is [`MAX_VOICES`]. Twenty would need either 13 Hz steps in the fundamental &#8212; at the edge of audibility and well past the edge of memorability &#8212; or vocal-tract scales close enough to</span></li>
-<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">be heard as the same person on a different day. The honest number is ten, so the table has ten and this paragraph says why.</span></li>
-<li><span class="sec">const MAX_VOICES</span> <span class="meta">line 82</span><br><span class="x">How many distinct destination voices this engine will hand out. See the module documentation for why this is ten and not twenty.</span></li>
-<li><span class="sec">struct Voice</span> <span class="meta">line 87</span><br><span class="x">One destination voice: the canonical values every speaker in this slot is mapped onto.</span></li>
-<li><span class="sec">impl Voice</span> <span class="meta">line 96</span><br><span class="x"></span></li>
-<li><span class="sec">fn applied_to</span> <span class="meta">line 103</span><br><span class="x">Apply this voice to an [`AccentConfig`]. Only the three canonical targets are replaced. The *strengths* &#8212; how hard the neutraliser pushes toward them &#8212; are left alone, because they are the user&#x27;s setting and a slot is a destination, not a</span></li>
-<li><span class="sec">fn applied_to</span> <span class="meta">line 103</span><br><span class="x">policy about how firmly to arrive at it.</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 115</span><br><span class="x">Whether this voice is inside the range the engine can render usefully. Checked rather than clamped: a caller who built a voice out of range meant something, and silently moving it would give them a different speaker from the one they asked</span></li>
-<li><span class="sec">fn checked</span> <span class="meta">line 115</span><br><span class="x">for without saying so.</span></li>
-<li><span class="sec">fn describe</span> <span class="meta">line 155</span><br><span class="x">A short label for an interface: &quot;low voice, small tract&quot; and so on. Describes the *destination*, never the speaker. There is deliberately no vocabulary here for who somebody was: &quot;man&quot;, &quot;woman&quot;, &quot;child&quot;, &quot;older&quot; are all statements about an</span></li>
-<li><span class="sec">fn describe</span> <span class="meta">line 155</span><br><span class="x">input this crate has just finished destroying, and a label that reintroduced one would undo the point.</span></li>
-<li><span class="sec">const F0_MIN_HZ</span> <span class="meta">line 180</span><br><span class="x">The lowest fundamental a resynthesised voice stays intelligible at.</span></li>
-<li><span class="sec">const F0_MAX_HZ</span> <span class="meta">line 182</span><br><span class="x">The highest fundamental that still reads as a speaking register.</span></li>
-<li><span class="sec">const CENTROID_MIN_HZ</span> <span class="meta">line 184</span><br><span class="x">The narrowest canonical vocal tract offered.</span></li>
-<li><span class="sec">const CENTROID_MAX_HZ</span> <span class="meta">line 186</span><br><span class="x">The widest canonical vocal tract offered.</span></li>
-<li><span class="sec">const TILT_MIN_DB_OCT</span> <span class="meta">line 188</span><br><span class="x">The steepest permitted long-term slope, in dB per octave.</span></li>
-<li><span class="sec">const TILT_MAX_DB_OCT</span> <span class="meta">line 190</span><br><span class="x">The flattest permitted long-term slope, in dB per octave.</span></li>
-<li><span class="sec">const REGISTERS_HZ</span> <span class="meta">line 194</span><br><span class="x">The five registers, spaced about 26 Hz apart &#8212; three times the just-noticeable difference for the fundamental of speech at this register.</span></li>
-<li><span class="sec">const TABLE</span> <span class="meta">line 208</span><br><span class="x">The ten destination voices, in the order they are handed out. The order is chosen, not incidental. Slot 0 and slot 1 are the two furthest apart in both dimensions, because a **two-person conversation is the common case** and the two people</span></li>
-<li><span class="sec">const TABLE</span> <span class="meta">line 208</span><br><span class="x">in it should be the easiest pair in the table to tell apart. Slot 2 is then the furthest remaining from both, and so on: the table degrades gracefully as more speakers are added rather than saving its clearest contrasts for a tenth speaker</span></li>
-<li><span class="sec">const TABLE</span> <span class="meta">line 208</span><br><span class="x">who is usually not there. Every one of the five registers appears exactly twice and every one of the two tracts exactly five times, so the set is the full five-by-two grid; only the order is arranged.</span></li>
-<li><span class="sec">fn voice</span> <span class="meta">line 229</span><br><span class="x">The destination voice for slot `index`. Wraps rather than failing past [`MAX_VOICES`]: an eleventh speaker gets the first voice again. That is a real collision &#8212; two people sharing one output voice &#8212; and it is why [`MAX_VOICES`] is stated</span></li>
-<li><span class="sec">fn voice</span> <span class="meta">line 229</span><br><span class="x">and why a front end should refuse rather than rely on this. Wrapping is here so the function is total, not because reusing a voice is acceptable.</span></li>
-<li><span class="sec">fn all</span> <span class="meta">line 239</span><br><span class="x">Every destination voice, in the order they are handed out.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 244</span><br><span class="x"></span></li>
-<li><span class="sec">fn there_are_exactly_ten_and_they_are_all_different</span> <span class="meta">line 248</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_table_is_the_whole_five_by_two_grid</span> <span class="meta">line 264</span><br><span class="x">The table must be the full grid: every register twice, every tract five times. A typo that repeated one pair and dropped another would still pass the &quot;all different&quot; test above by accident of the tilt.</span></li>
-<li><span class="sec">fn the_registers_are_far_enough_apart_to_keep_track_of</span> <span class="meta">line 286</span><br><span class="x">The claim in the module documentation, checked: about 26 Hz between neighbouring registers, three times the roughly 8 Hz just-noticeable difference at this fundamental.</span></li>
-<li><span class="sec">fn the_first_two_slots_are_the_easiest_pair_to_tell_apart</span> <span class="meta">line 301</span><br><span class="x">A two-person conversation is the common case, so slots 0 and 1 must be the furthest apart in the table.</span></li>
-<li><span class="sec">fn every_shipped_voice_is_within_range</span> <span class="meta">line 320</span><br><span class="x">Every voice in the table must be one the engine will accept.</span></li>
-<li><span class="sec">fn a_voice_out_of_range_is_refused_rather_than_moved</span> <span class="meta">line 329</span><br><span class="x"></span></li>
-<li><span class="sec">fn applying_a_voice_changes_only_the_destination</span> <span class="meta">line 361</span><br><span class="x">Applying a voice replaces the destination and nothing else. The strengths are the user&#x27;s setting.</span></li>
-<li><span class="sec">fn a_slot_is_the_same_voice_every_time</span> <span class="meta">line 383</span><br><span class="x">The slot is a function of the index and of nothing else. If this ever takes anything derived from the input, the output voice becomes a function of the input voice and the whole exercise is undone.</span></li>
-<li><span class="sec">fn asking_past_the_table_wraps_onto_a_voice_already_in_use</span> <span class="meta">line 392</span><br><span class="x">Past the table it wraps rather than panicking, and the collision is real: slot 10 is slot 0 again.</span></li>
-<li><span class="sec">fn no_label_says_anything_about_the_original_speaker</span> <span class="meta">line 401</span><br><span class="x">A label describes where the voice arrived, never who was speaking.</span></li>
-<li><span class="sec">fn every_label_is_distinct</span> <span class="meta">line 419</span><br><span class="x"></span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">single-speaker mode: the same phase discard, the same many-to-one normalisation onto the slot&#x27;s canonical values. # A register has to land on a bin, and that is the whole constraint The first version of this table picked five registers</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">about 26 Hz apart on the reasoning that the just-noticeable difference for the fundamental of speech is around 8 Hz, so 26 Hz would be three times that. The reasoning was sound and the table was wrong, because it measured the wrong thing.</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">When accent neutralisation is on, [`crate::spectral`] does not resample the excitation &#8212; it **replaces** it with a harmonic comb at the canonical fundamental, quantised to the nearest whole FFT bin so that every comb line sits on a bin</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">centre and the frames overlap-add coherently. The rendered fundamental is therefore not the number in the table. It is ```text round(target_f0 / bin_hz) * bin_hz, bin_hz = sample_rate / frame_size ``` At the default 1024-point frame and 48</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">kHz that spacing is **46.875 Hz**, so the five registers 105, 131, 157, 183 and 209 Hz render as 93.75, 140.625, 140.625, 187.5 and 187.5 &#8212; three distinct pitches, not five. Two pairs of speakers would have shared a register with nothing</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">in the interface saying so. It was found by measuring the fundamental of an actual rendered file, not by reading the code, and the tests below now measure the same thing the ear would. So the registers are **bin-exact by construction**:</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">each is a whole number of bins at the default configuration. Inside the range where a resynthesised voice stays intelligible &#8212; roughly 90 to 240 Hz, below which the comb has too few harmonics under the vowels and above which it stops being</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">a speaking register &#8212; there are exactly four: | bin | rendered | |---:|---:| | 2 | 93.75 Hz | | 3 | 140.625 Hz | | 4 | 187.5 Hz | | 5 | 234.375 Hz | # Ten voices, from four registers and three vocal tracts The second axis is the canonical</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">vocal-tract scale, which is a continuous warp and is **not** quantised &#8212; so it is free to take values the ear can separate: 620, 760 and 900 Hz, each about 22 % from its neighbour, all inside the range where the vowels stay natural. Four</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">registers times three tracts is twelve, and [`MAX_VOICES`] ships ten of them. Twenty, which was asked for, is not available: it would need either registers a single bin apart at a frame size four times longer &#8212; which quadruples the latency</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">&#8212; or vocal tracts close enough to be heard as the same person on a different day. # If you change the frame size, check the table again The registers are exact at the *default* configuration. A caller who changes</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">[`crate::DeidConfig::frame_size`] or the sample rate moves the bin grid underneath them, and two registers can collide again. [`Voice::rendered_f0_hz`] reports what a given configuration will actually produce, and [`distinct_voices`]</span></li>
+<li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">counts how many of the ten survive it &#8212; so a front end can say &quot;this frame size gives you six distinguishable voices&quot; rather than handing out ten labels for six sounds.</span></li>
+<li><span class="sec">const MAX_VOICES</span> <span class="meta">line 115</span><br><span class="x">How many distinct destination voices this engine hands out. Ten of the twelve the table can express. See the module documentation for why it is not twenty.</span></li>
+<li><span class="sec">struct Voice</span> <span class="meta">line 120</span><br><span class="x">One destination voice: the canonical values every speaker in this slot is mapped onto.</span></li>
+<li><span class="sec">impl Voice</span> <span class="meta">line 135</span><br><span class="x"></span></li>
+<li><span class="sec">fn applied_to</span> <span class="meta">line 142</span><br><span class="x">Apply this voice to an [`AccentConfig`]. Only the three canonical targets are replaced. The *strengths* &#8212; how hard the neutraliser pushes toward them &#8212; are left alone, because they are the user&#x27;s setting and a slot is a destination, not a</span></li>
+<li><span class="sec">fn applied_to</span> <span class="meta">line 142</span><br><span class="x">policy about how firmly to arrive at it.</span></li>
+<li><span class="sec">fn rendered_f0_hz</span> <span class="meta">line 156</span><br><span class="x">The fundamental this voice will **actually** be rendered at, under `config`. The voiced excitation is a harmonic comb snapped to the FFT bin grid, so the rendered fundamental is the requested one rounded to the nearest whole bin. This is</span></li>
+<li><span class="sec">fn rendered_f0_hz</span> <span class="meta">line 156</span><br><span class="x">the number to compare two voices by, and the number to show anybody who asks what a slot sounds like.</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 169</span><br><span class="x">Whether this voice is inside the range the engine can render usefully. Checked rather than clamped: a caller who built a voice out of range meant something, and silently moving it would give them a different speaker from the one they asked</span></li>
+<li><span class="sec">fn checked</span> <span class="meta">line 169</span><br><span class="x">for without saying so.</span></li>
+<li><span class="sec">fn describe</span> <span class="meta">line 213</span><br><span class="x">A short label for an interface: &quot;low register, narrow tract&quot;. Describes the *destination*, never the speaker. There is deliberately no vocabulary here for who somebody was: &quot;man&quot;, &quot;woman&quot;, &quot;child&quot;, &quot;older&quot; are all statements about an input</span></li>
+<li><span class="sec">fn describe</span> <span class="meta">line 213</span><br><span class="x">this crate has just finished destroying, and a label that reintroduced one would undo the point. The hertz figure quoted is the one that will be **rendered** at the default configuration, not the one requested, so the label and the ear</span></li>
+<li><span class="sec">fn describe</span> <span class="meta">line 213</span><br><span class="x">agree.</span></li>
+<li><span class="sec">const F0_MIN_HZ</span> <span class="meta">line 239</span><br><span class="x">The lowest fundamental a resynthesised voice stays intelligible at.</span></li>
+<li><span class="sec">const F0_MAX_HZ</span> <span class="meta">line 241</span><br><span class="x">The highest fundamental that still reads as a speaking register.</span></li>
+<li><span class="sec">const CENTROID_MIN_HZ</span> <span class="meta">line 243</span><br><span class="x">The narrowest canonical vocal tract offered.</span></li>
+<li><span class="sec">const CENTROID_MAX_HZ</span> <span class="meta">line 245</span><br><span class="x">The widest canonical vocal tract offered.</span></li>
+<li><span class="sec">const TILT_MIN_DB_OCT</span> <span class="meta">line 247</span><br><span class="x">The steepest permitted long-term slope, in dB per octave.</span></li>
+<li><span class="sec">const TILT_MAX_DB_OCT</span> <span class="meta">line 249</span><br><span class="x">The flattest permitted long-term slope, in dB per octave.</span></li>
+<li><span class="sec">fn bin_hz</span> <span class="meta">line 256</span><br><span class="x">The FFT bin spacing of a configuration, in hertz. The grid every canonical register is snapped to. Public because a front end that lets somebody change the frame size needs to be able to explain what changed about the voices.</span></li>
+<li><span class="sec">const REGISTERS_HZ</span> <span class="meta">line 269</span><br><span class="x">The four registers, each a whole number of bins at the default configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz. Written out rather than computed from the default, so that changing the default frame size makes a **test**</span></li>
+<li><span class="sec">const REGISTERS_HZ</span> <span class="meta">line 269</span><br><span class="x">fail rather than silently moving every voice in every recording anybody has already made.</span></li>
+<li><span class="sec">const TRACTS</span> <span class="meta">line 273</span><br><span class="x">The three vocal-tract scales, about 22 % apart. Not quantised &#8212; the warp is continuous &#8212; so these render as asked.</span></li>
+<li><span class="sec">const TABLE</span> <span class="meta">line 291</span><br><span class="x">The ten destination voices, in the order they are handed out. The order is chosen, not incidental. Slot 0 and slot 1 are the two furthest apart in both dimensions, because a **two-person conversation is the common case** and the two people</span></li>
+<li><span class="sec">const TABLE</span> <span class="meta">line 291</span><br><span class="x">in it should be the easiest pair in the table to tell apart. The table then works inward, so it degrades gracefully as more speakers are added rather than saving its clearest contrasts for a tenth speaker who is usually not there. Two of</span></li>
+<li><span class="sec">const TABLE</span> <span class="meta">line 291</span><br><span class="x">the twelve combinations are unused, which is slack rather than a stretch: nothing here is reaching for a tenth voice it cannot really make.</span></li>
+<li><span class="sec">fn voice</span> <span class="meta">line 312</span><br><span class="x">The destination voice for slot `index`. Wraps rather than failing past [`MAX_VOICES`]: an eleventh speaker gets the first voice again. That is a real collision &#8212; two people sharing one output voice &#8212; and it is why [`MAX_VOICES`] is stated</span></li>
+<li><span class="sec">fn voice</span> <span class="meta">line 312</span><br><span class="x">and why a front end should refuse rather than rely on this. Wrapping is here so the function is total, not because reusing a voice is acceptable.</span></li>
+<li><span class="sec">fn all</span> <span class="meta">line 323</span><br><span class="x">Every destination voice, in the order they are handed out.</span></li>
+<li><span class="sec">fn distinct_voices</span> <span class="meta">line 337</span><br><span class="x">How many of the ten are still distinguishable under `config`. Two voices count as the same when they would be **rendered** with the same fundamental and the same vocal tract. At the default configuration the answer is [`MAX_VOICES`]; at a</span></li>
+<li><span class="sec">fn distinct_voices</span> <span class="meta">line 337</span><br><span class="x">shorter frame size it is fewer, because the bin grid coarsens and registers collapse onto each other. A front end that lets somebody change the frame size should call this and say what it returns. Handing out ten labels for six sounds is</span></li>
+<li><span class="sec">fn distinct_voices</span> <span class="meta">line 337</span><br><span class="x">the failure this function exists to make visible.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 355</span><br><span class="x"></span></li>
+<li><span class="sec">fn default_config</span> <span class="meta">line 358</span><br><span class="x"></span></li>
+<li><span class="sec">fn there_are_exactly_ten_and_they_are_all_different_as_written</span> <span class="meta">line 363</span><br><span class="x"></span></li>
+<li><span class="sec">fn all_ten_are_still_distinct_after_the_bin_grid_has_had_them</span> <span class="meta">line 383</span><br><span class="x">**The test the first version of this table did not have.** Being different as written is not enough: the voiced excitation is a comb snapped to the FFT bin grid, so two registers a few hertz apart can render as the same pitch. The first</span></li>
+<li><span class="sec">fn all_ten_are_still_distinct_after_the_bin_grid_has_had_them</span> <span class="meta">line 383</span><br><span class="x">table had five registers that rendered as three, and two pairs of speakers would have shared a voice with nothing saying so. This compares what comes *out*.</span></li>
+<li><span class="sec">fn every_register_is_bin_exact_at_the_default_configuration</span> <span class="meta">line 414</span><br><span class="x">Each register must be a whole number of bins at the default configuration, so what is asked for is what is rendered. If somebody changes the default frame size, this is what tells them the voice table needs choosing again.</span></li>
+<li><span class="sec">fn the_registers_that_were_wrong_are_still_wrong_for_the_same_reason</span> <span class="meta">line 443</span><br><span class="x">The measurement that found the bug, kept as a test. These are the registers the first table shipped, and what they actually rendered as.</span></li>
+<li><span class="sec">fn a_shorter_frame_reports_fewer_distinguishable_voices</span> <span class="meta">line 460</span><br><span class="x">A coarser grid must be reported as fewer voices rather than silently handing out ten labels for a smaller number of sounds.</span></li>
+<li><span class="sec">fn the_vocal_tracts_are_far_apart_and_are_not_quantised</span> <span class="meta">line 477</span><br><span class="x">The vocal tract is a continuous warp, not a quantised one, so its three values must survive any frame size.</span></li>
+<li><span class="sec">fn the_first_two_slots_are_the_easiest_pair_to_tell_apart</span> <span class="meta">line 493</span><br><span class="x">A two-person conversation is the common case, so slots 0 and 1 must be the furthest apart in the table.</span></li>
+<li><span class="sec">fn every_shipped_voice_is_within_range</span> <span class="meta">line 513</span><br><span class="x">Every voice in the table must be one the engine will accept.</span></li>
+<li><span class="sec">fn a_voice_out_of_range_is_refused_rather_than_moved</span> <span class="meta">line 522</span><br><span class="x"></span></li>
+<li><span class="sec">fn applying_a_voice_changes_only_the_destination</span> <span class="meta">line 554</span><br><span class="x">Applying a voice replaces the destination and nothing else. The strengths are the user&#x27;s setting.</span></li>
+<li><span class="sec">fn a_slot_is_the_same_voice_every_time</span> <span class="meta">line 576</span><br><span class="x">The slot is a function of the index and of nothing else. If this ever takes anything derived from the input, the output voice becomes a function of the input voice and the whole exercise is undone.</span></li>
+<li><span class="sec">fn asking_past_the_table_wraps_onto_a_voice_already_in_use</span> <span class="meta">line 585</span><br><span class="x">Past the table it wraps rather than panicking, and the collision is real: slot 10 is slot 0 again.</span></li>
+<li><span class="sec">fn no_label_says_anything_about_the_original_speaker</span> <span class="meta">line 593</span><br><span class="x">A label describes where the voice arrived, never who was speaking.</span></li>
+<li><span class="sec">fn a_label_quotes_the_rendered_fundamental</span> <span class="meta">line 613</span><br><span class="x">A label must quote the fundamental that will be heard, not the one that was asked for -- otherwise the interface and the ear disagree.</span></li>
+<li><span class="sec">fn every_label_is_distinct</span> <span class="meta">line 626</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_impossible_configuration_reports_no_bin_spacing_rather_than_dividing_by_zero</span> <span class="meta">line 635</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -7148,7 +7264,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>Cargo.lock</code> <span class="meta">&mdash; root, 5983 lines, 400 sections</span></summary>
+<summary><code>Cargo.lock</code> <span class="meta">&mdash; root, 5984 lines, 400 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/Cargo.lock">open Cargo.lock</a></p>
 <ul>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x"># This file is automatically @generated by Cargo. # It is not intended for manual editing. version = 4 [[package]] name = &quot;ab_glyph&quot; version = &quot;0.2.32&quot; source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot; checksum =</span></li>
@@ -7594,17 +7710,17 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/Cargo.toml</code> <span class="meta">&mdash; veilvoice-cli, 44 lines, 8 sections</span></summary>
+<summary><code>crates/veilvoice-cli/Cargo.toml</code> <span class="meta">&mdash; veilvoice-cli, 45 lines, 8 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/Cargo.toml">open Cargo.toml</a></p>
 <ul>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">[package] name = &quot;veilvoice-cli&quot; version.workspace = true edition.workspace = true rust-version.workspace = true license.workspace = true authors.workspace = true repository.workspace = true description = &quot;Command-line interface for</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings.&quot; [[bin]] name = &quot;veilvoice&quot; path = &quot;src/main.rs&quot; [features] default = [&quot;live&quot;] # Live microphone scrambling. Off on platforms with no `cpal`</span></li>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">backend (the # BSDs); file processing, encryption and metadata cleaning still work there. live = [&quot;veilvoice-audio/live&quot;] [dependencies] veilvoice-core = { path = &quot;../veilvoice-core&quot; } veilvoice-crypto = { path = &quot;../veilvoice-crypto&quot; }</span></li>
-<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">veilvoice-guard = { path = &quot;../veilvoice-guard&quot; } veilvoice-audio = { path = &quot;../veilvoice-audio&quot;, default-features = false } veilvoice-capture = { path = &quot;../veilvoice-capture&quot; } veilvoice-meta = { path = &quot;../veilvoice-meta&quot; }</span></li>
-<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">veilvoice-policy = { path = &quot;../veilvoice-policy&quot; } veilvoice-sentry = { path = &quot;../veilvoice-sentry&quot; } veilvoice-setup = { path = &quot;../veilvoice-setup&quot; } veilvoice-watch = { path = &quot;../veilvoice-watch&quot; } clap = { version = &quot;4&quot;, features =</span></li>
-<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">[&quot;derive&quot;] } rpassword = &quot;7&quot; zeroize.workspace = true [dev-dependencies] tempfile = &quot;3&quot; # Embeds the application icon and version block into the Windows executable. # A *build* dependency only: it is not in the shipped dependency graph,</span></li>
-<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">and the</span></li>
-<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x"># `offline` CI job that forbids network crates is unaffected. [target.&#x27;cfg(windows)&#x27;.build-dependencies] winresource = &quot;0.1&quot;</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">veilvoice-guard = { path = &quot;../veilvoice-guard&quot; } veilvoice-audio = { path = &quot;../veilvoice-audio&quot;, default-features = false } veilvoice-capture = { path = &quot;../veilvoice-capture&quot; } veilvoice-conversation = { path =</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">&quot;../veilvoice-conversation&quot; } veilvoice-meta = { path = &quot;../veilvoice-meta&quot; } veilvoice-policy = { path = &quot;../veilvoice-policy&quot; } veilvoice-sentry = { path = &quot;../veilvoice-sentry&quot; } veilvoice-setup = { path = &quot;../veilvoice-setup&quot; }</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">veilvoice-watch = { path = &quot;../veilvoice-watch&quot; } clap = { version = &quot;4&quot;, features = [&quot;derive&quot;] } rpassword = &quot;7&quot; zeroize.workspace = true [dev-dependencies] tempfile = &quot;3&quot; # Embeds the application icon and version block into the Windows</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">executable.</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x"># A *build* dependency only: it is not in the shipped dependency graph, and the # `offline` CI job that forbids network crates is unaffected. [target.&#x27;cfg(windows)&#x27;.build-dependencies] winresource = &quot;0.1&quot;</span></li>
 </ul>
 </details>
 <details open>
