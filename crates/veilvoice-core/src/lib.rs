@@ -57,12 +57,14 @@ mod modulation;
 mod pitch;
 mod spectral;
 mod stft;
+pub mod voices;
 mod window;
 
 pub use accent::{AccentConfig, AccentNeutralizer, AccentStats};
 pub use chain::{DeidConfig, Deidentifier, ProcessStats};
 pub use modulation::{ModValues, Modulator};
 pub use pitch::PitchEstimate;
+pub use voices::{voice, Voice, MAX_VOICES};
 
 /// Crate version, surfaced in the About panel.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
