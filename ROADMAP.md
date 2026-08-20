@@ -79,8 +79,8 @@ it cannot do as plainly as what it can.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 33 | Screen-capture detection — application name, PID, when, how often | **planned** | 3 d |
-| 34 | Hide VeilVoice's own window from screen capture and recording | **planned** | 1–2 d |
+| 33 | Screen-capture detection — which recorders are running, muted per program by an allowlist | **done** | — |
+| 34 | Hide VeilVoice's own window from screen capture and recording | **blocked** | — |
 | 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **planned** | 2–3 d |
 | 36 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **done** | — |
 | 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
@@ -170,6 +170,22 @@ without an explicit yes -- and to always write a self-contained animation that
 needs nothing else installed, so the feature still produces something on a
 machine without it. What will not happen is a silent dependency on a program
 the user did not know they were running.
+
+**Hiding VeilVoice's own window from a screen recorder needs `unsafe`.**
+Marker 34. Excluding a window from capture is `SetWindowDisplayAffinity` on
+Windows, and the equivalents on macOS and under Wayland; all of them are
+foreign-function calls, and every crate in this workspace carries
+`#![forbid(unsafe_code)]` — which is on the front page and is one of the things
+a reader can check in ten seconds. The trade is the maintainer's: a documented
+`unsafe` shim in one file, or a window that can be recorded. **Until it is
+made, the honest state is written where a user will read it**: VeilVoice does
+not hide itself, `veilvoice capture` says so, and marker 33 shipped without
+pretending otherwise. Nothing about it is hard except the decision.
+
+Worth noting that the same decision would not buy very much. A window
+excluded from capture is still visible to a camera pointed at the screen, and
+the thing VeilVoice protects — the recording — is a file, not a picture of a
+window.
 
 **Duress and decoy passwords are the most dangerous thing on this list.** A duress password
 destroys data on purpose, and a decoy system exists to be believed. Neither is

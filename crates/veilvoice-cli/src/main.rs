@@ -7,7 +7,7 @@
 //!
 //! # What is here
 //!
-//! Eighteen subcommands, and they divide into five groups:
+//! Nineteen subcommands, and they divide into five groups:
 //!
 //! * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
 //!   `devices`.
@@ -15,7 +15,8 @@
 //!   `decrypt`, `keygen`, `shred`.
 //! * **Watching the machine** -- `watch` the microphone and camera, `guard`
 //!   VeilVoice's own files against tampering, `sentry` for canaries and how
-//!   fast a folder is changing.
+//!   fast a folder is changing, `capture` for which screen recorders are
+//!   running.
 //! * **The app lock** -- `lock set|status|change|remove`, and `policy` for
 //!   settings somebody has fixed so the interface cannot turn them off.
 //! * **Getting it onto the machine** -- `install`, `uninstall`, `companions`,
@@ -56,6 +57,7 @@
 #![forbid(unsafe_code)]
 
 mod atrest;
+mod capture;
 mod guard;
 mod lock;
 mod policy;
@@ -278,6 +280,28 @@ enum Command {
         what: PolicyCommand,
     },
 
+    /// Which screen recorders are running, and which you meant to run.
+    ///
+    /// **VeilVoice does not hide its own window from capture.** You can record
+    /// this application with OBS or anything else, deliberately, and nothing
+    /// here prevents it. Excluding a window from capture needs `unsafe` FFI,
+    /// which every crate in this workspace forbids, so the exclusion is not
+    /// built -- see ROADMAP.md.
+    ///
+    /// What this does is tell you a recorder is running, once, and then stop
+    /// telling you if you say you meant it. A monitor that warns every thirty
+    /// seconds while you record a tutorial is a monitor you switch off, and
+    /// then it is not watching for the recorder you did *not* start.
+    ///
+    /// Two things it cannot do. It only knows the programs in its table, so an
+    /// empty report is not evidence that nothing is recording. And it cannot
+    /// tell whether a program that is running is actually capturing anything --
+    /// a meeting application being open is not somebody watching your screen.
+    Capture {
+        #[command(subcommand)]
+        what: CaptureCommand,
+    },
+
     /// Canaries, and how fast a folder is changing.
     ///
     /// Two early warnings that something is going through your files. Neither
@@ -314,6 +338,38 @@ enum Command {
         #[arg(long, value_name = "NAME")]
         install: Option<String>,
     },
+}
+
+/// What `veilvoice capture` can do.
+#[derive(Subcommand)]
+enum CaptureCommand {
+    /// What is running, what is allowed, and what this cannot see.
+    Status,
+
+    /// Every program this build knows how to notice.
+    List,
+
+    /// Stop notifying about one program.
+    ///
+    /// Allowed means muted, not hidden: it still appears in `status`.
+    Allow {
+        /// The program's key, as `list` prints it.
+        key: String,
+    },
+
+    /// Start notifying about one program again.
+    Deny {
+        /// The program's key, as `list` prints it.
+        key: String,
+    },
+
+    /// Look now, and exit non-zero if something unallowed is running.
+    ///
+    /// For a script that should not start recording something sensitive while
+    /// a screen recorder is open. A listing that failed prints the reason and
+    /// still exits zero: a check that could not see is not a check that
+    /// passed, and it is not a reason to fail somebody's script either.
+    Check,
 }
 
 /// What `veilvoice policy` can do.
@@ -647,6 +703,20 @@ fn run(command: Command) -> Result<(), String> {
                 }
             }
         }
+
+        Command::Capture { what } => match what {
+            CaptureCommand::Status => capture::status(),
+            CaptureCommand::List => capture::list(),
+            CaptureCommand::Allow { key } => capture::allow(&key),
+            CaptureCommand::Deny { key } => capture::deny(&key),
+            CaptureCommand::Check => {
+                if capture::check()? {
+                    Err("a screen recorder you have not allowed is running".to_string())
+                } else {
+                    Ok(())
+                }
+            }
+        },
 
         Command::Policy { what } => match what {
             PolicyCommand::Status => policy::status(),

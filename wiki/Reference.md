@@ -21,11 +21,20 @@ Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable rou
 - [[`lib.rs`|File-veilvoice-audio-lib]] &mdash; Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path.
 - [[`live.rs`|File-veilvoice-audio-live]] &mdash; Live microphone scrambling.
 
+## [[veilvoice-capture|Crate-veilvoice-capture]]
+
+Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of what cannot be seen.
+
+- [[`lib.rs`|File-veilvoice-capture-lib]] &mdash; Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do.
+- [[`processes.rs`|File-veilvoice-capture-processes]] &mdash; Listing the processes that are running, per platform.
+- [[`programs.rs`|File-veilvoice-capture-programs]] &mdash; The programs this build knows can capture a screen.
+
 ## [[veilvoice-cli|Crate-veilvoice-cli]]
 
 Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings.
 
 - [[`atrest.rs`|File-veilvoice-cli-atrest]] &mdash; Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.
+- [[`capture.rs`|File-veilvoice-cli-capture]] &mdash; veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.

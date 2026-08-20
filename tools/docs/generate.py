@@ -81,6 +81,7 @@ import sys
 CRATES = (
     "fuzz",
     "veilvoice-audio",
+    "veilvoice-capture",
     "veilvoice-cli",
     "veilvoice-conversation",
     "veilvoice-core",
@@ -102,6 +103,7 @@ CRATES = (
 ALL_CRATES = (
     "fuzz",
     "veilvoice-audio",
+    "veilvoice-capture",
     "veilvoice-cli",
     "veilvoice-conversation",
     "veilvoice-core",
