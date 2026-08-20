@@ -32,7 +32,7 @@ engine backs both this and the graphical app.
 
 # What is here
 
-Fourteen subcommands, and they divide into four groups:
+Sixteen subcommands, and they divide into five groups:
 
 * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
 `devices`.
@@ -41,6 +41,13 @@ Fourteen subcommands, and they divide into four groups:
 * **Watching the machine** -- `watch` the microphone and camera, `guard`
 VeilVoice's own files against tampering.
 * **The app lock** -- `lock set|status|change|remove`.
+* **Getting it onto the machine** -- `install`, `uninstall`, `companions`,
+and `gui` to open the desktop application.
+
+That last group is a front end over `veilvoice_setup`, which the desktop
+application's setup tab also calls. The careful part -- editing `PATH` --
+has one implementation and one set of tests, rather than one per front
+end.
 
 # Two behaviours that surprise people, on purpose
 
@@ -80,10 +87,9 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1241 lines"])
+    n_main(["main.rs<br/>1417 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
     n_guard["guard.rs<br/>338 lines"]
-    n_install["install.rs<br/>561 lines"]
     n_lock["lock.rs<br/>239 lines"]
     n_theme["theme.rs<br/>135 lines"]
     n_atrest --> n_theme
@@ -95,7 +101,6 @@ flowchart TD
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" "open the source"
     click n_atrest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" "open the source"
     click n_guard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" "open the source"
-    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs" "open the source"
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" "open the source"
 ```
@@ -106,9 +111,8 @@ flowchart TD
 |---|---:|---|
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
-| [`install.rs`](../../docs/files/veilvoice-cli/install.md) | 561 | veilvoice install -- put this program somewhere the system can find it. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1241 | veilvoice — the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1417 | veilvoice — the command-line interface. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 135 | Tokyo Night colouring for the terminal. |
 
 ## Public items
@@ -123,13 +127,6 @@ flowchart TD
 | `fn read_new_password` | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | Read a password twice, without echoing it, and check the two agree. |
 | `enum Action` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
 | `fn run` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
-| `const NAME` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | The name of the directory and the uninstall entry. |
-| `fn prefix` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | Where an installation goes, for this user only. |
-| `fn bin_dir` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | The directory a PATH entry should point at. |
-| `struct Status` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | What an installation currently looks like. |
-| `fn status` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | Read the current state without changing anything. |
-| `fn install` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | Install for this user. |
-| `fn uninstall` | [`install.rs`](../../docs/files/veilvoice-cli/install.md) | Remove what install added. |
 | `enum Action` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
 | `fn wrap` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | Greedy word wrap. |
 | `fn run` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |

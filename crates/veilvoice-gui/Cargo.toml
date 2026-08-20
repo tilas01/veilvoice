@@ -17,6 +17,7 @@ veilvoice-core = { path = "../veilvoice-core" }
 veilvoice-audio = { path = "../veilvoice-audio" }
 veilvoice-crypto = { path = "../veilvoice-crypto" }
 veilvoice-meta = { path = "../veilvoice-meta" }
+veilvoice-setup = { path = "../veilvoice-setup" }
 veilvoice-watch = { path = "../veilvoice-watch" }
 eframe = { version = "0.29", default-features = false, features = ["glow", "default_fonts", "wayland", "x11"] }
 egui = "0.29"

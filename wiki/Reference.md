@@ -27,7 +27,6 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 
 - [[`atrest.rs`|File-veilvoice-cli-atrest]] &mdash; Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
-- [[`install.rs`|File-veilvoice-cli-install]] &mdash; veilvoice install -- put this program somewhere the system can find it.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &mdash; Tokyo Night colouring for the terminal.
@@ -78,7 +77,7 @@ Integrity manifest and tamper detection for VeilVoice's own files, with best-eff
 
 egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 
-- [[`app.rs`|File-veilvoice-gui-app]] &mdash; The VeilVoice desktop application: six tabs, one window, no menus.
+- [[`app.rs`|File-veilvoice-gui-app]] &mdash; The VeilVoice desktop application: seven tabs, one window, no menus.
 - [[`crashlog.rs`|File-veilvoice-gui-crashlog]] &mdash; Make a failure that produces no output produce some.
 - [[`lib.rs`|File-veilvoice-gui-lib]] &mdash; The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.
 - [[`main.rs`|File-veilvoice-gui-main]] &mdash; Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.
@@ -87,6 +86,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] &mdash; Whether the operating system has been asked to reduce motion.
 - [[`security.rs`|File-veilvoice-gui-security]] &mdash; The application lock, and the at-rest encryption of what VeilVoice writes.
 - [[`settings.rs`|File-veilvoice-gui-settings]] &mdash; The settings panel: a menu of pages, each a titled group of choices.
+- [[`setup.rs`|File-veilvoice-gui-setup]] &mdash; The setup tab: install this copy, undo that, and the optional companions.
 - [[`soundbar.rs`|File-veilvoice-gui-soundbar]] &mdash; The animated mark: a row of bars that rise and fall.
 - [[`theme.rs`|File-veilvoice-gui-theme]] &mdash; Colour schemes for the desktop app.
 
@@ -99,6 +99,14 @@ Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.
 - [[`lib.rs`|File-veilvoice-meta-lib]] &mdash; Strip or spoof the identifying metadata that rides along with media files.
 - [[`wav.rs`|File-veilvoice-meta-wav]] &mdash; Chunk-level RIFF/WAVE metadata removal.
 - [[`wav_fuzz.rs`|File-veilvoice-meta-tests-wav_fuzz]] &mdash; Randomised robustness testing for the RIFF chunk walker.
+
+## [[veilvoice-setup|Crate-veilvoice-setup]]
+
+Per-user installation and companion-software detection, shared by the command line and the desktop app.
+
+- [[`companions.rs`|File-veilvoice-setup-companions]] &mdash; Optional third-party software, detected rather than assumed.
+- [[`install.rs`|File-veilvoice-setup-install]] &mdash; Put this program somewhere the system can find it.
+- [[`lib.rs`|File-veilvoice-setup-lib]] &mdash; Everything that puts VeilVoice on a machine, and everything that reports what is already on it.
 
 ## [[veilvoice-verify|Crate-veilvoice-verify]]
 
