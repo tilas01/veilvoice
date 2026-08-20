@@ -7,10 +7,10 @@
 //!
 //! # What is here
 //!
-//! Nineteen subcommands, and they divide into five groups:
+//! Twenty subcommands, and they divide into five groups:
 //!
 //! * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
-//!   `devices`.
+//!   `devices`, `conversation` for a recording with several people in it.
 //! * **Privacy of the files themselves** -- `clean` metadata, `encrypt`,
 //!   `decrypt`, `keygen`, `shred`.
 //! * **Watching the machine** -- `watch` the microphone and camera, `guard`
@@ -58,6 +58,7 @@
 
 mod atrest;
 mod capture;
+mod conversation;
 mod guard;
 mod lock;
 mod policy;
@@ -280,6 +281,28 @@ enum Command {
         what: PolicyCommand,
     },
 
+    /// A recording with several people in it: a voice each, and subtitles.
+    ///
+    /// Run an interview through `anonymise` and both people come out as the
+    /// same voice -- private, and unusable, because nobody can tell a question
+    /// from its answer. This gives each speaker their own destination voice and
+    /// destroys each voiceprint just as thoroughly.
+    ///
+    /// **You say who is talking.** Working that out from the audio needs a
+    /// trained model; there is none here and no server to ask, and a wrong
+    /// guess would either merge two people or invent a third without anything
+    /// in the output showing it. So the plan is a text file of turns, or one
+    /// microphone per person.
+    ///
+    /// **What a conversation keeps** is the shape of the conversation: how many
+    /// people, who spoke when, and for how long. That is kept on purpose --
+    /// it is what makes the result worth listening to -- and it is information
+    /// about the conversation.
+    Conversation {
+        #[command(subcommand)]
+        what: ConversationCommand,
+    },
+
     /// Which screen recorders are running, and which you meant to run.
     ///
     /// **VeilVoice does not hide its own window from capture.** You can record
@@ -337,6 +360,43 @@ enum Command {
         /// Install one, by name. Without this, nothing is installed.
         #[arg(long, value_name = "NAME")]
         install: Option<String>,
+    },
+}
+
+/// What `veilvoice conversation` can do.
+#[derive(Subcommand)]
+enum ConversationCommand {
+    /// Describe a plan: who is in it, which voice each gets, and any overlaps.
+    ///
+    /// Reads the plan and nothing else. Worth doing before a long render.
+    Inspect {
+        /// The plan file.
+        plan: PathBuf,
+    },
+
+    /// Render a recording according to a plan.
+    ///
+    /// Writes the audio and both subtitle formats. Audio that no turn claims
+    /// is **silenced**, never passed through -- it has not been veiled, and a
+    /// gap in a plan must not put a real voice into the result. How much went
+    /// is printed.
+    Render {
+        /// The plan file.
+        plan: PathBuf,
+        /// The recording.
+        input: PathBuf,
+        /// Where to write the audio. The subtitles take the same name.
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// 0..1 -- how far the transform pushes.
+        #[arg(long, default_value_t = 1.0)]
+        intensity: f32,
+        /// Leave the speaker's accent and intonation intact.
+        #[arg(long)]
+        keep_accent: bool,
+        /// Seconds between modulation seed rolls; 0 keeps one stream.
+        #[arg(long, default_value_t = 2.0)]
+        reseed_secs: f32,
     },
 }
 
@@ -703,6 +763,27 @@ fn run(command: Command) -> Result<(), String> {
                 }
             }
         }
+
+        Command::Conversation { what } => match what {
+            ConversationCommand::Inspect { plan } => conversation::inspect(&plan),
+            ConversationCommand::Render {
+                plan,
+                input,
+                output,
+                intensity,
+                keep_accent,
+                reseed_secs,
+            } => conversation::run(
+                &plan,
+                &input,
+                output,
+                config(Tuning {
+                    intensity,
+                    keep_accent,
+                    reseed_secs,
+                }),
+            ),
+        },
 
         Command::Capture { what } => match what {
             CaptureCommand::Status => capture::status(),

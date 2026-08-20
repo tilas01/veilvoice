@@ -45,40 +45,73 @@
 //!   discard, the same many-to-one normalisation onto the slot's canonical
 //!   values.
 //!
-//! A single-speaker recording leaks the first two facts too, and they are
-//! trivial there. Here they are not, and that is worth a sentence in any front
-//! end that offers this.
+//! # A register has to land on a bin, and that is the whole constraint
 //!
-//! # Ten, and not twenty
+//! The first version of this table picked five registers about 26 Hz apart on
+//! the reasoning that the just-noticeable difference for the fundamental of
+//! speech is around 8 Hz, so 26 Hz would be three times that. The reasoning was
+//! sound and the table was wrong, because it measured the wrong thing.
 //!
-//! Twenty was asked for. Ten is what can honestly be delivered, and the
-//! arithmetic is short.
+//! When accent neutralisation is on, [`crate::spectral`] does not resample the
+//! excitation — it **replaces** it with a harmonic comb at the canonical
+//! fundamental, quantised to the nearest whole FFT bin so that every comb line
+//! sits on a bin centre and the frames overlap-add coherently. The rendered
+//! fundamental is therefore not the number in the table. It is
 //!
-//! A destination voice is distinguishable from another by its fundamental and
-//! by its vocal-tract scale. The fundamental has to stay inside roughly
-//! 100–210 Hz: below that the resynthesised comb has too few harmonics in the
-//! band that carries the vowels, and above it the register stops being a
-//! plausible speaking voice. The just-noticeable difference for the
-//! fundamental of speech is around five to eight per cent, so about 10 Hz at
-//! this register — and "just noticeable" is far too close together for somebody
-//! to *keep track of* over an hour of conversation. Five registers across that
-//! range gives steps of about 26 Hz, which is three times the threshold.
+//! ```text
+//! round(target_f0 / bin_hz) * bin_hz,   bin_hz = sample_rate / frame_size
+//! ```
 //!
-//! Two vocal-tract scales, 660 Hz and 840 Hz, are about 25 % apart: a clear
-//! difference in apparent speaker size, and both still inside the range where
-//! the vowels stay natural.
+//! At the default 1024-point frame and 48 kHz that spacing is **46.875 Hz**, so
+//! the five registers 105, 131, 157, 183 and 209 Hz render as 93.75, 140.625,
+//! 140.625, 187.5 and 187.5 — three distinct pitches, not five. Two pairs of
+//! speakers would have shared a register with nothing in the interface saying
+//! so. It was found by measuring the fundamental of an actual rendered file,
+//! not by reading the code, and the tests below now measure the same thing the
+//! ear would.
 //!
-//! Five registers times two tracts is [`MAX_VOICES`]. Twenty would need either
-//! 13 Hz steps in the fundamental — at the edge of audibility and well past the
-//! edge of memorability — or vocal-tract scales close enough to be heard as the
-//! same person on a different day. The honest number is ten, so the table has
-//! ten and this paragraph says why.
+//! So the registers are **bin-exact by construction**: each is a whole number
+//! of bins at the default configuration. Inside the range where a resynthesised
+//! voice stays intelligible — roughly 90 to 240 Hz, below which the comb has too
+//! few harmonics under the vowels and above which it stops being a speaking
+//! register — there are exactly four:
+//!
+//! | bin | rendered |
+//! |---:|---:|
+//! | 2 | 93.75 Hz |
+//! | 3 | 140.625 Hz |
+//! | 4 | 187.5 Hz |
+//! | 5 | 234.375 Hz |
+//!
+//! # Ten voices, from four registers and three vocal tracts
+//!
+//! The second axis is the canonical vocal-tract scale, which is a continuous
+//! warp and is **not** quantised — so it is free to take values the ear can
+//! separate: 620, 760 and 900 Hz, each about 22 % from its neighbour, all
+//! inside the range where the vowels stay natural.
+//!
+//! Four registers times three tracts is twelve, and [`MAX_VOICES`] ships ten of
+//! them. Twenty, which was asked for, is not available: it would need either
+//! registers a single bin apart at a frame size four times longer — which
+//! quadruples the latency — or vocal tracts close enough to be heard as the
+//! same person on a different day.
+//!
+//! # If you change the frame size, check the table again
+//!
+//! The registers are exact at the *default* configuration. A caller who changes
+//! [`crate::DeidConfig::frame_size`] or the sample rate moves the bin grid
+//! underneath them, and two registers can collide again.
+//! [`Voice::rendered_f0_hz`] reports what a given configuration will actually
+//! produce, and [`distinct_voices`] counts how many of the ten survive it — so
+//! a front end can say "this frame size gives you six distinguishable voices"
+//! rather than handing out ten labels for six sounds.
 
-use crate::AccentConfig;
+use crate::{AccentConfig, DeidConfig};
 
-/// How many distinct destination voices this engine will hand out.
+/// How many distinct destination voices this engine hands out.
 ///
-/// See the module documentation for why this is ten and not twenty.
+/// Ten of the twelve the table can express. See the module documentation for
+/// why it is not twenty.
 pub const MAX_VOICES: usize = 10;
 
 /// One destination voice: the canonical values every speaker in this slot is
@@ -86,8 +119,14 @@ pub const MAX_VOICES: usize = 10;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Voice {
     /// Pitch register, in hertz.
+    ///
+    /// What is *asked for*. What is rendered is this quantised to the FFT bin
+    /// grid — see [`Voice::rendered_f0_hz`], and the module documentation for
+    /// why that distinction cost a wrong table once already.
     pub target_f0_hz: f32,
     /// Canonical long-term envelope centroid, in hertz — the vocal-tract scale.
+    ///
+    /// A continuous warp, so this one is rendered as asked.
     pub target_centroid_hz: f32,
     /// Slope of the canonical long-term spectrum, in dB per octave.
     pub target_tilt_db_oct: f32,
@@ -105,6 +144,21 @@ impl Voice {
         accent.target_centroid_hz = self.target_centroid_hz;
         accent.target_tilt_db_oct = self.target_tilt_db_oct;
         accent
+    }
+
+    /// The fundamental this voice will **actually** be rendered at, under
+    /// `config`.
+    ///
+    /// The voiced excitation is a harmonic comb snapped to the FFT bin grid, so
+    /// the rendered fundamental is the requested one rounded to the nearest
+    /// whole bin. This is the number to compare two voices by, and the number
+    /// to show anybody who asks what a slot sounds like.
+    pub fn rendered_f0_hz(&self, config: &DeidConfig) -> f32 {
+        let bin_hz = bin_hz(config);
+        if bin_hz <= 0.0 || !self.target_f0_hz.is_finite() {
+            return 0.0;
+        }
+        (self.target_f0_hz / bin_hz).round().max(1.0) * bin_hz
     }
 
     /// Whether this voice is inside the range the engine can render usefully.
@@ -146,32 +200,37 @@ impl Voice {
         Ok(self)
     }
 
-    /// A short label for an interface: "low voice, small tract" and so on.
+    /// A short label for an interface: "low register, narrow tract".
     ///
     /// Describes the *destination*, never the speaker. There is deliberately no
     /// vocabulary here for who somebody was: "man", "woman", "child", "older"
     /// are all statements about an input this crate has just finished
     /// destroying, and a label that reintroduced one would undo the point.
+    ///
+    /// The hertz figure quoted is the one that will be **rendered** at the
+    /// default configuration, not the one requested, so the label and the ear
+    /// agree.
     pub fn describe(&self) -> String {
-        let register = if self.target_f0_hz < 120.0 {
+        let rendered = self.rendered_f0_hz(&DeidConfig::default());
+        let register = if rendered < 115.0 {
             "low"
-        } else if self.target_f0_hz < 145.0 {
+        } else if rendered < 165.0 {
             "low-mid"
-        } else if self.target_f0_hz < 170.0 {
-            "mid"
-        } else if self.target_f0_hz < 196.0 {
+        } else if rendered < 210.0 {
             "mid-high"
         } else {
             "high"
         };
-        let tract = if self.target_centroid_hz < 750.0 {
+        let tract = if self.target_centroid_hz < 690.0 {
             "narrow"
+        } else if self.target_centroid_hz < 830.0 {
+            "medium"
         } else {
             "wide"
         };
         format!(
-            "{register} register, {tract} tract ({:.0} Hz, {:.0} Hz)",
-            self.target_f0_hz, self.target_centroid_hz
+            "{register} register, {tract} tract ({rendered:.0} Hz, {:.0} Hz)",
+            self.target_centroid_hz
         )
     }
 }
@@ -189,34 +248,58 @@ pub const TILT_MIN_DB_OCT: f32 = -12.0;
 /// The flattest permitted long-term slope, in dB per octave.
 pub const TILT_MAX_DB_OCT: f32 = 0.0;
 
-/// The five registers, spaced about 26 Hz apart — three times the
-/// just-noticeable difference for the fundamental of speech at this register.
-const REGISTERS_HZ: [f32; 5] = [105.0, 131.0, 157.0, 183.0, 209.0];
+/// The FFT bin spacing of a configuration, in hertz.
+///
+/// The grid every canonical register is snapped to. Public because a front end
+/// that lets somebody change the frame size needs to be able to explain what
+/// changed about the voices.
+pub fn bin_hz(config: &DeidConfig) -> f32 {
+    if config.frame_size == 0 || !config.sample_rate.is_finite() {
+        return 0.0;
+    }
+    config.sample_rate / config.frame_size as f32
+}
+
+/// The four registers, each a whole number of bins at the default
+/// configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz.
+///
+/// Written out rather than computed from the default, so that changing the
+/// default frame size makes a **test** fail rather than silently moving every
+/// voice in every recording anybody has already made.
+const REGISTERS_HZ: [f32; 4] = [93.75, 140.625, 187.5, 234.375];
+
+/// The three vocal-tract scales, about 22 % apart. Not quantised — the warp is
+/// continuous — so these render as asked.
+const TRACTS: [(f32, f32); 3] = [
+    // (centroid Hz, tilt dB per octave)
+    (620.0, -5.0),
+    (760.0, -6.0),
+    (900.0, -7.0),
+];
 
 /// The ten destination voices, in the order they are handed out.
 ///
 /// The order is chosen, not incidental. Slot 0 and slot 1 are the two furthest
 /// apart in both dimensions, because a **two-person conversation is the common
 /// case** and the two people in it should be the easiest pair in the table to
-/// tell apart. Slot 2 is then the furthest remaining from both, and so on: the
-/// table degrades gracefully as more speakers are added rather than saving its
-/// clearest contrasts for a tenth speaker who is usually not there.
+/// tell apart. The table then works inward, so it degrades gracefully as more
+/// speakers are added rather than saving its clearest contrasts for a tenth
+/// speaker who is usually not there.
 ///
-/// Every one of the five registers appears exactly twice and every one of the
-/// two tracts exactly five times, so the set is the full five-by-two grid; only
-/// the order is arranged.
-const TABLE: [(usize, f32, f32); MAX_VOICES] = [
-    // (register index, centroid Hz, tilt dB/octave)
-    (0, 660.0, -5.0), // 0: lowest register, narrow tract
-    (4, 840.0, -7.0), // 1: highest register, wide tract
-    (2, 840.0, -7.0), // 2: middle register, the other tract
-    (1, 660.0, -5.0), // 3
-    (3, 660.0, -5.0), // 4
-    (0, 840.0, -7.0), // 5
-    (4, 660.0, -5.0), // 6
-    (2, 660.0, -5.0), // 7
-    (1, 840.0, -7.0), // 8
-    (3, 840.0, -7.0), // 9
+/// Two of the twelve combinations are unused, which is slack rather than a
+/// stretch: nothing here is reaching for a tenth voice it cannot really make.
+const TABLE: [(usize, usize); MAX_VOICES] = [
+    // (register index, tract index)
+    (0, 0), // 0: lowest register, narrowest tract
+    (3, 2), // 1: highest register, widest tract -- furthest from slot 0
+    (1, 2), // 2
+    (2, 0), // 3
+    (0, 2), // 4
+    (3, 0), // 5
+    (1, 0), // 6
+    (2, 2), // 7
+    (0, 1), // 8
+    (3, 1), // 9
 ];
 
 /// The destination voice for slot `index`.
@@ -227,7 +310,8 @@ const TABLE: [(usize, f32, f32); MAX_VOICES] = [
 /// refuse rather than rely on this. Wrapping is here so the function is total,
 /// not because reusing a voice is acceptable.
 pub fn voice(index: usize) -> Voice {
-    let (register, centroid, tilt) = TABLE[index % MAX_VOICES];
+    let (register, tract) = TABLE[index % MAX_VOICES];
+    let (centroid, tilt) = TRACTS[tract];
     Voice {
         target_f0_hz: REGISTERS_HZ[register],
         target_centroid_hz: centroid,
@@ -240,12 +324,43 @@ pub fn all() -> Vec<Voice> {
     (0..MAX_VOICES).map(voice).collect()
 }
 
+/// How many of the ten are still distinguishable under `config`.
+///
+/// Two voices count as the same when they would be **rendered** with the same
+/// fundamental and the same vocal tract. At the default configuration the
+/// answer is [`MAX_VOICES`]; at a shorter frame size it is fewer, because the
+/// bin grid coarsens and registers collapse onto each other.
+///
+/// A front end that lets somebody change the frame size should call this and
+/// say what it returns. Handing out ten labels for six sounds is the failure
+/// this function exists to make visible.
+pub fn distinct_voices(config: &DeidConfig) -> usize {
+    let mut seen: Vec<(i64, i64)> = Vec::with_capacity(MAX_VOICES);
+    for voice in all() {
+        // Rounded to a hundredth of a hertz before comparing: these are
+        // computed floats, and two that differ in the last bit are the same
+        // sound.
+        let key = (
+            (voice.rendered_f0_hz(config) * 100.0).round() as i64,
+            (voice.target_centroid_hz * 100.0).round() as i64,
+        );
+        if !seen.contains(&key) {
+            seen.push(key);
+        }
+    }
+    seen.len()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    fn default_config() -> DeidConfig {
+        DeidConfig::default()
+    }
+
     #[test]
-    fn there_are_exactly_ten_and_they_are_all_different() {
+    fn there_are_exactly_ten_and_they_are_all_different_as_written() {
         let voices = all();
         assert_eq!(voices.len(), MAX_VOICES);
         for (i, a) in voices.iter().enumerate() {
@@ -257,40 +372,117 @@ mod tests {
         }
     }
 
-    /// The table must be the full grid: every register twice, every tract five
-    /// times. A typo that repeated one pair and dropped another would still
-    /// pass the "all different" test above by accident of the tilt.
+    /// **The test the first version of this table did not have.**
+    ///
+    /// Being different as written is not enough: the voiced excitation is a
+    /// comb snapped to the FFT bin grid, so two registers a few hertz apart can
+    /// render as the same pitch. The first table had five registers that
+    /// rendered as three, and two pairs of speakers would have shared a voice
+    /// with nothing saying so. This compares what comes *out*.
     #[test]
-    fn the_table_is_the_whole_five_by_two_grid() {
+    fn all_ten_are_still_distinct_after_the_bin_grid_has_had_them() {
+        let config = default_config();
+        assert_eq!(
+            distinct_voices(&config),
+            MAX_VOICES,
+            "the table collapses to {} distinguishable voices at the default \
+             configuration",
+            distinct_voices(&config)
+        );
+
         let voices = all();
-        for register in REGISTERS_HZ {
-            let count = voices
-                .iter()
-                .filter(|v| (v.target_f0_hz - register).abs() < 1e-3)
-                .count();
-            assert_eq!(count, 2, "{register} Hz appears {count} times, not twice");
-        }
-        for centroid in [660.0f32, 840.0] {
-            let count = voices
-                .iter()
-                .filter(|v| (v.target_centroid_hz - centroid).abs() < 1e-3)
-                .count();
-            assert_eq!(count, 5, "{centroid} Hz appears {count} times, not five");
+        for (i, a) in voices.iter().enumerate() {
+            for (j, b) in voices.iter().enumerate().skip(i + 1) {
+                let same_pitch =
+                    (a.rendered_f0_hz(&config) - b.rendered_f0_hz(&config)).abs() < 0.01;
+                let same_tract = (a.target_centroid_hz - b.target_centroid_hz).abs() < 0.01;
+                assert!(
+                    !(same_pitch && same_tract),
+                    "slots {i} and {j} both render at {:.3} Hz with a {:.0} Hz tract",
+                    a.rendered_f0_hz(&config),
+                    a.target_centroid_hz
+                );
+            }
         }
     }
 
-    /// The claim in the module documentation, checked: about 26 Hz between
-    /// neighbouring registers, three times the roughly 8 Hz just-noticeable
-    /// difference at this fundamental.
+    /// Each register must be a whole number of bins at the default
+    /// configuration, so what is asked for is what is rendered. If somebody
+    /// changes the default frame size, this is what tells them the voice table
+    /// needs choosing again.
     #[test]
-    fn the_registers_are_far_enough_apart_to_keep_track_of() {
-        for pair in REGISTERS_HZ.windows(2) {
-            let step = pair[1] - pair[0];
+    fn every_register_is_bin_exact_at_the_default_configuration() {
+        let config = default_config();
+        let spacing = bin_hz(&config);
+        assert!(
+            (spacing - 46.875).abs() < 1e-4,
+            "the bin spacing is {spacing} Hz, and the register table was chosen for \
+             46.875 Hz. Choose it again."
+        );
+        for register in REGISTERS_HZ {
+            let bins = register / spacing;
             assert!(
-                step >= 24.0,
-                "{} Hz to {} Hz is only {step} Hz apart",
-                pair[0],
-                pair[1]
+                (bins - bins.round()).abs() < 1e-4,
+                "{register} Hz is {bins} bins, and a register must be a whole number"
+            );
+            let voice = Voice {
+                target_f0_hz: register,
+                ..voice(0)
+            };
+            assert!(
+                (voice.rendered_f0_hz(&config) - register).abs() < 1e-3,
+                "{register} Hz renders as {} Hz",
+                voice.rendered_f0_hz(&config)
+            );
+        }
+    }
+
+    /// The measurement that found the bug, kept as a test. These are the
+    /// registers the first table shipped, and what they actually rendered as.
+    #[test]
+    fn the_registers_that_were_wrong_are_still_wrong_for_the_same_reason() {
+        let config = default_config();
+        let rendered = |hz: f32| {
+            Voice {
+                target_f0_hz: hz,
+                ..voice(0)
+            }
+            .rendered_f0_hz(&config)
+        };
+        assert!((rendered(131.0) - rendered(157.0)).abs() < 0.01);
+        assert!((rendered(183.0) - rendered(209.0)).abs() < 0.01);
+        assert!((rendered(105.0) - 93.75).abs() < 0.01);
+    }
+
+    /// A coarser grid must be reported as fewer voices rather than silently
+    /// handing out ten labels for a smaller number of sounds.
+    #[test]
+    fn a_shorter_frame_reports_fewer_distinguishable_voices() {
+        let coarse = DeidConfig {
+            frame_size: 256,
+            ..DeidConfig::default()
+        };
+        let fewer = distinct_voices(&coarse);
+        assert!(
+            fewer < MAX_VOICES,
+            "a 256-point frame is 187.5 Hz per bin and must collapse the table, got \
+             {fewer}"
+        );
+        assert!(fewer >= 1);
+    }
+
+    /// The vocal tract is a continuous warp, not a quantised one, so its three
+    /// values must survive any frame size.
+    #[test]
+    fn the_vocal_tracts_are_far_apart_and_are_not_quantised() {
+        for pair in TRACTS.windows(2) {
+            let ratio = pair[1].0 / pair[0].0;
+            assert!(
+                ratio > 1.18,
+                "{} Hz and {} Hz are only {:.0}% apart",
+                pair[0].0,
+                pair[1].0,
+                (ratio - 1.0) * 100.0
             );
         }
     }
@@ -299,10 +491,11 @@ mod tests {
     /// the furthest apart in the table.
     #[test]
     fn the_first_two_slots_are_the_easiest_pair_to_tell_apart() {
+        let config = default_config();
         let voices = all();
         let separation = |a: &Voice, b: &Voice| {
-            (a.target_f0_hz - b.target_f0_hz).abs() / 26.0
-                + (a.target_centroid_hz - b.target_centroid_hz).abs() / 180.0
+            (a.rendered_f0_hz(&config) - b.rendered_f0_hz(&config)).abs() / 46.875
+                + (a.target_centroid_hz - b.target_centroid_hz).abs() / 140.0
         };
         let first_pair = separation(&voices[0], &voices[1]);
         for (i, a) in voices.iter().enumerate() {
@@ -392,7 +585,6 @@ mod tests {
     fn asking_past_the_table_wraps_onto_a_voice_already_in_use() {
         assert_eq!(voice(MAX_VOICES), voice(0));
         assert_eq!(voice(MAX_VOICES * 3 + 4), voice(4));
-        // And no index panics.
         let _ = voice(usize::MAX);
     }
 
@@ -408,10 +600,25 @@ mod tests {
                 assert!(
                     !label
                         .split(|c: char| !c.is_alphanumeric())
-                        .any(|w| w == forbidden),
+                        .any(|word| word == forbidden),
                     "{label} describes a person, not a destination"
                 );
             }
+        }
+    }
+
+    /// A label must quote the fundamental that will be heard, not the one that
+    /// was asked for -- otherwise the interface and the ear disagree.
+    #[test]
+    fn a_label_quotes_the_rendered_fundamental() {
+        let config = default_config();
+        for voice in all() {
+            let label = voice.describe();
+            let rendered = format!("{:.0} Hz", voice.rendered_f0_hz(&config));
+            assert!(
+                label.contains(&rendered),
+                "{label} does not quote its rendered {rendered}"
+            );
         }
     }
 
@@ -422,5 +629,15 @@ mod tests {
         let before = labels.len();
         labels.dedup();
         assert_eq!(before, labels.len(), "two slots describe themselves alike");
+    }
+
+    #[test]
+    fn an_impossible_configuration_reports_no_bin_spacing_rather_than_dividing_by_zero() {
+        let broken = DeidConfig {
+            frame_size: 0,
+            ..DeidConfig::default()
+        };
+        assert_eq!(bin_hz(&broken), 0.0);
+        assert_eq!(voice(0).rendered_f0_hz(&broken), 0.0);
     }
 }

@@ -82,14 +82,14 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>70 lines"])
-    n_accent["accent.rs<br/>677 lines"]
+    n_accent["accent.rs<br/>684 lines"]
     n_chain["chain.rs<br/>1256 lines"]
     n_effects["effects.rs<br/>214 lines"]
     n_modulation["modulation.rs<br/>300 lines"]
     n_pitch["pitch.rs<br/>274 lines"]
     n_spectral["spectral.rs<br/>428 lines"]
     n_stft["stft.rs<br/>246 lines"]
-    n_voices["voices.rs<br/>426 lines"]
+    n_voices["voices.rs<br/>643 lines"]
     n_window["window.rs<br/>91 lines"]
     n_accent --> n_pitch
     n_accent --> n_spectral
@@ -118,7 +118,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | 677 | Accent and speaker-trait neutralisation. |
+| [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | 684 | Accent and speaker-trait neutralisation. |
 | [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 1256 | The assembled de-identification chain and its live performance statistics. |
 | [`effects.rs`](../../docs/files/veilvoice-core/effects.md) | 214 | Light time-domain effects applied after resynthesis. |
 | [`lib.rs`](../../docs/files/veilvoice-core/lib.md) | 70 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
@@ -126,7 +126,7 @@ flowchart TD
 | [`pitch.rs`](../../docs/files/veilvoice-core/pitch.md) | 274 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [`spectral.rs`](../../docs/files/veilvoice-core/spectral.md) | 428 | Frequency-domain de-identification transform. |
 | [`stft.rs`](../../docs/files/veilvoice-core/stft.md) | 246 | Streaming short-time Fourier transform with overlap-add resynthesis. |
-| [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | 426 | Destination voices: several canonical registers instead of one. |
+| [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | 643 | Destination voices: several canonical registers instead of one. |
 | [`window.rs`](../../docs/files/veilvoice-core/window.md) | 91 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
 | [`spectrum_report.rs`](../../docs/files/veilvoice-core/examples-spectrum_report.md) | 99 | Where do the output partials actually land? |
 | [`veil_a_buffer.rs`](../../docs/files/veilvoice-core/examples-veil_a_buffer.md) | 45 | _no module documentation yet_ |
@@ -136,6 +136,7 @@ flowchart TD
 
 | Item | Where | What |
 |---|---|---|
+| `const WARMUP_S` | [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | Seconds of voiced audio over which corrections fade in from nothing. |
 | `struct AccentConfig` | [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | How aggressively accent and speaker traits are normalised. |
 | `struct AccentStats` | [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | Live read-out of what the neutraliser is currently doing, for the UI. |
 | `struct AccentNeutralizer` | [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | Maps any speaker onto one canonical pitch register, vocal-tract scale and long-term spectrum. |
@@ -152,7 +153,7 @@ flowchart TD
 | `struct PitchTracker` | [`pitch.rs`](../../docs/files/veilvoice-core/pitch.md) | Rolling, allocation-free f0 tracker. |
 | `struct SpectralState` | [`spectral.rs`](../../docs/files/veilvoice-core/spectral.md) | Persistent per-instance state for the spectral transform. |
 | `struct StftEngine` | [`stft.rs`](../../docs/files/veilvoice-core/stft.md) | Reusable streaming STFT engine (single channel). |
-| `const MAX_VOICES` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | How many distinct destination voices this engine will hand out. |
+| `const MAX_VOICES` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | How many distinct destination voices this engine hands out. |
 | `struct Voice` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | One destination voice: the canonical values every speaker in this slot is mapped onto. |
 | `const F0_MIN_HZ` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The lowest fundamental a resynthesised voice stays intelligible at. |
 | `const F0_MAX_HZ` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The highest fundamental that still reads as a speaking register. |
@@ -160,8 +161,10 @@ flowchart TD
 | `const CENTROID_MAX_HZ` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The widest canonical vocal tract offered. |
 | `const TILT_MIN_DB_OCT` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The steepest permitted long-term slope, in dB per octave. |
 | `const TILT_MAX_DB_OCT` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The flattest permitted long-term slope, in dB per octave. |
+| `fn bin_hz` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The FFT bin spacing of a configuration, in hertz. |
 | `fn voice` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The destination voice for slot index. |
 | `fn all` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | Every destination voice, in the order they are handed out. |
+| `fn distinct_voices` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | How many of the ten are still distinguishable under config. |
 | `fn hann` | [`window.rs`](../../docs/files/veilvoice-core/window.md) | Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design). |
 | `fn ola_gain` | [`window.rs`](../../docs/files/veilvoice-core/window.md) | Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop. |
 
