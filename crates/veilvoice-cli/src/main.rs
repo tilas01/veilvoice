@@ -7,14 +7,15 @@
 //!
 //! # What is here
 //!
-//! Sixteen subcommands, and they divide into five groups:
+//! Seventeen subcommands, and they divide into five groups:
 //!
 //! * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
 //!   `devices`.
 //! * **Privacy of the files themselves** -- `clean` metadata, `encrypt`,
 //!   `decrypt`, `keygen`, `shred`.
 //! * **Watching the machine** -- `watch` the microphone and camera, `guard`
-//!   VeilVoice's own files against tampering.
+//!   VeilVoice's own files against tampering, `sentry` for canaries and how
+//!   fast a folder is changing.
 //! * **The app lock** -- `lock set|status|change|remove`.
 //! * **Getting it onto the machine** -- `install`, `uninstall`, `companions`,
 //!   and `gui` to open the desktop application.
@@ -56,6 +57,7 @@
 mod atrest;
 mod guard;
 mod lock;
+mod sentry;
 mod theme;
 
 use atrest::{prompt_secret, read_new_password};
@@ -69,6 +71,7 @@ use veilvoice_audio::io as audio_io;
 use veilvoice_core::{AccentConfig, DeidConfig};
 use veilvoice_crypto::{container, hybrid, kdf};
 use veilvoice_meta::Policy;
+use veilvoice_sentry::rate::{Limits, Threshold};
 use veilvoice_setup::{companions, install};
 
 #[derive(Parser)]
@@ -254,6 +257,25 @@ enum Command {
         yes: bool,
     },
 
+    /// Canaries, and how fast a folder is changing.
+    ///
+    /// Two early warnings that something is going through your files. Neither
+    /// stops anything, and neither names the program responsible.
+    ///
+    /// A **canary** is a file VeilVoice writes and nothing reads. If it ever
+    /// changes, something walked that folder and wrote to everything in it. It
+    /// only fires if whatever is running reaches that folder, so a quiet canary
+    /// is not evidence that nothing happened.
+    ///
+    /// A **baseline** records what a folder holds now, and `check` says how
+    /// much of it changed since and how fast. That number cannot tell
+    /// ransomware from a backup restore, a photo import or a compiler, so it is
+    /// reported against thresholds you set rather than as a verdict.
+    Sentry {
+        #[command(subcommand)]
+        what: SentryCommand,
+    },
+
     /// Optional third-party software VeilVoice works with, and whether this
     /// machine already has it.
     ///
@@ -270,6 +292,68 @@ enum Command {
         /// Install one, by name. Without this, nothing is installed.
         #[arg(long, value_name = "NAME")]
         install: Option<String>,
+    },
+}
+
+/// What `veilvoice sentry` can do.
+#[derive(Subcommand)]
+enum SentryCommand {
+    /// What is planted, what is watched, and what this is worth.
+    Status,
+
+    /// Write a canary into a directory and start watching it.
+    Plant {
+        /// The directory to put it in.
+        dir: PathBuf,
+        /// A different filename. The default says what the file is, which a
+        /// reader can therefore skip; a name of your own does not.
+        #[arg(long)]
+        name: Option<String>,
+    },
+
+    /// Stop watching a canary, and delete it.
+    ///
+    /// Use this rather than deleting the file, or the deletion is itself
+    /// reported as a change.
+    PullUp {
+        /// The canary's path, as `status` prints it.
+        path: PathBuf,
+    },
+
+    /// Record what a directory holds now, to compare against later.
+    ///
+    /// Running it again replaces the record for that directory. Do that after
+    /// a change you know about, or every later check reports it again.
+    Baseline {
+        /// The directory to record.
+        dir: PathBuf,
+        /// Stop after this many files, and say the record is partial.
+        #[arg(long, default_value_t = Limits::default().max_files)]
+        max_files: usize,
+        /// How many directories deep to descend.
+        #[arg(long, default_value_t = Limits::default().max_depth)]
+        max_depth: usize,
+    },
+
+    /// Look at every canary and every baseline.
+    ///
+    /// Exits non-zero only if a **canary** tripped, which is a fact. Churn is a
+    /// question at any level, so it never fails the command -- a check that
+    /// fails every time somebody copies a folder is a check somebody removes
+    /// from their scheduled task.
+    Check {
+        /// Files touched per minute, above which this is worth mentioning.
+        #[arg(long, default_value_t = Threshold::default().files_per_minute)]
+        files_per_minute: f64,
+        /// Proportion of the watched files touched, from 0.0 to 1.0.
+        #[arg(long, default_value_t = Threshold::default().share)]
+        share: f32,
+        /// Stop after this many files.
+        #[arg(long, default_value_t = Limits::default().max_files)]
+        max_files: usize,
+        /// How many directories deep to descend.
+        #[arg(long, default_value_t = Limits::default().max_depth)]
+        max_depth: usize,
     },
 }
 
@@ -489,6 +573,59 @@ fn run(command: Command) -> Result<(), String> {
                 }
             }
         }
+
+        Command::Sentry { what } => match what {
+            SentryCommand::Status => sentry::status(),
+            SentryCommand::Plant { dir, name } => sentry::plant(&dir, name.as_deref()),
+            SentryCommand::PullUp { path } => sentry::pull_up(&path),
+            SentryCommand::Baseline {
+                dir,
+                max_files,
+                max_depth,
+            } => sentry::baseline(
+                &dir,
+                Limits {
+                    max_files,
+                    max_depth,
+                },
+            ),
+            SentryCommand::Check {
+                files_per_minute,
+                share,
+                max_files,
+                max_depth,
+            } => {
+                if !(0.0..=1.0).contains(&share) {
+                    // Refused rather than clamped. A share of 2.0 can never be
+                    // met, so clamping it to 1.0 would silently turn a typo
+                    // into a threshold that fires on every full rewrite -- and
+                    // the user would believe they had asked for something else.
+                    return Err(format!(
+                        "--share is a proportion from 0.0 to 1.0, not {share}"
+                    ));
+                }
+                if !(files_per_minute.is_finite() && files_per_minute >= 0.0) {
+                    return Err(format!(
+                        "--files-per-minute must be zero or more, not {files_per_minute}"
+                    ));
+                }
+                let tripped = sentry::check(
+                    Threshold {
+                        files_per_minute,
+                        share,
+                    },
+                    Limits {
+                        max_files,
+                        max_depth,
+                    },
+                )?;
+                if tripped {
+                    Err("a canary tripped".to_string())
+                } else {
+                    Ok(())
+                }
+            }
+        },
 
         Command::Companions { install: wanted } => match wanted {
             None => {

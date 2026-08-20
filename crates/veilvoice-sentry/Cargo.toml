@@ -1,0 +1,15 @@
+[package]
+name = "veilvoice-sentry"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Ransomware canaries and mass-change rate detection: an early warning that says plainly what it cannot do."
+
+[dependencies]
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"
