@@ -68,7 +68,6 @@
 <ul>
 <li><a href="veilvoice-cli/atrest.html"><code>atrest.rs</code></a> <span style="color:var(--muted)">Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.</span></li>
 <li><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a> <span style="color:var(--muted)">veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</span></li>
-<li><a href="veilvoice-cli/install.html"><code>install.rs</code></a> <span style="color:var(--muted)">veilvoice install -- put this program somewhere the system can find it.</span></li>
 <li><a href="veilvoice-cli/lock.html"><code>lock.rs</code></a> <span style="color:var(--muted)">veilvoice lock &#8212; manage the application lock from the command line.</span></li>
 <li><a href="veilvoice-cli/main.html"><code>main.rs</code></a> <span style="color:var(--muted)">veilvoice &#8212; the command-line interface.</span></li>
 <li><a href="veilvoice-cli/theme.html"><code>theme.rs</code></a> <span style="color:var(--muted)">Tokyo Night colouring for the terminal.</span></li>
@@ -123,7 +122,7 @@
 <h2><a href="veilvoice-gui.html">veilvoice-gui</a></h2>
 <p>egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.</p>
 <ul>
-<li><a href="veilvoice-gui/app.html"><code>app.rs</code></a> <span style="color:var(--muted)">The VeilVoice desktop application: six tabs, one window, no menus.</span></li>
+<li><a href="veilvoice-gui/app.html"><code>app.rs</code></a> <span style="color:var(--muted)">The VeilVoice desktop application: seven tabs, one window, no menus.</span></li>
 <li><a href="veilvoice-gui/crashlog.html"><code>crashlog.rs</code></a> <span style="color:var(--muted)">Make a failure that produces no output produce some.</span></li>
 <li><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</span></li>
 <li><a href="veilvoice-gui/main.html"><code>main.rs</code></a> <span style="color:var(--muted)">Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.</span></li>
@@ -132,6 +131,7 @@
 <li><a href="veilvoice-gui/reduced_motion.html"><code>reduced_motion.rs</code></a> <span style="color:var(--muted)">Whether the operating system has been asked to reduce motion.</span></li>
 <li><a href="veilvoice-gui/security.html"><code>security.rs</code></a> <span style="color:var(--muted)">The application lock, and the at-rest encryption of what VeilVoice writes.</span></li>
 <li><a href="veilvoice-gui/settings.html"><code>settings.rs</code></a> <span style="color:var(--muted)">The settings panel: a menu of pages, each a titled group of choices.</span></li>
+<li><a href="veilvoice-gui/setup.html"><code>setup.rs</code></a> <span style="color:var(--muted)">The setup tab: install this copy, undo that, and the optional companions.</span></li>
 <li><a href="veilvoice-gui/soundbar.html"><code>soundbar.rs</code></a> <span style="color:var(--muted)">The animated mark: a row of bars that rise and fall.</span></li>
 <li><a href="veilvoice-gui/theme.html"><code>theme.rs</code></a> <span style="color:var(--muted)">Colour schemes for the desktop app.</span></li>
 </ul>
@@ -145,6 +145,15 @@
 <li><a href="veilvoice-meta/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Strip or spoof the identifying metadata that rides along with media files.</span></li>
 <li><a href="veilvoice-meta/wav.html"><code>wav.rs</code></a> <span style="color:var(--muted)">Chunk-level RIFF/WAVE metadata removal.</span></li>
 <li><a href="veilvoice-meta/tests-wav_fuzz.html"><code>wav_fuzz.rs</code></a> <span style="color:var(--muted)">Randomised robustness testing for the RIFF chunk walker.</span></li>
+</ul>
+</section>
+<section id="veilvoice-setup">
+<h2><a href="veilvoice-setup.html">veilvoice-setup</a></h2>
+<p>Per-user installation and companion-software detection, shared by the command line and the desktop app.</p>
+<ul>
+<li><a href="veilvoice-setup/companions.html"><code>companions.rs</code></a> <span style="color:var(--muted)">Optional third-party software, detected rather than assumed.</span></li>
+<li><a href="veilvoice-setup/install.html"><code>install.rs</code></a> <span style="color:var(--muted)">Put this program somewhere the system can find it.</span></li>
+<li><a href="veilvoice-setup/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Everything that puts VeilVoice on a machine, and everything that reports what is already on it.</span></li>
 </ul>
 </section>
 <section id="veilvoice-verify">

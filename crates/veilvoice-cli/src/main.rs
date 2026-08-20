@@ -7,7 +7,7 @@
 //!
 //! # What is here
 //!
-//! Fourteen subcommands, and they divide into four groups:
+//! Sixteen subcommands, and they divide into five groups:
 //!
 //! * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
 //!   `devices`.
@@ -16,6 +16,13 @@
 //! * **Watching the machine** -- `watch` the microphone and camera, `guard`
 //!   VeilVoice's own files against tampering.
 //! * **The app lock** -- `lock set|status|change|remove`.
+//! * **Getting it onto the machine** -- `install`, `uninstall`, `companions`,
+//!   and `gui` to open the desktop application.
+//!
+//! That last group is a front end over [`veilvoice_setup`], which the desktop
+//! application's setup tab also calls. The careful part -- editing `PATH` --
+//! has one implementation and one set of tests, rather than one per front
+//! end.
 //!
 //! # Two behaviours that surprise people, on purpose
 //!
@@ -48,7 +55,6 @@
 
 mod atrest;
 mod guard;
-mod install;
 mod lock;
 mod theme;
 
@@ -63,6 +69,7 @@ use veilvoice_audio::io as audio_io;
 use veilvoice_core::{AccentConfig, DeidConfig};
 use veilvoice_crypto::{container, hybrid, kdf};
 use veilvoice_meta::Policy;
+use veilvoice_setup::{companions, install};
 
 #[derive(Parser)]
 #[command(
@@ -245,6 +252,24 @@ enum Command {
         /// Do not ask for confirmation.
         #[arg(long)]
         yes: bool,
+    },
+
+    /// Optional third-party software VeilVoice works with, and whether this
+    /// machine already has it.
+    ///
+    /// Nothing here is part of VeilVoice and nothing here is needed to run it.
+    /// A virtual audio cable is what lets live mode feed a veiled microphone
+    /// into a call; an audio editor is how most people trim a recording first.
+    ///
+    /// With no arguments this only *reports*. `--install NAME` is the explicit
+    /// yes, one named program at a time, and even then VeilVoice will not run
+    /// somebody else's installer: for proprietary software it prints the
+    /// vendor's page, and for anything needing root it prints the command
+    /// rather than asking for a password.
+    Companions {
+        /// Install one, by name. Without this, nothing is installed.
+        #[arg(long, value_name = "NAME")]
+        install: Option<String>,
     },
 }
 
@@ -463,6 +488,157 @@ fn run(command: Command) -> Result<(), String> {
                     Err("uninstall failed".to_string())
                 }
             }
+        }
+
+        Command::Companions { install: wanted } => match wanted {
+            None => {
+                list_companions();
+                Ok(())
+            }
+            Some(name) => install_companion(&name),
+        },
+    }
+}
+
+/// Report every companion that means anything on this platform.
+///
+/// Reporting is all this does. The licence and the author are printed beside
+/// each one because somebody deciding whether to install software is entitled
+/// to both before they decide, not afterwards in a manual.
+fn list_companions() {
+    println!("{}", heading("Companions"));
+    println!("  None of these is part of VeilVoice and none of them is required.");
+    println!();
+    for companion in companions::for_this_platform() {
+        println!("{}", paint(colour::BLUE, companion.name));
+        println!("{}", field("key", companion.key));
+        println!("{}", field("made by", companion.vendor));
+        println!("{}", field("licence", companion.licence));
+        let presence = companion.detect();
+        let line = presence.describe();
+        println!(
+            "{}",
+            field(
+                "on this machine",
+                &if presence.is_present() {
+                    line
+                } else {
+                    format!("{line} (this says where VeilVoice looked, not what you have)")
+                }
+            )
+        );
+        println!("      {}", companion.what);
+        println!("      {}", companion.why);
+        if !presence.is_present() {
+            println!("{}", field("to install", &offer_line(&companion.offer())));
+        }
+        println!();
+    }
+    println!("  Install one with: veilvoice companions --install <key>");
+}
+
+/// One line describing what VeilVoice can do about a missing companion.
+fn offer_line(offer: &companions::Offer) -> String {
+    match offer {
+        companions::Offer::Command {
+            via,
+            needs_privilege,
+            ..
+        } => {
+            let command = offer.command_line().unwrap_or_default();
+            if *needs_privilege {
+                format!("{command}   (via {via}; needs root, so run it yourself)")
+            } else {
+                format!("{command}   (via {via})")
+            }
+        }
+        companions::Offer::Page(url) => {
+            format!("{url}   (their installer, run by you, under their licence)")
+        }
+        companions::Offer::PartOfTheSystem(explanation) => explanation.to_string(),
+        companions::Offer::NotOnThisPlatform => "not applicable on this platform".to_string(),
+        companions::Offer::NoKnownRoute(reason) => reason.clone(),
+    }
+}
+
+/// Act on one named companion. The name is the explicit yes.
+fn install_companion(name: &str) -> Result<(), String> {
+    let Some(companion) = companions::by_key(name) else {
+        let known: Vec<&str> = companions::for_this_platform()
+            .iter()
+            .map(|c| c.key)
+            .collect();
+        return Err(format!(
+            "no companion called '{name}'. On this platform: {}",
+            known.join(", ")
+        ));
+    };
+    println!("{}", heading(companion.name));
+    println!("{}", field("made by", companion.vendor));
+    println!("{}", field("licence", companion.licence));
+
+    let presence = companion.detect();
+    if presence.is_present() {
+        println!(
+            "{}",
+            ok(&format!("already here -- {}", presence.describe()))
+        );
+        return Ok(());
+    }
+    println!("{}", field("looked", &presence.describe()));
+
+    let offer = companion.offer();
+    match &offer {
+        companions::Offer::Page(url) => {
+            // Never fetched and never executed. VB-CABLE is proprietary
+            // donationware with its own licence, and a program whose subject
+            // is verifying what you run has no business running an unverified
+            // third-party installer on somebody's behalf.
+            println!();
+            println!("{}", warn("VeilVoice does not install this for you."));
+            println!("  Get it from {url}, read their licence, and run their");
+            println!("  installer yourself. On Windows, reboot afterwards before");
+            println!("  using live mode.");
+            Ok(())
+        }
+        companions::Offer::Command {
+            via,
+            needs_privilege,
+            ..
+        } => {
+            let command = offer.command_line().unwrap_or_default();
+            println!("{}", field("via", via));
+            println!("{}", field("command", &command));
+            if *needs_privilege {
+                println!();
+                println!(
+                    "{}",
+                    warn(
+                        "this needs root, and VeilVoice does not ask for a password. \
+                         Run that command yourself."
+                    )
+                );
+                return Ok(());
+            }
+            println!();
+            match companions::run(&offer) {
+                Ok(report) => {
+                    for line in report.lines() {
+                        println!("  {line}");
+                    }
+                    println!("{}", ok("done"));
+                    Ok(())
+                }
+                Err(error) => {
+                    println!("{}", err(&error));
+                    Err("the companion was not installed".to_string())
+                }
+            }
+        }
+        _ => {
+            println!();
+            println!("  {}", offer_line(&offer));
+            Ok(())
         }
     }
 }

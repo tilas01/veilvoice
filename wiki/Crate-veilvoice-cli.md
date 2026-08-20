@@ -24,7 +24,7 @@ engine backs both this and the graphical app.
 
 # What is here
 
-Fourteen subcommands, and they divide into four groups:
+Sixteen subcommands, and they divide into five groups:
 
 * **Audio** -- `anonymise` a file, `live` scramble a microphone, list
 `devices`.
@@ -33,6 +33,13 @@ Fourteen subcommands, and they divide into four groups:
 * **Watching the machine** -- `watch` the microphone and camera, `guard`
 VeilVoice's own files against tampering.
 * **The app lock** -- `lock set|status|change|remove`.
+* **Getting it onto the machine** -- `install`, `uninstall`, `companions`,
+and `gui` to open the desktop application.
+
+That last group is a front end over `veilvoice_setup`, which the desktop
+application's setup tab also calls. The careful part -- editing `PATH` --
+has one implementation and one set of tests, rather than one per front
+end.
 
 # Two behaviours that surprise people, on purpose
 
@@ -67,10 +74,9 @@ does not, except that `--path` is now global specifically so both do.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1241 lines"])
+    n_main(["main.rs<br/>1417 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
     n_guard["guard.rs<br/>338 lines"]
-    n_install["install.rs<br/>561 lines"]
     n_lock["lock.rs<br/>239 lines"]
     n_theme["theme.rs<br/>135 lines"]
     n_atrest --> n_theme
@@ -82,7 +88,6 @@ flowchart TD
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" "open the source"
     click n_atrest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" "open the source"
     click n_guard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" "open the source"
-    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/install.rs" "open the source"
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" "open the source"
 ```
@@ -93,7 +98,6 @@ flowchart TD
 |---|---:|---|
 | [[`atrest.rs`|File-veilvoice-cli-atrest]] | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [[`guard.rs`|File-veilvoice-cli-guard]] | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
-| [[`install.rs`|File-veilvoice-cli-install]] | 561 | veilvoice install -- put this program somewhere the system can find it. |
 | [[`lock.rs`|File-veilvoice-cli-lock]] | 239 | veilvoice lock — manage the application lock from the command line. |
-| [[`main.rs`|File-veilvoice-cli-main]] | 1241 | veilvoice — the command-line interface. |
+| [[`main.rs`|File-veilvoice-cli-main]] | 1417 | veilvoice — the command-line interface. |
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 135 | Tokyo Night colouring for the terminal. |

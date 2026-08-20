@@ -23,6 +23,7 @@
 //! | [`security`] | The unlock screen, the lock tab, and the at-rest controls |
 //! | [`prefs`] | Preferences, and recovering from a corrupt preferences file |
 //! | [`settings`] | The settings tab |
+//! | [`setup`] | Installing this copy, and the optional companions |
 //! | [`theme`] | The palette, shared with the command-line front end |
 //! | [`soundbar`] | The animated level meter |
 //! | [`reduced_motion`] | Whether to animate at all |
@@ -49,6 +50,7 @@ pub mod prefs;
 pub mod reduced_motion;
 pub mod security;
 pub mod settings;
+pub mod setup;
 pub mod soundbar;
 pub mod theme;
 
