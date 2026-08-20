@@ -305,7 +305,10 @@ pub fn check(threshold: Threshold, limits: Limits) -> Result<bool, String> {
 /// A paragraph printed as one line is a paragraph nobody reads in an
 /// eighty-column terminal, and the scope note is the paragraph here that most
 /// needs reading.
-fn wrap(text: &str, width: usize) -> Vec<String> {
+///
+/// Shared with [`crate::policy`], which prints its own crate's scope note the
+/// same way. One wrapper rather than two that drift over what a column is.
+pub fn wrap(text: &str, width: usize) -> Vec<String> {
     let mut lines = Vec::new();
     let mut current = String::new();
     for word in text.split_whitespace() {

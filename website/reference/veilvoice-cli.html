@@ -55,12 +55,12 @@
 <p><code>veilvoice</code> &#8212; the command-line interface.</p>
 <p>Everything VeilVoice does, available without a desktop: it runs over SSH, in a container, and on machines that have no GUI toolkit at all. The same engine backs both this and the graphical app.</p>
 <h2 id="what-is-here">What is here</h2>
-<p>Seventeen subcommands, and they divide into five groups:</p>
+<p>Eighteen subcommands, and they divide into five groups:</p>
 <ul>
 <li><strong>Audio</strong> -- <code>anonymise</code> a file, <code>live</code> scramble a microphone, list <code>devices</code>.</li>
 <li><strong>Privacy of the files themselves</strong> -- <code>clean</code> metadata, <code>encrypt</code>, <code>decrypt</code>, <code>keygen</code>, <code>shred</code>.</li>
 <li><strong>Watching the machine</strong> -- <code>watch</code> the microphone and camera, <code>guard</code> VeilVoice&#x27;s own files against tampering, <code>sentry</code> for canaries and how fast a folder is changing.</li>
-<li><strong>The app lock</strong> -- <code>lock set|status|change|remove</code>.</li>
+<li><strong>The app lock</strong> -- <code>lock set|status|change|remove</code>, and <code>policy</code> for settings somebody has fixed so the interface cannot turn them off.</li>
 <li><strong>Getting it onto the machine</strong> -- <code>install</code>, <code>uninstall</code>, <code>companions</code>, and <code>gui</code> to open the desktop application.</li>
 </ul>
 <p>That last group is a front end over <code>veilvoice_setup</code>, which the desktop application&#x27;s setup tab also calls. The careful part -- editing <code>PATH</code> -- has one implementation and one set of tests, rather than one per front end.</p>
@@ -80,15 +80,18 @@
 <rect x="0" y="0" width="880" height="294" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M382.6 74.0 C 382.6 94.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M553.2 47.0 C 575.2 47.0, 575.2 47.0, 433.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M505.0 74.0 C 505.0 94.0, 440.0 100.0, 440.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M505.0 74.0 C 505.0 94.0, 378.8 100.0, 378.8 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M505.0 74.0 C 505.0 94.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M488.2 147.0 C 510.2 147.0, 510.2 47.0, 433.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M440.0 174.0 C 440.0 194.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M427.0 147.0 C 452.8 147.0, 452.8 47.0, 433.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M378.8 174.0 C 378.8 194.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M675.6 47.0 C 697.6 47.0, 697.6 47.0, 433.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M627.4 74.0 C 627.4 94.0, 501.2 100.0, 501.2 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M627.4 74.0 C 627.4 94.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M501.2 174.0 C 501.2 194.0, 440.0 200.0, 440.0 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" target="_blank" rel="noopener noreferrer">
 <rect x="204.4" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="256.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main.rs</text>
-<text x="256.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1554 lines</text>
+<text x="256.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1676 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" target="_blank" rel="noopener noreferrer">
 <rect x="334.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -101,14 +104,19 @@
 <text x="505.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">338 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" target="_blank" rel="noopener noreferrer">
-<rect x="391.8" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
-<text x="440.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lock.rs</text>
-<text x="440.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">239 lines</text>
+<rect x="330.6" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="378.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lock.rs</text>
+<text x="378.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">239 lines</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" target="_blank" rel="noopener noreferrer">
+<rect x="579.2" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="627.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">policy.rs</text>
+<text x="627.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">236 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" target="_blank" rel="noopener noreferrer">
-<rect x="579.2" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
-<text x="627.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sentry.rs</text>
-<text x="627.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">373 lines</text>
+<rect x="453.0" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
+<text x="501.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sentry.rs</text>
+<text x="501.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">376 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" target="_blank" rel="noopener noreferrer">
 <rect x="391.8" y="220.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -121,11 +129,12 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_main([&quot;main.rs&lt;br/&gt;1554 lines&quot;])
+    n_main([&quot;main.rs&lt;br/&gt;1676 lines&quot;])
     n_atrest[&quot;atrest.rs&lt;br/&gt;275 lines&quot;]
     n_guard[&quot;guard.rs&lt;br/&gt;338 lines&quot;]
     n_lock[&quot;lock.rs&lt;br/&gt;239 lines&quot;]
-    n_sentry[&quot;sentry.rs&lt;br/&gt;373 lines&quot;]
+    n_policy[&quot;policy.rs&lt;br/&gt;236 lines&quot;]
+    n_sentry[&quot;sentry.rs&lt;br/&gt;376 lines&quot;]
     n_theme[&quot;theme.rs&lt;br/&gt;135 lines&quot;]
     n_atrest --&gt; n_theme
     n_guard --&gt; n_atrest
@@ -133,11 +142,15 @@ flowchart TD
     n_guard --&gt; n_theme
     n_lock --&gt; n_atrest
     n_lock --&gt; n_theme
+    n_policy --&gt; n_atrest
+    n_policy --&gt; n_sentry
+    n_policy --&gt; n_theme
     n_sentry --&gt; n_theme
     click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs&quot; &quot;open the source&quot;
     click n_atrest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs&quot; &quot;open the source&quot;
     click n_guard href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs&quot; &quot;open the source&quot;
     click n_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs&quot; &quot;open the source&quot;
+    click n_policy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs&quot; &quot;open the source&quot;
     click n_sentry href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs&quot; &quot;open the source&quot;
     click n_theme href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs&quot; &quot;open the source&quot;</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -149,8 +162,9 @@ flowchart TD
 <tr><td><a href="veilvoice-cli/atrest.html"><code>atrest.rs</code></a></td><td>275</td><td>Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.</td></tr>
 <tr><td><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a></td><td>338</td><td>veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</td></tr>
 <tr><td><a href="veilvoice-cli/lock.html"><code>lock.rs</code></a></td><td>239</td><td>veilvoice lock &#8212; manage the application lock from the command line.</td></tr>
-<tr><td><a href="veilvoice-cli/main.html"><code>main.rs</code></a></td><td>1554</td><td>veilvoice &#8212; the command-line interface.</td></tr>
-<tr><td><a href="veilvoice-cli/sentry.html"><code>sentry.rs</code></a></td><td>373</td><td>veilvoice sentry -- canaries, baselines, and what changed since.</td></tr>
+<tr><td><a href="veilvoice-cli/main.html"><code>main.rs</code></a></td><td>1676</td><td>veilvoice &#8212; the command-line interface.</td></tr>
+<tr><td><a href="veilvoice-cli/policy.html"><code>policy.rs</code></a></td><td>236</td><td>veilvoice policy -- settings that can only be tightened.</td></tr>
+<tr><td><a href="veilvoice-cli/sentry.html"><code>sentry.rs</code></a></td><td>376</td><td>veilvoice sentry -- canaries, baselines, and what changed since.</td></tr>
 <tr><td><a href="veilvoice-cli/theme.html"><code>theme.rs</code></a></td><td>135</td><td>Tokyo Night colouring for the terminal.</td></tr>
 </tbody></table>
 </section>

@@ -70,6 +70,7 @@
 <li><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a> <span style="color:var(--muted)">veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</span></li>
 <li><a href="veilvoice-cli/lock.html"><code>lock.rs</code></a> <span style="color:var(--muted)">veilvoice lock &#8212; manage the application lock from the command line.</span></li>
 <li><a href="veilvoice-cli/main.html"><code>main.rs</code></a> <span style="color:var(--muted)">veilvoice &#8212; the command-line interface.</span></li>
+<li><a href="veilvoice-cli/policy.html"><code>policy.rs</code></a> <span style="color:var(--muted)">veilvoice policy -- settings that can only be tightened.</span></li>
 <li><a href="veilvoice-cli/sentry.html"><code>sentry.rs</code></a> <span style="color:var(--muted)">veilvoice sentry -- canaries, baselines, and what changed since.</span></li>
 <li><a href="veilvoice-cli/theme.html"><code>theme.rs</code></a> <span style="color:var(--muted)">Tokyo Night colouring for the terminal.</span></li>
 </ul>
@@ -128,6 +129,7 @@
 <li><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</span></li>
 <li><a href="veilvoice-gui/main.html"><code>main.rs</code></a> <span style="color:var(--muted)">Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.</span></li>
 <li><a href="veilvoice-gui/palettes.html"><code>palettes.rs</code></a> <span style="color:var(--muted)">User-defined colour schemes, and the contrast check that keeps them usable.</span></li>
+<li><a href="veilvoice-gui/policy.html"><code>policy.rs</code></a> <span style="color:var(--muted)">The policy in force, and what the interface does about it.</span></li>
 <li><a href="veilvoice-gui/prefs.html"><code>prefs.rs</code></a> <span style="color:var(--muted)">What the user has chosen about how the app looks and moves.</span></li>
 <li><a href="veilvoice-gui/reduced_motion.html"><code>reduced_motion.rs</code></a> <span style="color:var(--muted)">Whether the operating system has been asked to reduce motion.</span></li>
 <li><a href="veilvoice-gui/security.html"><code>security.rs</code></a> <span style="color:var(--muted)">The application lock, and the at-rest encryption of what VeilVoice writes.</span></li>
@@ -146,6 +148,14 @@
 <li><a href="veilvoice-meta/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Strip or spoof the identifying metadata that rides along with media files.</span></li>
 <li><a href="veilvoice-meta/wav.html"><code>wav.rs</code></a> <span style="color:var(--muted)">Chunk-level RIFF/WAVE metadata removal.</span></li>
 <li><a href="veilvoice-meta/tests-wav_fuzz.html"><code>wav_fuzz.rs</code></a> <span style="color:var(--muted)">Randomised robustness testing for the RIFF chunk walker.</span></li>
+</ul>
+</section>
+<section id="veilvoice-policy">
+<h2><a href="veilvoice-policy.html">veilvoice-policy</a></h2>
+<p>Settings that can only be tightened, sealed with the project&#x27;s own post-quantum cryptography.</p>
+<ul>
+<li><a href="veilvoice-policy/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Settings somebody else decided, sealed so they cannot be edited without a passphrase &#8212; and, more importantly, built so that editing them without one buys nothing worth having.</span></li>
+<li><a href="veilvoice-policy/policy.html"><code>policy.rs</code></a> <span style="color:var(--muted)">The policy itself: what can be required, and what requiring it does.</span></li>
 </ul>
 </section>
 <section id="veilvoice-sentry">

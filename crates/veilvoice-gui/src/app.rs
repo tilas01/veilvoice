@@ -70,6 +70,15 @@
 //! list imply an empty machine. The indicator must never present "we could not
 //! see" as "nothing is there".
 //!
+//! # A policy tightens the controls, and the tightening is not the drawing code
+//!
+//! [`crate::policy::InForce`] holds whatever `veilvoice policy` fixed on this
+//! machine. Fixed controls are drawn disabled with the reason underneath, but
+//! that is a courtesy: the values a job actually uses come from
+//! [`VeilVoiceApp::posture`], which applies the policy every time it is asked.
+//! A policy that held only while a checkbox was drawn would not be a policy,
+//! and this file already keeps that rule for the at-rest choice.
+//!
 //! # Where the honest limits are stated
 //!
 //! The about tab carries the scope text, and the lock tab carries
@@ -78,6 +87,7 @@
 //! left worse off than one who never had it. If you are editing text in this
 //! file and a test starts failing, it is that rule, and it is working.
 
+use crate::policy::InForce;
 use crate::security::Security;
 use crate::setup::Setup;
 use crate::theme::palette as p;
@@ -153,6 +163,9 @@ pub struct VeilVoiceApp {
     // intensity and accent controls -- a different thing entirely.
     preferences: crate::settings::Settings,
 
+    // Settings somebody else fixed. Read once; never asks for a passphrase.
+    policy: InForce,
+
     // Portable or installed, and the optional companions. Reads the machine
     // on construction and changes nothing until a button is pressed.
     setup: Setup,
@@ -222,6 +235,10 @@ impl VeilVoiceApp {
             meter_out: 0.0,
             security: Security::default(),
             preferences: crate::settings::Settings::default(),
+            // No policy here, so `without_devices` and `Default` touch no file
+            // that belongs to the user. `VeilVoiceApp::new` loads the real one,
+            // exactly as it does for the app lock.
+            policy: InForce::none(),
             setup: Setup::new(),
             watch: veilvoice_watch::Monitor::new(),
             watch_support: veilvoice_watch::support(),
@@ -270,19 +287,62 @@ impl VeilVoiceApp {
         let mut preferences = crate::settings::Settings::load(&cc.egui_ctx);
         preferences.palette_problems = palette_problems;
         crate::theme::install(&cc.egui_ctx);
-        Self {
+
+        let policy = InForce::load();
+        let mut app = Self {
             jetbrains,
             security: Security::load(),
             preferences,
+            policy,
             ..Default::default()
+        };
+        app.apply_policy();
+        app
+    }
+
+    /// Bring the controls into line with the policy, once, at startup.
+    ///
+    /// Not the enforcement -- [`VeilVoiceApp::posture`] is. This is so the
+    /// interface *opens* showing the values a job would use, rather than
+    /// showing something looser that silently changes when the job runs.
+    fn apply_policy(&mut self) {
+        let constrained = self.posture();
+        self.intensity = constrained.intensity;
+        self.neutralise_accent = constrained.neutralise_accent;
+        self.clean_metadata = constrained.clean_metadata;
+        self.security.encryption_pinned = self
+            .policy
+            .requires(&veilvoice_policy::Requirement::EncryptRecordings);
+        self.security.lock_required = self
+            .policy
+            .requires(&veilvoice_policy::Requirement::AppLock);
+        if self.security.encryption_pinned {
+            self.security.encrypt_recordings = true;
         }
     }
 
-    fn config(&self) -> DeidConfig {
-        DeidConfig {
+    /// The settings as they will actually be used, after the policy.
+    ///
+    /// Everything that runs a job reads this rather than the fields directly.
+    /// The policy can only tighten it, so the worst this can do is process a
+    /// recording more thoroughly than the sliders show -- which is the right
+    /// direction for the one mistake that is unrecoverable.
+    fn posture(&self) -> veilvoice_policy::Posture {
+        self.policy.constrain(veilvoice_policy::Posture {
+            encrypt_recordings: self.security.encrypt_recordings,
+            clean_metadata: self.clean_metadata,
+            neutralise_accent: self.neutralise_accent,
+            app_lock: self.security.has_lock(),
             intensity: self.intensity,
+        })
+    }
+
+    fn config(&self) -> DeidConfig {
+        let posture = self.posture();
+        DeidConfig {
+            intensity: posture.intensity,
             accent: AccentConfig {
-                enabled: self.neutralise_accent,
+                enabled: posture.neutralise_accent,
                 ..AccentConfig::default()
             },
             reseed_secs: self.reseed_secs,
@@ -442,15 +502,42 @@ impl VeilVoiceApp {
 
     fn settings(&mut self, ui: &mut egui::Ui) {
         ui.label(RichText::new("SETTINGS").color(p::blue()).small());
+
+        // A floor becomes the bottom of the slider's range rather than a value
+        // the slider snaps back from. A control that visibly refuses to go
+        // where it is dragged reads as broken; one whose range starts higher
+        // reads as a decision, which is what it is.
+        let floor = self.policy.minimum_intensity();
+        if self.intensity < floor {
+            self.intensity = floor;
+        }
         ui.add(
-            egui::Slider::new(&mut self.intensity, 0.0..=1.0)
+            egui::Slider::new(&mut self.intensity, floor..=1.0)
                 .text("intensity")
                 .fixed_decimals(2),
         );
-        ui.checkbox(
-            &mut self.neutralise_accent,
-            "neutralise accent and intonation",
+        if floor > 0.0 {
+            self.policy.note(
+                ui,
+                &veilvoice_policy::Requirement::MinimumIntensity((floor * 100.0).round() as u8),
+            );
+        }
+
+        let accent_fixed = self
+            .policy
+            .requires(&veilvoice_policy::Requirement::NeutraliseAccent);
+        if accent_fixed {
+            self.neutralise_accent = true;
+        }
+        ui.add_enabled(
+            !accent_fixed,
+            egui::Checkbox::new(
+                &mut self.neutralise_accent,
+                "neutralise accent and intonation",
+            ),
         );
+        self.policy
+            .note(ui, &veilvoice_policy::Requirement::NeutraliseAccent);
         ui.label(
             RichText::new(if self.neutralise_accent {
                 "every speaker is mapped onto one canonical register and vocal tract"
@@ -504,7 +591,18 @@ impl VeilVoiceApp {
 
         ui.add_space(8.0);
         self.settings(ui);
-        ui.checkbox(&mut self.clean_metadata, "strip metadata from the result");
+        let metadata_fixed = self
+            .policy
+            .requires(&veilvoice_policy::Requirement::CleanMetadata);
+        if metadata_fixed {
+            self.clean_metadata = true;
+        }
+        ui.add_enabled(
+            !metadata_fixed,
+            egui::Checkbox::new(&mut self.clean_metadata, "strip metadata from the result"),
+        );
+        self.policy
+            .note(ui, &veilvoice_policy::Requirement::CleanMetadata);
 
         ui.add_space(12.0);
         self.security.recording_controls(ui);
@@ -567,7 +665,7 @@ impl VeilVoiceApp {
             o
         });
         let config = self.config();
-        let clean = self.clean_metadata;
+        let clean = self.posture().clean_metadata;
         let plan = self.security.plan();
         let (tx, rx) = mpsc::channel();
         self.job = Some(rx);
@@ -931,6 +1029,9 @@ impl VeilVoiceApp {
         ui.add_space(12.0);
         ui.label(RichText::new("THE APP LOCK").color(p::yellow()).small());
         ui.label(RichText::new(veilvoice_crypto::lock::SCOPE).color(p::fg()));
+
+        ui.add_space(16.0);
+        self.policy.panel(ui);
     }
 }
 
@@ -1110,6 +1211,124 @@ mod tests {
             "with no default, the first is better than nothing"
         );
         assert_eq!(preferred_input(&[]), None);
+    }
+
+    /// A policy that fixes the engine settings must reach the *job*, not just
+    /// the widgets. The fields are deliberately left loose here: if `config`
+    /// read them directly, this would fail.
+    #[test]
+    fn a_policy_constrains_the_settings_a_job_actually_uses() {
+        let mut policy = veilvoice_policy::Policy::new();
+        policy.require(veilvoice_policy::Requirement::NeutraliseAccent);
+        policy.require(veilvoice_policy::Requirement::MinimumIntensity(80));
+        policy.require(veilvoice_policy::Requirement::CleanMetadata);
+
+        let app = VeilVoiceApp {
+            intensity: 0.1,
+            neutralise_accent: false,
+            clean_metadata: false,
+            policy: InForce::from_policy(policy),
+            ..VeilVoiceApp::without_devices()
+        };
+
+        let config = app.config();
+        assert!(
+            (config.intensity - 0.8).abs() < 1e-6,
+            "the floor must reach the engine: {}",
+            config.intensity
+        );
+        assert!(
+            config.accent.enabled,
+            "a required accent neutralisation must reach the engine"
+        );
+        assert!(
+            app.posture().clean_metadata,
+            "a required metadata strip must reach the job"
+        );
+        config
+            .checked()
+            .expect("a constrained configuration must still be a valid one");
+    }
+
+    /// Whatever the sliders say, a policy may only ever make the result more
+    /// thoroughly processed. Checked across the slider's whole range.
+    #[test]
+    fn a_policy_never_loosens_what_a_job_would_do() {
+        let mut policy = veilvoice_policy::Policy::new();
+        policy.require(veilvoice_policy::Requirement::MinimumIntensity(60));
+        for step in 0..=10 {
+            let asked = step as f32 / 10.0;
+            let app = VeilVoiceApp {
+                intensity: asked,
+                neutralise_accent: false,
+                policy: InForce::from_policy(policy.clone()),
+                ..VeilVoiceApp::without_devices()
+            };
+            assert!(
+                app.config().intensity >= asked,
+                "asked for {asked}, got {}",
+                app.config().intensity
+            );
+        }
+    }
+
+    /// The at-rest requirement is pinned in the state, not merely drawn
+    /// disabled -- and pinning it must also close the dialogue that turns it
+    /// off, which is reachable from more than one frame's worth of state.
+    #[test]
+    fn a_required_encryption_is_pinned_rather_than_only_disabled() {
+        let mut policy = veilvoice_policy::Policy::new();
+        policy.require(veilvoice_policy::Requirement::EncryptRecordings);
+        let mut app = VeilVoiceApp {
+            policy: InForce::from_policy(policy),
+            ..VeilVoiceApp::without_devices()
+        };
+        app.security.encrypt_recordings = false;
+        app.apply_policy();
+        assert!(app.security.encryption_pinned);
+        assert!(app.security.encrypt_recordings);
+        assert!(app.posture().encrypt_recordings);
+    }
+
+    /// A required lock is announced and never imposed: VeilVoice cannot set a
+    /// lock, because that needs a passphrase only the user has.
+    #[test]
+    fn a_required_lock_is_announced_and_not_imposed() {
+        let mut policy = veilvoice_policy::Policy::new();
+        policy.require(veilvoice_policy::Requirement::AppLock);
+        let mut app = VeilVoiceApp {
+            policy: InForce::from_policy(policy),
+            ..VeilVoiceApp::without_devices()
+        };
+        app.apply_policy();
+        assert!(app.security.lock_required);
+        assert!(
+            !app.security.has_lock(),
+            "nothing may invent a lock the user did not set"
+        );
+        assert!(
+            !app.security.is_locked(),
+            "and the application must stay usable"
+        );
+    }
+
+    /// With no policy -- the ordinary case -- nothing is pinned and nothing is
+    /// raised.
+    #[test]
+    fn without_a_policy_nothing_is_fixed() {
+        let mut app = VeilVoiceApp {
+            intensity: 0.25,
+            neutralise_accent: false,
+            clean_metadata: false,
+            ..VeilVoiceApp::without_devices()
+        };
+        app.apply_policy();
+        assert!(!app.security.encryption_pinned);
+        assert!(!app.security.lock_required);
+        assert_eq!(app.intensity, 0.25);
+        assert!(!app.neutralise_accent);
+        assert!(!app.clean_metadata);
+        assert_eq!(app.config().intensity, 0.25);
     }
 
     /// The one test that talks to the machine's audio stack. Kept single, and
