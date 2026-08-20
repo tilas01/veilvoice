@@ -45,6 +45,7 @@ Irreversible voice de-identification DSP engine: cryptographically-modulated pit
 - [[`pitch.rs`|File-veilvoice-core-pitch]] &mdash; Monophonic fundamental-frequency tracker (decimated YIN).
 - [[`spectral.rs`|File-veilvoice-core-spectral]] &mdash; Frequency-domain de-identification transform.
 - [[`stft.rs`|File-veilvoice-core-stft]] &mdash; Streaming short-time Fourier transform with overlap-add resynthesis.
+- [[`voices.rs`|File-veilvoice-core-voices]] &mdash; Destination voices: several canonical registers instead of one.
 - [[`window.rs`|File-veilvoice-core-window]] &mdash; Analysis and synthesis windowing, and the one constant that keeps overlap-add honest.
 - [[`spectrum_report.rs`|File-veilvoice-core-examples-spectrum_report]] &mdash; Where do the output partials actually land?
 - [[`veil_a_buffer.rs`|File-veilvoice-core-examples-veil_a_buffer]] &mdash; no module documentation yet

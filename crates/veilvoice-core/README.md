@@ -81,14 +81,15 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>68 lines"])
+    n_lib(["lib.rs<br/>70 lines"])
     n_accent["accent.rs<br/>677 lines"]
-    n_chain["chain.rs<br/>856 lines"]
+    n_chain["chain.rs<br/>1256 lines"]
     n_effects["effects.rs<br/>214 lines"]
-    n_modulation["modulation.rs<br/>280 lines"]
+    n_modulation["modulation.rs<br/>300 lines"]
     n_pitch["pitch.rs<br/>274 lines"]
     n_spectral["spectral.rs<br/>428 lines"]
     n_stft["stft.rs<br/>246 lines"]
+    n_voices["voices.rs<br/>426 lines"]
     n_window["window.rs<br/>91 lines"]
     n_accent --> n_pitch
     n_accent --> n_spectral
@@ -109,6 +110,7 @@ flowchart TD
     click n_pitch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs" "open the source"
     click n_spectral href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs" "open the source"
     click n_stft href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" "open the source"
+    click n_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" "open the source"
     click n_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs" "open the source"
 ```
 
@@ -117,13 +119,14 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | 677 | Accent and speaker-trait neutralisation. |
-| [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 856 | The assembled de-identification chain and its live performance statistics. |
+| [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 1256 | The assembled de-identification chain and its live performance statistics. |
 | [`effects.rs`](../../docs/files/veilvoice-core/effects.md) | 214 | Light time-domain effects applied after resynthesis. |
-| [`lib.rs`](../../docs/files/veilvoice-core/lib.md) | 68 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
-| [`modulation.rs`](../../docs/files/veilvoice-core/modulation.md) | 280 | Cryptographically-seeded modulation of the effect parameters. |
+| [`lib.rs`](../../docs/files/veilvoice-core/lib.md) | 70 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
+| [`modulation.rs`](../../docs/files/veilvoice-core/modulation.md) | 300 | Cryptographically-seeded modulation of the effect parameters. |
 | [`pitch.rs`](../../docs/files/veilvoice-core/pitch.md) | 274 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [`spectral.rs`](../../docs/files/veilvoice-core/spectral.md) | 428 | Frequency-domain de-identification transform. |
 | [`stft.rs`](../../docs/files/veilvoice-core/stft.md) | 246 | Streaming short-time Fourier transform with overlap-add resynthesis. |
+| [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | 426 | Destination voices: several canonical registers instead of one. |
 | [`window.rs`](../../docs/files/veilvoice-core/window.md) | 91 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
 | [`spectrum_report.rs`](../../docs/files/veilvoice-core/examples-spectrum_report.md) | 99 | Where do the output partials actually land? |
 | [`veil_a_buffer.rs`](../../docs/files/veilvoice-core/examples-veil_a_buffer.md) | 45 | _no module documentation yet_ |
@@ -149,6 +152,16 @@ flowchart TD
 | `struct PitchTracker` | [`pitch.rs`](../../docs/files/veilvoice-core/pitch.md) | Rolling, allocation-free f0 tracker. |
 | `struct SpectralState` | [`spectral.rs`](../../docs/files/veilvoice-core/spectral.md) | Persistent per-instance state for the spectral transform. |
 | `struct StftEngine` | [`stft.rs`](../../docs/files/veilvoice-core/stft.md) | Reusable streaming STFT engine (single channel). |
+| `const MAX_VOICES` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | How many distinct destination voices this engine will hand out. |
+| `struct Voice` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | One destination voice: the canonical values every speaker in this slot is mapped onto. |
+| `const F0_MIN_HZ` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The lowest fundamental a resynthesised voice stays intelligible at. |
+| `const F0_MAX_HZ` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The highest fundamental that still reads as a speaking register. |
+| `const CENTROID_MIN_HZ` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The narrowest canonical vocal tract offered. |
+| `const CENTROID_MAX_HZ` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The widest canonical vocal tract offered. |
+| `const TILT_MIN_DB_OCT` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The steepest permitted long-term slope, in dB per octave. |
+| `const TILT_MAX_DB_OCT` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The flattest permitted long-term slope, in dB per octave. |
+| `fn voice` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The destination voice for slot index. |
+| `fn all` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | Every destination voice, in the order they are handed out. |
 | `fn hann` | [`window.rs`](../../docs/files/veilvoice-core/window.md) | Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design). |
 | `fn ola_gain` | [`window.rs`](../../docs/files/veilvoice-core/window.md) | Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop. |
 

@@ -127,6 +127,26 @@ impl Modulator {
         next.zeroize();
     }
 
+    /// Draw a whole number of frames uniformly from `lo..=hi`.
+    ///
+    /// Used for the randomised roll interval: the gap before the next ratchet
+    /// is itself drawn from the stream, so it is as unpredictable as everything
+    /// else here and costs no syscall and no allocation -- which it cannot,
+    /// because it is drawn inside an audio callback.
+    ///
+    /// `hi` below `lo` is treated as `lo`. That is not input validation --
+    /// [`crate::DeidConfig::checked`] refuses a reversed range long before this
+    /// is reached -- it is this function being total so that a caller cannot
+    /// produce a panic in an audio thread by arithmetic.
+    pub fn draw_frames(&mut self, lo: u32, hi: u32) -> u32 {
+        let lo = lo.max(1);
+        let hi = hi.max(lo);
+        if hi == lo {
+            return lo;
+        }
+        self.rng.gen_range(lo..=hi)
+    }
+
     /// Advance one STFT frame and return the parameters to apply.
     pub fn next_frame(&mut self) -> ModValues {
         if self.frame_in_seg == 0 {
