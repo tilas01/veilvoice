@@ -4879,6 +4879,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "veilvoice-drivers"
+version = "0.1.12"
+dependencies = [
+ "tempfile",
+]
+
+[[package]]
 name = "veilvoice-guard"
 version = "0.1.12"
 dependencies = [

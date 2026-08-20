@@ -135,6 +135,42 @@ anybody who can run that command can delete the same two files with a file
 manager, and pretending otherwise would teach you something false about what
 this program does.
 
+### `veilvoice-drivers`: what is loaded in the kernel, and what changed
+
+The third security crate. Record the loaded drivers, look again later, and say
+what appeared, disappeared or changed. Loading a driver is the step almost
+everything that wants to watch a microphone from underneath has to take.
+
+| Platform | Source | Needs privilege |
+|---|---|---|
+| Linux | `/proc/modules`, cross-checked against `/sys/module` | no |
+| Windows | `driverquery.exe /FO CSV /NH` | no |
+| macOS | `kmutil showloaded`, falling back to `kextstat` | no |
+
+**The limit is stated before the feature.** This reads a list the operating
+system hands out, so anything able to lie to that list is not in it. A quiet
+report is not evidence that nothing is hiding, and the wording never lets it
+read as one.
+
+**The cross-view check, honestly.** On Linux the kernel publishes the same fact
+twice, and modules present in one list and absent from the other are reported.
+That catches something which unlinked itself from `/proc/modules` and forgot
+`/sys/module` -- a mistake real rootkits have made. It catches carelessness and
+nothing else: both lists come from the same kernel, so anything with the
+privilege to edit one can edit both. No other platform here has a second list,
+so the check is empty there and `support()` says that means "nothing was
+checked", not "the check passed".
+
+**A new driver is not a finding.** Printers, graphics updates, VPN clients and
+virtual audio cables -- VeilVoice recommends one -- all load drivers. A change
+is a fact about a list, and a test fails the build if any of the wording ever
+turns into an accusation.
+
+Load addresses are deliberately not recorded on either Linux or macOS: they are
+zeroed for an unprivileged reader on a machine with kernel-pointer restriction,
+and change at every boot on one without. Recording them would report every
+module as altered after a restart, which is a report nobody opens twice.
+
 ### Also
 
 - `veilvoice-setup` is usable on its own: no dependencies, no `unsafe`, and
