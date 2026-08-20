@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! `veilvoice install` -- put this program somewhere the system can find it.
+//! Put this program somewhere the system can find it.
+//!
+//! Reached as `veilvoice install` on the command line and as the setup tab
+//! in the desktop application. Both call the functions below; neither has a
+//! copy of them. See the crate documentation for why that mattered enough to
+//! move this file out of the binary it used to live in.
 //!
 //! # Portable is the default, and installing is the exception
 //!
@@ -51,8 +56,6 @@
 //! is finding F-13.
 
 use std::path::{Path, PathBuf};
-#[cfg(windows)]
-use std::process::Command;
 
 /// The name of the directory and the uninstall entry.
 ///
@@ -63,28 +66,6 @@ pub const NAME: &str = "VeilVoice";
 
 /// Files that make up an installation, if they are beside the running binary.
 const PROGRAMS: &[&str] = &["veilvoice", "veilvoice-gui", "veilvoice-verify"];
-
-/// Spawn without a console window.
-///
-/// Same reasoning as the copies in `veilvoice-watch` and `veilvoice-guard`: on
-/// Windows a `Command` for a console program creates one, and if this is ever
-/// called from the desktop application a window would flash. `creation_flags`
-/// is safe, so this costs nothing against `#![forbid(unsafe_code)]`.
-///
-/// Gated to Windows because every caller is: the registry helpers below are
-/// the only ones, and they do not exist elsewhere. Left ungated it is dead
-/// code on every other platform, which CI turns into an error and which only
-/// the Linux and macOS runners can see.
-#[cfg(windows)]
-fn no_window(mut command: Command) -> Command {
-    #[cfg(windows)]
-    {
-        use std::os::windows::process::CommandExt;
-        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
-        command.creation_flags(CREATE_NO_WINDOW);
-    }
-    command
-}
 
 /// `reg.exe`, by absolute path.
 ///
@@ -128,10 +109,23 @@ pub fn bin_dir() -> Option<PathBuf> {
 }
 
 /// What an installation currently looks like.
+///
+/// Read by [`status`], which changes nothing. Every field is a separate fact
+/// on purpose: "something is installed" and "you are running the installed
+/// copy" are different, and a front end that conflates them tells somebody
+/// editing a portable folder that their changes took effect.
 pub struct Status {
+    /// Where an installation would go, or does. `None` when this system
+    /// offers no per-user program directory at all.
     pub prefix: Option<PathBuf>,
+    /// A VeilVoice command line exists under [`Status::prefix`].
     pub installed: bool,
+    /// The install directory is on **this process's** `PATH` -- which is what
+    /// "will typing `veilvoice` work in the terminal I already have open"
+    /// actually depends on.
     pub on_path: bool,
+    /// The binary that is running right now, as the operating system reports
+    /// it.
     pub running_from: Option<PathBuf>,
     /// True when the running binary is the installed one rather than a
     /// portable copy. Worth telling the user: "installed" and "you are running
@@ -242,7 +236,7 @@ fn add_to_path(dir: &Path) -> Result<bool, String> {
             }
         }
     };
-    let output = no_window(Command::new(reg_exe()))
+    let output = crate::command(reg_exe())
         .args([
             "add",
             r"HKCU\Environment",
@@ -287,7 +281,7 @@ enum UserPath {
 /// write rather than guessing.
 #[cfg(windows)]
 fn read_user_path() -> Result<UserPath, String> {
-    let output = no_window(Command::new(reg_exe()))
+    let output = crate::command(reg_exe())
         .args(["query", r"HKCU\Environment", "/v", "PATH"])
         .output()
         .map_err(|e| format!("could not run reg.exe: {e}"))?;
@@ -362,7 +356,7 @@ fn register_uninstall(prefix: &Path) -> Result<(), String> {
         ),
     ];
     for (name, kind, value) in entries {
-        let output = no_window(Command::new(reg_exe()))
+        let output = crate::command(reg_exe())
             .args(["add", &key, "/v", name, "/t", kind, "/d"])
             .arg(value)
             .arg("/f")
@@ -405,7 +399,7 @@ fn remove_from_path(dir: &Path) -> Result<bool, String> {
     // uninstall that rewrites PATH from a template destroys whatever else the
     // user had, at the moment they are least likely to look.
     let joined = kept.join(";");
-    let output = no_window(Command::new(reg_exe()))
+    let output = crate::command(reg_exe())
         .args([
             "add",
             r"HKCU\Environment",
@@ -436,7 +430,7 @@ fn remove_from_path(_dir: &Path) -> Result<bool, String> {
 #[cfg(windows)]
 fn unregister_uninstall() -> Result<(), String> {
     let key = format!(r"HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{NAME}");
-    let _ = no_window(Command::new(reg_exe()))
+    let _ = crate::command(reg_exe())
         .args(["delete", &key, "/f"])
         .output();
     Ok(())

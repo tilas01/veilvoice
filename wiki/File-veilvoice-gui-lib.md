@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 58 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 60 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -34,6 +34,7 @@ window.
 | `security` | The unlock screen, the lock tab, and the at-rest controls |
 | `prefs` | Preferences, and recovering from a corrupt preferences file |
 | `settings` | The settings tab |
+| `setup` | Installing this copy, and the optional companions |
 | `theme` | The palette, shared with the command-line front end |
 | `soundbar` | The animated level meter |
 | `reduced_motion` | Whether to animate at all |
@@ -59,4 +60,4 @@ This file defines no functions of its own.
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L58) | Crate version string, surfaced in the About panel. |
+| `VERSION` <sub>pub const</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L60) | Crate version string, surfaced in the About panel. |

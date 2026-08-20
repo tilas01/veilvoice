@@ -44,6 +44,7 @@ window.
 | `security` | The unlock screen, the lock tab, and the at-rest controls |
 | `prefs` | Preferences, and recovering from a corrupt preferences file |
 | `settings` | The settings tab |
+| `setup` | Installing this copy, and the optional companions |
 | `theme` | The palette, shared with the command-line front end |
 | `soundbar` | The animated level meter |
 | `reduced_motion` | Whether to animate at all |
@@ -71,21 +72,23 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>58 lines"])
+    n_lib(["lib.rs<br/>60 lines"])
     n_main(["main.rs<br/>87 lines"])
-    n_app["app.rs<br/>1110 lines"]
+    n_app["app.rs<br/>1129 lines"]
     n_crashlog["crashlog.rs<br/>254 lines"]
     n_palettes["palettes.rs<br/>691 lines"]
     n_prefs["prefs.rs<br/>386 lines"]
     n_reduced_motion["reduced_motion.rs<br/>328 lines"]
     n_security["security.rs<br/>1030 lines"]
     n_settings["settings.rs<br/>706 lines"]
+    n_setup["setup.rs<br/>707 lines"]
     n_soundbar["soundbar.rs<br/>349 lines"]
     n_theme["theme.rs<br/>745 lines"]
     n_app --> n_crashlog
     n_app --> n_palettes
     n_app --> n_security
     n_app --> n_settings
+    n_app --> n_setup
     n_app --> n_soundbar
     n_app --> n_theme
     n_crashlog --> n_prefs
@@ -98,6 +101,8 @@ flowchart TD
     n_settings --> n_reduced_motion
     n_settings --> n_soundbar
     n_settings --> n_theme
+    n_setup --> n_prefs
+    n_setup --> n_theme
     n_soundbar --> n_prefs
     n_soundbar --> n_theme
     n_theme --> n_palettes
@@ -110,6 +115,7 @@ flowchart TD
     click n_reduced_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs" "open the source"
     click n_security href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" "open the source"
     click n_settings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" "open the source"
+    click n_setup href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" "open the source"
     click n_soundbar href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" "open the source"
 ```
@@ -118,15 +124,16 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1110 | The VeilVoice desktop application: six tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1129 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 254 | Make a failure that produces no output produce some. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 58 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 60 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 87 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 691 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 386 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 328 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1030 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 706 | The settings panel: a menu of pages, each a titled group of choices. |
+| [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 707 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 349 | The animated mark: a row of bars that rise and fall. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 745 | Colour schemes for the desktop app. |
 
@@ -160,6 +167,7 @@ flowchart TD
 | `enum Plan` | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | What a finished job should do with its bytes. |
 | `enum Page` | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | Which page of the settings menu is showing. |
 | `struct Settings` | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | The settings tab's own state. |
+| `struct Setup` | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | The setup tab's state. |
 | `fn draw` | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | Draw the mark at size, returning the response so it can carry a tooltip. |
 | `struct Theme` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | One complete colour scheme. |
 | `const THEMES` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Every theme, in the order the picker shows them. |
