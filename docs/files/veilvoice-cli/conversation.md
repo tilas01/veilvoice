@@ -11,11 +11,12 @@
 
 # `crates/veilvoice-cli/src/conversation.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 360 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 647 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs)
 
 ## Contents
 
 - [What comes out](#what-comes-out)
+- [The page, and why it is not a video](#the-page-and-why-it-is-not-a-video)
 - [The one warning this command will not let you miss](#the-one-warning-this-command-will-not-let-you-miss)
 - [This does not encrypt what it writes](#this-does-not-encrypt-what-it-writes)
   - [What this file contains](#what-this-file-contains)
@@ -36,7 +37,21 @@ Three files beside the output you name:
 out.veiled.wav   the audio, one destination voice per speaker
 out.veiled.vtt   subtitles for a browser
 out.veiled.srt   subtitles for everything else
+out.veiled.html  with `--page`: a player that needs nothing installed
 ```
+
+# The page, and why it is not a video
+
+`--page` writes a self-contained HTML player: the waveform, a circle per
+speaker that lights when they speak, and the subtitles. It references the
+audio and the WebVTT track by relative name rather than embedding them, so
+the files move together and the page does not double the size of a recording
+already sitting beside it.
+
+A *video* file needs an encoder, and this project ships no codec. `preview`
+prints the `ffmpeg` command that would make one, and says whether `ffmpeg`
+is on this machine -- it never runs it. Nothing here silently depends on a
+program the user did not know they were running.
 
 The subtitles are written whether or not anybody wrote down the words. With
 every voice replaced, a caption track saying *who* is talking is often the
@@ -62,13 +77,16 @@ whatever names were typed and are not veiled by anything.
 
 ## What this file contains
 
-360 lines defining **4 functions** (2 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+647 lines defining **7 functions** (4 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `inspect` (line 49) -- Show a plan without rendering anything.
+- `look_from` (line 77) -- Turn the picture flags into a Look, or explain why they do not describe a picture that can be drawn.
+- `inspect` (line 110) -- Show a plan without rendering anything.
   - reaches: `load_plan`
-- `run` (line 109) -- Render a recording according to a plan.
+- `run` (line 173) -- Render a recording according to a plan.
+  - reaches: `file_name`, `load_plan`, `with_extension`
+- `preview` (line 322) -- A still of what the page will look like, and the command that would make a video of it.
   - reaches: `load_plan`, `with_extension`
 
 ## What calls what
@@ -91,21 +109,30 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_inspect(["inspect<br/>line 49"])
-    n_run(["run<br/>line 109"])
-    n_load_plan["load_plan<br/>line 224"]
-    n_with_extension["with_extension<br/>line 229"]
+    n_look_from(["look_from<br/>line 77"])
+    n_inspect(["inspect<br/>line 110"])
+    n_run(["run<br/>line 173"])
+    n_preview(["preview<br/>line 322"])
+    n_file_name["file_name<br/>line 420"]
+    n_load_plan["load_plan<br/>line 427"]
+    n_with_extension["with_extension<br/>line 432"]
     n_inspect --> n_load_plan
+    n_preview --> n_load_plan
+    n_preview --> n_with_extension
+    n_run --> n_file_name
     n_run --> n_load_plan
     n_run --> n_with_extension
-    click n_inspect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L49" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L109" "open the source"
-    click n_load_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L224" "open the source"
-    click n_with_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L229" "open the source"
+    click n_look_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L77" "open the source"
+    click n_inspect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L110" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L173" "open the source"
+    click n_preview href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L322" "open the source"
+    click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L420" "open the source"
+    click n_load_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L427" "open the source"
+    click n_with_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L432" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_inspect,n_run entry
+    class n_look_from,n_inspect,n_run,n_preview entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_load_plan,n_with_extension helper
+    class n_file_name,n_load_plan,n_with_extension helper
 ```
 
 </details>
@@ -114,10 +141,14 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `inspect` <sub>pub fn</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L49) | Show a plan without rendering anything. |
-| `run` <sub>pub fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L109) | Render a recording according to a plan. |
-| `load_plan` <sub>fn</sub> | [224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L224) | Read a plan, and say where it went wrong rather than only that it did. |
-| `with_extension` <sub>fn</sub> | [229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L229) | Replace the last extension, keeping any .veiled before it. |
+| `WAVE_COLUMNS` <sub>const</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L69) | How many columns of waveform to reduce a recording to. |
+| `look_from` <sub>pub fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L77) | Turn the picture flags into a Look, or explain why they do not describe a picture that can be drawn. |
+| `inspect` <sub>pub fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L110) | Show a plan without rendering anything. |
+| `run` <sub>pub fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L173) | Render a recording according to a plan. |
+| `preview` <sub>pub fn</sub> | [322](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L322) | A still of what the page will look like, and the command that would make a video of it. |
+| `file_name` <sub>fn</sub> | [420](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L420) | The last component of a path, for writing into a page as a relative link. |
+| `load_plan` <sub>fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L427) | Read a plan, and say where it went wrong rather than only that it did. |
+| `with_extension` <sub>fn</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L432) | Replace the last extension, keeping any .veiled before it. |
 
 ---
 

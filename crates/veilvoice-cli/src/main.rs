@@ -397,6 +397,68 @@ enum ConversationCommand {
         /// Seconds between modulation seed rolls; 0 keeps one stream.
         #[arg(long, default_value_t = 2.0)]
         reseed_secs: f32,
+
+        /// Also write a self-contained HTML player beside the audio.
+        ///
+        /// The waveform, a circle per speaker that lights when they speak, and
+        /// the subtitles. It reads the audio and the WebVTT track by name from
+        /// the same directory, so move all of them or none.
+        #[arg(long)]
+        page: bool,
+        /// Picture width in pixels.
+        #[arg(long, default_value_t = 1280)]
+        width: u32,
+        /// Picture height in pixels.
+        #[arg(long, default_value_t = 720)]
+        height: u32,
+        /// Margin around everything, in pixels.
+        #[arg(long, default_value_t = 48)]
+        padding: u32,
+        /// A `#rrggbb` colour, or the path to an image file.
+        #[arg(long)]
+        background: Option<String>,
+        /// Plain black behind everything. Overrides `--background`.
+        #[arg(long)]
+        black: bool,
+    },
+
+    /// Draw a still of the page, without rendering any audio.
+    ///
+    /// The layout, the speaker circles and which voice each speaker becomes --
+    /// answered in a second rather than in the length of the recording. With
+    /// `--ffmpeg` it also prints the command that would turn frames into a
+    /// video file, and whether `ffmpeg` is on this machine. **It never runs
+    /// it**: this project ships no codec and starts no program you did not.
+    Preview {
+        /// The plan file.
+        plan: PathBuf,
+        /// A recording, so the waveform is real rather than flat.
+        #[arg(long)]
+        audio: Option<PathBuf>,
+        /// Which second of the conversation to draw.
+        #[arg(long, default_value_t = 0.0)]
+        at: f64,
+        /// Where to write the SVG. Defaults to the plan's name.
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// Print the ffmpeg command, and whether ffmpeg is installed.
+        #[arg(long)]
+        ffmpeg: bool,
+        /// Picture width in pixels.
+        #[arg(long, default_value_t = 1280)]
+        width: u32,
+        /// Picture height in pixels.
+        #[arg(long, default_value_t = 720)]
+        height: u32,
+        /// Margin around everything, in pixels.
+        #[arg(long, default_value_t = 48)]
+        padding: u32,
+        /// A `#rrggbb` colour, or the path to an image file.
+        #[arg(long)]
+        background: Option<String>,
+        /// Plain black behind everything. Overrides `--background`.
+        #[arg(long)]
+        black: bool,
     },
 }
 
@@ -773,15 +835,49 @@ fn run(command: Command) -> Result<(), String> {
                 intensity,
                 keep_accent,
                 reseed_secs,
-            } => conversation::run(
-                &plan,
-                &input,
+                page,
+                width,
+                height,
+                padding,
+                background,
+                black,
+            } => {
+                // The picture flags are read whether or not `--page` was given,
+                // so `--width 40 --page` and `--width 40` fail the same way.
+                // Accepting numbers that describe nothing, silently, because
+                // the page happened not to be asked for, is how a flag comes to
+                // mean two different things.
+                let look = conversation::look_from(width, height, padding, background, black)?;
+                conversation::run(
+                    &plan,
+                    &input,
+                    output,
+                    config(Tuning {
+                        intensity,
+                        keep_accent,
+                        reseed_secs,
+                    }),
+                    page.then_some(look),
+                )
+            }
+            ConversationCommand::Preview {
+                plan,
+                audio,
+                at,
                 output,
-                config(Tuning {
-                    intensity,
-                    keep_accent,
-                    reseed_secs,
-                }),
+                ffmpeg,
+                width,
+                height,
+                padding,
+                background,
+                black,
+            } => conversation::preview(
+                &plan,
+                audio,
+                at,
+                conversation::look_from(width, height, padding, background, black)?,
+                output,
+                ffmpeg,
             ),
         },
 
