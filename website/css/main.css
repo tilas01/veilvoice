@@ -455,6 +455,208 @@ html:not(.js) .bn { display: none; }
   border-radius: 10px;
 }
 
+/* ---------- the journey: a file in, a file out ---------- */
+/*
+ * One eight-second cycle, shared by every part. Each element animates for its
+ * own share of the cycle and rests for the rest of it, positioned by `--at` in
+ * the markup rather than by a stack of delay classes here -- so the sequence
+ * can be re-timed by reading the numbers in `index.html` in order.
+ *
+ * `animation-delay` is positive rather than negative on purpose. A negative
+ * delay starts an animation part-way through, which means the first pass of
+ * the sequence plays out of order before settling; a positive one simply waits,
+ * and the loop is in step from the first cycle a reader ever sees.
+ *
+ * The reduced-motion rule at the top of this file collapses all of it. What is
+ * left is the three cards, side by side, with their labels -- which is the
+ * whole point of the picture. The motion is the ordering, not the meaning.
+ */
+
+.journey { margin: 18px 0 0; }
+
+.jr-flow {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jr-step {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 8px;
+}
+
+.jr-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 0 auto;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg-inset);
+  animation: jr-card 8s ease-in-out infinite;
+  animation-delay: var(--at, 0s);
+}
+
+@keyframes jr-card {
+  0%          { border-color: var(--border); background: var(--bg-inset); }
+  3%          { border-color: var(--accent); background: var(--bg-soft); }
+  18%         { border-color: var(--accent); background: var(--bg-soft); }
+  32%, 100%   { border-color: var(--border); background: var(--bg-inset); }
+}
+
+.jr-name {
+  color: var(--fg);
+  font-size: 14px;
+  word-break: break-all;
+}
+.jr-fact { color: var(--muted); font-size: 12.5px; }
+.jr-key { display: inline-block; min-width: 9ch; }
+.jr-fact b { color: var(--fg); font-weight: 700; }
+.jr-warn { color: var(--warn) !important; }
+.jr-ok { color: var(--ok) !important; }
+
+/* Two lines of room whether the caption needs two or one. The captions sit
+ * *below* the cards in a column, so a caption that wraps makes its card
+ * shorter than the others -- three boxes of three different heights, for a
+ * reason that is nothing to do with what they say. */
+.jr-caption {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+  min-height: 3em;
+}
+
+.jr-engine { align-items: flex-start; }
+.jr-mark {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 2px;
+}
+
+/* The ring is the only part that is not a label: it is the moment the work
+ * happens, and it needs to read as a moment rather than as a state. A spreading
+ * shadow rather than a spinner, because a spinner means "waiting for something
+ * else" and this is not waiting for anything. */
+.jr-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: 9px;
+  pointer-events: none;
+  animation: jr-ring 8s ease-out infinite;
+  animation-delay: var(--at, 0s);
+}
+
+@keyframes jr-ring {
+  0%        { box-shadow: 0 0 0 0 var(--accent-2); opacity: 0.5; }
+  22%       { box-shadow: 0 0 0 14px var(--accent-2); opacity: 0; }
+  23%, 100% { box-shadow: 0 0 0 0 var(--accent-2); opacity: 0; }
+}
+
+.jr-link {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(34px, 7vw, 86px);
+  margin-top: 26px;
+  align-self: flex-start;
+  height: 2px;
+  background: var(--border);
+}
+
+/* The travelling packet. `left` rather than a transform: the distance is a
+ * percentage of a container whose width is a `clamp()`, and a transform
+ * percentage resolves against the moving dot instead -- which put the whole
+ * journey inside eight pixels. */
+.jr-packet {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  animation: jr-packet 8s cubic-bezier(0.4, 0, 0.3, 1) infinite;
+  animation-delay: var(--at, 0s);
+}
+.jr-packet-out { background: var(--accent-2); }
+
+@keyframes jr-packet {
+  0%        { left: 0; opacity: 0; }
+  4%        { left: 0; opacity: 1; }
+  17%       { left: calc(100% - 10px); opacity: 1; }
+  21%, 100% { left: calc(100% - 10px); opacity: 0; }
+}
+
+.jr-offline {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+/* A prohibition sign: a ring with a bar through it. Drawn from two boxes
+ * rather than written as a character, because the crossed-out arrow this
+ * started as needed two glyphs that not every monospace font has, and rendered
+ * as a smudge where it did not -- looked at, not assumed. */
+.jr-offline-mark {
+  position: relative;
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 2px solid var(--err);
+  border-radius: 50%;
+}
+.jr-offline-mark::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 3.5px;
+  width: 17px;
+  height: 2px;
+  background: var(--err);
+  transform: rotate(-45deg);
+}
+
+.journey figcaption {
+  margin-top: 20px;
+  color: var(--muted);
+  max-width: 68ch;
+  line-height: 1.65;
+}
+.journey figcaption strong { color: var(--fg); }
+
+/* Stacked on a narrow screen, with the connectors turned on their side. The
+ * cards are the content; the arrangement is not worth a horizontal scroll. */
+@media (max-width: 700px) {
+  .jr-flow { flex-direction: column; align-items: stretch; }
+  .jr-step { flex: none; }
+  .jr-link {
+    width: 2px;
+    height: 30px;
+    margin: 0 0 0 22px;
+    align-self: flex-start;
+  }
+  .jr-packet { animation-name: jr-packet-down; top: 0; left: -4px; }
+  @keyframes jr-packet-down {
+    0%        { top: 0; opacity: 0; }
+    4%        { top: 0; opacity: 1; }
+    17%       { top: calc(100% - 10px); opacity: 1; }
+    21%, 100% { top: calc(100% - 10px); opacity: 0; }
+  }
+}
+
 /* ---------- the demonstration ---------- */
 /*
  * A voice going in, the mark lighting as it passes, an unidentifiable wave

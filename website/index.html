@@ -194,6 +194,83 @@
   </noscript>
 </div>
 
+<section id="how">
+  <div class="wrap">
+  <h2>WHAT HAPPENS TO YOUR RECORDING</h2>
+
+  <figure class="journey">
+    <!--
+      The product in one picture: a file goes in, the voiceprint is destroyed,
+      a file comes out with the same words in a voice that is not yours.
+
+      Text and CSS, not an image and not a script -- the same three reasons as
+      the banner. It follows the reader's palette, every claim in it can be
+      selected and read aloud, and `prefers-reduced-motion` reaches it. The
+      whole sequence is one eight-second cycle; each part animates for its own
+      share of it and rests for the remainder, so nothing here needs the parts
+      to be told about each other.
+
+      Deliberately not another waveform. The section below this one is two
+      waveforms and the mark between them, and it is about what the *signal*
+      does. This one is about what *you* do, so it is files and labels.
+    -->
+    <ol class="jr-flow" aria-hidden="true">
+      <li class="jr-step">
+        <span class="jr-card" style="--at:0s">
+          <span class="jr-name">interview.wav</span>
+          <span class="jr-fact"><span class="jr-key">voiceprint</span> <b class="jr-warn">present</b></span>
+          <span class="jr-fact"><span class="jr-key">words</span> <b>yours</b></span>
+        </span>
+        <span class="jr-caption">what you recorded</span>
+      </li>
+
+      <li class="jr-link"><span class="jr-packet" style="--at:0.9s"></span></li>
+
+      <li class="jr-step">
+        <span class="jr-card jr-engine" style="--at:2.2s">
+          <img class="jr-mark" src="assets/icon-32.png" alt="">
+          <span class="jr-name">veilvoice</span>
+          <span class="jr-fact"><span class="jr-key">phase</span> <b>discarded</b></span>
+          <span class="jr-ring" style="--at:2.2s"></span>
+        </span>
+        <span class="jr-caption">on your machine, offline</span>
+      </li>
+
+      <li class="jr-link"><span class="jr-packet jr-packet-out" style="--at:4.3s"></span></li>
+
+      <li class="jr-step">
+        <span class="jr-card jr-done" style="--at:5.4s">
+          <span class="jr-name">interview-veiled.wav</span>
+          <span class="jr-fact"><span class="jr-key">voiceprint</span> <b class="jr-ok">destroyed</b></span>
+          <span class="jr-fact"><span class="jr-key">words</span> <b>unchanged</b></span>
+        </span>
+        <span class="jr-caption">the same words, in a voice that is not yours</span>
+      </li>
+    </ol>
+
+    <p class="jr-offline" aria-hidden="true">
+      <span class="jr-offline-mark"></span>
+      nothing leaves this machine
+    </p>
+
+    <figcaption>
+      <strong>What goes in is a file; what comes out is a file.</strong> There
+      is no account, no upload and no queue: the whole of it happens on the
+      machine you are sitting at, and CI fails the build if a network client
+      appears anywhere in the dependency graph.
+      <br><br>
+      <strong>What this picture does not show is the limit.</strong> The
+      voiceprint goes; <em>what you said</em> stays, because the output is
+      meant to be listened to and transcribed. If the words themselves identify
+      you — a name, a place, a story only you could tell — VeilVoice has not
+      touched that and does not claim to. Segmental accent cues, which phonemes
+      you actually produced, survive for the same reason. See
+      <a href="#crypto">security and cryptography</a> for the full scope.
+    </figcaption>
+  </figure>
+  </div>
+</section>
+
 <section id="what">
   <div class="wrap">
     <h2>WHAT IT ACTUALLY DOES</h2>
