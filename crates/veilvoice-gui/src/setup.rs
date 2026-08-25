@@ -90,6 +90,16 @@ impl Setup {
         }
     }
 
+    /// Whether this copy is the installed one.
+    ///
+    /// Read once, when the panel was built. That is deliberate: the tab row is
+    /// drawn every frame and this answer involves the filesystem, so asking per
+    /// frame would put a `stat` in the paint path -- which is exactly the shape
+    /// of the defect that made the window freeze every couple of seconds.
+    pub fn running_installed(&self) -> bool {
+        self.status.running_installed
+    }
+
     /// True while a worker is running, so the app can keep repainting.
     pub fn is_busy(&self) -> bool {
         self.job.is_some()
@@ -150,6 +160,28 @@ impl Setup {
             });
     }
 
+    /// Why this tab is here, and how to make it not be.
+    ///
+    /// Under the header rather than buried in settings, because the question
+    /// "why is this program asking to install itself" is asked *here*, while
+    /// looking at the tab. The control that answers it lives in settings --
+    /// a tab that could hide itself and nothing else could bring it back would
+    /// be a one-way door.
+    fn visibility_note(&self, ui: &mut Ui) {
+        ui.label(
+            RichText::new(
+                "This tab is only here because you are running a portable copy. Once \
+                 VeilVoice is installed it disappears by itself: a program offering to \
+                 install itself when it already is tells you something untrue about \
+                 what you are running. To hide it on a portable copy too, there is a \
+                 tick under settings -> interface.",
+            )
+            .small()
+            .color(p::muted()),
+        );
+        ui.add_space(10.0);
+    }
+
     // --- the state of this copy --------------------------------------------
 
     fn where_this_copy_lives(&mut self, ui: &mut Ui) {
@@ -158,6 +190,7 @@ impl Setup {
 
         // Portable first, and stated as a working arrangement rather than as
         // something missing. It is how most people will run this.
+        self.visibility_note(ui);
         let (headline, colour) = match (self.status.installed, self.status.running_installed) {
             (_, true) => ("you are running the installed copy", p::green()),
             (true, false) => (
