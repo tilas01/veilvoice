@@ -8,6 +8,31 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The front page now shows what the product actually does
+
+A new section — **what happens to your recording** — between the banner and
+the list of features. A file goes in, the voiceprint is destroyed, a file comes
+out with the same words in a voice that is not yours. One eight-second CSS
+cycle: the input card lights, a packet travels the connector, the engine pulses,
+a second packet travels out, the output card lights.
+
+It is text and CSS, for the same three reasons the banner is: it follows the
+reader's palette, every claim in it can be selected and read aloud, and
+`prefers-reduced-motion` reaches it — after which what is left is three labelled
+cards side by side, which is the whole point of the picture. The motion is the
+ordering, not the meaning.
+
+Deliberately not another waveform. The section below it is two waveforms and
+the mark between them and is about what the *signal* does; this one is about
+what *you* do, so it is files and labels.
+
+And it states its own limit in the caption rather than in a footnote: the
+voiceprint goes, **what you said stays**, because the output is meant to be
+listened to and transcribed. If the words themselves identify you — a name, a
+place, a story only you could tell — VeilVoice has not touched that and does
+not claim to. Segmental accent cues survive for the same reason.
+
+
 ### The banner: a GIF in the README, and CSS on the site
 
 **The README animates again.** `assets/generate.py` gained a GIF encoder — its
