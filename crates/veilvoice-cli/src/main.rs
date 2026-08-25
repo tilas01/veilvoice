@@ -420,6 +420,12 @@ enum ConversationCommand {
         /// Plain black behind everything. Overrides `--background`.
         #[arg(long)]
         black: bool,
+        /// Colour scheme, from the nine the website and the app offer.
+        ///
+        /// Defaults to Tokyo Night. An unknown name is refused, and the error
+        /// lists every one it could have been.
+        #[arg(long)]
+        theme: Option<String>,
     },
 
     /// Draw a still of the page, without rendering any audio.
@@ -459,6 +465,9 @@ enum ConversationCommand {
         /// Plain black behind everything. Overrides `--background`.
         #[arg(long)]
         black: bool,
+        /// Colour scheme, from the nine the website and the app offer.
+        #[arg(long)]
+        theme: Option<String>,
     },
 }
 
@@ -841,13 +850,15 @@ fn run(command: Command) -> Result<(), String> {
                 padding,
                 background,
                 black,
+                theme,
             } => {
                 // The picture flags are read whether or not `--page` was given,
                 // so `--width 40 --page` and `--width 40` fail the same way.
                 // Accepting numbers that describe nothing, silently, because
                 // the page happened not to be asked for, is how a flag comes to
                 // mean two different things.
-                let look = conversation::look_from(width, height, padding, background, black)?;
+                let look =
+                    conversation::look_from(width, height, padding, background, black, theme)?;
                 conversation::run(
                     &plan,
                     &input,
@@ -871,11 +882,12 @@ fn run(command: Command) -> Result<(), String> {
                 padding,
                 background,
                 black,
+                theme,
             } => conversation::preview(
                 &plan,
                 audio,
                 at,
-                conversation::look_from(width, height, padding, background, black)?,
+                conversation::look_from(width, height, padding, background, black, theme)?,
                 output,
                 ffmpeg,
             ),

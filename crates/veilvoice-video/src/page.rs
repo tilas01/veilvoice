@@ -55,6 +55,13 @@ pub struct Look {
     pub padding: u32,
     /// What is behind it all.
     pub background: Background,
+    /// The colour scheme, from the same nine the website and the desktop
+    /// application offer.
+    ///
+    /// A reference rather than an identifier, so a `Look` that exists is a
+    /// `Look` whose palette exists: the name is resolved once, where the user
+    /// typed it, and every drawing after that is looking at real colours.
+    pub palette: &'static palette::Palette,
 }
 
 impl Default for Look {
@@ -64,6 +71,7 @@ impl Default for Look {
             height: 720,
             padding: 48,
             background: Background::Colour(palette::BG.to_string()),
+            palette: palette::default_palette(),
         }
     }
 }
@@ -82,6 +90,28 @@ impl Look {
     pub fn black(self) -> Self {
         Self {
             background: Background::Colour("#000000".to_string()),
+            ..self
+        }
+    }
+
+    /// The same look in another palette.
+    ///
+    /// The background follows unless it was set to something specific. A
+    /// reader who asked for Gruvbox and got a Gruvbox picture on a Tokyo Night
+    /// page would reasonably call that a bug; a reader who asked for Gruvbox
+    /// *and* `--background #123456` asked for two things and gets both.
+    pub fn themed(self, palette: &'static palette::Palette) -> Self {
+        let followed = matches!(
+            &self.background,
+            Background::Colour(colour) if colour == self.palette.bg
+        );
+        Self {
+            background: if followed {
+                Background::Colour(palette.bg.to_string())
+            } else {
+                self.background
+            },
+            palette,
             ..self
         }
     }
@@ -290,9 +320,9 @@ fn background_markup(look: &Look, width: u32, height: u32) -> (String, Vec<Strin
                          preserveAspectRatio=\"xMidYMid slice\"/>\
                          <rect width=\"{width}\" height=\"{height}\" fill=\"{}\" \
                          opacity=\"0.55\"/>",
-                        palette::BG,
+                        look.palette.bg,
                         escape(&uri),
-                        palette::BG
+                        look.palette.bg
                     ),
                     notes,
                 )
@@ -300,7 +330,7 @@ fn background_markup(look: &Look, width: u32, height: u32) -> (String, Vec<Strin
             Err(error) => (
                 format!(
                     "<rect width=\"{width}\" height=\"{height}\" fill=\"{}\"/>",
-                    palette::BG
+                    look.palette.bg
                 ),
                 vec![format!(
                     "the background image was not used: {error}. The picture was drawn on \
@@ -318,6 +348,7 @@ fn speaker_markup(
     centre_x: f32,
     layout: &Layout,
     active: bool,
+    ink: &str,
 ) -> (String, Vec<String>) {
     let speaker = &plan.speakers()[slot];
     let colour = palette::speaker(slot);
@@ -370,7 +401,7 @@ fn speaker_markup(
              <text x=\"{centre_x:.1}\" y=\"{label_y:.1}\" text-anchor=\"middle\" \
              font-family=\"ui-monospace, SFMono-Regular, Menlo, Consolas, monospace\" \
              font-size=\"{font:.1}\" fill=\"{}\">{}</text></g>",
-            palette::FG,
+            ink,
             escape(&speaker.name)
         ),
         notes,
@@ -422,7 +453,7 @@ pub fn still(
             escape(title),
             x = width as f32 / 2.0,
             y = layout.title_y,
-            fg = palette::FG,
+            fg = look.palette.fg,
         ));
     }
 
@@ -440,8 +471,14 @@ pub fn still(
     let step = layout.wave_width / count as f32;
     for slot in 0..plan.len() {
         let centre_x = layout.wave_x + step * (slot as f32 + 0.5);
-        let (markup, speaker_notes) =
-            speaker_markup(plan, slot, centre_x, &layout, speaking.contains(&slot));
+        let (markup, speaker_notes) = speaker_markup(
+            plan,
+            slot,
+            centre_x,
+            &layout,
+            speaking.contains(&slot),
+            look.palette.fg,
+        );
         out.push_str(&markup);
         notes.extend(speaker_notes);
     }
@@ -454,8 +491,8 @@ pub fn still(
         layout.wave_y,
         layout.wave_width,
         layout.wave_height,
-        palette::BG_INSET,
-        palette::BORDER,
+        look.palette.bg_inset,
+        look.palette.border,
     ));
     let path = waveform::svg_path(
         envelope,
@@ -467,7 +504,7 @@ pub fn still(
     if !path.is_empty() {
         out.push_str(&format!(
             "<path d=\"{path}\" fill=\"{}\" opacity=\"0.85\"/>",
-            palette::MUTED
+            look.palette.muted
         ));
     }
     let duration = plan.duration().max(1e-9);
@@ -556,9 +593,9 @@ pub fn player(
          audio.addEventListener('timeupdate', tick);\n  \
          audio.addEventListener('seeked', tick);\n  \
          void box;\n  tick();\n}})();\n</script>\n</body>\n</html>\n",
-        bg = palette::BG,
-        fg = palette::FG,
-        muted = palette::MUTED,
+        bg = look.palette.bg,
+        fg = look.palette.fg,
+        muted = look.palette.muted,
         svg = drawn.markup,
         audio = escape(audio_href),
         vtt = escape(subtitles_href),

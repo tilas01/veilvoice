@@ -55,10 +55,250 @@ pub const FG: &str = "#c0caf5";
 /// Secondary text.
 pub const MUTED: &str = "#737aa2";
 
+/// One complete colour scheme, matching one `[data-theme]` block in
+/// `website/css/themes.css` and one entry in `veilvoice-gui`'s theme table.
+///
+/// The field names are the CSS custom properties one for one: `bg` is `--bg`,
+/// `accent_2` is `--accent-2`. A test reads that stylesheet and fails if any of
+/// them ever disagree, which is the same arrangement the desktop application
+/// has had since the themes existed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Palette {
+    /// Stable identifier, matching the website's `data-theme` value.
+    pub id: &'static str,
+    /// Human-readable name, as the pickers show it.
+    pub name: &'static str,
+    /// Whether this is a light scheme.
+    pub light: bool,
+
+    /// The page behind everything.
+    pub bg: &'static str,
+    /// A raised surface.
+    pub bg_soft: &'static str,
+    /// A panel or inset, behind the waveform.
+    pub bg_inset: &'static str,
+    /// Hairlines and dividers.
+    pub border: &'static str,
+    /// Body text.
+    pub fg: &'static str,
+    /// Secondary text.
+    pub muted: &'static str,
+    /// The project's primary colour.
+    pub accent: &'static str,
+    /// The "veiled" half of the mark.
+    pub accent_2: &'static str,
+    /// Values and figures.
+    pub cyan: &'static str,
+    /// Success.
+    pub ok: &'static str,
+    /// Warning.
+    pub warn: &'static str,
+    /// Error.
+    pub err: &'static str,
+}
+
+/// Every palette, in the order the pickers show them.
+///
+/// Index 0 is the default, and is what an unknown identifier falls back to.
+pub const PALETTES: &[Palette] = &[
+    Palette {
+        id: "tokyo-night",
+        name: "Tokyo Night",
+        light: false,
+        bg: "#1a1b26",
+        bg_soft: "#1f2335",
+        bg_inset: "#16161e",
+        border: "#2f3549",
+        fg: "#c0caf5",
+        muted: "#737aa2",
+        accent: "#7aa2f7",
+        accent_2: "#bb9af7",
+        cyan: "#7dcfff",
+        ok: "#9ece6a",
+        warn: "#e0af68",
+        err: "#f7768e",
+    },
+    Palette {
+        id: "gruvbox",
+        name: "Gruvbox",
+        light: false,
+        bg: "#282828",
+        bg_soft: "#32302f",
+        bg_inset: "#1d2021",
+        border: "#504945",
+        fg: "#ebdbb2",
+        muted: "#928374",
+        accent: "#83a598",
+        accent_2: "#d3869b",
+        cyan: "#8ec07c",
+        ok: "#b8bb26",
+        warn: "#fabd2f",
+        err: "#fb4934",
+    },
+    Palette {
+        id: "dracula",
+        name: "Dracula",
+        light: false,
+        bg: "#282a36",
+        bg_soft: "#343746",
+        bg_inset: "#21222c",
+        border: "#44475a",
+        fg: "#f8f8f2",
+        muted: "#6272a4",
+        accent: "#bd93f9",
+        accent_2: "#ff79c6",
+        cyan: "#8be9fd",
+        ok: "#50fa7b",
+        warn: "#f1fa8c",
+        err: "#ff5555",
+    },
+    Palette {
+        id: "nord",
+        name: "Nord",
+        light: false,
+        bg: "#2e3440",
+        bg_soft: "#3b4252",
+        bg_inset: "#272c36",
+        border: "#4c566a",
+        fg: "#eceff4",
+        muted: "#7b88a1",
+        accent: "#88c0d0",
+        accent_2: "#b48ead",
+        cyan: "#8fbcbb",
+        ok: "#a3be8c",
+        warn: "#ebcb8b",
+        err: "#bf616a",
+    },
+    Palette {
+        id: "catppuccin",
+        name: "Catppuccin Mocha",
+        light: false,
+        bg: "#1e1e2e",
+        bg_soft: "#313244",
+        bg_inset: "#181825",
+        border: "#45475a",
+        fg: "#cdd6f4",
+        muted: "#7f849c",
+        accent: "#89b4fa",
+        accent_2: "#cba6f7",
+        cyan: "#94e2d5",
+        ok: "#a6e3a1",
+        warn: "#f9e2af",
+        err: "#f38ba8",
+    },
+    Palette {
+        id: "everforest",
+        name: "Everforest",
+        light: false,
+        bg: "#2d353b",
+        bg_soft: "#343f44",
+        bg_inset: "#272e33",
+        border: "#475258",
+        fg: "#d3c6aa",
+        muted: "#859289",
+        accent: "#a7c080",
+        accent_2: "#d699b6",
+        cyan: "#83c092",
+        ok: "#a7c080",
+        warn: "#dbbc7f",
+        err: "#e67e80",
+    },
+    Palette {
+        id: "solarized",
+        name: "Solarized Dark",
+        light: false,
+        bg: "#002b36",
+        bg_soft: "#073642",
+        bg_inset: "#00212b",
+        border: "#0f4b5c",
+        fg: "#93a1a1",
+        muted: "#657b83",
+        accent: "#268bd2",
+        accent_2: "#d33682",
+        cyan: "#2aa198",
+        ok: "#859900",
+        warn: "#b58900",
+        err: "#dc322f",
+    },
+    Palette {
+        id: "rose-pine",
+        name: "Rose Pine",
+        light: false,
+        bg: "#191724",
+        bg_soft: "#1f1d2e",
+        bg_inset: "#14121f",
+        border: "#33304a",
+        fg: "#e0def4",
+        muted: "#6e6a86",
+        accent: "#9ccfd8",
+        accent_2: "#c4a7e7",
+        cyan: "#31748f",
+        ok: "#a6da95",
+        warn: "#f6c177",
+        err: "#eb6f92",
+    },
+    Palette {
+        id: "paper",
+        name: "Paper (light)",
+        light: true,
+        bg: "#faf4ed",
+        bg_soft: "#f2e9e1",
+        bg_inset: "#fffaf3",
+        border: "#dfd8d0",
+        fg: "#575279",
+        muted: "#797593",
+        accent: "#286983",
+        accent_2: "#907aa9",
+        cyan: "#56949f",
+        ok: "#618774",
+        warn: "#ea9d34",
+        err: "#b4637a",
+    },
+];
+
+/// The palette a render uses unless one is named.
+pub const DEFAULT_ID: &str = "tokyo-night";
+
+/// The palette with this identifier.
+///
+/// `None` rather than a fallback: a caller who typed a theme name meant it, and
+/// silently drawing in a different one answers a question they did not ask. The
+/// command line turns this into an error that lists what it could have been.
+pub fn by_id(id: &str) -> Option<&'static Palette> {
+    PALETTES.iter().find(|palette| palette.id == id)
+}
+
+/// The default palette. Tokyo Night, and the same hexes the constants above
+/// carry.
+pub fn default_palette() -> &'static Palette {
+    &PALETTES[0]
+}
+
+/// Every identifier, for an error message or a picker.
+pub fn ids() -> Vec<&'static str> {
+    PALETTES.iter().map(|palette| palette.id).collect()
+}
+
 /// The ten speaker colours, in the order slots are handed out.
 ///
 /// See the module note for why the order is what it is, and why the tenth is
 /// pale rather than another hue.
+///
+/// # One set, for every palette
+///
+/// These do **not** change with the chosen palette, and that is a decision
+/// rather than an omission. A palette here has six chromatic tokens; ten
+/// mutually separable colours cannot be got out of six without inventing four,
+/// and four invented colours are four colours whose separation nobody has
+/// measured. This set was measured: the closest pair anywhere in it scores 63
+/// under [`distance`], and that pair is only ever reached by a recording with
+/// nine or ten people in it.
+///
+/// What the palette *does* decide is everything around them -- the page, the
+/// panel, the hairlines, the text -- so a render in Gruvbox is a Gruvbox
+/// picture with these ten circles in it. And the ink drawn on each circle is
+/// computed by [`ink_on`] rather than assumed, so the names stay readable on a
+/// light palette as well as a dark one.
 pub const SPEAKERS: [&str; 10] = [
     "#73daca", // 0  teal      -- furthest-apart pair with slot 1
     "#ff007c", // 1  magenta
@@ -216,6 +456,172 @@ mod tests {
     /// Two speakers is the common case, so slots 0 and 1 must be **the**
     /// furthest-apart pair in the set. The first version of this table failed
     /// exactly here, which is why the order is computed rather than judged.
+    /// Every palette here is a palette the website has, with the same hexes.
+    ///
+    /// The same arrangement `veilvoice-gui` has had since the themes existed:
+    /// the values are written out so a crate needs no website on disk to draw
+    /// a circle, and this reads the stylesheet and fails if the two ever part
+    /// company. Without it a theme could be changed on the site and a rendered
+    /// video would quietly keep the old colours.
+    #[test]
+    fn every_palette_matches_the_website_stylesheet() {
+        let css = std::fs::read_to_string(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../website/css/themes.css"),
+        )
+        .expect("themes.css should be readable from the crate directory");
+
+        for palette in PALETTES {
+            // The block for this theme: from its selector to the closing brace.
+            let marker = format!("[data-theme=\"{}\"]", palette.id);
+            let start = css
+                .find(&marker)
+                .unwrap_or_else(|| panic!("{} is not in themes.css", palette.id));
+            let block = &css[start..];
+            let end = block.find('}').expect("a theme block must close");
+            let block = &block[..end];
+
+            for (token, value) in [
+                ("--bg", palette.bg),
+                ("--bg-soft", palette.bg_soft),
+                ("--bg-inset", palette.bg_inset),
+                ("--border", palette.border),
+                ("--fg", palette.fg),
+                ("--muted", palette.muted),
+                ("--accent", palette.accent),
+                ("--accent-2", palette.accent_2),
+                ("--cyan", palette.cyan),
+                ("--ok", palette.ok),
+                ("--warn", palette.warn),
+                ("--err", palette.err),
+            ] {
+                // `--accent` would otherwise match `--accent-2`.
+                let wanted = format!("{token}:");
+                let at = block
+                    .match_indices(&wanted)
+                    .find(|(index, _)| {
+                        block[..*index].ends_with(char::is_whitespace) || *index == 0
+                    })
+                    .unwrap_or_else(|| panic!("{} has no {token}", palette.id))
+                    .0;
+                let rest = &block[at + wanted.len()..];
+                let declared = rest.trim_start();
+                assert!(
+                    declared.to_lowercase().starts_with(&value.to_lowercase()),
+                    "{} {token} is {} here and {} in themes.css",
+                    palette.id,
+                    value,
+                    &declared[..7.min(declared.len())]
+                );
+            }
+        }
+    }
+
+    /// The stylesheet must not hold a theme this crate has never heard of. A
+    /// picker offering nine and a renderer knowing eight is a picker with one
+    /// entry that silently draws in the wrong colours.
+    #[test]
+    fn the_stylesheet_has_no_theme_this_crate_is_missing() {
+        let css = std::fs::read_to_string(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../website/css/themes.css"),
+        )
+        .expect("themes.css should be readable from the crate directory");
+
+        for (index, _) in css.match_indices("[data-theme=\"") {
+            let rest = &css[index + "[data-theme=\"".len()..];
+            let id: String = rest.chars().take_while(|c| *c != '"').collect();
+            assert!(
+                by_id(&id).is_some(),
+                "themes.css declares {id:?} and this crate has no palette for it"
+            );
+        }
+    }
+
+    #[test]
+    fn the_default_is_tokyo_night_and_matches_the_constants() {
+        let default = default_palette();
+        assert_eq!(default.id, DEFAULT_ID);
+        assert_eq!(default.bg, BG);
+        assert_eq!(default.bg_inset, BG_INSET);
+        assert_eq!(default.border, BORDER);
+        assert_eq!(default.fg, FG);
+        assert_eq!(default.muted, MUTED);
+    }
+
+    /// An unknown name is refused rather than falling back. A caller who typed
+    /// a theme meant it, and drawing in a different one answers a question
+    /// they did not ask.
+    #[test]
+    fn an_unknown_identifier_is_refused_rather_than_defaulted() {
+        assert!(by_id("tokyo-night").is_some());
+        assert!(by_id("gruvbox").is_some());
+        assert!(by_id("solarised").is_none(), "not a spelling this has");
+        assert!(by_id("").is_none());
+        assert!(by_id("TOKYO-NIGHT").is_none(), "identifiers are exact");
+    }
+
+    #[test]
+    fn every_identifier_is_unique_and_every_colour_parses() {
+        let mut ids = ids();
+        let count = ids.len();
+        ids.sort_unstable();
+        ids.dedup();
+        assert_eq!(ids.len(), count, "two palettes share an identifier");
+        assert!(count >= 9, "the website offers nine; this has {count}");
+
+        for palette in PALETTES {
+            for (what, colour) in [
+                ("bg", palette.bg),
+                ("bg-soft", palette.bg_soft),
+                ("bg-inset", palette.bg_inset),
+                ("border", palette.border),
+                ("fg", palette.fg),
+                ("muted", palette.muted),
+                ("accent", palette.accent),
+                ("accent-2", palette.accent_2),
+                ("cyan", palette.cyan),
+                ("ok", palette.ok),
+                ("warn", palette.warn),
+                ("err", palette.err),
+            ] {
+                assert!(
+                    rgb(colour).is_some(),
+                    "{} {what} is {colour:?}, which is not #rrggbb",
+                    palette.id
+                );
+            }
+        }
+    }
+
+    /// Text has to be readable on the page in every palette, light or dark.
+    /// WCAG's floor for body text is 4.5:1; this is the arithmetic, not a
+    /// judgement.
+    #[test]
+    fn body_text_is_readable_on_the_page_in_every_palette() {
+        for palette in PALETTES {
+            let ratio = contrast(palette.fg, palette.bg);
+            assert!(
+                ratio >= 4.5,
+                "{}: fg on bg is {ratio:.2}:1, under 4.5",
+                palette.id
+            );
+        }
+    }
+
+    /// The speaker circles are one measured set shared by every palette, so
+    /// the thing that has to hold per palette is that a name drawn on a circle
+    /// is readable. `ink_on` computes that rather than assuming it.
+    #[test]
+    fn a_name_on_a_speaker_circle_is_readable_whatever_the_palette() {
+        for slot in 0..SPEAKERS.len() {
+            let circle = speaker(slot);
+            let ratio = contrast(ink_on(circle), circle);
+            assert!(
+                ratio >= 4.5,
+                "slot {slot} ({circle}) gives {ratio:.2}:1 for its label"
+            );
+        }
+    }
+
     #[test]
     fn the_first_two_slots_are_the_furthest_apart_pair_in_the_set() {
         let first_pair = distance(SPEAKERS[0], SPEAKERS[1]);
