@@ -75,6 +75,13 @@ will not appear.
 
 _Colour key: **helper** -- private to this file._
 
+<p align="center">
+  <img src="../../../assets/diagrams/veilvoice-verify/main.svg" alt="what calls what in main.rs" width="640">
+</p>
+
+<details>
+<summary>The same graph as Mermaid source</summary>
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
@@ -160,6 +167,8 @@ flowchart TD
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_good,n_fail,n_deny,n_embedded_key,n_fingerprint_of,n_sha256_file,n_digests_match,n_digest_from_sums,n_verify_detached,n_read_text,n_command_key,n_command_sums,n_command_file_against_sums,n_command_file_against_hash,n_command_hash,n_take_value,n_command_release,n_command_auto,n_wait_before_the_window_closes,n_main helper
 ```
+
+</details>
 
 ## Items
 

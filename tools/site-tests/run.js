@@ -22,7 +22,8 @@ const SUITES = [
   require("./repo.test.js"),
   require("./reveal.test.js"),
   require("./search.test.js"),
-  require("./links.test.js")
+  require("./links.test.js"),
+  require("./diagrams.test.js")
 ];
 
 // `run` may be synchronous or return a promise: the repository-panel suite
