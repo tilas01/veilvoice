@@ -237,7 +237,14 @@ h3[id] { scroll-margin-top: 90px; }
 
 /* ---------- hero ---------- */
 
-.hero { padding: 54px 0 34px; text-align: center; }
+/* The gutter is 20 px, the same as `.wrap`, because the hero is the one
+ * section that is not inside one. On a desktop nothing changes -- the banner
+ * and the tagline are capped at 860 and 640 px and centre themselves long
+ * before the padding matters. On a 390 px phone it was the difference between
+ * a paragraph with a margin and one whose first and last characters touched
+ * both edges of the screen. Seen, not deduced: the layout measured clean
+ * because nothing overflowed; it simply had no room around it. */
+.hero { padding: 54px 20px 34px; text-align: center; }
 
 /* `<picture>` is an inline box by default and is now the hero's direct child,
  * so it is what `.stagger > *` animates and what has to carry the width. The
@@ -492,6 +499,46 @@ h3[id] { scroll-margin-top: 90px; }
 /* For a term close to the right edge, where a left-anchored box would run off
  * that side instead. */
 [data-tip].tip-right::after { left: auto; right: 0; }
+
+/*
+ * On a phone there is no edge left to anchor to.
+ *
+ * The box is `width: max-content` capped at 34ch -- about 255 px -- and it is
+ * anchored to the left of the annotated word. In a 312 px column with the word
+ * two thirds of the way along, that put its right edge at 433 px on a 390 px
+ * screen: half the tooltip off the side, and, because a `visibility: hidden`
+ * box still takes part in layout, the *front page itself* scrolling sideways by
+ * 82 px whether anybody hovered anything or not. Measured with
+ * `tools/render/probe.py overflow --width 390`, which is also how the cause was
+ * narrowed from "something on the page" to one paragraph in one card.
+ *
+ * Pinned to the bottom of the viewport instead: full width, nothing to run off,
+ * and out from under the finger that opened it. `position: fixed` also takes
+ * the box out of the scrollable overflow entirely, which is what removes the
+ * 82 px.
+ *
+ * The query is 900 px rather than the site's usual 760 because this is not a
+ * phone problem: it is a *narrow column* problem, and the columns keep
+ * narrowing until the page reaches its full 900 px width. A tablet at 768 was
+ * still 75 px over. Above 900 the layout stops changing, the measurements are
+ * clean, and `.tip-right` remains the opt-out for a term genuinely close to
+ * the right-hand edge.
+ */
+@media (max-width: 900px) {
+  [data-tip]::after {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    top: auto;
+    width: auto;
+    max-width: none;
+    transform: translate(0, 6px);
+  }
+  [data-tip].tip-right::after { left: 12px; right: 12px; }
+  [data-tip]:hover::after,
+  [data-tip]:focus-visible::after { transform: translate(0, 0); }
+}
 
 /* The global reduced-motion rule collapses the transition, which is correct
  * here: the box appears at once rather than sliding, and it still appears.
@@ -765,8 +812,48 @@ pre {
 }
 
 table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13.5px; }
+
+/* A reference table has a column of item names that cannot be broken -- they
+ * are code -- so its narrowest possible width can exceed the column it is in.
+ * `display: block` makes the element its own sideways scroller; the rows inside
+ * are then laid out by an anonymous table box, which shrink-to-fits. That means
+ * the table still fills a column wide enough to hold it -- so nothing changes
+ * on a desktop -- and scrolls inside itself when the column is not, instead of
+ * taking the whole page sideways.
+ *
+ * Deliberately not inside a width query. The reference pages keep a 200 px
+ * contents column until 720 px, so a tablet at 768 gives a table *less* room
+ * than a phone does: with this scoped to 760, `chain.html` still scrolled to
+ * 908 px at a viewport of 768. Measured, then unscoped. */
+table {
+  display: block;
+  width: auto;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
 th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
 th { color: var(--accent); font-weight: 700; }
+
+/* `DeidConfig::reseed_range_is_finer_than_a_frame` is one unbreakable word
+ * 385 px wide, and a phone column is about 300. `break-word` breaks a word only
+ * when it would otherwise overflow, so ordinary code spans are untouched --
+ * and a `<code>` inside a `<pre>` is excluded, because a code block scrolls
+ * sideways on purpose and breaking its lines would change what they say. */
+code { overflow-wrap: break-word; }
+pre code { overflow-wrap: normal; }
+
+/* `anywhere` rather than `break-word`, and only inside a table cell.
+ *
+ * The two differ in exactly one way that matters here: `break-word` breaks a
+ * long word when it would overflow, but it does *not* count that break when the
+ * browser works out how narrow the element could possibly be. `anywhere` does.
+ * A table's width comes from that number, so with `break-word` the items table
+ * still insisted on 658 px and scrolled sideways inside a 630 px column on a
+ * desktop -- measured, after the rule above was already in place. With
+ * `anywhere` the same table fits its column and breaks an identifier only in
+ * the cells that actually need it. */
+td code, th code { overflow-wrap: anywhere; }
 
 ul, ol { padding-left: 22px; }
 li { margin: 5px 0; }
@@ -883,6 +970,17 @@ progress { width: 100%; height: 6px; margin-top: 12px; }
 .toc { position: sticky; top: 74px; font-size: 13px; }
 .toc a { display: block; color: var(--muted); padding: 3px 0; border: 0; }
 .toc a:hover, .toc a.active { color: var(--accent); }
+/* A grid item's default `min-width: auto` means it refuses to be narrower
+ * than its own contents, and one `<table>` of items has a min-content width of
+ * 658 px. So on a 390 px phone the column stayed 658 px wide and took the whole
+ * reference page sideways with it -- headings, paragraphs and all. Measured
+ * with `tools/render/probe.py overflow --width 390`, which named the table.
+ *
+ * `min-width: 0` is the same fix the navigation row already carries, for the
+ * same reason, and it is what lets the scroll containers below actually
+ * contain anything. */
+.wiki-layout > * { min-width: 0; }
+
 @media (max-width: 720px) {
   .wiki-layout { grid-template-columns: 1fr; }
   .toc { position: static; }
@@ -1044,7 +1142,14 @@ body.legal-locked { overflow: hidden; }
 
 .lead { color: var(--muted); max-width: 68ch; }
 
-.search-page { padding: 30px 0 60px; }
+/* The element is `<div class="wrap search-page">`, and `.wrap` sets
+ * `padding: 0 20px`. A second `padding` *shorthand* here does not add to
+ * that -- it replaces it, and the two zeroes took the side gutters away.
+ * Invisible at 900 px, where the column is narrower than the screen
+ * anyway; on a phone every heading and all 200 index rows ran edge to
+ * edge. Found by measuring how close text sits to the screen edge, which
+ * is a thing no overflow check can see, because nothing overflowed. */
+.search-page { padding: 30px 20px 60px; }
 .search-page h1 { margin-bottom: 6px; }
 
 .search-controls {
@@ -1227,6 +1332,20 @@ body.legal-locked { overflow: hidden; }
   /* On a phone the navigation already takes its own row, so the divider would
    * separate the controls from nothing. */
   .controls { margin-left: auto; padding-left: 0; border-left: 0; }
+
+  /* With scripts off the switch grows a note -- "(locked: scripts are not
+   * running)" -- which is 257 px of `white-space: nowrap` beside a colour
+   * picker. On a 390 px phone that pushed the header, and therefore every
+   * page, 90 px sideways. Measured with
+   * `tools/render/probe.py overflow --no-js --width 390`, which is a
+   * combination nothing had rendered before: the site was checked with
+   * scripts off, and separately on a phone, and never both at once.
+   *
+   * The note stays, in full, because it is the honest explanation of why the
+   * switch cannot be moved. It simply takes its own line. */
+  .controls { flex-wrap: wrap; row-gap: 4px; }
+  .js-toggle { white-space: normal; flex-wrap: wrap; }
+  .js-toggle-lock { white-space: normal; }
 }
 
 .js-toggle {

@@ -217,6 +217,16 @@ def main():
     try:
         browser.call("Page.enable")
         browser.call("Runtime.enable")
+        # The disk cache is the reason this is here.
+        #
+        # The profile directory is reused between runs, so Edge keeps a
+        # cached copy of `main.css` and serves it back on the next one. A
+        # stylesheet fix measured as applied by one tool photographed as
+        # *not* applied by this one, and the two disagreed for a full round
+        # of debugging before the cache was the answer. A renderer whose
+        # picture can be one edit out of date is worse than no renderer.
+        browser.call("Network.enable")
+        browser.call("Network.setCacheDisabled", cacheDisabled=True)
         browser.call("Emulation.setDeviceMetricsOverride",
                      width=args.width, height=args.height,
                      deviceScaleFactor=1, mobile=False)
