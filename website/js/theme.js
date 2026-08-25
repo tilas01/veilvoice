@@ -5,6 +5,16 @@
 // The choice is kept in localStorage, which never leaves the browser. No
 // cookie, so nothing is attached to a request and there is nothing to consent
 // to -- a preference the server never sees is not tracking.
+//
+// In plain words
+//
+// This is the colour-scheme menu in the corner of the page. Pick a theme and
+// every page on this site changes to it, and stays that way next time you
+// come back.
+//
+// Your choice is kept in your own browser. It is not a cookie, so it is never
+// sent anywhere: this site has no server that could receive it and nothing
+// that could match it to you.
 
 (function () {
   "use strict";

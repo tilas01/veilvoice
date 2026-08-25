@@ -87,6 +87,10 @@ GENERATORS = [
     # can be regenerated and checked here.
     ("terminal drawings", [sys.executable, "tools/shots/terminal.py"]),
     ("documentation", [sys.executable, "tools/docs/generate.py"]),
+    # The website's own source, which `generate.py` does not cover: it reads
+    # Rust doc comments, and these are JavaScript and CSS. Imports the same
+    # module for the palette and the drawing code, so it goes after it.
+    ("website source pages", [sys.executable, "tools/docs/sources.py"]),
     # Derived from website/index.html, so it must run after anything that could
     # edit that file and before the index walks the result.
     ("section pages", [sys.executable, "tools/site/split.py"]),
@@ -98,6 +102,8 @@ CHECKS = [
     ("terminal drawings match their output",
      [sys.executable, "tools/shots/terminal.py", "--check"]),
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),
+    ("website source pages match their files",
+     [sys.executable, "tools/docs/sources.py", "--check"]),
     ("section pages match index.html", [sys.executable, "tools/site/split.py", "--check"]),
     ("search index matches the tree", [sys.executable, "tools/search-index/generate.py", "--check"]),
     ("website suites", ["node", "tools/site-tests/run.js"]),

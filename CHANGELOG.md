@@ -8,6 +8,43 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The website's own source is documented, twice over
+
+Ten files the site invites you to open and read — eight scripts and two
+stylesheets — had no page, no picture and no index, while every crate and every
+`.rs` file had all three. `tools/docs/sources.py` gives them the same
+treatment: a banner, a workchart of what calls what, a list of what is in
+there, and an index.
+
+Every page says what the file does **technically**, and then says the same
+thing **in plain words**. Both are read out of the file's own header comment,
+so they sit beside the code they describe and are reviewed in the same diff.
+
+**The plain half cannot be generated, so the tool refuses to invent it.** A
+sentence assembled from a filename is padding and a reader can tell, so
+`sources.py` fails with the list of files that have no `In plain words`
+section rather than writing a page without one. All ten have one now, written
+for somebody who does not write software:
+
+> **`website/js/verify.js` — in plain words.** This is the box on the verify
+> page where you drop a file you have downloaded, and it tells you whether it
+> is the one that was published. Your file never leaves your computer.
+
+The workchart is a *syntactic* reading — an edge means the callee's name
+appears, called, inside the caller's body — and the page says so, exactly as
+the Rust pages do. A stylesheet has no functions, so its chart is its own
+section comments, in order, which is the structure a stylesheet actually has.
+
+Both generators now sweep for orphans in the directories they own, so a page
+about a file that has been deleted fails the build rather than sitting in the
+tree describing something that is gone.
+
+**Found by looking at the page**, not by any test: the first version passed its
+body to the page shell as a joined string, and the shell does `out.extend` — so
+the string was extended one character at a time and the page rendered its own
+markup as spaced-out text. Every check passed.
+
+
 ### Drag a download onto the window and be told what it is
 
 New **verify** tab in the desktop application. Drop the download, the

@@ -15,6 +15,17 @@
 //
 // No token, no cookies, no credentials. Unauthenticated GitHub API requests are
 // rate-limited by IP to 60/hour, which a documentation page will never approach.
+//
+// In plain words
+//
+// This is the panel showing the project's stars, its latest release and its
+// README, read from GitHub as you look at it.
+//
+// It is the only thing on this site that talks to anybody else's server, and
+// the page says so before it does. GitHub learns your address and that you
+// looked at this project -- which it already knows, because it is serving you
+// this page. If you would rather it did not happen at all, the panel turns
+// into a plain link and nothing else on the site notices.
 
 (function () {
   "use strict";

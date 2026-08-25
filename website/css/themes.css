@@ -14,6 +14,15 @@
  * `<progress>` bar, the file picker -- are drawn by the platform, and without
  * this they are drawn light on a near-black page. Keeping it in the same block
  * as the palette means a new theme cannot be added with the wrong one.
+ *
+ * In plain words
+ *
+ * This is the list of colour schemes -- nine of them, twelve colours each.
+ *
+ * Everything else on the site refers to colours by their job rather than by
+ * name: "the background", "a warning", "secondary text". That is why adding
+ * a whole new scheme means adding a block here and changing nothing else, and
+ * why the desktop application can offer exactly the same nine.
  */
 
 :root,
