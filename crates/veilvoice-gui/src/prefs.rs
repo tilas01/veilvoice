@@ -47,6 +47,13 @@ pub struct Prefs {
     pub animated_icon: bool,
     /// Whether the first-run panel has been answered.
     pub configured: bool,
+    /// Whether the install tab is hidden even on a portable copy.
+    ///
+    /// The tab already disappears once VeilVoice is installed -- an installed
+    /// program offering to install itself is a tab that can only mislead. This
+    /// is for somebody who runs the portable copy on purpose and does not want
+    /// to be asked again.
+    pub hide_install_tab: bool,
     /// Whether the app opens with group mode already on.
     ///
     /// The *mode itself* is deliberately not stored. Group mode changes what a
@@ -70,6 +77,7 @@ impl Default for Prefs {
             animations: true,
             animated_icon: true,
             configured: false,
+            hide_install_tab: false,
             always_group: false,
             recovered_from_corrupt_file: false,
         }
@@ -147,6 +155,12 @@ impl Prefs {
                         understood += 1;
                     }
                 }
+                "hide_install_tab" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.hide_install_tab = on;
+                        understood += 1;
+                    }
+                }
                 "always_group" => {
                     if let Some(on) = parse_bool(value) {
                         prefs.always_group = on;
@@ -172,6 +186,7 @@ impl Prefs {
         out.push_str(&format!("animations = {}\n", self.animations));
         out.push_str(&format!("animated_icon = {}\n", self.animated_icon));
         out.push_str(&format!("configured = {}\n", self.configured));
+        out.push_str(&format!("hide_install_tab = {}\n", self.hide_install_tab));
         out.push_str(&format!("always_group = {}\n", self.always_group));
         out
     }
@@ -271,6 +286,7 @@ mod tests {
             animations: false,
             animated_icon: false,
             configured: true,
+            hide_install_tab: true,
             always_group: true,
             recovered_from_corrupt_file: false,
         };
@@ -354,6 +370,7 @@ mod tests {
             animations: false,
             animated_icon: true,
             configured: true,
+            hide_install_tab: false,
             always_group: false,
             recovered_from_corrupt_file: false,
         };

@@ -37,6 +37,8 @@ pub enum Page {
     Appearance,
     /// Animation and the animated mark.
     Motion,
+    /// Which tabs the window offers.
+    Interface,
     /// Where settings live, and how to reset them.
     Storage,
 }
@@ -46,6 +48,7 @@ impl Page {
     pub const ALL: &'static [(Page, &'static str, &'static str)] = &[
         (Page::Appearance, "appearance", "Colour scheme"),
         (Page::Motion, "motion", "Animation, and the mark"),
+        (Page::Interface, "interface", "Which tabs are shown"),
         (Page::Storage, "storage", "Where this is kept"),
     ];
 }
@@ -155,6 +158,31 @@ impl Settings {
         self.save_error.as_deref()
     }
 
+    /// Whether the install tab should be offered at all.
+    ///
+    /// Two conditions, and the first is not a preference: an installed copy
+    /// never offers to install itself, because a program that does that is
+    /// telling its user something untrue about what it is. The preference only
+    /// covers the other case -- a portable copy, run on purpose, by somebody
+    /// who does not want to be asked again.
+    pub fn show_install_tab(&self, running_installed: bool) -> bool {
+        !running_installed && !self.prefs.hide_install_tab
+    }
+
+    /// Whether the install tab is hidden by preference.
+    pub fn hide_install_tab(&self) -> bool {
+        self.prefs.hide_install_tab
+    }
+
+    /// Record whether to hide the install tab on a portable copy.
+    pub fn set_hide_install_tab(&mut self, hide: bool) {
+        if self.prefs.hide_install_tab == hide {
+            return;
+        }
+        self.prefs.hide_install_tab = hide;
+        self.persist();
+    }
+
     /// Whether the app should open in group mode.
     pub fn always_group(&self) -> bool {
         self.prefs.always_group
@@ -167,6 +195,41 @@ impl Settings {
         }
         self.prefs.always_group = always;
         self.persist();
+    }
+
+    /// Which tabs the window offers.
+    fn interface_page(&mut self, ui: &mut Ui) {
+        section(
+            ui,
+            "Tabs",
+            "What the row along the top of the window shows.",
+        );
+
+        let mut hide = self.prefs.hide_install_tab;
+        if ui
+            .checkbox(&mut hide, "Hide the install tab")
+            .on_hover_text("Only affects a portable copy; an installed one never shows it")
+            .changed()
+        {
+            self.set_hide_install_tab(hide);
+        }
+        ui.label(
+            RichText::new(
+                "  The install tab already disappears by itself once VeilVoice is \
+                 installed: a program offering to install itself when it already is \
+                 tells you something untrue about what you are running. This covers the \
+                 other case -- a portable copy, run on purpose, by somebody who does not \
+                 want to be asked again. Nothing else changes: `veilvoice install` still \
+                 works from the command line.",
+            )
+            .small()
+            .color(p::muted()),
+        );
+
+        if let Some(error) = &self.save_error {
+            ui.add_space(10.0);
+            ui.label(RichText::new(error).color(p::yellow()).small());
+        }
     }
 
     /// The first-run panel: offered once, with animation already on.
@@ -264,6 +327,7 @@ impl Settings {
         match self.page {
             Page::Appearance => self.appearance_page(ui, ctx),
             Page::Motion => self.motion_page(ui, ctx),
+            Page::Interface => self.interface_page(ui),
             Page::Storage => self.storage_page(ui),
         }
 
@@ -597,7 +661,7 @@ mod tests {
         let count = seen.len();
         seen.dedup();
         assert_eq!(seen.len(), count, "a page is listed twice");
-        assert_eq!(count, 3, "a page was added without a menu entry");
+        assert_eq!(count, 4, "a page was added without a menu entry");
         for (_, label, blurb) in Page::ALL {
             assert!(!label.is_empty() && !blurb.is_empty());
         }
@@ -681,6 +745,50 @@ mod tests {
     }
 
     /// Reset must not touch anything that is not a presentation choice.
+    /// An installed copy never offers to install itself, whatever the
+    /// preference says. The preference is only about the portable case.
+    #[test]
+    fn the_install_tab_is_never_offered_by_an_installed_copy() {
+        let mut settings = Settings::default();
+        assert!(
+            settings.show_install_tab(false),
+            "a portable copy offers it by default"
+        );
+        assert!(
+            !settings.show_install_tab(true),
+            "an installed copy must never offer to install itself"
+        );
+
+        settings.prefs.hide_install_tab = true;
+        assert!(
+            !settings.show_install_tab(false),
+            "the preference hides it on a portable copy"
+        );
+        assert!(
+            !settings.show_install_tab(true),
+            "and an installed copy is still never offered it"
+        );
+    }
+
+    /// The tick is remembered. A preference that has to be set on every launch
+    /// is not a preference.
+    #[test]
+    fn hiding_the_install_tab_survives_a_reload() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.conf");
+        let mut settings = Settings {
+            path: Some(path.clone()),
+            ..Default::default()
+        };
+        settings.set_hide_install_tab(true);
+        assert!(
+            settings.save_error().is_none(),
+            "{:?}",
+            settings.save_error()
+        );
+        assert!(Prefs::load(&path).hide_install_tab);
+    }
+
     #[test]
     fn reset_leaves_the_first_run_answered() {
         let dir = tempfile::tempdir().unwrap();
@@ -691,6 +799,7 @@ mod tests {
                 animations: false,
                 animated_icon: false,
                 configured: true,
+                hide_install_tab: false,
                 always_group: false,
                 recovered_from_corrupt_file: false,
             },
