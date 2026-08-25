@@ -125,6 +125,8 @@ enum Tab {
     Watch,
     /// The app lock, and what it is worth.
     Security,
+    /// Check a download against the signed list of hashes.
+    Verify,
     /// Colour scheme, animation, and where those choices are kept.
     Preferences,
     /// Portable or installed, and the optional third-party companions.
@@ -197,6 +199,10 @@ pub struct VeilVoiceApp {
     // The manual update check. Holds no clock: the only path into it is the
     // button on the about tab.
     updates: crate::updates::Updates,
+
+    // Checking a download against the signed hashes. Shares its arithmetic
+    // with the portable verifier rather than reimplementing it.
+    verify: crate::verify::Verify,
 }
 
 /// Pick the output to start on: a virtual cable if the machine has one,
@@ -269,6 +275,7 @@ impl VeilVoiceApp {
             // and touch no machine. `VeilVoiceApp::new` starts the real one.
             watch: WatchFeed::idle(),
             updates: crate::updates::Updates::default(),
+            verify: crate::verify::Verify::default(),
         }
     }
 }
@@ -456,6 +463,7 @@ impl eframe::App for VeilVoiceApp {
                     (Tab::Group, "group"),
                     (Tab::Watch, "monitor"),
                     (Tab::Security, "lock"),
+                    (Tab::Verify, "verify"),
                     (Tab::Preferences, "settings"),
                     (Tab::Setup, "install"),
                     (Tab::About, "about"),
@@ -494,6 +502,7 @@ impl eframe::App for VeilVoiceApp {
                     Tab::Group => self.group.tab(ui, &mut self.preferences),
                     Tab::Watch => self.watch_tab(ui),
                     Tab::Security => self.security.tab(ui),
+                    Tab::Verify => self.verify.tab(ui),
                     Tab::Preferences => self.preferences.tab(ui, ctx),
                     Tab::Setup => self.setup.tab(ui, motion),
                     Tab::About => self.about_tab(ui),
@@ -504,11 +513,18 @@ impl eframe::App for VeilVoiceApp {
         self.watch.drain();
         self.updates.drain();
         self.group.drain();
+        self.verify.drain();
+        // Read once a frame, before anything is drawn. A file dropped on the
+        // window is meant for the verify tab wherever the reader happens to be
+        // -- dropping a download and being told nothing because the wrong tab
+        // was open would be the interface refusing to do the obvious thing.
+        self.verify.take_dropped(ctx);
 
         // The live meters only move if something repaints them, and the
         // monitor has to keep ticking even while the window is idle.
         if self.session.is_some()
             || self.updates.is_busy()
+            || self.verify.is_busy()
             || self.group.is_busy()
             || self.job.is_some()
             || self.security.is_busy()
