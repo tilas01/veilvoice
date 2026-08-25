@@ -88,6 +88,16 @@ impl Verify {
         self.job.is_some()
     }
 
+    /// Whether the window has to keep drawing for this panel's sake.
+    ///
+    /// Busy *or* hovering. An idle egui window repaints only when something
+    /// asks it to, and dragging a file over it is not by itself something that
+    /// does -- so without this the drop target never lit up and the dropped
+    /// file did not appear until the mouse moved for some other reason.
+    pub fn wants_repaint(&self) -> bool {
+        self.job.is_some() || self.hovering
+    }
+
     /// Take the worker's answer if it has one. Never waits.
     pub fn drain(&mut self) {
         let Some(rx) = &self.job else { return };
@@ -412,6 +422,17 @@ mod tests {
         };
         verify.accept(PathBuf::from("veilvoice.zip"));
         assert!(verify.report.is_none());
+    }
+
+    /// The window has to keep drawing while a file is over it, not only while
+    /// a check is running. This is the assertion behind that.
+    #[test]
+    fn hovering_keeps_the_window_awake() {
+        let mut verify = Verify::default();
+        assert!(!verify.wants_repaint(), "an idle panel asks for nothing");
+        verify.hovering = true;
+        assert!(verify.wants_repaint(), "a file over the window is a reason");
+        assert!(!verify.is_busy(), "hovering is not a running check");
     }
 
     #[test]
