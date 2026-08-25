@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/meter.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 343 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 250 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs)
 
 ## Contents
 
@@ -56,17 +56,17 @@ still showing what just happened.
 
 ## What this file contains
 
-343 lines defining **6 functions** (5 public), **1 type** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+250 lines defining **4 functions** (3 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Channel` (line 159) -- One channel's meter, keeping the peak between reads.
+- `struct Channel` (line 120) -- One channel's meter, keeping the peak between reads.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Channel::update` (line 177) -- Take a new reading and give back the meter to print.
-  - reaches: `dbfs`, `render`, `position`
-- `Channel::has_clipped` (line 198) -- Whether this channel has clipped at any point in the session.
+- `Channel::update` (line 138) -- Take a new reading and give back the meter to print.
+  - reaches: `render`
+- `Channel::has_clipped` (line 159) -- Whether this channel has clipped at any point in the session.
 
 ## What calls what
 
@@ -82,27 +82,19 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_dbfs["dbfs<br/>line 81"]
-    n_position["position<br/>line 90"]
-    n_render["render<br/>line 104"]
-    n_default["Channel::default<br/>line 166"]
-    n_update(["Channel::update<br/>line 177"])
-    n_has_clipped(["Channel::has_clipped<br/>line 198"])
-    n_position --> n_dbfs
-    n_render --> n_dbfs
-    n_render --> n_position
-    n_update --> n_dbfs
+    n_render["render<br/>line 65"]
+    n_default["Channel::default<br/>line 127"]
+    n_update(["Channel::update<br/>line 138"])
+    n_has_clipped(["Channel::has_clipped<br/>line 159"])
     n_update --> n_render
-    click n_dbfs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L81" "open the source"
-    click n_position href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L90" "open the source"
-    click n_render href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L104" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L166" "open the source"
-    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L177" "open the source"
-    click n_has_clipped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L198" "open the source"
+    click n_render href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L65" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L127" "open the source"
+    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L138" "open the source"
+    click n_has_clipped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L159" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_update,n_has_clipped entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_dbfs,n_position,n_render api
+    class n_render api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_default helper
 ```
@@ -113,14 +105,10 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `HOLD` <sub>pub const</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L47) | How long a peak marker is held before it falls back. |
-| `FLOOR_DB` <sub>pub const</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L54) | The quietest level the bar shows. |
-| `CLIP_DB` <sub>pub const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L62) | At or above this, the level is called clipping. |
-| `dbfs` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L81) | Level in decibels relative to full scale. |
-| `position` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L90) | Where a level sits along the bar, from 0.0 at the floor to 1.0 at full scale. |
-| `EIGHTHS` <sub>const</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L99) | The eighth-block characters, so a bar of n characters has 8n steps. |
-| `render` <sub>pub fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L104) | One meter: the bar, the peak marker, and the number. |
-| `Channel` <sub>pub struct</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L159) | One channel's meter, keeping the peak between reads. |
-| `Channel::default` <sub>fn</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L166) |  |
-| `Channel::update` <sub>pub fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L177) | Take a new reading and give back the meter to print. |
-| `Channel::has_clipped` <sub>pub fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L198) | Whether this channel has clipped at any point in the session. |
+| `HOLD` <sub>pub const</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L53) | How long a peak marker is held before it falls back. |
+| `EIGHTHS` <sub>const</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L60) | The eighth-block characters, so a bar of n characters has 8n steps. |
+| `render` <sub>pub fn</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L65) | One meter: the bar, the peak marker, and the number. |
+| `Channel` <sub>pub struct</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L120) | One channel's meter, keeping the peak between reads. |
+| `Channel::default` <sub>fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L127) |  |
+| `Channel::update` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L138) | Take a new reading and give back the meter to print. |
+| `Channel::has_clipped` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L159) | Whether this channel has clipped at any point in the session. |
