@@ -1,0 +1,11 @@
+Scramble a microphone live, into a device or a virtual cable
+
+Usage: veilvoice.exe live [OPTIONS]
+
+Options:
+  -i, --input <INPUT>              Input device name. Defaults to the system default
+  -o, --output <OUTPUT>            Output device name. Defaults to a virtual cable if one is found
+      --intensity <INTENSITY>      How far pitch and formants are pushed from the original, 0.0–1.0 [default: 1]
+      --keep-accent                Keep the speaker's accent and intonation intact
+      --reseed-secs <RESEED_SECS>  Seconds between rolls of the modulation seed. 0 keeps one stream for the whole session [default: 2]
+  -h, --help                       Print help

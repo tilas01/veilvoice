@@ -1,0 +1,58 @@
+Render a recording according to a plan.
+
+Writes the audio and both subtitle formats. Audio that no turn claims is **silenced**, never passed through -- it has not been veiled, and a gap in a plan must not put a real voice into the result. How much went is printed.
+
+Usage: veilvoice.exe conversation render [OPTIONS] <PLAN> <INPUT>
+
+Arguments:
+  <PLAN>
+          The plan file
+
+  <INPUT>
+          The recording
+
+Options:
+  -o, --output <OUTPUT>
+          Where to write the audio. The subtitles take the same name
+
+      --intensity <INTENSITY>
+          0..1 -- how far the transform pushes
+          
+          [default: 1]
+
+      --keep-accent
+          Leave the speaker's accent and intonation intact
+
+      --reseed-secs <RESEED_SECS>
+          Seconds between modulation seed rolls; 0 keeps one stream
+          
+          [default: 2]
+
+      --page
+          Also write a self-contained HTML player beside the audio.
+          
+          The waveform, a circle per speaker that lights when they speak, and the subtitles. It reads the audio and the WebVTT track by name from the same directory, so move all of them or none.
+
+      --width <WIDTH>
+          Picture width in pixels
+          
+          [default: 1280]
+
+      --height <HEIGHT>
+          Picture height in pixels
+          
+          [default: 720]
+
+      --padding <PADDING>
+          Margin around everything, in pixels
+          
+          [default: 48]
+
+      --background <BACKGROUND>
+          A `#rrggbb` colour, or the path to an image file
+
+      --black
+          Plain black behind everything. Overrides `--background`
+
+  -h, --help
+          Print help (see a summary with '-h')

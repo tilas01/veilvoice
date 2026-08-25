@@ -1,0 +1,21 @@
+Which screen recorders are running, and which you meant to run.
+
+**VeilVoice does not hide its own window from capture.** You can record this application with OBS or anything else, deliberately, and nothing here prevents it. Excluding a window from capture needs `unsafe` FFI, which every crate in this workspace forbids, so the exclusion is not built -- see ROADMAP.md.
+
+What this does is tell you a recorder is running, once, and then stop telling you if you say you meant it. A monitor that warns every thirty seconds while you record a tutorial is a monitor you switch off, and then it is not watching for the recorder you did *not* start.
+
+Two things it cannot do. It only knows the programs in its table, so an empty report is not evidence that nothing is recording. And it cannot tell whether a program that is running is actually capturing anything -- a meeting application being open is not somebody watching your screen.
+
+Usage: veilvoice.exe capture <COMMAND>
+
+Commands:
+  status  What is running, what is allowed, and what this cannot see
+  list    Every program this build knows how to notice
+  allow   Stop notifying about one program
+  deny    Start notifying about one program again
+  check   Look now, and exit non-zero if something unallowed is running
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help
+          Print help (see a summary with '-h')

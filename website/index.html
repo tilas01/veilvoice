@@ -523,6 +523,96 @@
   underneath, and describing sixty animated bars to a screen reader would be
   noise in place of the sentence.
 -->
+<section id="look">
+  <div class="wrap">
+  <h2>WHAT IT LOOKS LIKE</h2>
+
+  <p class="lead">
+    Every picture here is of the current build. The window captures are taken by
+    a script that drives the release build and photographs each tab, and the
+    terminal drawings are generated from the command output committed beside
+    them &mdash; so a picture that disagrees with the program fails the build
+    rather than sitting here saying something untrue.
+  </p>
+
+  <!--
+    `loading="lazy"` on every one. Eight window captures is about a megabyte,
+    and the front page should not spend that before the reader has scrolled to
+    them. The width and height attributes are on the images as well, so the
+    layout does not jump when each one arrives -- a page that reflows under a
+    reader who is mid-sentence is a worse fault than a slow image.
+  -->
+  <div class="shots">
+      <figure class="shot">
+        <img src="assets/screenshots/gui-file.png" alt="Anonymise a file" loading="lazy" width="1400" height="1000">
+        <figcaption><strong>Anonymise a file</strong> One recording in, a voice nobody owns out. Encrypted at rest by default.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/screenshots/gui-live.png" alt="Live scramble" loading="lazy" width="1400" height="1000">
+        <figcaption><strong>Live scramble</strong> A microphone, scrambled as it runs, into a virtual cable anything else can hear.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/screenshots/gui-group.png" alt="Group mode" loading="lazy" width="1400" height="1000">
+        <figcaption><strong>Group mode</strong> Several people in one recording, a name and a colour each, a different voice each.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/screenshots/gui-monitor.png" alt="Monitor" loading="lazy" width="1400" height="1000">
+        <figcaption><strong>Monitor</strong> Which programs are using the microphone and the camera, and what this cannot see.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/screenshots/gui-lock.png" alt="Lock" loading="lazy" width="1400" height="1000">
+        <figcaption><strong>Lock</strong> The app lock, and a plain account of what it is and is not worth.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/screenshots/gui-settings.png" alt="Settings" loading="lazy" width="1400" height="1000">
+        <figcaption><strong>Settings</strong> Nine palettes, your own if you write one, motion, and which tabs are shown.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/screenshots/gui-install.png" alt="Install" loading="lazy" width="1400" height="1000">
+        <figcaption><strong>Install</strong> Offered only to a portable copy. An installed one does not show this tab.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/screenshots/gui-about.png" alt="About" loading="lazy" width="1400" height="1000">
+        <figcaption><strong>About</strong> Versions, scope, and the update check that happens when you press it.</figcaption>
+      </figure>
+  </div>
+
+  <h3>The command line</h3>
+  <p class="lead">
+    Everything the window does, and some things it does not. These are drawings
+    rather than photographs: they follow your palette, and the text in them can
+    be selected and searched.
+  </p>
+
+  <div class="casts">
+      <figure class="cast">
+        <img src="assets/screenshots/cli-help.svg" alt="veilvoice --help" loading="lazy">
+        <figcaption>veilvoice --help</figcaption>
+      </figure>
+      <figure class="cast">
+        <img src="assets/screenshots/cli-conversation.svg" alt="veilvoice conversation --help" loading="lazy">
+        <figcaption>veilvoice conversation --help</figcaption>
+      </figure>
+      <figure class="cast">
+        <img src="assets/screenshots/cli-anonymise.svg" alt="veilvoice anonymise --help" loading="lazy">
+        <figcaption>veilvoice anonymise --help</figcaption>
+      </figure>
+      <figure class="cast">
+        <img src="assets/screenshots/cli-render.svg" alt="veilvoice conversation render --help" loading="lazy">
+        <figcaption>veilvoice conversation render --help</figcaption>
+      </figure>
+      <figure class="cast">
+        <img src="assets/screenshots/cli-preview.svg" alt="veilvoice conversation preview --help" loading="lazy">
+        <figcaption>veilvoice conversation preview --help</figcaption>
+      </figure>
+      <figure class="cast">
+        <img src="assets/screenshots/cli-companions.svg" alt="veilvoice companions --help" loading="lazy">
+        <figcaption>veilvoice companions --help</figcaption>
+      </figure>
+  </div>
+  </div>
+</section>
+
 <section id="demo">
   <div class="wrap">
   <h2>WHAT IT SOUNDS LIKE, IN ONE PICTURE</h2>

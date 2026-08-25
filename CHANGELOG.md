@@ -8,6 +8,56 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Pictures of the thing, in the README and on the website
+
+Every tab of the desktop application, and ten of the command line's screens.
+They are in the README, on the front page under **what it looks like**, and
+mirrored under `website/assets/screenshots/` by the tool that owns them rather
+than by hand.
+
+**Two kinds, and they are different on purpose.**
+
+`gui-*.png` are photographs of the running application, taken by
+`tools/shots/gui.ps1`. It starts the release build, fixes the window to one
+size and position, clicks each tab, and captures the window's real frame bounds
+rather than the extended bounds — which include the invisible resize border and
+the drop shadow, and put a strip of whatever is behind the window down both
+sides of every picture. It also **fails rather than writing a wrong picture**:
+each capture is compared with the one before it, and an identical pair means a
+click coordinate has gone stale, which would otherwise produce a directory of
+identical pictures with different names.
+
+`cli-*.svg` are drawings, generated from the command output committed beside
+them in `cli-*.txt`. `python tools/shots/terminal.py --check` regenerates every
+one and compares, and it runs in `tools/verify.py` — so a picture of a command
+line that disagrees with the command line fails the build. The `.txt` is the
+file to read in a diff; an SVG diff is unreadable, a diff of what the program
+printed is the review.
+
+### Two of the pictures are redacted, and it says which
+
+A screenshot of a working application is a screenshot of somebody's machine.
+The live tab lists this machine's audio devices — product names, describing the
+maintainer's hardware — and the install tab prints two paths containing the
+**account name**, which is not the pseudonym this project is published under.
+Both are painted over by the capture script, in the colours the interface draws
+them in, and `assets/screenshots/README.md` names exactly what was covered and
+what it says instead. Nothing else is altered.
+
+### Two things the repository's own checks caught
+
+The first capture ran `veilvoice` with `text=True`, which decodes with the
+locale encoding — CP1252 on this machine — and the help screens are full of em
+dashes. Every one was written as three wrong characters. The stray-character
+suite, which has been in this repository since long before any of this, is what
+noticed, three checks after the capture ran.
+
+The redaction then failed with "a generic error occurred in GDI+", which is
+what GDI+ says instead of "the file is locked": `new Bitmap(path)` holds the
+file open for as long as the object lives, so saving back to the same path
+cannot work. It draws onto a copy now.
+
+
 ### A check for updates that only happens when you press it
 
 New crate, `veilvoice-update`, and a button on the desktop app's **about** tab.

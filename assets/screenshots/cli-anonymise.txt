@@ -1,0 +1,26 @@
+De-identify an audio file and write a WAV
+
+Usage: veilvoice.exe anonymise [OPTIONS] <INPUT>
+
+Arguments:
+  <INPUT>  Audio file to read (wav, mp3, flac, ogg, m4a, ...)
+
+Options:
+  -o, --output <OUTPUT>
+          Where to write the result. Defaults to `<input>.veiled.wav`
+      --intensity <INTENSITY>
+          How far pitch and formants are pushed from the original, 0.0–1.0 [default: 1]
+      --keep-accent
+          Keep the speaker's accent and intonation intact
+      --reseed-secs <RESEED_SECS>
+          Seconds between rolls of the modulation seed. 0 keeps one stream for the whole session [default: 2]
+      --clean-metadata <CLEAN_METADATA>
+          Also strip metadata from the written file [default: true] [possible values: true, false]
+      --encrypt <ENCRYPT>
+          Encrypt the result at rest. On by default: the words survive de-identification on purpose, so an unencrypted result is still a recording of everything that was said [default: true] [possible values: true, false]
+      --encrypt-to <PUBKEY>
+          Seal to a recipient's public key file instead of a passphrase
+      --yes
+          Skip the confirmation when writing an unencrypted recording
+  -h, --help
+          Print help
