@@ -40,6 +40,7 @@
 //! binary is not the exception. Fetch the files however you like; this reads
 //! them from disk. It does not install anything, and it writes nothing.
 
+mod discover;
 mod fetch;
 
 use std::fmt::Write as _;
@@ -74,6 +75,14 @@ const USAGE: &str = "\
 veilvoice-verify -- check a VeilVoice release without GnuPG installed
 
 USAGE
+  veilvoice-verify
+  veilvoice-verify auto [DIRECTORY]
+      Find a downloaded release near you and check it, with nothing else to
+      type. Looks in the directory given, then the current one, then beside
+      this program, then your Downloads and Desktop. Entirely offline.
+
+      This is also what double-clicking the program does.
+
   veilvoice-verify key
       Print the signing key this binary carries, and its fingerprint.
       Compare it against README.md and https://tilas01.github.io/veilvoice/
@@ -624,9 +633,118 @@ fn command_release(tag: &str, asset: Option<&str>) -> ExitCode {
     command_file_against_sums(&archive, sums, signature)
 }
 
+/// Find a release near the user and check it, with nothing else to type.
+///
+/// The command somebody who has just downloaded an archive actually wants.
+/// Everything it does is offline: it looks in a few obvious places, and if it
+/// finds an archive with its hash list and signature beside it, it runs exactly
+/// the same check `file --sums --sig` runs.
+///
+/// A directory holding an archive but no hash list is **reported**, never
+/// completed from a hash list found somewhere else -- that would be checking one
+/// release against another release's list, and it would say "verified".
+fn command_auto(explicit: Option<&Path>) -> ExitCode {
+    let (complete, all) = discover::search(explicit);
+
+    if all.is_empty() {
+        return deny(
+            "no VeilVoice release was found to check",
+            &[
+                "Looked in: the directory given, the current directory, the folder this",
+                "program is in, and your Downloads and Desktop.",
+                "",
+                "Put the archive, SHA256SUMS and SHA256SUMS.asc in one folder and run this",
+                "again from there -- or name the folder:",
+                "",
+                "  veilvoice-verify auto <DIRECTORY>",
+            ],
+        );
+    }
+
+    let Some(found) = complete else {
+        // Something turned up and it cannot be checked. Say exactly what is
+        // missing, in each place, rather than a single unhelpful refusal.
+        let mut detail: Vec<String> = vec![
+            "Found something, but not a set that can be checked offline.".to_string(),
+            "A check needs the archive, SHA256SUMS and SHA256SUMS.asc together.".to_string(),
+            String::new(),
+        ];
+        for place in &all {
+            detail.push(format!("  {}", place.directory.display()));
+            for archive in &place.archives {
+                detail.push(format!(
+                    "    {}",
+                    archive.file_name().unwrap_or_default().to_string_lossy()
+                ));
+            }
+            detail.push(format!("    -- {}", place.missing().join(", ")));
+        }
+        detail.push(String::new());
+        detail.push("Both missing files are on the release page beside the archive.".to_string());
+        let borrowed: Vec<&str> = detail.iter().map(String::as_str).collect();
+        return deny("a release was found but cannot be checked", &borrowed);
+    };
+
+    println!("Checking what is in {}", found.directory.display());
+    println!();
+    let sums = found.sums.clone().unwrap_or_default();
+    let signature = found.signature.clone().unwrap_or_default();
+
+    let mut worst = ExitCode::SUCCESS;
+    let mut failures = 0usize;
+    for archive in &found.archives {
+        let outcome = command_file_against_sums(archive, &sums, &signature);
+        // `ExitCode` cannot be compared, so failures are counted instead. Any
+        // one archive failing has to fail the whole run: a set where three
+        // files are good and one is not is not a good download.
+        if format!("{outcome:?}") != format!("{:?}", ExitCode::SUCCESS) {
+            failures += 1;
+            worst = outcome;
+        }
+        println!();
+    }
+    if failures > 0 {
+        println!(
+            "{failures} of {} did not check out. Nothing above should be run.",
+            found.archives.len()
+        );
+    }
+    worst
+}
+
+/// Keep the window open when there was nobody watching a terminal.
+///
+/// A console program started by double-clicking gets a console of its own, and
+/// that console closes the instant the process exits -- so the usage text this
+/// used to print flashed past and vanished. Reported as "veilvoice-verify
+/// crashes on launch", and reasonably so: from the outside a window that
+/// appears and disappears is indistinguishable from one that fell over.
+///
+/// Detecting a double-click properly means asking Windows how many processes
+/// share this console, which is FFI, and every crate here carries
+/// `#![forbid(unsafe_code)]`. **No arguments** is the safe stand-in: somebody
+/// running this from a terminal almost always types a subcommand, and somebody
+/// who types the bare name gets one extra keypress.
+fn wait_before_the_window_closes() {
+    println!();
+    println!("Press Enter to close.");
+    let mut discard = String::new();
+    let _ = std::io::stdin().read_line(&mut discard);
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
-    if args.is_empty() || args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
+
+    // No arguments is very probably a double-click. Do the useful thing --
+    // look for a release nearby and check it -- and then wait, so the window
+    // does not vanish before it has been read.
+    if args.is_empty() {
+        let outcome = command_auto(None);
+        wait_before_the_window_closes();
+        return outcome;
+    }
+
+    if args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
         print!("{USAGE}");
         return ExitCode::SUCCESS;
     }
@@ -640,6 +758,8 @@ fn main() -> ExitCode {
     }
 
     match args[0].as_str() {
+        "auto" => command_auto(args.get(1).map(Path::new)),
+
         "key" => command_key(),
 
         "release" => match args.get(1) {
