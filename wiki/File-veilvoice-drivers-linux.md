@@ -58,6 +58,13 @@ and be switched off within a day.
 
 _Colour key: **helper** -- private to this file._
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/diagrams/veilvoice-drivers/linux.svg" alt="what calls what in linux.rs" width="640">
+</p>
+
+<details>
+<summary>The same graph as Mermaid source</summary>
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
@@ -72,6 +79,8 @@ flowchart TD
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_parse_proc_modules,n_read,n_sys_module_names helper
 ```
+
+</details>
 
 ## Items
 

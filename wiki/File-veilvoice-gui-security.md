@@ -91,6 +91,13 @@ _22 of 25 functions are drawn; the diagram is bounded at 22 so it stays readable
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/diagrams/veilvoice-gui/security.svg" alt="what calls what in security.rs" width="640">
+</p>
+
+<details>
+<summary>The same graph as Mermaid source</summary>
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
@@ -164,6 +171,8 @@ flowchart TD
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_into_secret,n_default,n_drop,n_wipe_secrets,n_spawn,n_poll,n_wipe_form,n_busy,n_run_op,n_reopen,n_password_row helper
 ```
+
+</details>
 
 ## Items
 
