@@ -66,8 +66,8 @@ circle for that reason, and `SCOPE` says it where a user will read it.
 flowchart TD
     n_lib(["lib.rs<br/>128 lines"])
     n_ffmpeg["ffmpeg.rs<br/>278 lines"]
-    n_page["page.rs<br/>940 lines"]
-    n_palette["palette.rs<br/>329 lines"]
+    n_page["page.rs<br/>977 lines"]
+    n_palette["palette.rs<br/>735 lines"]
     n_waveform["waveform.rs<br/>245 lines"]
     n_page --> n_palette
     n_page --> n_waveform
@@ -86,6 +86,6 @@ flowchart TD
 |---|---:|---|
 | [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 278 | The video file, which needs a codec this project does not ship. |
 | [[`lib.rs`|File-veilvoice-video-lib]] | 128 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
-| [[`page.rs`|File-veilvoice-video-page]] | 940 | The picture: one still for a preview, and one page that plays. |
-| [[`palette.rs`|File-veilvoice-video-palette]] | 329 | Colours: the site's own tokens, and one per speaker. |
+| [[`page.rs`|File-veilvoice-video-page]] | 977 | The picture: one still for a preview, and one page that plays. |
+| [[`palette.rs`|File-veilvoice-video-palette]] | 735 | Colours: the site's own tokens, and one per speaker. |
 | [[`waveform.rs`|File-veilvoice-video-waveform]] | 245 | The shape of the audio, reduced to something a page can draw. |
