@@ -193,6 +193,10 @@ pub struct VeilVoiceApp {
 
     // Device monitor, on a thread of its own. Never polled from here.
     watch: WatchFeed,
+
+    // The manual update check. Holds no clock: the only path into it is the
+    // button on the about tab.
+    updates: crate::updates::Updates,
 }
 
 /// Pick the output to start on: a virtual cable if the machine has one,
@@ -264,6 +268,7 @@ impl VeilVoiceApp {
             // Idle here, so `without_devices` and `Default` start no thread
             // and touch no machine. `VeilVoiceApp::new` starts the real one.
             watch: WatchFeed::idle(),
+            updates: crate::updates::Updates::default(),
         }
     }
 }
@@ -497,10 +502,12 @@ impl eframe::App for VeilVoiceApp {
         });
 
         self.watch.drain();
+        self.updates.drain();
 
         // The live meters only move if something repaints them, and the
         // monitor has to keep ticking even while the window is idle.
         if self.session.is_some()
+            || self.updates.is_busy()
             || self.job.is_some()
             || self.security.is_busy()
             || self.setup.is_busy()
@@ -1015,7 +1022,14 @@ impl VeilVoiceApp {
         field(ui, "monitor", veilvoice_watch::VERSION);
         field(ui, "crypto", veilvoice_crypto::VERSION);
         field(ui, "licence", "GPL-3.0-or-later");
-        field(ui, "network access", "none, by construction");
+        // Precise rather than short. "None" stopped being true the moment the
+        // update button existed, and a version string that overstates the thing
+        // it is printed beside is worse than no version screen at all.
+        field(
+            ui,
+            "network access",
+            "none, except the update check you press",
+        );
         field(
             ui,
             "typeface",
@@ -1025,6 +1039,9 @@ impl VeilVoiceApp {
                 "built-in monospace"
             },
         );
+
+        ui.add_space(16.0);
+        self.updates.section(ui, env!("CARGO_PKG_VERSION"));
 
         ui.add_space(16.0);
         ui.label(RichText::new("WHAT THIS PROTECTS").color(p::blue()).small());

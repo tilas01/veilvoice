@@ -8,6 +8,60 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### A check for updates that only happens when you press it
+
+New crate, `veilvoice-update`, and a button on the desktop app's **about** tab.
+
+**Nothing is automatic.** No timer, no check at startup, nothing in the
+background. An update checker that runs by itself is a beacon: it tells a
+server that this machine has VeilVoice on it, roughly how often it is used, and
+from which address. That is what is being refused. A button somebody presses,
+once, when they want to know, is a different act — and it is the only one on
+offer. A test asserts that a freshly built panel has asked nothing and is
+asking nothing, so a check at startup cannot be added without failing the build.
+
+**There is still no HTTP client in the dependency graph.** The crate has no
+dependencies at all. It runs the transfer tool your operating system already
+ships — as `veilvoice-verify` has fetched releases since it existed — found at
+an absolute path and never by bare name, because resolving a program by name on
+Windows searches the current directory first. That is finding F-13, and it does
+not get to happen twice.
+
+**It downloads nothing and installs nothing.** It reports a version number and
+leaves every decision to you. An update checker that could install its own
+answer is one that can be made to install somebody else's. Every report carries
+the caveat in the words the user sees: a version number on a page is not a
+signature, and a download should still be checked with `veilvoice-verify`.
+
+Being ahead of the newest release is reported as **ahead**, not as "up to
+date": somebody running an unreleased build should know that is what they are
+running. A version string this build cannot compare — a pre-release suffix, or
+something that is not three numbers — is reported as unreadable rather than
+ordered. Getting pre-release precedence subtly wrong is how a checker tells
+people to downgrade.
+
+**The wording changed in the same commit as the code.** The front page said "no
+telemetry, no update check". No telemetry is unchanged and nothing here sends
+anything about you. "No update check" has become "no *automatic* update check",
+in the README, on the front page, on the security page, in the app's own
+version screen — where "network access: none, by construction" is now "none,
+except the update check you press" — and in `veilvoice --help`, which can still
+say it talks to no servers because the button is not in the command line.
+
+### Found by running it, not by reading it
+
+The first version scanned the release page for `/releases/tag/` and took the
+first match. Against the real page it returned nothing: GitHub's release page
+contains an **empty** `/releases/tag/` before any real one, so the first match
+was an empty string and the check reported "no version number" against a page
+that plainly had one.
+
+Fixed, and improved past the bug: curl is now asked for the **redirect target**
+rather than the page. `/releases/latest` redirects to `/releases/tag/vX.Y.Z`,
+so the answer is one line. Measured on the real page: **54 bytes instead of
+205,538**, with nothing of the reply's markup reaching the scanner at all.
+
+
 ### An installed copy no longer offers to install itself
 
 The **install** tab is now only shown to a portable copy. A program that offers
