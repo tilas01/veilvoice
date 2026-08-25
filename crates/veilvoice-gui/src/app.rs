@@ -430,6 +430,20 @@ impl eframe::App for VeilVoiceApp {
                 });
             });
             ui.add_space(4.0);
+            // The install tab is not always offered. An installed copy never
+            // shows it -- a program offering to install itself when it already
+            // is tells the user something untrue about what they are running --
+            // and a portable copy shows it unless the reader has ticked it away
+            // under settings, interface.
+            let offer_install = self
+                .preferences
+                .show_install_tab(self.setup.running_installed());
+            // A tab that is not shown must not stay selected, or the window
+            // keeps drawing a panel with nothing to reach it by. Sent back to
+            // the first tab, which is where the app opens anyway.
+            if !offer_install && self.tab == Tab::Setup {
+                self.tab = Tab::File;
+            }
             ui.horizontal(|ui| {
                 for (tab, label) in [
                     (Tab::File, "anonymise file"),
@@ -441,6 +455,9 @@ impl eframe::App for VeilVoiceApp {
                     (Tab::Setup, "install"),
                     (Tab::About, "about"),
                 ] {
+                    if tab == Tab::Setup && !offer_install {
+                        continue;
+                    }
                     let selected = self.tab == tab;
                     let text =
                         RichText::new(label).color(if selected { p::blue() } else { p::muted() });

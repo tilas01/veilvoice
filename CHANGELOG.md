@@ -8,6 +8,27 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### An installed copy no longer offers to install itself
+
+The **install** tab is now only shown to a portable copy. A program that offers
+to install itself when it already is installed is telling you something untrue
+about what you are running, and there is no reading of that tab which is
+correct in that case.
+
+Under the tab's own header is the explanation of why it is there and how to
+make it not be, because "why is this asking to install itself" is a question
+asked while looking at the tab. The control itself lives in
+**settings → interface**, deliberately: a tab that could hide itself and
+nothing else could bring back would be a one-way door.
+
+The check is read once, when the panel is built, and not per frame. It touches
+the filesystem, and the tab row is drawn every frame — a `stat` in the paint
+path is the exact shape of the defect that made this window freeze every couple
+of seconds.
+
+`veilvoice install` from the command line is unchanged either way.
+
+
 ### Group mode, where you can see it
 
 The engine has handled several speakers since conversation mode shipped. The
