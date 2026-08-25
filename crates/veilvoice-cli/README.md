@@ -97,12 +97,13 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1935 lines"])
+    n_main(["main.rs<br/>1958 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
     n_capture["capture.rs<br/>240 lines"]
     n_conversation["conversation.rs<br/>742 lines"]
     n_guard["guard.rs<br/>338 lines"]
     n_lock["lock.rs<br/>239 lines"]
+    n_meter["meter.rs<br/>343 lines"]
     n_policy["policy.rs<br/>236 lines"]
     n_sentry["sentry.rs<br/>376 lines"]
     n_theme["theme.rs<br/>135 lines"]
@@ -117,6 +118,7 @@ flowchart TD
     n_guard --> n_theme
     n_lock --> n_atrest
     n_lock --> n_theme
+    n_meter --> n_theme
     n_policy --> n_atrest
     n_policy --> n_sentry
     n_policy --> n_theme
@@ -127,6 +129,7 @@ flowchart TD
     click n_conversation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs" "open the source"
     click n_guard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" "open the source"
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" "open the source"
+    click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" "open the source"
     click n_sentry href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" "open the source"
@@ -143,7 +146,8 @@ flowchart TD
 | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 742 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1935 | veilvoice — the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1958 | veilvoice — the command-line interface. |
+| [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 343 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 236 | veilvoice policy -- settings that can only be tightened. |
 | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 376 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 135 | Tokyo Night colouring for the terminal. |
@@ -173,6 +177,13 @@ flowchart TD
 | `enum Action` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
 | `fn wrap` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | Greedy word wrap. |
 | `fn run` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
+| `const HOLD` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | How long a peak marker is held before it falls back. |
+| `const FLOOR_DB` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | The quietest level the bar shows. |
+| `const CLIP_DB` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | At or above this, the level is called clipping. |
+| `fn dbfs` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | Level in decibels relative to full scale. |
+| `fn position` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | Where a level sits along the bar, from 0.0 at the floor to 1.0 at full scale. |
+| `fn render` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | One meter: the bar, the peak marker, and the number. |
+| `struct Channel` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | One channel's meter, keeping the peak between reads. |
 | `fn policy_dir` | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | Where the policy files live. |
 | `fn status` | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | What is in force, and what is known about the seal. |
 | `fn seal` | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | Write a policy and seal it. |
