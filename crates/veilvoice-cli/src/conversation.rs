@@ -80,6 +80,7 @@ pub fn look_from(
     padding: u32,
     background: Option<String>,
     black: bool,
+    theme: Option<String>,
 ) -> Result<Look, String> {
     let mut look = Look {
         width,
@@ -87,6 +88,20 @@ pub fn look_from(
         padding,
         ..Look::default()
     };
+
+    // Resolved here, where the user typed it, so that every drawing after this
+    // is looking at colours that exist. An unknown name is refused and the
+    // refusal lists what it could have been: a picture silently drawn in a
+    // different scheme than the one asked for is worse than an error.
+    if let Some(theme) = theme {
+        let palette = veilvoice_video::palette::by_id(&theme).ok_or_else(|| {
+            format!(
+                "{theme:?} is not a theme. It is one of: {}",
+                veilvoice_video::palette::ids().join(", ")
+            )
+        })?;
+        look = look.themed(palette);
+    }
     if let Some(background) = background {
         // A value that names a file that exists is an image; anything else is
         // read as a colour, and `checked()` rejects it if it is not one. Tried
@@ -355,6 +370,7 @@ pub fn preview(
         "{}",
         field("picture", &format!("{}x{}", look.width, look.height))
     );
+    println!("{}", field("theme", look.palette.name));
     println!("{}", field("at", &format!("{at_secs:.2} s")));
     if audio.is_none() {
         println!("{}", field("waveform", "flat -- no recording was given"));
@@ -600,26 +616,105 @@ mod tests {
     /// A picture nobody could read is refused rather than drawn.
     #[test]
     fn a_look_that_cannot_be_drawn_is_refused_with_the_numbers_in_it() {
-        let error = look_from(200, 100, 8, None, false).expect_err("too small to draw");
+        let error = look_from(200, 100, 8, None, false, None).expect_err("too small to draw");
         assert!(error.contains("200x100"), "{error}");
     }
 
     /// `--background` takes a colour or a file, and says so when it is neither.
     #[test]
     fn a_background_that_is_neither_a_colour_nor_a_file_is_named_in_the_error() {
-        let error =
-            look_from(1280, 720, 48, Some("chartreuse".into()), false).expect_err("not a colour");
+        let error = look_from(1280, 720, 48, Some("chartreuse".into()), false, None)
+            .expect_err("not a colour");
         assert!(error.contains("chartreuse"), "{error}");
     }
 
     /// `--black` wins over `--background`, as its help says.
     #[test]
     fn black_overrides_a_background_colour() {
-        let look = look_from(1280, 720, 48, Some("#ff0000".into()), true).unwrap();
+        let look = look_from(1280, 720, 48, Some("#ff0000".into()), true, None).unwrap();
         assert_eq!(
             look.background,
             Background::Colour("#000000".to_string()),
             "--black must override --background"
+        );
+    }
+
+    /// The default is Tokyo Night, and it is what a picture with no `--theme`
+    /// is drawn in.
+    #[test]
+    fn no_theme_means_tokyo_night() {
+        let look = look_from(1280, 720, 48, None, false, None).unwrap();
+        assert_eq!(look.palette.id, "tokyo-night");
+    }
+
+    /// A named theme reaches the drawing, and takes the background with it.
+    /// A Gruvbox picture on a Tokyo Night page is not what anybody asked for.
+    #[test]
+    fn a_named_theme_takes_the_background_with_it() {
+        let look = look_from(1280, 720, 48, None, false, Some("gruvbox".into())).unwrap();
+        assert_eq!(look.palette.id, "gruvbox");
+        assert_eq!(
+            look.background,
+            Background::Colour(look.palette.bg.to_string()),
+            "the page should follow the theme"
+        );
+    }
+
+    /// Unless the background was asked for separately, in which case both
+    /// requests are honoured.
+    #[test]
+    fn a_background_given_by_hand_survives_a_theme() {
+        let look = look_from(
+            1280,
+            720,
+            48,
+            Some("#123456".into()),
+            false,
+            Some("nord".into()),
+        )
+        .unwrap();
+        assert_eq!(look.palette.id, "nord");
+        assert_eq!(look.background, Background::Colour("#123456".to_string()));
+    }
+
+    /// An unknown name is refused, and the refusal says what it could have
+    /// been. An error that only says "no" leaves the reader guessing at a
+    /// spelling.
+    #[test]
+    fn an_unknown_theme_is_refused_and_lists_the_real_ones() {
+        let error = look_from(1280, 720, 48, None, false, Some("solarised".into()))
+            .expect_err("not a theme this build has");
+        assert!(error.contains("solarised"), "{error}");
+        assert!(error.contains("tokyo-night"), "{error}");
+        assert!(error.contains("gruvbox"), "{error}");
+    }
+
+    /// The colours actually reach the markup. Without this the flag could be
+    /// plumbed all the way through and change nothing anybody can see.
+    #[test]
+    fn the_theme_changes_the_colours_in_the_drawing() {
+        let dir = tempfile::tempdir().unwrap();
+        let plan = plan_file(dir.path());
+        let gruvbox = dir.path().join("gruvbox.svg");
+        preview(
+            &plan,
+            None,
+            0.0,
+            look_from(1280, 720, 48, None, false, Some("gruvbox".into())).unwrap(),
+            Some(gruvbox.clone()),
+            false,
+        )
+        .unwrap();
+        let markup = std::fs::read_to_string(&gruvbox).unwrap();
+        let wanted = veilvoice_video::palette::by_id("gruvbox").unwrap();
+        assert!(
+            markup.contains(wanted.bg),
+            "the page should be {}",
+            wanted.bg
+        );
+        assert!(
+            !markup.contains(veilvoice_video::palette::BG),
+            "no Tokyo Night background should survive a Gruvbox render"
         );
     }
 

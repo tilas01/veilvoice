@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-video/src/palette.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 329 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs)
+[[veilvoice-video|Crate-veilvoice-video]] &middot; 735 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs)
 
 ## Contents
 
@@ -60,14 +60,21 @@ showed only colours would be one about eight per cent of men could not use.
 
 ## What this file contains
 
-329 lines defining **6 functions** (6 public), **0 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+735 lines defining **9 functions** (9 public), **1 type** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `struct Palette` (line 66) -- One complete colour scheme, matching one data-theme block in website/css/themes.css and one entry in veilvoice-gui's theme table.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `speaker` (line 81) -- The colour for a speaker slot.
-- `distance` (line 94) -- How far apart two colours look, by the "redmean" approximation.
+- `by_id` (line 267) -- The palette with this identifier.
+- `default_palette` (line 273) -- The default palette.
+- `ids` (line 278) -- Every identifier, for an error message or a picker.
+- `speaker` (line 321) -- The colour for a speaker slot.
+- `distance` (line 334) -- How far apart two colours look, by the "redmean" approximation.
   - reaches: `rgb`
-- `ink_on` (line 156) -- Black or white, whichever is readable on background.
+- `ink_on` (line 396) -- Black or white, whichever is readable on background.
   - reaches: `contrast`, `luminance`, `rgb`
 
 ## What calls what
@@ -84,24 +91,30 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_speaker(["speaker<br/>line 81"])
-    n_distance(["distance<br/>line 94"])
-    n_rgb["rgb<br/>line 111"]
-    n_luminance["luminance<br/>line 129"]
-    n_contrast["contrast<br/>line 145"]
-    n_ink_on(["ink_on<br/>line 156"])
+    n_by_id(["by_id<br/>line 267"])
+    n_default_palette(["default_palette<br/>line 273"])
+    n_ids(["ids<br/>line 278"])
+    n_speaker(["speaker<br/>line 321"])
+    n_distance(["distance<br/>line 334"])
+    n_rgb["rgb<br/>line 351"]
+    n_luminance["luminance<br/>line 369"]
+    n_contrast["contrast<br/>line 385"]
+    n_ink_on(["ink_on<br/>line 396"])
     n_contrast --> n_luminance
     n_distance --> n_rgb
     n_ink_on --> n_contrast
     n_luminance --> n_rgb
-    click n_speaker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L81" "open the source"
-    click n_distance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L94" "open the source"
-    click n_rgb href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L111" "open the source"
-    click n_luminance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L129" "open the source"
-    click n_contrast href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L145" "open the source"
-    click n_ink_on href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L156" "open the source"
+    click n_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L267" "open the source"
+    click n_default_palette href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L273" "open the source"
+    click n_ids href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L278" "open the source"
+    click n_speaker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L321" "open the source"
+    click n_distance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L334" "open the source"
+    click n_rgb href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L351" "open the source"
+    click n_luminance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L369" "open the source"
+    click n_contrast href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L385" "open the source"
+    click n_ink_on href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L396" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_speaker,n_distance,n_ink_on entry
+    class n_by_id,n_default_palette,n_ids,n_speaker,n_distance,n_ink_on entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_rgb,n_luminance,n_contrast api
 ```
@@ -117,10 +130,16 @@ flowchart TD
 | `BORDER` <sub>pub const</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L52) | Hairlines and dividers. |
 | `FG` <sub>pub const</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L54) | Body text. |
 | `MUTED` <sub>pub const</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L56) | Secondary text. |
-| `SPEAKERS` <sub>pub const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L62) | The ten speaker colours, in the order slots are handed out. |
-| `speaker` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L81) | The colour for a speaker slot. |
-| `distance` <sub>pub fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L94) | How far apart two colours look, by the "redmean" approximation. |
-| `rgb` <sub>pub fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L111) | Parse #rrggbb into its three channels. |
-| `luminance` <sub>pub fn</sub> | [129](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L129) | Relative luminance, as WCAG defines it, from 0.0 to 1.0. |
-| `contrast` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L145) | The contrast ratio between two colours, from 1.0 to 21.0. |
-| `ink_on` <sub>pub fn</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L156) | Black or white, whichever is readable on background. |
+| `Palette` <sub>pub struct</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L66) | One complete colour scheme, matching one data-theme block in website/css/themes.css and one entry in veilvoice-gui's theme table. |
+| `PALETTES` <sub>pub const</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L103) | Every palette, in the order the pickers show them. |
+| `DEFAULT_ID` <sub>pub const</sub> | [260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L260) | The palette a render uses unless one is named. |
+| `by_id` <sub>pub fn</sub> | [267](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L267) | The palette with this identifier. |
+| `default_palette` <sub>pub fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L273) | The default palette. |
+| `ids` <sub>pub fn</sub> | [278](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L278) | Every identifier, for an error message or a picker. |
+| `SPEAKERS` <sub>pub const</sub> | [302](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L302) | The ten speaker colours, in the order slots are handed out. |
+| `speaker` <sub>pub fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L321) | The colour for a speaker slot. |
+| `distance` <sub>pub fn</sub> | [334](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L334) | How far apart two colours look, by the "redmean" approximation. |
+| `rgb` <sub>pub fn</sub> | [351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L351) | Parse #rrggbb into its three channels. |
+| `luminance` <sub>pub fn</sub> | [369](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L369) | Relative luminance, as WCAG defines it, from 0.0 to 1.0. |
+| `contrast` <sub>pub fn</sub> | [385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L385) | The contrast ratio between two colours, from 1.0 to 21.0. |
+| `ink_on` <sub>pub fn</sub> | [396](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L396) | Black or white, whichever is readable on background. |

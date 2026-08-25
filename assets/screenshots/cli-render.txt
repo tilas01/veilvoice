@@ -54,5 +54,10 @@ Options:
       --black
           Plain black behind everything. Overrides `--background`
 
+      --theme <THEME>
+          Colour scheme, from the nine the website and the app offer.
+          
+          Defaults to Tokyo Night. An unknown name is refused, and the error lists every one it could have been.
+
   -h, --help
           Print help (see a summary with '-h')
