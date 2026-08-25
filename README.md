@@ -98,6 +98,57 @@ talk to no servers at all.
 
 ---
 
+## What it looks like
+
+Every picture below is of this build. The window captures are taken by
+`tools/shots/gui.ps1`, which drives the release build and photographs each tab;
+the terminal drawings are generated from the command output committed beside
+them, and CI fails if a drawing and its output disagree. See
+[`assets/screenshots/README.md`](assets/screenshots/README.md) for why those two
+are different kinds of thing.
+
+### The desktop application
+
+| | |
+|---|---|
+| **Anonymise a file** — one recording, veiled, encrypted at rest by default | **Live scramble** — a microphone in, a voice that is not yours out |
+| ![anonymise a file](assets/screenshots/gui-file.png) | ![live scramble](assets/screenshots/gui-live.png) |
+| **Group mode** — several people, a name and a colour each | **Monitor** — who is using the microphone and camera |
+| ![group mode](assets/screenshots/gui-group.png) | ![monitor](assets/screenshots/gui-monitor.png) |
+| **Lock** — the app lock, and what it is and is not worth | **Settings** — nine palettes, motion, and which tabs are shown |
+| ![the app lock](assets/screenshots/gui-lock.png) | ![settings](assets/screenshots/gui-settings.png) |
+| **Install** — offered only to a portable copy | **About** — versions, scope, and the update check you press |
+| ![install](assets/screenshots/gui-install.png) | ![about](assets/screenshots/gui-about.png) |
+
+### The command line
+
+Everything the window does, and some things it does not.
+
+![veilvoice --help](assets/screenshots/cli-help.svg)
+
+![veilvoice conversation --help](assets/screenshots/cli-conversation.svg)
+
+![veilvoice anonymise --help](assets/screenshots/cli-anonymise.svg)
+
+<details>
+<summary>The rest of the commands</summary>
+
+![veilvoice live --help](assets/screenshots/cli-live.svg)
+
+![veilvoice conversation render --help](assets/screenshots/cli-render.svg)
+
+![veilvoice conversation preview --help](assets/screenshots/cli-preview.svg)
+
+![veilvoice companions --help](assets/screenshots/cli-companions.svg)
+
+![veilvoice capture --help](assets/screenshots/cli-capture.svg)
+
+![veilvoice guard --help](assets/screenshots/cli-guard.svg)
+
+![veilvoice clean --help](assets/screenshots/cli-clean.svg)
+
+</details>
+
 ## Install
 
 Grab a build from [Releases](https://github.com/tilas01/veilvoice/releases) —

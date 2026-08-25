@@ -80,6 +80,12 @@ def stage(root):
 
 GENERATORS = [
     ("artwork", [sys.executable, "assets/generate.py"]),
+    # Drawn from the command output committed beside them. `--capture`, which
+    # actually runs `veilvoice`, is a separate and manual step: it needs a
+    # build, a machine and a person deciding the output is right. Everything
+    # after that is a pure function of those text files, which is why this half
+    # can be regenerated and checked here.
+    ("terminal drawings", [sys.executable, "tools/shots/terminal.py"]),
     ("documentation", [sys.executable, "tools/docs/generate.py"]),
     # Derived from website/index.html, so it must run after anything that could
     # edit that file and before the index walks the result.
@@ -89,6 +95,8 @@ GENERATORS = [
 
 CHECKS = [
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
+    ("terminal drawings match their output",
+     [sys.executable, "tools/shots/terminal.py", "--check"]),
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),
     ("section pages match index.html", [sys.executable, "tools/site/split.py", "--check"]),
     ("search index matches the tree", [sys.executable, "tools/search-index/generate.py", "--check"]),

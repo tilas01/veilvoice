@@ -1,0 +1,33 @@
+VeilVoice destroys the biometric voiceprint of a speaker — pitch, formants, timbre and the melody of an accent — while keeping the words clean and transcribable. This command line talks to no servers, ever: the one thing in VeilVoice that reaches the network is the desktop app's check-for-updates button, and it is not here.
+
+Usage: veilvoice.exe <COMMAND>
+
+Commands:
+  anonymise     De-identify an audio file and write a WAV
+  live          Scramble a microphone live, into a device or a virtual cable
+  devices       List the audio devices this machine offers
+  clean         Strip identifying metadata from an audio or image file, in place
+  encrypt       Encrypt a file into a `.veil` container
+  decrypt       Decrypt a `.veil` container
+  keygen        Generate a hybrid post-quantum key pair
+  guard         Record and check the integrity of VeilVoice's own files
+  lock          Manage the application lock that guards the desktop app
+  watch         Show which applications are using the microphone and camera
+  shred         Securely erase a file, then delete it. Irreversible
+  info          Show version and build information
+  gui           Open the desktop application
+  install       Copy VeilVoice somewhere the system can find it, and add it to PATH
+  uninstall     Undo what `install` did: the PATH entry, the uninstall entry, and the installed copy
+  policy        Settings fixed so the interface cannot turn them off
+  conversation  A recording with several people in it: a voice each, and subtitles
+  capture       Which screen recorders are running, and which you meant to run
+  sentry        Canaries, and how fast a folder is changing
+  companions    Optional third-party software VeilVoice works with, and whether this machine already has it
+  help          Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version

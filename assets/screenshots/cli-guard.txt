@@ -1,0 +1,13 @@
+Record and check the integrity of VeilVoice's own files
+
+Usage: veilvoice.exe guard [OPTIONS] <COMMAND>
+
+Commands:
+  init    Record the current state of the watched files
+  check   Compare the watched files against the record
+  status  Show where the record is kept, and what it is worth
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+      --path <PATH>  Where the record is kept. Defaults to this platform's config directory, beside the app lock
+  -h, --help         Print help

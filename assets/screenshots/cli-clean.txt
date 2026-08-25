@@ -1,0 +1,20 @@
+Strip identifying metadata from an audio or image file, in place
+
+Usage: veilvoice.exe clean [OPTIONS] <FILE>
+
+Arguments:
+  <FILE>
+          File to clean
+
+Options:
+      --policy <POLICY>
+          Whether to leave plausible placeholder tags behind
+
+          Possible values:
+          - strip:     Remove every tag
+          - realistic: Replace tags with plausible, non-identifying values
+          
+          [default: strip]
+
+  -h, --help
+          Print help (see a summary with '-h')
