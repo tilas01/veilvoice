@@ -193,6 +193,54 @@ impl Conversation {
         Ok(())
     }
 
+    /// Rename everybody, in slot order, keeping every turn where it is.
+    ///
+    /// For a front end that holds the names and reads the turns from a plan
+    /// file somebody wrote earlier. The names are the ones just typed; the
+    /// turns are the plan's, and nothing here touches them.
+    ///
+    /// # Refused rather than reconciled
+    ///
+    /// The count has to match exactly. A plan naming three speakers renamed
+    /// from a list of two would either leave one person with a stale name or
+    /// silently drop a slot, and a dropped slot means somebody's audio comes
+    /// out in another person's voice — the one mistake here that cannot be
+    /// heard in the result, because both voices are unfamiliar.
+    ///
+    /// Every name is validated exactly as [`Conversation::add_speaker`]
+    /// validates one, and for the same reasons: an empty name labels nobody,
+    /// and a name containing a line break can forge a record in the plan file.
+    /// Nothing is changed unless every name passes, so a refusal leaves the
+    /// plan exactly as it was rather than half-renamed.
+    pub fn rename_speakers(&mut self, names: &[String]) -> Result<(), Error> {
+        if names.len() != self.speakers.len() {
+            return Err(Error::Malformed(format!(
+                "this plan has {} speaker(s) and {} name(s) were given",
+                self.speakers.len(),
+                names.len()
+            )));
+        }
+        let mut checked = Vec::with_capacity(names.len());
+        for name in names {
+            let trimmed = name.trim();
+            if trimmed.is_empty() {
+                return Err(Error::Malformed("a speaker needs a name".into()));
+            }
+            if trimmed.contains('\n') || trimmed.contains('\r') {
+                return Err(Error::Malformed(
+                    "a speaker's name may not contain a line break: it would be able to \
+                     forge a record"
+                        .into(),
+                ));
+            }
+            checked.push(trimmed.to_string());
+        }
+        for (speaker, name) in self.speakers.iter_mut().zip(checked) {
+            speaker.name = name;
+        }
+        Ok(())
+    }
+
     /// The speakers, in the order they were added.
     pub fn speakers(&self) -> &[Speaker] {
         &self.speakers
@@ -722,6 +770,58 @@ mod tests {
         let conversation = two_people();
         let padded = conversation.to_text().replace('\n', "\n\n");
         assert_eq!(Conversation::parse(&padded).unwrap(), conversation);
+    }
+
+    /// Renaming keeps the turns exactly where they were.
+    #[test]
+    fn renaming_leaves_every_turn_alone() {
+        let mut plan = two_people();
+        let before = plan.turns().to_vec();
+        plan.rename_speakers(&["Robin".to_string(), "Jules".to_string()])
+            .unwrap();
+        assert_eq!(plan.speakers()[0].name, "Robin");
+        assert_eq!(plan.speakers()[1].name, "Jules");
+        assert_eq!(plan.turns(), before.as_slice(), "the turns must not move");
+    }
+
+    /// The one mistake here that cannot be heard in the result: a mismatch
+    /// would put somebody's audio in another person's voice, and both voices
+    /// are unfamiliar, so nobody would notice.
+    #[test]
+    fn a_different_number_of_names_is_refused() {
+        let mut plan = two_people();
+        let error = plan
+            .rename_speakers(&["Only one".to_string()])
+            .expect_err("two speakers, one name");
+        assert!(format!("{error}").contains('2'), "{error}");
+        assert_eq!(plan.speakers()[0].name, "Alex", "nothing may have changed");
+    }
+
+    /// Every name is checked the way `add_speaker` checks one, and nothing is
+    /// changed unless all of them pass.
+    #[test]
+    fn a_bad_name_leaves_the_plan_exactly_as_it_was() {
+        let mut plan = two_people();
+        for bad in ["", "   ", "Robin\nspeaker  9  Mallory"] {
+            let error = plan
+                .rename_speakers(&["Robin".to_string(), bad.to_string()])
+                .expect_err("{bad:?} should be refused");
+            let _ = error;
+            assert_eq!(
+                plan.speakers()[0].name,
+                "Alex",
+                "a refusal must not half-rename"
+            );
+            assert_eq!(plan.speakers()[1].name, "Sam");
+        }
+    }
+
+    #[test]
+    fn names_are_trimmed_the_same_way_they_are_when_added() {
+        let mut plan = two_people();
+        plan.rename_speakers(&["  Robin  ".to_string(), "Jules".to_string()])
+            .unwrap();
+        assert_eq!(plan.speakers()[0].name, "Robin");
     }
 
     #[test]
