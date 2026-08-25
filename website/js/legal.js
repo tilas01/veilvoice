@@ -22,6 +22,17 @@
 // The page underneath is inert while the dialog is open -- focus is trapped, and
 // the content is hidden from assistive technology -- so the gate cannot be
 // stepped around by tabbing past it.
+//
+// In plain words
+//
+// This is the notice you see the first time you open the site: the licence,
+// what this project does not promise, and the fact that it was built with AI
+// assistance.
+//
+// It remembers that you read it for as long as the tab is open, and forgets
+// when you close it. Nothing about that is sent anywhere. There is no
+// "remember me forever" option because keeping a permanent note about you
+// would be more than a privacy tool's website has any business keeping.
 
 (function () {
   "use strict";

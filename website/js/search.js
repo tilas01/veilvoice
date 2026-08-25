@@ -33,6 +33,15 @@
 // rendered, so no input makes the tab do an unbounded amount of work. Scoring
 // is a linear pass with a plain `indexOf` -- no regular expression is ever
 // built from user input, so there is no pattern for a query to blow up.
+//
+// In plain words
+//
+// This is the search box. It looks through every file in the project -- the
+// code, the documents and this website -- and shows you the lines that match.
+//
+// The searching happens in your browser, on a list that ships with the site.
+// Nothing you type is sent anywhere, and there is nothing here that could
+// collect it.
 
 (function () {
   "use strict";

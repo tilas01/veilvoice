@@ -35,6 +35,17 @@
 // a real network request, and a privacy tool that quietly reached a third party
 // to make itself feel fast would be undermining its own argument. There is no
 // third-party host in this file and there is nothing to configure.
+//
+// In plain words
+//
+// This quietly fetches the one or two pages you are most likely to click
+// next, so that when you do, they are already there.
+//
+// Almost all of it is done by the pages themselves without any code at all.
+// This file exists for the search index, which is about a megabyte -- too
+// much to pull down on a phone on a slow connection for something you might
+// never open. So it asks the browser how good the connection is, and skips it
+// when the answer is "not very".
 
 (function () {
   "use strict";
