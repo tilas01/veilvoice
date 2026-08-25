@@ -2393,12 +2393,16 @@ def check(root, files):
     # A file this generator used to own and no longer produces would otherwise
     # sit in the tree for ever, describing something that has been deleted.
     #
-    # `website/reference/source/` is somebody else's: `tools/docs/sources.py`
-    # documents the website's own JavaScript and CSS, which this tool cannot
-    # read because it reads Rust doc comments. It has its own `--check` with its
-    # own orphan sweep, so the pages there are covered -- by the generator that
-    # actually knows what belongs in them.
-    not_ours = ("website/reference/source/",)
+    # `website/reference/source/` and `wiki/Source-*` are somebody else's:
+    # `tools/docs/sources.py` documents the website's own JavaScript and CSS,
+    # which this tool cannot read because it reads Rust doc comments. It has its
+    # own `--check` with its own orphan sweep over exactly those paths, so they
+    # are covered -- by the generator that knows what belongs in them.
+    #
+    # The wiki is one flat namespace, so the exclusion there is a *prefix* on a
+    # file name rather than a directory. That is the price of the wiki's shape,
+    # and it is why those pages are named `Source-` and nothing else is.
+    not_ours = ("website/reference/source/", "wiki/Source-")
     for base in ("docs/files", "website/reference", "assets/banners",
                  "website/assets/banners", "wiki"):
         directory = os.path.join(root, base.replace("/", os.sep))
