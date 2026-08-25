@@ -16,6 +16,18 @@
 // digest API, so the whole file must be in memory at once for `digest()`.
 // Reading it in chunks first lets the progress bar move and keeps the tab
 // responsive, rather than freezing until the browser finishes.
+//
+// In plain words
+//
+// This is the box on the verify page where you drop a file you have
+// downloaded, and it tells you whether it is the one that was published.
+//
+// Your file never leaves your computer. The browser does the arithmetic
+// itself, on the file sitting on your disk, and this file is the whole of
+// how -- there is no upload in it, and you can read it and see that.
+//
+// It reads a big file in pieces rather than all at once, so a large download
+// does not make the page freeze while it works.
 
 (function () {
   "use strict";

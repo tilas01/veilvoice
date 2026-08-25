@@ -2056,6 +2056,13 @@ def html_index(colours, models, fingerprint, covered, uncovered):
                 'disagree with it. Regenerate with the same command; CI runs '
                 'it with <code>--check</code> and fails if the tree and these '
                 'pages have parted company.</p>')
+    # The website's own source is documented the same way, by a sibling tool:
+    # this one reads Rust doc comments and those files are JavaScript and CSS.
+    # Linked from here because a reader looking for "how does this work" should
+    # not have to know which generator wrote which page.
+    body.append('<p><a href="source/index.html">The website&rsquo;s own '
+                'source</a> &mdash; every script and stylesheet this site is '
+                'made of, explained technically and then in plain words.</p>')
 
     for model in models:
         crate = model["crate"]
@@ -2385,6 +2392,13 @@ def check(root, files):
 
     # A file this generator used to own and no longer produces would otherwise
     # sit in the tree for ever, describing something that has been deleted.
+    #
+    # `website/reference/source/` is somebody else's: `tools/docs/sources.py`
+    # documents the website's own JavaScript and CSS, which this tool cannot
+    # read because it reads Rust doc comments. It has its own `--check` with its
+    # own orphan sweep, so the pages there are covered -- by the generator that
+    # actually knows what belongs in them.
+    not_ours = ("website/reference/source/",)
     for base in ("docs/files", "website/reference", "assets/banners",
                  "website/assets/banners", "wiki"):
         directory = os.path.join(root, base.replace("/", os.sep))
@@ -2394,6 +2408,8 @@ def check(root, files):
             for name in names:
                 rel = os.path.relpath(os.path.join(current, name), root)
                 rel = rel.replace(os.sep, "/")
+                if rel.startswith(not_ours):
+                    continue
                 if rel not in files:
                     problems.append("%s: not produced by the generator any more" % rel)
 

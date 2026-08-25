@@ -5,6 +5,16 @@
  * asset is a request that tells someone else you were here.
  *
  * Typography is monospace throughout, from the fonts the reader already has.
+ *
+ * In plain words
+ *
+ * This is what the site looks like: the spacing, the type, the buttons, the
+ * diagrams and the animations.
+ *
+ * There is no framework and no font downloaded from anywhere else. Every
+ * remote thing a page loads is a request that tells somebody else you were
+ * here, and a site for a privacy tool has no business making them. The type
+ * you see is one you already have.
  */
 
 *,
