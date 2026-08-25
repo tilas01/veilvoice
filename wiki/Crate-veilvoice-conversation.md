@@ -9,12 +9,13 @@
 
 ## Contents
 
-- [Why this exists](#why-this-exists)
-- [What a conversation costs, said plainly](#what-a-conversation-costs-said-plainly)
-- [VeilVoice does not decide who is talking](#veilvoice-does-not-decide-who-is-talking)
-- [The modules](#the-modules)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
+  - [Why this exists](#why-this-exists)
+  - [What a conversation costs, said plainly](#what-a-conversation-costs-said-plainly)
+  - [VeilVoice does not decide who is talking](#veilvoice-does-not-decide-who-is-talking)
+  - [The modules](#the-modules)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
 
 Several people in one recording: a plan of who spoke when, a distinct
 destination voice for each of them, and subtitles that carry their names.
@@ -65,6 +66,19 @@ comes from the user — a channel per person, or a list of turns. See
 | `render` | One engine per speaker, spliced back onto the timeline |
 | `subtitles` | WebVTT and SubRip, from the same plan |
 
+# In plain words
+
+This is for a recording with more than one person in it.
+
+Given a note of who speaks when, it gives each person a different voice --
+every one of them just as thoroughly disguised as a single speaker would be --
+and writes subtitles saying who said what.
+
+It will not guess who is talking. Working that out needs a trained model, and
+this project ships none, so it is told: either one microphone per person, or a
+list of turns. Any part of the recording nobody claims is silenced rather than
+passed through, because audio nobody claimed has not been disguised.
+
 ## How the crate fits together
 
 <p align="center">
@@ -77,7 +91,7 @@ comes from the user — a channel per person, or a list of turns. See
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>165 lines"])
+    n_lib(["lib.rs<br/>178 lines"])
     n_plan["plan.rs<br/>837 lines"]
     n_render["render.rs<br/>836 lines"]
     n_subtitles["subtitles.rs<br/>263 lines"]
@@ -93,7 +107,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`lib.rs`|File-veilvoice-conversation-lib]] | 165 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
+| [[`lib.rs`|File-veilvoice-conversation-lib]] | 178 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
 | [[`plan.rs`|File-veilvoice-conversation-plan]] | 837 | Who is in the recording, and who is speaking when. |
 | [[`render.rs`|File-veilvoice-conversation-render]] | 836 | Turning a plan and a recording into veiled audio, one engine per speaker. |
 | [[`subtitles.rs`|File-veilvoice-conversation-subtitles]] | 263 | Subtitles, from the same plan the audio is rendered from. |

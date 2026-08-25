@@ -47,6 +47,7 @@
   <a href="#what-a-conversation-costs-said-plainly">What a conversation costs, said plainly</a>
   <a href="#veilvoice-does-not-decide-who-is-talking">VeilVoice does not decide who is talking</a>
   <a href="#the-modules">The modules</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -67,6 +68,10 @@
 <p>Working that out from audio alone is speaker diarisation and needs a trained model. There is no model here, there is no server to ask, and guessing would be worse than not offering it: a wrong guess either merges two people or invents a third, and neither would be visible in the output. So the plan comes from the user &#8212; a channel per person, or a list of turns. See <code>plan</code>.</p>
 <h3 id="the-modules">The modules</h3>
 <p>| Module | What it owns | |---|---| | <code>plan</code> | Who is in the recording, when they speak, and the text format | | <code>render</code> | One engine per speaker, spliced back onto the timeline | | <code>subtitles</code> | WebVTT and SubRip, from the same plan |</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is for a recording with more than one person in it.</p>
+<p>Given a note of who speaks when, it gives each person a different voice -- every one of them just as thoroughly disguised as a single speaker would be -- and writes subtitles saying who said what.</p>
+<p>It will not guess who is talking. Working that out needs a trained model, and this project ships none, so it is told: either one microphone per person, or a list of turns. Any part of the recording nobody claims is silenced rather than passed through, because audio nobody claimed has not been disguised.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -78,7 +83,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">165 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">178 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -101,7 +106,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;165 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;178 lines&quot;])
     n_plan[&quot;plan.rs&lt;br/&gt;837 lines&quot;]
     n_render[&quot;render.rs&lt;br/&gt;836 lines&quot;]
     n_subtitles[&quot;subtitles.rs&lt;br/&gt;263 lines&quot;]
@@ -115,7 +120,7 @@ flowchart TD
 <section id="s-files">
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
-<tr><td><a href="veilvoice-conversation/lib.html"><code>lib.rs</code></a></td><td>165</td><td>Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names.</td></tr>
+<tr><td><a href="veilvoice-conversation/lib.html"><code>lib.rs</code></a></td><td>178</td><td>Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names.</td></tr>
 <tr><td><a href="veilvoice-conversation/plan.html"><code>plan.rs</code></a></td><td>837</td><td>Who is in the recording, and who is speaking when.</td></tr>
 <tr><td><a href="veilvoice-conversation/render.html"><code>render.rs</code></a></td><td>836</td><td>Turning a plan and a recording into veiled audio, one engine per speaker.</td></tr>
 <tr><td><a href="veilvoice-conversation/subtitles.html"><code>subtitles.rs</code></a></td><td>263</td><td>Subtitles, from the same plan the audio is rendered from.</td></tr>

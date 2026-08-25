@@ -46,6 +46,7 @@
   <a href="#what-this-produces-and-what-needs-something-else">What this produces, and what needs something else</a>
   <a href="#the-page-needs-a-little-javascript-and-says-so">The page needs a little JavaScript, and says so</a>
   <a href="#a-picture-is-not-veiled">A picture is not veiled</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -60,6 +61,10 @@
 <p>Lighting the right circle means knowing where the audio has got to, and only the audio element knows that. There is a small inline script &#8212; no file, no network, no library &#8212; and a <code>&lt;noscript&gt;</code> that says what it does. Without it the audio still plays, the subtitles still appear and the waveform is still drawn; the circles simply do not light up.</p>
 <h3 id="a-picture-is-not-veiled">A picture is not veiled</h3>
 <p>A speaker may have a portrait, and it is drawn exactly as supplied. Nothing here anonymises an image: a photograph of somebody&#x27;s face beside their veiled voice identifies them completely. The default is a plain filled circle for that reason, and <code>SCOPE</code> says it where a user will read it.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This draws the picture.</p>
+<p>A waveform, a circle for each person in their own colour with their name under it, a title, and a page that plays all of it together in a browser and needs nothing installed.</p>
+<p>It does not make a video file. That needs an encoder, and this project ships none -- so it prints the command that would do it with <code>ffmpeg</code>, if you have <code>ffmpeg</code>, and leaves running it to you.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -73,7 +78,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">128 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">140 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -101,7 +106,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;128 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;140 lines&quot;])
     n_ffmpeg[&quot;ffmpeg.rs&lt;br/&gt;278 lines&quot;]
     n_page[&quot;page.rs&lt;br/&gt;977 lines&quot;]
     n_palette[&quot;palette.rs&lt;br/&gt;735 lines&quot;]
@@ -120,7 +125,7 @@ flowchart TD
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-video/ffmpeg.html"><code>ffmpeg.rs</code></a></td><td>278</td><td>The video file, which needs a codec this project does not ship.</td></tr>
-<tr><td><a href="veilvoice-video/lib.html"><code>lib.rs</code></a></td><td>128</td><td>A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background.</td></tr>
+<tr><td><a href="veilvoice-video/lib.html"><code>lib.rs</code></a></td><td>140</td><td>A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background.</td></tr>
 <tr><td><a href="veilvoice-video/page.html"><code>page.rs</code></a></td><td>977</td><td>The picture: one still for a preview, and one page that plays.</td></tr>
 <tr><td><a href="veilvoice-video/palette.html"><code>palette.rs</code></a></td><td>735</td><td>Colours: the site&#x27;s own tokens, and one per speaker.</td></tr>
 <tr><td><a href="veilvoice-video/waveform.html"><code>waveform.rs</code></a></td><td>245</td><td>The shape of the audio, reduced to something a page can draw.</td></tr>

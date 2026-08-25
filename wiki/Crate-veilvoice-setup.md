@@ -12,6 +12,7 @@
 - [Why this is a library and not part of the command line](#why-this-is-a-library-and-not-part-of-the-command-line)
 - [What it will not do](#what-it-will-not-do)
 - [No unsafe, and therefore some subprocesses](#no-unsafe-and-therefore-some-subprocesses)
+- [In plain words](#in-plain-words)
   - [How the crate fits together](#how-the-crate-fits-together)
   - [The files](#the-files)
 
@@ -64,6 +65,19 @@ window when the desktop application is the caller — the defect that shipped
 in v0.1.10 — and a test reads this crate's own source to catch a spawn that
 forgets.
 
+# In plain words
+
+This installs the program, if you want it installed.
+
+You do not have to. Unzipping it and running it is a perfectly normal way to
+use it, and this says so rather than treating it as a mistake. Installing does
+three small things -- copies the program into your own folder, adds it to your
+PATH so typing its name works, and adds an entry so Windows can remove it --
+and nothing else. No administrator rights, no service.
+
+It also looks for the few other programs VeilVoice can work alongside, tells
+you who makes each one, and installs none of them unless you say so.
+
 ## How the crate fits together
 
 <p align="center">
@@ -76,7 +90,7 @@ forgets.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>153 lines"])
+    n_lib(["lib.rs<br/>166 lines"])
     n_companions["companions.rs<br/>761 lines"]
     n_install["install.rs<br/>555 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" "open the source"
@@ -92,4 +106,4 @@ flowchart TD
 |---|---:|---|
 | [[`companions.rs`|File-veilvoice-setup-companions]] | 761 | Optional third-party software, detected rather than assumed. |
 | [[`install.rs`|File-veilvoice-setup-install]] | 555 | Put this program somewhere the system can find it. |
-| [[`lib.rs`|File-veilvoice-setup-lib]] | 153 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [[`lib.rs`|File-veilvoice-setup-lib]] | 166 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |

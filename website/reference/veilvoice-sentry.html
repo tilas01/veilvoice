@@ -47,6 +47,7 @@
   <a href="#the-two-signals-and-what-each-is-worth">The two signals, and what each is worth</a>
   <a href="#what-it-cannot-tell-you-who">What it cannot tell you: who</a>
   <a href="#entropy-is-a-hint-and-never-evidence">Entropy is a hint and never evidence</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -64,6 +65,10 @@
 <p>Nothing here names a process. Attribution needs system auditing that is normally switched off, and it lives in <code>veilvoice-guard</code> rather than here &#8212; <code>veilvoice_guard::who_touched</code> takes a path and usually, honestly, answers that it does not know. This crate deliberately does not depend on that one: a project that wants canaries should not have to take a cryptography stack with them.</p>
 <h3 id="entropy-is-a-hint-and-never-evidence">Entropy is a hint and never evidence</h3>
 <p><code>entropy</code> measures Shannon entropy in bits per byte, and encrypted data sits near 8.0. So does a JPEG, a <code>.zip</code>, a video, and this project&#x27;s own <code>.veil</code> container. High entropy is only meaningful for a file whose contents this crate <em>planted</em> and therefore knows should have been prose. It is used for exactly that and nothing else.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This watches for the pattern ransomware makes.</p>
+<p>It leaves a few files lying around that nothing has any reason to touch, and it counts how fast files in a folder are being rewritten. Something quietly encrypting your documents trips both.</p>
+<p>It is a warning, not a defence. It notices; it does not stop anything, and it can be fooled by anything patient enough to go slowly.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -75,7 +80,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">236 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">247 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -93,7 +98,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;236 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;247 lines&quot;])
     n_canary[&quot;canary.rs&lt;br/&gt;750 lines&quot;]
     n_rate[&quot;rate.rs&lt;br/&gt;942 lines&quot;]
     click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs&quot; &quot;open the source&quot;
@@ -106,7 +111,7 @@ flowchart TD
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-sentry/canary.html"><code>canary.rs</code></a></td><td>750</td><td>Decoy files that should never change, and a record of what they were.</td></tr>
-<tr><td><a href="veilvoice-sentry/lib.html"><code>lib.rs</code></a></td><td>236</td><td>An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing.</td></tr>
+<tr><td><a href="veilvoice-sentry/lib.html"><code>lib.rs</code></a></td><td>247</td><td>An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing.</td></tr>
 <tr><td><a href="veilvoice-sentry/rate.html"><code>rate.rs</code></a></td><td>942</td><td>How much of a directory tree changed, and how fast.</td></tr>
 </tbody></table>
 </section>

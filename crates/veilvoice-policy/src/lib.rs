@@ -54,6 +54,15 @@
 //! passphrase, never blocks, and reports the seal as [`Verification::Unchecked`]
 //! rather than pretending to have looked. A front end that wants the stronger
 //! statement calls [`verify`] when it has a passphrase to offer.
+//!
+//! # In plain words
+//!
+//! This lets settings be locked down, and only in one direction.
+//!
+//! Someone setting up a machine for other people can seal a set of settings so
+//! they can be made stricter but never looser. Nobody needs a password to read
+//! what the rules are -- only to change them -- because a rule people cannot see
+//! is a rule they will trip over.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

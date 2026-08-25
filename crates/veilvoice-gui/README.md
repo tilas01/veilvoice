@@ -17,6 +17,7 @@
 
 - [The modules](#the-modules)
 - [Two rules this crate keeps](#two-rules-this-crate-keeps)
+- [In plain words](#in-plain-words)
   - [How the crate fits together](#how-the-crate-fits-together)
   - [The files](#the-files)
   - [Public items](#public-items)
@@ -64,6 +65,18 @@ does not protect anybody.
 explicit choice, and the whole interface reads that answer rather than each
 widget deciding for itself.
 
+# In plain words
+
+This is the window.
+
+Tabs down the top for the things the program does: disguise a file, scramble a
+microphone as you talk, handle a recording with several people, watch for
+anything using your microphone, put the app behind a password, check a
+download, and change how it looks.
+
+Nine colour schemes, and your own if you write one. It does the slow work on
+another thread, so the window keeps answering while it is busy.
+
 ## How the crate fits together
 
 Every arrow below is a `crate::` or `super::` path one module actually
@@ -81,7 +94,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>67 lines"])
+    n_lib(["lib.rs<br/>79 lines"])
     n_main(["main.rs<br/>87 lines"])
     n_app["app.rs<br/>1514 lines"]
     n_crashlog["crashlog.rs<br/>254 lines"]
@@ -158,7 +171,7 @@ flowchart TD
 | [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1514 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 254 | Make a failure that produces no output produce some. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1044 | Group mode: several people in one recording, each with a name and a colour. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 67 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 79 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 87 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 691 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 311 | The policy in force, and what the interface does about it. |

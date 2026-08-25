@@ -11,16 +11,17 @@
 
 # `crates/veilvoice-policy/src/lib.rs`
 
-[`veilvoice-policy`](../../../crates/veilvoice-policy/README.md) &middot; 156 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs)
+[`veilvoice-policy`](../../../crates/veilvoice-policy/README.md) &middot; 165 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs)
 
 ## Contents
 
-- [The design decision this crate turns on](#the-design-decision-this-crate-turns-on)
-- [What the seal is for, and what it is not](#what-the-seal-is-for-and-what-it-is-not)
-- [Reading a policy costs nothing](#reading-a-policy-costs-nothing)
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [The design decision this crate turns on](#the-design-decision-this-crate-turns-on)
+  - [What the seal is for, and what it is not](#what-the-seal-is-for-and-what-it-is-not)
+  - [Reading a policy costs nothing](#reading-a-policy-costs-nothing)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Settings somebody else decided, sealed so they cannot be edited without a
 passphrase — and, more importantly, built so that editing them without one
@@ -76,13 +77,22 @@ passphrase, never blocks, and reports the seal as `Verification::Unchecked`
 rather than pretending to have looked. A front end that wants the stronger
 statement calls `verify` when it has a passphrase to offer.
 
+# In plain words
+
+This lets settings be locked down, and only in one direction.
+
+Someone setting up a machine for other people can seal a set of settings so
+they can be made stricter but never looser. Nobody needs a password to read
+what the rules are -- only to change them -- because a rule people cannot see
+is a rule they will trip over.
+
 ## What this file contains
 
-156 lines defining **4 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+165 lines defining **4 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 83) -- Everything that can go wrong in this crate.
+- `enum Error` (line 92) -- Everything that can go wrong in this crate.
 
 ## What calls what
 
@@ -104,14 +114,14 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Error::from<br/>line 93"]
-    n_from["Error::from<br/>line 99"]
-    n_fmt["Error::fmt<br/>line 105"]
-    n_source["Error::source<br/>line 115"]
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L93" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L99" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L105" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L115" "open the source"
+    n_from["Error::from<br/>line 102"]
+    n_from["Error::from<br/>line 108"]
+    n_fmt["Error::fmt<br/>line 114"]
+    n_source["Error::source<br/>line 124"]
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L102" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L108" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L114" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L124" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_from,n_from,n_fmt,n_source helper
 ```
@@ -122,13 +132,13 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L65) | Crate version string, surfaced in the About panel. |
-| `SCOPE` <sub>pub const</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L71) | What a sealed policy is worth, in the words a front end should show. |
-| `Error` <sub>pub enum</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L83) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L93) |  |
-| `Error::from` <sub>fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L99) |  |
-| `Error::fmt` <sub>fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L105) |  |
-| `Error::source` <sub>fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L115) |  |
+| `VERSION` <sub>pub const</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L74) | Crate version string, surfaced in the About panel. |
+| `SCOPE` <sub>pub const</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L80) | What a sealed policy is worth, in the words a front end should show. |
+| `Error` <sub>pub enum</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L92) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L102) |  |
+| `Error::from` <sub>fn</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L108) |  |
+| `Error::fmt` <sub>fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L114) |  |
+| `Error::source` <sub>fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs#L124) |  |
 
 ---
 

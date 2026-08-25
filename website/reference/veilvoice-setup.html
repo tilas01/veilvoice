@@ -46,6 +46,7 @@
   <a href="#why-this-is-a-library-and-not-part-of-the-command-line">Why this is a library and not part of the command line</a>
   <a href="#what-it-will-not-do">What it will not do</a>
   <a href="#no-unsafe-and-therefore-some-subprocesses">No unsafe, and therefore some subprocesses</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -61,6 +62,10 @@
 <p><strong>Nothing is ticked by default.</strong> There are no checkboxes at all: each companion is a separate, deliberate action. The rule that predates this crate &#8212; detect, say what it is and who makes it, act only on an explicit yes &#8212; is unchanged by the interface getting prettier.</p>
 <h2 id="no-unsafe-and-therefore-some-subprocesses">No <code>unsafe</code>, and therefore some subprocesses</h2>
 <p><code>#![forbid(unsafe_code)]</code> holds here as everywhere else in the workspace, so the Windows registry is reached through <code>reg.exe</code> rather than the Win32 API. <code>command</code> wraps every spawn so that none of them flashes a console window when the desktop application is the caller &#8212; the defect that shipped in v0.1.10 &#8212; and a test reads this crate&#x27;s own source to catch a spawn that forgets.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This installs the program, if you want it installed.</p>
+<p>You do not have to. Unzipping it and running it is a perfectly normal way to use it, and this says so rather than treating it as a mistake. Installing does three small things -- copies the program into your own folder, adds it to your PATH so typing its name works, and adds an entry so Windows can remove it -- and nothing else. No administrator rights, no service.</p>
+<p>It also looks for the few other programs VeilVoice can work alongside, tells you who makes each one, and installs none of them unless you say so.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -72,7 +77,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">153 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">166 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -90,7 +95,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;153 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;166 lines&quot;])
     n_companions[&quot;companions.rs&lt;br/&gt;761 lines&quot;]
     n_install[&quot;install.rs&lt;br/&gt;555 lines&quot;]
     click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs&quot; &quot;open the source&quot;
@@ -104,7 +109,7 @@ flowchart TD
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-setup/companions.html"><code>companions.rs</code></a></td><td>761</td><td>Optional third-party software, detected rather than assumed.</td></tr>
 <tr><td><a href="veilvoice-setup/install.html"><code>install.rs</code></a></td><td>555</td><td>Put this program somewhere the system can find it.</td></tr>
-<tr><td><a href="veilvoice-setup/lib.html"><code>lib.rs</code></a></td><td>153</td><td>Everything that puts VeilVoice on a machine, and everything that reports what is already on it.</td></tr>
+<tr><td><a href="veilvoice-setup/lib.html"><code>lib.rs</code></a></td><td>166</td><td>Everything that puts VeilVoice on a machine, and everything that reports what is already on it.</td></tr>
 </tbody></table>
 </section>
 </div></div>

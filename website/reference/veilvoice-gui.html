@@ -45,6 +45,7 @@
 <nav class="toc" aria-label="Contents">
   <a href="#the-modules">The modules</a>
   <a href="#two-rules-this-crate-keeps">Two rules this crate keeps</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -58,6 +59,10 @@
 <h2 id="two-rules-this-crate-keeps">Two rules this crate keeps</h2>
 <p><strong>The user interface never softens a scope note.</strong> Where a control has a bound -- the app lock is a verifier and not disk encryption, tamper detection detects rather than prevents -- the interface says so next to the control, and tests fail the build if that text changes. Documentation nobody opens does not protect anybody.</p>
 <p><strong>Animation is a preference that is honoured, not a decoration.</strong> <code>reduced_motion</code> resolves the platform&#x27;s own setting alongside the user&#x27;s explicit choice, and the whole interface reads that answer rather than each widget deciding for itself.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is the window.</p>
+<p>Tabs down the top for the things the program does: disguise a file, scramble a microphone as you talk, handle a recording with several people, watch for anything using your microphone, put the app behind a password, check a download, and change how it looks.</p>
+<p>Nine colour schemes, and your own if you write one. It does the slow work on another thread, so the window keeps answering while it is busy.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -101,7 +106,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="72.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="72.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">67 lines</text>
+<text x="72.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">79 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.8" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -189,7 +194,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;67 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;79 lines&quot;])
     n_main([&quot;main.rs&lt;br/&gt;87 lines&quot;])
     n_app[&quot;app.rs&lt;br/&gt;1514 lines&quot;]
     n_crashlog[&quot;crashlog.rs&lt;br/&gt;254 lines&quot;]
@@ -264,7 +269,7 @@ flowchart TD
 <tr><td><a href="veilvoice-gui/app.html"><code>app.rs</code></a></td><td>1514</td><td>The VeilVoice desktop application: seven tabs, one window, no menus.</td></tr>
 <tr><td><a href="veilvoice-gui/crashlog.html"><code>crashlog.rs</code></a></td><td>254</td><td>Make a failure that produces no output produce some.</td></tr>
 <tr><td><a href="veilvoice-gui/group.html"><code>group.rs</code></a></td><td>1044</td><td>Group mode: several people in one recording, each with a name and a colour.</td></tr>
-<tr><td><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a></td><td>67</td><td>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</td></tr>
+<tr><td><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a></td><td>79</td><td>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</td></tr>
 <tr><td><a href="veilvoice-gui/main.html"><code>main.rs</code></a></td><td>87</td><td>Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.</td></tr>
 <tr><td><a href="veilvoice-gui/palettes.html"><code>palettes.rs</code></a></td><td>691</td><td>User-defined colour schemes, and the contrast check that keeps them usable.</td></tr>
 <tr><td><a href="veilvoice-gui/policy.html"><code>policy.rs</code></a></td><td>311</td><td>The policy in force, and what the interface does about it.</td></tr>

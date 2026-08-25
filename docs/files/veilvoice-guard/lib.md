@@ -11,17 +11,18 @@
 
 # `crates/veilvoice-guard/src/lib.rs`
 
-[`veilvoice-guard`](../../../crates/veilvoice-guard/README.md) &middot; 140 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs)
+[`veilvoice-guard`](../../../crates/veilvoice-guard/README.md) &middot; 150 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs)
 
 ## Contents
 
-- [What this is, and the word it deliberately does not use](#what-this-is-and-the-word-it-deliberately-does-not-use)
-- [What it actually does](#what-it-actually-does)
-- [The manifest is only as trustworthy as where it is kept](#the-manifest-is-only-as-trustworthy-as-where-it-is-kept)
-- [What a privileged helper would add, and why there is not one here](#what-a-privileged-helper-would-add-and-why-there-is-not-one-here)
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [What this is, and the word it deliberately does not use](#what-this-is-and-the-word-it-deliberately-does-not-use)
+  - [What it actually does](#what-it-actually-does)
+  - [The manifest is only as trustworthy as where it is kept](#the-manifest-is-only-as-trustworthy-as-where-it-is-kept)
+  - [What a privileged helper would add, and why there is not one here](#what-a-privileged-helper-would-add-and-why-there-is-not-one-here)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Tamper **detection** for VeilVoice's own files: a manifest of what they
 should be, a check of what they are, and a best-effort answer to "what
@@ -74,13 +75,23 @@ and it still could not stop a root-level attacker, only watch one. So the
 unprivileged half ships first, on its own merits, and `ROADMAP.md` records
 what the privileged half would need to be worth adding.
 
+# In plain words
+
+This notices when the program's own files have been changed.
+
+It writes down what every file should look like, and later tells you if any of
+them no longer does -- and which one, and when.
+
+It is a smoke alarm, not a lock. Anything that can change those files can
+change the list too. What it catches is a change nobody was hiding.
+
 ## What this file contains
 
-140 lines defining **4 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+150 lines defining **4 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 80) -- Everything that can go wrong in this crate.
+- `enum Error` (line 90) -- Everything that can go wrong in this crate.
 
 ## What calls what
 
@@ -102,14 +113,14 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Error::from<br/>line 90"]
-    n_from["Error::from<br/>line 96"]
-    n_fmt["Error::fmt<br/>line 102"]
-    n_source["Error::source<br/>line 112"]
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L90" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L96" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L102" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L112" "open the source"
+    n_from["Error::from<br/>line 100"]
+    n_from["Error::from<br/>line 106"]
+    n_fmt["Error::fmt<br/>line 112"]
+    n_source["Error::source<br/>line 122"]
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L100" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L106" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L112" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L122" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_from,n_from,n_fmt,n_source helper
 ```
@@ -120,13 +131,13 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L64) | Crate version string, surfaced in the About panel. |
-| `SCOPE` <sub>pub const</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L70) | What tamper detection is worth, in the words a front-end should show. |
-| `Error` <sub>pub enum</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L80) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L90) |  |
-| `Error::from` <sub>fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L96) |  |
-| `Error::fmt` <sub>fn</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L102) |  |
-| `Error::source` <sub>fn</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L112) |  |
+| `VERSION` <sub>pub const</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L74) | Crate version string, surfaced in the About panel. |
+| `SCOPE` <sub>pub const</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L80) | What tamper detection is worth, in the words a front-end should show. |
+| `Error` <sub>pub enum</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L90) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L100) |  |
+| `Error::from` <sub>fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L106) |  |
+| `Error::fmt` <sub>fn</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L112) |  |
+| `Error::source` <sub>fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs#L122) |  |
 
 ---
 

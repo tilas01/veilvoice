@@ -9,12 +9,13 @@
 
 ## Contents
 
-- [The limit, stated first](#the-limit-stated-first)
-- [The cross-view check, and what it is actually worth](#the-cross-view-check-and-what-it-is-actually-worth)
-- [A new driver is not by itself a finding](#a-new-driver-is-not-by-itself-a-finding)
-- [Where the answer comes from](#where-the-answer-comes-from)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
+  - [The limit, stated first](#the-limit-stated-first)
+  - [The cross-view check, and what it is actually worth](#the-cross-view-check-and-what-it-is-actually-worth)
+  - [A new driver is not by itself a finding](#a-new-driver-is-not-by-itself-a-finding)
+  - [Where the answer comes from](#where-the-answer-comes-from)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
 
 What is loaded into the kernel, recorded, and compared later. A driver
 appearing between two looks is worth knowing about: it is the step almost
@@ -67,6 +68,18 @@ Linux reads two files and spawns nothing. The other two shell out to a tool
 the system already ships, for the same reason the rest of this workspace
 does: `#![forbid(unsafe_code)]` holds here too, and the native APIs are FFI.
 
+# In plain words
+
+This lists what is loaded deep inside the operating system, and tells you when
+that list changes.
+
+Drivers run below almost everything else, so something that gets in there can
+see a great deal. Knowing a new one has appeared is worth something.
+
+It asks the system twice, in two different ways, and says so when the two
+answers disagree -- which is a hint, not a detection. Anything already down
+there can lie to both.
+
 ## How the crate fits together
 
 <p align="center">
@@ -79,7 +92,7 @@ does: `#![forbid(unsafe_code)]` holds here too, and the native APIs are FFI.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>736 lines"])
+    n_lib(["lib.rs<br/>748 lines"])
     n_linux["linux.rs<br/>230 lines"]
     n_macos["macos.rs<br/>206 lines"]
     n_windows["windows.rs<br/>232 lines"]
@@ -95,7 +108,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`lib.rs`|File-veilvoice-drivers-lib]] | 736 | What is loaded into the kernel, recorded, and compared later. |
+| [[`lib.rs`|File-veilvoice-drivers-lib]] | 748 | What is loaded into the kernel, recorded, and compared later. |
 | [[`linux.rs`|File-veilvoice-drivers-linux]] | 230 | Linux: /proc/modules, cross-checked against /sys/module. |
 | [[`macos.rs`|File-veilvoice-drivers-macos]] | 206 | macOS: kmutil showloaded, falling back to kextstat. |
 | [[`windows.rs`|File-veilvoice-drivers-windows]] | 232 | Windows: driverquery.exe, which the system already ships. |

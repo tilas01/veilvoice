@@ -46,6 +46,7 @@
   <a href="#why-this-exists">Why this exists</a>
   <a href="#strip-versus-spoof">Strip versus spoof</a>
   <a href="#what-this-crate-cannot-do">What this crate cannot do</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -62,6 +63,9 @@
 </ul>
 <h3 id="what-this-crate-cannot-do">What this crate cannot do</h3>
 <p>It removes <em>container</em> metadata. It cannot remove information encoded in the media itself: a photograph still shows the room it was taken in, and audio still carries its room acoustics and background noise. Nor does it touch filesystem timestamps or the filename, both of which are outside the file &#8212; callers that care must handle those separately.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This strips the hidden labels off a file.</p>
+<p>Photographs and recordings carry information you never typed: where the picture was taken, which phone or microphone made it, what the file was called before, sometimes a name. Removing the sound of a voice and leaving that behind would be pointless, so this takes it out -- not by blanking the fields, but by removing the parts of the file that hold them.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -74,7 +78,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">111 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">121 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -97,7 +101,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;111 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;121 lines&quot;])
     n_audio[&quot;audio.rs&lt;br/&gt;268 lines&quot;]
     n_image[&quot;image.rs&lt;br/&gt;202 lines&quot;]
     n_wav[&quot;wav.rs&lt;br/&gt;332 lines&quot;]
@@ -114,7 +118,7 @@ flowchart TD
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-meta/audio.html"><code>audio.rs</code></a></td><td>268</td><td>Audio tag removal and replacement.</td></tr>
 <tr><td><a href="veilvoice-meta/image.html"><code>image.rs</code></a></td><td>202</td><td>Image EXIF/GPS removal.</td></tr>
-<tr><td><a href="veilvoice-meta/lib.html"><code>lib.rs</code></a></td><td>111</td><td>Strip or spoof the identifying metadata that rides along with media files.</td></tr>
+<tr><td><a href="veilvoice-meta/lib.html"><code>lib.rs</code></a></td><td>121</td><td>Strip or spoof the identifying metadata that rides along with media files.</td></tr>
 <tr><td><a href="veilvoice-meta/wav.html"><code>wav.rs</code></a></td><td>332</td><td>Chunk-level RIFF/WAVE metadata removal.</td></tr>
 <tr><td><a href="veilvoice-meta/tests-wav_fuzz.html"><code>wav_fuzz.rs</code></a></td><td>291</td><td>Randomised robustness testing for the RIFF chunk walker.</td></tr>
 </tbody></table>

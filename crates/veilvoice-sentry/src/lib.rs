@@ -60,6 +60,17 @@
 //! `.veil` container. High entropy is only meaningful for a file whose
 //! contents this crate *planted* and therefore knows should have been prose.
 //! It is used for exactly that and nothing else.
+//!
+//! # In plain words
+//!
+//! This watches for the pattern ransomware makes.
+//!
+//! It leaves a few files lying around that nothing has any reason to touch, and it
+//! counts how fast files in a folder are being rewritten. Something quietly
+//! encrypting your documents trips both.
+//!
+//! It is a warning, not a defence. It notices; it does not stop anything, and it
+//! can be fooled by anything patient enough to go slowly.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

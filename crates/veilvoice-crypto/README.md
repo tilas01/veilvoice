@@ -15,13 +15,14 @@
 
 ## Contents
 
-- [What this crate is for](#what-this-crate-is-for)
-- [Threat model, stated plainly](#threat-model-stated-plainly)
-- [Example](#example)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
-- [Public items](#public-items)
-- [Reading it elsewhere](#reading-it-elsewhere)
+  - [What this crate is for](#what-this-crate-is-for)
+  - [Threat model, stated plainly](#threat-model-stated-plainly)
+  - [Example](#example)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
+  - [Public items](#public-items)
+  - [Reading it elsewhere](#reading-it-elsewhere)
 
 Key derivation, post-quantum-hybrid key agreement, authenticated encryption
 and amnesic secret storage for VeilVoice.
@@ -75,6 +76,21 @@ assert!(container::open_with_password(b"wrong", &sealed).is_err());
 VeilVoice contains **no `unsafe` code at all** — including the page-locking
 in `amnesia`, which goes through a safe wrapper.
 
+# In plain words
+
+This is the locking.
+
+Two separate things use it. Recordings are sealed on your disk so that somebody
+who takes the disk cannot listen to them, and the app can be put behind a
+password so somebody who picks up your unlocked computer cannot open it.
+
+Those two passwords are deliberately different. Opening the program should not
+be the same act as unsealing everything it has ever written.
+
+The maths is chosen to be slow to guess and to still be safe if somebody one
+day builds a quantum computer. Nothing is sent anywhere; the sealing happens on
+your machine and the key is made from your password each time.
+
 ## How the crate fits together
 
 Every arrow below is a `crate::` or `super::` path one module actually
@@ -92,7 +108,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>175 lines"])
+    n_lib(["lib.rs<br/>190 lines"])
     n_aead["aead.rs<br/>168 lines"]
     n_amnesia["amnesia.rs<br/>313 lines"]
     n_container["container.rs<br/>479 lines"]
@@ -124,7 +140,7 @@ flowchart TD
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 479 | The .veil encrypted container format. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 435 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 387 | Password-based key derivation with Argon2id. |
-| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 175 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 190 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 732 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 157 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 401 | Secure erasure — the self-destruct. |

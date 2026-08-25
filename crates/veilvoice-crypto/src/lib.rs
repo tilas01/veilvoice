@@ -52,6 +52,21 @@
 //!
 //! VeilVoice contains **no `unsafe` code at all** — including the page-locking
 //! in [`amnesia`], which goes through a safe wrapper.
+//!
+//! # In plain words
+//!
+//! This is the locking.
+//!
+//! Two separate things use it. Recordings are sealed on your disk so that somebody
+//! who takes the disk cannot listen to them, and the app can be put behind a
+//! password so somebody who picks up your unlocked computer cannot open it.
+//!
+//! Those two passwords are deliberately different. Opening the program should not
+//! be the same act as unsealing everything it has ever written.
+//!
+//! The maths is chosen to be slow to guess and to still be safe if somebody one
+//! day builds a quantum computer. Nothing is sent anywhere; the sealing happens on
+//! your machine and the key is made from your password each time.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
