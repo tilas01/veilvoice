@@ -1,0 +1,14 @@
+Optional third-party software VeilVoice works with, and whether this machine already has it.
+
+Nothing here is part of VeilVoice and nothing here is needed to run it. A virtual audio cable is what lets live mode feed a veiled microphone into a call; an audio editor is how most people trim a recording first.
+
+With no arguments this only *reports*. `--install NAME` is the explicit yes, one named program at a time, and even then VeilVoice will not run somebody else's installer: for proprietary software it prints the vendor's page, and for anything needing root it prints the command rather than asking for a password.
+
+Usage: veilvoice.exe companions [OPTIONS]
+
+Options:
+      --install <NAME>
+          Install one, by name. Without this, nothing is installed
+
+  -h, --help
+          Print help (see a summary with '-h')

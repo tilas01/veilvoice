@@ -1,0 +1,48 @@
+Draw a still of the page, without rendering any audio.
+
+The layout, the speaker circles and which voice each speaker becomes -- answered in a second rather than in the length of the recording. With `--ffmpeg` it also prints the command that would turn frames into a video file, and whether `ffmpeg` is on this machine. **It never runs it**: this project ships no codec and starts no program you did not.
+
+Usage: veilvoice.exe conversation preview [OPTIONS] <PLAN>
+
+Arguments:
+  <PLAN>
+          The plan file
+
+Options:
+      --audio <AUDIO>
+          A recording, so the waveform is real rather than flat
+
+      --at <AT>
+          Which second of the conversation to draw
+          
+          [default: 0]
+
+  -o, --output <OUTPUT>
+          Where to write the SVG. Defaults to the plan's name
+
+      --ffmpeg
+          Print the ffmpeg command, and whether ffmpeg is installed
+
+      --width <WIDTH>
+          Picture width in pixels
+          
+          [default: 1280]
+
+      --height <HEIGHT>
+          Picture height in pixels
+          
+          [default: 720]
+
+      --padding <PADDING>
+          Margin around everything, in pixels
+          
+          [default: 48]
+
+      --background <BACKGROUND>
+          A `#rrggbb` colour, or the path to an image file
+
+      --black
+          Plain black behind everything. Overrides `--background`
+
+  -h, --help
+          Print help (see a summary with '-h')

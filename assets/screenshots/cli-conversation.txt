@@ -1,0 +1,19 @@
+A recording with several people in it: a voice each, and subtitles.
+
+Run an interview through `anonymise` and both people come out as the same voice -- private, and unusable, because nobody can tell a question from its answer. This gives each speaker their own destination voice and destroys each voiceprint just as thoroughly.
+
+**You say who is talking.** Working that out from the audio needs a trained model; there is none here and no server to ask, and a wrong guess would either merge two people or invent a third without anything in the output showing it. So the plan is a text file of turns, or one microphone per person.
+
+**What a conversation keeps** is the shape of the conversation: how many people, who spoke when, and for how long. That is kept on purpose -- it is what makes the result worth listening to -- and it is information about the conversation.
+
+Usage: veilvoice.exe conversation <COMMAND>
+
+Commands:
+  inspect  Describe a plan: who is in it, which voice each gets, and any overlaps
+  render   Render a recording according to a plan
+  preview  Draw a still of the page, without rendering any audio
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help
+          Print help (see a summary with '-h')
