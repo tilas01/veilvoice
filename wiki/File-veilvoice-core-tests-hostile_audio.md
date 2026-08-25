@@ -31,6 +31,13 @@ the session was NaN, silently.
 
 _Colour key: **helper** -- private to this file._
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/diagrams/veilvoice-core/tests-hostile_audio.svg" alt="what calls what in hostile_audio.rs" width="640">
+</p>
+
+<details>
+<summary>The same graph as Mermaid source</summary>
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
@@ -74,6 +81,8 @@ flowchart TD
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_speech,n_engine,n_a_single_nan_does_not_poison_the_engine_for_ever,n_every_flavour_of_non_finite_is_survived,n_an_entirely_non_finite_buffer_is_handled,n_digital_silence_stays_silent_and_leaves_the_state_usable,n_pathological_but_legal_audio_is_handled,n_hostile_input_is_survived_with_accent_neutralisation_off,n_a_non_finite_sample_rate_is_refused_rather_than_built,n_an_absurd_sample_rate_is_refused_rather_than_allocated,n_an_absurd_frame_size_is_refused,n_non_finite_parameters_are_refused_and_wild_ones_are_clamped,n_every_configuration_that_builds_produces_finite_audio helper
 ```
+
+</details>
 
 ## Items
 

@@ -32,6 +32,13 @@ binary is to be the thing you check a download with.
 
 _Colour key: **helper** -- private to this file._
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/diagrams/veilvoice-verify/tests.svg" alt="what calls what in tests.rs" width="640">
+</p>
+
+<details>
+<summary>The same graph as Mermaid source</summary>
+
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
@@ -64,6 +71,8 @@ flowchart TD
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_the_embedded_key_parses_and_is_the_expected_one,n_the_embedded_key_carries_no_email_address,n_the_fingerprint_constant_is_written_out_not_computed,n_a_hash_is_found_by_its_file_name,n_a_binary_mode_star_is_not_part_of_the_name,n_a_file_that_is_not_listed_is_not_found,n_a_name_that_merely_contains_the_wanted_one_does_not_match,n_blank_and_comment_lines_are_skipped,n_a_malformed_line_is_skipped_rather_than_panicking,n_digests_compare_case_insensitively_and_ignore_surrounding_space,n_a_signature_that_is_not_openpgp_is_refused,n_an_empty_signature_is_refused,n_an_armoured_block_that_is_not_a_signature_is_refused helper
 ```
+
+</details>
 
 ## Items
 

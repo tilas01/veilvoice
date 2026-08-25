@@ -8,6 +8,35 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The flowcharts are drawn at a size a person can read
+
+Every generated flowchart laid one rank out on one line, so the canvas was as
+wide as the busiest rank in the file. `veilvoice-core/chain.rs` reached
+**4490 px**, and the drawing went into the page as `width="100%"` with no size
+of its own, inside a column measured at 630 px. The browser scaled it to
+**0.147** — a 13 px label rendered under two pixels tall. That number is a
+measurement of the published page over the DevTools protocol, not an estimate;
+the same measurement on a 390 px viewport reported a `scrollWidth` of 561, so
+the wide drawings were part of what pushed the reference pages sideways on a
+phone as well.
+
+A rank now **wraps** into as many lines as it needs, the canvas is only as wide
+as the widest line actually is, and every drawing carries its own `width` and
+`height` with `max-width: 100%`. So a diagram renders at its own size on a
+desktop and scales *down* on a narrow screen — never up, and never to a fifth
+of legible. The widest canvas in the tree is now 649 px.
+
+The repository and the wiki showed the same graph as a Mermaid fence, which
+left the layout to GitHub. They now show **the same drawing the website shows**,
+written to `assets/diagrams/`, with the Mermaid source kept underneath in a
+`<details>` for anyone who wants GitHub to render it natively. One layout,
+checked in one place.
+
+`tools/site-tests/diagrams.test.js` is the permanent guard: a canvas over
+900 px, a drawing with no intrinsic size, or a `.diagram` that does not scroll
+on its own, fails the build.
+
+
 ### The installer has a window, and the companions are asked about properly
 
 `veilvoice install` did the work already; it simply had no interface but a
