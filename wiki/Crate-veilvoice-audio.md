@@ -53,14 +53,16 @@ detects an installed one so the UI can offer it directly.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>204 lines"])
+    n_lib(["lib.rs<br/>209 lines"])
     n_devices["devices.rs<br/>228 lines"]
     n_io["io.rs<br/>555 lines"]
     n_live["live.rs<br/>237 lines"]
+    n_meter["meter.rs<br/>154 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" "open the source"
     click n_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" "open the source"
     click n_io href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" "open the source"
     click n_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" "open the source"
+    click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs" "open the source"
 ```
 
 </details>
@@ -71,5 +73,6 @@ flowchart TD
 |---|---:|---|
 | [[`devices.rs`|File-veilvoice-audio-devices]] | 228 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [[`io.rs`|File-veilvoice-audio-io]] | 555 | Reading and writing audio files. |
-| [[`lib.rs`|File-veilvoice-audio-lib]] | 204 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
+| [[`lib.rs`|File-veilvoice-audio-lib]] | 209 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
 | [[`live.rs`|File-veilvoice-audio-live]] | 237 | Live microphone scrambling. |
+| [[`meter.rs`|File-veilvoice-audio-meter]] | 154 | The scale a level meter is drawn on. |
