@@ -8,6 +8,60 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The banner: a GIF in the README, and CSS on the site
+
+**The README animates again.** `assets/generate.py` gained a GIF encoder — its
+own LZW, no dependency, no quantiser — so the animated banner is back in the
+first thing every reader sees, in the one animated format every client draws.
+
+The note beside the APNG had rejected GIF because "GIF is limited to 256
+colours, so the palette would have to be quantised". That was right about
+quantising and wrong about this picture, and one measurement settled it: the
+whole banner uses **63** distinct colours, the waveform frames **255** between
+them, and the two together **261**. 261 is over the limit for one palette and
+well under it for the two GIF actually allows — a frame may carry its own
+colour table. Nothing is quantised, nothing is approximated, and the bytes are
+identical on every machine.
+
+The one real loss is the frame delay: GIF counts in hundredths of a second and
+1/60 s is not a hundredth of anything, so the GIF is 50 frames at 2/100 rather
+than the APNG's 60 at 1/60. Same one-second loop, at the fastest rate the
+format can honestly express. The alternative — rounding to 1/100 — would give a
+banner that runs at 60 % speed in some viewers and full speed in others.
+
+The encoder was checked against a decoder that is not ours: Windows' own GDI+
+reads the file, reports 50 frames, and reproduces the generator's pixels
+exactly for frames 0, 1, 25 and 49 — including the local colour tables and the
+frame-to-frame composition. That matters because GIF's LZW has one detail every
+implementation gets wrong: the decoder builds its dictionary one entry behind
+the encoder, so the encoder must widen its codes one entry early. The wrong
+rule produces a file this project can read back perfectly and no browser can.
+
+**The website's banner is now drawn in CSS**, and has no soundbar. It is live
+text with a veil drifting across the wordmark — the same letters, unresolvable,
+which is the one illustration on that page of what the tool does. Three things
+follow from it being text rather than pixels: it follows the reader's palette
+instead of being baked in one of nine; its claims can be selected, searched and
+read aloud; and `prefers-reduced-motion` reaches it, which no rule in a
+stylesheet can do to a PNG. It is also legible on a phone, which the drawn
+banner never was — finding F-37 was this project's own claims rendered
+illegibly inside an image at phone width.
+
+The waveform is gone from it deliberately: the motif appears twice more on the
+same page, in the demonstration and in the mark, and a third one at the top was
+the loudest thing there competing with the two that carry meaning.
+
+With scripts off, a `<noscript>` serves the README's GIF instead. Nothing in
+the CSS banner needs a script; a reader who has chosen the edition of this site
+that runs nothing is simply better served by one picture than by a page of
+rules.
+
+**Stated rather than left to be discovered:** `assets/banner-animated.png` now
+has no consumer. It is still generated and still checked, because it is the
+better animation — 60 fps, full alpha, half the bytes — and because deleting a
+working generator is the maintainer's call rather than a tidy-up.
+
+
 ### The site stops scrolling sideways on a phone
 
 Six separate faults, each found by measuring a rendered page rather than by
