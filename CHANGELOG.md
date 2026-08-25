@@ -8,6 +8,48 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The live meters now show a level a person can read
+
+`veilvoice live` had meters. They were **linear**, which is arithmetically fine
+and useless as a meter, because loudness is not. Ordinary speech recorded at a
+sensible level peaks around -12 dBFS -- 0.25 linear -- so it filled a quarter
+of the bar and read as near-silence. The only way to fill that bar was to be
+clipping.
+
+```
+                dBFS                            the linear meter it replaces
+silence         ····················  -60.0     ····················
+room tone       ██··················  -54.0     ····················
+quiet speech    ███████████▉········  -24.4     █···················
+normal speech   ████████████████····  -12.0     █████···············
+loud speech     ██████████████████··   -6.0     ██████████··········
+shouting        ███████████████████▍   -2.0     ████████████████····
+clipping        ████████████████████    0.0     ████████████████████
+```
+
+Now: -60 dBFS to 0, the number printed beside the bar, eighth-block characters
+so twenty columns give a hundred and sixty steps rather than twenty, a
+**peak-hold marker** that decays after a second and a half, and a **sticky
+CLIP** warning -- clipping is destructive and over in a millisecond, and a
+warning that has gone before the person looks up was never given. Below -40 the
+bar is drawn muted, so a quiet room does not read as a working microphone.
+
+It says what it is: a **sample peak** meter, not a loudness meter, and not a
+true-peak one. It cannot see an inter-sample peak — a waveform that passes
+above full scale between two samples and clips in a converter without any one
+sample exceeding 1.0 — and it says nothing about those rather than implying it
+caught them.
+
+Two things the tests settled rather than assumed. A wrong reading now pins the
+meter **high** rather than low: both are wrong, and a meter stuck at the top is
+noticed in a second while one stuck at the bottom looks exactly like an
+unplugged microphone. And the clip threshold's own test had the numbers
+backwards at first — a *linear* 0.99 is -0.087 dBFS, already inside a tenth of
+a decibel of full scale. Decibels near the top of the scale are far finer than
+they look in linear terms, which is most of the reason a linear meter is a bad
+meter.
+
+
 ### Video and page renders follow the same nine palettes everything else does
 
 ```
