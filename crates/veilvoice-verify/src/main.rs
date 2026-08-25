@@ -43,33 +43,47 @@
 mod discover;
 mod fetch;
 
-use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use pgp::composed::{Deserializable, DetachedSignature, SignedPublicKey};
-use pgp::types::KeyDetails as _;
-use sha2::{Digest, Sha256};
+use pgp::composed::SignedPublicKey;
 
-/// The signing key, compiled in.
-///
-/// Read from the copy the website serves, so there is exactly one key file in
-/// this repository and no chance of a second one drifting from it. A test
-/// asserts that this key's fingerprint is [`FINGERPRINT`]; if somebody swaps
-/// the file, the build fails rather than the verifier trusting a new key.
-const PUBLIC_KEY: &str = include_str!(concat!(
-    env!("CARGO_MANIFEST_DIR"),
-    "/../../website/assets/veilvoice-signing-key.asc"
-));
+// ---------------------------------------------------------------------------
+// The key, the hashing and the signature check live in `veilvoice-check`.
+//
+// They were here, in a binary crate, which by construction has no consumers.
+// The desktop application was asked for a verify tab, and the choice was to
+// link a GUI toolkit into this 1.5 MB single file -- whose smallness is a
+// feature, because it is what somebody downloads before they trust anything
+// else here -- or to move the arithmetic somewhere both front ends can call it.
+//
+// This binary is unchanged in what it does and what it prints. `veilvoice-gui`
+// is now a second caller rather than a second implementation, and the one place
+// a silent accept could come from is the one place there is only one of.
+// ---------------------------------------------------------------------------
 
-/// The fingerprint, written out rather than derived.
-///
-/// Deriving it from `PUBLIC_KEY` would make this constant agree with the key
-/// automatically, which sounds like an improvement and is the opposite of one:
-/// the whole point is that a reader can compare this string against the one
-/// published in `README.md`, on the website and in the release notes. A value
-/// computed from the very file it is meant to authenticate checks nothing.
-const FINGERPRINT: &str = "8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A";
+use veilvoice_check::{digest_from_sums, digests_match, fingerprint_of, FINGERPRINT};
+
+/// The embedded key, with its fingerprint checked against [`FINGERPRINT`].
+fn embedded_key() -> Result<SignedPublicKey, String> {
+    veilvoice_check::key().map_err(|error| error.to_string())
+}
+
+// The two fallible ones are wrapped rather than imported. The library reports a
+// typed `Error` so a graphical front end can tell "could not check" from "the
+// answer is no"; this program has always reported a sentence and prints it in
+// one place, so it flattens them here rather than rewriting every call site to
+// say the same thing in a longer way.
+
+/// SHA-256 of a file, as this program's `Result<_, String>`.
+fn sha256_file(path: &Path) -> Result<String, String> {
+    veilvoice_check::sha256_file(path).map_err(|error| error.to_string())
+}
+
+/// Verify a detached signature, as this program's `Result<_, String>`.
+fn verify_detached(key: &SignedPublicKey, signature: &str, data: &[u8]) -> Result<(), String> {
+    veilvoice_check::verify_detached(key, signature, data).map_err(|error| error.to_string())
+}
 
 const USAGE: &str = "\
 veilvoice-verify -- check a VeilVoice release without GnuPG installed
@@ -212,121 +226,6 @@ fn deny(reason: &str, detail: &[&str]) -> ExitCode {
 // ---------------------------------------------------------------------------
 // The key
 // ---------------------------------------------------------------------------
-
-/// Parse the embedded key and confirm its fingerprint is the expected one.
-///
-/// Done at run time rather than trusted, because "the binary contains a key"
-/// and "the binary contains *the* key" are different statements, and only the
-/// second is worth anything.
-fn embedded_key() -> Result<SignedPublicKey, String> {
-    let (key, _) = SignedPublicKey::from_string(PUBLIC_KEY)
-        .map_err(|e| format!("the embedded public key does not parse: {e}"))?;
-
-    let actual = fingerprint_of(&key);
-    if actual != FINGERPRINT {
-        return Err(format!(
-            "the embedded key's fingerprint is {actual}, not {FINGERPRINT}"
-        ));
-    }
-    Ok(key)
-}
-
-fn fingerprint_of(key: &SignedPublicKey) -> String {
-    let mut out = String::new();
-    for byte in key.fingerprint().as_bytes() {
-        let _ = write!(out, "{byte:02X}");
-    }
-    out
-}
-
-// ---------------------------------------------------------------------------
-// Hashing
-// ---------------------------------------------------------------------------
-
-/// SHA-256 of a file, read in chunks.
-///
-/// Streamed rather than read whole: a release archive is tens of megabytes and
-/// there is no reason for this to need that much memory at once. The web
-/// verifier had the same problem in the other direction -- finding F-36.
-fn sha256_file(path: &Path) -> Result<String, String> {
-    use std::io::Read;
-
-    let mut file =
-        std::fs::File::open(path).map_err(|e| format!("cannot open {}: {e}", path.display()))?;
-    let mut hasher = Sha256::new();
-    let mut buffer = vec![0u8; 64 * 1024];
-    loop {
-        let read = file
-            .read(&mut buffer)
-            .map_err(|e| format!("cannot read {}: {e}", path.display()))?;
-        if read == 0 {
-            break;
-        }
-        hasher.update(&buffer[..read]);
-    }
-
-    let mut out = String::new();
-    for byte in hasher.finalize() {
-        let _ = write!(out, "{byte:02x}");
-    }
-    Ok(out)
-}
-
-/// Compare two hex digests without caring about case or stray whitespace.
-///
-/// Not constant time, and deliberately so: both values are public, and there
-/// is no secret here for a timing difference to leak. Saying that plainly is
-/// better than a `subtle` dependency that implies there was a threat.
-fn digests_match(a: &str, b: &str) -> bool {
-    a.trim().eq_ignore_ascii_case(b.trim())
-}
-
-/// Find a file's line in a `sha256sum`-format list.
-///
-/// The format is `<hex>  <name>`, and `sha256sum` writes a `*` before the name
-/// for a binary-mode hash. Only the file's base name is compared: the list is
-/// written with plain names, and the file being checked is usually somewhere
-/// else entirely.
-fn digest_from_sums(sums: &str, wanted: &str) -> Option<String> {
-    for line in sums.lines() {
-        let line = line.trim();
-        if line.is_empty() || line.starts_with('#') {
-            continue;
-        }
-        let (digest, name) = match line.split_once(char::is_whitespace) {
-            Some(parts) => parts,
-            None => continue,
-        };
-        let name = name.trim().trim_start_matches('*');
-        if name == wanted {
-            return Some(digest.trim().to_string());
-        }
-    }
-    None
-}
-
-// ---------------------------------------------------------------------------
-// Signature checking
-// ---------------------------------------------------------------------------
-
-/// Verify a detached signature over `data` using the embedded key.
-fn verify_detached(key: &SignedPublicKey, signature: &str, data: &[u8]) -> Result<(), String> {
-    let (signature, _) = DetachedSignature::from_string(signature)
-        .map_err(|e| format!("the signature file does not parse as OpenPGP: {e}"))?;
-
-    // Try the primary key and every subkey. Release signatures are normally
-    // made by a signing subkey rather than the primary -- checking only the
-    // primary would reject every genuine signature this project has ever made.
-    if signature.verify(key, data).is_ok() {
-        return Ok(());
-    }
-    for subkey in &key.public_subkeys {
-        if signature.verify(subkey, data).is_ok() {
-            return Ok(());
-        }
-    }
-    Err("the signature was not made by this key".to_string())
-}
 
 // ---------------------------------------------------------------------------
 // Commands

@@ -79,7 +79,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>866 lines"])
+    n_main(["main.rs<br/>765 lines"])
     n_discover["discover.rs<br/>344 lines"]
     n_fetch["fetch.rs<br/>320 lines"]
     n_tests["tests.rs<br/>138 lines"]
@@ -97,7 +97,7 @@ flowchart TD
 |---|---:|---|
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 344 | Finding a release to check, without being told where it is. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 320 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 866 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 765 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 138 | The verifier's own tests. |
 
 ## Public items

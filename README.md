@@ -115,10 +115,12 @@ are different kinds of thing.
 | ![anonymise a file](assets/screenshots/gui-file.png) | ![live scramble](assets/screenshots/gui-live.png) |
 | **Group mode** — several people, a name and a colour each | **Monitor** — who is using the microphone and camera |
 | ![group mode](assets/screenshots/gui-group.png) | ![monitor](assets/screenshots/gui-monitor.png) |
-| **Lock** — the app lock, and what it is and is not worth | **Settings** — nine palettes, motion, and which tabs are shown |
-| ![the app lock](assets/screenshots/gui-lock.png) | ![settings](assets/screenshots/gui-settings.png) |
-| **Install** — offered only to a portable copy | **About** — versions, scope, and the update check you press |
-| ![install](assets/screenshots/gui-install.png) | ![about](assets/screenshots/gui-about.png) |
+| **Lock** — the app lock, and what it is and is not worth | **Verify** — drop a download on the window and be told what it is |
+| ![the app lock](assets/screenshots/gui-lock.png) | ![verify a download](assets/screenshots/gui-verify.png) |
+| **Settings** — nine palettes, motion, and which tabs are shown | **Install** — offered only to a portable copy |
+| ![settings](assets/screenshots/gui-settings.png) | ![install](assets/screenshots/gui-install.png) |
+| **About** — versions, scope, and the update check you press | |
+| ![about](assets/screenshots/gui-about.png) | |
 
 ### The command line
 
