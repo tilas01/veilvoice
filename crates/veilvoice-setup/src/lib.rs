@@ -49,6 +49,19 @@
 //! window when the desktop application is the caller — the defect that shipped
 //! in v0.1.10 — and a test reads this crate's own source to catch a spawn that
 //! forgets.
+//!
+//! # In plain words
+//!
+//! This installs the program, if you want it installed.
+//!
+//! You do not have to. Unzipping it and running it is a perfectly normal way to
+//! use it, and this says so rather than treating it as a mistake. Installing does
+//! three small things -- copies the program into your own folder, adds it to your
+//! PATH so typing its name works, and adds an entry so Windows can remove it --
+//! and nothing else. No administrator rights, no service.
+//!
+//! It also looks for the few other programs VeilVoice can work alongside, tells
+//! you who makes each one, and installs none of them unless you say so.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

@@ -27,6 +27,19 @@
 //! appear as an ordinary microphone to any call, stream or recorder on the
 //! machine, with no per-application setup. [`devices::find_virtual_cable`]
 //! detects an installed one so the UI can offer it directly.
+//!
+//! # In plain words
+//!
+//! This is the plumbing between your microphone, your speakers and the part that
+//! changes the voice.
+//!
+//! It finds the sound devices you have, opens the recording you point at whatever
+//! kind of file it is, and writes the result back out. For live use it does the
+//! whole loop while you talk -- in from the microphone, through the engine, out to
+//! whatever else is listening -- fast enough that a conversation still works.
+//!
+//! It also reports how loud things are, which is what the level bars in the
+//! program are drawing.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

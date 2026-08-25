@@ -51,6 +51,16 @@
 //! and it still could not stop a root-level attacker, only watch one. So the
 //! unprivileged half ships first, on its own merits, and `ROADMAP.md` records
 //! what the privileged half would need to be worth adding.
+//!
+//! # In plain words
+//!
+//! This notices when the program's own files have been changed.
+//!
+//! It writes down what every file should look like, and later tells you if any of
+//! them no longer does -- and which one, and when.
+//!
+//! It is a smoke alarm, not a lock. Anything that can change those files can
+//! change the list too. What it catches is a change nobody was hiding.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

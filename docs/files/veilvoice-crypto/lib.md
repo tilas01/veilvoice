@@ -11,16 +11,17 @@
 
 # `crates/veilvoice-crypto/src/lib.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 175 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 190 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs)
 
 ## Contents
 
-- [What this crate is for](#what-this-crate-is-for)
-- [Threat model, stated plainly](#threat-model-stated-plainly)
-- [Example](#example)
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [What this crate is for](#what-this-crate-is-for)
+  - [Threat model, stated plainly](#threat-model-stated-plainly)
+  - [Example](#example)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Key derivation, post-quantum-hybrid key agreement, authenticated encryption
 and amnesic secret storage for VeilVoice.
@@ -74,13 +75,28 @@ assert!(container::open_with_password(b"wrong", &sealed).is_err());
 VeilVoice contains **no `unsafe` code at all** — including the page-locking
 in `amnesia`, which goes through a safe wrapper.
 
+# In plain words
+
+This is the locking.
+
+Two separate things use it. Recordings are sealed on your disk so that somebody
+who takes the disk cannot listen to them, and the app can be put behind a
+password so somebody who picks up your unlocked computer cannot open it.
+
+Those two passwords are deliberately different. Opening the program should not
+be the same act as unsealing everything it has ever written.
+
+The maths is chosen to be slow to guess and to still be safe if somebody one
+day builds a quantum computer. Nothing is sent anywhere; the sealing happens on
+your machine and the key is made from your password each time.
+
 ## What this file contains
 
-175 lines defining **1 function** (0 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+190 lines defining **1 function** (0 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 81) -- Everything that can go wrong in this crate.
+- `enum Error` (line 96) -- Everything that can go wrong in this crate.
 
 ## What calls what
 
@@ -102,8 +118,8 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_fmt["Error::fmt<br/>line 136"]
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L136" "open the source"
+    n_fmt["Error::fmt<br/>line 151"]
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L151" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_fmt helper
 ```
@@ -114,9 +130,9 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L72) | Crate version string, surfaced in the About panel. |
-| `Error` <sub>pub enum</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L81) | Everything that can go wrong in this crate. |
-| `Error::fmt` <sub>fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L136) |  |
+| `VERSION` <sub>pub const</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L87) | Crate version string, surfaced in the About panel. |
+| `Error` <sub>pub enum</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L96) | Everything that can go wrong in this crate. |
+| `Error::fmt` <sub>fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs#L151) |  |
 
 ---
 

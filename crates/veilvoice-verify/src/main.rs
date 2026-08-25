@@ -39,6 +39,19 @@
 //! It does not download anything -- this project has no network code and this
 //! binary is not the exception. Fetch the files however you like; this reads
 //! them from disk. It does not install anything, and it writes nothing.
+//!
+//! # In plain words
+//!
+//! This is the small program you can check a download with before trusting
+//! anything else here.
+//!
+//! It is deliberately tiny and it is on its own: no window, no other pieces, and
+//! it does not need any other software installed -- not even the usual signature
+//! program. That matters because it is the first thing you run, and the point of
+//! it is to be small enough to be worth reading.
+//!
+//! Double-click it and it looks for a downloaded release nearby and checks it.
+//! Give it arguments and it does exactly what you asked.
 
 mod discover;
 mod fetch;

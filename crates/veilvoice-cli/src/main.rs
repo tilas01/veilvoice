@@ -54,6 +54,18 @@
 //! subcommand on the command line unless it is marked `global = true`. So
 //! `veilvoice lock --path X status` parses and `veilvoice lock status --path X`
 //! does not, except that `--path` is now global specifically so both do.
+//!
+//! # In plain words
+//!
+//! This is VeilVoice without a window.
+//!
+//! Everything the program does, typed instead of clicked: disguise a recording,
+//! scramble a microphone while you talk, seal a file, strip a photograph's hidden
+//! labels, handle a recording with several people in it.
+//!
+//! It is the same code underneath, so it works the same way -- over a remote
+//! connection, on a machine with no desktop, or from a script that runs it a
+//! thousand times.
 #![forbid(unsafe_code)]
 
 mod atrest;

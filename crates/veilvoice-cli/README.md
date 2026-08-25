@@ -19,6 +19,7 @@
 - [Two behaviours that surprise people, on purpose](#two-behaviours-that-surprise-people-on-purpose)
 - [Passphrase prompts cannot be piped](#passphrase-prompts-cannot-be-piped)
 - [A clap ordering rule worth knowing](#a-clap-ordering-rule-worth-knowing)
+- [In plain words](#in-plain-words)
   - [How the crate fits together](#how-the-crate-fits-together)
   - [The files](#the-files)
   - [Public items](#public-items)
@@ -80,6 +81,18 @@ subcommand on the command line unless it is marked `global = true`. So
 `veilvoice lock --path X status` parses and `veilvoice lock status --path X`
 does not, except that `--path` is now global specifically so both do.
 
+# In plain words
+
+This is VeilVoice without a window.
+
+Everything the program does, typed instead of clicked: disguise a recording,
+scramble a microphone while you talk, seal a file, strip a photograph's hidden
+labels, handle a recording with several people in it.
+
+It is the same code underneath, so it works the same way -- over a remote
+connection, on a machine with no desktop, or from a script that runs it a
+thousand times.
+
 ## How the crate fits together
 
 Every arrow below is a `crate::` or `super::` path one module actually
@@ -97,7 +110,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1958 lines"])
+    n_main(["main.rs<br/>1970 lines"])
     n_atrest["atrest.rs<br/>275 lines"]
     n_capture["capture.rs<br/>240 lines"]
     n_conversation["conversation.rs<br/>742 lines"]
@@ -146,7 +159,7 @@ flowchart TD
 | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 742 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1958 | veilvoice — the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1970 | veilvoice — the command-line interface. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 250 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 236 | veilvoice policy -- settings that can only be tightened. |
 | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 376 | veilvoice sentry -- canaries, baselines, and what changed since. |

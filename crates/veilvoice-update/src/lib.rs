@@ -53,6 +53,18 @@
 //! to act on: a name in a document is not a signature. Nothing in this crate
 //! verifies anything, and [`Report::caveat`] says so in the words the user
 //! sees rather than only in this comment.
+//!
+//! # In plain words
+//!
+//! This is the "check for updates" button, and nothing else.
+//!
+//! It runs when you press it and at no other time. There is no timer and nothing
+//! in the background, because a program that checks by itself is telling somebody
+//! else's computer that yours exists and how often you use it.
+//!
+//! It reads a public page anybody can open, tells you the newest version number,
+//! and stops there. It does not download anything and it does not install
+//! anything.
 
 use std::path::PathBuf;
 use std::process::Command;

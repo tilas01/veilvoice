@@ -46,6 +46,7 @@
   <a href="#the-design-decision-this-crate-turns-on">The design decision this crate turns on</a>
   <a href="#what-the-seal-is-for-and-what-it-is-not">What the seal is for, and what it is not</a>
   <a href="#reading-a-policy-costs-nothing">Reading a policy costs nothing</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -63,6 +64,9 @@
 <p>Detecting deletion is <code>veilvoice-guard</code>&#x27;s job, not this one&#x27;s: put the policy files in a tamper manifest and the removal shows up there.</p>
 <h3 id="reading-a-policy-costs-nothing">Reading a policy costs nothing</h3>
 <p><code>Policy::load</code> reads the plain file and applies it. It never asks for a passphrase, never blocks, and reports the seal as <code>Verification::Unchecked</code> rather than pretending to have looked. A front end that wants the stronger statement calls <code>verify</code> when it has a passphrase to offer.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This lets settings be locked down, and only in one direction.</p>
+<p>Someone setting up a machine for other people can seal a set of settings so they can be made stricter but never looser. Nobody needs a password to read what the rules are -- only to change them -- because a rule people cannot see is a rule they will trip over.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -74,7 +78,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">156 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">165 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -87,7 +91,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;156 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;165 lines&quot;])
     n_policy[&quot;policy.rs&lt;br/&gt;892 lines&quot;]
     click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs&quot; &quot;open the source&quot;
     click n_policy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs&quot; &quot;open the source&quot;</code></pre>
@@ -97,7 +101,7 @@ flowchart TD
 <section id="s-files">
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
-<tr><td><a href="veilvoice-policy/lib.html"><code>lib.rs</code></a></td><td>156</td><td>Settings somebody else decided, sealed so they cannot be edited without a passphrase &#8212; and, more importantly, built so that editing them without one buys nothing worth having.</td></tr>
+<tr><td><a href="veilvoice-policy/lib.html"><code>lib.rs</code></a></td><td>165</td><td>Settings somebody else decided, sealed so they cannot be edited without a passphrase &#8212; and, more importantly, built so that editing them without one buys nothing worth having.</td></tr>
 <tr><td><a href="veilvoice-policy/policy.html"><code>policy.rs</code></a></td><td>892</td><td>The policy itself: what can be required, and what requiring it does.</td></tr>
 </tbody></table>
 </section>

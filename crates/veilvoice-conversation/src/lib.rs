@@ -49,6 +49,19 @@
 //! | [`plan`] | Who is in the recording, when they speak, and the text format |
 //! | [`render`] | One engine per speaker, spliced back onto the timeline |
 //! | [`subtitles`] | WebVTT and SubRip, from the same plan |
+//!
+//! # In plain words
+//!
+//! This is for a recording with more than one person in it.
+//!
+//! Given a note of who speaks when, it gives each person a different voice --
+//! every one of them just as thoroughly disguised as a single speaker would be --
+//! and writes subtitles saying who said what.
+//!
+//! It will not guess who is talking. Working that out needs a trained model, and
+//! this project ships none, so it is told: either one microphone per person, or a
+//! list of turns. Any part of the recording nobody claims is silenced rather than
+//! passed through, because audio nobody claimed has not been disguised.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

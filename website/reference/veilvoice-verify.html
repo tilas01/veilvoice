@@ -46,6 +46,7 @@
   <a href="#what-this-is-for">What this is for</a>
   <a href="#the-one-thing-it-cannot-embed">The one thing it cannot embed</a>
   <a href="#what-it-does-not-do">What it does not do</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -61,6 +62,10 @@
 <p>Most people want the first. The second is what makes the first worth anything, and it needs somebody other than the author to have done a build. <code>docs/REPRODUCIBLE_BUILDS.md</code> says how.</p>
 <h2 id="what-it-does-not-do">What it does not do</h2>
 <p>It does not download anything -- this project has no network code and this binary is not the exception. Fetch the files however you like; this reads them from disk. It does not install anything, and it writes nothing.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is the small program you can check a download with before trusting anything else here.</p>
+<p>It is deliberately tiny and it is on its own: no window, no other pieces, and it does not need any other software installed -- not even the usual signature program. That matters because it is the first thing you run, and the point of it is to be small enough to be worth reading.</p>
+<p>Double-click it and it looks for a downloaded release nearby and checks it. Give it arguments and it does exactly what you asked.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -72,7 +77,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">765 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">778 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -95,7 +100,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_main([&quot;main.rs&lt;br/&gt;765 lines&quot;])
+    n_main([&quot;main.rs&lt;br/&gt;778 lines&quot;])
     n_discover[&quot;discover.rs&lt;br/&gt;344 lines&quot;]
     n_fetch[&quot;fetch.rs&lt;br/&gt;320 lines&quot;]
     n_tests[&quot;tests.rs&lt;br/&gt;138 lines&quot;]
@@ -111,7 +116,7 @@ flowchart TD
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-verify/discover.html"><code>discover.rs</code></a></td><td>344</td><td>Finding a release to check, without being told where it is.</td></tr>
 <tr><td><a href="veilvoice-verify/fetch.html"><code>fetch.rs</code></a></td><td>320</td><td>Download a release, without putting an HTTP client in the dependency graph.</td></tr>
-<tr><td><a href="veilvoice-verify/main.html"><code>main.rs</code></a></td><td>765</td><td>The portable verifier: check a VeilVoice release without GnuPG installed.</td></tr>
+<tr><td><a href="veilvoice-verify/main.html"><code>main.rs</code></a></td><td>778</td><td>The portable verifier: check a VeilVoice release without GnuPG installed.</td></tr>
 <tr><td><a href="veilvoice-verify/tests.html"><code>tests.rs</code></a></td><td>138</td><td>The verifier&#x27;s own tests.</td></tr>
 </tbody></table>
 </section>

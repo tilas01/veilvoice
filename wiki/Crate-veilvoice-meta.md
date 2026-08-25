@@ -9,11 +9,12 @@
 
 ## Contents
 
-- [Why this exists](#why-this-exists)
-- [Strip versus spoof](#strip-versus-spoof)
-- [What this crate cannot do](#what-this-crate-cannot-do)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
+  - [Why this exists](#why-this-exists)
+  - [Strip versus spoof](#strip-versus-spoof)
+  - [What this crate cannot do](#what-this-crate-cannot-do)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
 
 Strip or spoof the identifying metadata that rides along with media files.
 
@@ -47,6 +48,16 @@ still carries its room acoustics and background noise. Nor does it touch
 filesystem timestamps or the filename, both of which are outside the file —
 callers that care must handle those separately.
 
+# In plain words
+
+This strips the hidden labels off a file.
+
+Photographs and recordings carry information you never typed: where the picture
+was taken, which phone or microphone made it, what the file was called before,
+sometimes a name. Removing the sound of a voice and leaving that behind would
+be pointless, so this takes it out -- not by blanking the fields, but by
+removing the parts of the file that hold them.
+
 ## How the crate fits together
 
 <p align="center">
@@ -59,7 +70,7 @@ callers that care must handle those separately.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>111 lines"])
+    n_lib(["lib.rs<br/>121 lines"])
     n_audio["audio.rs<br/>268 lines"]
     n_image["image.rs<br/>202 lines"]
     n_wav["wav.rs<br/>332 lines"]
@@ -78,6 +89,6 @@ flowchart TD
 |---|---:|---|
 | [[`audio.rs`|File-veilvoice-meta-audio]] | 268 | Audio tag removal and replacement. |
 | [[`image.rs`|File-veilvoice-meta-image]] | 202 | Image EXIF/GPS removal. |
-| [[`lib.rs`|File-veilvoice-meta-lib]] | 111 | Strip or spoof the identifying metadata that rides along with media files. |
+| [[`lib.rs`|File-veilvoice-meta-lib]] | 121 | Strip or spoof the identifying metadata that rides along with media files. |
 | [[`wav.rs`|File-veilvoice-meta-wav]] | 332 | Chunk-level RIFF/WAVE metadata removal. |
 | [[`wav_fuzz.rs`|File-veilvoice-meta-tests-wav_fuzz]] | 291 | Randomised robustness testing for the RIFF chunk walker. |

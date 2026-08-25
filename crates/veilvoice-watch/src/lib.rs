@@ -30,6 +30,17 @@
 //! On Linux you see every process you have permission to inspect. Without root
 //! that means your own; other users' processes are invisible, and that is a
 //! kernel permission boundary rather than something this crate can work around.
+//!
+//! # In plain words
+//!
+//! This tells you when something is using your microphone or camera.
+//!
+//! Not what it is doing with them -- just that a program has them open, and which
+//! program. That is worth knowing before you start talking, and it is the kind of
+//! thing an operating system knows and does not always show you.
+//!
+//! It cannot see everything. Some ways of getting at a microphone do not go past
+//! the place this reads.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

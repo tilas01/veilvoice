@@ -3,16 +3,17 @@
 
 # `crates/veilvoice-core/src/lib.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 70 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs)
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 86 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs)
 
 ## Contents
 
-- [What it guarantees (and what it deliberately does not)](#what-it-guarantees-and-what-it-deliberately-does-not)
-- [Accent](#accent)
-- [Why it is one-way](#why-it-is-one-way)
-- [Example](#example)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [What it guarantees (and what it deliberately does not)](#what-it-guarantees-and-what-it-deliberately-does-not)
+  - [Accent](#accent)
+  - [Why it is one-way](#why-it-is-one-way)
+  - [Example](#example)
+- [In plain words](#in-plain-words)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 The security-critical heart of VeilVoice: an **irreversible, cryptographically
 modulated voice de-identification** engine.
@@ -61,6 +62,22 @@ assert_eq!(output.len(), input.len());
 let _ms = deid.stats().last_block_ms();
 ```
 
+# In plain words
+
+This is the part that actually changes the voice.
+
+A recording goes in and a recording comes out. The words are the same and you
+can still understand every one of them; the voice is not yours any more, and
+there is no setting, no key and no clever program that turns it back. What made
+it recognisably *you* -- the pitch, the shape of your mouth and throat, the
+timing, the music of your accent -- is not hidden. It is thrown away, and
+everybody who goes through it comes out sounding like the same handful of
+people.
+
+What it does not do is keep your words secret. It is not meant to: a voice
+nobody can understand would be no use to anyone. If what you said would
+identify you, this has not touched that.
+
 ## What calls what
 
 This file defines no functions of its own.
@@ -69,4 +86,4 @@ This file defines no functions of its own.
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs#L70) | Crate version, surfaced in the About panel. |
+| `VERSION` <sub>pub const</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs#L86) | Crate version, surfaced in the About panel. |
