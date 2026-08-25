@@ -8,6 +8,60 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The site stops scrolling sideways on a phone
+
+Six separate faults, each found by measuring a rendered page rather than by
+reading the stylesheet, and none of them visible in the source:
+
+* A **grid item defaults to `min-width: auto`**, so the reference pages' content
+  column refused to be narrower than its widest table — 658 px — and took every
+  heading and paragraph on the page sideways with it, at any viewport.
+* A **table of item names** cannot be made narrow: the names are code. It is now
+  its own sideways scroller. Deliberately at every width, not only on a phone:
+  the reference pages keep a 200 px contents column until 720 px, so a tablet at
+  768 px gives a table *less* room than a phone does.
+* `overflow-wrap: break-word` does **not** shrink an element's intrinsic width —
+  only `anywhere` does. With `break-word` alone the items table still scrolled
+  inside a 630 px desktop column.
+* A **tooltip** is `position: absolute`, anchored to the left of the word it
+  annotates, and a `visibility: hidden` box still takes part in layout. A closed
+  tooltip two thirds along a card pushed the **front page** 82 px sideways with
+  nobody hovering anything. Below 900 px it is now pinned to the bottom of the
+  viewport — full width, out from under the finger that opened it.
+* The **hero** is the one section not inside `.wrap`, so it had no gutter: on a
+  390 px screen the tagline's first and last characters touched both edges.
+* `.search-page` set a `padding` **shorthand** on an element that already had
+  `.wrap`'s `padding: 0 20px`. A shorthand replaces rather than adds, so the
+  index's 200 rows ran edge to edge.
+
+With scripts off there were two more, in a combination nothing had ever
+rendered — the site had been checked with scripts off, and separately on a
+phone, never both. The switch's "(locked: scripts are not running)" note is
+257 px of `nowrap` beside the colour picker, which pushed every page 90 px
+sideways; it now takes its own line, in full. And the static index's excerpts
+are lines of source, one of them 1270 px of unbroken regular expression.
+
+Twelve pages at five viewport widths, with and without scripts, now report no
+horizontal scrolling at all.
+
+**What this does not claim.** Every measurement here was taken in Chromium.
+Firefox and WebKit have not rendered any of it, so the marker for "every
+engine" stays open rather than being ticked on one engine's word.
+
+### Two tools for looking, rather than reasoning
+
+`tools/render/probe.py` is new: it drives the same headless browser
+`shot.py` does and prints *numbers* — which pages scroll sideways, which element
+is to blame, what any expression evaluates to on any page at any width. Every
+fault above came out of it.
+
+`shot.py` had a defect of its own worth writing down: it reuses one browser
+profile directory between runs, so Edge cached `main.css` and photographed a
+stylesheet one edit out of date. A fix measured as applied by one tool appeared
+*not* applied by the other, and the two disagreed for a full round of debugging.
+Both now disable the cache.
+
+
 ### The flowcharts are drawn at a size a person can read
 
 Every generated flowchart laid one rank out on one line, so the canvas was as

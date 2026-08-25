@@ -408,6 +408,64 @@ function run() {
     else { pass(`${tipUses.length} tooltips are announced exactly once`); }
   }
 
+  // ---- the page must not scroll sideways ----------------------------------
+  //
+  // Every rule below was written because a viewport was measured with
+  // `tools/render/probe.py overflow` and found to scroll horizontally. A phone
+  // that scrolls sideways is not a cosmetic complaint: it moves the text out
+  // from under the reader on every swipe. None of it is visible from the source
+  // -- each looked correct until a number came back -- so each is pinned here.
+  const mobile = [
+    [/\.wiki-layout\s*>\s*\*\s*\{[^}]*min-width:\s*0/,
+     "a grid item defaults to min-width:auto, so the reference column refused " +
+     "to be narrower than its widest table (658px) and took the page with it"],
+    [/(^|\})\s*table\s*\{[^}]*display:\s*block[^}]*overflow-x:\s*auto/m,
+     "a table has to be its own sideways scroller, or a column of code names " +
+     "wider than the page drags the whole page along"],
+    [/td code,\s*th code\s*\{[^}]*overflow-wrap:\s*anywhere/,
+     "break-word does not shrink a table's intrinsic width; anywhere does, " +
+     "and without it the items table scrolled inside a desktop column too"],
+    [/\bcode\s*\{[^}]*overflow-wrap:\s*break-word/,
+     "one identifier can be 385px of unbreakable word in a 300px column"],
+    [/pre code\s*\{[^}]*overflow-wrap:\s*normal/,
+     "a code block scrolls on purpose; breaking its lines changes what it says"],
+    [/\.hero\s*\{[^}]*padding:\s*\d+px\s+[1-9]/,
+     "the hero is the one section not inside .wrap, so it needs its own gutter " +
+     "or the tagline touches both edges of a phone"],
+    [/\.search-page\s*\{\s*padding:\s*\d+px\s+[1-9]/,
+     "a padding shorthand on .wrap.search-page replaces .wrap's side padding " +
+     "rather than adding to it, which took the gutters away"],
+    [/\.diagram\s*\{[^}]*overflow-x:\s*auto/,
+     "a drawing wider than its column must scroll inside itself"]
+  ];
+  for (const [pattern, why] of mobile) {
+    if (!pattern.test(main)) fail(`${why} — the rule for it is gone`);
+  }
+  if (mobile.every(([pattern]) => pattern.test(main))) {
+    pass(`${mobile.length} measured horizontal-overflow fixes are still in place`);
+  }
+
+  // The tooltip is the subtle one. It is `position: absolute`, anchored to the
+  // left of the word it annotates, and `visibility: hidden` still takes part in
+  // layout -- so a closed tooltip near the right of a narrow column pushed the
+  // front page 82px sideways with nobody hovering anything. The fix pins it to
+  // the viewport below 900px, which is where the columns stop narrowing; a
+  // query written at the site's usual 760 left a tablet at 768 still 75px over.
+  const pinned = main.match(
+    /@media \(max-width:\s*(\d+)px\)\s*\{\s*\[data-tip\]::after\s*\{([^}]*)\}/);
+  if (!pinned) {
+    fail("[data-tip]::after is not pinned to the viewport on a narrow screen, " +
+         "so a closed tooltip can push the page sideways");
+  } else if (Number(pinned[1]) < 900) {
+    fail(`the tooltip is only pinned below ${pinned[1]}px; a tablet at 768 was ` +
+         `still 75px over, so this has to reach 900`);
+  } else if (!/position:\s*fixed/.test(pinned[2])) {
+    fail("the pinned tooltip must be position:fixed — an absolute box still " +
+         "counts toward the page's scrollable width");
+  } else {
+    pass(`tooltips are pinned to the viewport below ${pinned[1]}px`);
+  }
+
   return failures;
 }
 
