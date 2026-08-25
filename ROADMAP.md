@@ -89,7 +89,7 @@ it cannot do as plainly as what it can.
 | 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | — |
 | 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **planned** | 2 d |
 | 42 | Duress and decoy passwords | **planned** | 7–10 d |
-| 43 | Transcription through your own API key, given **veiled audio only** | **planned** | 4–6 d |
+| 43 | Transcription through your own API key, given **veiled audio only** | **blocked** | — |
 
 ## Conversations, subtitles and video
 
@@ -141,7 +141,7 @@ about the signal, which is already done.
 | 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **next** | 3–4 d |
 | 62 | **A name and a colour per speaker in the app** — the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **planned** | 2–3 d |
 | 63 | **Live levels and a wave per speaker**, in the app and in the terminal, while a recording is running | **planned** | 3–4 d |
-| 64 | **Speaker detection through software you already have** — `ollama` detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **planned** | 4–6 d |
+| 64 | **Speaker detection through software you already have** — detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **blocked** | — |
 
 ## Finally
 
@@ -187,21 +187,50 @@ Three rules go with it, and they are what keep the front page true:
   servers. Ever." becomes true-with-a-named-exception the moment this ships, and
   the wording changes in the same commit as the code, not after it.
 
-Not every provider accepts audio input; that gets checked before anything is
-built rather than discovered by a user.
+Not every provider accepts audio input, and that is not a small caveat: an API
+that takes text and images does not take a WAV, whatever else it can do. Which
+providers actually accept audio is a fact about somebody else's service that
+this machine cannot check offline, so it is checked *from a machine that can*
+before a line of it is written — the same rule that turned marker 64 from
+planned into blocked, one paragraph down, and saved a feature that would have
+shipped unable to work.
 
-**Detecting who is speaking: also decided, and it ships no model.**
-The open question was that real diarisation means shipping a trained model,
-which contradicts the rule that VeilVoice bundles nothing it cannot explain.
-Marker 64 resolves it the way the companion setup already resolves VB-CABLE and
-Audacity: if `ollama` is on the machine, VeilVoice can offer to use it, naming
-what it is and who makes it; if it is not, VeilVoice does not install a model
-and does not pretend to guess. The two honest paths that exist today — one
-microphone per person, or a turn list — remain, and remain the default.
+**Detecting who is speaking: decided in principle, and then measured, and the
+measurement moved it.**
 
-What this does **not** become is a project with a model in it. Nothing is
-downloaded, nothing is bundled, and a machine with no `ollama` and no API key
-behaves exactly as it does today.
+The decision stands: VeilVoice ships no model, and uses software you already
+have or nothing. What changed is *which* software, and it changed because the
+promise a few paragraphs up — "that gets checked before anything is built
+rather than discovered by a user" — was kept.
+
+`ollama` was the named candidate. It was checked on a machine that has it:
+
+* **It is there and it is detectable.** Found at an absolute path, version
+  0.32.5, with seven models installed. The companion-detection pattern works on
+  it exactly as it does on Audacity.
+* **None of it transcribes speech.** Every model on that machine is a text
+  model. ollama's registry is language and vision models; speech-to-text is not
+  what it hosts. Detecting ollama and offering "transcription" through it would
+  have produced a feature that cannot work, on a machine where every check
+  passed.
+* **Running it is not free.** A single `ollama list` started a background
+  server, opened a local UI port, started an update checker on an hourly timer,
+  and made a network request to GitHub — all of it in the first two seconds,
+  none of it asked for. For most programs that is unremarkable. For this one it
+  means "VeilVoice can use ollama" would have to be read as "VeilVoice can
+  start a background service that phones home on a timer", and that has to be
+  said in those words or not offered.
+
+So marker 64 is **blocked**, on a question rather than on effort: local
+speech-to-text means a Whisper-family program — `whisper.cpp`, `faster-whisper`
+— and speaker diarisation means a third thing again. Which of those to detect,
+and whether starting any of them is acceptable given what was measured above,
+is the maintainer's call. Marker 43 is blocked behind the same question for its
+local half.
+
+The two honest paths that exist today — one microphone per person, or a turn
+list — remain, and remain the default. A machine with none of this installed
+behaves exactly as it does now.
 
 **Privileged mode and driver alerting cannot reach kernel level on Windows
 or macOS.** Loading a
