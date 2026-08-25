@@ -87,7 +87,7 @@ use veilvoice_setup::{companions, install};
     about = "Irreversible voice de-identification — fully offline.",
     long_about = "VeilVoice destroys the biometric voiceprint of a speaker — pitch, \
 formants, timbre and the melody of an accent — while keeping the words clean and \
-transcribable. It talks to no servers, ever."
+transcribable. This command line talks to no servers, ever: the one thing in VeilVoice that reaches the network is the desktop app's check-for-updates button, and it is not here."
 )]
 struct Cli {
     #[command(subcommand)]

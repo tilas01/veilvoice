@@ -57,6 +57,7 @@ pub mod settings;
 pub mod setup;
 pub mod soundbar;
 pub mod theme;
+pub mod updates;
 pub mod watchfeed;
 
 pub use app::VeilVoiceApp;

@@ -81,9 +81,9 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>65 lines"])
+    n_lib(["lib.rs<br/>66 lines"])
     n_main(["main.rs<br/>87 lines"])
-    n_app["app.rs<br/>1373 lines"]
+    n_app["app.rs<br/>1390 lines"]
     n_crashlog["crashlog.rs<br/>254 lines"]
     n_group["group.rs<br/>653 lines"]
     n_palettes["palettes.rs<br/>691 lines"]
@@ -95,6 +95,7 @@ flowchart TD
     n_setup["setup.rs<br/>740 lines"]
     n_soundbar["soundbar.rs<br/>349 lines"]
     n_theme["theme.rs<br/>745 lines"]
+    n_updates["updates.rs<br/>234 lines"]
     n_watchfeed["watchfeed.rs<br/>338 lines"]
     n_app --> n_crashlog
     n_app --> n_group
@@ -105,6 +106,7 @@ flowchart TD
     n_app --> n_setup
     n_app --> n_soundbar
     n_app --> n_theme
+    n_app --> n_updates
     n_app --> n_watchfeed
     n_crashlog --> n_prefs
     n_group --> n_settings
@@ -124,6 +126,7 @@ flowchart TD
     n_soundbar --> n_prefs
     n_soundbar --> n_theme
     n_theme --> n_palettes
+    n_updates --> n_theme
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" "open the source"
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" "open the source"
     click n_app href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" "open the source"
@@ -138,6 +141,7 @@ flowchart TD
     click n_setup href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" "open the source"
     click n_soundbar href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs" "open the source"
+    click n_updates href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs" "open the source"
     click n_watchfeed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs" "open the source"
 ```
 
@@ -147,10 +151,10 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1373 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1390 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 254 | Make a failure that produces no output produce some. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 653 | Group mode: several people in one recording, each with a name and a colour. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 65 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 66 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 87 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 691 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 311 | The policy in force, and what the interface does about it. |
@@ -161,6 +165,7 @@ flowchart TD
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 740 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 349 | The animated mark: a row of bars that rise and fall. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 745 | Colour schemes for the desktop app. |
+| [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 234 | The manual update check, as the window shows it. |
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 338 | The device monitor, moved off the thread that paints. |
 
 ## Public items
@@ -211,6 +216,7 @@ flowchart TD
 | `mod palette` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Shorthand accessors, so call sites read as p::fg() rather than theme::active().fg. |
 | `fn install_fonts` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Load JetBrains Mono if the system has it. |
 | `fn install` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Apply the active theme's visuals and a monospace-everywhere type scale. |
+| `struct Updates` | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | The panel's state. |
 | `struct Update` | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | One look at the machine. |
 | `struct WatchFeed` | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | The window's end of the monitor. |
 
