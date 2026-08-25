@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 65 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 66 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -70,7 +70,7 @@ This file defines no functions of its own.
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L65) | Crate version string, surfaced in the About panel. |
+| `VERSION` <sub>pub const</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L66) | Crate version string, surfaced in the About panel. |
 
 ---
 

@@ -1,0 +1,13 @@
+[package]
+name = "veilvoice-update"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Ask, when told to, whether a newer VeilVoice release exists. No HTTP client, no automatic check, and nothing is downloaded or installed."
+
+[dependencies]
+
+[dev-dependencies]

@@ -33,9 +33,19 @@ timbre, micro-timing and the melody of an accent — so that neither software no
 a human listener can re-identify the speaker or reconstruct the original voice,
 **while the words themselves stay clean and transcribable**.
 
-It talks to no servers. Ever. There is no telemetry, no update check, and no
-network code in the dependency graph — CI fails the build if an HTTP client
-appears in it.
+There is no telemetry, no account, and no network code in the dependency
+graph — CI fails the build if an HTTP client appears in it.
+
+**One thing reaches the network, and only when you press it.** The desktop app
+has a *check for updates* button. It runs then and at no other time: no timer,
+no check at startup, nothing in the background. It sends nothing about you or
+your machine, it reads a public page anybody can open, and it downloads and
+installs nothing — it reports a version number and every decision after that is
+yours. There is still no HTTP client in the dependency graph: like the release
+verifier, it borrows the transfer tool your operating system already ships.
+
+Anonymising, scrambling, encrypting and every other thing VeilVoice does still
+talk to no servers at all.
 
 ---
 
