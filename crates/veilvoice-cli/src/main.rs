@@ -61,6 +61,10 @@ mod capture;
 mod conversation;
 mod guard;
 mod lock;
+// Only the live path draws a meter, and the crate builds without that path on
+// the BSDs, where `cpal` has no backend.
+#[cfg(feature = "live")]
+mod meter;
 mod policy;
 mod sentry;
 mod theme;
@@ -1395,11 +1399,27 @@ fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result
         .map_err(|e| e.to_string())?;
 
     println!();
+    println!(
+        "{}",
+        paint(
+            colour::MUTED,
+            "  dBFS, peak. 0 is full scale; speech usually sits near -12."
+        )
+    );
     println!("{}", paint(colour::MUTED, "  Ctrl-C to stop."));
     println!();
 
+    const WIDTH: usize = 20;
+    let mut in_meter = meter::Channel::default();
+    let mut out_meter = meter::Channel::default();
+
+    // Sixty times a second would be smoother and would also be sixty terminal
+    // writes a second for a bar twenty characters wide. Twenty is fast enough
+    // that a syllable moves the bar, and the peak hold is what catches what
+    // falls between two frames -- nothing is missed, because the audio thread
+    // keeps the maximum and resets it on read.
     loop {
-        std::thread::sleep(std::time::Duration::from_millis(250));
+        std::thread::sleep(std::time::Duration::from_millis(50));
         let s = session.stats();
         let glitches = if s.dropped > 0 || s.starved > 0 {
             paint(
@@ -1409,34 +1429,28 @@ fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result
         } else {
             String::new()
         };
+        // Sticky, because clipping is destructive and is over in a
+        // millisecond: a warning that has gone before the person looks up was
+        // never given.
+        let clipped = if in_meter.has_clipped() || out_meter.has_clipped() {
+            paint(colour::RED, "  CLIPPED")
+        } else {
+            String::new()
+        };
         print!(
-            "\r  {} in {}  out {}   {} {:.1} ms{}   ",
-            paint(colour::MUTED, "lvl"),
-            meter(s.input_peak),
-            meter(s.output_peak),
+            "\r  {} {}   {} {}   {} {:.1} ms{}{}   ",
+            paint(colour::MUTED, " in"),
+            in_meter.update(s.input_peak, WIDTH),
+            paint(colour::MUTED, "out"),
+            out_meter.update(s.output_peak, WIDTH),
             paint(colour::MUTED, "cpu"),
             s.process.ema_block_ms(),
-            glitches
+            glitches,
+            clipped
         );
         use std::io::Write;
         let _ = std::io::stdout().flush();
     }
-}
-
-/// A small textual level meter.
-#[cfg(feature = "live")]
-fn meter(peak: f32) -> String {
-    const WIDTH: usize = 12;
-    let filled = ((peak.clamp(0.0, 1.0)) * WIDTH as f32).round() as usize;
-    let bar: String = "█".repeat(filled) + &"·".repeat(WIDTH - filled);
-    let shade = if peak > 0.95 {
-        colour::RED
-    } else if peak > 0.7 {
-        colour::YELLOW
-    } else {
-        colour::GREEN
-    };
-    paint(shade, &bar)
 }
 
 #[cfg(feature = "live")]
@@ -1925,11 +1939,20 @@ mod tests {
     #[cfg(feature = "live")]
     #[test]
     fn meter_scales_and_never_panics() {
+        // The meter itself, its scale and its edge cases, are tested in
+        // `meter.rs` beside the code. What is worth checking from here is that
+        // the two are still connected: a level a person would call loud must
+        // not draw as an empty bar, which is what the linear meter this
+        // replaced did to ordinary speech.
         for peak in [-1.0f32, 0.0, 0.25, 0.5, 1.0, 4.0] {
-            let bar = meter(peak);
+            let bar = meter::render(peak, 0.0, 12);
             assert!(bar.chars().count() >= 12);
         }
-        assert!(meter(0.0).starts_with('·'));
-        assert!(meter(1.0).starts_with('█'));
+        assert!(meter::render(0.0, 0.0, 12).contains('·'));
+        assert!(meter::render(1.0, 0.0, 12).contains('█'));
+        assert!(
+            meter::render(0.251, 0.0, 12).matches('█').count() >= 8,
+            "speech at -12 dBFS must fill most of the bar"
+        );
     }
 }
