@@ -16,6 +16,16 @@
 // emits are ever introduced. Raw HTML in the source Markdown is shown as text
 // rather than injected, so the README cannot inject script into this page even
 // if it were altered upstream.
+//
+// In plain words
+//
+// This turns the project's plain-text documents into the formatted pages you
+// read, including the colours in the code examples.
+//
+// Most sites borrow somebody else's code from another company's server to do
+// this. That would tell that company your address and what you were reading.
+// This is a few hundred lines written here instead, so nothing about your
+// visit leaves this site.
 
 window.MD = (function () {
   "use strict";

@@ -36,6 +36,18 @@
 //    without laying out the page again.
 //  - Obey `prefers-reduced-motion`: someone who asked the system for less
 //    movement gets the content with no movement at all.
+//
+// In plain words
+//
+// This is the gentle fade as sections of the page come into view.
+//
+// It is written around one rule that matters more than the effect: text must
+// never end up invisible. An earlier version could leave whole paragraphs
+// hidden if you jumped down the page, which was found by looking at the page
+// rather than by any test. If anything at all goes wrong now, everything
+// simply shows.
+//
+// If you have asked your computer for less movement, there is no fade at all.
 
 (function () {
   "use strict";
