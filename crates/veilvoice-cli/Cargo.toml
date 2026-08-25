@@ -29,6 +29,7 @@ veilvoice-meta = { path = "../veilvoice-meta" }
 veilvoice-policy = { path = "../veilvoice-policy" }
 veilvoice-sentry = { path = "../veilvoice-sentry" }
 veilvoice-setup = { path = "../veilvoice-setup" }
+veilvoice-video = { path = "../veilvoice-video" }
 veilvoice-watch = { path = "../veilvoice-watch" }
 clap = { version = "4", features = ["derive"] }
 rpassword = "7"
