@@ -1,15 +1,22 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
-<!-- The banner is the still image on purpose. The animated version
-     exists and is used on the website, but a README is read in a
-     hundred clients that handle animation differently, and GitHub's
-     own renderer escapes the `<picture>` element this used to need --
-     which put a paragraph of raw markup above the project's name in
-     the website's repository panel. Animations belong in the parts of
-     the documentation that explain how the tool works, not in the
-     first thing every reader sees. Both images come from
-     `assets/generate.py`. -->
-![VeilVoice — irreversible voice de-identification](assets/banner.png)
+<!-- The animated banner, as a GIF, for the reason the still one was
+     here instead: a README is read in a hundred clients that handle
+     animation differently. The version this replaces needed a
+     `<picture>` element to offer an APNG with a still fallback, and
+     GitHub's renderer escapes `<picture>` -- which put a paragraph of
+     raw markup above the project's name in the website's repository
+     panel. One plain Markdown image needs no element to escape, and
+     GIF is the one animated format every client draws. A client that
+     will not animate it shows the first frame, which is exactly
+     `assets/banner.png`.
+
+     Nothing here is a committed blob: `assets/generate.py` draws the
+     frames, writes the GIF with its own LZW encoder, and CI fails the
+     build if the file and the generator disagree. The website does not
+     serve this picture at all any more -- its banner is drawn in CSS,
+     so it follows the reader's palette and its claims are text. -->
+![VeilVoice — irreversible voice de-identification](assets/banner.gif)
 
 # VeilVoice
 
