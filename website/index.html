@@ -66,16 +66,39 @@
 <main>
 
 <div class="wrap hero stagger">
-  <!-- An animated image does not obey `prefers-reduced-motion` by itself, and
-       the CSS at the top of main.css cannot reach inside a PNG. The media query
-       on <source> is what honours the preference: someone who asked for less
-       motion is served the still banner, and everyone else the APNG. A browser
-       without APNG support draws its first frame, which *is* the still banner,
-       so there is no path here that ends with no image. -->
-  <picture class="banner-pic" style="--i:0">
-    <source srcset="assets/banner-animated.png" media="(prefers-reduced-motion: no-preference)">
-    <img class="banner" src="assets/banner.png" alt="VeilVoice — irreversible voice de-identification">
-  </picture>
+  <!-- The banner is drawn in CSS rather than served as a picture, so it
+       follows the reader's palette, its claims can be read aloud and searched,
+       and the reduced-motion rule at the top of main.css reaches every part of
+       it -- none of which a PNG can do. See the long note in main.css under
+       "the banner, drawn in CSS", including why it has no soundbar.
+
+       `aria-hidden` because the <h1> below states the same thing once, and a
+       reader using a screen reader should hear it once. The picture this
+       replaces was equally unreadable to them; nothing is lost here, and the
+       lines it shows all appear again in text further down the page.
+
+       The <noscript> copy is the animated GIF from the README. Nothing above
+       needs a script -- with scripts off the reader has chosen the edition of
+       this site that runs nothing, and one picture is the simpler thing to
+       serve them. -->
+  <div class="bn" style="--i:0" aria-hidden="true">
+    <span class="bn-sweep"></span>
+    <img class="bn-mark" src="assets/icon-32.png" alt="" width="32" height="32">
+    <p class="bn-word" data-word="VEILVOICE">VEILVOICE</p>
+    <p class="bn-sub">IRREVERSIBLE VOICE DE-IDENTIFICATION</p>
+    <p class="bn-claim">THE VOICEPRINT IS DESTROYED. THE WORDS STAY READABLE.</p>
+    <ul class="bn-lines">
+      <li class="bn-ok">FULLY OFFLINE</li>
+      <li class="bn-cyan">SECURE AUDITED RUST CODE</li>
+      <li class="bn-muted">GPL-3.0-OR-LATER</li>
+      <li class="bn-ok">BY TILAS01 ON GITHUB</li>
+    </ul>
+    <span class="bn-rule"></span>
+  </div>
+  <noscript>
+    <img class="bn-fallback" src="assets/banner.gif"
+         alt="VeilVoice — irreversible voice de-identification">
+  </noscript>
   <!-- The page had no h1 at all: the banner is an image, and an image is not a
        heading. A screen reader's outline began at "WHAT IT ACTUALLY DOES", and
        the document's own subject was never stated in text anywhere. Visually
