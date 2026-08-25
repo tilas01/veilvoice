@@ -47,6 +47,15 @@ pub struct Prefs {
     pub animated_icon: bool,
     /// Whether the first-run panel has been answered.
     pub configured: bool,
+    /// Whether the app opens with group mode already on.
+    ///
+    /// The *mode itself* is deliberately not stored. Group mode changes what a
+    /// recording is treated as, and a mode that survives a restart is a mode
+    /// somebody eventually forgets is on -- which for this tool means a
+    /// single-speaker recording rendered against a plan that does not describe
+    /// it. So the toggle is per-run, and this separate, explicit tick is the
+    /// only way it starts on.
+    pub always_group: bool,
     /// Set when the file on disk could not be understood, so the settings
     /// panel can say the defaults are in force and why. Never persisted.
     pub recovered_from_corrupt_file: bool,
@@ -61,6 +70,7 @@ impl Default for Prefs {
             animations: true,
             animated_icon: true,
             configured: false,
+            always_group: false,
             recovered_from_corrupt_file: false,
         }
     }
@@ -137,6 +147,12 @@ impl Prefs {
                         understood += 1;
                     }
                 }
+                "always_group" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.always_group = on;
+                        understood += 1;
+                    }
+                }
                 _ => {}
             }
         }
@@ -156,6 +172,7 @@ impl Prefs {
         out.push_str(&format!("animations = {}\n", self.animations));
         out.push_str(&format!("animated_icon = {}\n", self.animated_icon));
         out.push_str(&format!("configured = {}\n", self.configured));
+        out.push_str(&format!("always_group = {}\n", self.always_group));
         out
     }
 
@@ -254,6 +271,7 @@ mod tests {
             animations: false,
             animated_icon: false,
             configured: true,
+            always_group: true,
             recovered_from_corrupt_file: false,
         };
         let back = Prefs::parse(&prefs.to_text());
@@ -336,6 +354,7 @@ mod tests {
             animations: false,
             animated_icon: true,
             configured: true,
+            always_group: false,
             recovered_from_corrupt_file: false,
         };
         prefs.save(&path).unwrap();
