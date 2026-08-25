@@ -28,6 +28,11 @@ description = "Verify a VeilVoice release without GnuPG installed"
 # RSA PKCS#1 v1.5 verification, and a subtle mistake there would be a silent
 # accept in the one tool whose entire job is not to silently accept. A widely
 # used implementation that many people read is the better risk.
+# The checking itself lives in `veilvoice-check`, so the desktop
+# application's verify tab and this binary share one implementation rather than
+# holding two. This crate keeps the command line, the reporting, and the
+# download shim; it no longer owns the arithmetic.
+veilvoice-check = { path = "../veilvoice-check" }
 pgp = { version = "0.20", default-features = false }
 sha2 = "0.10"
 

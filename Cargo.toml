@@ -11,6 +11,7 @@
 resolver = "2"
 members = [
     "crates/veilvoice-capture",
+    "crates/veilvoice-check",
     "crates/veilvoice-conversation",
     "crates/veilvoice-core",
     "crates/veilvoice-crypto",

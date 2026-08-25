@@ -15,11 +15,17 @@ the window to one size and position, clicks each tab, and captures the window's
 real frame bounds. Re-running it takes a minute, so a change to the interface
 can be followed by a change to its pictures in the same commit.
 
-That script fails rather than writing a wrong picture. The tabs are clicked at
-measured coordinates, and a coordinate that has gone stale — a tab added,
-renamed, or the row wrapping — would otherwise produce a directory of identical
-pictures with different names: wrong, plausible, and silent. Each capture is
-compared with the one before it and an identical pair stops the run.
+That script fails rather than writing a wrong picture, and it does not remember
+where the tabs are. It **finds** them: it scans the strip of pixels the labels
+sit in and groups the lit columns into runs, one run per label, and stops if the
+count is not the one it expects.
+
+It did remember them, once, and they went stale the first time a tab was
+inserted. Every click still landed on *a* tab, so every capture was different,
+the duplicate check saw nothing wrong, and three tabs were quietly photographed
+under the wrong names. Two guards remain from that: an identical pair of
+consecutive captures stops the run, and after each click the pixel above the
+label has to be the raised background a selected tab is drawn on.
 
 **`cli-*.svg` are drawings, and they are generated.** Each one is a pure
 function of the `cli-*.txt` beside it, which holds exactly what the command
@@ -56,6 +62,7 @@ black bar.
 |---|---|---|
 | `gui-live.png` | the two audio device dropdowns | `your microphone`, `your virtual cable` |
 | `gui-install.png` | the running-from and install-to paths | the same paths, under a user called `you` |
+| `gui-lock.png` | where the app lock file lives | the same path, under a user called `you` |
 
 The device names are product names: a headset model and a particular
 virtual-cable setup, which together describe the maintainer's hardware. The

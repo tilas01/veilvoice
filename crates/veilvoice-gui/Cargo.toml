@@ -18,6 +18,7 @@ veilvoice-audio = { path = "../veilvoice-audio" }
 veilvoice-crypto = { path = "../veilvoice-crypto" }
 veilvoice-meta = { path = "../veilvoice-meta" }
 veilvoice-policy = { path = "../veilvoice-policy" }
+veilvoice-check = { path = "../veilvoice-check" }
 veilvoice-conversation = { path = "../veilvoice-conversation" }
 veilvoice-setup = { path = "../veilvoice-setup" }
 veilvoice-update = { path = "../veilvoice-update" }
