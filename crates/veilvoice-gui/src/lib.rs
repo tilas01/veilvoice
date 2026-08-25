@@ -47,6 +47,7 @@
 
 mod app;
 pub mod crashlog;
+pub mod group;
 pub mod palettes;
 pub mod policy;
 pub mod prefs;

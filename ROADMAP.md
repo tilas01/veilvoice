@@ -89,7 +89,7 @@ it cannot do as plainly as what it can.
 | 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | — |
 | 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **planned** | 2 d |
 | 42 | Duress and decoy passwords | **planned** | 7–10 d |
-| 43 | Cloud transcription through your own API key | **blocked** | — |
+| 43 | Transcription through your own API key, given **veiled audio only** | **planned** | 4–6 d |
 
 ## Conversations, subtitles and video
 
@@ -130,6 +130,19 @@ then the smallest thing it does.
 | 59 | **Custom install** — CLI, desktop app, or both, from a build you just made or from a download you just verified | **planned** | 2–3 d |
 | 60 | **Four verbosity levels** — nothing, minimal, normal (the default) and everything — applied to every one of the above, with the exit status carrying the answer when the output carries nothing | **planned** | 1–2 d |
 
+## Group mode, where you can see it
+
+The engine has handled several speakers since marker 46. The desktop app has
+never shown it. These are about making the thing visible and usable rather than
+about the signal, which is already done.
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **next** | 3–4 d |
+| 62 | **A name and a colour per speaker in the app** — the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **planned** | 2–3 d |
+| 63 | **Live levels and a wave per speaker**, in the app and in the terminal, while a recording is running | **planned** | 3–4 d |
+| 64 | **Speaker detection through software you already have** — `ollama` detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **planned** | 4–6 d |
+
 ## Finally
 
 | # | Marker | Status | Estimate |
@@ -146,16 +159,49 @@ pretending otherwise would make this roadmap a wish list. They are named rather
 than numbered, because a number changes whenever a row above it does -- which is
 exactly what happened when the USB work was dropped from this list.
 
-**Cloud transcription is blocked on a decision, not on code.**
-VeilVoice currently talks to no servers at all, and CI fails the build if a
-network client appears anywhere in the dependency graph. That is one of the few
-claims a reader can verify in ten seconds, and it is a large part of why this
-project is worth trusting. Transcribing through a provider means an HTTP client
-exists somewhere. It can be done honestly — one crate, off by default, the
-guarantee kept everywhere else and the claim reworded everywhere it appears —
-but it is a real trade and it is not made silently. Note also that not every
-named provider accepts audio input; that will be checked before anything is
+**Transcription: the decision has now been taken, and it is a narrow one.**
+Marker 43 was blocked because VeilVoice talks to no servers at all and CI fails
+the build if a network client appears anywhere in the dependency graph — one of
+the few claims a reader can check in ten seconds, and a large part of why this
+project is worth trusting.
+
+The decision is: **transcription may happen, and anything that leaves this
+machine is the veiled audio, never the recording.** That is a smaller trade than
+it first looks, because the veiled audio is the thing this project exists to
+produce: the words are intact and the voiceprint is gone, so a provider given it
+receives a transcribable recording of a voice that is not anybody's. Sending the
+original would hand a biometric to a third party, and that is the thing being
+refused rather than the transcription.
+
+Three rules go with it, and they are what keep the front page true:
+
+* **Off by default, and never a default.** No transcription happens unless it
+  is switched on for that run.
+* **The guarantee is kept in the dependency graph.** Nothing here adds an HTTP
+  client to VeilVoice: a local model is reached by running the program the user
+  already installed, and a provider is reached by shelling out to the system's
+  own transfer tool — the same arrangement the release verifier has used for
+  downloads since it existed. The CI job that fails on a network client stays
+  exactly as it is.
+* **The claim is reworded where it appears, not quietly kept.** "It talks to no
+  servers. Ever." becomes true-with-a-named-exception the moment this ships, and
+  the wording changes in the same commit as the code, not after it.
+
+Not every provider accepts audio input; that gets checked before anything is
 built rather than discovered by a user.
+
+**Detecting who is speaking: also decided, and it ships no model.**
+The open question was that real diarisation means shipping a trained model,
+which contradicts the rule that VeilVoice bundles nothing it cannot explain.
+Marker 64 resolves it the way the companion setup already resolves VB-CABLE and
+Audacity: if `ollama` is on the machine, VeilVoice can offer to use it, naming
+what it is and who makes it; if it is not, VeilVoice does not install a model
+and does not pretend to guess. The two honest paths that exist today — one
+microphone per person, or a turn list — remain, and remain the default.
+
+What this does **not** become is a project with a model in it. Nothing is
+downloaded, nothing is bundled, and a machine with no `ollama` and no API key
+behaves exactly as it does today.
 
 **Privileged mode and driver alerting cannot reach kernel level on Windows
 or macOS.** Loading a
