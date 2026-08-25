@@ -106,6 +106,18 @@ precisely the two of them drifting apart while both looked plausible alone.
 
 ### The website's own source is documented, twice over
 
+**In all three places**, as everything else here is: the repository, the
+website, and the GitHub wiki. One generator writes all three from one header
+comment, so they cannot disagree — which is the entire reason any of it is
+generated.
+
+The wiki is a single flat namespace shared with the crate pages, so these are
+named `Source-*` and both generators sweep for orphans over exactly the paths
+they own: `generate.py` skips `wiki/Source-` and `website/reference/source/`,
+and `sources.py` sweeps them. A page about a file that has been deleted fails
+the build in either direction.
+
+
 Ten files the site invites you to open and read — eight scripts and two
 stylesheets — had no page, no picture and no index, while every crate and every
 `.rs` file had all three. `tools/docs/sources.py` gives them the same
