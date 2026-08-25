@@ -1334,6 +1334,46 @@ progress { width: 100%; height: 6px; margin-top: 12px; }
 .tok-fn   { color: var(--cyan); }
 .tok-attr { color: var(--warn); }
 
+/* ---------- the screenshot gallery ---------- */
+
+.shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
+  margin: 22px 0 0;
+}
+
+.shot, .cast { margin: 0; }
+
+/* `height: auto` beside the width/height attributes on the element: the
+ * attributes give the browser the aspect ratio before the bytes arrive, so the
+ * page does not jump as each picture loads, and this stops that ratio being
+ * applied as a fixed pixel height once it has. */
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg-inset);
+}
+
+.shot figcaption, .cast figcaption {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  margin-top: 8px;
+}
+.shot figcaption strong { color: var(--fg); }
+
+.casts { margin: 20px 0 0; }
+.cast { margin: 0 0 20px; }
+/* The drawings carry their own width and height, exactly as the flowcharts do,
+ * so they render at their own size and scale down on a narrow screen rather
+ * than being blown up on a wide one. The scroll is the safety net. */
+.cast { overflow-x: auto; }
+.cast img { display: block; max-width: 100%; height: auto; }
+
 /* ---------- wiki ---------- */
 
 .wiki-layout { display: grid; grid-template-columns: 200px 1fr; gap: 30px; align-items: start; }
