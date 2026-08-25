@@ -4927,6 +4927,7 @@ dependencies = [
  "veilvoice-meta",
  "veilvoice-policy",
  "veilvoice-setup",
+ "veilvoice-update",
  "veilvoice-video",
  "veilvoice-watch",
  "winresource",
@@ -4961,6 +4962,10 @@ dependencies = [
 
 [[package]]
 name = "veilvoice-setup"
+version = "0.1.12"
+
+[[package]]
+name = "veilvoice-update"
 version = "0.1.12"
 
 [[package]]

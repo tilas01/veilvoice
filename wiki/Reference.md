@@ -122,6 +122,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`setup.rs`|File-veilvoice-gui-setup]] &mdash; The setup tab: install this copy, undo that, and the optional companions.
 - [[`soundbar.rs`|File-veilvoice-gui-soundbar]] &mdash; The animated mark: a row of bars that rise and fall.
 - [[`theme.rs`|File-veilvoice-gui-theme]] &mdash; Colour schemes for the desktop app.
+- [[`updates.rs`|File-veilvoice-gui-updates]] &mdash; The manual update check, as the window shows it.
 - [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] &mdash; The device monitor, moved off the thread that paints.
 
 ## [[veilvoice-meta|Crate-veilvoice-meta]]

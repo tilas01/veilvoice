@@ -25,6 +25,7 @@ members = [
     "crates/veilvoice-policy",
     "crates/veilvoice-sentry",
     "crates/veilvoice-setup",
+    "crates/veilvoice-update",
     "crates/veilvoice-verify",
 ]
 # `fuzz/` is a cargo-fuzz package and needs nightly plus libFuzzer. Excluding it
