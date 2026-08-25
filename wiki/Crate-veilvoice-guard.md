@@ -9,12 +9,13 @@
 
 ## Contents
 
-- [What this is, and the word it deliberately does not use](#what-this-is-and-the-word-it-deliberately-does-not-use)
-- [What it actually does](#what-it-actually-does)
-- [The manifest is only as trustworthy as where it is kept](#the-manifest-is-only-as-trustworthy-as-where-it-is-kept)
-- [What a privileged helper would add, and why there is not one here](#what-a-privileged-helper-would-add-and-why-there-is-not-one-here)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
+  - [What this is, and the word it deliberately does not use](#what-this-is-and-the-word-it-deliberately-does-not-use)
+  - [What it actually does](#what-it-actually-does)
+  - [The manifest is only as trustworthy as where it is kept](#the-manifest-is-only-as-trustworthy-as-where-it-is-kept)
+  - [What a privileged helper would add, and why there is not one here](#what-a-privileged-helper-would-add-and-why-there-is-not-one-here)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
 
 Tamper **detection** for VeilVoice's own files: a manifest of what they
 should be, a check of what they are, and a best-effort answer to "what
@@ -67,6 +68,16 @@ and it still could not stop a root-level attacker, only watch one. So the
 unprivileged half ships first, on its own merits, and `ROADMAP.md` records
 what the privileged half would need to be worth adding.
 
+# In plain words
+
+This notices when the program's own files have been changed.
+
+It writes down what every file should look like, and later tells you if any of
+them no longer does -- and which one, and when.
+
+It is a smoke alarm, not a lock. Anything that can change those files can
+change the list too. What it catches is a change nobody was hiding.
+
 ## How the crate fits together
 
 <p align="center">
@@ -79,7 +90,7 @@ what the privileged half would need to be worth adding.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>140 lines"])
+    n_lib(["lib.rs<br/>150 lines"])
     n_blame["blame.rs<br/>405 lines"]
     n_manifest["manifest.rs<br/>539 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs" "open the source"
@@ -94,5 +105,5 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`blame.rs`|File-veilvoice-guard-blame]] | 405 | Best-effort attribution: which program changed a file. |
-| [[`lib.rs`|File-veilvoice-guard-lib]] | 140 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
+| [[`lib.rs`|File-veilvoice-guard-lib]] | 150 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
 | [[`manifest.rs`|File-veilvoice-guard-manifest]] | 539 | The integrity manifest: what the files were, and what they are now. |

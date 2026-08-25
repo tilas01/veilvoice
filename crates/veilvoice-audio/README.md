@@ -15,12 +15,13 @@
 
 ## Contents
 
-- [The live feature](#the-live-feature)
-- [Routing, and why a virtual cable matters](#routing-and-why-a-virtual-cable-matters)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
-- [Public items](#public-items)
-- [Reading it elsewhere](#reading-it-elsewhere)
+  - [The live feature](#the-live-feature)
+  - [Routing, and why a virtual cable matters](#routing-and-why-a-virtual-cable-matters)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
+  - [Public items](#public-items)
+  - [Reading it elsewhere](#reading-it-elsewhere)
 
 Everything between the sound hardware and
 [`veilvoice_core`](../veilvoice-core/README.md): device enumeration, file
@@ -49,6 +50,19 @@ appear as an ordinary microphone to any call, stream or recorder on the
 machine, with no per-application setup. `devices::find_virtual_cable`
 detects an installed one so the UI can offer it directly.
 
+# In plain words
+
+This is the plumbing between your microphone, your speakers and the part that
+changes the voice.
+
+It finds the sound devices you have, opens the recording you point at whatever
+kind of file it is, and writes the result back out. For live use it does the
+whole loop while you talk -- in from the microphone, through the engine, out to
+whatever else is listening -- fast enough that a conversation still works.
+
+It also reports how loud things are, which is what the level bars in the
+program are drawing.
+
 ## How the crate fits together
 
 Every arrow below is a `crate::` or `super::` path one module actually
@@ -66,7 +80,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>209 lines"])
+    n_lib(["lib.rs<br/>222 lines"])
     n_devices["devices.rs<br/>228 lines"]
     n_io["io.rs<br/>555 lines"]
     n_live["live.rs<br/>237 lines"]
@@ -86,7 +100,7 @@ flowchart TD
 |---|---:|---|
 | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | 228 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 555 | Reading and writing audio files. |
-| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 209 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
+| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 222 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
 | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 237 | Live microphone scrambling. |
 | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | 154 | The scale a level meter is drawn on. |
 

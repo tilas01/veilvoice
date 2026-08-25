@@ -30,6 +30,12 @@ Which screen-recording programs are running, an allowlist for the ones you meant
 - [[`processes.rs`|File-veilvoice-capture-processes]] &mdash; Listing the processes that are running, per platform.
 - [[`programs.rs`|File-veilvoice-capture-programs]] &mdash; The programs this build knows can capture a screen.
 
+## [[veilvoice-check|Crate-veilvoice-check]]
+
+Check a VeilVoice release: the SHA-256 of a file, its line in a signed SHA256SUMS, and the detached signature over that list. No GnuPG, no network.
+
+- [[`lib.rs`|File-veilvoice-check-lib]] &mdash; Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list.
+
 ## [[veilvoice-cli|Crate-veilvoice-cli]]
 
 Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings.
@@ -160,6 +166,13 @@ Per-user installation and companion-software detection, shared by the command li
 - [[`companions.rs`|File-veilvoice-setup-companions]] &mdash; Optional third-party software, detected rather than assumed.
 - [[`install.rs`|File-veilvoice-setup-install]] &mdash; Put this program somewhere the system can find it.
 - [[`lib.rs`|File-veilvoice-setup-lib]] &mdash; Everything that puts VeilVoice on a machine, and everything that reports what is already on it.
+
+## [[veilvoice-update|Crate-veilvoice-update]]
+
+Ask, when told to, whether a newer VeilVoice release exists. No HTTP client, no automatic check, and nothing is downloaded or installed.
+
+- [[`lib.rs`|File-veilvoice-update-lib]] &mdash; Ask, only when told to, whether a newer VeilVoice release exists.
+- [[`ask.rs`|File-veilvoice-update-examples-ask]] &mdash; Run the real check once, by hand.
 
 ## [[veilvoice-verify|Crate-veilvoice-verify]]
 

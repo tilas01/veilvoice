@@ -15,14 +15,15 @@
 
 ## Contents
 
-- [What it guarantees (and what it deliberately does not)](#what-it-guarantees-and-what-it-deliberately-does-not)
-- [Accent](#accent)
-- [Why it is one-way](#why-it-is-one-way)
-- [Example](#example)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
-- [Public items](#public-items)
-- [Reading it elsewhere](#reading-it-elsewhere)
+  - [What it guarantees (and what it deliberately does not)](#what-it-guarantees-and-what-it-deliberately-does-not)
+  - [Accent](#accent)
+  - [Why it is one-way](#why-it-is-one-way)
+  - [Example](#example)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
+  - [Public items](#public-items)
+  - [Reading it elsewhere](#reading-it-elsewhere)
 
 The security-critical heart of VeilVoice: an **irreversible, cryptographically
 modulated voice de-identification** engine.
@@ -71,6 +72,22 @@ assert_eq!(output.len(), input.len());
 let _ms = deid.stats().last_block_ms();
 ```
 
+# In plain words
+
+This is the part that actually changes the voice.
+
+A recording goes in and a recording comes out. The words are the same and you
+can still understand every one of them; the voice is not yours any more, and
+there is no setting, no key and no clever program that turns it back. What made
+it recognisably *you* -- the pitch, the shape of your mouth and throat, the
+timing, the music of your accent -- is not hidden. It is thrown away, and
+everybody who goes through it comes out sounding like the same handful of
+people.
+
+What it does not do is keep your words secret. It is not meant to: a voice
+nobody can understand would be no use to anyone. If what you said would
+identify you, this has not touched that.
+
 ## How the crate fits together
 
 Every arrow below is a `crate::` or `super::` path one module actually
@@ -88,7 +105,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>70 lines"])
+    n_lib(["lib.rs<br/>86 lines"])
     n_accent["accent.rs<br/>684 lines"]
     n_chain["chain.rs<br/>1256 lines"]
     n_effects["effects.rs<br/>214 lines"]
@@ -130,7 +147,7 @@ flowchart TD
 | [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | 684 | Accent and speaker-trait neutralisation. |
 | [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 1256 | The assembled de-identification chain and its live performance statistics. |
 | [`effects.rs`](../../docs/files/veilvoice-core/effects.md) | 214 | Light time-domain effects applied after resynthesis. |
-| [`lib.rs`](../../docs/files/veilvoice-core/lib.md) | 70 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
+| [`lib.rs`](../../docs/files/veilvoice-core/lib.md) | 86 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
 | [`modulation.rs`](../../docs/files/veilvoice-core/modulation.md) | 300 | Cryptographically-seeded modulation of the effect parameters. |
 | [`pitch.rs`](../../docs/files/veilvoice-core/pitch.md) | 274 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [`spectral.rs`](../../docs/files/veilvoice-core/spectral.md) | 428 | Frequency-domain de-identification transform. |

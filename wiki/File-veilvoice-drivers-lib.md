@@ -3,16 +3,17 @@
 
 # `crates/veilvoice-drivers/src/lib.rs`
 
-[[veilvoice-drivers|Crate-veilvoice-drivers]] &middot; 736 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs)
+[[veilvoice-drivers|Crate-veilvoice-drivers]] &middot; 748 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs)
 
 ## Contents
 
-- [The limit, stated first](#the-limit-stated-first)
-- [The cross-view check, and what it is actually worth](#the-cross-view-check-and-what-it-is-actually-worth)
-- [A new driver is not by itself a finding](#a-new-driver-is-not-by-itself-a-finding)
-- [Where the answer comes from](#where-the-answer-comes-from)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [The limit, stated first](#the-limit-stated-first)
+  - [The cross-view check, and what it is actually worth](#the-cross-view-check-and-what-it-is-actually-worth)
+  - [A new driver is not by itself a finding](#a-new-driver-is-not-by-itself-a-finding)
+  - [Where the answer comes from](#where-the-answer-comes-from)
+- [In plain words](#in-plain-words)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 What is loaded into the kernel, recorded, and compared later. A driver
 appearing between two looks is worth knowing about: it is the step almost
@@ -65,36 +66,48 @@ Linux reads two files and spawns nothing. The other two shell out to a tool
 the system already ships, for the same reason the rest of this workspace
 does: `#![forbid(unsafe_code)]` holds here too, and the native APIs are FFI.
 
+# In plain words
+
+This lists what is loaded deep inside the operating system, and tells you when
+that list changes.
+
+Drivers run below almost everything else, so something that gets in there can
+see a great deal. Knowing a new one has appeared is worth something.
+
+It asks the system twice, in two different ways, and says so when the two
+answers disagree -- which is a hint, not a detection. Anything already down
+there can lie to both.
+
 ## What this file contains
 
-736 lines defining **21 functions** (15 public), **5 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+748 lines defining **21 functions** (15 public), **5 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Module` (line 86) -- One loaded driver or kernel module.
-- `enum Change` (line 124) -- How a module differs from the record.
-- `struct Support` (line 166) -- What this platform can and cannot answer.
-- `struct Report` (line 221) -- What is loaded right now, and anything odd about how it was found.
-- `enum Error` (line 467) -- Everything that can go wrong in this crate.
+- `struct Module` (line 98) -- One loaded driver or kernel module.
+- `enum Change` (line 136) -- How a module differs from the record.
+- `struct Support` (line 178) -- What this platform can and cannot answer.
+- `struct Report` (line 233) -- What is loaded right now, and anything odd about how it was found.
+- `enum Error` (line 479) -- Everything that can go wrong in this crate.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Change::name` (line 140) -- The module's name, whichever side it came from.
-- `Change::describe` (line 148) -- One line for a terminal or a log.
-- `support` (line 180) -- Report what this platform can do.
-- `Report::take` (line 242) -- Ask the platform what is loaded.
+- `Change::name` (line 152) -- The module's name, whichever side it came from.
+- `Change::describe` (line 160) -- One line for a terminal or a log.
+- `support` (line 192) -- Report what this platform can do.
+- `Report::take` (line 254) -- Ask the platform what is loaded.
   - reaches: `new`, `now_seconds`, `read_platform`, `collapse_whitespace`
-- `Report::len` (line 258) -- How many modules were listed.
-- `Report::is_empty` (line 263) -- Whether nothing was listed.
-- `Report::modules` (line 268) -- The modules, in a stable order.
-- `Report::with_taken` (line 274) -- Replace the recorded time.
-- `Report::from_modules` (line 285) -- Build a report from a list, for tests and for another front end that has already obtained one.
+- `Report::len` (line 270) -- How many modules were listed.
+- `Report::is_empty` (line 275) -- Whether nothing was listed.
+- `Report::modules` (line 280) -- The modules, in a stable order.
+- `Report::with_taken` (line 286) -- Replace the recorded time.
+- `Report::from_modules` (line 297) -- Build a report from a list, for tests and for another front end that has already obtained one.
   - reaches: `new`, `now_seconds`, `collapse_whitespace`
-- `Report::save` (line 392) -- Write the report to path.
+- `Report::save` (line 404) -- Write the report to path.
   - reaches: `to_text`
-- `Report::load` (line 403) -- Read a report written by Report::save.
+- `Report::load` (line 415) -- Read a report written by Report::save.
   - reaches: `parse`
-- `compare` (line 412) -- Compare two reports of the same machine.
+- `compare` (line 424) -- Compare two reports of the same machine.
 
 ## What calls what
 
@@ -110,27 +123,27 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new["Module::new<br/>line 109"]
-    n_collapse_whitespace["collapse_whitespace<br/>line 118"]
-    n_name(["Change::name<br/>line 140"])
-    n_describe(["Change::describe<br/>line 148"])
-    n_support(["support<br/>line 180"])
-    n_take(["Report::take<br/>line 242"])
-    n_len(["Report::len<br/>line 258"])
-    n_is_empty(["Report::is_empty<br/>line 263"])
-    n_modules(["Report::modules<br/>line 268"])
-    n_with_taken(["Report::with_taken<br/>line 274"])
-    n_from_modules(["Report::from_modules<br/>line 285"])
-    n_to_text["Report::to_text<br/>line 309"]
-    n_parse["Report::parse<br/>line 330"]
-    n_save(["Report::save<br/>line 392"])
-    n_load(["Report::load<br/>line 403"])
-    n_compare(["compare<br/>line 412"])
-    n_now_seconds["now_seconds<br/>line 433"]
-    n_read_platform["read_platform<br/>line 445"]
-    n_from["Error::from<br/>line 475"]
-    n_fmt["Error::fmt<br/>line 481"]
-    n_source["Error::source<br/>line 490"]
+    n_new["Module::new<br/>line 121"]
+    n_collapse_whitespace["collapse_whitespace<br/>line 130"]
+    n_name(["Change::name<br/>line 152"])
+    n_describe(["Change::describe<br/>line 160"])
+    n_support(["support<br/>line 192"])
+    n_take(["Report::take<br/>line 254"])
+    n_len(["Report::len<br/>line 270"])
+    n_is_empty(["Report::is_empty<br/>line 275"])
+    n_modules(["Report::modules<br/>line 280"])
+    n_with_taken(["Report::with_taken<br/>line 286"])
+    n_from_modules(["Report::from_modules<br/>line 297"])
+    n_to_text["Report::to_text<br/>line 321"]
+    n_parse["Report::parse<br/>line 342"]
+    n_save(["Report::save<br/>line 404"])
+    n_load(["Report::load<br/>line 415"])
+    n_compare(["compare<br/>line 424"])
+    n_now_seconds["now_seconds<br/>line 445"]
+    n_read_platform["read_platform<br/>line 457"]
+    n_from["Error::from<br/>line 487"]
+    n_fmt["Error::fmt<br/>line 493"]
+    n_source["Error::source<br/>line 502"]
     n_from_modules --> n_new
     n_from_modules --> n_now_seconds
     n_load --> n_parse
@@ -139,27 +152,27 @@ flowchart TD
     n_take --> n_new
     n_take --> n_now_seconds
     n_take --> n_read_platform
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L109" "open the source"
-    click n_collapse_whitespace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L118" "open the source"
-    click n_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L140" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L148" "open the source"
-    click n_support href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L180" "open the source"
-    click n_take href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L242" "open the source"
-    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L258" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L263" "open the source"
-    click n_modules href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L268" "open the source"
-    click n_with_taken href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L274" "open the source"
-    click n_from_modules href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L285" "open the source"
-    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L309" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L330" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L392" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L403" "open the source"
-    click n_compare href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L412" "open the source"
-    click n_now_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L433" "open the source"
-    click n_read_platform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L445" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L475" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L481" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L490" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L121" "open the source"
+    click n_collapse_whitespace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L130" "open the source"
+    click n_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L152" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L160" "open the source"
+    click n_support href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L192" "open the source"
+    click n_take href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L254" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L270" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L275" "open the source"
+    click n_modules href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L280" "open the source"
+    click n_with_taken href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L286" "open the source"
+    click n_from_modules href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L297" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L321" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L342" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L404" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L415" "open the source"
+    click n_compare href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L424" "open the source"
+    click n_now_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L445" "open the source"
+    click n_read_platform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L457" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L487" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L493" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L502" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_name,n_describe,n_support,n_take,n_len,n_is_empty,n_modules,n_with_taken,n_from_modules,n_save,n_load,n_compare entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -174,32 +187,32 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L65) | Crate version string, surfaced in the About panel. |
-| `SCOPE` <sub>pub const</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L71) | What this is worth, in the words a front end should show. |
-| `Module` <sub>pub struct</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L86) | One loaded driver or kernel module. |
-| `Module::new` <sub>pub fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L109) | A module, with both strings made safe for the record. |
-| `collapse_whitespace` <sub>fn</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L118) | Every run of whitespace becomes one space, and the ends are trimmed. |
-| `Change` <sub>pub enum</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L124) | How a module differs from the record. |
-| `Change::name` <sub>pub fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L140) | The module's name, whichever side it came from. |
-| `Change::describe` <sub>pub fn</sub> | [148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L148) | One line for a terminal or a log. |
-| `Support` <sub>pub struct</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L166) | What this platform can and cannot answer. |
-| `support` <sub>pub fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L180) | Report what this platform can do. |
-| `Report` <sub>pub struct</sub> | [221](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L221) | What is loaded right now, and anything odd about how it was found. |
-| `MAGIC` <sub>const</sub> | [238](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L238) | Magic first line of a saved report. |
-| `Report::take` <sub>pub fn</sub> | [242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L242) | Ask the platform what is loaded. |
-| `Report::len` <sub>pub fn</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L258) | How many modules were listed. |
-| `Report::is_empty` <sub>pub fn</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L263) | Whether nothing was listed. |
-| `Report::modules` <sub>pub fn</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L268) | The modules, in a stable order. |
-| `Report::with_taken` <sub>pub fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L274) | Replace the recorded time. |
-| `Report::from_modules` <sub>pub fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L285) | Build a report from a list, for tests and for another front end that has already obtained one. |
-| `Report::to_text` <sub>pub fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L309) | Serialise to a text format, one record per line. |
-| `Report::parse` <sub>pub fn</sub> | [330](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L330) | Parse the text format. |
-| `Report::save` <sub>pub fn</sub> | [392](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L392) | Write the report to path. |
-| `Report::load` <sub>pub fn</sub> | [403](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L403) | Read a report written by Report::save. |
-| `compare` <sub>pub fn</sub> | [412](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L412) | Compare two reports of the same machine. |
-| `now_seconds` <sub>fn</sub> | [433](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L433) |  |
-| `read_platform` <sub>fn</sub> | [445](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L445) | Ask whichever reader this platform has. |
-| `Error` <sub>pub enum</sub> | [467](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L467) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [475](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L475) |  |
-| `Error::fmt` <sub>fn</sub> | [481](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L481) |  |
-| `Error::source` <sub>fn</sub> | [490](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L490) |  |
+| `VERSION` <sub>pub const</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L77) | Crate version string, surfaced in the About panel. |
+| `SCOPE` <sub>pub const</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L83) | What this is worth, in the words a front end should show. |
+| `Module` <sub>pub struct</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L98) | One loaded driver or kernel module. |
+| `Module::new` <sub>pub fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L121) | A module, with both strings made safe for the record. |
+| `collapse_whitespace` <sub>fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L130) | Every run of whitespace becomes one space, and the ends are trimmed. |
+| `Change` <sub>pub enum</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L136) | How a module differs from the record. |
+| `Change::name` <sub>pub fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L152) | The module's name, whichever side it came from. |
+| `Change::describe` <sub>pub fn</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L160) | One line for a terminal or a log. |
+| `Support` <sub>pub struct</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L178) | What this platform can and cannot answer. |
+| `support` <sub>pub fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L192) | Report what this platform can do. |
+| `Report` <sub>pub struct</sub> | [233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L233) | What is loaded right now, and anything odd about how it was found. |
+| `MAGIC` <sub>const</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L250) | Magic first line of a saved report. |
+| `Report::take` <sub>pub fn</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L254) | Ask the platform what is loaded. |
+| `Report::len` <sub>pub fn</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L270) | How many modules were listed. |
+| `Report::is_empty` <sub>pub fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L275) | Whether nothing was listed. |
+| `Report::modules` <sub>pub fn</sub> | [280](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L280) | The modules, in a stable order. |
+| `Report::with_taken` <sub>pub fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L286) | Replace the recorded time. |
+| `Report::from_modules` <sub>pub fn</sub> | [297](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L297) | Build a report from a list, for tests and for another front end that has already obtained one. |
+| `Report::to_text` <sub>pub fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L321) | Serialise to a text format, one record per line. |
+| `Report::parse` <sub>pub fn</sub> | [342](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L342) | Parse the text format. |
+| `Report::save` <sub>pub fn</sub> | [404](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L404) | Write the report to path. |
+| `Report::load` <sub>pub fn</sub> | [415](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L415) | Read a report written by Report::save. |
+| `compare` <sub>pub fn</sub> | [424](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L424) | Compare two reports of the same machine. |
+| `now_seconds` <sub>fn</sub> | [445](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L445) |  |
+| `read_platform` <sub>fn</sub> | [457](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L457) | Ask whichever reader this platform has. |
+| `Error` <sub>pub enum</sub> | [479](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L479) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [487](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L487) |  |
+| `Error::fmt` <sub>fn</sub> | [493](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L493) |  |
+| `Error::source` <sub>fn</sub> | [502](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L502) |  |

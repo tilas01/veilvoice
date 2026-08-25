@@ -42,6 +42,18 @@
 //! [`reduced_motion`] resolves the platform's own setting alongside the user's
 //! explicit choice, and the whole interface reads that answer rather than each
 //! widget deciding for itself.
+//!
+//! # In plain words
+//!
+//! This is the window.
+//!
+//! Tabs down the top for the things the program does: disguise a file, scramble a
+//! microphone as you talk, handle a recording with several people, watch for
+//! anything using your microphone, put the app behind a password, check a
+//! download, and change how it looks.
+//!
+//! Nine colour schemes, and your own if you write one. It does the slow work on
+//! another thread, so the window keeps answering while it is busy.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

@@ -3,16 +3,17 @@
 
 # `crates/veilvoice-sentry/src/lib.rs`
 
-[[veilvoice-sentry|Crate-veilvoice-sentry]] &middot; 236 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs)
+[[veilvoice-sentry|Crate-veilvoice-sentry]] &middot; 247 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs)
 
 ## Contents
 
-- [The word this crate does not use](#the-word-this-crate-does-not-use)
-- [The two signals, and what each is worth](#the-two-signals-and-what-each-is-worth)
-- [What it cannot tell you: who](#what-it-cannot-tell-you-who)
-- [Entropy is a hint and never evidence](#entropy-is-a-hint-and-never-evidence)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [The word this crate does not use](#the-word-this-crate-does-not-use)
+  - [The two signals, and what each is worth](#the-two-signals-and-what-each-is-worth)
+  - [What it cannot tell you: who](#what-it-cannot-tell-you-who)
+  - [Entropy is a hint and never evidence](#entropy-is-a-hint-and-never-evidence)
+- [In plain words](#in-plain-words)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 An early warning that something is going through your files: decoy files
 that should never change, and a measure of how fast a directory tree is
@@ -74,17 +75,28 @@ sits near 8.0. So does a JPEG, a `.zip`, a video, and this project's own
 contents this crate *planted* and therefore knows should have been prose.
 It is used for exactly that and nothing else.
 
+# In plain words
+
+This watches for the pattern ransomware makes.
+
+It leaves a few files lying around that nothing has any reason to touch, and it
+counts how fast files in a folder are being rewritten. Something quietly
+encrypting your documents trips both.
+
+It is a warning, not a defence. It notices; it does not stop anything, and it
+can be fooled by anything patient enough to go slowly.
+
 ## What this file contains
 
-236 lines defining **4 functions** (1 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+247 lines defining **4 functions** (1 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 116) -- Everything that can go wrong in this crate.
+- `enum Error` (line 127) -- Everything that can go wrong in this crate.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `entropy` (line 93) -- Shannon entropy of bytes, in bits per byte, from 0.0 to 8.0.
+- `entropy` (line 104) -- Shannon entropy of bytes, in bits per byte, from 0.0 to 8.0.
 
 ## What calls what
 
@@ -100,14 +112,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_entropy(["entropy<br/>line 93"])
-    n_from["Error::from<br/>line 124"]
-    n_fmt["Error::fmt<br/>line 130"]
-    n_source["Error::source<br/>line 139"]
-    click n_entropy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L93" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L124" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L130" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L139" "open the source"
+    n_entropy(["entropy<br/>line 104"])
+    n_from["Error::from<br/>line 135"]
+    n_fmt["Error::fmt<br/>line 141"]
+    n_source["Error::source<br/>line 150"]
+    click n_entropy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L104" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L135" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L141" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L150" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_entropy entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -120,10 +132,10 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L70) | Crate version string, surfaced in the About panel. |
-| `SCOPE` <sub>pub const</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L76) | What this crate is worth, in the words a front end should show. |
-| `entropy` <sub>pub fn</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L93) | Shannon entropy of bytes, in bits per byte, from 0.0 to 8.0. |
-| `Error` <sub>pub enum</sub> | [116](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L116) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L124) |  |
-| `Error::fmt` <sub>fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L130) |  |
-| `Error::source` <sub>fn</sub> | [139](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L139) |  |
+| `VERSION` <sub>pub const</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L81) | Crate version string, surfaced in the About panel. |
+| `SCOPE` <sub>pub const</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L87) | What this crate is worth, in the words a front end should show. |
+| `entropy` <sub>pub fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L104) | Shannon entropy of bytes, in bits per byte, from 0.0 to 8.0. |
+| `Error` <sub>pub enum</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L127) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L135) |  |
+| `Error::fmt` <sub>fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L141) |  |
+| `Error::source` <sub>fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs#L150) |  |

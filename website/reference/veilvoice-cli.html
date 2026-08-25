@@ -47,6 +47,7 @@
   <a href="#two-behaviours-that-surprise-people-on-purpose">Two behaviours that surprise people, on purpose</a>
   <a href="#passphrase-prompts-cannot-be-piped">Passphrase prompts cannot be piped</a>
   <a href="#a-clap-ordering-rule-worth-knowing">A clap ordering rule worth knowing</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -71,6 +72,10 @@
 <p><code>rpassword</code> needs a real console; piping a passphrase in blocks on <code>CONIN$</code> rather than reading it. That is a property of terminal input, not a bug here, and it means anything that prompts cannot be smoke-tested from a non-interactive shell. The layer <em>beneath</em> each prompt is therefore tested instead -- see <code>crate::atrest</code> and <code>crate::lock</code>, where the logic lives precisely so it can be reached without a terminal.</p>
 <h2 id="a-clap-ordering-rule-worth-knowing">A clap ordering rule worth knowing</h2>
 <p>An argument declared beside <code>#[command(subcommand)]</code> must precede the subcommand on the command line unless it is marked <code>global = true</code>. So <code>veilvoice lock --path X status</code> parses and <code>veilvoice lock status --path X</code> does not, except that <code>--path</code> is now global specifically so both do.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is VeilVoice without a window.</p>
+<p>Everything the program does, typed instead of clicked: disguise a recording, scramble a microphone while you talk, seal a file, strip a photograph&#x27;s hidden labels, handle a recording with several people in it.</p>
+<p>It is the same code underneath, so it works the same way -- over a remote connection, on a machine with no desktop, or from a script that runs it a thousand times.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -98,7 +103,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="72.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main.rs</text>
-<text x="72.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1958 lines</text>
+<text x="72.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1970 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" target="_blank" rel="noopener noreferrer">
 <rect x="150.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -151,7 +156,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_main([&quot;main.rs&lt;br/&gt;1958 lines&quot;])
+    n_main([&quot;main.rs&lt;br/&gt;1970 lines&quot;])
     n_atrest[&quot;atrest.rs&lt;br/&gt;275 lines&quot;]
     n_capture[&quot;capture.rs&lt;br/&gt;240 lines&quot;]
     n_conversation[&quot;conversation.rs&lt;br/&gt;742 lines&quot;]
@@ -198,7 +203,7 @@ flowchart TD
 <tr><td><a href="veilvoice-cli/conversation.html"><code>conversation.rs</code></a></td><td>742</td><td>veilvoice conversation -- several speakers, a voice each, and subtitles.</td></tr>
 <tr><td><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a></td><td>338</td><td>veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</td></tr>
 <tr><td><a href="veilvoice-cli/lock.html"><code>lock.rs</code></a></td><td>239</td><td>veilvoice lock &#8212; manage the application lock from the command line.</td></tr>
-<tr><td><a href="veilvoice-cli/main.html"><code>main.rs</code></a></td><td>1958</td><td>veilvoice &#8212; the command-line interface.</td></tr>
+<tr><td><a href="veilvoice-cli/main.html"><code>main.rs</code></a></td><td>1970</td><td>veilvoice &#8212; the command-line interface.</td></tr>
 <tr><td><a href="veilvoice-cli/meter.html"><code>meter.rs</code></a></td><td>250</td><td>Level meters for veilvoice live, on a scale that means something.</td></tr>
 <tr><td><a href="veilvoice-cli/policy.html"><code>policy.rs</code></a></td><td>236</td><td>veilvoice policy -- settings that can only be tightened.</td></tr>
 <tr><td><a href="veilvoice-cli/sentry.html"><code>sentry.rs</code></a></td><td>376</td><td>veilvoice sentry -- canaries, baselines, and what changed since.</td></tr>

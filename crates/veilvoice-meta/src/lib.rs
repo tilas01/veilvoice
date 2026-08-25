@@ -32,6 +32,16 @@
 //! still carries its room acoustics and background noise. Nor does it touch
 //! filesystem timestamps or the filename, both of which are outside the file —
 //! callers that care must handle those separately.
+//!
+//! # In plain words
+//!
+//! This strips the hidden labels off a file.
+//!
+//! Photographs and recordings carry information you never typed: where the picture
+//! was taken, which phone or microphone made it, what the file was called before,
+//! sometimes a name. Removing the sound of a voice and leaving that behind would
+//! be pointless, so this takes it out -- not by blanking the fields, but by
+//! removing the parts of the file that hold them.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

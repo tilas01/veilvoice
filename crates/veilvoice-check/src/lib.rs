@@ -38,6 +38,20 @@
 //! Nothing in this crate opens a socket or runs a program. It is given bytes
 //! and it reports on them. Downloading is the caller's problem, and the two
 //! callers that do it shell out to the system's own transfer tool.
+//!
+//! # In plain words
+//!
+//! This is the checking behind "is this download the real one".
+//!
+//! You give it the file you downloaded, the published list of fingerprints, and
+//! the signature over that list. It checks the signature first -- because a list
+//! nobody signed proves nothing -- and only then compares your file against it.
+//!
+//! A pass means the file is the one the person holding that key published. It does
+//! not mean the file is safe, and it does not mean the program in it matches the
+//! source code you can read. That last one is the check worth the most, and it is
+//! the one this cannot do for you: it needs somebody other than the author to have
+//! built the same thing and got the same answer.
 
 use std::fmt::Write as _;
 use std::path::Path;

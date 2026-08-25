@@ -47,6 +47,22 @@
 //! // Live processing cost, e.g. for a latency read-out:
 //! let _ms = deid.stats().last_block_ms();
 //! ```
+//!
+//! # In plain words
+//!
+//! This is the part that actually changes the voice.
+//!
+//! A recording goes in and a recording comes out. The words are the same and you
+//! can still understand every one of them; the voice is not yours any more, and
+//! there is no setting, no key and no clever program that turns it back. What made
+//! it recognisably *you* -- the pitch, the shape of your mouth and throat, the
+//! timing, the music of your accent -- is not hidden. It is thrown away, and
+//! everybody who goes through it comes out sounding like the same handful of
+//! people.
+//!
+//! What it does not do is keep your words secret. It is not meant to: a voice
+//! nobody can understand would be no use to anyone. If what you said would
+//! identify you, this has not touched that.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

@@ -47,6 +47,7 @@
   <a href="#the-cross-view-check-and-what-it-is-actually-worth">The cross-view check, and what it is actually worth</a>
   <a href="#a-new-driver-is-not-by-itself-a-finding">A new driver is not by itself a finding</a>
   <a href="#where-the-answer-comes-from">Where the answer comes from</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -64,6 +65,10 @@
 <h3 id="where-the-answer-comes-from">Where the answer comes from</h3>
 <p>| Platform | Source | Needs privilege | |---|---|---| | Linux | <code>/proc/modules</code>, cross-checked against <code>/sys/module</code> | no | | Windows | <code>driverquery.exe /FO CSV /NH</code> | no | | macOS | <code>kmutil showloaded</code>, falling back to <code>kextstat</code> | no | | others | nothing is read, and <code>support</code> says so | &#8212; |</p>
 <p>Linux reads two files and spawns nothing. The other two shell out to a tool the system already ships, for the same reason the rest of this workspace does: <code>#![forbid(unsafe_code)]</code> holds here too, and the native APIs are FFI.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This lists what is loaded deep inside the operating system, and tells you when that list changes.</p>
+<p>Drivers run below almost everything else, so something that gets in there can see a great deal. Knowing a new one has appeared is worth something.</p>
+<p>It asks the system twice, in two different ways, and says so when the two answers disagree -- which is a hint, not a detection. Anything already down there can lie to both.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -75,7 +80,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">736 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">748 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -98,7 +103,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;736 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;748 lines&quot;])
     n_linux[&quot;linux.rs&lt;br/&gt;230 lines&quot;]
     n_macos[&quot;macos.rs&lt;br/&gt;206 lines&quot;]
     n_windows[&quot;windows.rs&lt;br/&gt;232 lines&quot;]
@@ -112,7 +117,7 @@ flowchart TD
 <section id="s-files">
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
-<tr><td><a href="veilvoice-drivers/lib.html"><code>lib.rs</code></a></td><td>736</td><td>What is loaded into the kernel, recorded, and compared later.</td></tr>
+<tr><td><a href="veilvoice-drivers/lib.html"><code>lib.rs</code></a></td><td>748</td><td>What is loaded into the kernel, recorded, and compared later.</td></tr>
 <tr><td><a href="veilvoice-drivers/linux.html"><code>linux.rs</code></a></td><td>230</td><td>Linux: /proc/modules, cross-checked against /sys/module.</td></tr>
 <tr><td><a href="veilvoice-drivers/macos.html"><code>macos.rs</code></a></td><td>206</td><td>macOS: kmutil showloaded, falling back to kextstat.</td></tr>
 <tr><td><a href="veilvoice-drivers/windows.html"><code>windows.rs</code></a></td><td>232</td><td>Windows: driverquery.exe, which the system already ships.</td></tr>

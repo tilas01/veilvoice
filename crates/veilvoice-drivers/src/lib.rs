@@ -51,6 +51,18 @@
 //! Linux reads two files and spawns nothing. The other two shell out to a tool
 //! the system already ships, for the same reason the rest of this workspace
 //! does: `#![forbid(unsafe_code)]` holds here too, and the native APIs are FFI.
+//!
+//! # In plain words
+//!
+//! This lists what is loaded deep inside the operating system, and tells you when
+//! that list changes.
+//!
+//! Drivers run below almost everything else, so something that gets in there can
+//! see a great deal. Knowing a new one has appeared is worth something.
+//!
+//! It asks the system twice, in two different ways, and says so when the two
+//! answers disagree -- which is a hint, not a detection. Anything already down
+//! there can lie to both.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

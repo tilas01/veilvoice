@@ -9,11 +9,12 @@
 
 ## Contents
 
-- [What this produces, and what needs something else](#what-this-produces-and-what-needs-something-else)
-- [The page needs a little JavaScript, and says so](#the-page-needs-a-little-javascript-and-says-so)
-- [A picture is not veiled](#a-picture-is-not-veiled)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
+  - [What this produces, and what needs something else](#what-this-produces-and-what-needs-something-else)
+  - [The page needs a little JavaScript, and says so](#the-page-needs-a-little-javascript-and-says-so)
+  - [A picture is not veiled](#a-picture-is-not-veiled)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
 
 A watchable version of a veiled conversation: the waveform, a circle per
 speaker, the title, the subtitles, and a background.
@@ -52,6 +53,18 @@ here anonymises an image: a photograph of somebody's face beside their
 veiled voice identifies them completely. The default is a plain filled
 circle for that reason, and `SCOPE` says it where a user will read it.
 
+# In plain words
+
+This draws the picture.
+
+A waveform, a circle for each person in their own colour with their name under
+it, a title, and a page that plays all of it together in a browser and needs
+nothing installed.
+
+It does not make a video file. That needs an encoder, and this project ships
+none -- so it prints the command that would do it with `ffmpeg`, if you have
+`ffmpeg`, and leaves running it to you.
+
 ## How the crate fits together
 
 <p align="center">
@@ -64,7 +77,7 @@ circle for that reason, and `SCOPE` says it where a user will read it.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>128 lines"])
+    n_lib(["lib.rs<br/>140 lines"])
     n_ffmpeg["ffmpeg.rs<br/>278 lines"]
     n_page["page.rs<br/>977 lines"]
     n_palette["palette.rs<br/>735 lines"]
@@ -85,7 +98,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 278 | The video file, which needs a codec this project does not ship. |
-| [[`lib.rs`|File-veilvoice-video-lib]] | 128 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
+| [[`lib.rs`|File-veilvoice-video-lib]] | 140 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
 | [[`page.rs`|File-veilvoice-video-page]] | 977 | The picture: one still for a preview, and one page that plays. |
 | [[`palette.rs`|File-veilvoice-video-palette]] | 735 | Colours: the site's own tokens, and one per speaker. |
 | [[`waveform.rs`|File-veilvoice-video-waveform]] | 245 | The shape of the audio, reduced to something a page can draw. |

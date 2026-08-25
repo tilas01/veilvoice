@@ -11,15 +11,16 @@
 
 # `crates/veilvoice-audio/src/lib.rs`
 
-[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 209 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs)
+[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 222 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs)
 
 ## Contents
 
-- [The live feature](#the-live-feature)
-- [Routing, and why a virtual cable matters](#routing-and-why-a-virtual-cable-matters)
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [The live feature](#the-live-feature)
+  - [Routing, and why a virtual cable matters](#routing-and-why-a-virtual-cable-matters)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Everything between the sound hardware and
 [`veilvoice_core`](../../../crates/veilvoice-core/README.md): device enumeration, file
@@ -48,17 +49,30 @@ appear as an ordinary microphone to any call, stream or recorder on the
 machine, with no per-application setup. `devices::find_virtual_cable`
 detects an installed one so the UI can offer it directly.
 
+# In plain words
+
+This is the plumbing between your microphone, your speakers and the part that
+changes the voice.
+
+It finds the sound devices you have, opens the recording you point at whatever
+kind of file it is, and writes the result back out. For live use it does the
+whole loop while you talk -- in from the microphone, through the engine, out to
+whatever else is listening -- fast enough that a conversation still works.
+
+It also reports how loud things are, which is what the level bars in the
+program are drawing.
+
 ## What this file contains
 
-209 lines defining **5 functions** (1 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+222 lines defining **5 functions** (1 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 56) -- Everything that can go wrong in this crate.
+- `enum Error` (line 69) -- Everything that can go wrong in this crate.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `deidentify` (line 115) -- De-identify a whole buffer of audio in one call.
+- `deidentify` (line 128) -- De-identify a whole buffer of audio in one call.
 
 ## What calls what
 
@@ -80,16 +94,16 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Error::from<br/>line 74"]
-    n_from["Error::from<br/>line 80"]
-    n_fmt["Error::fmt<br/>line 86"]
-    n_source["Error::source<br/>line 101"]
-    n_deidentify(["deidentify<br/>line 115"])
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L74" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L80" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L86" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L101" "open the source"
-    click n_deidentify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L115" "open the source"
+    n_from["Error::from<br/>line 87"]
+    n_from["Error::from<br/>line 93"]
+    n_fmt["Error::fmt<br/>line 99"]
+    n_source["Error::source<br/>line 114"]
+    n_deidentify(["deidentify<br/>line 128"])
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L87" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L93" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L99" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L114" "open the source"
+    click n_deidentify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L128" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_deidentify entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -102,13 +116,13 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L51) | Crate version string, surfaced in the About panel. |
-| `Error` <sub>pub enum</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L56) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L74) |  |
-| `Error::from` <sub>fn</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L80) |  |
-| `Error::fmt` <sub>fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L86) |  |
-| `Error::source` <sub>fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L101) |  |
-| `deidentify` <sub>pub fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L115) | De-identify a whole buffer of audio in one call. |
+| `VERSION` <sub>pub const</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L64) | Crate version string, surfaced in the About panel. |
+| `Error` <sub>pub enum</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L69) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L87) |  |
+| `Error::from` <sub>fn</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L93) |  |
+| `Error::fmt` <sub>fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L99) |  |
+| `Error::source` <sub>fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L114) |  |
+| `deidentify` <sub>pub fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L128) | De-identify a whole buffer of audio in one call. |
 
 ---
 

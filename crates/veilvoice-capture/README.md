@@ -15,14 +15,15 @@
 
 ## Contents
 
-- [VeilVoice does not hide itself from your recorder](#veilvoice-does-not-hide-itself-from-your-recorder)
-- [Telling you, and then not telling you again](#telling-you-and-then-not-telling-you-again)
-- [Running is not recording, and this crate never confuses them](#running-is-not-recording-and-this-crate-never-confuses-them)
-- [And it only knows the programs it knows](#and-it-only-knows-the-programs-it-knows)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
-- [Public items](#public-items)
-- [Reading it elsewhere](#reading-it-elsewhere)
+  - [VeilVoice does not hide itself from your recorder](#veilvoice-does-not-hide-itself-from-your-recorder)
+  - [Telling you, and then not telling you again](#telling-you-and-then-not-telling-you-again)
+  - [Running is not recording, and this crate never confuses them](#running-is-not-recording-and-this-crate-never-confuses-them)
+  - [And it only knows the programs it knows](#and-it-only-knows-the-programs-it-knows)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
+  - [Public items](#public-items)
+  - [Reading it elsewhere](#reading-it-elsewhere)
 
 Which screen-recording programs are running, an allowlist for the ones you
 meant to run, and a plain account of the two things this cannot do.
@@ -77,6 +78,17 @@ and something written to record a screen quietly would not be called
 `obs64.exe`. An empty report is not evidence that nothing is recording, and
 `SCOPE` says so.
 
+# In plain words
+
+This tells you which screen-recording programs are running.
+
+If you are about to say something private and a recorder is going, that is
+worth knowing first. Programs you run on purpose can be marked as expected, and
+they stay in the list rather than disappearing from it.
+
+It cannot hide VeilVoice's window from a recorder, and it does not pretend to.
+A camera pointed at the screen would not care anyway.
+
 ## How the crate fits together
 
 Every arrow below is a `crate::` or `super::` path one module actually
@@ -94,7 +106,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>557 lines"])
+    n_lib(["lib.rs<br/>568 lines"])
     n_processes["processes.rs<br/>255 lines"]
     n_programs["programs.rs<br/>342 lines"]
     n_processes --> n_programs
@@ -109,7 +121,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | 557 | Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do. |
+| [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | 568 | Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do. |
 | [`processes.rs`](../../docs/files/veilvoice-capture/processes.md) | 255 | Listing the processes that are running, per platform. |
 | [`programs.rs`](../../docs/files/veilvoice-capture/programs.md) | 342 | The programs this build knows can capture a screen. |
 

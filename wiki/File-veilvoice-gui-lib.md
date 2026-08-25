@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 67 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 79 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
 - [The modules](#the-modules)
 - [Two rules this crate keeps](#two-rules-this-crate-keeps)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -54,6 +55,18 @@ does not protect anybody.
 explicit choice, and the whole interface reads that answer rather than each
 widget deciding for itself.
 
+# In plain words
+
+This is the window.
+
+Tabs down the top for the things the program does: disguise a file, scramble a
+microphone as you talk, handle a recording with several people, watch for
+anything using your microphone, put the app behind a password, check a
+download, and change how it looks.
+
+Nine colour schemes, and your own if you write one. It does the slow work on
+another thread, so the window keeps answering while it is busy.
+
 ## What calls what
 
 This file defines no functions of its own.
@@ -62,4 +75,4 @@ This file defines no functions of its own.
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L67) | Crate version string, surfaced in the About panel. |
+| `VERSION` <sub>pub const</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L79) | Crate version string, surfaced in the About panel. |

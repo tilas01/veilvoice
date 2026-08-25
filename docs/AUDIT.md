@@ -40,7 +40,7 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Four defects found and fixed (F-61 to F-64.)** **None had shipped**: every
+**Five defects found and fixed (F-61 to F-65.)** **None had shipped**: every
 one was in code written during this cycle, and `main` has not been released
 since v0.1.12.
 
@@ -103,6 +103,24 @@ the shrink happens on the anonymous table box inside the block, not on the
 block.
 
 The trade is still worth making. The comment now says what it costs.
+
+### F-65 -- two crates were invisible to the documentation generator
+
+`tools/docs/generate.py`. `veilvoice-check` and `veilvoice-update` were added to
+the workspace this cycle and to neither `CRATES` nor `ALL_CRATES`, so they had
+no page, no banner, no diagram -- and no entry under "not yet covered" either.
+
+That last part is what makes it a defect rather than a gap. `ALL_CRATES` exists
+precisely so this tool can say what it is *not* covering rather than quietly
+covering less than the tree contains; the audit's own section 4.5 describes a
+silent partial pass as the failure mode to avoid. A crate in neither list is
+**invisible rather than uncovered**, which is the one outcome those lists were
+written to prevent, and it was reached by the ordinary act of adding a crate.
+
+The lists are still written out -- a generator that discovers its own inputs
+cannot tell you it is missing one -- but they are now checked against the
+workspace manifest, in both directions, and a mismatch stops the run with the
+names in it. Both crates are documented.
 
 ### F-64 -- a nameless line in a `SHA256SUMS` could answer a lookup
 
@@ -1630,11 +1648,11 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Sixty-four defects found and fixed across seven audit rounds (F-1 to F-64):**
+**Sixty-five defects found and fixed across seven audit rounds (F-1 to F-65):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
-twelve in the fifth, one in the sixth, four in the seventh.
+twelve in the fifth, one in the sixth, five in the seventh.
 
-**None of the seventh round's four had shipped**, which is the first round that
+**None of the seventh round's five had shipped**, which is the first round that
 can say so, and it is worth being careful about why: `main` has not been
 released since v0.1.12, so "had not shipped" and "was written this cycle" are
 the same sentence. It is not evidence that the code is getting better. The
