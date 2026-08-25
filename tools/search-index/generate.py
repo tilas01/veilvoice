@@ -576,13 +576,24 @@ def render_static(index):
         'background:var(--bg-inset);margin:8px 0;padding:6px 12px}')
     add('summary{cursor:pointer;padding:4px 0}')
     add('summary code{color:var(--fg)}')
+    add('code,summary{overflow-wrap:anywhere}')
     add('.meta{color:var(--muted);font-size:12px}')
     add('ul{margin:6px 0 10px;padding-left:20px}')
     add('ul.toc{columns:2;column-gap:24px}')
     add('ul.toc li{break-inside:avoid}')
     add('li{margin:4px 0}')
-    add('.sec{color:var(--accent-2)}')
-    add('.x{color:var(--muted)}')
+    # Same reason as `.x` below: a section name here is a Rust test
+    # function, and `an_incomplete_directory_is_reported_and_not_completed`
+    # is 523 px of one word.
+    add('.sec{color:var(--accent-2);overflow-wrap:anywhere}')
+    # An excerpt is a line of source, and a line of source contains raw
+    # URLs and regular expressions -- one is 1270 px of unbreakable
+    # characters. Without `anywhere` the static index scrolled sideways by
+    # 555 px on a tablet and by more on a phone, measured with
+    # `tools/render/probe.py overflow --page nojs/search.html`. `anywhere`
+    # rather than `break-word` because this also has to shrink the box's
+    # intrinsic width, not merely break the line inside it.
+    add('.x{color:var(--muted);overflow-wrap:anywhere}')
     add('nav.top{margin-bottom:14px}')
     add('nav.top a{margin-right:14px}')
     add('.js-toggle{display:inline-flex;align-items:center;gap:7px;border:0;'
