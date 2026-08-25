@@ -40,6 +40,86 @@ longer offered as the explanation for anything.
 
 ## This round
 
+**Four defects found and fixed (F-61 to F-64.)** **None had shipped**: every
+one was in code written during this cycle, and `main` has not been released
+since v0.1.12.
+
+This round covers what has been added since then: a manual update check, a
+shared release-checking library and the desktop verify tab that made it
+necessary, group mode in the window, a GIF encoder, video palettes, two
+generators for pictures of the application and the command line, and the
+website's own source documented for the first time.
+
+**The most useful finding is the least dramatic.** F-61 was a comment that
+described the code correctly *if* you read only the comment: it said a dropped
+file was read "before anything is drawn", and the call sat at the bottom of
+`update`, after the panel that shows the result. A wrong thing that agrees with
+itself survives a reading, and this one had survived several. It was found by
+looking for the repaint that F-62 turned out to be missing.
+
+**Three of the four are the same shape**: a claim that was true when written,
+or true of a simpler version, and never re-measured. F-63 is a stylesheet
+comment claiming a change was invisible on a desktop when it moves a table by
+forty pixels; F-61 is a comment describing a call that had moved. The
+project's rule about never overstating what the software does turns out to
+apply to comments about layout exactly as it does to claims about cryptography.
+
+**What was checked and found sound.** The GIF encoder's dictionary-reset path
+had never been exercised by an independent decoder -- the banner's own frames
+may not reach 4096 codes. A 512x512 field of pseudo-random indices was built to
+force it, reset the dictionary 66 times, and was decoded by Windows' GDI+ with
+**zero mismatched pixels in 262,144**. The colour table refuses a 257th colour
+rather than truncating, the sub-block framing is exact at 255 and 256 bytes,
+and none of the encoder's paths falls over on empty input.
+
+### F-61 -- a dropped file was read a frame after the panel that shows it
+
+`veilvoice-gui/src/app.rs`. `Verify::take_dropped` was called at the end of
+`update`, after `CentralPanel` had already been painted, so a file dropped on
+the window and the highlight under a hovering one were both one frame stale.
+The comment above the call said "read once a frame, before anything is drawn".
+
+Moved to the top of `update`, before any panel. The comment is now true.
+
+### F-62 -- nothing woke the window while a file was hovering over it
+
+`veilvoice-gui/src/app.rs`, `verify.rs`. An idle egui window repaints only when
+something asks it to, and the repaint condition listed every *busy* state and
+no hovering state. Dragging a file over an otherwise idle window therefore lit
+nothing up, and the dropped file did not appear until the mouse moved for some
+other reason -- the one moment in this application where the user is waiting
+for the window to react and the window has decided nothing is happening.
+
+`Verify::wants_repaint` is busy **or** hovering, and the frame loop asks it.
+
+### F-63 -- a stylesheet comment claimed a change nothing could see
+
+`website/css/main.css`. Making tables their own sideways scrollers stopped the
+reference pages scrolling on a phone, and the comment beside it said "nothing
+changes on a desktop". Measured: the security page's tables render at 820 px
+inside an 860 px column, so the row rules stop forty pixels short of the text
+above them. `width: 100%` does not restore it -- tried and measured -- because
+the shrink happens on the anonymous table box inside the block, not on the
+block.
+
+The trade is still worth making. The comment now says what it costs.
+
+### F-64 -- a nameless line in a `SHA256SUMS` could answer a lookup
+
+`veilvoice-check/src/lib.rs`. A malformed line carrying a digest and no name --
+`aaaa   ` -- was parsed as a name of `""`, and `check_file` derived its `wanted`
+name from `Path::file_name`, which is `None` for a directory, a root or `..`
+and was turned into `""` by `unwrap_or_default`. A path with no final component
+could therefore be answered with a digest belonging to nothing, and it would
+look exactly like a successful lookup.
+
+Neither half is reachable from either front end today -- both pass a real file
+-- so this is a hole rather than a live defect. Both halves are closed: an
+empty name never matches, and a path that names no file is refused with a
+reason instead of being turned into an empty string.
+
+## The sixth round
+
 **Twelve defects found and fixed (F-48 to F-59.)** **Two had shipped** -- both
 live on the published site, one of them the appearance of the default theme --
 and ten were caught in code written during this round. Section 2.5 keeps those
@@ -1550,9 +1630,18 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Sixty defects found and fixed across six audit rounds (F-1 to F-60):**
+**Sixty-four defects found and fixed across seven audit rounds (F-1 to F-64):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
-twelve in the fifth, one in the sixth.
+twelve in the fifth, one in the sixth, four in the seventh.
+
+**None of the seventh round's four had shipped**, which is the first round that
+can say so, and it is worth being careful about why: `main` has not been
+released since v0.1.12, so "had not shipped" and "was written this cycle" are
+the same sentence. It is not evidence that the code is getting better. The
+pattern that *is* worth noting is that three of the four were **comments that
+had stopped being true** -- about where a call sits, about what a stylesheet
+costs -- rather than logic that was wrong. A wrong thing that agrees with
+itself survives every reading.
 
 Of this round's twelve, **two had shipped** and ten were caught in code written
 during the round. Keeping those apart matters: a round that counts

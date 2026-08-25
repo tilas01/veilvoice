@@ -199,6 +199,14 @@ pub fn digest_from_sums(sums: &str, wanted: &str) -> Option<String> {
             continue;
         };
         let name = name.trim().trim_start_matches('*');
+        // A line like `aaaa   ` has a digest and no name. Without this it
+        // matches a `wanted` of "" -- which is what a path with no final
+        // component gives -- and the caller is handed a digest for a file that
+        // was never listed. Nothing downstream would notice: it looks exactly
+        // like a successful lookup.
+        if name.is_empty() {
+            continue;
+        }
         if name == wanted {
             return Some(digest.trim().to_string());
         }
@@ -278,10 +286,14 @@ pub fn check_file(file: &Path, sums: &str, signature: &str) -> Result<Checked, E
     let key = key()?;
     verify_detached(&key, signature, sums.as_bytes())?;
 
+    // A path with no final component -- a directory, a root, `..` -- has no
+    // name to look up, and asking for one would be asking the list about
+    // nothing. Refused here rather than turned into an empty string that some
+    // malformed line might happen to match.
     let name = file
         .file_name()
         .map(|n| n.to_string_lossy().into_owned())
-        .unwrap_or_default();
+        .ok_or_else(|| Error::Io(format!("{} does not name a file", file.display())))?;
     let expected = digest_from_sums(sums, &name).ok_or_else(|| Error::NotListed(name.clone()))?;
     let actual = sha256_file(file)?;
 
@@ -360,6 +372,26 @@ cccc  spaced name.zip
             Some("cccc")
         );
         assert_eq!(digest_from_sums(sums, "missing"), None);
+    }
+
+    /// A line with a digest and no name must not answer a lookup for "",
+    /// which is what a path with no final component gives.
+    #[test]
+    fn a_nameless_line_matches_nothing() {
+        let sums = "aaaa   \nbbbb  real.zip\n";
+        assert_eq!(digest_from_sums(sums, ""), None);
+        assert_eq!(digest_from_sums(sums, "real.zip").as_deref(), Some("bbbb"));
+    }
+
+    /// And a path with nothing to look up is refused rather than turned into
+    /// that empty string in the first place.
+    #[test]
+    fn a_path_with_no_file_name_is_refused() {
+        let error = check_file(std::path::Path::new(".."), "aaaa  x\n", "sig")
+            .expect_err("`..` names no file");
+        // Refused before the signature is even parsed would be wrong too; what
+        // matters is that it never reaches a lookup with an empty name.
+        assert!(!matches!(error, Error::NotListed(ref n) if n.is_empty()));
     }
 
     #[test]

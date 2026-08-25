@@ -404,6 +404,19 @@ impl eframe::App for VeilVoiceApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.poll_job();
 
+        // Before anything is drawn, and it has to be: this was at the *bottom*
+        // of `update`, after the panel that shows the result had already been
+        // painted, so a dropped file and the highlight under a hovering one
+        // were both a frame late. The comment there said "before anything is
+        // drawn", which is how a wrong thing survives a reading -- it agreed
+        // with itself.
+        //
+        // Read whatever tab is open. A file dropped on the window is meant for
+        // the verify tab wherever the reader happens to be; telling them
+        // nothing because the wrong tab was open would be the interface
+        // refusing to do the obvious thing.
+        self.verify.take_dropped(ctx);
+
         // The gate comes before everything: while locked, no device list, no
         // file names and no live session are reachable or even drawn.
         if self.security.is_locked() {
@@ -523,17 +536,17 @@ impl eframe::App for VeilVoiceApp {
         self.updates.drain();
         self.group.drain();
         self.verify.drain();
-        // Read once a frame, before anything is drawn. A file dropped on the
-        // window is meant for the verify tab wherever the reader happens to be
-        // -- dropping a download and being told nothing because the wrong tab
-        // was open would be the interface refusing to do the obvious thing.
-        self.verify.take_dropped(ctx);
 
         // The live meters only move if something repaints them, and the
         // monitor has to keep ticking even while the window is idle.
         if self.session.is_some()
             || self.updates.is_busy()
-            || self.verify.is_busy()
+            // Hovering, not only busy. An idle window requests no repaint, so
+            // dragging a file over it lit nothing up and the file did not
+            // appear until the mouse moved for some other reason -- the one
+            // moment in this application where the user is waiting for the
+            // window to react and the window has decided nothing is happening.
+            || self.verify.wants_repaint()
             || self.group.is_busy()
             || self.job.is_some()
             || self.security.is_busy()
