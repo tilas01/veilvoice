@@ -33,6 +33,7 @@ sha2 = "0.10"
 
 [dev-dependencies]
 hex = "0.4"
+tempfile = "3"
 
 # Embeds the application icon and version block into the Windows executable.
 # A *build* dependency only: it is not in the shipped dependency graph, and the

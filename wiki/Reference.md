@@ -160,6 +160,7 @@ Per-user installation and companion-software detection, shared by the command li
 
 Verify a VeilVoice release without GnuPG installed
 
+- [[`discover.rs`|File-veilvoice-verify-discover]] &mdash; Finding a release to check, without being told where it is.
 - [[`fetch.rs`|File-veilvoice-verify-fetch]] &mdash; Download a release, without putting an HTTP client in the dependency graph.
 - [[`main.rs`|File-veilvoice-verify-main]] &mdash; The portable verifier: check a VeilVoice release without GnuPG installed.
 - [[`tests.rs`|File-veilvoice-verify-tests]] &mdash; The verifier's own tests.
