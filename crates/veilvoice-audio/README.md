@@ -66,14 +66,16 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>204 lines"])
+    n_lib(["lib.rs<br/>209 lines"])
     n_devices["devices.rs<br/>228 lines"]
     n_io["io.rs<br/>555 lines"]
     n_live["live.rs<br/>237 lines"]
+    n_meter["meter.rs<br/>154 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" "open the source"
     click n_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" "open the source"
     click n_io href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" "open the source"
     click n_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" "open the source"
+    click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs" "open the source"
 ```
 
 </details>
@@ -84,8 +86,9 @@ flowchart TD
 |---|---:|---|
 | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | 228 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 555 | Reading and writing audio files. |
-| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 204 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
+| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 209 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
 | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 237 | Live microphone scrambling. |
+| [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | 154 | The scale a level meter is drawn on. |
 
 ## Public items
 
@@ -108,6 +111,11 @@ flowchart TD
 | `fn deidentify` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | De-identify a whole buffer of audio in one call. |
 | `struct LiveStats` | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | A snapshot of what the live path is doing, safe to read from the UI. |
 | `struct LiveSession` | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | A running live-scramble session. |
+| `const FLOOR_DB` | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | The quietest level worth drawing. |
+| `const CLIP_DB` | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | At or above this, the level is called clipping. |
+| `fn dbfs` | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | Level in decibels relative to full scale. |
+| `fn position` | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | Where a level sits along a bar: 0.0 at the floor, 1.0 at full scale. |
+| `fn clipping` | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | Whether a reading counts as clipping. |
 
 ## Reading it elsewhere
 

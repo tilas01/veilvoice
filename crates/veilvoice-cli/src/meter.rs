@@ -40,56 +40,17 @@
 //! than sticking, so the bar stays honest about what is happening *now* while
 //! still showing what just happened.
 
+// The scale lives in `veilvoice-audio`, beside the thing that produces the
+// peaks, because the desktop application draws the same readings and the two
+// were drawing them differently -- one linear bar with a decibel number printed
+// next to it, which is a meter arguing with itself. This file owns how it looks
+// in a terminal and nothing else.
 use crate::theme::{colour, paint};
 use std::time::{Duration, Instant};
+use veilvoice_audio::meter::{clipping, dbfs, position, CLIP_DB, FLOOR_DB};
 
 /// How long a peak marker is held before it falls back.
 pub const HOLD: Duration = Duration::from_millis(1500);
-
-/// The quietest level the bar shows. Below this is drawn as silence.
-///
-/// Sixty decibels is the range a person can usefully read off twelve
-/// characters. A meter that went to -90 would spend a third of itself on room
-/// tone.
-pub const FLOOR_DB: f32 = -60.0;
-
-/// At or above this, the level is called clipping.
-///
-/// -0.1 dBFS rather than exactly 0. A sample that reaches 32767 in a 16-bit
-/// file is already at full scale and the next one up does not exist, so
-/// waiting for a mathematically perfect 1.0 means never saying `CLIP` about a
-/// signal that is plainly clipped.
-pub const CLIP_DB: f32 = -0.1;
-
-/// Level in decibels relative to full scale.
-///
-/// Silence is [`FLOOR_DB`] rather than negative infinity: the caller wants a
-/// number to place on a bar, and a meter is not the place to introduce an
-/// infinity into arithmetic that has to keep running.
-///
-/// # The two ways a reading can be nonsense, answered differently
-///
-/// **NaN** is not a level at all — nothing can be inferred from it, and it is
-/// read as silence.
-///
-/// **Positive infinity** is read as **full scale**, not as silence. Both are
-/// wrong readings, and a meter should be wrong in the direction that gets
-/// looked at: a broken meter pinned at the top is noticed in a second, and one
-/// pinned at the bottom looks exactly like a microphone that is not plugged in.
-/// The engine cannot produce either, and it is not the engine this guards
-/// against — it is whatever produces the samples.
-pub fn dbfs(peak: f32) -> f32 {
-    if peak.is_nan() || peak <= 0.0 {
-        return FLOOR_DB;
-    }
-    (20.0 * peak.clamp(0.0, 1.0).log10()).max(FLOOR_DB)
-}
-
-/// Where a level sits along the bar, from 0.0 at the floor to 1.0 at full
-/// scale.
-pub fn position(peak: f32) -> f32 {
-    ((dbfs(peak) - FLOOR_DB) / -FLOOR_DB).clamp(0.0, 1.0)
-}
 
 /// The eighth-block characters, so a bar of `n` characters has `8n` steps.
 ///
@@ -184,7 +145,7 @@ impl Channel {
             self.hold = peak;
             self.since = Instant::now();
         }
-        if dbfs(peak) >= CLIP_DB {
+        if clipping(peak) {
             self.clipped = true;
         }
         render(peak, self.hold, width)
@@ -203,44 +164,6 @@ impl Channel {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn full_scale_is_zero_and_silence_is_the_floor() {
-        assert!((dbfs(1.0) - 0.0).abs() < 0.001);
-        assert_eq!(dbfs(0.0), FLOOR_DB);
-        assert_eq!(dbfs(-1.0), FLOOR_DB, "a negative peak is not a level");
-        assert_eq!(dbfs(f32::NAN), FLOOR_DB, "nothing can be read from NaN");
-        assert_eq!(dbfs(f32::NEG_INFINITY), FLOOR_DB);
-        // Wrong in the direction that gets looked at. See the note on `dbfs`.
-        assert_eq!(dbfs(f32::INFINITY), 0.0, "a broken meter should pin high");
-    }
-
-    /// Halving the amplitude is six decibels, and this is the check that the
-    /// scale is a decibel scale rather than something that merely curves.
-    #[test]
-    fn halving_the_amplitude_is_six_decibels() {
-        let full = dbfs(1.0);
-        let half = dbfs(0.5);
-        assert!((full - half - 6.0206).abs() < 0.01, "{full} to {half}");
-        assert!((dbfs(0.5) - dbfs(0.25) - 6.0206).abs() < 0.01);
-    }
-
-    /// The defect this file exists to fix, stated as a test.
-    ///
-    /// Speech at a sensible recording level peaks near -12 dBFS. On the linear
-    /// meter that filled a quarter of the bar and read as near-silence. On this
-    /// one it sits in the middle, where a person can see it move.
-    #[test]
-    fn ordinary_speech_lands_in_the_middle_of_the_bar() {
-        let speech = 0.251; // -12 dBFS
-        let where_it_sits = position(speech);
-        assert!(
-            (0.7..0.85).contains(&where_it_sits),
-            "-12 dBFS sits at {where_it_sits:.3} of the bar"
-        );
-        // What it used to do, for the record.
-        assert!(speech < 0.3, "the linear meter filled under a third");
-    }
 
     #[test]
     fn the_bar_is_the_width_it_was_asked_for() {
@@ -311,22 +234,6 @@ mod tests {
             channel.has_clipped(),
             "a warning that vanishes was never given"
         );
-    }
-
-    /// -0.1 dBFS counts, because a sample at full scale in a 16-bit file has
-    /// no larger neighbour to reach.
-    ///
-    /// The numbers here were checked rather than assumed, and the first version
-    /// of this test had them wrong: a *linear* 0.99 is -0.087 dBFS, which is
-    /// already inside a tenth of a decibel of full scale. Decibels near the top
-    /// of the scale are much finer than they look in linear terms, which is
-    /// most of the reason a linear meter is a bad meter.
-    #[test]
-    fn the_clip_threshold_is_just_below_full_scale() {
-        assert!(dbfs(0.9) < CLIP_DB, "0.9 is -0.9 dBFS, not clipping");
-        assert!(dbfs(0.98) < CLIP_DB, "0.98 is -0.18 dBFS, not clipping");
-        assert!(dbfs(0.99) >= CLIP_DB, "0.99 is -0.087 dBFS, which is");
-        assert!(dbfs(1.0) >= CLIP_DB);
     }
 
     #[test]

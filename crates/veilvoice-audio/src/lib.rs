@@ -35,6 +35,11 @@ pub mod devices;
 pub mod io;
 #[cfg(feature = "live")]
 pub mod live;
+// Not behind the `live` feature. The scale is arithmetic over a number, and a
+// front end that only processes files still has a level to draw -- and on the
+// BSDs, where `cpal` has no backend and `live` is off, the alternative would be
+// a second copy of it in whichever crate still wanted one.
+pub mod meter;
 
 #[cfg(feature = "live")]
 pub use devices::{DeviceInfo, Direction};
