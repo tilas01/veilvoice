@@ -4852,6 +4852,7 @@ dependencies = [
  "veilvoice-policy",
  "veilvoice-sentry",
  "veilvoice-setup",
+ "veilvoice-video",
  "veilvoice-watch",
  "winresource",
  "zeroize",
