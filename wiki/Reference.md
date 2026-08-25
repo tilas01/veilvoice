@@ -39,6 +39,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
+- [[`meter.rs`|File-veilvoice-cli-meter]] &mdash; Level meters for veilvoice live, on a scale that means something.
 - [[`policy.rs`|File-veilvoice-cli-policy]] &mdash; veilvoice policy -- settings that can only be tightened.
 - [[`sentry.rs`|File-veilvoice-cli-sentry]] &mdash; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &mdash; Tokyo Night colouring for the terminal.
