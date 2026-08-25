@@ -69,7 +69,11 @@ param(
   [string]$Exe = "",
   [string]$Out = "",
   [int]$Width = 1400,
-  [int]$Height = 1000
+  # Tall enough that the longest tab -- group, with the render controls under
+  # the speaker list -- fits without scrolling. A picture of half a panel is a
+  # picture of half a feature. 1320 leaves room under a 1440-tall screen for
+  # the window not to be clipped by the taskbar.
+  [int]$Height = 1320
 )
 
 $ErrorActionPreference = "Stop"
@@ -255,7 +259,7 @@ if ($h -eq [IntPtr]::Zero) {
 # a diff of two runs is about what changed in the interface.
 # SWP_NOMOVE is not set: position is fixed too, because a window half off the
 # screen captures the desktop behind it.
-[void][Shot]::SetWindowPos($h, [IntPtr]::Zero, 80, 80, $Width, $Height, 0x0040)
+[void][Shot]::SetWindowPos($h, [IntPtr]::Zero, 60, 20, $Width, $Height, 0x0040)
 Start-Sleep -Milliseconds 800
 
 $previous = $null

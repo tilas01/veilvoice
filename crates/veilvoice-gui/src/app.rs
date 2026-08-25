@@ -503,11 +503,13 @@ impl eframe::App for VeilVoiceApp {
 
         self.watch.drain();
         self.updates.drain();
+        self.group.drain();
 
         // The live meters only move if something repaints them, and the
         // monitor has to keep ticking even while the window is idle.
         if self.session.is_some()
             || self.updates.is_busy()
+            || self.group.is_busy()
             || self.job.is_some()
             || self.security.is_busy()
             || self.setup.is_busy()

@@ -40,6 +40,8 @@ Pure standard library.
 import argparse
 import io
 import os
+import re
+import struct
 import subprocess
 import sys
 
@@ -268,6 +270,57 @@ def window_captures():
     )
 
 
+
+def png_size(path):
+    """Width and height out of a PNG's header, without a decoder.
+
+    IHDR is always the first chunk and its first eight bytes are the two
+    dimensions, big-endian. Sixteen bytes in, eight bytes long -- which is why
+    this is four lines rather than a dependency.
+    """
+    with open(path, "rb") as handle:
+        head = handle.read(24)
+    if len(head) < 24 or head[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("%s is not a PNG" % path)
+    return struct.unpack(">II", head[16:24])
+
+
+def check_declared_sizes():
+    """The gallery declares each capture's size; verify it is the real one.
+
+    `width` and `height` on an `<img>` are what stop the page reflowing as each
+    picture arrives -- the browser reserves the right box before the bytes come.
+    A declared size that has gone stale is worse than none: the page reserves
+    the wrong box and then jumps anyway, under a reader who is mid-sentence.
+
+    It went stale the first time within an hour of being written, because the
+    capture window was made taller so a longer tab would fit. Hence a check
+    rather than a note asking somebody to remember.
+    """
+    page = os.path.join(ROOT, "website", "index.html")
+    if not os.path.exists(page):
+        return []
+    with io.open(page, encoding="utf-8") as handle:
+        html = handle.read()
+
+    problems = []
+    for name in window_captures():
+        width, height = png_size(os.path.join(OUT, name))
+        found = re.search(
+            r'src="assets/screenshots/%s"[^>]*?width="(\d+)" height="(\d+)"' % re.escape(name),
+            html,
+        )
+        if found is None:
+            # Not every capture has to be in the gallery; one that is not
+            # simply has nothing to check.
+            continue
+        if (int(found.group(1)), int(found.group(2))) != (width, height):
+            problems.append(
+                "website/index.html declares %s as %sx%s and it is %dx%d"
+                % (name, found.group(1), found.group(2), width, height)
+            )
+    return problems
+
 def mirror_captures(check):
     """Copy, or verify, the window captures under `website/`."""
     problems = []
@@ -312,7 +365,7 @@ def main():
         return 1
 
     if args.check:
-        problems = mirror_captures(check=True)
+        problems = mirror_captures(check=True) + check_declared_sizes()
         for rel, text in sorted(files.items()):
             path = os.path.join(ROOT, rel.replace("/", os.sep))
             try:

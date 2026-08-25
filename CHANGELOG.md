@@ -8,6 +8,46 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Group mode can now actually render
+
+The group tab could be configured and could do nothing. It has the rest of it
+now: a recording, a plan, a title, a palette, and a **render** button.
+
+The **plan** is where the turns come from, and the panel says so where it is
+asked rather than after the fact: this panel knows *who* is in the recording,
+and only a plan knows *when* each of them speaks. Audio no turn claims is
+silenced rather than passed through, so a render with no plan would produce a
+silent file, not a veiled one.
+
+The names the panel holds win over the names in the plan file — they are what
+was just typed — and the turns are the plan's and are untouched.
+`Conversation::rename_speakers` is new for that, and it **refuses a count that
+does not match** rather than reconciling one: a plan naming three renamed from
+a list of two would put somebody's audio in another person's voice, and since
+both voices are unfamiliar, nobody would ever hear it. Nothing is changed
+unless every name passes the same validation `add_speaker` applies, so a
+refusal leaves the plan exactly as it was rather than half-renamed.
+
+The **page palette** is the same nine, by the same identifiers, so a page
+rendered here and one rendered by `veilvoice conversation render --theme` are
+the same picture. It is per-run and resets to Tokyo Night, the same shape as
+the mode toggle above it.
+
+The render runs on a thread and the window never waits for it. A worker that
+dies without answering is reported rather than leaving a spinner turning
+forever.
+
+### The gallery's declared image sizes cannot go stale
+
+`width` and `height` on an `<img>` are what stop the page reflowing as each
+picture loads. Those numbers went stale within an hour of being written — the
+capture window was made taller so the group tab would fit — and a *wrong*
+declared size is worse than none: the page reserves the wrong box and then
+jumps anyway, under a reader who is mid-sentence. `tools/shots/terminal.py
+--check` now reads each capture's real dimensions out of its PNG header and
+fails if the page disagrees.
+
+
 ### The live meters now show a level a person can read
 
 `veilvoice live` had meters. They were **linear**, which is arithmetically fine
