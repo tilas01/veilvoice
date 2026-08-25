@@ -109,6 +109,27 @@ subtitles; and an optional video of the result.
 | 53 | The website on mobile, and on every engine — not only the one it was written in | **next** | 1–2 d |
 | 54 | **Seventh audit round** across the whole tree, then the production deploy | **planned** | 5–7 d |
 
+## Building it yourself, and proving the download matches
+
+Asked for after the conversation work. Today `veilvoice-verify` answers one
+question — *is this download the one that was published* — and answers it
+without GnuPG, without a network client of its own, and without ever holding a
+private key. The request is to make the same program answer the harder
+question: **is the published build the one this source produces**, and to have
+it set your machine up so you can find out.
+
+The program is renamed `veilvoice-setup-tools`, because checking a signature is
+then the smallest thing it does.
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 55 | **Build the whole repository from source**, from the tool itself: find or install a toolchain, pin it to `rust-toolchain.toml`, and run the same build the release does | **planned** | 4–6 d |
+| 56 | **Reproducibility check** — build here, hash what came out, and compare it against the published `SHA256SUMS` entry for this platform, saying which files matched and which did not | **planned** | 3–4 d |
+| 57 | **The hashes are trusted only after the signature is** — verify the detached signature over `SHA256SUMS` against the project key *before* any hash from it is compared, and refuse rather than warn if it does not verify | **planned** | 2 d |
+| 58 | **Set the machine up per platform** — the build dependencies each operating system actually needs, detected, named with who ships them, and installed only on an explicit yes | **planned** | 4–5 d |
+| 59 | **Custom install** — CLI, desktop app, or both, from a build you just made or from a download you just verified | **planned** | 2–3 d |
+| 60 | **Four verbosity levels** — nothing, minimal, normal (the default) and everything — applied to every one of the above, with the exit status carrying the answer when the output carries nothing | **planned** | 1–2 d |
+
 ## Finally
 
 | # | Marker | Status | Estimate |
@@ -146,6 +167,42 @@ purpose. **The decision taken is to ship the administrator version** — which i
 most of the protection and none of the pretence — and to say plainly that
 kernel-level enforcement is unavailable on those two platforms and why. Linux
 and OpenBSD have no such gate.
+
+**"Builds for every operating system" will mean "builds for the one it is
+running on".** Markers 55 to 58. A build needs that platform's headers and
+linker: `veilvoice-cli` cannot be compiled for Linux from this machine today
+because `alsa-sys` needs ALSA's headers, and a macOS build needs Apple's SDK,
+which Apple's licence does not allow to be redistributed or run elsewhere.
+Every other crate cross-checks cleanly with `--target`, and that is a *type
+check*, not a binary anyone should install.
+
+So the honest shape is: the tool builds VeilVoice for the machine it is on, and
+compares that against the published build **for that platform**. Three machines
+give you three platforms verified, which is exactly how a reproducible-build
+claim is normally checked, and it is a real answer rather than a pretended one.
+Where a cross-target check *is* possible the tool will offer it and will label
+it as what it is.
+
+**Reproducibility is a property of the release, not of the checker.** Marker 56
+can only report what it finds. If a build here and the published build differ,
+that is a finding to publish, not a bug in the tool to paper over -- and the
+first version will print both hashes and the differing file names rather than a
+verdict, because "not reproducible" has several causes and most of them are
+boring.
+
+**Installing build dependencies means running somebody else's package manager.**
+Marker 58. That is the same trade the companion setup already makes and it gets
+the same rule, which predates this roadmap: detect what is there, say what each
+thing is and who ships it, and install only on an explicit yes -- never
+silently, never ticked by default. What it will not do is add a network client
+to VeilVoice: it shells out to the tool the platform already has, exactly as the
+verifier does for downloads today, so the guarantee that this project's own
+dependency graph contains no HTTP client is unchanged.
+
+**"Nothing" is a real verbosity level and needs the exit status to carry the
+answer.** Marker 60. A tool that prints nothing and returns zero on failure is
+worse than a noisy one. Every operation gets a distinct non-zero status, and
+they are documented, before the quiet mode exists.
 
 **"Every engine" is a claim only one engine has been asked about.** Marker 53.
 The mobile half is done and was done by measurement: twelve pages at five

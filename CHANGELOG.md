@@ -8,6 +8,42 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### `veilvoice conversation` can draw what it made
+
+`veilvoice-video` has existed and been fully tested since the conversation
+work; nothing could reach it. Two commands now can.
+
+```
+veilvoice conversation render plan.txt talk.wav --page
+veilvoice conversation preview plan.txt --audio talk.wav --at 4.5 --ffmpeg
+```
+
+`--page` writes a fourth file beside the audio and the two subtitle tracks: a
+self-contained HTML player with the waveform, a circle per speaker that lights
+when they speak, and the captions. It references the audio and the WebVTT track
+**by name**, not by embedding them, so the four files move together and the
+page does not double the size of a recording already on disk beside it.
+
+The waveform drawn is the waveform of the **veiled** audio. Drawing the input's
+would put a picture of the original signal next to a file whose whole point is
+that the original is gone.
+
+`preview` answers "what will I get" in a second rather than in the length of
+the recording: the layout, the speaker circles, and which destination voice
+each speaker becomes. It needs no recording at all — without one the waveform
+is drawn flat, which is honest about there being nothing measured yet.
+
+`--width`, `--height`, `--padding`, `--background` and `--black` shape the
+picture, and are **refused rather than clamped**: a 200-pixel render of nine
+speakers is a question, and quietly drawing an illegible one answers a
+different one. The flags are read whether or not `--page` was given, so
+`--width 40` fails the same way with and without it.
+
+`--ffmpeg` prints the command that would turn frames into a video file, and
+says whether ffmpeg is on this machine. **It never runs it.** This project
+ships no codec and starts no program you did not ask for.
+
+
 ### The front page now shows what the product actually does
 
 A new section — **what happens to your recording** — between the banner and
