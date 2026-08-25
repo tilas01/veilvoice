@@ -39,13 +39,14 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-drivers/lib.svg" alt="lib.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-drivers/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-drivers.html">veilvoice-drivers</a> &middot; 736 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-drivers.html">veilvoice-drivers</a> &middot; 748 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-limit-stated-first">The limit, stated first</a>
   <a href="#the-cross-view-check-and-what-it-is-actually-worth">The cross-view check, and what it is actually worth</a>
   <a href="#a-new-driver-is-not-by-itself-a-finding">A new driver is not by itself a finding</a>
   <a href="#where-the-answer-comes-from">Where the answer comes from</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -64,45 +65,49 @@
 <h3 id="where-the-answer-comes-from">Where the answer comes from</h3>
 <p>| Platform | Source | Needs privilege | |---|---|---| | Linux | <code>/proc/modules</code>, cross-checked against <code>/sys/module</code> | no | | Windows | <code>driverquery.exe /FO CSV /NH</code> | no | | macOS | <code>kmutil showloaded</code>, falling back to <code>kextstat</code> | no | | others | nothing is read, and <code>support</code> says so | &#8212; |</p>
 <p>Linux reads two files and spawns nothing. The other two shell out to a tool the system already ships, for the same reason the rest of this workspace does: <code>#![forbid(unsafe_code)]</code> holds here too, and the native APIs are FFI.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This lists what is loaded deep inside the operating system, and tells you when that list changes.</p>
+<p>Drivers run below almost everything else, so something that gets in there can see a great deal. Knowing a new one has appeared is worth something.</p>
+<p>It asks the system twice, in two different ways, and says so when the two answers disagree -- which is a hint, not a detection. Anything already down there can lie to both.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>736 lines defining <strong>21 functions</strong> (15 public), <strong>5 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>748 lines defining <strong>21 functions</strong> (15 public), <strong>5 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Module</code> <span style="color:var(--muted)">line 86</span> &mdash; One loaded driver or kernel module.</li>
-<li><code>enum Change</code> <span style="color:var(--muted)">line 124</span> &mdash; How a module differs from the record.</li>
-<li><code>struct Support</code> <span style="color:var(--muted)">line 166</span> &mdash; What this platform can and cannot answer.</li>
-<li><code>struct Report</code> <span style="color:var(--muted)">line 221</span> &mdash; What is loaded right now, and anything odd about how it was found.</li>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 467</span> &mdash; Everything that can go wrong in this crate.</li>
+<li><code>struct Module</code> <span style="color:var(--muted)">line 98</span> &mdash; One loaded driver or kernel module.</li>
+<li><code>enum Change</code> <span style="color:var(--muted)">line 136</span> &mdash; How a module differs from the record.</li>
+<li><code>struct Support</code> <span style="color:var(--muted)">line 178</span> &mdash; What this platform can and cannot answer.</li>
+<li><code>struct Report</code> <span style="color:var(--muted)">line 233</span> &mdash; What is loaded right now, and anything odd about how it was found.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 479</span> &mdash; Everything that can go wrong in this crate.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Change::name</code> <span style="color:var(--muted)">line 140</span> &mdash; The module&#x27;s name, whichever side it came from.
+<li><code>Change::name</code> <span style="color:var(--muted)">line 152</span> &mdash; The module&#x27;s name, whichever side it came from.
 </li>
-<li><code>Change::describe</code> <span style="color:var(--muted)">line 148</span> &mdash; One line for a terminal or a log.
+<li><code>Change::describe</code> <span style="color:var(--muted)">line 160</span> &mdash; One line for a terminal or a log.
 </li>
-<li><code>support</code> <span style="color:var(--muted)">line 180</span> &mdash; Report what this platform can do.
+<li><code>support</code> <span style="color:var(--muted)">line 192</span> &mdash; Report what this platform can do.
 </li>
-<li><code>Report::take</code> <span style="color:var(--muted)">line 242</span> &mdash; Ask the platform what is loaded.
+<li><code>Report::take</code> <span style="color:var(--muted)">line 254</span> &mdash; Ask the platform what is loaded.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>new</code>, <code>now_seconds</code>, <code>read_platform</code>, <code>collapse_whitespace</code></span>
 </li>
-<li><code>Report::len</code> <span style="color:var(--muted)">line 258</span> &mdash; How many modules were listed.
+<li><code>Report::len</code> <span style="color:var(--muted)">line 270</span> &mdash; How many modules were listed.
 </li>
-<li><code>Report::is_empty</code> <span style="color:var(--muted)">line 263</span> &mdash; Whether nothing was listed.
+<li><code>Report::is_empty</code> <span style="color:var(--muted)">line 275</span> &mdash; Whether nothing was listed.
 </li>
-<li><code>Report::modules</code> <span style="color:var(--muted)">line 268</span> &mdash; The modules, in a stable order.
+<li><code>Report::modules</code> <span style="color:var(--muted)">line 280</span> &mdash; The modules, in a stable order.
 </li>
-<li><code>Report::with_taken</code> <span style="color:var(--muted)">line 274</span> &mdash; Replace the recorded time.
+<li><code>Report::with_taken</code> <span style="color:var(--muted)">line 286</span> &mdash; Replace the recorded time.
 </li>
-<li><code>Report::from_modules</code> <span style="color:var(--muted)">line 285</span> &mdash; Build a report from a list, for tests and for another front end that has already obtained one.
+<li><code>Report::from_modules</code> <span style="color:var(--muted)">line 297</span> &mdash; Build a report from a list, for tests and for another front end that has already obtained one.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>new</code>, <code>now_seconds</code>, <code>collapse_whitespace</code></span>
 </li>
-<li><code>Report::save</code> <span style="color:var(--muted)">line 392</span> &mdash; Write the report to path.
+<li><code>Report::save</code> <span style="color:var(--muted)">line 404</span> &mdash; Write the report to path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Report::load</code> <span style="color:var(--muted)">line 403</span> &mdash; Read a report written by Report::save.
+<li><code>Report::load</code> <span style="color:var(--muted)">line 415</span> &mdash; Read a report written by Report::save.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code></span>
 </li>
-<li><code>compare</code> <span style="color:var(--muted)">line 412</span> &mdash; Compare two reports of the same machine.
+<li><code>compare</code> <span style="color:var(--muted)">line 424</span> &mdash; Compare two reports of the same machine.
 </li>
 </ul>
 </section>
@@ -121,110 +126,110 @@
 <path d="M223.6 147.0 C 245.6 147.0, 245.6 47.0, 161.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M164.0 174.0 C 164.0 194.0, 343.4 500.0, 343.4 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M164.0 174.0 C 164.0 194.0, 488.6 500.0, 488.6 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L109" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L121" target="_blank" rel="noopener noreferrer">
 <rect x="47.0" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="102.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Module::new</text>
-<text x="102.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 109</text>
+<text x="102.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 121</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L118" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L130" target="_blank" rel="noopener noreferrer">
 <rect x="89.2" y="520.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="175.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">collapse_whitespace</text>
-<text x="175.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 118</text>
+<text x="175.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L140" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L152" target="_blank" rel="noopener noreferrer">
 <rect x="184.6" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="244.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Change::name</text>
-<text x="244.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
+<text x="244.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 152</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L148" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L160" target="_blank" rel="noopener noreferrer">
 <rect x="329.8" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="404.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Change::describe</text>
-<text x="404.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 148</text>
+<text x="404.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 160</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L180" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L192" target="_blank" rel="noopener noreferrer">
 <rect x="505.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="549.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">support</text>
-<text x="549.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 180</text>
+<text x="549.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L242" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L254" target="_blank" rel="noopener noreferrer">
 <rect x="104.4" y="120.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="164.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::take</text>
-<text x="164.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 242</text>
+<text x="164.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 254</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L258" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L270" target="_blank" rel="noopener noreferrer">
 <rect x="249.6" y="120.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="305.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::len</text>
-<text x="305.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 258</text>
+<text x="305.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L263" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L275" target="_blank" rel="noopener noreferrer">
 <rect x="387.2" y="120.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="462.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::is_empty</text>
-<text x="462.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 263</text>
+<text x="462.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 275</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L268" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L280" target="_blank" rel="noopener noreferrer">
 <rect x="51.2" y="220.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="122.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::modules</text>
-<text x="122.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 268</text>
+<text x="122.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 280</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L274" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L286" target="_blank" rel="noopener noreferrer">
 <rect x="219.2" y="220.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="301.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::with_taken</text>
-<text x="301.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 274</text>
+<text x="301.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 286</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L285" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L297" target="_blank" rel="noopener noreferrer">
 <rect x="410.0" y="220.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="500.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::from_modules</text>
-<text x="500.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 285</text>
+<text x="500.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 297</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L309" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L321" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="320.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="99.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::to_text</text>
-<text x="99.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
+<text x="99.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L330" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L342" target="_blank" rel="noopener noreferrer">
 <rect x="196.0" y="320.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="259.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::parse</text>
-<text x="259.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 330</text>
+<text x="259.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 342</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L392" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L404" target="_blank" rel="noopener noreferrer">
 <rect x="348.8" y="320.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="408.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::save</text>
-<text x="408.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 392</text>
+<text x="408.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 404</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L403" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L415" target="_blank" rel="noopener noreferrer">
 <rect x="494.0" y="320.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="553.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::load</text>
-<text x="553.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 403</text>
+<text x="553.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 415</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L412" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L424" target="_blank" rel="noopener noreferrer">
 <rect x="66.0" y="420.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="110.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">compare</text>
-<text x="110.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 412</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L433" target="_blank" rel="noopener noreferrer">
-<rect x="287.6" y="520.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="343.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">now_seconds</text>
-<text x="343.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 433</text>
+<text x="110.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 424</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L445" target="_blank" rel="noopener noreferrer">
+<rect x="287.6" y="520.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="343.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">now_seconds</text>
+<text x="343.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 445</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L457" target="_blank" rel="noopener noreferrer">
 <rect x="425.2" y="520.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="488.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_platform</text>
-<text x="488.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 445</text>
+<text x="488.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 457</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L475" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L487" target="_blank" rel="noopener noreferrer">
 <rect x="180.8" y="420.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="236.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::from</text>
-<text x="236.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 475</text>
+<text x="236.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 487</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L481" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L493" target="_blank" rel="noopener noreferrer">
 <rect x="318.4" y="420.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="370.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
-<text x="370.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 481</text>
+<text x="370.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 493</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L490" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L502" target="_blank" rel="noopener noreferrer">
 <rect x="448.4" y="420.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="511.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::source</text>
-<text x="511.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 490</text>
+<text x="511.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 502</text>
 </a>
 </svg>
 </div>
@@ -232,27 +237,27 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_new[&quot;Module::new&lt;br/&gt;line 109&quot;]
-    n_collapse_whitespace[&quot;collapse_whitespace&lt;br/&gt;line 118&quot;]
-    n_name([&quot;Change::name&lt;br/&gt;line 140&quot;])
-    n_describe([&quot;Change::describe&lt;br/&gt;line 148&quot;])
-    n_support([&quot;support&lt;br/&gt;line 180&quot;])
-    n_take([&quot;Report::take&lt;br/&gt;line 242&quot;])
-    n_len([&quot;Report::len&lt;br/&gt;line 258&quot;])
-    n_is_empty([&quot;Report::is_empty&lt;br/&gt;line 263&quot;])
-    n_modules([&quot;Report::modules&lt;br/&gt;line 268&quot;])
-    n_with_taken([&quot;Report::with_taken&lt;br/&gt;line 274&quot;])
-    n_from_modules([&quot;Report::from_modules&lt;br/&gt;line 285&quot;])
-    n_to_text[&quot;Report::to_text&lt;br/&gt;line 309&quot;]
-    n_parse[&quot;Report::parse&lt;br/&gt;line 330&quot;]
-    n_save([&quot;Report::save&lt;br/&gt;line 392&quot;])
-    n_load([&quot;Report::load&lt;br/&gt;line 403&quot;])
-    n_compare([&quot;compare&lt;br/&gt;line 412&quot;])
-    n_now_seconds[&quot;now_seconds&lt;br/&gt;line 433&quot;]
-    n_read_platform[&quot;read_platform&lt;br/&gt;line 445&quot;]
-    n_from[&quot;Error::from&lt;br/&gt;line 475&quot;]
-    n_fmt[&quot;Error::fmt&lt;br/&gt;line 481&quot;]
-    n_source[&quot;Error::source&lt;br/&gt;line 490&quot;]
+    n_new[&quot;Module::new&lt;br/&gt;line 121&quot;]
+    n_collapse_whitespace[&quot;collapse_whitespace&lt;br/&gt;line 130&quot;]
+    n_name([&quot;Change::name&lt;br/&gt;line 152&quot;])
+    n_describe([&quot;Change::describe&lt;br/&gt;line 160&quot;])
+    n_support([&quot;support&lt;br/&gt;line 192&quot;])
+    n_take([&quot;Report::take&lt;br/&gt;line 254&quot;])
+    n_len([&quot;Report::len&lt;br/&gt;line 270&quot;])
+    n_is_empty([&quot;Report::is_empty&lt;br/&gt;line 275&quot;])
+    n_modules([&quot;Report::modules&lt;br/&gt;line 280&quot;])
+    n_with_taken([&quot;Report::with_taken&lt;br/&gt;line 286&quot;])
+    n_from_modules([&quot;Report::from_modules&lt;br/&gt;line 297&quot;])
+    n_to_text[&quot;Report::to_text&lt;br/&gt;line 321&quot;]
+    n_parse[&quot;Report::parse&lt;br/&gt;line 342&quot;]
+    n_save([&quot;Report::save&lt;br/&gt;line 404&quot;])
+    n_load([&quot;Report::load&lt;br/&gt;line 415&quot;])
+    n_compare([&quot;compare&lt;br/&gt;line 424&quot;])
+    n_now_seconds[&quot;now_seconds&lt;br/&gt;line 445&quot;]
+    n_read_platform[&quot;read_platform&lt;br/&gt;line 457&quot;]
+    n_from[&quot;Error::from&lt;br/&gt;line 487&quot;]
+    n_fmt[&quot;Error::fmt&lt;br/&gt;line 493&quot;]
+    n_source[&quot;Error::source&lt;br/&gt;line 502&quot;]
     n_from_modules --&gt; n_new
     n_from_modules --&gt; n_now_seconds
     n_load --&gt; n_parse
@@ -261,27 +266,27 @@ flowchart TD
     n_take --&gt; n_new
     n_take --&gt; n_now_seconds
     n_take --&gt; n_read_platform
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L109&quot; &quot;open the source&quot;
-    click n_collapse_whitespace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L118&quot; &quot;open the source&quot;
-    click n_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L140&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L148&quot; &quot;open the source&quot;
-    click n_support href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L180&quot; &quot;open the source&quot;
-    click n_take href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L242&quot; &quot;open the source&quot;
-    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L258&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L263&quot; &quot;open the source&quot;
-    click n_modules href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L268&quot; &quot;open the source&quot;
-    click n_with_taken href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L274&quot; &quot;open the source&quot;
-    click n_from_modules href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L285&quot; &quot;open the source&quot;
-    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L309&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L330&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L392&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L403&quot; &quot;open the source&quot;
-    click n_compare href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L412&quot; &quot;open the source&quot;
-    click n_now_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L433&quot; &quot;open the source&quot;
-    click n_read_platform href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L445&quot; &quot;open the source&quot;
-    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L475&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L481&quot; &quot;open the source&quot;
-    click n_source href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L490&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L121&quot; &quot;open the source&quot;
+    click n_collapse_whitespace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L130&quot; &quot;open the source&quot;
+    click n_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L152&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L160&quot; &quot;open the source&quot;
+    click n_support href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L192&quot; &quot;open the source&quot;
+    click n_take href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L254&quot; &quot;open the source&quot;
+    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L270&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L275&quot; &quot;open the source&quot;
+    click n_modules href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L280&quot; &quot;open the source&quot;
+    click n_with_taken href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L286&quot; &quot;open the source&quot;
+    click n_from_modules href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L297&quot; &quot;open the source&quot;
+    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L321&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L342&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L404&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L415&quot; &quot;open the source&quot;
+    click n_compare href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L424&quot; &quot;open the source&quot;
+    click n_now_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L445&quot; &quot;open the source&quot;
+    click n_read_platform href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L457&quot; &quot;open the source&quot;
+    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L487&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L493&quot; &quot;open the source&quot;
+    click n_source href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L502&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_name,n_describe,n_support,n_take,n_len,n_is_empty,n_modules,n_with_taken,n_from_modules,n_save,n_load,n_compare entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -294,35 +299,35 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L65" rel="noopener noreferrer">65</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
-<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L71" rel="noopener noreferrer">71</a></td><td>What this is worth, in the words a front end should show.</td></tr>
-<tr><td><code>Module</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L86" rel="noopener noreferrer">86</a></td><td>One loaded driver or kernel module.</td></tr>
-<tr><td><code>Module::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L109" rel="noopener noreferrer">109</a></td><td>A module, with both strings made safe for the record.</td></tr>
-<tr><td><code>collapse_whitespace</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L118" rel="noopener noreferrer">118</a></td><td>Every run of whitespace becomes one space, and the ends are trimmed.</td></tr>
-<tr><td><code>Change</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L124" rel="noopener noreferrer">124</a></td><td>How a module differs from the record.</td></tr>
-<tr><td><code>Change::name</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L140" rel="noopener noreferrer">140</a></td><td>The module&#x27;s name, whichever side it came from.</td></tr>
-<tr><td><code>Change::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L148" rel="noopener noreferrer">148</a></td><td>One line for a terminal or a log.</td></tr>
-<tr><td><code>Support</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L166" rel="noopener noreferrer">166</a></td><td>What this platform can and cannot answer.</td></tr>
-<tr><td><code>support</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L180" rel="noopener noreferrer">180</a></td><td>Report what this platform can do.</td></tr>
-<tr><td><code>Report</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L221" rel="noopener noreferrer">221</a></td><td>What is loaded right now, and anything odd about how it was found.</td></tr>
-<tr><td><code>MAGIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L238" rel="noopener noreferrer">238</a></td><td>Magic first line of a saved report.</td></tr>
-<tr><td><code>Report::take</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L242" rel="noopener noreferrer">242</a></td><td>Ask the platform what is loaded.</td></tr>
-<tr><td><code>Report::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L258" rel="noopener noreferrer">258</a></td><td>How many modules were listed.</td></tr>
-<tr><td><code>Report::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L263" rel="noopener noreferrer">263</a></td><td>Whether nothing was listed.</td></tr>
-<tr><td><code>Report::modules</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L268" rel="noopener noreferrer">268</a></td><td>The modules, in a stable order.</td></tr>
-<tr><td><code>Report::with_taken</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L274" rel="noopener noreferrer">274</a></td><td>Replace the recorded time.</td></tr>
-<tr><td><code>Report::from_modules</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L285" rel="noopener noreferrer">285</a></td><td>Build a report from a list, for tests and for another front end that has already obtained one.</td></tr>
-<tr><td><code>Report::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L309" rel="noopener noreferrer">309</a></td><td>Serialise to a text format, one record per line.</td></tr>
-<tr><td><code>Report::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L330" rel="noopener noreferrer">330</a></td><td>Parse the text format.</td></tr>
-<tr><td><code>Report::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L392" rel="noopener noreferrer">392</a></td><td>Write the report to path.</td></tr>
-<tr><td><code>Report::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L403" rel="noopener noreferrer">403</a></td><td>Read a report written by Report::save.</td></tr>
-<tr><td><code>compare</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L412" rel="noopener noreferrer">412</a></td><td>Compare two reports of the same machine.</td></tr>
-<tr><td><code>now_seconds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L433" rel="noopener noreferrer">433</a></td><td></td></tr>
-<tr><td><code>read_platform</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L445" rel="noopener noreferrer">445</a></td><td>Ask whichever reader this platform has.</td></tr>
-<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L467" rel="noopener noreferrer">467</a></td><td>Everything that can go wrong in this crate.</td></tr>
-<tr><td><code>Error::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L475" rel="noopener noreferrer">475</a></td><td></td></tr>
-<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L481" rel="noopener noreferrer">481</a></td><td></td></tr>
-<tr><td><code>Error::source</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L490" rel="noopener noreferrer">490</a></td><td></td></tr>
+<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L77" rel="noopener noreferrer">77</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
+<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L83" rel="noopener noreferrer">83</a></td><td>What this is worth, in the words a front end should show.</td></tr>
+<tr><td><code>Module</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L98" rel="noopener noreferrer">98</a></td><td>One loaded driver or kernel module.</td></tr>
+<tr><td><code>Module::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L121" rel="noopener noreferrer">121</a></td><td>A module, with both strings made safe for the record.</td></tr>
+<tr><td><code>collapse_whitespace</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L130" rel="noopener noreferrer">130</a></td><td>Every run of whitespace becomes one space, and the ends are trimmed.</td></tr>
+<tr><td><code>Change</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L136" rel="noopener noreferrer">136</a></td><td>How a module differs from the record.</td></tr>
+<tr><td><code>Change::name</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L152" rel="noopener noreferrer">152</a></td><td>The module&#x27;s name, whichever side it came from.</td></tr>
+<tr><td><code>Change::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L160" rel="noopener noreferrer">160</a></td><td>One line for a terminal or a log.</td></tr>
+<tr><td><code>Support</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L178" rel="noopener noreferrer">178</a></td><td>What this platform can and cannot answer.</td></tr>
+<tr><td><code>support</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L192" rel="noopener noreferrer">192</a></td><td>Report what this platform can do.</td></tr>
+<tr><td><code>Report</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L233" rel="noopener noreferrer">233</a></td><td>What is loaded right now, and anything odd about how it was found.</td></tr>
+<tr><td><code>MAGIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L250" rel="noopener noreferrer">250</a></td><td>Magic first line of a saved report.</td></tr>
+<tr><td><code>Report::take</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L254" rel="noopener noreferrer">254</a></td><td>Ask the platform what is loaded.</td></tr>
+<tr><td><code>Report::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L270" rel="noopener noreferrer">270</a></td><td>How many modules were listed.</td></tr>
+<tr><td><code>Report::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L275" rel="noopener noreferrer">275</a></td><td>Whether nothing was listed.</td></tr>
+<tr><td><code>Report::modules</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L280" rel="noopener noreferrer">280</a></td><td>The modules, in a stable order.</td></tr>
+<tr><td><code>Report::with_taken</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L286" rel="noopener noreferrer">286</a></td><td>Replace the recorded time.</td></tr>
+<tr><td><code>Report::from_modules</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L297" rel="noopener noreferrer">297</a></td><td>Build a report from a list, for tests and for another front end that has already obtained one.</td></tr>
+<tr><td><code>Report::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L321" rel="noopener noreferrer">321</a></td><td>Serialise to a text format, one record per line.</td></tr>
+<tr><td><code>Report::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L342" rel="noopener noreferrer">342</a></td><td>Parse the text format.</td></tr>
+<tr><td><code>Report::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L404" rel="noopener noreferrer">404</a></td><td>Write the report to path.</td></tr>
+<tr><td><code>Report::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L415" rel="noopener noreferrer">415</a></td><td>Read a report written by Report::save.</td></tr>
+<tr><td><code>compare</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L424" rel="noopener noreferrer">424</a></td><td>Compare two reports of the same machine.</td></tr>
+<tr><td><code>now_seconds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L445" rel="noopener noreferrer">445</a></td><td></td></tr>
+<tr><td><code>read_platform</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L457" rel="noopener noreferrer">457</a></td><td>Ask whichever reader this platform has.</td></tr>
+<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L479" rel="noopener noreferrer">479</a></td><td>Everything that can go wrong in this crate.</td></tr>
+<tr><td><code>Error::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L487" rel="noopener noreferrer">487</a></td><td></td></tr>
+<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L493" rel="noopener noreferrer">493</a></td><td></td></tr>
+<tr><td><code>Error::source</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs#L502" rel="noopener noreferrer">502</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

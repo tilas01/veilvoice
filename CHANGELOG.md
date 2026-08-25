@@ -8,6 +8,43 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Every crate now says what it is for in plain words
+
+All eighteen, plus `fuzz` in its README. The technical explanation was already
+there; this is the same thing said to somebody who does not write software, at
+the end of each crate's own `//!` block, so it is reviewed in the same diff as
+the code it describes.
+
+> **`veilvoice-core` — in plain words.** This is the part that actually changes
+> the voice. A recording goes in and a recording comes out. The words are the
+> same and you can still understand every one of them; the voice is not yours
+> any more, and there is no setting, no key and no clever program that turns it
+> back.
+
+**Required, not encouraged.** `tools/docs/generate.py` refuses to write a page
+for a crate that has not got one, with the crate named — the same rule
+`sources.py` already applies to the website's own files, under the same
+heading. "We should document that" does not survive a busy week; a build that
+stops does.
+
+### F-65 — two crates were invisible rather than uncovered
+
+`veilvoice-check` and `veilvoice-update` were added to the workspace this cycle
+and to neither of the documentation generator's crate lists. So they had no
+page, no banner, no diagram — **and no entry under "not yet covered" either.**
+
+That last part is what makes it a defect. `ALL_CRATES` exists precisely so the
+tool can say what it is *not* covering rather than quietly covering less than
+the tree contains. A crate in neither list is invisible rather than uncovered,
+which is the one outcome those lists were written to prevent, and it was
+reached by the ordinary act of adding a crate.
+
+The lists stay written out — a generator that discovers its own inputs cannot
+tell you it is missing one — but they are now checked against the workspace
+manifest in both directions, and a mismatch stops the run with the names in it.
+Both crates are documented: 751 files for 19 crates, up from 721 for 17.
+
+
 ### Seventh audit round — four defects, and one encoder proved sound
 
 Four found and fixed, **F-61 to F-64**, all in code written this cycle. `main`

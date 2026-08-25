@@ -11,15 +11,16 @@
 
 # `crates/veilvoice-watch/src/lib.rs`
 
-[`veilvoice-watch`](../../../crates/veilvoice-watch/README.md) &middot; 401 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs)
+[`veilvoice-watch`](../../../crates/veilvoice-watch/README.md) &middot; 412 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs)
 
 ## Contents
 
-- [Why this belongs in a voice-privacy tool](#why-this-belongs-in-a-voice-privacy-tool)
-- [What it can actually see, per platform](#what-it-can-actually-see-per-platform)
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [Why this belongs in a voice-privacy tool](#why-this-belongs-in-a-voice-privacy-tool)
+  - [What it can actually see, per platform](#what-it-can-actually-see-per-platform)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Find out which applications are using your microphone and camera, right now.
 
@@ -51,29 +52,40 @@ On Linux you see every process you have permission to inspect. Without root
 that means your own; other users' processes are invisible, and that is a
 kernel permission boundary rather than something this crate can work around.
 
+# In plain words
+
+This tells you when something is using your microphone or camera.
+
+Not what it is doing with them -- just that a program has them open, and which
+program. That is worth knowing before you start talking, and it is the kind of
+thing an operating system knows and does not always show you.
+
+It cannot see everything. Some ways of getting at a microphone do not go past
+the place this reads.
+
 ## What this file contains
 
-401 lines defining **13 functions** (9 public), **6 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+412 lines defining **13 functions** (9 public), **6 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum DeviceKind` (line 49) -- The kind of device being used.
-- `struct DeviceUse` (line 67) -- One application holding one device.
-- `struct Support` (line 101) -- What detection is possible here.
-- `enum Error` (line 149) -- Everything that can go wrong here.
-- `enum Change` (line 194) -- A change between two scans.
-- `struct Monitor` (line 226) -- Watches for changes between scans.
+- `enum DeviceKind` (line 60) -- The kind of device being used.
+- `struct DeviceUse` (line 78) -- One application holding one device.
+- `struct Support` (line 112) -- What detection is possible here.
+- `enum Error` (line 160) -- Everything that can go wrong here.
+- `enum Change` (line 205) -- A change between two scans.
+- `struct Monitor` (line 237) -- Watches for changes between scans.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `DeviceUse::key` (line 88) -- A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed.
-- `DeviceUse::held_for` (line 93) -- How long this application has held the device.
-- `support` (line 115) -- Report what this platform can detect.
-- `Change::alert` (line 203) -- A one-line alert suitable for a notification or an overlay.
-- `DeviceUse::describe` (line 213) -- name (pid 1234), or just the name when there is no PID.
-- `Monitor::new` (line 232) -- A monitor that has not yet seen anything.
-- `Monitor::current` (line 237) -- The most recent snapshot.
-- `Monitor::poll` (line 246) -- Scan, and report what changed since the previous call.
+- `DeviceUse::key` (line 99) -- A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed.
+- `DeviceUse::held_for` (line 104) -- How long this application has held the device.
+- `support` (line 126) -- Report what this platform can detect.
+- `Change::alert` (line 214) -- A one-line alert suitable for a notification or an overlay.
+- `DeviceUse::describe` (line 224) -- name (pid 1234), or just the name when there is no PID.
+- `Monitor::new` (line 243) -- A monitor that has not yet seen anything.
+- `Monitor::current` (line 248) -- The most recent snapshot.
+- `Monitor::poll` (line 257) -- Scan, and report what changed since the previous call.
   - reaches: `diff`, `scan`
 
 ## What calls what
@@ -96,34 +108,34 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_fmt["DeviceKind::fmt<br/>line 57"]
-    n_key(["DeviceUse::key<br/>line 88"])
-    n_held_for(["DeviceUse::held_for<br/>line 93"])
-    n_support(["support<br/>line 115"])
-    n_from["Error::from<br/>line 157"]
-    n_fmt["Error::fmt<br/>line 163"]
-    n_scan["scan<br/>line 177"]
-    n_alert(["Change::alert<br/>line 203"])
-    n_describe(["DeviceUse::describe<br/>line 213"])
-    n_new(["Monitor::new<br/>line 232"])
-    n_current(["Monitor::current<br/>line 237"])
-    n_poll(["Monitor::poll<br/>line 246"])
-    n_diff["Monitor::diff<br/>line 251"]
+    n_fmt["DeviceKind::fmt<br/>line 68"]
+    n_key(["DeviceUse::key<br/>line 99"])
+    n_held_for(["DeviceUse::held_for<br/>line 104"])
+    n_support(["support<br/>line 126"])
+    n_from["Error::from<br/>line 168"]
+    n_fmt["Error::fmt<br/>line 174"]
+    n_scan["scan<br/>line 188"]
+    n_alert(["Change::alert<br/>line 214"])
+    n_describe(["DeviceUse::describe<br/>line 224"])
+    n_new(["Monitor::new<br/>line 243"])
+    n_current(["Monitor::current<br/>line 248"])
+    n_poll(["Monitor::poll<br/>line 257"])
+    n_diff["Monitor::diff<br/>line 262"]
     n_poll --> n_diff
     n_poll --> n_scan
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L57" "open the source"
-    click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L88" "open the source"
-    click n_held_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L93" "open the source"
-    click n_support href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L115" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L157" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L163" "open the source"
-    click n_scan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L177" "open the source"
-    click n_alert href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L203" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L213" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L232" "open the source"
-    click n_current href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L237" "open the source"
-    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L246" "open the source"
-    click n_diff href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L251" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L68" "open the source"
+    click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L99" "open the source"
+    click n_held_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L104" "open the source"
+    click n_support href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L126" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L168" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L174" "open the source"
+    click n_scan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L188" "open the source"
+    click n_alert href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L214" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L224" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L243" "open the source"
+    click n_current href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L248" "open the source"
+    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L257" "open the source"
+    click n_diff href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L262" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_key,n_held_for,n_support,n_alert,n_describe,n_new,n_current,n_poll entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -138,26 +150,26 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L45) | Crate version string, surfaced in the About panel. |
-| `DeviceKind` <sub>pub enum</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L49) | The kind of device being used. |
-| `DeviceKind::fmt` <sub>fn</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L57) |  |
-| `DeviceUse` <sub>pub struct</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L67) | One application holding one device. |
-| `DeviceUse::key` <sub>pub fn</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L88) | A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed. |
-| `DeviceUse::held_for` <sub>pub fn</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L93) | How long this application has held the device. |
-| `Support` <sub>pub struct</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L101) | What detection is possible here. |
-| `support` <sub>pub fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L115) | Report what this platform can detect. |
-| `Error` <sub>pub enum</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L149) | Everything that can go wrong here. |
-| `Error::from` <sub>fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L157) |  |
-| `Error::fmt` <sub>fn</sub> | [163](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L163) |  |
-| `scan` <sub>pub fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L177) | Take one snapshot of what is currently using the microphone and camera. |
-| `Change` <sub>pub enum</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L194) | A change between two scans. |
-| `Change::alert` <sub>pub fn</sub> | [203](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L203) | A one-line alert suitable for a notification or an overlay. |
-| `DeviceUse::describe` <sub>pub fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L213) | name (pid 1234), or just the name when there is no PID. |
-| `Monitor` <sub>pub struct</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L226) | Watches for changes between scans. |
-| `Monitor::new` <sub>pub fn</sub> | [232](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L232) | A monitor that has not yet seen anything. |
-| `Monitor::current` <sub>pub fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L237) | The most recent snapshot. |
-| `Monitor::poll` <sub>pub fn</sub> | [246](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L246) | Scan, and report what changed since the previous call. |
-| `Monitor::diff` <sub>fn</sub> | [251](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L251) | The comparison, split out so it can be tested without a real system. |
+| `VERSION` <sub>pub const</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L56) | Crate version string, surfaced in the About panel. |
+| `DeviceKind` <sub>pub enum</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L60) | The kind of device being used. |
+| `DeviceKind::fmt` <sub>fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L68) |  |
+| `DeviceUse` <sub>pub struct</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L78) | One application holding one device. |
+| `DeviceUse::key` <sub>pub fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L99) | A stable key for comparing two scans, so an app is not reported as having stopped and restarted when nothing changed. |
+| `DeviceUse::held_for` <sub>pub fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L104) | How long this application has held the device. |
+| `Support` <sub>pub struct</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L112) | What detection is possible here. |
+| `support` <sub>pub fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L126) | Report what this platform can detect. |
+| `Error` <sub>pub enum</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L160) | Everything that can go wrong here. |
+| `Error::from` <sub>fn</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L168) |  |
+| `Error::fmt` <sub>fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L174) |  |
+| `scan` <sub>pub fn</sub> | [188](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L188) | Take one snapshot of what is currently using the microphone and camera. |
+| `Change` <sub>pub enum</sub> | [205](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L205) | A change between two scans. |
+| `Change::alert` <sub>pub fn</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L214) | A one-line alert suitable for a notification or an overlay. |
+| `DeviceUse::describe` <sub>pub fn</sub> | [224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L224) | name (pid 1234), or just the name when there is no PID. |
+| `Monitor` <sub>pub struct</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L237) | Watches for changes between scans. |
+| `Monitor::new` <sub>pub fn</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L243) | A monitor that has not yet seen anything. |
+| `Monitor::current` <sub>pub fn</sub> | [248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L248) | The most recent snapshot. |
+| `Monitor::poll` <sub>pub fn</sub> | [257](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L257) | Scan, and report what changed since the previous call. |
+| `Monitor::diff` <sub>fn</sub> | [262](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs#L262) | The comparison, split out so it can be tested without a real system. |
 
 ---
 

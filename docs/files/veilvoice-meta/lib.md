@@ -11,16 +11,17 @@
 
 # `crates/veilvoice-meta/src/lib.rs`
 
-[`veilvoice-meta`](../../../crates/veilvoice-meta/README.md) &middot; 111 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs)
+[`veilvoice-meta`](../../../crates/veilvoice-meta/README.md) &middot; 121 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs)
 
 ## Contents
 
-- [Why this exists](#why-this-exists)
-- [Strip versus spoof](#strip-versus-spoof)
-- [What this crate cannot do](#what-this-crate-cannot-do)
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [Why this exists](#why-this-exists)
+  - [Strip versus spoof](#strip-versus-spoof)
+  - [What this crate cannot do](#what-this-crate-cannot-do)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Strip or spoof the identifying metadata that rides along with media files.
 
@@ -54,15 +55,25 @@ still carries its room acoustics and background noise. Nor does it touch
 filesystem timestamps or the filename, both of which are outside the file —
 callers that care must handle those separately.
 
+# In plain words
+
+This strips the hidden labels off a file.
+
+Photographs and recordings carry information you never typed: where the picture
+was taken, which phone or microphone made it, what the file was called before,
+sometimes a name. Removing the sound of a voice and leaving that behind would
+be pointless, so this takes it out -- not by blanking the fields, but by
+removing the parts of the file that hold them.
+
 ## What this file contains
 
-111 lines defining **4 functions** (0 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+121 lines defining **4 functions** (0 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Policy` (line 51) -- How aggressively to rewrite metadata.
-- `struct Report` (line 62) -- What changed in a single file.
-- `enum Error` (line 79) -- Everything that can go wrong in this crate.
+- `enum Policy` (line 61) -- How aggressively to rewrite metadata.
+- `struct Report` (line 72) -- What changed in a single file.
+- `enum Error` (line 89) -- Everything that can go wrong in this crate.
 
 ## What calls what
 
@@ -84,14 +95,14 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_note["Report::note<br/>line 70"]
-    n_from["Error::from<br/>line 89"]
-    n_fmt["Error::fmt<br/>line 95"]
-    n_source["Error::source<br/>line 105"]
-    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L70" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L89" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L95" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L105" "open the source"
+    n_note["Report::note<br/>line 80"]
+    n_from["Error::from<br/>line 99"]
+    n_fmt["Error::fmt<br/>line 105"]
+    n_source["Error::source<br/>line 115"]
+    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L80" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L99" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L105" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L115" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_note,n_from,n_fmt,n_source helper
 ```
@@ -102,14 +113,14 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L47) | Crate version string, surfaced in the About panel. |
-| `Policy` <sub>pub enum</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L51) | How aggressively to rewrite metadata. |
-| `Report` <sub>pub struct</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L62) | What changed in a single file. |
-| `Report::note` <sub>fn</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L70) |  |
-| `Error` <sub>pub enum</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L79) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [89](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L89) |  |
-| `Error::fmt` <sub>fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L95) |  |
-| `Error::source` <sub>fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L105) |  |
+| `VERSION` <sub>pub const</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L57) | Crate version string, surfaced in the About panel. |
+| `Policy` <sub>pub enum</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L61) | How aggressively to rewrite metadata. |
+| `Report` <sub>pub struct</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L72) | What changed in a single file. |
+| `Report::note` <sub>fn</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L80) |  |
+| `Error` <sub>pub enum</sub> | [89](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L89) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L99) |  |
+| `Error::fmt` <sub>fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L105) |  |
+| `Error::source` <sub>fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L115) |  |
 
 ---
 

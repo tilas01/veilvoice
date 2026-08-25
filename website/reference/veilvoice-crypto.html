@@ -46,6 +46,7 @@
   <a href="#what-this-crate-is-for">What this crate is for</a>
   <a href="#threat-model-stated-plainly">Threat model, stated plainly</a>
   <a href="#example">Example</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -75,6 +76,11 @@ let sealed = container::seal_with_password(b&quot;pass phrase&quot;, b&quot;audi
 assert_eq!(container::open_with_password(b&quot;pass phrase&quot;, &amp;sealed)?, b&quot;audio bytes&quot;);
 assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err());</code></pre>
 <p>VeilVoice contains <strong>no <code>unsafe</code> code at all</strong> &#8212; including the page-locking in <code>amnesia</code>, which goes through a safe wrapper.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is the locking.</p>
+<p>Two separate things use it. Recordings are sealed on your disk so that somebody who takes the disk cannot listen to them, and the app can be put behind a password so somebody who picks up your unlocked computer cannot open it.</p>
+<p>Those two passwords are deliberately different. Opening the program should not be the same act as unsealing everything it has ever written.</p>
+<p>The maths is chosen to be slow to guess and to still be safe if somebody one day builds a quantum computer. Nothing is sent anywhere; the sealing happens on your machine and the key is made from your password each time.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -87,7 +93,7 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">175 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">190 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -135,7 +141,7 @@ assert!(container::open_with_password(b&quot;wrong&quot;, &amp;sealed).is_err())
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;175 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;190 lines&quot;])
     n_aead[&quot;aead.rs&lt;br/&gt;168 lines&quot;]
     n_amnesia[&quot;amnesia.rs&lt;br/&gt;313 lines&quot;]
     n_container[&quot;container.rs&lt;br/&gt;479 lines&quot;]
@@ -165,7 +171,7 @@ flowchart TD
 <tr><td><a href="veilvoice-crypto/container.html"><code>container.rs</code></a></td><td>479</td><td>The .veil encrypted container format.</td></tr>
 <tr><td><a href="veilvoice-crypto/hybrid.html"><code>hybrid.rs</code></a></td><td>435</td><td>Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.</td></tr>
 <tr><td><a href="veilvoice-crypto/kdf.html"><code>kdf.rs</code></a></td><td>387</td><td>Password-based key derivation with Argon2id.</td></tr>
-<tr><td><a href="veilvoice-crypto/lib.html"><code>lib.rs</code></a></td><td>175</td><td>Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.</td></tr>
+<tr><td><a href="veilvoice-crypto/lib.html"><code>lib.rs</code></a></td><td>190</td><td>Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.</td></tr>
 <tr><td><a href="veilvoice-crypto/lock.html"><code>lock.rs</code></a></td><td>732</td><td>The application lock: an Argon2id password verifier with a rate limit.</td></tr>
 <tr><td><a href="veilvoice-crypto/privatefile.html"><code>privatefile.rs</code></a></td><td>157</td><td>Writing a file that only its owner can read.</td></tr>
 <tr><td><a href="veilvoice-crypto/shred.html"><code>shred.rs</code></a></td><td>401</td><td>Secure erasure &#8212; the self-destruct.</td></tr>

@@ -53,6 +53,17 @@
 //! and something written to record a screen quietly would not be called
 //! `obs64.exe`. An empty report is not evidence that nothing is recording, and
 //! [`SCOPE`] says so.
+//!
+//! # In plain words
+//!
+//! This tells you which screen-recording programs are running.
+//!
+//! If you are about to say something private and a recorder is going, that is
+//! worth knowing first. Programs you run on purpose can be marked as expected, and
+//! they stay in the list rather than disappearing from it.
+//!
+//! It cannot hide VeilVoice's window from a recorder, and it does not pretend to.
+//! A camera pointed at the screen would not care anyway.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

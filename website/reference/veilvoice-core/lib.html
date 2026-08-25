@@ -39,13 +39,14 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/lib.svg" alt="lib.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 70 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 86 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-it-guarantees-and-what-it-deliberately-does-not">What it guarantees (and what it deliberately does not)</a>
   <a href="#accent">Accent</a>
   <a href="#why-it-is-one-way">Why it is one-way</a>
   <a href="#example">Example</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
 </nav>
@@ -67,6 +68,10 @@ let output = deid.process_vec(&amp;input);
 assert_eq!(output.len(), input.len());
 // Live processing cost, e.g. for a latency read-out:
 let _ms = deid.stats().last_block_ms();</code></pre>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is the part that actually changes the voice.</p>
+<p>A recording goes in and a recording comes out. The words are the same and you can still understand every one of them; the voice is not yours any more, and there is no setting, no key and no clever program that turns it back. What made it recognisably <em>you</em> -- the pitch, the shape of your mouth and throat, the timing, the music of your accent -- is not hidden. It is thrown away, and everybody who goes through it comes out sounding like the same handful of people.</p>
+<p>What it does not do is keep your words secret. It is not meant to: a voice nobody can understand would be no use to anyone. If what you said would identify you, this has not touched that.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -75,7 +80,7 @@ let _ms = deid.stats().last_block_ms();</code></pre>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs#L70" rel="noopener noreferrer">70</a></td><td>Crate version, surfaced in the About panel.</td></tr>
+<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/lib.rs#L86" rel="noopener noreferrer">86</a></td><td>Crate version, surfaced in the About panel.</td></tr>
 </tbody></table>
 </section>
 </div></div>

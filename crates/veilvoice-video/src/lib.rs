@@ -37,6 +37,18 @@
 //! here anonymises an image: a photograph of somebody's face beside their
 //! veiled voice identifies them completely. The default is a plain filled
 //! circle for that reason, and [`SCOPE`] says it where a user will read it.
+//!
+//! # In plain words
+//!
+//! This draws the picture.
+//!
+//! A waveform, a circle for each person in their own colour with their name under
+//! it, a title, and a page that plays all of it together in a browser and needs
+//! nothing installed.
+//!
+//! It does not make a video file. That needs an encoder, and this project ships
+//! none -- so it prints the command that would do it with `ffmpeg`, if you have
+//! `ffmpeg`, and leaves running it to you.
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 

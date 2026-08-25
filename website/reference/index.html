@@ -73,6 +73,13 @@
 <li><a href="veilvoice-capture/programs.html"><code>programs.rs</code></a> <span style="color:var(--muted)">The programs this build knows can capture a screen.</span></li>
 </ul>
 </section>
+<section id="veilvoice-check">
+<h2><a href="veilvoice-check.html">veilvoice-check</a></h2>
+<p>Check a VeilVoice release: the SHA-256 of a file, its line in a signed SHA256SUMS, and the detached signature over that list. No GnuPG, no network.</p>
+<ul>
+<li><a href="veilvoice-check/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Check a VeilVoice release: a file&#x27;s SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list.</span></li>
+</ul>
+</section>
 <section id="veilvoice-cli">
 <h2><a href="veilvoice-cli.html">veilvoice-cli</a></h2>
 <p>Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings.</p>
@@ -213,6 +220,14 @@
 <li><a href="veilvoice-setup/companions.html"><code>companions.rs</code></a> <span style="color:var(--muted)">Optional third-party software, detected rather than assumed.</span></li>
 <li><a href="veilvoice-setup/install.html"><code>install.rs</code></a> <span style="color:var(--muted)">Put this program somewhere the system can find it.</span></li>
 <li><a href="veilvoice-setup/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Everything that puts VeilVoice on a machine, and everything that reports what is already on it.</span></li>
+</ul>
+</section>
+<section id="veilvoice-update">
+<h2><a href="veilvoice-update.html">veilvoice-update</a></h2>
+<p>Ask, when told to, whether a newer VeilVoice release exists. No HTTP client, no automatic check, and nothing is downloaded or installed.</p>
+<ul>
+<li><a href="veilvoice-update/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Ask, only when told to, whether a newer VeilVoice release exists.</span></li>
+<li><a href="veilvoice-update/examples-ask.html"><code>ask.rs</code></a> <span style="color:var(--muted)">Run the real check once, by hand.</span></li>
 </ul>
 </section>
 <section id="veilvoice-verify">

@@ -9,10 +9,11 @@
 
 ## Contents
 
-- [Why this belongs in a voice-privacy tool](#why-this-belongs-in-a-voice-privacy-tool)
-- [What it can actually see, per platform](#what-it-can-actually-see-per-platform)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
+  - [Why this belongs in a voice-privacy tool](#why-this-belongs-in-a-voice-privacy-tool)
+  - [What it can actually see, per platform](#what-it-can-actually-see-per-platform)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
 
 Find out which applications are using your microphone and camera, right now.
 
@@ -44,6 +45,17 @@ On Linux you see every process you have permission to inspect. Without root
 that means your own; other users' processes are invisible, and that is a
 kernel permission boundary rather than something this crate can work around.
 
+# In plain words
+
+This tells you when something is using your microphone or camera.
+
+Not what it is doing with them -- just that a program has them open, and which
+program. That is worth knowing before you start talking, and it is the kind of
+thing an operating system knows and does not always show you.
+
+It cannot see everything. Some ways of getting at a microphone do not go past
+the place this reads.
+
 ## How the crate fits together
 
 <p align="center">
@@ -56,7 +68,7 @@ kernel permission boundary rather than something this crate can work around.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>401 lines"])
+    n_lib(["lib.rs<br/>412 lines"])
     n_linux["linux.rs<br/>192 lines"]
     n_windows["windows.rs<br/>589 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" "open the source"
@@ -70,7 +82,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`lib.rs`|File-veilvoice-watch-lib]] | 401 | Find out which applications are using your microphone and camera, right now. |
+| [[`lib.rs`|File-veilvoice-watch-lib]] | 412 | Find out which applications are using your microphone and camera, right now. |
 | [[`linux.rs`|File-veilvoice-watch-linux]] | 192 | Linux detection, via open file handles in /proc. |
 | [[`windows.rs`|File-veilvoice-watch-windows]] | 589 | Windows detection, via the Capability Access Manager. |
 | [[`scan_once.rs`|File-veilvoice-watch-examples-scan_once]] | 22 | Print what is using the microphone and camera right now. |

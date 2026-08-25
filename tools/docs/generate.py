@@ -82,6 +82,7 @@ CRATES = (
     "fuzz",
     "veilvoice-audio",
     "veilvoice-capture",
+    "veilvoice-check",
     "veilvoice-cli",
     "veilvoice-conversation",
     "veilvoice-core",
@@ -93,6 +94,7 @@ CRATES = (
     "veilvoice-policy",
     "veilvoice-sentry",
     "veilvoice-setup",
+    "veilvoice-update",
     "veilvoice-verify",
     "veilvoice-video",
     "veilvoice-watch",
@@ -105,6 +107,7 @@ ALL_CRATES = (
     "fuzz",
     "veilvoice-audio",
     "veilvoice-capture",
+    "veilvoice-check",
     "veilvoice-cli",
     "veilvoice-conversation",
     "veilvoice-core",
@@ -116,10 +119,55 @@ ALL_CRATES = (
     "veilvoice-policy",
     "veilvoice-sentry",
     "veilvoice-setup",
+    "veilvoice-update",
     "veilvoice-verify",
     "veilvoice-video",
     "veilvoice-watch",
 )
+
+def workspace_crates(root):
+    """Every crate `Cargo.toml` lists as a member, plus `fuzz`.
+
+    # Why this exists
+
+    [`ALL_CRATES`] is hand-written, and its whole job is to let this tool say
+    what it is *not* covering rather than quietly covering less than the tree
+    contains. A hand-written list of what exists has one failure mode, and it
+    happened: `veilvoice-check` and `veilvoice-update` were added to the
+    workspace and to neither list, so they had no page, no banner, no diagram
+    and no entry under "not yet covered" -- invisible rather than uncovered,
+    which is the exact failure the list was written to prevent.
+
+    So the list is now checked against the workspace manifest. It stays written
+    out, because a generator that discovers its own inputs cannot tell you it is
+    missing one; it is simply told, loudly, when the two disagree.
+
+    `fuzz` is a workspace *exclusion* -- it needs nightly and libFuzzer -- so it
+    is not a member and is added here by name.
+    """
+    manifest = read(os.path.join(root, "Cargo.toml"))
+    members = []
+    inside = False
+    for line in manifest.split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("members"):
+            inside = True
+            continue
+        if inside:
+            if stripped.startswith("]"):
+                break
+            name = stripped.strip(",").strip('"')
+            if name.startswith("crates/"):
+                members.append(name[len("crates/") :])
+    return tuple(sorted(set(members) | {"fuzz"}))
+
+
+def crates_missing_from_the_lists(root):
+    """Crates the workspace has that this file does not name, and vice versa."""
+    actual = set(workspace_crates(root))
+    listed = set(ALL_CRATES)
+    return sorted(actual - listed), sorted(listed - actual)
+
 
 REPO = "tilas01/veilvoice"
 REF = "main"
@@ -797,6 +845,29 @@ def known_modules(root):
             for crate in ALL_CRATES}
 
 
+# Every crate's `//!` block has to say what the crate is for **in plain words**,
+# under this heading, as well as technically.
+#
+# The two are for different readers and the technical one does not become the
+# plain one by being read slowly. A person deciding whether to trust a privacy
+# tool should be able to find out what each part of it does without knowing what
+# a formant or a KDF is, and the place to put that is beside the code, where it
+# is reviewed in the same diff as the thing it describes.
+#
+# Required rather than encouraged: this generator refuses to write a page for a
+# crate that has not got one, which is the only version of "we should document
+# that" that survives a busy week. `tools/docs/sources.py` requires the same of
+# the website's own files, under the same heading, for the same reason.
+PLAIN_HEADING = "In plain words"
+
+
+def has_plain_words(doc):
+    """Whether a `//!` block carries the plain-words section."""
+    return any(
+        line.strip().lstrip("#").strip().lower() == PLAIN_HEADING.lower() for line in doc
+    )
+
+
 def build(root, crate):
     """Everything the renderers need, gathered once."""
     files = source_files(root, crate)
@@ -829,6 +900,26 @@ def build(root, crate):
         "files": entries,
         "edges": module_edges(root, crate, files),
     }
+
+
+def crates_without_plain_words(models):
+    """Which crates have no plain-words section, in order.
+
+    `fuzz` is exempt for the same reason its README is hand-written: it has no
+    library and no `//!` block for this generator to read. Its plain-words
+    section lives in `fuzz/README.md`, where the rest of its documentation is.
+    """
+    missing = []
+    for model in models:
+        if model["crate"] in HAND_WRITTEN_README:
+            continue
+        lib = next(
+            (entry for entry in model["files"] if entry["stem"] in ("lib", "main")),
+            None,
+        )
+        if lib is None or not has_plain_words(lib["doc"]):
+            missing.append(model["crate"])
+    return missing
 
 
 # --- graphs -----------------------------------------------------------------
@@ -2261,7 +2352,35 @@ def outputs(root):
 
     known = known_modules(root)
     spellings = link_targets(known)
+    unlisted, phantom = crates_missing_from_the_lists(root)
+    if unlisted or phantom:
+        lines = []
+        if unlisted:
+            lines.append("  the workspace has crates this generator does not name:")
+            lines.extend("    %s" % name for name in unlisted)
+        if phantom:
+            lines.append("  this generator names crates the workspace does not have:")
+            lines.extend("    %s" % name for name in phantom)
+        raise SystemExit(
+            "\n".join(lines)
+            + "\n\n  Add them to CRATES and ALL_CRATES in tools/docs/generate.py.\n"
+            "  A crate missing from both lists has no page and no entry under\n"
+            "  \"not yet covered\" -- it is invisible rather than uncovered, which\n"
+            "  is the failure those lists exist to prevent."
+        )
+
     models = [build(root, crate) for crate in CRATES]
+    missing = crates_without_plain_words(models)
+    if missing:
+        raise SystemExit(
+            "  these crates have no '%s' section in their //! block:\n    %s\n\n"
+            "  Every crate says what it is for technically and then says the same\n"
+            "  thing in plain words, for a reader who does not write software. The\n"
+            "  plain half cannot be generated from the technical half -- if it\n"
+            "  could, it would not be worth having. Write it at the end of the\n"
+            "  crate's //! block, under that heading."
+            % (PLAIN_HEADING, "\n    ".join(missing))
+        )
     covered = list(CRATES)
     uncovered = [crate for crate in ALL_CRATES if crate not in CRATES]
 

@@ -11,17 +11,18 @@
 
 # `crates/veilvoice-conversation/src/lib.rs`
 
-[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 165 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs)
+[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 178 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs)
 
 ## Contents
 
-- [Why this exists](#why-this-exists)
-- [What a conversation costs, said plainly](#what-a-conversation-costs-said-plainly)
-- [VeilVoice does not decide who is talking](#veilvoice-does-not-decide-who-is-talking)
-- [The modules](#the-modules)
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+  - [Why this exists](#why-this-exists)
+  - [What a conversation costs, said plainly](#what-a-conversation-costs-said-plainly)
+  - [VeilVoice does not decide who is talking](#veilvoice-does-not-decide-who-is-talking)
+  - [The modules](#the-modules)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Several people in one recording: a plan of who spoke when, a distinct
 destination voice for each of them, and subtitles that carry their names.
@@ -72,13 +73,26 @@ comes from the user — a channel per person, or a list of turns. See
 | `render` | One engine per speaker, spliced back onto the timeline |
 | `subtitles` | WebVTT and SubRip, from the same plan |
 
+# In plain words
+
+This is for a recording with more than one person in it.
+
+Given a note of who speaks when, it gives each person a different voice --
+every one of them just as thoroughly disguised as a single speaker would be --
+and writes subtitles saying who said what.
+
+It will not guess who is talking. Working that out needs a trained model, and
+this project ships none, so it is told: either one microphone per person, or a
+list of turns. Any part of the recording nobody claims is silenced rather than
+passed through, because audio nobody claimed has not been disguised.
+
 ## What this file contains
 
-165 lines defining **3 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+178 lines defining **3 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 80) -- Everything that can go wrong in this crate.
+- `enum Error` (line 93) -- Everything that can go wrong in this crate.
 
 ## What calls what
 
@@ -100,12 +114,12 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Error::from<br/>line 94"]
-    n_fmt["Error::fmt<br/>line 100"]
-    n_source["Error::source<br/>line 115"]
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L94" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L100" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L115" "open the source"
+    n_from["Error::from<br/>line 107"]
+    n_fmt["Error::fmt<br/>line 113"]
+    n_source["Error::source<br/>line 128"]
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L107" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L113" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L128" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_from,n_fmt,n_source helper
 ```
@@ -116,12 +130,12 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L62) | Crate version string, surfaced in the About panel. |
-| `SCOPE` <sub>pub const</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L68) | What this crate does to a recording, in the words a front end should show. |
-| `Error` <sub>pub enum</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L80) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L94) |  |
-| `Error::fmt` <sub>fn</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L100) |  |
-| `Error::source` <sub>fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L115) |  |
+| `VERSION` <sub>pub const</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L75) | Crate version string, surfaced in the About panel. |
+| `SCOPE` <sub>pub const</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L81) | What this crate does to a recording, in the words a front end should show. |
+| `Error` <sub>pub enum</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L93) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L107) |  |
+| `Error::fmt` <sub>fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L113) |  |
+| `Error::source` <sub>fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L128) |  |
 
 ---
 

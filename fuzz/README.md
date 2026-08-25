@@ -2,6 +2,17 @@
 
 # Coverage-guided fuzzing
 
+## In plain words
+
+This throws deliberately broken files at the program to see whether it falls
+over.
+
+Not the ordinary tests, which check that correct input gives correct output.
+These generate nonsense -- truncated recordings, impossible headers, files that
+lie about their own length -- and keep going, on the theory that anything a
+person can be sent, somebody will eventually send.
+
+
 Six targets, one for each parser in VeilVoice that reads bytes somebody else
 produced:
 

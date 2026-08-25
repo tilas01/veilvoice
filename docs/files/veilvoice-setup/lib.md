@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-setup/src/lib.rs`
 
-[`veilvoice-setup`](../../../crates/veilvoice-setup/README.md) &middot; 153 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs)
+[`veilvoice-setup`](../../../crates/veilvoice-setup/README.md) &middot; 166 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs)
 
 ## Contents
 
 - [Why this is a library and not part of the command line](#why-this-is-a-library-and-not-part-of-the-command-line)
 - [What it will not do](#what-it-will-not-do)
 - [No unsafe, and therefore some subprocesses](#no-unsafe-and-therefore-some-subprocesses)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -71,9 +72,22 @@ window when the desktop application is the caller — the defect that shipped
 in v0.1.10 — and a test reads this crate's own source to catch a spawn that
 forgets.
 
+# In plain words
+
+This installs the program, if you want it installed.
+
+You do not have to. Unzipping it and running it is a perfectly normal way to
+use it, and this says so rather than treating it as a mistake. Installing does
+three small things -- copies the program into your own folder, adds it to your
+PATH so typing its name works, and adds an entry so Windows can remove it --
+and nothing else. No administrator rights, no service.
+
+It also looks for the few other programs VeilVoice can work alongside, tells
+you who makes each one, and installs none of them unless you say so.
+
 ## What this file contains
 
-153 lines defining **3 functions** (0 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+166 lines defining **3 functions** (0 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -95,13 +109,13 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_command["command<br/>line 74"]
-    n_hide_console["hide_console<br/>line 88"]
-    n_hide_console["hide_console<br/>line 98"]
+    n_command["command<br/>line 87"]
+    n_hide_console["hide_console<br/>line 101"]
+    n_hide_console["hide_console<br/>line 111"]
     n_command --> n_hide_console
-    click n_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L74" "open the source"
-    click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L88" "open the source"
-    click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L98" "open the source"
+    click n_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L87" "open the source"
+    click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L101" "open the source"
+    click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L111" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_command,n_hide_console,n_hide_console helper
 ```
@@ -112,10 +126,10 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L62) | Crate version string, surfaced in the About panel. |
-| `command` <sub>pub(crate) fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L74) | Spawn without a console window. |
-| `hide_console` <sub>fn</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L88) | The Windows half of command. |
-| `hide_console` <sub>fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L98) | The everywhere-else half of command: nothing to hide, and no console is created by spawning a process in the first place. |
+| `VERSION` <sub>pub const</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L75) | Crate version string, surfaced in the About panel. |
+| `command` <sub>pub(crate) fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L87) | Spawn without a console window. |
+| `hide_console` <sub>fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L101) | The Windows half of command. |
+| `hide_console` <sub>fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L111) | The everywhere-else half of command: nothing to hide, and no console is created by spawning a process in the first place. |
 
 ---
 

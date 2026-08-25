@@ -45,6 +45,7 @@
 <nav class="toc" aria-label="Contents">
   <a href="#the-live-feature">The live feature</a>
   <a href="#routing-and-why-a-virtual-cable-matters">Routing, and why a virtual cable matters</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#how-the-crate-fits-together">How the crate fits together</a>
   <a href="#the-files">The files</a>
 </nav>
@@ -60,6 +61,10 @@
 <p><code>devices</code> and <code>live</code> sit behind the default-on <code>live</code> feature. They are the only part of this crate that needs <code>cpal</code>, and <code>cpal</code> has no backend for the BSDs. Everything else &#8212; decoding, encoding, and running the engine over a buffer &#8212; is pure Rust and builds anywhere, so turning the feature off keeps file processing working on platforms that cannot do live capture rather than failing to build at all.</p>
 <h3 id="routing-and-why-a-virtual-cable-matters">Routing, and why a virtual cable matters</h3>
 <p>Scrambling a microphone is only useful if other applications can hear the result. Selecting a virtual audio cable as the output makes the veiled voice appear as an ordinary microphone to any call, stream or recorder on the machine, with no per-application setup. <code>devices::find_virtual_cable</code> detects an installed one so the UI can offer it directly.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is the plumbing between your microphone, your speakers and the part that changes the voice.</p>
+<p>It finds the sound devices you have, opens the recording you point at whatever kind of file it is, and writes the result back out. For live use it does the whole loop while you talk -- in from the microphone, through the engine, out to whatever else is listening -- fast enough that a conversation still works.</p>
+<p>It also reports how loud things are, which is what the level bars in the program are drawing.</p>
 </section>
 <section id="s-structure">
 <h2 id="how-the-crate-fits-together">HOW THE CRATE FITS TOGETHER</h2>
@@ -71,7 +76,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">209 lines</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">222 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -99,7 +104,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;209 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;222 lines&quot;])
     n_devices[&quot;devices.rs&lt;br/&gt;228 lines&quot;]
     n_io[&quot;io.rs&lt;br/&gt;555 lines&quot;]
     n_live[&quot;live.rs&lt;br/&gt;237 lines&quot;]
@@ -117,7 +122,7 @@ flowchart TD
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-audio/devices.html"><code>devices.rs</code></a></td><td>228</td><td>Enumerating audio devices, and guessing which of them are virtual cables.</td></tr>
 <tr><td><a href="veilvoice-audio/io.html"><code>io.rs</code></a></td><td>555</td><td>Reading and writing audio files.</td></tr>
-<tr><td><a href="veilvoice-audio/lib.html"><code>lib.rs</code></a></td><td>209</td><td>Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</td></tr>
+<tr><td><a href="veilvoice-audio/lib.html"><code>lib.rs</code></a></td><td>222</td><td>Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</td></tr>
 <tr><td><a href="veilvoice-audio/live.html"><code>live.rs</code></a></td><td>237</td><td>Live microphone scrambling.</td></tr>
 <tr><td><a href="veilvoice-audio/meter.html"><code>meter.rs</code></a></td><td>154</td><td>The scale a level meter is drawn on.</td></tr>
 </tbody></table>

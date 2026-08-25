@@ -9,12 +9,13 @@
 
 ## Contents
 
-- [The word this crate does not use](#the-word-this-crate-does-not-use)
-- [The two signals, and what each is worth](#the-two-signals-and-what-each-is-worth)
-- [What it cannot tell you: who](#what-it-cannot-tell-you-who)
-- [Entropy is a hint and never evidence](#entropy-is-a-hint-and-never-evidence)
-- [How the crate fits together](#how-the-crate-fits-together)
-- [The files](#the-files)
+  - [The word this crate does not use](#the-word-this-crate-does-not-use)
+  - [The two signals, and what each is worth](#the-two-signals-and-what-each-is-worth)
+  - [What it cannot tell you: who](#what-it-cannot-tell-you-who)
+  - [Entropy is a hint and never evidence](#entropy-is-a-hint-and-never-evidence)
+- [In plain words](#in-plain-words)
+  - [How the crate fits together](#how-the-crate-fits-together)
+  - [The files](#the-files)
 
 An early warning that something is going through your files: decoy files
 that should never change, and a measure of how fast a directory tree is
@@ -76,6 +77,17 @@ sits near 8.0. So does a JPEG, a `.zip`, a video, and this project's own
 contents this crate *planted* and therefore knows should have been prose.
 It is used for exactly that and nothing else.
 
+# In plain words
+
+This watches for the pattern ransomware makes.
+
+It leaves a few files lying around that nothing has any reason to touch, and it
+counts how fast files in a folder are being rewritten. Something quietly
+encrypting your documents trips both.
+
+It is a warning, not a defence. It notices; it does not stop anything, and it
+can be fooled by anything patient enough to go slowly.
+
 ## How the crate fits together
 
 <p align="center">
@@ -88,7 +100,7 @@ It is used for exactly that and nothing else.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>236 lines"])
+    n_lib(["lib.rs<br/>247 lines"])
     n_canary["canary.rs<br/>750 lines"]
     n_rate["rate.rs<br/>942 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs" "open the source"
@@ -103,5 +115,5 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`canary.rs`|File-veilvoice-sentry-canary]] | 750 | Decoy files that should never change, and a record of what they were. |
-| [[`lib.rs`|File-veilvoice-sentry-lib]] | 236 | An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing. |
+| [[`lib.rs`|File-veilvoice-sentry-lib]] | 247 | An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing. |
 | [[`rate.rs`|File-veilvoice-sentry-rate]] | 942 | How much of a directory tree changed, and how fast. |
