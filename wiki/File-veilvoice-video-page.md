@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-video/src/page.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 940 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs)
+[[veilvoice-video|Crate-veilvoice-video]] &middot; 977 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs)
 
 ## Contents
 
@@ -55,20 +55,21 @@ drawn and the circles simply stay dim.
 
 ## What this file contains
 
-940 lines defining **12 functions** (7 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+977 lines defining **13 functions** (8 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct Look` (line 49) -- What the picture looks like.
-- `enum Background` (line 73) -- What sits behind the picture.
-- `struct Layout` (line 132) -- Where each part of the picture goes.
-- `struct Drawn` (line 382) -- What a render produced, and anything the user should know about it.
+- `enum Background` (line 81) -- What sits behind the picture.
+- `struct Layout` (line 162) -- Where each part of the picture goes.
+- `struct Drawn` (line 413) -- What a render produced, and anything the user should know about it.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Look::black` (line 82) -- Black, for somebody who wants the plainest possible picture.
-- `Look::checked` (line 94) -- Whether these numbers describe a picture that can be drawn.
-- `player` (line 494) -- The self-contained page that plays.
+- `Look::black` (line 90) -- Black, for somebody who wants the plainest possible picture.
+- `Look::themed` (line 103) -- The same look in another palette.
+- `Look::checked` (line 124) -- Whether these numbers describe a picture that can be drawn.
+- `player` (line 531) -- The self-contained page that plays.
   - reaches: `escape`, `layout`, `still`, `background_markup`, `speaker_markup`, `data_uri`, `base64`, `media_type`
 
 ## What calls what
@@ -85,18 +86,19 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["Look::default<br/>line 61"]
-    n_black(["Look::black<br/>line 82"])
-    n_checked(["Look::checked<br/>line 94"])
-    n_layout["layout<br/>line 150"]
-    n_escape["escape<br/>line 186"]
-    n_base64["base64<br/>line 206"]
-    n_media_type["media_type<br/>line 233"]
-    n_data_uri["data_uri<br/>line 254"]
-    n_background_markup["background_markup<br/>line 266"]
-    n_speaker_markup["speaker_markup<br/>line 315"]
-    n_still["still<br/>line 396"]
-    n_player(["player<br/>line 494"])
+    n_default["Look::default<br/>line 68"]
+    n_black(["Look::black<br/>line 90"])
+    n_themed(["Look::themed<br/>line 103"])
+    n_checked(["Look::checked<br/>line 124"])
+    n_layout["layout<br/>line 180"]
+    n_escape["escape<br/>line 216"]
+    n_base64["base64<br/>line 236"]
+    n_media_type["media_type<br/>line 263"]
+    n_data_uri["data_uri<br/>line 284"]
+    n_background_markup["background_markup<br/>line 296"]
+    n_speaker_markup["speaker_markup<br/>line 345"]
+    n_still["still<br/>line 427"]
+    n_player(["player<br/>line 531"])
     n_background_markup --> n_data_uri
     n_background_markup --> n_escape
     n_data_uri --> n_base64
@@ -110,20 +112,21 @@ flowchart TD
     n_still --> n_escape
     n_still --> n_layout
     n_still --> n_speaker_markup
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L61" "open the source"
-    click n_black href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L82" "open the source"
-    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L94" "open the source"
-    click n_layout href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L150" "open the source"
-    click n_escape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L186" "open the source"
-    click n_base64 href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L206" "open the source"
-    click n_media_type href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L233" "open the source"
-    click n_data_uri href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L254" "open the source"
-    click n_background_markup href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L266" "open the source"
-    click n_speaker_markup href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L315" "open the source"
-    click n_still href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L396" "open the source"
-    click n_player href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L494" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L68" "open the source"
+    click n_black href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L90" "open the source"
+    click n_themed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L103" "open the source"
+    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L124" "open the source"
+    click n_layout href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L180" "open the source"
+    click n_escape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L216" "open the source"
+    click n_base64 href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L236" "open the source"
+    click n_media_type href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L263" "open the source"
+    click n_data_uri href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L284" "open the source"
+    click n_background_markup href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L296" "open the source"
+    click n_speaker_markup href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L345" "open the source"
+    click n_still href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L427" "open the source"
+    click n_player href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L531" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_black,n_checked,n_player entry
+    class n_black,n_themed,n_checked,n_player entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_layout,n_escape,n_data_uri,n_still api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -137,18 +140,19 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `Look` <sub>pub struct</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L49) | What the picture looks like. |
-| `Look::default` <sub>fn</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L61) |  |
-| `Background` <sub>pub enum</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L73) | What sits behind the picture. |
-| `Look::black` <sub>pub fn</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L82) | Black, for somebody who wants the plainest possible picture. |
-| `Look::checked` <sub>pub fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L94) | Whether these numbers describe a picture that can be drawn. |
-| `Layout` <sub>pub struct</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L132) | Where each part of the picture goes. |
-| `layout` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L150) | Work out the layout for a look and a number of speakers. |
-| `escape` <sub>pub fn</sub> | [186](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L186) | Escape text for markup. |
-| `base64` <sub>fn</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L206) | Base64, for embedding an image so the page stays one file. |
-| `media_type` <sub>fn</sub> | [233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L233) | The media type for an image, by extension. |
-| `data_uri` <sub>pub fn</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L254) | Read an image and turn it into a data: URI. |
-| `background_markup` <sub>fn</sub> | [266](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L266) | The background element, and anything worth telling the user about it. |
-| `speaker_markup` <sub>fn</sub> | [315](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L315) | One speaker's circle and name, as SVG. |
-| `Drawn` <sub>pub struct</sub> | [382](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L382) | What a render produced, and anything the user should know about it. |
-| `still` <sub>pub fn</sub> | [396](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L396) | A single frame, as standalone SVG. |
-| `player` <sub>pub fn</sub> | [494](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L494) | The self-contained page that plays. |
+| `Look::default` <sub>fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L68) |  |
+| `Background` <sub>pub enum</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L81) | What sits behind the picture. |
+| `Look::black` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L90) | Black, for somebody who wants the plainest possible picture. |
+| `Look::themed` <sub>pub fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L103) | The same look in another palette. |
+| `Look::checked` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L124) | Whether these numbers describe a picture that can be drawn. |
+| `Layout` <sub>pub struct</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L162) | Where each part of the picture goes. |
+| `layout` <sub>pub fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L180) | Work out the layout for a look and a number of speakers. |
+| `escape` <sub>pub fn</sub> | [216](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L216) | Escape text for markup. |
+| `base64` <sub>fn</sub> | [236](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L236) | Base64, for embedding an image so the page stays one file. |
+| `media_type` <sub>fn</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L263) | The media type for an image, by extension. |
+| `data_uri` <sub>pub fn</sub> | [284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L284) | Read an image and turn it into a data: URI. |
+| `background_markup` <sub>fn</sub> | [296](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L296) | The background element, and anything worth telling the user about it. |
+| `speaker_markup` <sub>fn</sub> | [345](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L345) | One speaker's circle and name, as SVG. |
+| `Drawn` <sub>pub struct</sub> | [413](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L413) | What a render produced, and anything the user should know about it. |
+| `still` <sub>pub fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L427) | A single frame, as standalone SVG. |
+| `player` <sub>pub fn</sub> | [531](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs#L531) | The self-contained page that plays. |

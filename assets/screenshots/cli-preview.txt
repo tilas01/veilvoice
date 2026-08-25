@@ -44,5 +44,8 @@ Options:
       --black
           Plain black behind everything. Overrides `--background`
 
+      --theme <THEME>
+          Colour scheme, from the nine the website and the app offer
+
   -h, --help
           Print help (see a summary with '-h')

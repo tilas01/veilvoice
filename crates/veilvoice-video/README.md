@@ -79,8 +79,8 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>128 lines"])
     n_ffmpeg["ffmpeg.rs<br/>278 lines"]
-    n_page["page.rs<br/>940 lines"]
-    n_palette["palette.rs<br/>329 lines"]
+    n_page["page.rs<br/>977 lines"]
+    n_palette["palette.rs<br/>735 lines"]
     n_waveform["waveform.rs<br/>245 lines"]
     n_page --> n_palette
     n_page --> n_waveform
@@ -99,8 +99,8 @@ flowchart TD
 |---|---:|---|
 | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 278 | The video file, which needs a codec this project does not ship. |
 | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 128 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
-| [`page.rs`](../../docs/files/veilvoice-video/page.md) | 940 | The picture: one still for a preview, and one page that plays. |
-| [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 329 | Colours: the site's own tokens, and one per speaker. |
+| [`page.rs`](../../docs/files/veilvoice-video/page.md) | 977 | The picture: one still for a preview, and one page that plays. |
+| [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 735 | Colours: the site's own tokens, and one per speaker. |
 | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 245 | The shape of the audio, reduced to something a page can draw. |
 
 ## Public items
@@ -129,6 +129,12 @@ flowchart TD
 | `const BORDER` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | Hairlines and dividers. |
 | `const FG` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | Body text. |
 | `const MUTED` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | Secondary text. |
+| `struct Palette` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | One complete colour scheme, matching one data-theme block in website/css/themes.css and one entry in veilvoice-gui's theme table. |
+| `const PALETTES` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | Every palette, in the order the pickers show them. |
+| `const DEFAULT_ID` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | The palette a render uses unless one is named. |
+| `fn by_id` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | The palette with this identifier. |
+| `fn default_palette` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | The default palette. |
+| `fn ids` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | Every identifier, for an error message or a picker. |
 | `const SPEAKERS` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | The ten speaker colours, in the order slots are handed out. |
 | `fn speaker` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | The colour for a speaker slot. |
 | `fn distance` | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | How far apart two colours look, by the "redmean" approximation. |

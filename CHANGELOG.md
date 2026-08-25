@@ -8,6 +8,42 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Video and page renders follow the same nine palettes everything else does
+
+```
+veilvoice conversation render plan.txt talk.wav --page --theme gruvbox
+veilvoice conversation preview plan.txt --theme nord
+```
+
+`veilvoice-video` knew one colour scheme. It now carries all nine the website
+declares and the desktop application offers, with the same identifiers, and a
+test reads `website/css/themes.css` and fails if any hex ever disagrees — the
+same arrangement the app has had since the themes existed. A second test fails
+if the stylesheet gains a theme this crate has never heard of, because a picker
+offering nine and a renderer knowing eight is a picker with one entry that
+silently draws the wrong colours.
+
+The default is Tokyo Night. An unknown name is **refused**, and the refusal
+lists every one it could have been: a picture quietly drawn in a different
+scheme than the one asked for is worse than an error. The page follows the
+theme unless a `--background` was asked for separately, in which case both
+requests are honoured.
+
+**The ten speaker colours do not change with the palette, and that is a
+decision rather than an omission.** A palette here has six chromatic tokens;
+ten mutually separable colours cannot be got out of six without inventing four,
+and four invented colours are four whose separation nobody has measured. This
+set *was* measured — the closest pair anywhere in it scores 63, and that pair
+is only reached by a recording with nine or ten people. What the palette
+decides is everything around them, so a Gruvbox render is a Gruvbox picture
+with those ten circles in it. The ink drawn on each circle is computed rather
+than assumed, and a test checks every one clears 4.5:1.
+
+While the contrast arithmetic was there it was pointed at the palettes
+themselves: body text on the page clears 4.5:1 in all nine, light ones
+included.
+
+
 ### Pictures of the thing, in the README and on the website
 
 Every tab of the desktop application, and ten of the command line's screens.
