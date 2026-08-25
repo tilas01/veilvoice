@@ -8,6 +8,47 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Seventh audit round — four defects, and one encoder proved sound
+
+Four found and fixed, **F-61 to F-64**, all in code written this cycle. `main`
+has not been released since v0.1.12, so "none had shipped" and "all were
+written this cycle" are the same sentence, and the round says so rather than
+claiming credit for it.
+
+**Three of the four are the same shape: a comment that had stopped being true.**
+
+* **F-61** — the verify tab's dropped file was read at the *end* of `update`,
+  after the panel that shows it had been painted, so a drop and the highlight
+  under a hovering file were a frame late. The comment above the call said
+  "before anything is drawn". A wrong thing that agrees with itself survives a
+  reading, and this one had survived several.
+* **F-62** — nothing woke the window while a file hovered over it. An idle egui
+  window repaints only when asked, and the repaint condition listed every busy
+  state and no hovering state, so the drop target lit nothing up and the file
+  did not appear until the mouse moved for some other reason. The one moment
+  where the user is waiting for the window and the window has decided nothing
+  is happening.
+* **F-63** — the stylesheet comment beside the responsive-table rule said
+  "nothing changes on a desktop". Measured: the tables render 820 px wide in an
+  860 px column, so the row rules stop forty pixels short. `width: 100%` does
+  not restore it, because the shrink happens on the anonymous table box inside
+  the block. The trade is still right; the comment now says what it costs.
+* **F-64** — a malformed `SHA256SUMS` line carrying a digest and no name could
+  answer a lookup for `""`, which is what `Path::file_name` gives for a
+  directory or `..` once it has been through `unwrap_or_default`. Not reachable
+  from either front end, so a hole rather than a live defect. Both halves
+  closed.
+
+**What was checked and found sound.** The GIF encoder's dictionary-reset path
+had never been seen by an independent decoder, because the banner's own frames
+may never reach 4096 codes. A 512×512 field built to force it reset the
+dictionary **66 times** and was decoded by Windows' GDI+ with **zero
+mismatched pixels in 262,144**.
+
+The front page's defect count is checked against `docs/AUDIT.md` by a site
+test, which is what noticed the page still said sixty.
+
+
 ### Transcription and speaker detection: checked before built, and the check moved them
 
 Both were decided in principle earlier in this cycle and neither is built. The

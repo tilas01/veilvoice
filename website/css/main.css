@@ -1195,11 +1195,17 @@ table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13.5p
 
 /* A reference table has a column of item names that cannot be broken -- they
  * are code -- so its narrowest possible width can exceed the column it is in.
- * `display: block` makes the element its own sideways scroller; the rows inside
- * are then laid out by an anonymous table box, which shrink-to-fits. That means
- * the table still fills a column wide enough to hold it -- so nothing changes
- * on a desktop -- and scrolls inside itself when the column is not, instead of
- * taking the whole page sideways.
+ * `display: block` makes the element its own sideways scroller, and the rows
+ * inside are laid out by an anonymous table box.
+ *
+ * What that costs, measured rather than assumed: a table is now **content**
+ * width rather than column width. On the security page the tables come out at
+ * 820 px inside an 860 px column, so the row rules stop forty pixels short of
+ * the text above them. `width: 100%` does not change it -- tried, measured,
+ * still 820 -- because the shrink happens on the anonymous table inside, not on
+ * the block. Forty pixels of rule against a page that no longer scrolls
+ * sideways on a phone is a trade worth making, but it is a trade, and an
+ * earlier version of this comment claimed nothing changed on a desktop.
  *
  * Deliberately not inside a width query. The reference pages keep a 200 px
  * contents column until 720 px, so a tablet at 768 gives a table *less* room

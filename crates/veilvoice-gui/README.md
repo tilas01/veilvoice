@@ -83,7 +83,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>67 lines"])
     n_main(["main.rs<br/>87 lines"])
-    n_app["app.rs<br/>1501 lines"]
+    n_app["app.rs<br/>1514 lines"]
     n_crashlog["crashlog.rs<br/>254 lines"]
     n_group["group.rs<br/>1044 lines"]
     n_palettes["palettes.rs<br/>691 lines"]
@@ -96,7 +96,7 @@ flowchart TD
     n_soundbar["soundbar.rs<br/>349 lines"]
     n_theme["theme.rs<br/>745 lines"]
     n_updates["updates.rs<br/>234 lines"]
-    n_verify["verify.rs<br/>462 lines"]
+    n_verify["verify.rs<br/>483 lines"]
     n_watchfeed["watchfeed.rs<br/>338 lines"]
     n_app --> n_crashlog
     n_app --> n_group
@@ -155,7 +155,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1501 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1514 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 254 | Make a failure that produces no output produce some. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1044 | Group mode: several people in one recording, each with a name and a colour. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 67 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
@@ -170,7 +170,7 @@ flowchart TD
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 349 | The animated mark: a row of bars that rise and fall. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 745 | Colour schemes for the desktop app. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 234 | The manual update check, as the window shows it. |
-| [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 462 | The verify tab: drop a download on the window and be told what it is. |
+| [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 483 | The verify tab: drop a download on the window and be told what it is. |
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 338 | The device monitor, moved off the thread that paints. |
 
 ## Public items
