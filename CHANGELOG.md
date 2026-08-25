@@ -8,6 +8,26 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The desktop meters were arguing with themselves
+
+The terminal's meters were fixed a few commits ago. The desktop application's
+had the same fault and one worse: the bar was filled **linearly** while the
+number printed beside it was in **decibels**. At ordinary speech the number
+said -12 dB and the bar showed a quarter. Two meters disagreeing about the same
+reading is worse than one bad meter, because it makes the reader doubt the
+number as well as the bar.
+
+The scale moved to `veilvoice-audio`, beside the thing that produces the peaks,
+so both front ends now draw the same reading the same way. The desktop bars
+gained the rest of it too: a **peak-hold hairline** that decays after a second
+and a half, a clip colour on the same threshold, and a muted bar below -40 dBFS
+so a quiet room does not read as a working microphone.
+
+A test asserts the bar and the number agree — that the fill is exactly the
+affine map of the decibel figure — because the failure this replaces was
+precisely the two of them drifting apart while both looked plausible alone.
+
+
 ### The website's own source is documented, twice over
 
 Ten files the site invites you to open and read — eight scripts and two

@@ -177,6 +177,12 @@ pub struct VeilVoiceApp {
     live_error: Option<String>,
     meter_in: f32,
     meter_out: f32,
+    // The highest level of the last moment or so, and when it was taken. A bar
+    // showing only the current frame cannot show a transient: the loud syllable
+    // is gone before an eye finishes moving.
+    hold_in: f32,
+    hold_out: f32,
+    hold_since: Option<std::time::Instant>,
 
     // The app lock, and at-rest encryption of what jobs write.
     security: Security,
@@ -260,6 +266,9 @@ impl VeilVoiceApp {
             live_error: None,
             meter_in: 0.0,
             meter_out: 0.0,
+            hold_in: 0.0,
+            hold_out: 0.0,
+            hold_since: None,
             security: Security::default(),
             // Off. `VeilVoiceApp::new` is the only place the saved preference
             // is consulted, so no test and no `Default` can open in group mode
@@ -825,6 +834,9 @@ impl VeilVoiceApp {
                 self.session = None;
                 self.meter_in = 0.0;
                 self.meter_out = 0.0;
+                self.hold_in = 0.0;
+                self.hold_out = 0.0;
+                self.hold_since = None;
             }
             if running {
                 ui.label(RichText::new("● live").color(p::green()));
@@ -842,10 +854,29 @@ impl VeilVoiceApp {
             self.meter_in = (self.meter_in * 0.7).max(stats.input_peak);
             self.meter_out = (self.meter_out * 0.7).max(stats.output_peak);
 
+            // The hold rises at once and falls back after a second and a half,
+            // rather than sticking -- otherwise the bar slowly becomes a picture
+            // of the loudest thing that ever happened.
+            const HOLD: std::time::Duration = std::time::Duration::from_millis(1500);
+            let expired = self
+                .hold_since
+                .map(|at| at.elapsed() >= HOLD)
+                .unwrap_or(true);
+            if expired || self.meter_in >= self.hold_in || self.meter_out >= self.hold_out {
+                if expired {
+                    self.hold_in = self.meter_in;
+                    self.hold_out = self.meter_out;
+                } else {
+                    self.hold_in = self.hold_in.max(self.meter_in);
+                    self.hold_out = self.hold_out.max(self.meter_out);
+                }
+                self.hold_since = Some(std::time::Instant::now());
+            }
+
             ui.add_space(12.0);
             ui.label(RichText::new("LEVELS").color(p::blue()).small());
-            meter(ui, "in ", self.meter_in);
-            meter(ui, "out", self.meter_out);
+            meter(ui, "in ", self.meter_in, self.hold_in);
+            meter(ui, "out", self.meter_out, self.hold_out);
 
             ui.add_space(12.0);
             ui.label(RichText::new("PERFORMANCE").color(p::blue()).small());
@@ -1127,29 +1158,64 @@ fn field(ui: &mut egui::Ui, label: &str, value: &str) {
     });
 }
 
-fn meter(ui: &mut egui::Ui, label: &str, peak: f32) {
+/// One level meter: a bar on the decibel scale, and the number beside it.
+///
+/// This was a **linear** bar with a decibel number printed next to it, which is
+/// a meter arguing with itself: the number said -12 dB and the bar showed a
+/// quarter. Ordinary speech at a sensible recording level peaks near -12 dBFS,
+/// so the bar read as near-silence and the only way to fill it was to clip.
+///
+/// The scale now comes from `veilvoice_audio::meter`, which is where the peaks
+/// come from, so this bar and the terminal's are the same bar. `hold` is the
+/// highest level of the last moment or so, drawn as a mark: a transient is over
+/// before an eye finishes moving, and a bar showing only *now* cannot show one.
+fn meter(ui: &mut egui::Ui, label: &str, peak: f32, hold: f32) {
+    use veilvoice_audio::meter;
+
     ui.horizontal(|ui| {
         ui.label(RichText::new(label).color(p::muted()));
         let (rect, _) = ui.allocate_exact_size(egui::vec2(280.0, 12.0), egui::Sense::hover());
         let painter = ui.painter();
         painter.rect_filled(rect, 2.0, p::bg_dark());
 
-        let level = peak.clamp(0.0, 1.0);
-        let colour = if level > 0.95 {
+        let db = meter::dbfs(peak);
+        let colour = if meter::clipping(peak) {
             p::red()
-        } else if level > 0.7 {
+        } else if db >= -6.0 {
             p::yellow()
-        } else {
+        } else if db >= -40.0 {
             p::green()
+        } else {
+            // Below -40 the signal is room tone rather than speech. Drawn muted,
+            // so a quiet room does not read as a working microphone.
+            p::muted()
         };
         let mut filled = rect;
-        filled.set_width(rect.width() * level);
+        filled.set_width(rect.width() * meter::position(peak));
         painter.rect_filled(filled, 2.0, colour);
+
+        // The held peak, as a hairline. Only where the bar is empty: inside the
+        // fill it would be saying what the fill already says.
+        if meter::position(hold) > meter::position(peak) {
+            let x = rect.left() + rect.width() * meter::position(hold);
+            painter.line_segment(
+                [egui::pos2(x, rect.top()), egui::pos2(x, rect.bottom())],
+                egui::Stroke::new(1.5, p::fg()),
+            );
+        }
+
         painter.rect_stroke(rect, 2.0, egui::Stroke::new(1.0, p::border()));
 
-        ui.label(
-            RichText::new(format!("{:>5.1} dB", 20.0 * level.max(1e-4).log10())).color(p::muted()),
-        );
+        let text = if db <= meter::FLOOR_DB {
+            "  -inf dBFS".to_string()
+        } else {
+            format!("{db:>6.1} dBFS")
+        };
+        ui.label(RichText::new(text).color(if meter::clipping(peak) {
+            p::red()
+        } else {
+            p::muted()
+        }));
     });
 }
 
@@ -1165,6 +1231,33 @@ mod tests {
             is_default: default,
             is_virtual_cable: cable,
         }
+    }
+
+    /// The bar and the number beside it have to be saying the same thing.
+    ///
+    /// They did not: the bar was filled linearly and the number was decibels,
+    /// so at ordinary speech the number said -12 and the bar showed a quarter.
+    /// Both now come from `veilvoice_audio::meter`, and this is the assertion
+    /// that keeps them there.
+    #[test]
+    fn the_bar_and_the_number_agree_about_the_level() {
+        use veilvoice_audio::meter;
+        for peak in [0.0f32, 0.001, 0.06, 0.251, 0.5, 0.9, 1.0] {
+            let along = meter::position(peak);
+            let db = meter::dbfs(peak);
+            // The bar's fill is `position`; the number is `dbfs`. One is an
+            // affine map of the other, so if they ever stop agreeing this fails.
+            let from_db = ((db - meter::FLOOR_DB) / -meter::FLOOR_DB).clamp(0.0, 1.0);
+            assert!(
+                (along - from_db).abs() < 1e-6,
+                "peak {peak}: bar at {along}, number says {db} dBFS"
+            );
+        }
+        // And the thing the old meter got wrong, stated outright.
+        assert!(
+            meter::position(0.251) > 0.7,
+            "speech at -12 dBFS must fill most of the bar"
+        );
     }
 
     #[test]

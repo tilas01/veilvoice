@@ -103,7 +103,7 @@ flowchart TD
     n_conversation["conversation.rs<br/>742 lines"]
     n_guard["guard.rs<br/>338 lines"]
     n_lock["lock.rs<br/>239 lines"]
-    n_meter["meter.rs<br/>343 lines"]
+    n_meter["meter.rs<br/>250 lines"]
     n_policy["policy.rs<br/>236 lines"]
     n_sentry["sentry.rs<br/>376 lines"]
     n_theme["theme.rs<br/>135 lines"]
@@ -147,7 +147,7 @@ flowchart TD
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
 | [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 1958 | veilvoice — the command-line interface. |
-| [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 343 | Level meters for veilvoice live, on a scale that means something. |
+| [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 250 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 236 | veilvoice policy -- settings that can only be tightened. |
 | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 376 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 135 | Tokyo Night colouring for the terminal. |
@@ -178,10 +178,6 @@ flowchart TD
 | `fn wrap` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | Greedy word wrap. |
 | `fn run` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
 | `const HOLD` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | How long a peak marker is held before it falls back. |
-| `const FLOOR_DB` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | The quietest level the bar shows. |
-| `const CLIP_DB` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | At or above this, the level is called clipping. |
-| `fn dbfs` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | Level in decibels relative to full scale. |
-| `fn position` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | Where a level sits along the bar, from 0.0 at the floor to 1.0 at full scale. |
 | `fn render` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | One meter: the bar, the peak marker, and the number. |
 | `struct Channel` | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | One channel's meter, keeping the peak between reads. |
 | `fn policy_dir` | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | Where the policy files live. |

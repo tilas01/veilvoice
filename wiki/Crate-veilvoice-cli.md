@@ -90,7 +90,7 @@ flowchart TD
     n_conversation["conversation.rs<br/>742 lines"]
     n_guard["guard.rs<br/>338 lines"]
     n_lock["lock.rs<br/>239 lines"]
-    n_meter["meter.rs<br/>343 lines"]
+    n_meter["meter.rs<br/>250 lines"]
     n_policy["policy.rs<br/>236 lines"]
     n_sentry["sentry.rs<br/>376 lines"]
     n_theme["theme.rs<br/>135 lines"]
@@ -134,7 +134,7 @@ flowchart TD
 | [[`guard.rs`|File-veilvoice-cli-guard]] | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [[`lock.rs`|File-veilvoice-cli-lock]] | 239 | veilvoice lock — manage the application lock from the command line. |
 | [[`main.rs`|File-veilvoice-cli-main]] | 1958 | veilvoice — the command-line interface. |
-| [[`meter.rs`|File-veilvoice-cli-meter]] | 343 | Level meters for veilvoice live, on a scale that means something. |
+| [[`meter.rs`|File-veilvoice-cli-meter]] | 250 | Level meters for veilvoice live, on a scale that means something. |
 | [[`policy.rs`|File-veilvoice-cli-policy]] | 236 | veilvoice policy -- settings that can only be tightened. |
 | [[`sentry.rs`|File-veilvoice-cli-sentry]] | 376 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 135 | Tokyo Night colouring for the terminal. |

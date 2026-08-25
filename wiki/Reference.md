@@ -20,6 +20,7 @@ Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable rou
 - [[`io.rs`|File-veilvoice-audio-io]] &mdash; Reading and writing audio files.
 - [[`lib.rs`|File-veilvoice-audio-lib]] &mdash; Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path.
 - [[`live.rs`|File-veilvoice-audio-live]] &mdash; Live microphone scrambling.
+- [[`meter.rs`|File-veilvoice-audio-meter]] &mdash; The scale a level meter is drawn on.
 
 ## [[veilvoice-capture|Crate-veilvoice-capture]]
 
