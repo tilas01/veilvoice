@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/app.svg" alt="app.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/app.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1339 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1356 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-seven-tabs-and-why-these-seven">The seven tabs, and why these seven</a>
@@ -80,14 +80,14 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1339 lines defining <strong>22 functions</strong> (1 public), <strong>3 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1356 lines defining <strong>22 functions</strong> (1 public), <strong>3 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Tab</code> <span style="color:var(--muted)">line 117</span> &mdash; The things VeilVoice does.</li>
-<li><code>enum JobDone</code> <span style="color:var(--muted)">line 135</span> &mdash; Result of a background file job.</li>
-<li><code>struct VeilVoiceApp</code> <span style="color:var(--muted)">line 146</span> &mdash; Application state.</li>
+<li><code>enum JobDone</code> <span style="color:var(--muted)">line 137</span> &mdash; Result of a background file job.</li>
+<li><code>struct VeilVoiceApp</code> <span style="color:var(--muted)">line 148</span> &mdash; Application state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>VeilVoiceApp::new</code> <span style="color:var(--muted)">line 280</span> &mdash; Build the app, applying theme and fonts to ctx.
+<li><code>VeilVoiceApp::new</code> <span style="color:var(--muted)">line 290</span> &mdash; Build the app, applying theme and fonts to ctx.
 </li>
 </ul>
 </section>
@@ -121,115 +121,115 @@
 <path d="M213.4 374.0 C 213.4 394.0, 430.8 500.0, 430.8 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M213.4 374.0 C 213.4 394.0, 209.6 700.0, 209.6 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M213.4 374.0 C 213.4 394.0, 461.2 700.0, 461.2 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L203" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L209" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="102.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">preferred_output</text>
-<text x="102.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 203</text>
+<text x="102.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L212" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L218" target="_blank" rel="noopener noreferrer">
 <rect x="203.6" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="274.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">preferred_input</text>
-<text x="274.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 212</text>
+<text x="274.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 218</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L226" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L232" target="_blank" rel="noopener noreferrer">
 <rect x="371.6" y="20.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="495.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::without_devices</text>
-<text x="495.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 226</text>
+<text x="495.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 232</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L262" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L272" target="_blank" rel="noopener noreferrer">
 <rect x="138.6" y="120.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="232.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::default</text>
-<text x="232.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 262</text>
+<text x="232.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L280" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L290" target="_blank" rel="noopener noreferrer">
 <rect x="352.2" y="120.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="430.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::new</text>
-<text x="430.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 280</text>
+<text x="430.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 290</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L321" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L336" target="_blank" rel="noopener noreferrer">
 <rect x="108.2" y="220.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="221.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::apply_policy</text>
-<text x="221.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
+<text x="221.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 336</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L343" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L358" target="_blank" rel="noopener noreferrer">
 <rect x="119.6" y="520.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="213.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::posture</text>
-<text x="213.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 343</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L353" target="_blank" rel="noopener noreferrer">
-<rect x="359.8" y="220.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="449.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::config</text>
-<text x="449.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 353</text>
+<text x="213.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 358</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L368" target="_blank" rel="noopener noreferrer">
+<rect x="359.8" y="220.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="449.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::config</text>
+<text x="449.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 368</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L383" target="_blank" rel="noopener noreferrer">
 <rect x="123.4" y="320.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="213.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::update</text>
-<text x="213.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 368</text>
+<text x="213.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 383</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L485" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L502" target="_blank" rel="noopener noreferrer">
 <rect x="333.2" y="520.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="430.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::poll_job</text>
-<text x="430.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 485</text>
+<text x="430.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 502</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L519" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L536" target="_blank" rel="noopener noreferrer">
 <rect x="329.4" y="320.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="427.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::settings</text>
-<text x="427.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 519</text>
+<text x="427.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 536</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L583" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L600" target="_blank" rel="noopener noreferrer">
 <rect x="115.8" y="620.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="213.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::file_tab</text>
-<text x="213.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 583</text>
+<text x="213.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 600</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L674" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L691" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="920.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="129.4" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::start_job</text>
-<text x="129.4" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 674</text>
+<text x="129.4" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 691</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L730" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L747" target="_blank" rel="noopener noreferrer">
 <rect x="337.0" y="620.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="434.6" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::live_tab</text>
-<text x="434.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 730</text>
+<text x="434.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 747</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L821" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L838" target="_blank" rel="noopener noreferrer">
 <rect x="256.8" y="920.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="362.0" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::start_live</text>
-<text x="362.0" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 821</text>
+<text x="362.0" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 838</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L836" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L853" target="_blank" rel="noopener noreferrer">
 <rect x="85.4" y="720.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="209.6" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::watch_indicator</text>
-<text x="209.6" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 836</text>
+<text x="209.6" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 853</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L866" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L883" target="_blank" rel="noopener noreferrer">
 <rect x="359.8" y="720.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="461.2" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::watch_tab</text>
-<text x="461.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 866</text>
+<text x="461.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 883</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L949" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L966" target="_blank" rel="noopener noreferrer">
 <rect x="203.6" y="420.0" width="240.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="324.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::previous_crash</text>
-<text x="324.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 949</text>
+<text x="324.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 966</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L974" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L991" target="_blank" rel="noopener noreferrer">
 <rect x="222.6" y="820.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="324.0" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VeilVoiceApp::about_tab</text>
-<text x="324.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 974</text>
+<text x="324.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 991</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1029" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1046" target="_blank" rel="noopener noreferrer">
 <rect x="493.2" y="920.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="556.6" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">device_picker</text>
-<text x="556.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1029</text>
+<text x="556.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1046</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1054" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1071" target="_blank" rel="noopener noreferrer">
 <rect x="214.6" y="1020.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="262.8" y="1042.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
-<text x="262.8" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1054</text>
+<text x="262.8" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1071</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1061" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1078" target="_blank" rel="noopener noreferrer">
 <rect x="337.0" y="1020.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="385.2" y="1042.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">meter</text>
-<text x="385.2" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1061</text>
+<text x="385.2" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1078</text>
 </a>
 </svg>
 </div>
@@ -237,28 +237,28 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_preferred_output[&quot;preferred_output&lt;br/&gt;line 203&quot;]
-    n_preferred_input[&quot;preferred_input&lt;br/&gt;line 212&quot;]
-    n_without_devices[&quot;VeilVoiceApp::without_devices&lt;br/&gt;line 226&quot;]
-    n_default[&quot;VeilVoiceApp::default&lt;br/&gt;line 262&quot;]
-    n_new([&quot;VeilVoiceApp::new&lt;br/&gt;line 280&quot;])
-    n_apply_policy[&quot;VeilVoiceApp::apply_policy&lt;br/&gt;line 321&quot;]
-    n_posture[&quot;VeilVoiceApp::posture&lt;br/&gt;line 343&quot;]
-    n_config[&quot;VeilVoiceApp::config&lt;br/&gt;line 353&quot;]
-    n_update[&quot;VeilVoiceApp::update&lt;br/&gt;line 368&quot;]
-    n_poll_job[&quot;VeilVoiceApp::poll_job&lt;br/&gt;line 485&quot;]
-    n_settings[&quot;VeilVoiceApp::settings&lt;br/&gt;line 519&quot;]
-    n_file_tab[&quot;VeilVoiceApp::file_tab&lt;br/&gt;line 583&quot;]
-    n_start_job[&quot;VeilVoiceApp::start_job&lt;br/&gt;line 674&quot;]
-    n_live_tab[&quot;VeilVoiceApp::live_tab&lt;br/&gt;line 730&quot;]
-    n_start_live[&quot;VeilVoiceApp::start_live&lt;br/&gt;line 821&quot;]
-    n_watch_indicator[&quot;VeilVoiceApp::watch_indicator&lt;br/&gt;line 836&quot;]
-    n_watch_tab[&quot;VeilVoiceApp::watch_tab&lt;br/&gt;line 866&quot;]
-    n_previous_crash[&quot;VeilVoiceApp::previous_crash&lt;br/&gt;line 949&quot;]
-    n_about_tab[&quot;VeilVoiceApp::about_tab&lt;br/&gt;line 974&quot;]
-    n_device_picker[&quot;device_picker&lt;br/&gt;line 1029&quot;]
-    n_field[&quot;field&lt;br/&gt;line 1054&quot;]
-    n_meter[&quot;meter&lt;br/&gt;line 1061&quot;]
+    n_preferred_output[&quot;preferred_output&lt;br/&gt;line 209&quot;]
+    n_preferred_input[&quot;preferred_input&lt;br/&gt;line 218&quot;]
+    n_without_devices[&quot;VeilVoiceApp::without_devices&lt;br/&gt;line 232&quot;]
+    n_default[&quot;VeilVoiceApp::default&lt;br/&gt;line 272&quot;]
+    n_new([&quot;VeilVoiceApp::new&lt;br/&gt;line 290&quot;])
+    n_apply_policy[&quot;VeilVoiceApp::apply_policy&lt;br/&gt;line 336&quot;]
+    n_posture[&quot;VeilVoiceApp::posture&lt;br/&gt;line 358&quot;]
+    n_config[&quot;VeilVoiceApp::config&lt;br/&gt;line 368&quot;]
+    n_update[&quot;VeilVoiceApp::update&lt;br/&gt;line 383&quot;]
+    n_poll_job[&quot;VeilVoiceApp::poll_job&lt;br/&gt;line 502&quot;]
+    n_settings[&quot;VeilVoiceApp::settings&lt;br/&gt;line 536&quot;]
+    n_file_tab[&quot;VeilVoiceApp::file_tab&lt;br/&gt;line 600&quot;]
+    n_start_job[&quot;VeilVoiceApp::start_job&lt;br/&gt;line 691&quot;]
+    n_live_tab[&quot;VeilVoiceApp::live_tab&lt;br/&gt;line 747&quot;]
+    n_start_live[&quot;VeilVoiceApp::start_live&lt;br/&gt;line 838&quot;]
+    n_watch_indicator[&quot;VeilVoiceApp::watch_indicator&lt;br/&gt;line 853&quot;]
+    n_watch_tab[&quot;VeilVoiceApp::watch_tab&lt;br/&gt;line 883&quot;]
+    n_previous_crash[&quot;VeilVoiceApp::previous_crash&lt;br/&gt;line 966&quot;]
+    n_about_tab[&quot;VeilVoiceApp::about_tab&lt;br/&gt;line 991&quot;]
+    n_device_picker[&quot;device_picker&lt;br/&gt;line 1046&quot;]
+    n_field[&quot;field&lt;br/&gt;line 1071&quot;]
+    n_meter[&quot;meter&lt;br/&gt;line 1078&quot;]
     n_about_tab --&gt; n_field
     n_about_tab --&gt; n_previous_crash
     n_apply_policy --&gt; n_posture
@@ -282,28 +282,28 @@ flowchart TD
     n_update --&gt; n_poll_job
     n_update --&gt; n_watch_indicator
     n_update --&gt; n_watch_tab
-    click n_preferred_output href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L203&quot; &quot;open the source&quot;
-    click n_preferred_input href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L212&quot; &quot;open the source&quot;
-    click n_without_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L226&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L262&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L280&quot; &quot;open the source&quot;
-    click n_apply_policy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L321&quot; &quot;open the source&quot;
-    click n_posture href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L343&quot; &quot;open the source&quot;
-    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L353&quot; &quot;open the source&quot;
-    click n_update href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L368&quot; &quot;open the source&quot;
-    click n_poll_job href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L485&quot; &quot;open the source&quot;
-    click n_settings href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L519&quot; &quot;open the source&quot;
-    click n_file_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L583&quot; &quot;open the source&quot;
-    click n_start_job href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L674&quot; &quot;open the source&quot;
-    click n_live_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L730&quot; &quot;open the source&quot;
-    click n_start_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L821&quot; &quot;open the source&quot;
-    click n_watch_indicator href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L836&quot; &quot;open the source&quot;
-    click n_watch_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L866&quot; &quot;open the source&quot;
-    click n_previous_crash href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L949&quot; &quot;open the source&quot;
-    click n_about_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L974&quot; &quot;open the source&quot;
-    click n_device_picker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1029&quot; &quot;open the source&quot;
-    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1054&quot; &quot;open the source&quot;
-    click n_meter href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1061&quot; &quot;open the source&quot;
+    click n_preferred_output href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L209&quot; &quot;open the source&quot;
+    click n_preferred_input href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L218&quot; &quot;open the source&quot;
+    click n_without_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L232&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L272&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L290&quot; &quot;open the source&quot;
+    click n_apply_policy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L336&quot; &quot;open the source&quot;
+    click n_posture href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L358&quot; &quot;open the source&quot;
+    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L368&quot; &quot;open the source&quot;
+    click n_update href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L383&quot; &quot;open the source&quot;
+    click n_poll_job href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L502&quot; &quot;open the source&quot;
+    click n_settings href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L536&quot; &quot;open the source&quot;
+    click n_file_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L600&quot; &quot;open the source&quot;
+    click n_start_job href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L691&quot; &quot;open the source&quot;
+    click n_live_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L747&quot; &quot;open the source&quot;
+    click n_start_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L838&quot; &quot;open the source&quot;
+    click n_watch_indicator href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L853&quot; &quot;open the source&quot;
+    click n_watch_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L883&quot; &quot;open the source&quot;
+    click n_previous_crash href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L966&quot; &quot;open the source&quot;
+    click n_about_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L991&quot; &quot;open the source&quot;
+    click n_device_picker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1046&quot; &quot;open the source&quot;
+    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1071&quot; &quot;open the source&quot;
+    click n_meter href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1078&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -315,30 +315,30 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>Tab</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L117" rel="noopener noreferrer">117</a></td><td>The things VeilVoice does.</td></tr>
-<tr><td><code>JobDone</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L135" rel="noopener noreferrer">135</a></td><td>Result of a background file job.</td></tr>
-<tr><td><code>VeilVoiceApp</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L146" rel="noopener noreferrer">146</a></td><td>Application state.</td></tr>
-<tr><td><code>preferred_output</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L203" rel="noopener noreferrer">203</a></td><td>Pick the output to start on: a virtual cable if the machine has one, because routing there is what lets other applications hear the veiled voice at all; otherwise the system default.</td></tr>
-<tr><td><code>preferred_input</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L212" rel="noopener noreferrer">212</a></td><td>Pick the input to start on: the system default, else whatever is first.</td></tr>
-<tr><td><code>VeilVoiceApp::without_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L226" rel="noopener noreferrer">226</a></td><td>The application with no devices enumerated.</td></tr>
-<tr><td><code>VeilVoiceApp::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L262" rel="noopener noreferrer">262</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L280" rel="noopener noreferrer">280</a></td><td>Build the app, applying theme and fonts to ctx.</td></tr>
-<tr><td><code>VeilVoiceApp::apply_policy</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L321" rel="noopener noreferrer">321</a></td><td>Bring the controls into line with the policy, once, at startup.</td></tr>
-<tr><td><code>VeilVoiceApp::posture</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L343" rel="noopener noreferrer">343</a></td><td>The settings as they will actually be used, after the policy.</td></tr>
-<tr><td><code>VeilVoiceApp::config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L353" rel="noopener noreferrer">353</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::update</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L368" rel="noopener noreferrer">368</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::poll_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L485" rel="noopener noreferrer">485</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::settings</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L519" rel="noopener noreferrer">519</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::file_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L583" rel="noopener noreferrer">583</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::start_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L674" rel="noopener noreferrer">674</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::live_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L730" rel="noopener noreferrer">730</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::start_live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L821" rel="noopener noreferrer">821</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::watch_indicator</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L836" rel="noopener noreferrer">836</a></td><td>Re-scan on a timer rather than every frame.</td></tr>
-<tr><td><code>VeilVoiceApp::watch_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L866" rel="noopener noreferrer">866</a></td><td></td></tr>
-<tr><td><code>VeilVoiceApp::previous_crash</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L949" rel="noopener noreferrer">949</a></td><td>Say so if the last run ended badly, and offer the file.</td></tr>
-<tr><td><code>VeilVoiceApp::about_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L974" rel="noopener noreferrer">974</a></td><td></td></tr>
-<tr><td><code>device_picker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1029" rel="noopener noreferrer">1029</a></td><td></td></tr>
-<tr><td><code>field</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1054" rel="noopener noreferrer">1054</a></td><td></td></tr>
-<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1061" rel="noopener noreferrer">1061</a></td><td></td></tr>
+<tr><td><code>JobDone</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L137" rel="noopener noreferrer">137</a></td><td>Result of a background file job.</td></tr>
+<tr><td><code>VeilVoiceApp</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L148" rel="noopener noreferrer">148</a></td><td>Application state.</td></tr>
+<tr><td><code>preferred_output</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L209" rel="noopener noreferrer">209</a></td><td>Pick the output to start on: a virtual cable if the machine has one, because routing there is what lets other applications hear the veiled voice at all; otherwise the system default.</td></tr>
+<tr><td><code>preferred_input</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L218" rel="noopener noreferrer">218</a></td><td>Pick the input to start on: the system default, else whatever is first.</td></tr>
+<tr><td><code>VeilVoiceApp::without_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L232" rel="noopener noreferrer">232</a></td><td>The application with no devices enumerated.</td></tr>
+<tr><td><code>VeilVoiceApp::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L272" rel="noopener noreferrer">272</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L290" rel="noopener noreferrer">290</a></td><td>Build the app, applying theme and fonts to ctx.</td></tr>
+<tr><td><code>VeilVoiceApp::apply_policy</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L336" rel="noopener noreferrer">336</a></td><td>Bring the controls into line with the policy, once, at startup.</td></tr>
+<tr><td><code>VeilVoiceApp::posture</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L358" rel="noopener noreferrer">358</a></td><td>The settings as they will actually be used, after the policy.</td></tr>
+<tr><td><code>VeilVoiceApp::config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L368" rel="noopener noreferrer">368</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::update</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L383" rel="noopener noreferrer">383</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::poll_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L502" rel="noopener noreferrer">502</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::settings</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L536" rel="noopener noreferrer">536</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::file_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L600" rel="noopener noreferrer">600</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::start_job</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L691" rel="noopener noreferrer">691</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::live_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L747" rel="noopener noreferrer">747</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::start_live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L838" rel="noopener noreferrer">838</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::watch_indicator</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L853" rel="noopener noreferrer">853</a></td><td>Re-scan on a timer rather than every frame.</td></tr>
+<tr><td><code>VeilVoiceApp::watch_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L883" rel="noopener noreferrer">883</a></td><td></td></tr>
+<tr><td><code>VeilVoiceApp::previous_crash</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L966" rel="noopener noreferrer">966</a></td><td>Say so if the last run ended badly, and offer the file.</td></tr>
+<tr><td><code>VeilVoiceApp::about_tab</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L991" rel="noopener noreferrer">991</a></td><td></td></tr>
+<tr><td><code>device_picker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1046" rel="noopener noreferrer">1046</a></td><td></td></tr>
+<tr><td><code>field</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1071" rel="noopener noreferrer">1071</a></td><td></td></tr>
+<tr><td><code>meter</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1078" rel="noopener noreferrer">1078</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

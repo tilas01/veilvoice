@@ -81,21 +81,23 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>64 lines"])
+    n_lib(["lib.rs<br/>65 lines"])
     n_main(["main.rs<br/>87 lines"])
-    n_app["app.rs<br/>1339 lines"]
+    n_app["app.rs<br/>1356 lines"]
     n_crashlog["crashlog.rs<br/>254 lines"]
+    n_group["group.rs<br/>653 lines"]
     n_palettes["palettes.rs<br/>691 lines"]
     n_policy["policy.rs<br/>311 lines"]
-    n_prefs["prefs.rs<br/>386 lines"]
+    n_prefs["prefs.rs<br/>405 lines"]
     n_reduced_motion["reduced_motion.rs<br/>328 lines"]
     n_security["security.rs<br/>1092 lines"]
-    n_settings["settings.rs<br/>706 lines"]
+    n_settings["settings.rs<br/>733 lines"]
     n_setup["setup.rs<br/>707 lines"]
     n_soundbar["soundbar.rs<br/>349 lines"]
     n_theme["theme.rs<br/>745 lines"]
     n_watchfeed["watchfeed.rs<br/>338 lines"]
     n_app --> n_crashlog
+    n_app --> n_group
     n_app --> n_palettes
     n_app --> n_policy
     n_app --> n_security
@@ -105,6 +107,8 @@ flowchart TD
     n_app --> n_theme
     n_app --> n_watchfeed
     n_crashlog --> n_prefs
+    n_group --> n_settings
+    n_group --> n_theme
     n_palettes --> n_prefs
     n_palettes --> n_theme
     n_policy --> n_theme
@@ -124,6 +128,7 @@ flowchart TD
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" "open the source"
     click n_app href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" "open the source"
     click n_crashlog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" "open the source"
+    click n_group href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" "open the source"
     click n_palettes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs" "open the source"
     click n_prefs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" "open the source"
@@ -142,16 +147,17 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1339 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1356 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 254 | Make a failure that produces no output produce some. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 64 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 653 | Group mode: several people in one recording, each with a name and a colour. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 65 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 87 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 691 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 311 | The policy in force, and what the interface does about it. |
-| [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 386 | What the user has chosen about how the app looks and moves. |
+| [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 405 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 328 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1092 | The application lock, and the at-rest encryption of what VeilVoice writes. |
-| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 706 | The settings panel: a menu of pages, each a titled group of choices. |
+| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 733 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 707 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 349 | The animated mark: a row of bars that rise and fall. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 745 | Colour schemes for the desktop app. |
@@ -168,6 +174,10 @@ flowchart TD
 | `fn record_startup_failure` | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | Record a startup failure that eframe returned rather than panicked. |
 | `fn previous` | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | Read a previous report, if one is there, so the interface can mention it. |
 | `fn clear` | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | Forget a previous report. |
+| `struct Person` | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | One person, as the panel holds them. |
+| `struct Outputs` | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | What comes out of a group render. |
+| `struct Group` | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | The group-mode panel's state. |
+| `fn assigned_colour` | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | The colour a slot is given, as an egui colour. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | Crate version string, surfaced in the About panel. |
 | `const REQUIRED` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | Every token a palette file has to define. |
 | `const MAX_PALETTES` | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | The most palette files that will be read from the directory. |

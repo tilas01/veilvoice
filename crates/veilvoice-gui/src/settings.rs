@@ -143,6 +143,32 @@ impl Settings {
         self.save_error = self.prefs.save(path).err();
     }
 
+    /// Whether the app should open in group mode, and a way to change it.
+    ///
+    /// Exposed as a pair of methods rather than as a public field so the group
+    /// panel can ask to have a choice remembered without knowing where
+    /// preferences live or what happens when the platform will not say. A
+    /// failed write is not fatal here either: the tick applies for this
+    /// session and the settings page reports why it was not kept.
+    /// Why the last write failed, if it did.
+    pub fn save_error(&self) -> Option<&str> {
+        self.save_error.as_deref()
+    }
+
+    /// Whether the app should open in group mode.
+    pub fn always_group(&self) -> bool {
+        self.prefs.always_group
+    }
+
+    /// Record whether the app should open in group mode.
+    pub fn set_always_group(&mut self, always: bool) {
+        if self.prefs.always_group == always {
+            return;
+        }
+        self.prefs.always_group = always;
+        self.persist();
+    }
+
     /// The first-run panel: offered once, with animation already on.
     ///
     /// Shown as a page rather than a modal because it is not urgent and does
@@ -665,6 +691,7 @@ mod tests {
                 animations: false,
                 animated_icon: false,
                 configured: true,
+                always_group: false,
                 recovered_from_corrupt_file: false,
             },
             page: Page::Storage,

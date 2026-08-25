@@ -8,6 +8,81 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Group mode, where you can see it
+
+The engine has handled several speakers since conversation mode shipped. The
+desktop app has never shown it. There is now a **group** tab, and it is a
+picture rather than a flag: a circle per person in their colour, their name
+under it, and the destination voice each of them becomes.
+
+**Off by default, and the toggle does not persist.** Group mode changes what a
+recording is *treated as*, and a mode that survives a restart is a mode
+somebody eventually forgets is on — which here means a recording of one person
+rendered against a plan describing several, silencing everything the plan does
+not claim. So the toggle is per-run, and a **separate, explicit tick** —
+"always start in group mode" — is the only thing written to disk. Two controls
+where one would look like enough, deliberately: they answer two different
+questions.
+
+**A colour per speaker, assigned by slot.** A speaker's colour is a function of
+their slot, exactly as their destination voice is, and for the same reason:
+anything chosen by measuring the input would make an output property a function
+of the input speaker, which is the linkage this project exists to destroy. Slot
+0 and slot 1 are the furthest-apart pair in the table because two people is the
+common case, and a test in the app asserts that stays true.
+
+**Any colour, from any palette.** Clicking a swatch opens a picker: the ten a
+slot can be given, and then every colour of all nine palettes the website
+offers, each group named. An override is a person's choice about their own
+recording, made after the fact, and carries none of the linkage problem above.
+
+**Colour is never the only signal.** The name is drawn beside every circle, in
+the list, and in the subtitles. A panel that separated speakers by colour alone
+would be one about eight per cent of men could not use.
+
+Outputs default to **audio, subtitles and page, all three**. A default that
+produces less than was asked for is one that gets discovered after the
+recording has been deleted.
+
+Ten is the limit and it is stated rather than wrapped around: there are ten
+destination voices, and an eleventh speaker would have to share one. Two is the
+floor, because one speaker is not a group.
+
+### Two things that were looked at rather than reasoned about
+
+The speaker strip was built at 96 pixels a card, which turned "high register,
+wide tract (234 Hz, 900 Hz)" into five wrapped lines — a row of circles reading
+as a wall of text. And with the colour picker open the panel is taller than the
+window, so without a scroller the picker was not reachable at all. Both were
+obvious in a capture of the running application and invisible in the source.
+
+**And the freeze that was reported against v0.1.12 is still gone.** Measured on
+the running release build with the group tab open: 220 round trips to the
+window's message loop over 25 seconds — median **0.19 ms**, 95th percentile
+**15.6 ms**, worst **27.1 ms**, and never once flagged as not responding.
+
+### Two decisions taken, and written down
+
+The roadmap's two open questions were both answered, and neither quietly.
+
+**Transcription may happen, and what leaves this machine is the veiled audio,
+never the recording.** That is a narrower trade than it looks: the veiled audio
+is the thing this project exists to produce — the words intact, the voiceprint
+gone — so a provider given it receives a transcribable recording of a voice
+that is nobody's. Sending the original would hand a biometric to a third party,
+and that is what is being refused. Off by default; nothing added to the
+dependency graph, because a local model is reached by running the program the
+user already installed and a provider by the system's own transfer tool, as the
+release verifier has always done for downloads; and the "talks to no servers"
+wording changes in the same commit as the code, not after it.
+
+**Detecting who is speaking ships no model.** If `ollama` is on the machine,
+VeilVoice can offer to use it, named with who makes it, exactly as VB-CABLE and
+Audacity are. If it is not, VeilVoice does not install one and does not pretend
+to guess. One microphone per person and a turn list remain, and remain the
+default.
+
+
 ### `veilvoice conversation` can draw what it made
 
 `veilvoice-video` has existed and been fully tested since the conversation

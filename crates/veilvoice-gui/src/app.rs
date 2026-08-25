@@ -119,6 +119,8 @@ enum Tab {
     File,
     /// Scramble a microphone in real time.
     Live,
+    /// Several people in one recording, each with a name and a colour.
+    Group,
     /// Who is using the microphone and camera.
     Watch,
     /// The app lock, and what it is worth.
@@ -159,6 +161,10 @@ pub struct VeilVoiceApp {
     job: Option<mpsc::Receiver<JobDone>>,
     status: Option<(String, Color32)>,
     last_metadata: Vec<String>,
+
+    // Group mode. Off unless the saved preference says to start it on, and
+    // the mode itself is never saved -- see `crate::group`.
+    group: crate::group::Group,
 
     // Live mode.
     inputs: Vec<devices::DeviceInfo>,
@@ -245,6 +251,10 @@ impl VeilVoiceApp {
             meter_in: 0.0,
             meter_out: 0.0,
             security: Security::default(),
+            // Off. `VeilVoiceApp::new` is the only place the saved preference
+            // is consulted, so no test and no `Default` can open in group mode
+            // because of something on this machine's disk.
+            group: crate::group::Group::default(),
             preferences: crate::settings::Settings::default(),
             // No policy here, so `without_devices` and `Default` touch no file
             // that belongs to the user. `VeilVoiceApp::new` loads the real one,
@@ -298,9 +308,14 @@ impl VeilVoiceApp {
         crate::theme::install(&cc.egui_ctx);
 
         let policy = InForce::load();
+        // The one place "always start in group mode" is read. The mode itself
+        // is never persisted -- see `crate::group` for why two controls exist
+        // where one would look like enough.
+        let group = crate::group::Group::start_from(preferences.prefs.always_group);
         let mut app = Self {
             jetbrains,
             security: Security::load(),
+            group,
             preferences,
             policy,
             // The one place the monitor thread is started. Everything else
@@ -419,6 +434,7 @@ impl eframe::App for VeilVoiceApp {
                 for (tab, label) in [
                     (Tab::File, "anonymise file"),
                     (Tab::Live, "live scramble"),
+                    (Tab::Group, "group"),
                     (Tab::Watch, "monitor"),
                     (Tab::Security, "lock"),
                     (Tab::Preferences, "settings"),
@@ -453,6 +469,7 @@ impl eframe::App for VeilVoiceApp {
                 match self.tab {
                     Tab::File => self.file_tab(ui),
                     Tab::Live => self.live_tab(ui),
+                    Tab::Group => self.group.tab(ui, &mut self.preferences),
                     Tab::Watch => self.watch_tab(ui),
                     Tab::Security => self.security.tab(ui),
                     Tab::Preferences => self.preferences.tab(ui, ctx),
