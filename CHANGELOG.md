@@ -8,6 +8,41 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Transcription and speaker detection: checked before built, and the check moved them
+
+Both were decided in principle earlier in this cycle and neither is built. The
+roadmap promised the provider question would be "checked before anything is
+built rather than discovered by a user". It was, on a machine that has the
+software, and the answer changed the plan.
+
+`ollama` was the named candidate for the local half. Measured:
+
+* **It is there and it is detectable.** Absolute path, version 0.32.5, seven
+  models. The companion-detection pattern works on it exactly as it does on
+  Audacity.
+* **None of it transcribes speech.** Every model on that machine is a text
+  model, and ollama's registry hosts language and vision models rather than
+  speech recognition. Detecting ollama and offering transcription through it
+  would have produced a feature that cannot work, on a machine where every
+  check passed.
+* **Running it is not free.** One `ollama list` started a background server,
+  opened a local UI port, started an hourly update checker and made a network
+  request to GitHub — all in the first two seconds, none of it asked for. For
+  most programs that is unremarkable. For this one, "VeilVoice can use ollama"
+  would have to be read as "VeilVoice can start a background service that
+  phones home on a timer", and that has to be said in those words or not
+  offered.
+
+So markers 43 and 64 are **blocked** on a question rather than on effort. Local
+speech-to-text means a Whisper-family program; diarisation means a third thing
+again; and whether starting any of them is acceptable, given what was measured,
+is the maintainer's call. The two honest paths — one microphone per person, or
+a turn list — remain, and remain the default.
+
+Nothing shipped for this. That is the point: the alternative was shipping a
+feature that could not work, and finding out from somebody who trusted it.
+
+
 ### The desktop meters were arguing with themselves
 
 The terminal's meters were fixed a few commits ago. The desktop application's
