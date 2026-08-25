@@ -44,8 +44,11 @@
 
 use crate::theme::palette as p;
 use eframe::egui::{self, Color32, RichText, Ui};
+use std::path::PathBuf;
+use std::sync::mpsc;
 use veilvoice_conversation::{Conversation, Speaker};
 use veilvoice_core::voices::{self, MAX_VOICES};
+use veilvoice_video::palette::Palette;
 
 /// One person, as the panel holds them.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -110,6 +113,22 @@ pub struct Group {
     pub outputs: Outputs,
     /// The last thing that went wrong, to show rather than to swallow.
     pub notice: Option<String>,
+
+    /// The recording.
+    pub input: Option<PathBuf>,
+    /// The plan holding who speaks when. Without it nothing can be rendered:
+    /// this panel knows *who*, and a plan is the only honest source of *when*.
+    pub plan: Option<PathBuf>,
+    /// A title for the page, if the plan does not carry one.
+    pub title: String,
+    /// Which palette a page is drawn in. Tokyo Night unless changed, and
+    /// **not persisted** -- the same shape as the mode toggle above it.
+    pub theme: &'static Palette,
+
+    /// The worker, while a render is running.
+    job: Option<mpsc::Receiver<Result<Vec<PathBuf>, String>>>,
+    /// The last render's result, kept until another is started.
+    report: Option<Result<Vec<PathBuf>, String>>,
 }
 
 impl Default for Group {
@@ -122,6 +141,12 @@ impl Default for Group {
             picking: None,
             outputs: Outputs::default(),
             notice: None,
+            input: None,
+            plan: None,
+            title: String::new(),
+            theme: veilvoice_video::palette::default_palette(),
+            job: None,
+            report: None,
         }
     }
 }
@@ -254,6 +279,10 @@ impl Group {
         self.people_list(ui);
         ui.add_space(12.0);
         self.output_controls(ui);
+        ui.add_space(12.0);
+        self.files_and_theme(ui);
+        ui.add_space(12.0);
+        self.render_controls(ui);
 
         if let Some(notice) = &self.notice {
             ui.add_space(8.0);
@@ -521,6 +550,301 @@ impl Group {
             );
         }
     }
+
+    /// Whether a render is running, so the window keeps repainting.
+    pub fn is_busy(&self) -> bool {
+        self.job.is_some()
+    }
+
+    /// Take the worker's answer if it has one. Called once a frame; never waits.
+    pub fn drain(&mut self) {
+        let Some(rx) = &self.job else { return };
+        match rx.try_recv() {
+            Ok(done) => {
+                self.report = Some(done);
+                self.job = None;
+            }
+            Err(mpsc::TryRecvError::Empty) => {}
+            Err(mpsc::TryRecvError::Disconnected) => {
+                self.report = Some(Err("the render stopped without finishing".into()));
+                self.job = None;
+            }
+        }
+    }
+
+    /// The recording, the plan, the title and the palette.
+    fn files_and_theme(&mut self, ui: &mut Ui) {
+        ui.label(RichText::new("THE RECORDING").color(p::blue()));
+        ui.add_space(4.0);
+
+        ui.horizontal(|ui| {
+            if ui.button("choose recording…").clicked() {
+                if let Some(path) = rfd::FileDialog::new()
+                    .add_filter("audio", &["wav", "mp3", "flac", "ogg", "m4a", "aac"])
+                    .pick_file()
+                {
+                    self.input = Some(path);
+                }
+            }
+            ui.label(
+                RichText::new(match &self.input {
+                    Some(path) => file_name(path),
+                    None => "no recording chosen".to_string(),
+                })
+                .color(if self.input.is_some() {
+                    p::fg()
+                } else {
+                    p::muted()
+                })
+                .small(),
+            );
+        });
+
+        ui.horizontal(|ui| {
+            if ui.button("choose plan…").clicked() {
+                if let Some(path) = rfd::FileDialog::new()
+                    .add_filter("plan", &["txt"])
+                    .pick_file()
+                {
+                    self.plan = Some(path);
+                }
+            }
+            ui.label(
+                RichText::new(match &self.plan {
+                    Some(path) => file_name(path),
+                    None => "no plan chosen".to_string(),
+                })
+                .color(if self.plan.is_some() {
+                    p::fg()
+                } else {
+                    p::muted()
+                })
+                .small(),
+            );
+        });
+
+        // Said here rather than discovered afterwards. This panel knows who is
+        // in the recording; only a plan knows when each of them speaks, and
+        // audio no turn claims is silenced rather than passed through.
+        ui.label(
+            RichText::new(
+                "  The plan says when each person speaks. Without one there is nothing to \
+                 render against, and audio no turn claims is silenced rather than passed \
+                 through -- so a missing plan would produce a silent file, not a veiled \
+                 one. `veilvoice conversation inspect` describes a plan you already have.",
+            )
+            .color(p::muted())
+            .small(),
+        );
+
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            ui.label(RichText::new("title").color(p::muted()).small());
+            ui.add(
+                egui::TextEdit::singleline(&mut self.title)
+                    .desired_width(240.0)
+                    .hint_text("taken from the plan if left empty"),
+            );
+        });
+
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            ui.label(RichText::new("page palette").color(p::muted()).small());
+            // The same nine the website and this application offer, and the
+            // same identifiers, so a page rendered here and a page rendered by
+            // the command line in the same theme are the same picture.
+            egui::ComboBox::from_id_salt("group-theme")
+                .selected_text(self.theme.name)
+                .show_ui(ui, |ui| {
+                    for palette in veilvoice_video::palette::PALETTES {
+                        ui.selectable_value(&mut self.theme, palette, palette.name);
+                    }
+                });
+            ui.label(
+                RichText::new("for this run; the app opens in Tokyo Night")
+                    .color(p::muted())
+                    .small(),
+            );
+        });
+    }
+
+    /// The button, and what came of pressing it.
+    fn render_controls(&mut self, ui: &mut Ui) {
+        let ready = self.input.is_some() && self.plan.is_some() && self.outputs.any();
+        ui.horizontal(|ui| {
+            let busy = self.is_busy();
+            if ui
+                .add_enabled(ready && !busy, egui::Button::new("render"))
+                .clicked()
+            {
+                self.start();
+            }
+            if busy {
+                ui.spinner();
+                ui.label(RichText::new("rendering…").color(p::muted()).small());
+            } else if !ready {
+                ui.label(
+                    RichText::new(if !self.outputs.any() {
+                        "nothing is ticked to write"
+                    } else if self.input.is_none() {
+                        "choose a recording"
+                    } else {
+                        "choose a plan"
+                    })
+                    .color(p::muted())
+                    .small(),
+                );
+            }
+        });
+
+        match &self.report {
+            None => {}
+            Some(Ok(written)) => {
+                ui.add_space(6.0);
+                for path in written {
+                    ui.label(RichText::new(format!("wrote {}", path.display())).color(p::green()));
+                }
+                ui.label(
+                    RichText::new(
+                        "These files are not encrypted. The subtitles hold the names you \
+                         typed, and nothing veils a name.",
+                    )
+                    .color(p::yellow())
+                    .small(),
+                );
+            }
+            Some(Err(why)) => {
+                ui.add_space(6.0);
+                ui.label(RichText::new(why).color(p::red()));
+            }
+        }
+    }
+
+    /// Start a render on a thread of its own.
+    ///
+    /// `update()` may read, paint and start work; it may never wait for any.
+    /// A render reads a whole recording and runs the engine over it, which is
+    /// seconds at best and the length of the file at worst.
+    fn start(&mut self) {
+        let (Some(input), Some(plan_path)) = (self.input.clone(), self.plan.clone()) else {
+            return;
+        };
+        let names: Vec<String> = self.people.iter().map(|one| one.name.clone()).collect();
+        let title = self.title.trim().to_string();
+        let outputs = self.outputs;
+        let theme = self.theme;
+
+        let (tx, rx) = mpsc::channel();
+        self.job = Some(rx);
+        self.report = None;
+        std::thread::spawn(move || {
+            let _ = tx.send(render_now(
+                &input, &plan_path, &names, &title, outputs, theme,
+            ));
+        });
+    }
+}
+
+/// The last component of a path, for showing beside a button.
+fn file_name(path: &std::path::Path) -> String {
+    path.file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_else(|| path.display().to_string())
+}
+
+/// Do the render. Runs on a worker thread and touches no interface state.
+///
+/// The names come from the panel and the turns come from the plan, and the two
+/// have to agree about how many people there are. A plan naming three speakers
+/// rendered against a panel holding two would put one person's audio in
+/// somebody else's voice, which is the one mistake here that cannot be heard in
+/// the result -- so it is refused rather than reconciled.
+fn render_now(
+    input: &std::path::Path,
+    plan_path: &std::path::Path,
+    names: &[String],
+    title: &str,
+    outputs: Outputs,
+    theme: &'static Palette,
+) -> Result<Vec<PathBuf>, String> {
+    use veilvoice_conversation::render::{self, Settings};
+    use veilvoice_conversation::subtitles::{self, Format};
+
+    let mut plan = Conversation::load(plan_path)
+        .map_err(|error| format!("{}: {error}", plan_path.display()))?;
+    if plan.len() != names.len() {
+        return Err(format!(
+            "the plan names {} speaker(s) and this panel holds {}. Rendering one against \
+             the other would put somebody's audio in the wrong voice.",
+            plan.len(),
+            names.len()
+        ));
+    }
+    // The panel's names win: they are what the person just typed, and the plan
+    // may have been written before they renamed anybody. The *turns* are the
+    // plan's and are untouched.
+    plan.rename_speakers(names)
+        .map_err(|error| error.to_string())?;
+    if !title.is_empty() {
+        plan.title = Some(title.to_string());
+    }
+
+    let audio = veilvoice_audio::io::load(input).map_err(|error| error.to_string())?;
+    let mut settings = Settings::default();
+    settings.config.sample_rate = audio.sample_rate as f32;
+    let rendered = render::render(&plan, &audio.samples, &settings, None)
+        .map_err(|error| error.to_string())?;
+
+    let mut base = input.to_path_buf();
+    base.set_extension("veiled.wav");
+    let mut written = Vec::new();
+
+    let veiled = veilvoice_audio::io::Audio {
+        samples: rendered.samples,
+        sample_rate: audio.sample_rate,
+    };
+    if outputs.audio || outputs.page {
+        // The page plays the audio, so it is written whenever the page is --
+        // a player pointing at a file that was never written is worse than no
+        // player.
+        veilvoice_audio::io::save_wav(&base, &veiled).map_err(|error| error.to_string())?;
+        written.push(base.clone());
+    }
+
+    let vtt = with_extension(&base, "vtt");
+    if outputs.subtitles || outputs.page {
+        std::fs::write(&vtt, subtitles::write(&plan, Format::WebVtt))
+            .map_err(|error| format!("{}: {error}", vtt.display()))?;
+        written.push(vtt.clone());
+        let srt = with_extension(&base, "srt");
+        std::fs::write(&srt, subtitles::write(&plan, Format::SubRip))
+            .map_err(|error| format!("{}: {error}", srt.display()))?;
+        written.push(srt);
+    }
+
+    if outputs.page {
+        use veilvoice_video::{page, waveform};
+        let look = page::Look::default().themed(theme);
+        // The veiled audio's waveform, not the input's: a picture of the
+        // original signal beside a file whose point is that the original is
+        // gone would be the wrong picture.
+        let envelope = waveform::envelope(&veiled.samples, 640);
+        let drawn = page::player(&plan, &envelope, &look, &file_name(&base), &file_name(&vtt))
+            .map_err(|error| error.to_string())?;
+        let html = with_extension(&base, "html");
+        std::fs::write(&html, drawn.markup)
+            .map_err(|error| format!("{}: {error}", html.display()))?;
+        written.push(html);
+    }
+
+    Ok(written)
+}
+
+/// Replace the last extension, keeping any `.veiled` before it.
+fn with_extension(path: &std::path::Path, extension: &str) -> PathBuf {
+    let mut out = path.to_path_buf();
+    out.set_extension(extension);
+    out
 }
 
 /// The colour a slot is given, as an egui colour.
@@ -636,6 +960,73 @@ mod tests {
         group.people[0].name = "Alex\nspeaker  9  Mallory".into();
         let error = group.to_plan(None).expect_err("a line break is refused");
         assert!(error.contains("line break"), "{error}");
+    }
+
+    /// A render cannot start without both files and something to write. This
+    /// is the state the button is disabled in, asserted rather than trusted to
+    /// the interface.
+    #[test]
+    fn a_render_needs_a_recording_a_plan_and_an_output() {
+        let mut group = Group::default();
+        assert!(group.input.is_none() && group.plan.is_none());
+        group.start();
+        assert!(!group.is_busy(), "nothing to render");
+
+        group.input = Some(PathBuf::from("talk.wav"));
+        group.start();
+        assert!(!group.is_busy(), "still no plan");
+    }
+
+    /// A worker that dies without answering must not leave the panel saying
+    /// "rendering" forever.
+    #[test]
+    fn a_render_that_stops_without_finishing_is_reported() {
+        let (tx, rx) = mpsc::channel::<Result<Vec<PathBuf>, String>>();
+        drop(tx);
+        let mut group = Group {
+            job: Some(rx),
+            ..Group::default()
+        };
+        group.drain();
+        assert!(!group.is_busy());
+        match group.report {
+            Some(Err(ref why)) => assert!(why.contains("without finishing"), "{why}"),
+            other => panic!("expected a reported failure, got {other:?}"),
+        }
+    }
+
+    /// The palette is Tokyo Night unless changed, and is not persisted -- the
+    /// same shape as the mode toggle above it.
+    #[test]
+    fn the_page_palette_starts_at_tokyo_night_every_time() {
+        assert_eq!(Group::default().theme.id, "tokyo-night");
+        assert_eq!(Group::start_from(true).theme.id, "tokyo-night");
+    }
+
+    /// A plan and a panel that disagree about how many people there are is
+    /// refused, because the result would be somebody's audio in the wrong
+    /// voice and nobody could hear it.
+    #[test]
+    fn rendering_against_a_plan_with_a_different_count_is_refused() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("plan.txt");
+        let mut plan = Conversation::new();
+        plan.add_speaker(Speaker::named("A")).unwrap();
+        plan.add_speaker(Speaker::named("B")).unwrap();
+        plan.add_speaker(Speaker::named("C")).unwrap();
+        plan.save(&path).unwrap();
+
+        let error = render_now(
+            std::path::Path::new("nothing.wav"),
+            &path,
+            &["one".to_string(), "two".to_string()],
+            "",
+            Outputs::default(),
+            veilvoice_video::palette::default_palette(),
+        )
+        .expect_err("three against two");
+        assert!(error.contains("wrong voice"), "{error}");
+        assert!(error.contains('3') && error.contains('2'), "{error}");
     }
 
     #[test]
