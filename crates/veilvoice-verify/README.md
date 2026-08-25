@@ -72,10 +72,12 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>746 lines"])
+    n_main(["main.rs<br/>866 lines"])
+    n_discover["discover.rs<br/>344 lines"]
     n_fetch["fetch.rs<br/>320 lines"]
     n_tests["tests.rs<br/>138 lines"]
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs" "open the source"
+    click n_discover href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" "open the source"
     click n_fetch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" "open the source"
     click n_tests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" "open the source"
 ```
@@ -84,14 +86,22 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
+| [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 344 | Finding a release to check, without being told where it is. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 320 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 746 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 866 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 138 | The verifier's own tests. |
 
 ## Public items
 
 | Item | Where | What |
 |---|---|---|
+| `const SUMS` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | The names of the two files a signed release carries beside its archives. |
+| `const SUMS_SIG` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | The detached signature over SUMS. |
+| `struct Found` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | What was found in one directory. |
+| `fn looks_like_archive` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Whether a filename looks like one of this project's release archives. |
+| `fn look_in` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Look in one directory, one level deep. |
+| `fn places` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Every place worth looking, in order, without duplicates. |
+| `fn search` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Look everywhere worth looking and return the first directory that holds a complete, checkable set — or, failing that, everything that turned up. |
 | `const HOST` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The only host this will ever talk to. |
 | `const REPO` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The repository releases are fetched from. |
 | `const MAX_BYTES` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The largest file this will accept. |
