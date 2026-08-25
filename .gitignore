@@ -76,3 +76,6 @@ CLAUDE.md
 # downloads, and several carry their own upstream licences.
 .claude/skills/
 skills/
+
+# The next-session prompt, beside HANDOFF.md. Working notes, not a deliverable.
+NEXT-SESSION.md
