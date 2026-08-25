@@ -171,6 +171,13 @@ $redactInstall = @(
      text = "C:\Users\you\AppData\Local\Programs\VeilVoice" }
 )
 
+# The lock tab prints where the app lock lives, which is under the account name
+# again. Same reason, same treatment.
+$redactLock = @(
+  @{ x = 10; y = 238; w = 700; h = 26; flat = $true
+     text = "C:\Users\you\AppData\Roaming\veilvoice\applock.bin" }
+)
+
 function Redact([string]$path, $areas) {
   # Drawn onto a copy, not onto the loaded file. `new Bitmap(path)` holds the
   # file open for as long as the object lives, so saving back to the same path
@@ -211,6 +218,82 @@ function Redact([string]$path, $areas) {
   $bmp.Dispose()
 }
 
+# Is a tab selected at this x?
+#
+# egui draws a selected `selectable_label` on a raised background; an unselected
+# one is drawn on the panel. Sampling a few pixels just above the label -- above
+# the glyphs, inside the rounded rectangle -- tells the two apart without
+# needing to read any text. Anything brighter than the panel is a selection.
+function Selected([string]$path, [int]$x, [int]$y) {
+  $src = New-Object System.Drawing.Bitmap $path
+  try {
+    $lit = 0
+    foreach ($dy in -18, -16, -14) {
+      $sy = $y + $dy
+      if ($sy -lt 0 -or $sy -ge $src.Height -or $x -lt 0 -or $x -ge $src.Width) { continue }
+      $c = $src.GetPixel($x, $sy)
+      # The panel is #1a1b26; a selected tab sits on something visibly lighter.
+      $sum = [int]$c.R + [int]$c.G + [int]$c.B
+      if ($sum -gt 110) { $lit++ }
+    }
+    return ($lit -ge 2)
+  } finally {
+    $src.Dispose()
+  }
+}
+
+# Where each tab is, read off the window rather than remembered.
+#
+# The labels are drawn in `--muted` or `--accent` on the panel's `--bg`, so a
+# column containing any pixel brighter than the panel is a column with a label
+# in it. Contiguous lit columns are one label; a gap wider than a couple of
+# characters is the space between two. One run per tab, and the centre of a run
+# is where to click.
+function Find-Tabs($h, [int]$y, [int]$expected) {
+  $temp = [System.IO.Path]::GetTempFileName() + ".png"
+  Capture $h $temp
+  $src = New-Object System.Drawing.Bitmap $temp
+  $runs = @()
+  try {
+    $start = -1
+    # The window's own border is lit too, and at both ends: the first run came
+    # back starting at x=0 and there was a two-pixel tenth run against the right
+    # edge. Skipping the frame is what makes a run a label.
+    $edge = 12
+    for ($x = $edge; $x -lt ($src.Width - $edge); $x++) {
+      $lit = $false
+      # The band the glyphs occupy. Above it is the rounded top of a selected
+      # tab, below it the separator; both would blur the runs together.
+      for ($dy = -6; $dy -le 6; $dy++) {
+        $c = $src.GetPixel($x, $y + $dy)
+        if (([int]$c.R + [int]$c.G + [int]$c.B) -gt 190) { $lit = $true; break }
+      }
+      if ($lit) {
+        if ($start -lt 0) { $start = $x }
+        $last = $x
+      } elseif ($start -ge 0 -and ($x - $last) -gt 18) {
+        # A run narrower than a short word is an artefact, not a label.
+        if (($last - $start) -ge 20) { $runs += ,@($start, $last) }
+        $start = -1
+      }
+    }
+    if ($start -ge 0 -and ($last - $start) -ge 20) { $runs += ,@($start, $last) }
+  } finally {
+    $src.Dispose()
+    Remove-Item $temp -Force -ErrorAction SilentlyContinue
+  }
+
+  if ($runs.Count -ne $expected) {
+    # `Write-Warning`, not `Write-Output`: anything written to the pipeline from
+    # inside a function becomes part of its return value, and the first version
+    # of this returned its own diagnostics as the list of coordinates.
+    Write-Warning ("found " + $runs.Count + " labels in the tab row, expected " + $expected)
+    foreach ($r in $runs) { Write-Warning ("  x " + $r[0] + ".." + $r[1]) }
+    return $null
+  }
+  return ($runs | ForEach-Object { [int](($_[0] + $_[1]) / 2) })
+}
+
 function Capture($h, [string]$path) {
   [void][Shot]::SetForegroundWindow($h)
   Start-Sleep -Milliseconds 500
@@ -225,23 +308,25 @@ function Capture($h, [string]$path) {
   $bmp.Dispose()
 }
 
-# The tab row, in window coordinates. Measured from a capture rather than
-# guessed: the row is left-aligned and its y does not move with the window's
-# width, so widening the window to fit "about" leaves every other x alone.
+# The tabs, in the order the window shows them. **No coordinates.**
+#
+# They were coordinates, measured off a capture, and they went stale the first
+# time a tab was inserted -- every click still landed on *a* tab, so every
+# capture was different, the duplicate check below saw nothing wrong, and three
+# tabs were quietly photographed under the wrong names.
+#
+# So the row is found instead: `Find-Tabs` scans the strip of pixels the labels
+# sit in and groups the lit columns into runs, one run per label. That is what
+# a person does when they look at the row, and it cannot go stale.
+#
+# What still has to be right is this list and its order. If it does not match
+# what the window draws, the count check in `Find-Tabs` fails and says so --
+# which is a loud failure rather than a wrong picture.
 #
 # `install` is only offered to a portable copy, which a build under `target/`
-# is. Running this against an installed copy will find one fewer tab, and the
-# duplicate check below is what says so rather than writing a wrong picture.
-$tabs = @(
-  @{ name = "file";     x = 121 },
-  @{ name = "live";     x = 325 },
-  @{ name = "group";    x = 476 },
-  @{ name = "monitor";  x = 589 },
-  @{ name = "lock";     x = 697 },
-  @{ name = "settings"; x = 811 },
-  @{ name = "install";  x = 943 },
-  @{ name = "about";    x = 1057 }
-)
+# is. Against an installed copy the row has one fewer tab and this stops.
+$tabs = @("file", "live", "group", "monitor", "lock", "verify", "settings",
+          "install", "about")
 $tabY = 141
 
 Write-Output "starting $Exe"
@@ -262,11 +347,22 @@ if ($h -eq [IntPtr]::Zero) {
 [void][Shot]::SetWindowPos($h, [IntPtr]::Zero, 60, 20, $Width, $Height, 0x0040)
 Start-Sleep -Milliseconds 800
 
+$centres = Find-Tabs $h $tabY $tabs.Count
+if ($centres -eq $null) {
+  Write-Output ""
+  Write-Output "The tab row does not have the labels this script expects. Update the"
+  Write-Output "`$tabs list above to match what the window draws."
+  $proc | Stop-Process -Force
+  exit 1
+}
+Write-Output ("tab row: " + ($centres -join ", "))
+
 $previous = $null
 $written = 0
 $problems = @()
 
-foreach ($tab in $tabs) {
+for ($index = 0; $index -lt $tabs.Count; $index++) {
+  $tab = @{ name = $tabs[$index]; x = $centres[$index] }
   $path = Join-Path $Out ("gui-" + $tab.name + ".png")
   Click-At $h $tab.x $tabY
   # Group mode is off by default, which is correct and makes for a picture of
@@ -277,12 +373,17 @@ foreach ($tab in $tabs) {
   Capture $h $path
   if ($tab.name -eq "live") { Redact $path $redactLive }
   if ($tab.name -eq "install") { Redact $path $redactInstall }
+  if ($tab.name -eq "lock") { Redact $path $redactLock }
   $bytes = [System.IO.File]::ReadAllBytes($path)
   $hash = [System.BitConverter]::ToString(
     [System.Security.Cryptography.SHA256]::Create().ComputeHash($bytes))
   if ($previous -ne $null -and $hash -eq $previous) {
     $problems += ("gui-" + $tab.name + ".png is identical to the tab before it: " +
                   "the click at x=" + $tab.x + " did not land on a tab")
+  }
+  if (-not (Selected $path $tab.x $tabY)) {
+    $problems += ("gui-" + $tab.name + ".png: nothing is selected at x=" + $tab.x +
+                  " -- the tab row has moved")
   }
   $previous = $hash
   $written++

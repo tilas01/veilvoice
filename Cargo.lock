@@ -4836,6 +4836,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "veilvoice-check"
+version = "0.1.12"
+dependencies = [
+ "pgp",
+ "sha2",
+ "tempfile",
+]
+
+[[package]]
 name = "veilvoice-cli"
 version = "0.1.12"
 dependencies = [
@@ -4921,6 +4930,7 @@ dependencies = [
  "rfd",
  "tempfile",
  "veilvoice-audio",
+ "veilvoice-check",
  "veilvoice-conversation",
  "veilvoice-core",
  "veilvoice-crypto",
@@ -4976,6 +4986,7 @@ dependencies = [
  "pgp",
  "sha2",
  "tempfile",
+ "veilvoice-check",
  "winresource",
 ]
 

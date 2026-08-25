@@ -1,0 +1,20 @@
+[package]
+name = "veilvoice-check"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Check a VeilVoice release: the SHA-256 of a file, its line in a signed SHA256SUMS, and the detached signature over that list. No GnuPG, no network."
+
+[dependencies]
+# The same OpenPGP implementation the portable verifier has always used, with
+# the same reasoning: hand-writing packet parsing and RSA PKCS#1 v1.5
+# verification is where a silent accept would come from, and this is the one
+# place a silent accept is the whole failure.
+pgp = { version = "0.20", default-features = false }
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"

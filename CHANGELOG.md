@@ -8,6 +8,55 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Drag a download onto the window and be told what it is
+
+New **verify** tab in the desktop application. Drop the download, the
+`SHA256SUMS` and the `SHA256SUMS.asc` anywhere on the window — whichever tab is
+open — and it says whether the file is the one this key published.
+
+All three slots are visible from the start rather than discovered one refusal
+at a time. Dropping one file and getting a verdict would be a lie, and an
+interface that says "and now the other two" *after* the drop teaches people
+that verification is fiddly rather than that it needs three things.
+
+The order the check runs in is the whole of its value, and it is asserted
+rather than assumed: **the signature is verified over the bytes of the list
+before any number in that list is read.** A checker that compared the hash
+first would, for the moment between the two, be trusting an unsigned document
+— and anyone who can hand you a file can hand you a `SHA256SUMS` to go with it.
+
+### One implementation of the checking, not two
+
+The arithmetic moved out of `veilvoice-verify` into a new crate,
+`veilvoice-check`. The alternative was linking a GUI toolkit into the portable
+verifier, which is the one program here whose *smallness* is a feature: it is
+what somebody downloads before they trust anything else in this project.
+
+The verifier is unchanged in what it does and what it prints. It is a caller
+now instead of an owner, and the one place a silent accept could come from is
+the one place there is only one of.
+
+**The verifier's own test suite caught a regression during the move.** A
+`?` where the original had a `continue` meant one malformed line near the top
+of a `SHA256SUMS` made every hash below it invisible — and the answer would
+have been "not listed", which reads as *wrong release* rather than as *this
+file is unreadable*. Found within a minute of the code moving.
+
+### The capture script no longer remembers where the tabs are
+
+It **finds** them, by scanning the strip of pixels the labels sit in and
+grouping the lit columns into runs. It used to remember, and those coordinates
+went stale the first time a tab was inserted: every click still landed on *a*
+tab, so every capture was different, the duplicate check saw nothing wrong, and
+three tabs were quietly photographed under the wrong names. Two guards survive
+from that — an identical consecutive pair stops the run, and after each click
+the pixel above the label has to be the raised background a selected tab sits
+on.
+
+A third redaction: the lock tab prints where the app lock file lives, which is
+under the account name. `assets/screenshots/README.md` names all three.
+
+
 ### Group mode can now actually render
 
 The group tab could be configured and could do nothing. It has the rest of it

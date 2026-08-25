@@ -134,5 +134,5 @@ fn an_armoured_block_that_is_not_a_signature_is_refused() {
     // signature. Feeding it in must fail to parse rather than be accepted by
     // something that only checked "does this look armoured".
     let key = embedded_key().unwrap();
-    assert!(verify_detached(&key, PUBLIC_KEY, b"data").is_err());
+    assert!(verify_detached(&key, veilvoice_check::PUBLIC_KEY, b"data").is_err());
 }
