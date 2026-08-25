@@ -162,7 +162,7 @@ def measure(browser, server, page, expression, width, height):
     # after load, and measuring mid-transition reports a width nothing ever has.
     time.sleep(0.6)
     result = browser.call("Runtime.evaluate", expression=expression,
-                          returnByValue=True, awaitPromise=False)
+                          returnByValue=True, awaitPromise=True)
     if "exceptionDetails" in result:
         raise SystemExit("the expression threw: %s"
                          % json.dumps(result["exceptionDetails"])[:400])

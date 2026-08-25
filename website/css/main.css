@@ -246,32 +246,19 @@ h3[id] { scroll-margin-top: 90px; }
  * because nothing overflowed; it simply had no room around it. */
 .hero { padding: 54px 20px 34px; text-align: center; }
 
-/* `<picture>` is an inline box by default and is now the hero's direct child,
- * so it is what `.stagger > *` animates and what has to carry the width. The
- * `<img>` inside it keeps the border and the sizing rules below. Without this
- * the banner sits on a text baseline and gains a few stray pixels underneath. */
-.hero .banner-pic { display: block; width: 100%; max-width: 860px; margin: 0 auto; }
-
-.hero img.banner {
-  width: 100%;
-  max-width: 860px;
-  height: auto;
-  /* No `image-rendering: pixelated` here, deliberately. banner.png is 1280 px
-   * wide and is never drawn larger than 860 -- and on a phone it is drawn at
-   * about 343, a 3.7x reduction. Nearest-neighbour sampling keeps roughly one
-   * row in four and drops the rest, so the one- and two-pixel strokes of the
-   * banner's own text lost more than half their rows: "THE VOICEPRINT IS
-   * DESTROYED. THE WORDS STAY READABLE." rendered as "TIE VOICEPRIN IS
-   * DESTOYED. THE WORDS STAY EDGRE.", and the licence and authorship lines with
-   * it. The first thing a phone reader saw was this project's own claims,
-   * illegible. Smooth resampling averages those rows instead of discarding
-   * them, and every line is readable at every width. */
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  /* No `rise` here: `.stagger > *` already animates the <picture> around it,
-   * and animating both ran the same entrance twice, one nested in the other. */
-  display: block;
-}
+/* The `<picture>` these rules sized is gone -- the hero banner is drawn in CSS
+ * now, further down this file. What is worth keeping from them is the finding,
+ * because it applies to every image this site scales down and the next one will
+ * hit it too:
+ *
+ * `image-rendering: pixelated` is for pixel art being *enlarged*. banner.png is
+ * 1280 px wide and was drawn at about 343 on a phone, a 3.7x reduction.
+ * Nearest-neighbour sampling keeps roughly one row in four and drops the rest,
+ * so the one- and two-pixel strokes of the banner's own text lost more than
+ * half their rows: "THE VOICEPRINT IS DESTROYED. THE WORDS STAY READABLE."
+ * rendered as "TIE VOICEPRIN IS DESTOYED. THE WORDS STAY EDGRE." The first
+ * thing a phone reader saw was this project's own claims, illegible. That was
+ * finding F-37, and it is the reason the banner is text today. */
 
 @keyframes rise {
   from { opacity: 0; transform: translateY(14px); }
@@ -285,6 +272,187 @@ h3[id] { scroll-margin-top: 90px; }
 .stagger > * {
   animation: rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* ---------- the banner, drawn in CSS ---------- */
+/*
+ * The hero banner used to be `assets/banner-animated.png` behind a `<picture>`.
+ * It is now live text with a CSS animation over it, and the picture has moved
+ * to the README, where a hundred different clients have to draw it and only a
+ * GIF reaches all of them.
+ *
+ * Three things are better as text than as pixels, and all three were already
+ * written down elsewhere in this stylesheet before this banner existed:
+ *
+ *   - **It follows the reader's palette.** An image is baked in one theme and
+ *     the site has nine. Every colour below is a token.
+ *   - **Its claims can be read aloud, selected and searched.** Finding F-37 was
+ *     this project's own claims rendered illegibly inside an image at phone
+ *     width. Text cannot have that failure.
+ *   - **It honours `prefers-reduced-motion`.** The global rule at the top of
+ *     this file reaches every animation here. It cannot reach inside a PNG,
+ *     which is why the old markup needed a media query on a `<source>`.
+ *
+ * And it has no soundbar. The waveform is the site's motif and it is used
+ * twice more further down the page -- in the demonstration and in the mark
+ * itself -- so a third one at the top was the loudest thing on the page
+ * competing with the two that carry meaning.
+ *
+ * Nothing here needs JavaScript. With scripts off the reader is served the GIF
+ * instead, from a `<noscript>` in the markup: they chose the edition of this
+ * site that runs nothing, and one picture is a simpler thing to be served than
+ * a page of rules. `html:not(.js)` hides this one, and `html.js` is set by a
+ * blocking script in `<head>`, so there is no frame in which both are visible.
+ */
+
+.bn {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 30px 32px 26px;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background-color: var(--bg-inset);
+  /* The same faint 16 px grid the drawn banner has, and for the same reason:
+   * texture that does not compete with the wordmark. Two repeating gradients
+   * rather than an image, so it costs no request and follows the theme. */
+  background-image:
+    repeating-linear-gradient(0deg, var(--bg-soft) 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(90deg, var(--bg-soft) 0 1px, transparent 1px 16px);
+}
+
+html:not(.js) .bn { display: none; }
+
+.bn-mark {
+  display: block;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg-soft);
+  padding: 3px;
+  box-sizing: content-box;
+}
+
+.bn-word {
+  position: relative;
+  margin: 0;
+  font-size: clamp(30px, 7.4vw, 62px);
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--fg);
+}
+
+/*
+ * The veil. A blurred copy of the wordmark, drifting and fading behind the
+ * sharp one: the same letters, unresolvable. It is the only illustration on
+ * this page of what the tool actually does to a voice, and it is one
+ * pseudo-element.
+ *
+ * `attr()` for content is the one form of `attr()` every engine has supported
+ * since forever -- the typed version that takes a unit is not, and is not used
+ * here. The copy is `aria-hidden` by construction: generated content of a
+ * decorative pseudo-element is not in the accessibility tree.
+ */
+.bn-word::after {
+  content: attr(data-word);
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent-2);
+  filter: blur(7px);
+  opacity: 0.42;
+  pointer-events: none;
+  animation: bn-veil 6.5s ease-in-out infinite alternate;
+}
+
+@keyframes bn-veil {
+  from { transform: translate(-6px, 0) scaleX(1.008); opacity: 0.24; }
+  to   { transform: translate(7px, 0) scaleX(0.994); opacity: 0.5; }
+}
+
+/* A slow band of light crossing the whole card. Under the wordmark's stacking
+ * order on purpose: it should pass behind the letters, not wash them out. */
+.bn-sweep {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 34%;
+  pointer-events: none;
+  background: linear-gradient(100deg,
+              transparent 0%, var(--accent) 50%, transparent 100%);
+  opacity: 0.075;
+  animation: bn-sweep 9s linear infinite;
+}
+
+@keyframes bn-sweep {
+  from { transform: translateX(-120%); }
+  to   { transform: translateX(400%); }
+}
+
+.bn-sub {
+  margin: 10px 0 0;
+  color: var(--accent);
+  font-size: clamp(11px, 2.1vw, 17px);
+  letter-spacing: 0.16em;
+}
+
+.bn-claim {
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-size: clamp(10px, 1.7vw, 14px);
+  letter-spacing: 0.08em;
+}
+
+.bn-lines {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  font-size: clamp(10px, 1.7vw, 14px);
+  letter-spacing: 0.08em;
+}
+.bn-lines li { margin: 2px 0; }
+.bn-ok    { color: var(--ok); }
+.bn-cyan  { color: var(--cyan); }
+.bn-muted { color: var(--muted); }
+
+/* The hairline along the bottom edge, which the drawn banner has as a solid
+ * bar. Here it carries the same light the sweep does, half a cycle behind it,
+ * so the card reads as one moving thing rather than two. */
+.bn-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+              var(--accent) 0%, var(--accent-2) 50%, var(--accent) 100%);
+  background-size: 200% 100%;
+  animation: bn-rule 9s linear infinite;
+}
+
+@keyframes bn-rule {
+  from { background-position: 0% 0; }
+  to   { background-position: 200% 0; }
+}
+
+/* The `<noscript>` copy, which is the README's GIF. Sized like the drawing it
+ * stands in for so the page does not change shape between the two editions. */
+.bn-fallback {
+  display: block;
+  width: 100%;
+  max-width: 860px;
+  height: auto;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
 }
 
 /* ---------- the demonstration ---------- */

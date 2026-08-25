@@ -697,6 +697,14 @@ def write_png_bytes(pixels):
 #   * A browser that does not understand APNG shows the first frame, which is
 #     the static banner. The failure mode is "no animation", never "no image".
 #
+# Nothing embeds this file today. The README shows the GIF below, because a
+# README is read in clients that do not all draw an APNG, and the website
+# draws its banner in CSS so that it follows the reader's palette. The APNG
+# is kept because it is the higher-fidelity copy of the same animation --
+# 60 fps against 50, full alpha, and half the bytes -- and because deleting a
+# working generator is the maintainer's call, not a tidy-up. Said plainly
+# here rather than left for somebody to discover: it is currently unused.
+#
 # Only the waveform band is animated. Frame 0 is the whole banner; every later
 # frame declares a sub-rectangle covering the band alone, which is why the file
 # is a fraction of the size of a full-frame animation.
@@ -863,6 +871,227 @@ def banner_frames():
     return frames
 
 
+
+# --- GIF --------------------------------------------------------------------
+#
+# The same animation again, as a GIF, because a README is read in a hundred
+# clients and GIF is the one animated format all of them draw. The APNG stays:
+# it is the better picture and it is what the website serves.
+#
+# The note on the APNG above says GIF was rejected because "GIF is limited to
+# 256 colours, so the palette would have to be quantised -- a lossy step whose
+# output depends on the quantiser, which is exactly the kind of thing that stops
+# a build being reproducible". That was right about quantising and wrong about
+# this picture, and the difference is one measurement:
+#
+#     the whole banner         63 distinct colours
+#     the waveform frames     255 distinct colours between them
+#     the two together        261
+#
+# 261 is over the limit for *one* palette and well under it for the two that
+# GIF actually allows: a frame may carry its own colour table. So frame 0 gets
+# its 63 colours and the waveform frames share their 255. Nothing is quantised,
+# nothing is approximated, and the bytes are the same on every machine -- which
+# is the property that mattered, not the format.
+#
+# The one real loss is the frame delay. GIF measures it in hundredths of a
+# second and 1/60 s is not a hundredth of anything, so the GIF runs 50 frames at
+# 2/100 s: the same one-second loop as the APNG's 60 at 1/60, at the fastest
+# rate this format can honestly express. Rounding 1/60 to 1/100 instead would
+# give a banner that runs at 60 % speed in some viewers and full speed in
+# others, which is worse than being 50 fps everywhere.
+
+GIF_FRAMES = 50
+GIF_DELAY = 2                 # hundredths of a second: 50 frames = one second
+
+
+def gif_frames():
+    """Frame 0 is the whole banner; the rest are the waveform band."""
+    base = banner()
+    frames = [(0, 0, base)]
+    for index in range(1, GIF_FRAMES):
+        phase = index / float(GIF_FRAMES)
+        frames.append((BAND_X, BAND_TOP, band_strip(phase, base)))
+    return frames
+
+
+def gif_palette(frame_pixels):
+    """The exact colours these frames use, in a fixed order.
+
+    Sorted rather than first-seen, so the table does not depend on which row
+    the generator reached first -- a detail that would otherwise make the file's
+    bytes a function of a loop order rather than of the picture.
+    """
+    colours = set()
+    for pixels in frame_pixels:
+        for row in pixels:
+            colours.update(row)
+    return sorted(colours)
+
+
+def lzw_compress(indices, min_code_size):
+    """GIF's LZW, written the way giflib writes it.
+
+    The one thing worth stating, because it is what every implementation of
+    this gets wrong: the decoder builds its dictionary one entry *behind* the
+    encoder, so the encoder has to widen its codes one entry early. giflib
+    widens once the counter has gone *past* `1 << bits`, which means code 511
+    still goes out in nine bits and code 512 does not. The symmetric-looking
+    `== 1 << bits` produces a file this script can read back perfectly and no
+    browser can, which is a bug that only a real decoder finds.
+
+    A prefix is carried as its own code rather than as the string it stands
+    for, so the dictionary is keyed on `(code, byte)`. The string form is the
+    textbook one and is quadratic in the length of a match.
+    """
+    clear = 1 << min_code_size
+    end = clear + 1
+    code_size = min_code_size + 1
+    table = {}
+    next_code = end + 1
+
+    packed = bytearray()
+    accumulator = 0
+    held = 0
+
+    def emit(code, width):
+        nonlocal accumulator, held
+        accumulator |= code << held
+        held += width
+        while held >= 8:
+            packed.append(accumulator & 0xFF)
+            accumulator >>= 8
+            held -= 8
+
+    emit(clear, code_size)
+
+    stream = iter(indices)
+    try:
+        prefix = next(stream)
+    except StopIteration:
+        emit(end, code_size)
+        if held:
+            packed.append(accumulator & 0xFF)
+        return bytes(packed)
+
+    for index in stream:
+        key = (prefix, index)
+        found = table.get(key)
+        if found is not None:
+            prefix = found
+            continue
+        emit(prefix, code_size)
+        if next_code == 4096:
+            # The dictionary is full. Tell the decoder to throw its away too;
+            # without the clear code the two stop agreeing on what any code
+            # means, and everything after this point is noise.
+            emit(clear, code_size)
+            table = {}
+            code_size = min_code_size + 1
+            next_code = end + 1
+        else:
+            table[key] = next_code
+            next_code += 1
+            if next_code > (1 << code_size) and code_size < 12:
+                code_size += 1
+        prefix = index
+
+    emit(prefix, code_size)
+    emit(end, code_size)
+    if held:
+        packed.append(accumulator & 0xFF)
+    return bytes(packed)
+
+
+def gif_sub_blocks(data):
+    """GIF carries data in blocks of at most 255 bytes, terminated by a zero."""
+    out = bytearray()
+    for start in range(0, len(data), 255):
+        chunk = data[start:start + 255]
+        out.append(len(chunk))
+        out += chunk
+    out.append(0)
+    return bytes(out)
+
+
+def gif_colour_table(palette):
+    """A GIF colour table is a power-of-two number of RGB triples."""
+    size = 2
+    while size < len(palette):
+        size *= 2
+    if size > 256:
+        raise ValueError("a GIF colour table holds 256 colours at most, and "
+                         "this frame needs %d" % len(palette))
+    out = bytearray()
+    for colour in palette:
+        out += bytes(colour[:3])
+    out += bytes(3 * (size - len(palette)))
+    return bytes(out), size
+
+
+def write_gif(path, frames, delay):
+    """Write an animated GIF89a. Nothing is quantised; see the note above.
+
+    `frames` is the same `(x, y, pixels)` shape `write_apng` takes, so the two
+    animations come from one set of drawings rather than from two.
+    """
+    width = len(frames[0][2][0])
+    height = len(frames[0][2])
+
+    # Frame 0's colours are the global table, so a viewer that draws only the
+    # first frame -- and some do, in some contexts -- still shows the static
+    # banner rather than nothing.
+    first = gif_palette([frames[0][2]])
+    global_table, global_size = gif_colour_table(first)
+    global_bits = max(1, (global_size - 1).bit_length())
+    band = gif_palette([pixels for _, _, pixels in frames[1:]]) if len(frames) > 1 else []
+
+    out = bytearray(b"GIF89a")
+    out += struct.pack("<HH", width, height)
+    #        global table present | colour resolution 8 | unsorted | size
+    out.append(0x80 | (7 << 4) | (global_bits - 1))
+    out.append(0)                                   # background colour index
+    out.append(0)                                   # no pixel aspect ratio
+    out += global_table
+
+    # NETSCAPE2.0: loop forever. Without it most viewers play the animation
+    # once, which for a banner reads as a page that stopped loading.
+    out += b"\x21\xff\x0bNETSCAPE2.0\x03\x01\x00\x00\x00"
+
+    for number, (x, y, pixels) in enumerate(frames):
+        palette = first if number == 0 else band
+        table, size = gif_colour_table(palette)
+        bits = max(1, (size - 1).bit_length())
+        lookup = {colour: index for index, colour in enumerate(palette)}
+
+        out += b"\x21\xf9\x04"                      # graphic control extension
+        # Disposal 1, "leave it where it is". "Restore to background" would
+        # blink the banner through the waveform fifty times a second, and
+        # "restore to previous" makes every frame depend on the one before it
+        # in a way no viewer implements the same way twice.
+        out.append(1 << 2)
+        out += struct.pack("<H", delay)
+        out.append(0)                               # transparent index, unused
+        out.append(0)                               # block terminator
+
+        out.append(0x2C)                            # image descriptor
+        out += struct.pack("<HHHH", x, y, len(pixels[0]), len(pixels))
+        out.append(0x00 if number == 0 else 0x80 | (bits - 1))
+        if number != 0:
+            out += table
+
+        min_code_size = max(2, bits)
+        out.append(min_code_size)
+        out += gif_sub_blocks(lzw_compress(
+            [lookup[colour] for row in pixels for colour in row], min_code_size))
+
+    out.append(0x3B)                                # trailer
+
+    with open(path, "wb") as handle:
+        handle.write(bytes(out))
+    return bytes(out)
+
+
 def decode_png(blob):
     """Decode the narrow PNG subset this script writes: 8-bit RGBA, filter 0.
 
@@ -906,7 +1135,8 @@ def decode_png(blob):
 # looked at `assets/` -- so `website/assets/banner.png` could drift from its
 # generator and nothing would notice. It had. The generator now writes both
 # and checks both, which is the only version of this that stays true.
-WEB_COPIES = ("icon.png", "icon-32.png", "banner.png", "banner-animated.png")
+WEB_COPIES = ("icon.png", "icon-32.png", "banner.png",
+              "banner-animated.png", "banner.gif")
 
 
 def website_assets(here):
@@ -961,6 +1191,26 @@ def check(here):
                "banner-animated.png", frames)
     check_apng(os.path.join(web, "banner-animated.png"),
                "website/assets/banner-animated.png", frames)
+
+    # The GIF: byte comparison rather than decoded pixels. The APNG above is
+    # compared decoded because zlib's output differs between Python builds and
+    # a byte comparison would fail on a machine that had changed nothing. LZW
+    # has no such freedom -- this file writes every code itself -- so the bytes
+    # are the stronger check here and the cheaper one.
+    want_gif = write_gif(os.path.join(here, ".gif-check"), gif_frames(), GIF_DELAY)
+    try:
+        os.remove(os.path.join(here, ".gif-check"))
+    except OSError:
+        pass
+    for label, path in (("banner.gif", os.path.join(here, "banner.gif")),
+                        ("website/assets/banner.gif",
+                         os.path.join(web, "banner.gif"))):
+        try:
+            with open(path, "rb") as handle:
+                if handle.read() != want_gif:
+                    problems.append("%s: differs from the generator output" % label)
+        except OSError as exc:
+            problems.append("%s: cannot read (%s)" % (label, exc))
 
     # The platform icons: byte comparison, because these are containers this
     # script writes end to end rather than images something else re-encodes.
@@ -1041,6 +1291,9 @@ def main():
         BANNER_DELAY_DEN,
     )
 
+    # And the GIF, for the README and for anything that will not draw an APNG.
+    write_gif(os.path.join(here, "banner.gif"), gif_frames(), GIF_DELAY)
+
     # And the website's own copies, from the same run rather than by hand.
     web = website_assets(here)
     os.makedirs(web, exist_ok=True)
@@ -1051,7 +1304,8 @@ def main():
             target.write(blob)
 
     for name in ("icon.png", "icon-32.png", "icon-32.rgba", "icon.ico",
-                 "icon.icns", "banner.png", "banner-animated.png"):
+                 "icon.icns", "banner.png", "banner-animated.png",
+                 "banner.gif"):
         size = os.path.getsize(os.path.join(here, name))
         print(f"  {name:<20} {size:>9,} bytes")
     print(f"  copied {len(WEB_COPIES)} of them into website/assets/")
