@@ -4940,6 +4940,7 @@ dependencies = [
  "veilvoice-update",
  "veilvoice-video",
  "veilvoice-watch",
+ "veilvoice-workspace",
  "winresource",
  "zeroize",
 ]
@@ -5001,6 +5002,15 @@ dependencies = [
 [[package]]
 name = "veilvoice-watch"
 version = "0.1.12"
+
+[[package]]
+name = "veilvoice-workspace"
+version = "0.1.12"
+dependencies = [
+ "tempfile",
+ "veilvoice-conversation",
+ "veilvoice-core",
+]
 
 [[package]]
 name = "version_check"

@@ -1,0 +1,16 @@
+[package]
+name = "veilvoice-workspace"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Named profiles and saved projects: the settings a recording was made with, written down so the next one can be made the same way."
+
+[dependencies]
+veilvoice-core = { path = "../veilvoice-core" }
+veilvoice-conversation = { path = "../veilvoice-conversation" }
+
+[dev-dependencies]
+tempfile = "3"

@@ -329,6 +329,24 @@ $tabs = @("file", "live", "group", "monitor", "lock", "verify", "settings",
           "install", "about")
 $tabY = 141
 
+# The application's own preference, so the group tab has something to show.
+# Written before the window opens, because it is read once at startup, and put
+# back at the end whatever happens.
+$settings = Join-Path $env:APPDATA "veilvoice\settings.conf"
+$savedSettings = $null
+if (Test-Path $settings) { $savedSettings = Get-Content -Raw $settings }
+$forced = if ($savedSettings) {
+  if ($savedSettings -match "always_group\s*=") {
+    $savedSettings -replace "always_group\s*=.*", "always_group = true"
+  } else {
+    $savedSettings.TrimEnd() + "`nalways_group = true`n"
+  }
+} else {
+  "always_group = true`n"
+}
+New-Item -ItemType Directory -Force (Split-Path $settings) | Out-Null
+Set-Content -Path $settings -Value $forced -Encoding utf8
+
 Write-Output "starting $Exe"
 $proc = Start-Process -FilePath $Exe -PassThru
 Start-Sleep -Seconds 8
@@ -365,11 +383,16 @@ for ($index = 0; $index -lt $tabs.Count; $index++) {
   $tab = @{ name = $tabs[$index]; x = $centres[$index] }
   $path = Join-Path $Out ("gui-" + $tab.name + ".png")
   Click-At $h $tab.x $tabY
-  # Group mode is off by default, which is correct and makes for a picture of
-  # an empty panel. A demonstration of group mode should demonstrate group
-  # mode, so the toggle is clicked before this one is taken. It is per-run and
-  # the application is closed at the end, so nothing is left changed.
-  if ($tab.name -eq "group") { Click-At $h 33 350 }
+  # Group mode is off by default -- correct, and a picture of an empty panel.
+  # It is turned on for this capture through the application's own
+  # "always start in group mode" preference, set before the window opened and
+  # put back afterwards.
+  #
+  # It used to be a click at a measured point, which went stale the first time
+  # a section was added above the toggle: the click landed elsewhere, group
+  # mode stayed off, and the capture was of an empty panel with nothing to say
+  # it was wrong. The same failure as the tab coordinates, and the same answer
+  # -- stop remembering where things are.
   Capture $h $path
   if ($tab.name -eq "live") { Redact $path $redactLive }
   if ($tab.name -eq "install") { Redact $path $redactInstall }
@@ -391,6 +414,15 @@ for ($index = 0; $index -lt $tabs.Count; $index++) {
 }
 
 $proc | Stop-Process -Force
+
+# The reader's own settings back, exactly as they were. A screenshot script
+# that leaves a preference changed is a screenshot script that edits somebody's
+# configuration to take a picture.
+if ($savedSettings -ne $null) {
+  Set-Content -Path $settings -Value $savedSettings -Encoding utf8
+} elseif (Test-Path $settings) {
+  Remove-Item $settings -Force
+}
 
 if ($problems.Count -gt 0) {
   Write-Output ""
