@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-setup/src/lib.rs`
 
-[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 166 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs)
+[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 168 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs)
 
 ## Contents
 
@@ -78,7 +78,7 @@ you who makes each one, and installs none of them unless you say so.
 
 ## What this file contains
 
-166 lines defining **3 functions** (0 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+168 lines defining **3 functions** (0 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 

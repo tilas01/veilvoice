@@ -70,7 +70,7 @@ the place this reads.
 flowchart TD
     n_lib(["lib.rs<br/>412 lines"])
     n_linux["linux.rs<br/>192 lines"]
-    n_windows["windows.rs<br/>589 lines"]
+    n_windows["windows.rs<br/>597 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" "open the source"
     click n_linux href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" "open the source"
     click n_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" "open the source"
@@ -84,5 +84,5 @@ flowchart TD
 |---|---:|---|
 | [[`lib.rs`|File-veilvoice-watch-lib]] | 412 | Find out which applications are using your microphone and camera, right now. |
 | [[`linux.rs`|File-veilvoice-watch-linux]] | 192 | Linux detection, via open file handles in /proc. |
-| [[`windows.rs`|File-veilvoice-watch-windows]] | 589 | Windows detection, via the Capability Access Manager. |
+| [[`windows.rs`|File-veilvoice-watch-windows]] | 597 | Windows detection, via the Capability Access Manager. |
 | [[`scan_once.rs`|File-veilvoice-watch-examples-scan_once]] | 22 | Print what is using the microphone and camera right now. |

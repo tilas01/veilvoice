@@ -523,7 +523,15 @@ mod tests {
     /// said everything was fine.
     #[test]
     fn the_windows_linker_is_not_looked_for_by_name_on_path() {
-        let source = include_str!("deps.rs");
+        // A source-reading test, so the line endings have to be settled first.
+        // F-72: these searched for "\n}\n" and passed on every machine
+        // whose checkout uses LF. GitHub's Windows runners default to
+        // core.autocrlf=true, so the file arrives with CRLF, the pattern
+        // matches nothing, and three tests failed there and nowhere else --
+        // including on the developer machine that had just run them.
+        // Normalised here as well as pinned in .gitattributes: a test that
+        // depends on a git setting is a test somebody will trip over.
+        let source = include_str!("deps.rs").replace("\r\n", "\n");
         let start = source.find("fn detect_linker()").expect("the function");
         let end = source[start..].find("\n}\n").expect("its end") + start;
         let body = &source[start..end];
@@ -550,7 +558,7 @@ mod tests {
     /// something else has to decide to run one, after asking.
     #[test]
     fn no_route_is_ever_taken_by_this_module() {
-        let source = include_str!("deps.rs");
+        let source = include_str!("deps.rs").replace("\r\n", "\n");
         let body = source.split("#[cfg(test)]").next().unwrap();
         for forbidden in [".status()", ".spawn()"] {
             assert!(
@@ -631,7 +639,7 @@ mod tests {
     /// Nothing here downloads anything itself.
     #[test]
     fn nothing_in_this_module_speaks_http() {
-        let source = include_str!("deps.rs");
+        let source = include_str!("deps.rs").replace("\r\n", "\n");
         for word in ["http://", "https://reqwest", "TcpStream"] {
             assert!(
                 !source.split("//!").last().unwrap_or("").contains(word),
