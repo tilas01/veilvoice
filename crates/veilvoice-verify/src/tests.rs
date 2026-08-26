@@ -136,3 +136,135 @@ fn an_armoured_block_that_is_not_a_signature_is_refused() {
     let key = embedded_key().unwrap();
     assert!(verify_detached(&key, veilvoice_check::PUBLIC_KEY, b"data").is_err());
 }
+
+// ---------------------------------------------------------------------------
+// The quiet level is only as good as the last line nobody gated
+// ---------------------------------------------------------------------------
+
+/// **Nothing may print without asking the level first.**
+///
+/// `--quiet` is a promise that this program says nothing, and the exit status
+/// is the whole answer. One forgotten `println!` breaks that promise, and it
+/// breaks it invisibly: every test still passes, the output is still correct
+/// at the default level, and the only reader who finds out is the one running
+/// it in a pipeline where a stray line is a parse error.
+///
+/// So the source itself is checked. Every `print!` and `println!` in `main.rs`
+/// must be inside one of the three macros that gate on the level, or in the
+/// short list below of things that are not reports about a check.
+#[test]
+fn every_line_printed_by_a_check_goes_through_the_level() {
+    let source = include_str!("main.rs");
+
+    // What is allowed to print unconditionally, and why.
+    //
+    // `--help`, `--version`, `--explain` and `--exit-status` print the thing
+    // that was asked for rather than reporting on a check. Somebody who types
+    // `--help` wants the help, whatever level they also passed.
+    let asked_for_directly = [
+        "print!(\"{USAGE}\");",
+        "print!(\"{EXPLAIN}\");",
+        "print!(\"{}\", Loudness::table());",
+        "print!(\"{}\", Status::table());",
+        "println!(\"veilvoice-verify {}\", env!(\"CARGO_PKG_VERSION\"));",
+        "println!();",
+    ];
+
+    // The macro bodies themselves, which are where the gating lives.
+    let inside_a_gate = [
+        r#"            println!($($arg)*);"#,
+        r#"            print!($($arg)*);"#,
+        r#"            println!("        {}", format!($($arg)*));"#,
+    ];
+
+    let mut ungated = Vec::new();
+    for (number, line) in source.lines().enumerate() {
+        let trimmed = line.trim();
+        if !(trimmed.contains("println!(") || trimmed.contains("print!(")) {
+            continue;
+        }
+        // Documentation and comments talk about printing; they do not print.
+        if trimmed.starts_with("//") {
+            continue;
+        }
+        if trimmed.starts_with("eprintln!") || trimmed.contains("eprintln!(") {
+            continue;
+        }
+        if inside_a_gate.contains(&line) {
+            continue;
+        }
+        if asked_for_directly.contains(&trimmed) {
+            continue;
+        }
+        ungated.push(format!("main.rs:{}: {trimmed}", number + 1));
+    }
+
+    assert!(
+        ungated.is_empty(),
+        "these lines print without asking the level, so `--quiet` is not quiet:\n{}",
+        ungated.join("\n")
+    );
+}
+
+/// The counterpart: standard error is gated too, and by the same rule.
+///
+/// A refusal is the one thing a `--quiet` reader most plausibly still wants,
+/// and the answer is still no -- they asked for nothing, and the exit status
+/// carries it. What must not happen is *some* refusals honouring that and
+/// others not.
+#[test]
+fn every_line_of_a_refusal_goes_through_the_level_too() {
+    let source = include_str!("main.rs");
+    let mut outside = Vec::new();
+    let mut depth_of_gate: Option<usize> = None;
+
+    for (number, line) in source.lines().enumerate() {
+        let indent = line.len() - line.trim_start().len();
+        let trimmed = line.trim();
+
+        if trimmed.starts_with("if report::level() >= Loudness::") {
+            depth_of_gate = Some(indent);
+            continue;
+        }
+        if let Some(gate) = depth_of_gate {
+            if trimmed == "}" && indent == gate {
+                depth_of_gate = None;
+                continue;
+            }
+        }
+        if trimmed.starts_with("eprintln!") && depth_of_gate.is_none() {
+            outside.push(format!("main.rs:{}: {trimmed}", number + 1));
+        }
+    }
+
+    assert!(
+        outside.is_empty(),
+        "these refusal lines print without asking the level:\n{}",
+        outside.join("\n")
+    );
+}
+
+/// Every exit this program can take is one of the documented statuses.
+///
+/// `ExitCode::FAILURE` is the shape this used to have and the one to keep out:
+/// it is 1, which now means "the command line could not be understood", so a
+/// leftover `FAILURE` would report a bad signature as a typing mistake.
+#[test]
+fn nothing_exits_with_an_undocumented_status() {
+    let source = include_str!("main.rs");
+    let mut stray = Vec::new();
+    for (number, line) in source.lines().enumerate() {
+        let trimmed = line.trim();
+        if trimmed.starts_with("//") || trimmed.starts_with("///") {
+            continue;
+        }
+        if trimmed.contains("ExitCode::FAILURE") {
+            stray.push(format!("main.rs:{}: {trimmed}", number + 1));
+        }
+    }
+    assert!(
+        stray.is_empty(),
+        "ExitCode::FAILURE is 1, which now means a usage error. Use a Status:\n{}",
+        stray.join("\n")
+    );
+}

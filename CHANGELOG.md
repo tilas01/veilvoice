@@ -8,6 +8,51 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Four verbosity levels, and eight exit statuses that mean something
+
+```
+veilvoice-verify --quiet file veilvoice.tar.gz --sums SHA256SUMS --sig SHA256SUMS.asc
+echo $?
+```
+
+`--quiet` says nothing at all. `--brief` says the answer and nothing else.
+The default is unchanged, and `--verbose` adds every command, path and hash.
+
+**The statuses came first, and that is the whole point.** A tool that prints
+nothing and returns zero when a signature did not verify is worse than a noisy
+one: it reports success by staying quiet. So there is no quiet mode until every
+outcome has its own documented number, and `--help` prints the table:
+
+```
+EXIT STATUS
+  0   everything asked for was done and every check passed
+  1   the command line could not be understood; nothing was attempted
+  2   a check ran and FAILED -- do not run what you downloaded
+  3   a check could not be completed; nothing was proven either way
+  4   the build was attempted and the compiler stopped
+  5   the build here does not match the published build
+  6   build dependencies are missing and were not installed
+  7   the check passed; putting the files in place did not
+```
+
+**2 and 3 were the same number before, and they are different facts.** "I
+checked and it was wrong" means somebody may have tampered with your download.
+"I could not check" usually means a network hiccup. A script could not tell
+them apart, and neither could a reader: a mistyped path used to print *"Nothing
+about this download has been proven. Do not run it."* Missing files, unreadable
+signatures and unhashable paths now say what actually happened, and mistyped
+commands say `USAGE:` rather than accusing a release.
+
+**5 is deliberately not 2.** A build here differing from the published build is
+a finding to look into and publish. Most causes are boring, and calling it
+tampering would be a claim this program cannot support.
+
+Two tests read the program's own source and fail the build if any line prints
+without asking the level first — one for standard output, one for standard
+error. A quiet mode is only as good as the last line nobody remembered to gate,
+and that omission is invisible: every other test still passes and the default
+output is still correct.
+
 ### F-67 — the group panel rendered with the default settings, not yours
 
 The eighth audit round, over the voice limit, saved projects and profiles, and
