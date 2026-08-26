@@ -89,7 +89,7 @@ it cannot do as plainly as what it can.
 | 34 | Hide VeilVoice's own window from screen capture and recording | **blocked** | — |
 | 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **done** | — |
 | 36 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **done** | — |
-| 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
+| 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **done** | — |
 | 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | — |
 | 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
 | 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | — |
@@ -382,6 +382,31 @@ Worth noting that the same decision would not buy very much. A window
 excluded from capture is still visible to a camera pointed at the screen, and
 the thing VeilVoice protects — the recording — is a file, not a picture of a
 window.
+
+**Marker 37 is a baseline, and it is named honestly everywhere but its own
+title.** `veilvoice-appctl` learns what normally runs here, then tells you when
+something runs that was not in that picture. **It does not block anything and
+cannot.** Real enforcement needs a kernel driver or a signed system policy and
+an application identity to sign it with, and this project is published under a
+pseudonym on purpose. Shipping something called "app control" that quietly only
+watches would be the exact failure rule 2 exists to prevent, so the scope note
+is printed by **every** subcommand — not once at setup, not behind a flag — and
+the *unknown* verdict says in so many words that the program is still running.
+
+Three decisions worth recording. **Learning has an end**: a baseline that is
+always learning has learned nothing, because whatever an attacker starts joins
+the picture the moment it starts. **Grants expire**, and an expired grant is
+left on record rather than swept, because "this was allowed until Tuesday" is
+worth more to a reader than a row that vanished; permanent is spelled
+`forever` rather than a distant date, so choosing it is something somebody
+typed. And **only the decisions worth reading are logged** — a line for every
+ordinary program every time it is seen is a log nobody reads, and a log nobody
+reads is not a control.
+
+Measured on this machine: 111 programs learned from 313 sightings, baseline
+closed, and a `check` while a stray process ran named `timeout.exe` and
+`smartscreen.exe` — the second one started by Windows itself, which is exactly
+the case this is for.
 
 **Marker 41's contrast is computed against the colour actually on screen.**
 A translucent card is a colour laid *over* the panel behind it, so measuring
