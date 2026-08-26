@@ -165,6 +165,9 @@ pub struct VeilVoiceApp {
     /// make the value shown beside the slider a lie the moment it was read.
     reseed_range: Option<(f32, f32)>,
 
+    /// The input-file picker, while it is open.
+    choosing_input: crate::dialog::Pending,
+
     /// What is being shown to the reader right now, if anything.
     ///
     /// One at a time. A stack of cards covering the window is how somebody
@@ -272,6 +275,7 @@ impl VeilVoiceApp {
                 .with_random_reseed_range()
                 .reseed_range_ms,
             notice: None,
+            choosing_input: crate::dialog::Pending::new(),
             input: None,
             output: None,
             clean_metadata: true,
@@ -756,20 +760,27 @@ impl VeilVoiceApp {
         ui.add_space(4.0);
         ui.label(RichText::new("INPUT").color(p::blue()).small());
         ui.horizontal(|ui| {
-            if ui.button("choose file…").clicked() {
-                if let Some(path) = rfd::FileDialog::new()
-                    .add_filter(
-                        "audio",
-                        &["wav", "mp3", "flac", "ogg", "m4a", "aac", "opus"],
-                    )
-                    .pick_file()
-                {
-                    let mut out = path.clone();
-                    out.set_extension("veiled.wav");
-                    self.input = Some(path);
-                    self.output = Some(out);
-                    self.status = None;
-                }
+            // Started, not waited for. The picker runs on its own thread and
+            // the answer is collected below, so the window keeps painting
+            // while somebody browses -- see `crate::dialog`.
+            if ui
+                .add_enabled(
+                    !self.choosing_input.is_open(),
+                    egui::Button::new("choose file…"),
+                )
+                .clicked()
+            {
+                self.choosing_input.start(crate::dialog::Ask::open_filtered(
+                    "audio",
+                    &["wav", "mp3", "flac", "ogg", "m4a", "aac", "opus"],
+                ));
+            }
+            if let Some(path) = self.choosing_input.taken() {
+                let mut out = path.clone();
+                out.set_extension("veiled.wav");
+                self.input = Some(path);
+                self.output = Some(out);
+                self.status = None;
             }
             match &self.input {
                 Some(path) => ui.label(RichText::new(path.display().to_string()).color(p::cyan())),

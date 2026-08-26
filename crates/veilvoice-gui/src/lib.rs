@@ -59,6 +59,7 @@
 
 mod app;
 pub mod crashlog;
+pub mod dialog;
 pub mod group;
 pub mod notify;
 pub mod palettes;
