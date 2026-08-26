@@ -6,7 +6,25 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
-## Unreleased
+## v0.1.13
+
+Build it yourself and check the release against what you built; group mode you
+can see; projects, profiles and a voice limit that was measured rather than
+chosen; and the eighth audit round.
+
+**The headline is `veilvoice-verify reproduce`.** Until now the verifier
+answered one question — *is this download the one that was published*.
+It now answers the harder one: **is the published build the one this source
+produces**. A signature says who made a file. Only a build says what it is made
+of.
+
+**The eighth audit round found seven defects (F-66 to F-72), none of them
+shipped.** Two were found by continuous integration rather than by anybody's
+judgement, and both had been watched to pass on the machine they failed on.
+Three more were found by running a command and reading what it printed. Not one
+would have been found by reading the code, which is the round's whole lesson
+and the third time this project has had to learn it.
+
 
 ### Build it yourself, and check the release against what you built
 
