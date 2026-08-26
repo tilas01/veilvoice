@@ -417,6 +417,12 @@ impl eframe::App for VeilVoiceApp {
         // refusing to do the obvious thing.
         self.verify.take_dropped(ctx);
 
+        // The group panel renders with the engine settings the rest of the
+        // application is set to, rather than with the defaults. Copied here,
+        // before anything is painted, so the limit it shows and the render it
+        // starts are both computed from the same thing (F-67).
+        self.group.config = self.config();
+
         // The gate comes before everything: while locked, no device list, no
         // file names and no live session are reachable or even drawn.
         if self.security.is_locked() {
