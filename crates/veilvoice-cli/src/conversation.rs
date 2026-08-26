@@ -54,6 +54,7 @@
 use crate::theme::{colour, err, field, heading, ok, paint, warn};
 use std::path::{Path, PathBuf};
 use veilvoice_audio::io as audio_io;
+use veilvoice_conversation::mode::VoiceMode;
 use veilvoice_conversation::render::{self, Settings};
 use veilvoice_conversation::subtitles::{self, Format};
 use veilvoice_conversation::Conversation;
@@ -191,11 +192,23 @@ pub fn run(
     output: Option<PathBuf>,
     tuning: DeidConfig,
     look: Option<Look>,
+    one_voice: bool,
 ) -> Result<(), String> {
-    let plan = load_plan(plan_path)?;
+    let mut plan = load_plan(plan_path)?;
     if plan.is_empty() {
         return Err("the plan names no speakers, so there is nothing to render into".into());
     }
+
+    // Set before anything is read or rendered. The refusal here is the useful
+    // one -- it names the alternative -- and it costs nothing to hit it before
+    // a long file has been decoded.
+    let mode = if one_voice {
+        VoiceMode::Uniform
+    } else {
+        VoiceMode::Distinct
+    };
+    plan.set_mode(mode, &tuning)
+        .map_err(|error| error.to_string())?;
 
     let out_path = output.unwrap_or_else(|| {
         let mut path = input.to_path_buf();
@@ -215,6 +228,13 @@ pub fn run(
         field("sample rate", &format!("{} Hz", audio.sample_rate))
     );
     println!("{}", field("speakers", &plan.len().to_string()));
+    println!("{}", field("voices", mode.label()));
+    if mode == VoiceMode::Uniform {
+        println!();
+        for line in crate::sentry::wrap(mode.note(), 72) {
+            println!("  {line}");
+        }
+    }
     println!();
 
     // The engine settings come from the same flags `anonymise` uses, with the
@@ -341,11 +361,19 @@ pub fn preview(
     look: Look,
     output: Option<PathBuf>,
     show_ffmpeg: bool,
+    one_voice: bool,
 ) -> Result<(), String> {
-    let plan = load_plan(plan_path)?;
+    let mut plan = load_plan(plan_path)?;
     if plan.is_empty() {
         return Err("the plan names no speakers, so there is nothing to draw".into());
     }
+    let mode = if one_voice {
+        VoiceMode::Uniform
+    } else {
+        VoiceMode::Distinct
+    };
+    plan.set_mode(mode, &DeidConfig::default())
+        .map_err(|error| error.to_string())?;
 
     // With no audio the waveform is flat rather than absent: the picture is
     // about the layout, and an empty band is honest about there being nothing
@@ -372,6 +400,7 @@ pub fn preview(
     );
     println!("{}", field("theme", look.palette.name));
     println!("{}", field("at", &format!("{at_secs:.2} s")));
+    println!("{}", field("voices", mode.label()));
     if audio.is_none() {
         println!("{}", field("waveform", "flat -- no recording was given"));
     }
@@ -383,6 +412,12 @@ pub fn preview(
 
     println!();
     println!("{}", heading("Which voice each speaker becomes"));
+    if mode == VoiceMode::Uniform {
+        for line in crate::sentry::wrap(mode.note(), 72) {
+            println!("  {line}");
+        }
+        println!();
+    }
     for (index, speaker) in plan.speakers().iter().enumerate() {
         println!(
             "{}",
@@ -525,6 +560,7 @@ mod tests {
             Some(output.clone()),
             DeidConfig::default(),
             None,
+            false,
         )
         .expect("the render should succeed");
 
@@ -555,7 +591,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let plan = plan_file(dir.path());
         let input = wav_file(dir.path(), 1.0);
-        run(&plan, &input, None, DeidConfig::default(), None).expect("should succeed");
+        run(&plan, &input, None, DeidConfig::default(), None, false).expect("should succeed");
         assert!(dir.path().join("input.veiled.wav").exists());
     }
 
@@ -570,6 +606,7 @@ mod tests {
             None,
             DeidConfig::default(),
             None,
+            false,
         )
         .expect_err("an empty plan is refused");
         assert!(error.contains("no speakers"), "{error}");
@@ -587,6 +624,7 @@ mod tests {
             None,
             DeidConfig::default(),
             Some(Look::default()),
+            false,
         )
         .expect("should succeed");
 
@@ -609,7 +647,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let plan = plan_file(dir.path());
         let input = wav_file(dir.path(), 1.0);
-        run(&plan, &input, None, DeidConfig::default(), None).expect("should succeed");
+        run(&plan, &input, None, DeidConfig::default(), None, false).expect("should succeed");
         assert!(!dir.path().join("input.veiled.html").exists());
     }
 
@@ -703,6 +741,7 @@ mod tests {
             look_from(1280, 720, 48, None, false, Some("gruvbox".into())).unwrap(),
             Some(gruvbox.clone()),
             false,
+            false,
         )
         .unwrap();
         let markup = std::fs::read_to_string(&gruvbox).unwrap();
@@ -724,8 +763,16 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let plan = plan_file(dir.path());
         let out = dir.path().join("still.svg");
-        preview(&plan, None, 0.25, Look::default(), Some(out.clone()), false)
-            .expect("a preview needs no audio");
+        preview(
+            &plan,
+            None,
+            0.25,
+            Look::default(),
+            Some(out.clone()),
+            false,
+            false,
+        )
+        .expect("a preview needs no audio");
         let markup = std::fs::read_to_string(&out).unwrap();
         assert!(markup.starts_with("<svg"), "{markup:.120}");
         assert!(markup.contains("Alex"), "the speakers should be named");

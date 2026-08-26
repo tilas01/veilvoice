@@ -65,10 +65,12 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod mode;
 pub mod plan;
 pub mod render;
 pub mod subtitles;
 
+pub use mode::{TooMany, VoiceMode};
 pub use plan::{Conversation, Speaker, Turn};
 
 /// Crate version string, surfaced in the About panel.

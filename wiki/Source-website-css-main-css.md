@@ -3,7 +3,7 @@
 
 # `website/css/main.css`
 
-[[The website's source|Source-index]] &middot; 1866 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css)
+[[The website's source|Source-index]] &middot; 1891 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css)
 
 ## What it does
 
@@ -26,20 +26,20 @@ There is no framework and no font downloaded from anywhere else. Every remote th
 | hero | 248 |
 | the banner, drawn in CSS | 287 |
 | the journey: a file in, a file out | 468 |
-| the demonstration | 670 |
-| tooltips | 799 |
-| the cycling fact line | 929 |
-| the veil animation | 996 |
-| reveal on scroll | 1033 |
-| the walkthrough | 1052 |
-| buttons | 1113 |
-| sections | 1135 |
-| verifier | 1247 |
-| repo panel | 1295 |
-| the repository panel, while it loads | 1302 |
-| the screenshot gallery | 1353 |
-| wiki | 1393 |
-| footer | 1434 |
-| welcome / legal gate | 1459 |
-| search | 1554 |
-| the JavaScript edition toggle | 1724 |
+| the demonstration | 677 |
+| tooltips | 806 |
+| the cycling fact line | 936 |
+| the veil animation | 1003 |
+| reveal on scroll | 1040 |
+| the walkthrough | 1059 |
+| buttons | 1120 |
+| sections | 1142 |
+| verifier | 1254 |
+| repo panel | 1302 |
+| the repository panel, while it loads | 1309 |
+| the screenshot gallery | 1360 |
+| wiki | 1400 |
+| footer | 1441 |
+| welcome / legal gate | 1466 |
+| search | 1579 |
+| the JavaScript edition toggle | 1749 |

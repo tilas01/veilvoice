@@ -48,7 +48,7 @@
 
 use crate::Error;
 use std::path::PathBuf;
-use veilvoice_core::voices::{self, Voice, MAX_VOICES};
+use veilvoice_core::voices::{Voice, MAX_VOICES};
 
 /// Magic first line. The digit is a format version.
 const MAGIC: &str = "VEILCONV1";
@@ -110,6 +110,13 @@ pub struct Conversation {
     pub title: Option<String>,
     speakers: Vec<Speaker>,
     turns: Vec<Turn>,
+    /// Whether each speaker gets their own voice, or one between them.
+    ///
+    /// Private, and **not written to the plan file**. A plan says who is in the
+    /// recording and when they speak; how they are rendered is decided at
+    /// render time by whoever is rendering. A mode stored in a shared file
+    /// would silently change what somebody else's render sounds like.
+    mode: crate::mode::VoiceMode,
 }
 
 impl Conversation {
@@ -263,7 +270,33 @@ impl Conversation {
 
     /// The destination voice for a speaker.
     pub fn voice(&self, speaker: usize) -> Voice {
-        voices::voice(speaker)
+        self.mode.voice_for(speaker)
+    }
+
+    /// Whether every speaker gets their own voice, or one between them.
+    ///
+    /// Not persisted in the plan file, and deliberately so. A plan says *who is
+    /// in the recording and when they speak*; how they are rendered is a
+    /// decision made at render time, by whoever is doing the rendering. Writing
+    /// it into the file would mean a plan somebody shared could silently change
+    /// what a later render sounds like.
+    pub fn mode(&self) -> crate::mode::VoiceMode {
+        self.mode
+    }
+
+    /// Render every speaker as the same voice, or as their own.
+    ///
+    /// Refuses when this plan holds more speakers than the mode can carry --
+    /// which for [`crate::mode::VoiceMode::Distinct`] is how many voices are
+    /// far enough apart to be told apart, measured under `config`.
+    pub fn set_mode(
+        &mut self,
+        mode: crate::mode::VoiceMode,
+        config: &veilvoice_core::DeidConfig,
+    ) -> Result<(), crate::mode::TooMany> {
+        crate::mode::check(self.speakers.len(), mode, config)?;
+        self.mode = mode;
+        Ok(())
     }
 
     /// When the last turn ends, in seconds.
@@ -822,6 +855,70 @@ mod tests {
         plan.rename_speakers(&["  Robin  ".to_string(), "Jules".to_string()])
             .unwrap();
         assert_eq!(plan.speakers()[0].name, "Robin");
+    }
+
+    /// Uniform mode gives every speaker the same voice. This is the whole of
+    /// what the mode does to the sound, so it is asserted directly.
+    #[test]
+    fn uniform_mode_gives_every_speaker_one_voice() {
+        use crate::mode::VoiceMode;
+        let config = veilvoice_core::DeidConfig::default();
+        let mut plan = two_people();
+        assert_ne!(plan.voice(0), plan.voice(1), "distinct by default");
+
+        plan.set_mode(VoiceMode::Uniform, &config).unwrap();
+        assert_eq!(plan.voice(0), plan.voice(1), "one voice between them");
+        assert_eq!(plan.mode(), VoiceMode::Uniform);
+
+        plan.set_mode(VoiceMode::Distinct, &config).unwrap();
+        assert_ne!(plan.voice(0), plan.voice(1), "and back again");
+    }
+
+    /// A plan with more speakers than there are separable voices cannot be put
+    /// into distinct mode, and the refusal says what to do instead.
+    #[test]
+    fn distinct_mode_is_refused_past_the_measured_limit() {
+        use crate::mode::VoiceMode;
+        let config = veilvoice_core::DeidConfig::default();
+        let mut plan = Conversation::new();
+        for index in 0..9 {
+            plan.add_speaker(Speaker::named(&format!("P{index}")))
+                .unwrap();
+        }
+        // Nine is past the eight that are clearly separable...
+        let error = plan
+            .set_mode(VoiceMode::Distinct, &config)
+            .expect_err("nine speakers, eight clear voices");
+        assert!(error.to_string().contains("one voice for everybody"));
+        // ...and uniform mode carries them, which is the point of the refusal
+        // naming it.
+        plan.set_mode(VoiceMode::Uniform, &config).unwrap();
+        assert_eq!(plan.mode(), VoiceMode::Uniform);
+        for slot in 0..9 {
+            assert_eq!(plan.voice(slot), plan.voice(0));
+        }
+    }
+
+    /// The mode is not written to the plan file. A plan says who speaks when;
+    /// how it is rendered is the renderer's decision, and a mode hidden in a
+    /// shared file would change what somebody else's render sounds like.
+    #[test]
+    fn the_mode_is_not_carried_in_the_file() {
+        use crate::mode::VoiceMode;
+        let config = veilvoice_core::DeidConfig::default();
+        let mut plan = two_people();
+        plan.set_mode(VoiceMode::Uniform, &config).unwrap();
+
+        let text = plan.to_text();
+        assert!(!text.to_lowercase().contains("uniform"), "{text}");
+        assert!(!text.to_lowercase().contains("mode"), "{text}");
+
+        let read_back = Conversation::parse(&text).unwrap();
+        assert_eq!(
+            read_back.mode(),
+            VoiceMode::Distinct,
+            "a plan read from disk renders distinct until told otherwise"
+        );
     }
 
     #[test]

@@ -100,7 +100,7 @@ flowchart TD
     n_pitch["pitch.rs<br/>274 lines"]
     n_spectral["spectral.rs<br/>428 lines"]
     n_stft["stft.rs<br/>246 lines"]
-    n_voices["voices.rs<br/>643 lines"]
+    n_voices["voices.rs<br/>853 lines"]
     n_window["window.rs<br/>91 lines"]
     n_accent --> n_pitch
     n_accent --> n_spectral
@@ -139,7 +139,7 @@ flowchart TD
 | [[`pitch.rs`|File-veilvoice-core-pitch]] | 274 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [[`spectral.rs`|File-veilvoice-core-spectral]] | 428 | Frequency-domain de-identification transform. |
 | [[`stft.rs`|File-veilvoice-core-stft]] | 246 | Streaming short-time Fourier transform with overlap-add resynthesis. |
-| [[`voices.rs`|File-veilvoice-core-voices]] | 643 | Destination voices: several canonical registers instead of one. |
+| [[`voices.rs`|File-veilvoice-core-voices]] | 853 | Destination voices: several canonical registers instead of one. |
 | [[`window.rs`|File-veilvoice-core-window]] | 91 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
 | [[`spectrum_report.rs`|File-veilvoice-core-examples-spectrum_report]] | 99 | Where do the output partials actually land? |
 | [[`veil_a_buffer.rs`|File-veilvoice-core-examples-veil_a_buffer]] | 45 | _no module documentation yet_ |
