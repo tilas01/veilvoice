@@ -75,6 +75,7 @@ mod conversation;
 mod guard;
 mod input;
 mod lock;
+mod priv_mode;
 // Only the live path draws a meter, and the crate builds without that path on
 // the BSDs, where `cpal` has no backend.
 #[cfg(feature = "live")]
@@ -374,6 +375,17 @@ enum Command {
         #[command(subcommand)]
         what: CaptureCommand,
     },
+
+    /// What VeilVoice is running with, and what that lets it see.
+    ///
+    /// Most of VeilVoice needs no special permissions; the monitoring features
+    /// see further as an administrator. This reports which you are getting and
+    /// prints the command to run it the other way.
+    ///
+    /// **It never raises its own privileges, installs a service, or asks for a
+    /// password.** Those are changes to your machine and they should be ones
+    /// you made on purpose.
+    Privilege,
 
     /// Learn what normally runs here, then notice what does not.
     ///
@@ -1060,6 +1072,8 @@ fn run(command: Command) -> Result<(), String> {
                 one_voice,
             ),
         },
+
+        Command::Privilege => priv_mode::show(),
 
         Command::Appctl { what } => match what {
             AppctlCommand::Learn { finish } => appctl::learn(finish),
