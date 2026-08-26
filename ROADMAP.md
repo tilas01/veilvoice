@@ -91,7 +91,7 @@ it cannot do as plainly as what it can.
 | 36 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **done** | — |
 | 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **done** | — |
 | 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | — |
-| 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
+| 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **done** | — |
 | 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | — |
 | 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **done** | — |
 | 42 | Duress and decoy passwords | **planned** | 7–10 d |
@@ -146,7 +146,7 @@ about the signal, which is already done.
 |---:|---|---|---|
 | 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **done** | — |
 | 62 | **A name and a colour per speaker in the app** — the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **done** | — |
-| 63 | **Live levels and a wave per speaker**, in the app and in the terminal, while a recording is running | **planned** | 3–4 d |
+| 63 | **Live levels and a wave per speaker**, in the app and in the terminal, while a recording is running | **blocked** | — |
 | 64 | **Speaker detection through software you already have** — detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **blocked** | — |
 
 ## Finally
@@ -382,6 +382,45 @@ Worth noting that the same decision would not buy very much. A window
 excluded from capture is still visible to a camera pointed at the screen, and
 the thing VeilVoice protects — the recording — is a file, not a picture of a
 window.
+
+**Marker 39 ships the administrator version and reports the difference; it
+does not acquire anything.** `veilvoice privilege` says what VeilVoice is
+running with, what that level can and cannot see, and prints the command to run
+it the other way. It never re-launches itself elevated, installs a service, or
+asks for a password: those are changes to somebody's machine and they belong to
+the person whose machine it is. A test names every subprocess the crate starts,
+so "it only reports" stays true rather than staying a comment.
+
+**The opt-in service is deliberately not shipped**, and the reason is written
+where a reader will meet it: a service outlives the window it was started from,
+starts itself at boot, and runs whether or not anybody is using the program —
+somebody who tried VeilVoice once should not find it still running next month.
+Leaving the window open is the honest form of continuous monitoring, because
+then what it can see is exactly what it says it can see.
+
+Two details found by measuring rather than reasoning. The Windows probe keys on
+the well-known SID `S-1-5-32-544` rather than the group's **name**, which is
+translated and would report every non-English machine as unprivileged. And the
+"Group used for deny only" attribute — what an administrator account looks like
+when it is *not* running elevated — is on the same 236-character line as the
+SID, not the next one; a console wraps it so it looks like two rows, and
+reading it that way would report every administrator account as elevated
+whether or not it was. Verified on a machine in exactly that state.
+
+**Marker 63 is half shipped and half blocked, and it moves to blocked rather
+than sitting as planned.** The *levels* are done and have been for some time:
+`veilvoice live` draws them in the terminal and the desktop application draws
+them beside the devices, both with peak-hold. The **wave per speaker** is a
+different thing entirely — it needs the live input separated by who is talking,
+which is diarisation, which is markers 43 and 64 and is blocked for the reason
+recorded there: real speaker separation means shipping a trained model, and
+locked decision 5 says this project does not.
+
+Leaving it marked *planned* would imply an estimate exists for work that cannot
+start, which is the same overstatement in the other direction. What could be
+built without diarisation — a wave per speaker in a *rendered* conversation,
+where the plan already says who speaks when — exists, and is what the video
+output and the HTML player draw.
 
 **Marker 37 is a baseline, and it is named honestly everywhere but its own
 title.** `veilvoice-appctl` learns what normally runs here, then tells you when

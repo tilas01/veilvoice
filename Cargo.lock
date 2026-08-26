@@ -4866,6 +4866,7 @@ dependencies = [
  "veilvoice-input",
  "veilvoice-meta",
  "veilvoice-policy",
+ "veilvoice-priv",
  "veilvoice-proc",
  "veilvoice-sentry",
  "veilvoice-setup",
@@ -4977,6 +4978,10 @@ dependencies = [
  "tempfile",
  "veilvoice-crypto",
 ]
+
+[[package]]
+name = "veilvoice-priv"
+version = "0.1.13"
 
 [[package]]
 name = "veilvoice-proc"
