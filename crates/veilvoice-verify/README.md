@@ -94,12 +94,12 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_main(["main.rs<br/>1396 lines"])
-    n_builder["builder.rs<br/>1140 lines"]
-    n_deps["deps.rs<br/>642 lines"]
+    n_builder["builder.rs<br/>1148 lines"]
+    n_deps["deps.rs<br/>650 lines"]
     n_discover["discover.rs<br/>344 lines"]
     n_fetch["fetch.rs<br/>320 lines"]
     n_report["report.rs<br/>385 lines"]
-    n_tests["tests.rs<br/>246 lines"]
+    n_tests["tests.rs<br/>346 lines"]
     n_builder --> n_deps
     n_builder --> n_report
     n_main --> n_report
@@ -118,13 +118,13 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 1140 | Build VeilVoice here, and compare what came out against what was published. |
-| [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 642 | What this machine needs before it can build VeilVoice, and who ships it. |
+| [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 1148 | Build VeilVoice here, and compare what came out against what was published. |
+| [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 650 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 344 | Finding a release to check, without being told where it is. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 320 | Download a release, without putting an HTTP client in the dependency graph. |
 | [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 1396 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
-| [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 246 | The verifier's own tests. |
+| [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 346 | The verifier's own tests. |
 
 ## Public items
 

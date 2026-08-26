@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-verify/src/deps.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 642 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 650 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs)
 
 ## Contents
 
@@ -81,7 +81,7 @@ with, so you can see exactly what is being run.
 
 ## What this file contains
 
-642 lines defining **12 functions** (7 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+650 lines defining **12 functions** (7 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

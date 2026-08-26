@@ -55,6 +55,34 @@ the hash list may be for another platform. A hash list naming nothing that was
 built would otherwise report success by vacuum, which is the failure mode this
 whole exercise is most exposed to.
 
+### F-72 — three tests passed here and failed on the same platform
+
+Several tests read this project's own source with `include_str!` and find a
+function's end by searching for `"\n}\n"`. They passed locally and failed on
+GitHub's Windows runners — not on a different platform, on the *same*
+one, minutes after being watched to pass. This machine has
+`core.autocrlf=input`; GitHub's Windows runners default to `true`, so the file
+arrives with CRLF and the pattern matches nothing.
+
+There was no `.gitattributes`, so a checkout's line endings were whatever each
+contributor's git happened to be set to.
+
+**The tests are the small half.** Every artefact here is regenerated and
+compared byte for byte by `tools/verify.py`, and every generator writes LF. A
+contributor whose git converts text on checkout would find every `--check`
+failing on files they had never touched, on their first run, with a diff that
+shows nothing — and would reasonably conclude the repository was
+broken.
+
+`.gitattributes` now pins text to LF for everyone and names the binary formats
+rather than trusting detection to guess right on a `.wav`. The source-reading
+tests normalise as well: a test that depends on a git setting is one somebody
+will trip over on a machine nobody here owns.
+
+The failure mode is now a test of its own — a search for `"\n}\n"`
+is asserted to succeed against LF and to fail against CRLF — so it is
+on record as reachable rather than as a story about it.
+
 ### F-71 — the guard against stale claims compared one copy to another
 
 The front page said **354 tests** and "no unsafe code, in any of the **nine**

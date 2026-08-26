@@ -104,7 +104,7 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>150 lines"])
-    n_blame["blame.rs<br/>405 lines"]
+    n_blame["blame.rs<br/>413 lines"]
     n_manifest["manifest.rs<br/>539 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs" "open the source"
     click n_blame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" "open the source"
@@ -117,7 +117,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`blame.rs`](../../docs/files/veilvoice-guard/blame.md) | 405 | Best-effort attribution: which program changed a file. |
+| [`blame.rs`](../../docs/files/veilvoice-guard/blame.md) | 413 | Best-effort attribution: which program changed a file. |
 | [`lib.rs`](../../docs/files/veilvoice-guard/lib.md) | 150 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
 | [`manifest.rs`](../../docs/files/veilvoice-guard/manifest.md) | 539 | The integrity manifest: what the files were, and what they are now. |
 

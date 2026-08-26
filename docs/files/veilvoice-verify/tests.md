@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-verify/src/tests.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 246 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 346 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
 
 ## Contents
 
@@ -35,7 +35,7 @@ binary is to be the thing you check a download with.
 
 ## What this file contains
 
-246 lines defining **15 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+346 lines defining **18 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -71,7 +71,10 @@ flowchart TD
     n_an_empty_signature_is_refused["an_empty_signature_is_refused<br/>line 126"]
     n_an_armoured_block_that_is_not_a_signature_is_refused["an_armoured_block_that_is_not…<br/>line 132"]
     n_every_line_printed_by_a_check_goes_through_the_level["every_line_printed_by_a_check…<br/>line 162"]
-    n_nothing_exits_with_an_undocumented_status["nothing_exits_with_an_undocum…<br/>line 229"]
+    n_nothing_exits_with_an_undocumented_status["nothing_exits_with_an_undocum…<br/>line 237"]
+    n_every_test_that_reads_source_normalises_its_line_endings["every_test_that_reads_source_…<br/>line 274"]
+    n_searching_for_a_brace_on_its_own_line_fails_against_crlf["searching_for_a_brace_on_its_…<br/>line 306"]
+    n_the_repository_pins_its_line_endings["the_repository_pins_its_line_…<br/>line 325"]
     click n_the_embedded_key_parses_and_is_the_expected_one href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L19" "open the source"
     click n_the_embedded_key_carries_no_email_address href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L25" "open the source"
     click n_the_fingerprint_constant_is_written_out_not_computed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L40" "open the source"
@@ -86,9 +89,12 @@ flowchart TD
     click n_an_empty_signature_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L126" "open the source"
     click n_an_armoured_block_that_is_not_a_signature_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L132" "open the source"
     click n_every_line_printed_by_a_check_goes_through_the_level href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L162" "open the source"
-    click n_nothing_exits_with_an_undocumented_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L229" "open the source"
+    click n_nothing_exits_with_an_undocumented_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L237" "open the source"
+    click n_every_test_that_reads_source_normalises_its_line_endings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L274" "open the source"
+    click n_searching_for_a_brace_on_its_own_line_fails_against_crlf href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L306" "open the source"
+    click n_the_repository_pins_its_line_endings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L325" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_the_embedded_key_parses_and_is_the_expected_one,n_the_embedded_key_carries_no_email_address,n_the_fingerprint_constant_is_written_out_not_computed,n_a_hash_is_found_by_its_file_name,n_a_binary_mode_star_is_not_part_of_the_name,n_a_file_that_is_not_listed_is_not_found,n_a_name_that_merely_contains_the_wanted_one_does_not_match,n_blank_and_comment_lines_are_skipped,n_a_malformed_line_is_skipped_rather_than_panicking,n_digests_compare_case_insensitively_and_ignore_surrounding_space,n_a_signature_that_is_not_openpgp_is_refused,n_an_empty_signature_is_refused,n_an_armoured_block_that_is_not_a_signature_is_refused,n_every_line_printed_by_a_check_goes_through_the_level,n_nothing_exits_with_an_undocumented_status helper
+    class n_the_embedded_key_parses_and_is_the_expected_one,n_the_embedded_key_carries_no_email_address,n_the_fingerprint_constant_is_written_out_not_computed,n_a_hash_is_found_by_its_file_name,n_a_binary_mode_star_is_not_part_of_the_name,n_a_file_that_is_not_listed_is_not_found,n_a_name_that_merely_contains_the_wanted_one_does_not_match,n_blank_and_comment_lines_are_skipped,n_a_malformed_line_is_skipped_rather_than_panicking,n_digests_compare_case_insensitively_and_ignore_surrounding_space,n_a_signature_that_is_not_openpgp_is_refused,n_an_empty_signature_is_refused,n_an_armoured_block_that_is_not_a_signature_is_refused,n_every_line_printed_by_a_check_goes_through_the_level,n_nothing_exits_with_an_undocumented_status,n_every_test_that_reads_source_normalises_its_line_endings,n_searching_for_a_brace_on_its_own_line_fails_against_crlf,n_the_repository_pins_its_line_endings helper
 ```
 
 </details>
@@ -111,7 +117,10 @@ flowchart TD
 | `an_empty_signature_is_refused` <sub>fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L126) |  |
 | `an_armoured_block_that_is_not_a_signature_is_refused` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L132) |  |
 | `every_line_printed_by_a_check_goes_through_the_level` <sub>fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L162) | Nothing may print without asking the level first. |
-| `nothing_exits_with_an_undocumented_status` <sub>fn</sub> | [229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L229) | Every exit this program can take is one of the documented statuses. |
+| `nothing_exits_with_an_undocumented_status` <sub>fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L237) | Every exit this program can take is one of the documented statuses. |
+| `every_test_that_reads_source_normalises_its_line_endings` <sub>fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L274) | F-72. |
+| `searching_for_a_brace_on_its_own_line_fails_against_crlf` <sub>fn</sub> | [306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L306) | The failure mode itself, so it is on record as reachable rather than theoretical. |
+| `the_repository_pins_its_line_endings` <sub>fn</sub> | [325](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L325) | .gitattributes exists and pins text to LF. |
 
 ---
 

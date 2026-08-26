@@ -79,6 +79,12 @@ def stage(root):
 
 
 GENERATORS = [
+    # First. It depends on nothing that is generated -- it runs the test suite
+    # and reads Cargo.toml -- and everything after it may quote what it
+    # measures. It was written in last, which put it after the search index:
+    # the index walked docs/ before this file had been rewritten and then
+    # disagreed with it, on the very first run.
+    ("measured numbers", [sys.executable, "tools/measured/generate.py"]),
     ("artwork", [sys.executable, "assets/generate.py"]),
     # Drawn from the command output committed beside them. `--capture`, which
     # actually runs `veilvoice`, is a separate and manual step: it needs a
@@ -95,11 +101,6 @@ GENERATORS = [
     # edit that file and before the index walks the result.
     ("section pages", [sys.executable, "tools/site/split.py"]),
     ("search index", [sys.executable, "tools/search-index/generate.py"]),
-    # Last, and before the checks: the website suites compare the page's stated
-    # counts against this file, so it has to be current before they run. It
-    # runs the test suite to get the number, which is why it is not cheap and
-    # why it is not first.
-    ("measured numbers", [sys.executable, "tools/measured/generate.py"]),
 ]
 
 CHECKS = [

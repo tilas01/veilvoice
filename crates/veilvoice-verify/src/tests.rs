@@ -160,7 +160,15 @@ fn an_armoured_block_that_is_not_a_signature_is_refused() {
 /// A rule enforced two ways is a rule with two definitions.
 #[test]
 fn every_line_printed_by_a_check_goes_through_the_level() {
-    let source = include_str!("main.rs");
+    // A source-reading test, so the line endings have to be settled first.
+    // F-72: these searched for "\n}\n" and passed on every machine
+    // whose checkout uses LF. GitHub's Windows runners default to
+    // core.autocrlf=true, so the file arrives with CRLF, the pattern
+    // matches nothing, and three tests failed there and nowhere else --
+    // including on the developer machine that had just run them.
+    // Normalised here as well as pinned in .gitattributes: a test that
+    // depends on a git setting is a test somebody will trip over.
+    let source = include_str!("main.rs").replace("\r\n", "\n");
 
     // What is allowed to print unconditionally, and why.
     //
@@ -227,7 +235,7 @@ fn every_line_printed_by_a_check_goes_through_the_level() {
 /// leftover `FAILURE` would report a bad signature as a typing mistake.
 #[test]
 fn nothing_exits_with_an_undocumented_status() {
-    let source = include_str!("main.rs");
+    let source = include_str!("main.rs").replace("\r\n", "\n");
     let mut stray = Vec::new();
     for (number, line) in source.lines().enumerate() {
         let trimmed = line.trim();
@@ -243,4 +251,96 @@ fn nothing_exits_with_an_undocumented_status() {
         "ExitCode::FAILURE is 1, which now means a usage error. Use a Status:\n{}",
         stray.join("\n")
     );
+}
+
+// ---------------------------------------------------------------------------
+// A test that reads source has to say which line endings it expects
+// ---------------------------------------------------------------------------
+
+/// **F-72.** Every `include_str!` of this project's own source is normalised
+/// before it is searched.
+///
+/// Three tests here searched for `"\n}\n"` and passed on every machine whose
+/// checkout uses LF. GitHub's Windows runners default to `core.autocrlf=true`,
+/// so the file arrives with CRLF, the pattern matches nothing, and the tests
+/// failed there and nowhere else -- including on the Windows machine that had
+/// just run them and watched them pass, because its git is set to `input`.
+///
+/// `.gitattributes` now pins the whole tree to LF, which is the real fix and
+/// also protects every generator's byte-for-byte `--check`. This is the second
+/// line of defence, because a test that depends on a git setting is a test
+/// somebody will trip over on a machine nobody here owns.
+#[test]
+fn every_test_that_reads_source_normalises_its_line_endings() {
+    let source = include_str!("tests.rs").replace("\r\n", "\n");
+    // Assembled at run time so this line does not contain the thing it looks
+    // for. Written out in full, the guard matched itself and reported its own
+    // detection as the defect -- an honest failure, and a useless one.
+    let invocation = concat!("include_str", "!(");
+    let normalised = concat!(".repl", "ace(");
+
+    let mut bare = Vec::new();
+    for (number, line) in source.lines().enumerate() {
+        let trimmed = line.trim();
+        if trimmed.starts_with("//") || !trimmed.contains(invocation) {
+            continue;
+        }
+        if !trimmed.contains(normalised) {
+            bare.push(format!("tests.rs:{}: {trimmed}", number + 1));
+        }
+    }
+
+    assert!(
+        bare.is_empty(),
+        "these read source without settling the line endings first:\n{}",
+        bare.join("\n")
+    );
+}
+
+/// The failure mode itself, so it is on record as reachable rather than
+/// theoretical.
+///
+/// This is what the three failing tests were doing, against the two forms the
+/// same file takes on two machines.
+#[test]
+fn searching_for_a_brace_on_its_own_line_fails_against_crlf() {
+    let lf = "fn thing() {\n    ()\n}\n\nfn next() {}\n";
+    let crlf = lf.replace('\n', "\r\n");
+
+    assert!(lf.find("\n}\n").is_some(), "LF is what the tests assumed");
+    assert!(
+        crlf.find("\n}\n").is_none(),
+        "if this ever matches, the defect was something else"
+    );
+    // And the fix, applied to the awkward form.
+    assert!(crlf.replace("\r\n", "\n").find("\n}\n").is_some());
+}
+
+/// `.gitattributes` exists and pins text to LF.
+///
+/// Checked from a test rather than trusted, because it is the thing that keeps
+/// every generator's byte comparison honest on a contributor's machine, and
+/// nothing else in the build would notice it being deleted.
+#[test]
+fn the_repository_pins_its_line_endings() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap();
+    let attributes = std::fs::read_to_string(root.join(".gitattributes"))
+        .expect(".gitattributes is what keeps the generators' byte checks honest");
+    assert!(
+        attributes.contains("* text=auto eol=lf"),
+        "text has to be pinned to LF for every checkout:\n{attributes}"
+    );
+    // And the formats where a wrong guess corrupts a file silently.
+    for binary in ["*.png", "*.wav", "*.gif"] {
+        assert!(
+            attributes.contains(&format!("{binary}   binary"))
+                || attributes.contains(&format!("{binary}  binary"))
+                || attributes.contains(&format!("{binary} binary")),
+            "{binary} must be marked binary:\n{attributes}"
+        );
+    }
 }
