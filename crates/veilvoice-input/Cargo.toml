@@ -1,0 +1,14 @@
+[package]
+name = "veilvoice-input"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Which running programs can see your keyboard and mouse, reported as the heuristic it is -- and why a clean result proves nothing."
+
+[dependencies]
+# The platform process listing, shared with `veilvoice-capture` rather than
+# copied. This crate reads a list of names; it never touches input itself.
+veilvoice-proc = { path = "../veilvoice-proc" }

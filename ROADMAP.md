@@ -87,7 +87,7 @@ it cannot do as plainly as what it can.
 |---:|---|---|---|
 | 33 | Screen-capture detection — which recorders are running, muted per program by an allowlist | **done** | — |
 | 34 | Hide VeilVoice's own window from screen capture and recording | **blocked** | — |
-| 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **planned** | 2–3 d |
+| 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **done** | — |
 | 36 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **done** | — |
 | 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **planned** | 5–7 d |
 | 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | — |
@@ -382,6 +382,28 @@ Worth noting that the same decision would not buy very much. A window
 excluded from capture is still visible to a camera pointed at the screen, and
 the thing VeilVoice protects — the recording — is a file, not a picture of a
 window.
+
+**Marker 35 detects what *can* watch, and says so; it does not claim to detect
+keyloggers.** Nothing can. The mechanisms a logger uses are the mechanisms
+accessibility software, password managers and remote-support tools use, and
+software written to hide is written to hide from a process list too. So
+`veilvoice input` names the programs running that are **able** to see keyboard
+and mouse, says what each is for, and prints -- with every result, found or not
+-- that a clean answer proves nothing. Somebody who reads "nothing found" as
+"nothing there" has been made less safe by running it, and that sentence is the
+most important thing the crate outputs.
+
+It also does not hook the keyboard to find out. Detecting input monitoring by
+monitoring input would make it the thing it warns about, and on Windows it
+would need exactly the call `#![forbid(unsafe_code)]` rules out. A test reads
+the crate's own source and fails the build if any of those mechanisms appear
+in it.
+
+The process listing that both this and screen-capture detection need was
+extracted into `veilvoice-proc` rather than copied or borrowed. Depending on
+`veilvoice-capture` for it would have meant a keyboard feature pulling in a
+table of screen recorders, which is what the note at the top of this section
+says these crates must not do.
 
 **Duress and decoy passwords are the most dangerous thing on this list.** A duress password
 destroys data on purpose, and a decoy system exists to be believed. Neither is

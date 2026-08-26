@@ -4833,6 +4833,7 @@ name = "veilvoice-capture"
 version = "0.1.13"
 dependencies = [
  "tempfile",
+ "veilvoice-proc",
 ]
 
 [[package]]
@@ -4857,6 +4858,7 @@ dependencies = [
  "veilvoice-core",
  "veilvoice-crypto",
  "veilvoice-guard",
+ "veilvoice-input",
  "veilvoice-meta",
  "veilvoice-policy",
  "veilvoice-sentry",
@@ -4946,6 +4948,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "veilvoice-input"
+version = "0.1.13"
+dependencies = [
+ "veilvoice-proc",
+]
+
+[[package]]
 name = "veilvoice-meta"
 version = "0.1.13"
 dependencies = [
@@ -4962,6 +4971,10 @@ dependencies = [
  "tempfile",
  "veilvoice-crypto",
 ]
+
+[[package]]
+name = "veilvoice-proc"
+version = "0.1.13"
 
 [[package]]
 name = "veilvoice-sentry"

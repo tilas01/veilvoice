@@ -229,6 +229,36 @@ pub fn by_key(key: &str) -> Option<&'static Program> {
 mod tests {
     use super::*;
 
+    /// The Linux kernel truncates `/proc/<pid>/comm` to fifteen characters, so
+    /// a longer name in the table never matches there -- silently, and on one
+    /// platform only, which is the exact shape of bug this project keeps
+    /// finding in itself.
+    ///
+    /// The rule is therefore not "every name is short" but "every program that
+    /// has a Unix name has **one** that survives truncation". Both spellings
+    /// are listed where they differ, because the full one is still what `ps`
+    /// and every Windows listing give.
+    #[test]
+    fn every_program_has_a_name_that_survives_the_linux_truncation() {
+        for program in ALL {
+            // A `.exe` name is a Windows name and never appears in `comm`.
+            let unix: Vec<&&str> = program
+                .processes
+                .iter()
+                .filter(|process| !process.ends_with(".exe"))
+                .collect();
+            if unix.is_empty() {
+                continue; // a Windows-only program, and there is nothing to check
+            }
+            assert!(
+                unix.iter().any(|process| process.len() <= 15),
+                "{} has no name of fifteen characters or fewer, so it can never match \
+                 on Linux: {unix:?}",
+                program.key
+            );
+        }
+    }
+
     #[test]
     fn keys_are_unique() {
         let mut keys: Vec<&str> = ALL.iter().map(|program| program.key).collect();
