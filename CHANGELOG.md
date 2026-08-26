@@ -8,6 +8,42 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The window no longer freezes while you pick a file
+
+Every file picker in the application was opened with the **blocking** API,
+straight from the frame that handled the click:
+
+```rust
+if ui.button("choose file…").clicked() {
+    if let Some(path) = rfd::FileDialog::new().pick_file() { … }
+}
+```
+
+`pick_file` does not return until you have chosen or cancelled, and it was
+being called from inside the render loop. So for as long as that dialog was
+open **VeilVoice drew nothing at all**: no repaints, animations stopped, meters
+frozen, and dragging the window left a trail of stale pixels. Somebody
+browsing for a recording for thirty seconds had a frozen application for
+thirty seconds.
+
+There were seven of them — the input file, the recording and plan in
+group mode, opening and saving a project, the public key, and all three slots
+on the verify tab.
+
+They now run on a thread of their own and the answer is collected without
+waiting, so the window keeps painting the whole time. A test reads every source
+file in the crate and fails the build if a blocking picker reappears anywhere
+outside the one module that is allowed to know about it.
+
+**macOS keeps the old behaviour, deliberately.** `NSOpenPanel` must be driven
+from the main thread; opening one anywhere else does not work, and on some
+versions it does not fail politely either. A frozen window is better than a
+dialog that never appears.
+
+Cancelling is reported as an answer rather than as silence, and a picker thread
+that dies without answering is treated as a cancel — otherwise the button
+that opened it stays disabled with no way back.
+
 ### `veilvoice privilege` — what it is running with, and what that lets it see
 
 Marker 39. Most of VeilVoice needs no special permissions — changing a

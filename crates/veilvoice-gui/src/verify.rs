@@ -80,6 +80,14 @@ pub struct Verify {
     report: Option<Result<Checked, Error>>,
     /// Set while files are over the window, so the drop target can light up.
     hovering: bool,
+    /// The file picker, while it is open.
+    choosing: crate::dialog::Pending,
+    /// Which slot the open picker was started for.
+    ///
+    /// Remembered because the answer arrives frames later, by which time the
+    /// loop that drew the button is over. Without it a chosen file lands in
+    /// whichever slot happened to be drawn when the dialog closed.
+    choosing_for: Option<Slot>,
 }
 
 impl Verify {
@@ -281,20 +289,34 @@ impl Verify {
             } else {
                 p::muted()
             }));
-            if ui.small_button("choose…").clicked() {
-                if let Some(path) = rfd::FileDialog::new().pick_file() {
-                    // Straight into this slot, not through `accept`: the user
-                    // said which one by pressing this button, and a guess from
-                    // the name would override what they just told us.
-                    match slot {
-                        Slot::Download => self.download = Some(path),
-                        Slot::Sums => self.sums = Some(path),
-                        Slot::Signature => self.signature = Some(path),
-                    }
-                    self.report = None;
-                }
+            if ui
+                .add_enabled(
+                    !self.choosing.is_open(),
+                    egui::Button::new("choose…").small(),
+                )
+                .clicked()
+            {
+                // Which slot was asked for is remembered here, because the
+                // answer arrives some frames later and by then this loop is
+                // over. Without it the file would land in whichever slot
+                // happened to be drawn when the dialog closed.
+                self.choosing_for = Some(slot);
+                self.choosing.start(crate::dialog::Ask::open());
             }
         });
+
+        // Straight into the slot that was asked for, not through `accept`: the
+        // user said which one by pressing that button, and a guess from the
+        // file name would override what they just told us.
+        if let Some(path) = self.choosing.taken() {
+            match self.choosing_for.take() {
+                Some(Slot::Download) => self.download = Some(path),
+                Some(Slot::Sums) => self.sums = Some(path),
+                Some(Slot::Signature) => self.signature = Some(path),
+                None => {}
+            }
+            self.report = None;
+        }
     }
 
     /// The answer, in the colour it deserves.

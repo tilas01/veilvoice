@@ -111,6 +111,8 @@ pub struct Security {
     pub sealing: Sealing,
     /// Recipient public key, for [`Sealing::PublicKey`].
     pub public_key: Option<PathBuf>,
+    /// The key picker, while it is open.
+    choosing_key: crate::dialog::Pending,
     /// The typing buffer. Held in a `String` only because that is what the
     /// text widget requires, and wiped the moment it is confirmed.
     passphrase: String,
@@ -161,6 +163,7 @@ impl Default for Security {
             encrypt_recordings: true,
             sealing: Sealing::Password,
             public_key: None,
+            choosing_key: crate::dialog::Pending::new(),
             passphrase: String::new(),
             held: None,
             passphrase_set: false,
@@ -463,6 +466,13 @@ impl Security {
     pub fn tab(&mut self, ui: &mut egui::Ui) {
         self.poll();
 
+        // Whatever the key picker answered while the reader was browsing. Taken
+        // before anything is drawn, so a chosen key is in place by the time the
+        // line that shows it is painted.
+        if let Some(path) = self.choosing_key.taken() {
+            self.public_key = Some(path);
+        }
+
         ui.add_space(4.0);
         ui.label(RichText::new("APP LOCK").color(p::blue()).small());
         match &self.path {
@@ -707,12 +717,8 @@ impl Security {
             Sealing::PublicKey => {
                 ui.horizontal(|ui| {
                     if ui.button("choose public key…").clicked() {
-                        if let Some(path) = rfd::FileDialog::new()
-                            .add_filter("public key", &["pub"])
-                            .pick_file()
-                        {
-                            self.public_key = Some(path);
-                        }
+                        self.choosing_key
+                            .start(crate::dialog::Ask::open_filtered("public key", &["pub"]));
                     }
                     match &self.public_key {
                         Some(path) => {
