@@ -63,6 +63,13 @@ pub struct Prefs {
     /// it. So the toggle is per-run, and this separate, explicit tick is the
     /// only way it starts on.
     pub always_group: bool,
+    /// How notifications are shown: `overlay`, `alert` or `off`.
+    ///
+    /// Stored as its key rather than as a number, so a settings file stays
+    /// readable and so reordering the enum cannot silently change somebody's
+    /// choice -- which for the value `off` would mean turning their warnings
+    /// back on, or worse, off.
+    pub notify_style: String,
     /// Set when the file on disk could not be understood, so the settings
     /// panel can say the defaults are in force and why. Never persisted.
     pub recovered_from_corrupt_file: bool,
@@ -79,6 +86,7 @@ impl Default for Prefs {
             configured: false,
             hide_install_tab: false,
             always_group: false,
+            notify_style: crate::notify::Style::default().key().to_string(),
             recovered_from_corrupt_file: false,
         }
     }
@@ -161,6 +169,12 @@ impl Prefs {
                         understood += 1;
                     }
                 }
+                "notify_style" => {
+                    // Anything unrecognised becomes the default rather than an
+                    // error, and the default shows something. A file this build
+                    // cannot read must never be the reason a warning is silent.
+                    prefs.notify_style = crate::notify::Style::from_key(value).key().to_string();
+                }
                 "always_group" => {
                     if let Some(on) = parse_bool(value) {
                         prefs.always_group = on;
@@ -188,6 +202,7 @@ impl Prefs {
         out.push_str(&format!("configured = {}\n", self.configured));
         out.push_str(&format!("hide_install_tab = {}\n", self.hide_install_tab));
         out.push_str(&format!("always_group = {}\n", self.always_group));
+        out.push_str(&format!("notify_style = {}\n", self.notify_style));
         out
     }
 
@@ -288,6 +303,7 @@ mod tests {
             configured: true,
             hide_install_tab: true,
             always_group: true,
+            notify_style: "alert".to_string(),
             recovered_from_corrupt_file: false,
         };
         let back = Prefs::parse(&prefs.to_text());
@@ -370,6 +386,7 @@ mod tests {
             animations: false,
             animated_icon: true,
             configured: true,
+            notify_style: "overlay".into(),
             hide_install_tab: false,
             always_group: false,
             recovered_from_corrupt_file: false,
