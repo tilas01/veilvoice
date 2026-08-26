@@ -10,6 +10,6 @@ fails the build instead of ageing quietly.
 
 | What | Measured |
 |---|---:|
-| Tests, measured by running them | 917 |
-| Crates in the workspace | 21 |
+| Tests, measured by running them | 931 |
+| Crates in the workspace | 22 |
 | Website suites | 11 |

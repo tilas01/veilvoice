@@ -8,6 +8,52 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### `veilvoice appctl` — learn what normally runs, then notice what does not
+
+```
+veilvoice appctl learn            # for a few days, while you work normally
+veilvoice appctl learn --finish   # close the baseline
+veilvoice appctl check            # what is running that it does not know
+```
+
+Marker 37. **It does not block anything and cannot.** It is a way of noticing,
+not a lock on the door: a program it calls unknown is still running. Real
+enforcement needs a kernel driver or a signed system policy and an application
+identity to sign it with, and this project is published under a pseudonym on
+purpose.
+
+That note is printed by **every** subcommand — not once at setup, not
+behind a flag — because a warning shown once is a warning forgotten by
+the second week, and the one thing a reader must not come away believing is
+that this stopped something.
+
+**Learning has an end.** A baseline that is always learning has learned
+nothing: whatever an attacker starts joins the picture the moment it starts.
+Freezing an empty baseline is refused, because a baseline that learned nothing
+calls everything unknown, which is the same as calling nothing unknown.
+
+**Grants expire**, checked against the clock rather than against a sweep that
+may not have run. An expired grant is left on record rather than removed —
+"this was allowed until Tuesday" is worth more to a reader than a row that
+quietly vanished. Permanent is spelled `--forever` rather than a distant date,
+so choosing it is something somebody typed.
+
+**Only the decisions worth reading are logged.** A line for every ordinary
+program every time it is seen is a log nobody reads, and a log nobody reads is
+not a control.
+
+Measured on a real machine: 111 programs learned from 313 sightings, then a
+`check` with a stray process running named `timeout.exe` and `smartscreen.exe`
+— the second started by Windows itself, which is exactly the case this
+is for.
+
+### `veilvoice-proc` gains a second caller
+
+The process listing extracted for `veilvoice-input` is now shared by three
+features rather than two. `veilvoice-appctl` has no dependencies at all: the
+caller supplies the names, so the crate is arithmetic over a list and its tests
+need no machine to run on.
+
 ### Notifications: a card, an alert, or nothing — with the contrast measured
 
 Marker 41. Three ways for the application to tell you something, chosen in

@@ -80,6 +80,7 @@ import sys
 # documenting whatever happens to be on disk.
 CRATES = (
     "fuzz",
+    "veilvoice-appctl",
     "veilvoice-audio",
     "veilvoice-capture",
     "veilvoice-check",
@@ -108,6 +109,7 @@ CRATES = (
 # partial pass is exactly the failure mode section 4.5 of the audit describes.
 ALL_CRATES = (
     "fuzz",
+    "veilvoice-appctl",
     "veilvoice-audio",
     "veilvoice-capture",
     "veilvoice-check",

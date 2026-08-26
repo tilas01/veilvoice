@@ -68,6 +68,7 @@
 //! thousand times.
 #![forbid(unsafe_code)]
 
+mod appctl;
 mod atrest;
 mod capture;
 mod conversation;
@@ -374,6 +375,20 @@ enum Command {
         what: CaptureCommand,
     },
 
+    /// Learn what normally runs here, then notice what does not.
+    ///
+    /// Run `learn` while you work normally for a few days, `learn --finish` to
+    /// close the baseline, and `check` afterwards.
+    ///
+    /// **It does not block anything and cannot.** It is a way of noticing, not
+    /// a lock on the door: a program it calls unknown is still running. Real
+    /// enforcement needs a kernel driver or a signed system policy, and neither
+    /// is something this project ships.
+    Appctl {
+        #[command(subcommand)]
+        what: AppctlCommand,
+    },
+
     /// What running programs can see your keyboard and mouse.
     ///
     /// Names the programs that are **able** to observe input -- remote-support
@@ -567,6 +582,33 @@ enum ConversationCommand {
 }
 
 /// What `veilvoice capture` can do.
+#[derive(Subcommand, Debug)]
+enum AppctlCommand {
+    /// Record what is running as ordinary.
+    Learn {
+        /// Close the baseline. Nothing joins it by running after this.
+        #[arg(long)]
+        finish: bool,
+    },
+    /// Compare what is running now against the baseline.
+    Check,
+    /// Allow a program that is not in the baseline.
+    Allow {
+        /// The executable name, as it appears in `check`.
+        program: String,
+        /// For this many hours. Without it, permanently.
+        #[arg(long)]
+        hours: Option<u64>,
+    },
+    /// Withdraw a grant.
+    Revoke {
+        /// The executable name.
+        program: String,
+    },
+    /// Every decision this baseline has made.
+    Log,
+}
+
 #[derive(Subcommand, Debug)]
 enum InputCommand {
     /// What is running now that could see input. The default.
@@ -1017,6 +1059,14 @@ fn run(command: Command) -> Result<(), String> {
                 ffmpeg,
                 one_voice,
             ),
+        },
+
+        Command::Appctl { what } => match what {
+            AppctlCommand::Learn { finish } => appctl::learn(finish),
+            AppctlCommand::Check => appctl::check(),
+            AppctlCommand::Allow { program, hours } => appctl::allow(&program, hours),
+            AppctlCommand::Revoke { program } => appctl::revoke(&program),
+            AppctlCommand::Log => appctl::log(),
         },
 
         Command::Input { what } => match what.unwrap_or(InputCommand::Look) {

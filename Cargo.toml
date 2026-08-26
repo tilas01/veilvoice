@@ -15,6 +15,7 @@ members = [
     "crates/veilvoice-conversation",
     "crates/veilvoice-core",
     "crates/veilvoice-crypto",
+    "crates/veilvoice-appctl",
     "crates/veilvoice-audio",
     "crates/veilvoice-meta",
     "crates/veilvoice-gui",
