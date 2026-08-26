@@ -70,7 +70,6 @@
 <ul>
 <li><a href="veilvoice-capture/comms.html"><code>comms.rs</code></a> <span style="color:var(--muted)">Communication programs, and how to put VeilVoice between you and them.</span></li>
 <li><a href="veilvoice-capture/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do.</span></li>
-<li><a href="veilvoice-capture/processes.html"><code>processes.rs</code></a> <span style="color:var(--muted)">Listing the processes that are running, per platform.</span></li>
 <li><a href="veilvoice-capture/programs.html"><code>programs.rs</code></a> <span style="color:var(--muted)">The programs this build knows can capture a screen.</span></li>
 </ul>
 </section>
@@ -89,6 +88,7 @@
 <li><a href="veilvoice-cli/capture.html"><code>capture.rs</code></a> <span style="color:var(--muted)">veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.</span></li>
 <li><a href="veilvoice-cli/conversation.html"><code>conversation.rs</code></a> <span style="color:var(--muted)">veilvoice conversation -- several speakers, a voice each, and subtitles.</span></li>
 <li><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a> <span style="color:var(--muted)">veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</span></li>
+<li><a href="veilvoice-cli/input.html"><code>input.rs</code></a> <span style="color:var(--muted)">veilvoice input &#8212; what running programs can see your keyboard and mouse.</span></li>
 <li><a href="veilvoice-cli/lock.html"><code>lock.rs</code></a> <span style="color:var(--muted)">veilvoice lock &#8212; manage the application lock from the command line.</span></li>
 <li><a href="veilvoice-cli/main.html"><code>main.rs</code></a> <span style="color:var(--muted)">veilvoice &#8212; the command-line interface.</span></li>
 <li><a href="veilvoice-cli/meter.html"><code>meter.rs</code></a> <span style="color:var(--muted)">Level meters for veilvoice live, on a scale that means something.</span></li>
@@ -164,6 +164,13 @@
 <li><a href="veilvoice-guard/manifest.html"><code>manifest.rs</code></a> <span style="color:var(--muted)">The integrity manifest: what the files were, and what they are now.</span></li>
 </ul>
 </section>
+<section id="veilvoice-input">
+<h2><a href="veilvoice-input.html">veilvoice-input</a></h2>
+<p>Which running programs can see your keyboard and mouse, reported as the heuristic it is -- and why a clean result proves nothing.</p>
+<ul>
+<li><a href="veilvoice-input/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">What on this machine could be watching the keyboard and the mouse.</span></li>
+</ul>
+</section>
 <section id="veilvoice-gui">
 <h2><a href="veilvoice-gui.html">veilvoice-gui</a></h2>
 <p>egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.</p>
@@ -204,6 +211,13 @@
 <ul>
 <li><a href="veilvoice-policy/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Settings somebody else decided, sealed so they cannot be edited without a passphrase &#8212; and, more importantly, built so that editing them without one buys nothing worth having.</span></li>
 <li><a href="veilvoice-policy/policy.html"><code>policy.rs</code></a> <span style="color:var(--muted)">The policy itself: what can be required, and what requiring it does.</span></li>
+</ul>
+</section>
+<section id="veilvoice-proc">
+<h2><a href="veilvoice-proc.html">veilvoice-proc</a></h2>
+<p>Which processes are running, per platform, with the limits of that answer stated rather than implied.</p>
+<ul>
+<li><a href="veilvoice-proc/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Which processes are running, per platform, and what that cannot tell you.</span></li>
 </ul>
 </section>
 <section id="veilvoice-sentry">
