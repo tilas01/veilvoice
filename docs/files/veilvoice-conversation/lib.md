@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-conversation/src/lib.rs`
 
-[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 178 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs)
+[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 180 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs)
 
 ## Contents
 
@@ -88,11 +88,11 @@ passed through, because audio nobody claimed has not been disguised.
 
 ## What this file contains
 
-178 lines defining **3 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+180 lines defining **3 functions** (0 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 93) -- Everything that can go wrong in this crate.
+- `enum Error` (line 95) -- Everything that can go wrong in this crate.
 
 ## What calls what
 
@@ -114,12 +114,12 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Error::from<br/>line 107"]
-    n_fmt["Error::fmt<br/>line 113"]
-    n_source["Error::source<br/>line 128"]
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L107" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L113" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L128" "open the source"
+    n_from["Error::from<br/>line 109"]
+    n_fmt["Error::fmt<br/>line 115"]
+    n_source["Error::source<br/>line 130"]
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L109" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L115" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L130" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_from,n_fmt,n_source helper
 ```
@@ -130,12 +130,12 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L75) | Crate version string, surfaced in the About panel. |
-| `SCOPE` <sub>pub const</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L81) | What this crate does to a recording, in the words a front end should show. |
-| `Error` <sub>pub enum</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L93) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L107) |  |
-| `Error::fmt` <sub>fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L113) |  |
-| `Error::source` <sub>fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L128) |  |
+| `VERSION` <sub>pub const</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L77) | Crate version string, surfaced in the About panel. |
+| `SCOPE` <sub>pub const</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L83) | What this crate does to a recording, in the words a front end should show. |
+| `Error` <sub>pub enum</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L95) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L109) |  |
+| `Error::fmt` <sub>fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L115) |  |
+| `Error::source` <sub>fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L130) |  |
 
 ---
 

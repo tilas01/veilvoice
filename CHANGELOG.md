@@ -8,6 +8,80 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Eight voices, not ten — measured, and the group is capped at it
+
+The engine holds ten destination voices and all ten are *different*. Only
+**eight** are far enough apart that somebody following a conversation can tell
+which is which.
+
+That is a measurement, not a judgement. `separation` expresses both axes —
+rendered pitch and vocal-tract scale — as ratios, because hearing is ratio-based
+on both, and `clear_voices` walks the table asking when a new voice first comes
+within three semitones of one already handed out:
+
+```
+ 8 voices: closest pair 1.2500     <- 25 % apart, comfortable
+ 9 voices: closest pair 1.1842     <- 18 %, under the floor
+```
+
+The ninth is slots 4 and 8: **exactly the same rendered pitch**, vocal tracts
+18 % apart. Group mode now stops at eight and says why.
+
+**The first version of the metric was wrong, and measuring it is what showed
+that.** It took the *smaller* of the two separations, reasoning that two voices
+are only as separable as their closest resemblance. Run, it reported that three
+voices were already indistinguishable — which is plainly false: slots 0 and 4
+share a pitch and have vocal tracts 45 % apart, so one sounds like a much larger
+person. A listener separates two voices by whichever cue is *strongest*, so the
+measure is the larger of the two.
+
+### One voice for everybody, which is the more private option
+
+```
+veilvoice conversation render plan.txt talk.wav --one-voice
+```
+
+Every speaker gets the *same* voice, and they are told apart by their names in
+the subtitles and by which circle lights up in the picture. Two consequences,
+one of each kind, and both are said where the option is offered:
+
+* **It is more private.** In distinct mode the output carries one bit of
+  structure the input had — *this is speaker three* — so anybody holding two
+  recordings of the same group can line them up by voice slot. There is nothing
+  to line up when everybody sounds the same.
+* **It cannot be followed by ear.** That is the price, and it is why this is
+  not the default.
+
+It has **no speaker limit** from voices, because one voice cannot collide with
+itself, so it is also the answer when eight is not enough — and the refusal at
+nine says so rather than being a dead end.
+
+Verified by measuring the audio, not by reading the log: rendering the same
+two-speaker recording gives **93.8 Hz and 234.1 Hz** in distinct mode and
+**93.8 Hz and 93.8 Hz** with `--one-voice`.
+
+The mode is deliberately **not stored in the plan file**. A plan says who is in
+the recording and when they speak; how it is rendered is decided by whoever is
+rendering, and a mode hidden in a shared file would quietly change what somebody
+else's render sounds like.
+
+### The demonstration no longer says "left" and "right"
+
+Below 640 px the three panels stack, so "the bars on the left" named the wrong
+thing on every phone — and it never meant anything to a reader using a screen
+reader at any width. The caption names the labels instead, which is true in
+every layout and to every reader. A site test refuses the directions coming
+back.
+
+### `inset` needed its longhands, and one place needed them badly
+
+`inset` arrived in Safari 14.1; an older engine drops the declaration entirely.
+For the legal gate that is not cosmetic: it is shown with
+`body { overflow: hidden }`, so an overlay that does not cover the page leaves
+a reader unable to scroll with nothing visible stopping them. Both uses now
+carry `top`/`right`/`bottom`/`left` first, and a test refuses a bare `inset`.
+
+
 ### Every crate now says what it is for in plain words
 
 All eighteen, plus `fuzz` in its README. The technical explanation was already

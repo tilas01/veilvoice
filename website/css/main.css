@@ -558,6 +558,13 @@ html:not(.js) .bn { display: none; }
  * else" and this is not waiting for anything. */
 .jr-ring {
   position: absolute;
+  /* Longhands before the shorthand. `inset` arrived in Safari 14.1, and an
+   * engine older than that drops the whole declaration -- see the note on the
+   * legal overlay, where the same gap has real consequences. */
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: -1px;
   inset: -1px;
   border-radius: 9px;
   pointer-events: none;
@@ -1462,6 +1469,24 @@ body.legal-locked { overflow: hidden; }
 
 .legal-overlay {
   position: fixed;
+  /*
+   * Longhands first, then the shorthand.
+   *
+   * `inset` is Safari 14.1 (early 2021), and an engine older than that treats
+   * the declaration as invalid and **drops it**. A `position: fixed` element
+   * with no offsets sits wherever it happened to be in the flow, at its own
+   * content size -- so this overlay would not cover the page.
+   *
+   * That matters more here than anywhere else on the site. The gate is shown
+   * with `body { overflow: hidden }`, so the failure is not "the modal looks
+   * wrong": it is a page the reader cannot scroll, with the thing stopping
+   * them not covering the screen. The `color-mix` fallback a few lines down
+   * exists for the same reader and the same reason.
+   */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 100;
   display: flex;

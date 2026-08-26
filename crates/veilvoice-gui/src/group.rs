@@ -46,8 +46,10 @@ use crate::theme::palette as p;
 use eframe::egui::{self, Color32, RichText, Ui};
 use std::path::PathBuf;
 use std::sync::mpsc;
+use veilvoice_conversation::mode::{self as voice_mode, VoiceMode};
 use veilvoice_conversation::{Conversation, Speaker};
 use veilvoice_core::voices::{self, MAX_VOICES};
+use veilvoice_core::DeidConfig;
 use veilvoice_video::palette::Palette;
 
 /// One person, as the panel holds them.
@@ -124,6 +126,8 @@ pub struct Group {
     /// Which palette a page is drawn in. Tokyo Night unless changed, and
     /// **not persisted** -- the same shape as the mode toggle above it.
     pub theme: &'static Palette,
+    /// A voice each, or one voice between everybody.
+    pub voices: VoiceMode,
 
     /// The worker, while a render is running.
     job: Option<mpsc::Receiver<Result<Vec<PathBuf>, String>>>,
@@ -145,6 +149,7 @@ impl Default for Group {
             plan: None,
             title: String::new(),
             theme: veilvoice_video::palette::default_palette(),
+            voices: VoiceMode::default(),
             job: None,
             report: None,
         }
@@ -188,15 +193,22 @@ impl Group {
     /// Two people sharing a voice is a real collision, so the limit is stated
     /// rather than wrapped around.
     pub fn add(&mut self) {
-        if self.people.len() >= MAX_VOICES {
-            self.notice = Some(format!(
-                "{MAX_VOICES} is the limit: there are {MAX_VOICES} destination voices, and \
-                 an eleventh speaker would have to share one."
-            ));
+        // The limit is whatever the *mode* can carry, and for a voice each that
+        // is how many voices are far enough apart to be told apart -- measured
+        // under the engine's configuration, not a number typed here.
+        if let Err(why) =
+            voice_mode::check(self.people.len() + 1, self.voices, &DeidConfig::default())
+        {
+            self.notice = Some(why.to_string());
             return;
         }
         self.people.push(Person::at(self.people.len()));
         self.notice = None;
+    }
+
+    /// How many people this panel can hold in its current mode.
+    pub fn limit(&self) -> usize {
+        self.voices.speaker_limit(&DeidConfig::default())
     }
 
     /// Remove one person, keeping at least two.
@@ -274,6 +286,8 @@ impl Group {
             return;
         }
 
+        self.voice_mode_controls(ui);
+        ui.add_space(12.0);
         self.strip(ui);
         ui.add_space(12.0);
         self.people_list(ui);
@@ -360,6 +374,50 @@ impl Group {
         }
     }
 
+    /// A voice each, or one voice between everybody.
+    ///
+    /// The second is more private and is not the default, which is the honest
+    /// way round: it removes a real trace -- *which* speaker somebody was --
+    /// and it costs the ability to follow the recording by ear. Most people
+    /// want the first, and the ones who want the second want it for a reason
+    /// they already know.
+    fn voice_mode_controls(&mut self, ui: &mut Ui) {
+        ui.label(RichText::new("VOICES").color(p::blue()));
+        ui.add_space(4.0);
+        ui.horizontal(|ui| {
+            for mode in [VoiceMode::Distinct, VoiceMode::Uniform] {
+                if ui
+                    .selectable_label(self.voices == mode, mode.label())
+                    .clicked()
+                    && self.voices != mode
+                {
+                    // Switching *to* a mode that cannot carry this many people
+                    // is refused, with the same words the engine would use.
+                    match voice_mode::check(self.people.len(), mode, &DeidConfig::default()) {
+                        Ok(()) => {
+                            self.voices = mode;
+                            self.notice = None;
+                        }
+                        Err(why) => self.notice = Some(why.to_string()),
+                    }
+                }
+            }
+        });
+        ui.label(RichText::new(self.voices.note()).color(p::muted()).small());
+
+        let clear = voices::clear_voices(&DeidConfig::default());
+        ui.add_space(4.0);
+        ui.label(
+            RichText::new(format!(
+                "  {clear} of the {MAX_VOICES} destination voices are far enough apart to \
+                 be told apart by ear -- measured, not chosen. Past that, one voice for \
+                 everybody is the honest option.",
+            ))
+            .color(p::muted())
+            .small(),
+        );
+    }
+
     /// The picture: a circle per person, in their colour, with their name.
     ///
     /// This is the part the request was actually about. A mode you can only
@@ -387,7 +445,7 @@ impl Group {
                             ui.vertical_centered(|ui| {
                                 ui.label(RichText::new(&name).color(p::fg()).small());
                                 ui.label(
-                                    RichText::new(voices::voice(slot).describe())
+                                    RichText::new(self.voices.voice_for(slot).describe())
                                         .color(p::muted())
                                         .small(),
                                 );
@@ -454,7 +512,7 @@ impl Group {
                 self.add();
             }
             ui.label(
-                RichText::new(format!("{} of {MAX_VOICES}", self.people.len()))
+                RichText::new(format!("{} of {}", self.people.len(), self.limit()))
                     .color(p::muted())
                     .small(),
             );
@@ -733,13 +791,14 @@ impl Group {
         let title = self.title.trim().to_string();
         let outputs = self.outputs;
         let theme = self.theme;
+        let voices = self.voices;
 
         let (tx, rx) = mpsc::channel();
         self.job = Some(rx);
         self.report = None;
         std::thread::spawn(move || {
             let _ = tx.send(render_now(
-                &input, &plan_path, &names, &title, outputs, theme,
+                &input, &plan_path, &names, &title, outputs, theme, voices,
             ));
         });
     }
@@ -766,6 +825,7 @@ fn render_now(
     title: &str,
     outputs: Outputs,
     theme: &'static Palette,
+    voices: VoiceMode,
 ) -> Result<Vec<PathBuf>, String> {
     use veilvoice_conversation::render::{self, Settings};
     use veilvoice_conversation::subtitles::{self, Format};
@@ -784,6 +844,10 @@ fn render_now(
     // may have been written before they renamed anybody. The *turns* are the
     // plan's and are untouched.
     plan.rename_speakers(names)
+        .map_err(|error| error.to_string())?;
+    // Set before anything is decoded: the refusal is cheap and it names the
+    // way out, and there is no reason to read a whole recording first.
+    plan.set_mode(voices, &DeidConfig::default())
         .map_err(|error| error.to_string())?;
     if !title.is_empty() {
         plan.title = Some(title.to_string());
@@ -914,17 +978,55 @@ mod tests {
         }
     }
 
+    /// The limit is the *measured* one -- how many voices can be told apart --
+    /// not the ten the table holds.
+    ///
+    /// Written as a bounded loop rather than `while len < MAX_VOICES`, which is
+    /// what it was: `add` now refuses at nine, so that loop never terminated
+    /// and the test suite hung rather than failed. A test that cannot fail
+    /// cannot pass either.
     #[test]
-    fn an_eleventh_speaker_is_refused_and_says_why() {
+    fn a_ninth_speaker_is_refused_and_the_refusal_names_the_way_out() {
         let mut group = Group::default();
-        while group.len() < MAX_VOICES {
+        for _ in 0..MAX_VOICES + 4 {
             group.add();
         }
-        assert_eq!(group.len(), MAX_VOICES);
-        group.add();
-        assert_eq!(group.len(), MAX_VOICES, "the limit must hold");
-        let notice = group.notice.expect("the refusal must be explained");
-        assert!(notice.contains("share"), "{notice}");
+        let clear = voices::clear_voices(&DeidConfig::default());
+        assert_eq!(clear, 8, "the measured clear limit");
+        assert_eq!(group.len(), clear, "the panel stops where the voices do");
+
+        let notice = group.notice.clone().expect("the refusal must be explained");
+        assert!(notice.contains("one voice for everybody"), "{notice}");
+    }
+
+    /// And switching to one voice lifts it, which is the point of the refusal
+    /// naming that mode.
+    #[test]
+    fn one_voice_for_everybody_carries_more_people() {
+        let mut group = Group {
+            voices: VoiceMode::Uniform,
+            ..Group::default()
+        };
+        for _ in 0..MAX_VOICES + 4 {
+            group.add();
+        }
+        assert_eq!(group.len(), MAX_VOICES, "up to what a plan can hold");
+        assert_eq!(group.limit(), MAX_VOICES);
+    }
+
+    /// Switching *back* with too many people is refused rather than silently
+    /// dropping somebody or handing two people one voice.
+    #[test]
+    fn switching_back_to_a_voice_each_is_refused_when_there_are_too_many() {
+        let config = DeidConfig::default();
+        let mut group = Group {
+            voices: VoiceMode::Uniform,
+            ..Group::default()
+        };
+        for _ in 0..MAX_VOICES + 4 {
+            group.add();
+        }
+        assert!(voice_mode::check(group.len(), VoiceMode::Distinct, &config).is_err());
     }
 
     /// One speaker is not a group. Removing past two would leave the mode on
@@ -1023,6 +1125,7 @@ mod tests {
             "",
             Outputs::default(),
             veilvoice_video::palette::default_palette(),
+            VoiceMode::default(),
         )
         .expect_err("three against two");
         assert!(error.contains("wrong voice"), "{error}");

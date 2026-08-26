@@ -98,7 +98,7 @@ flowchart TD
     n_main(["main.rs<br/>87 lines"])
     n_app["app.rs<br/>1514 lines"]
     n_crashlog["crashlog.rs<br/>254 lines"]
-    n_group["group.rs<br/>1044 lines"]
+    n_group["group.rs<br/>1147 lines"]
     n_palettes["palettes.rs<br/>691 lines"]
     n_policy["policy.rs<br/>311 lines"]
     n_prefs["prefs.rs<br/>422 lines"]
@@ -170,7 +170,7 @@ flowchart TD
 |---|---:|---|
 | [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1514 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 254 | Make a failure that produces no output produce some. |
-| [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1044 | Group mode: several people in one recording, each with a name and a colour. |
+| [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1147 | Group mode: several people in one recording, each with a name and a colour. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 79 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 87 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 691 | User-defined colour schemes, and the contrast check that keeps them usable. |

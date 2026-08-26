@@ -47,5 +47,8 @@ Options:
       --theme <THEME>
           Colour scheme, from the nine the website and the app offer
 
+      --one-voice
+          Draw it as if every speaker had the same voice
+
   -h, --help
           Print help (see a summary with '-h')

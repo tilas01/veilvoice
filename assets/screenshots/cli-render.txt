@@ -59,5 +59,10 @@ Options:
           
           Defaults to Tokyo Night. An unknown name is refused, and the error lists every one it could have been.
 
+      --one-voice
+          Give every speaker the **same** voice.
+          
+          More private: the output then carries no trace of *which* speaker somebody was, so two recordings of the same group cannot be lined up by voice. The price is that only the names and the picture say who is speaking -- by ear alone, nobody can. It also has no speaker limit, because one voice cannot collide with itself.
+
   -h, --help
           Print help (see a summary with '-h')
