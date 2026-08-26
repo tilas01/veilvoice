@@ -67,12 +67,14 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod comms;
 mod processes;
 pub mod programs;
 
 use std::collections::BTreeSet;
 use std::path::Path;
 
+pub use comms::Comm;
 pub use programs::{Program, Purpose};
 
 /// Crate version string, surfaced in the About panel.

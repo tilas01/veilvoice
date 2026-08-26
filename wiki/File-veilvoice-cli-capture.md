@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/capture.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 240 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 321 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs)
 
 ## Contents
 
@@ -43,18 +43,19 @@ printed.
 
 ## What this file contains
 
-240 lines defining **9 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+321 lines defining **10 functions** (7 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `status` (line 66) -- What is running, what is allowed, and what this cannot see.
   - reaches: `load`, `allow_path`, `capture_dir`
-- `list` (line 114) -- Every program in the table, whether it is running or not.
-- `allow` (line 147) -- Stop notifying about one program.
+- `calls` (line 118) -- Every program in the table, whether it is running or not.
+- `list` (line 195)
+- `allow` (line 228) -- Stop notifying about one program.
   - reaches: `load`, `save`, `allow_path`, `capture_dir`
-- `deny` (line 164) -- Start notifying about one program again.
+- `deny` (line 245) -- Start notifying about one program again.
   - reaches: `load`, `save`, `allow_path`, `capture_dir`
-- `check` (line 180) -- Look now, and let the exit code answer.
+- `check` (line 261) -- Look now, and let the exit code answer.
   - reaches: `load`, `allow_path`, `capture_dir`
 
 ## What calls what
@@ -76,10 +77,11 @@ flowchart TD
     n_load["load<br/>line 53"]
     n_save["save<br/>line 58"]
     n_status(["status<br/>line 66"])
-    n_list(["list<br/>line 114"])
-    n_allow(["allow<br/>line 147"])
-    n_deny(["deny<br/>line 164"])
-    n_check(["check<br/>line 180"])
+    n_calls(["calls<br/>line 118"])
+    n_list(["list<br/>line 195"])
+    n_allow(["allow<br/>line 228"])
+    n_deny(["deny<br/>line 245"])
+    n_check(["check<br/>line 261"])
     n_allow --> n_load
     n_allow --> n_save
     n_allow_path --> n_capture_dir
@@ -94,12 +96,13 @@ flowchart TD
     click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L53" "open the source"
     click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L58" "open the source"
     click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L66" "open the source"
-    click n_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L114" "open the source"
-    click n_allow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L147" "open the source"
-    click n_deny href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L164" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L180" "open the source"
+    click n_calls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L118" "open the source"
+    click n_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L195" "open the source"
+    click n_allow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L228" "open the source"
+    click n_deny href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L245" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L261" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_status,n_list,n_allow,n_deny,n_check entry
+    class n_status,n_calls,n_list,n_allow,n_deny,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_capture_dir api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -117,7 +120,8 @@ flowchart TD
 | `load` <sub>fn</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L53) |  |
 | `save` <sub>fn</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L58) |  |
 | `status` <sub>pub fn</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L66) | What is running, what is allowed, and what this cannot see. |
-| `list` <sub>pub fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L114) | Every program in the table, whether it is running or not. |
-| `allow` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L147) | Stop notifying about one program. |
-| `deny` <sub>pub fn</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L164) | Start notifying about one program again. |
-| `check` <sub>pub fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L180) | Look now, and let the exit code answer. |
+| `calls` <sub>pub fn</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L118) | Every program in the table, whether it is running or not. |
+| `list` <sub>pub fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L195) |  |
+| `allow` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L228) | Stop notifying about one program. |
+| `deny` <sub>pub fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L245) | Start notifying about one program again. |
+| `check` <sub>pub fn</sub> | [261](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L261) | Look now, and let the exit code answer. |
