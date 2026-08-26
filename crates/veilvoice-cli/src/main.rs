@@ -130,6 +130,22 @@ enum Command {
         /// for the whole session.
         #[arg(long, default_value_t = 2.0)]
         reseed_secs: f32,
+
+        /// Draw each gap from a range instead, in milliseconds: `250,1800`.
+        ///
+        /// A fixed interval is a fixed thing to observe. With a range, the gap
+        /// before every roll is drawn fresh from the modulation stream, so the
+        /// ratchet has no period at all.
+        ///
+        /// Without this, the range is **drawn from the operating system's
+        /// random source at launch**, so it is a property of this run rather
+        /// than a number compiled into every copy of VeilVoice. Pass
+        /// `--reseed-range fixed` to use `--reseed-secs` instead.
+        ///
+        /// A value that is not a usable range is **refused with the reason**,
+        /// never adjusted to fit.
+        #[arg(long)]
+        reseed_range: Option<String>,
         /// Also strip metadata from the written file.
         #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
         clean_metadata: bool,
@@ -164,6 +180,22 @@ enum Command {
         /// for the whole session.
         #[arg(long, default_value_t = 2.0)]
         reseed_secs: f32,
+
+        /// Draw each gap from a range instead, in milliseconds: `250,1800`.
+        ///
+        /// A fixed interval is a fixed thing to observe. With a range, the gap
+        /// before every roll is drawn fresh from the modulation stream, so the
+        /// ratchet has no period at all.
+        ///
+        /// Without this, the range is **drawn from the operating system's
+        /// random source at launch**, so it is a property of this run rather
+        /// than a number compiled into every copy of VeilVoice. Pass
+        /// `--reseed-range fixed` to use `--reseed-secs` instead.
+        ///
+        /// A value that is not a usable range is **refused with the reason**,
+        /// never adjusted to fit.
+        #[arg(long)]
+        reseed_range: Option<String>,
     },
     /// List the audio devices this machine offers.
     #[cfg(feature = "live")]
@@ -432,6 +464,22 @@ enum ConversationCommand {
         /// Seconds between modulation seed rolls; 0 keeps one stream.
         #[arg(long, default_value_t = 2.0)]
         reseed_secs: f32,
+
+        /// Draw each gap from a range instead, in milliseconds: `250,1800`.
+        ///
+        /// A fixed interval is a fixed thing to observe. With a range, the gap
+        /// before every roll is drawn fresh from the modulation stream, so the
+        /// ratchet has no period at all.
+        ///
+        /// Without this, the range is **drawn from the operating system's
+        /// random source at launch**, so it is a property of this run rather
+        /// than a number compiled into every copy of VeilVoice. Pass
+        /// `--reseed-range fixed` to use `--reseed-secs` instead.
+        ///
+        /// A value that is not a usable range is **refused with the reason**,
+        /// never adjusted to fit.
+        #[arg(long)]
+        reseed_range: Option<String>,
 
         /// Also write a self-contained HTML player beside the audio.
         ///
@@ -722,6 +770,7 @@ fn run(command: Command) -> Result<(), String> {
             intensity,
             keep_accent,
             reseed_secs,
+            reseed_range,
             clean_metadata,
             encrypt,
             encrypt_to,
@@ -733,6 +782,7 @@ fn run(command: Command) -> Result<(), String> {
                 intensity,
                 keep_accent,
                 reseed_secs,
+                reseed_range: reseed_range_from(reseed_range.as_deref())?,
             },
             clean_metadata,
             AtRest {
@@ -748,6 +798,7 @@ fn run(command: Command) -> Result<(), String> {
             intensity,
             keep_accent,
             reseed_secs,
+            reseed_range,
         } => live(
             input,
             output,
@@ -755,6 +806,7 @@ fn run(command: Command) -> Result<(), String> {
                 intensity,
                 keep_accent,
                 reseed_secs,
+                reseed_range: reseed_range_from(reseed_range.as_deref())?,
             },
         ),
         #[cfg(feature = "live")]
@@ -912,6 +964,7 @@ fn run(command: Command) -> Result<(), String> {
                 intensity,
                 keep_accent,
                 reseed_secs,
+                reseed_range,
                 page,
                 width,
                 height,
@@ -936,6 +989,7 @@ fn run(command: Command) -> Result<(), String> {
                         intensity,
                         keep_accent,
                         reseed_secs,
+                        reseed_range: reseed_range_from(reseed_range.as_deref())?,
                     }),
                     page.then_some(look),
                     one_voice,
@@ -1245,6 +1299,34 @@ struct Tuning {
     intensity: f32,
     keep_accent: bool,
     reseed_secs: f32,
+    /// The randomised roll range, already parsed and already refused if it was
+    /// not usable. `None` means the fixed [`Tuning::reseed_secs`] interval.
+    reseed_range: Option<(f32, f32)>,
+}
+
+/// Turn `--reseed-range` into a range, or into the reason it was not one.
+///
+/// Three answers, and the middle one is the point of F-73:
+///
+/// * `Some(text)` -- parse it, and **refuse** anything unusable rather than
+///   adjusting it to fit.
+/// * `None` -- draw a range from the operating system's random source, so the
+///   shipped interval is a property of this launch rather than of the binary.
+/// * `"fixed"` -- the caller has asked for the old fixed interval by name,
+///   which is the only way to get a predictable ratchet.
+fn reseed_range_from(flag: Option<&str>) -> Result<Option<(f32, f32)>, String> {
+    match flag {
+        Some(text) if text.trim().eq_ignore_ascii_case("fixed") => Ok(None),
+        Some(text) => veilvoice_core::parse_reseed_range(text)
+            .map(Some)
+            .map_err(|why| format!("--reseed-range: {why}")),
+        // The default, and the whole of F-73. `with_random_reseed_range` was
+        // written, documented as what the front ends do at launch, and called
+        // by nothing but its own test for two releases.
+        None => Ok(DeidConfig::default()
+            .with_random_reseed_range()
+            .reseed_range_ms),
+    }
 }
 
 fn config(t: Tuning) -> DeidConfig {
@@ -1255,7 +1337,23 @@ fn config(t: Tuning) -> DeidConfig {
             ..AccentConfig::default()
         },
         reseed_secs: t.reseed_secs.max(0.0),
+        reseed_range_ms: t.reseed_range,
         ..DeidConfig::default()
+    }
+}
+
+/// How a randomised roll range reads in the output.
+///
+/// Reports [`DeidConfig::effective_reseed_range_ms`] rather than what was
+/// asked for: the ratchet can only fire on a frame boundary, so the range that
+/// takes effect is quantised, and printing the request would tell somebody
+/// their interval varies over a span it does not.
+fn describe_reseed_range(config: &DeidConfig) -> String {
+    match config.effective_reseed_range_ms() {
+        Some((lo, hi)) => {
+            format!("{lo:.0}-{hi:.0} ms, drawn fresh before every roll -- no period to observe")
+        }
+        None => describe_reseed(config.reseed_secs),
     }
 }
 
@@ -1371,7 +1469,7 @@ fn anonymise(
     );
     println!(
         "{}",
-        field("Seed rolls", &describe_reseed(tuning.reseed_secs))
+        field("Seed rolls", &describe_reseed_range(&config(tuning)))
     );
     println!(
         "{}",
@@ -1446,7 +1544,7 @@ fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result
     );
     println!(
         "{}",
-        field("Seed rolls", &describe_reseed(tuning.reseed_secs))
+        field("Seed rolls", &describe_reseed_range(&config(tuning)))
     );
     if out_name.is_none() {
         println!(
@@ -1937,6 +2035,9 @@ mod tests {
             intensity,
             keep_accent,
             reseed_secs,
+            // The fixed interval, so these tests stay deterministic. The
+            // randomised range has its own tests in veilvoice-core.
+            reseed_range: None,
         }
     }
 

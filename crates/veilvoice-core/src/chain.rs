@@ -186,6 +186,13 @@ pub struct DeidConfig {
     /// test suite does. The front ends call
     /// [`DeidConfig::with_random_reseed_range`] at launch, which is what makes
     /// the shipped interval something other than a number compiled in.
+    ///
+    /// F-73: that last sentence was written before anything did it. The method
+    /// existed, was tested, and was called by **nothing but its own test** for
+    /// two releases, so every shipped copy rolled on the same fixed two-second
+    /// period -- a number compiled into the binary, which is precisely what it
+    /// says here is not the case. A test now reads the front ends' source and
+    /// fails the build if the call is not there.
     pub reseed_range_ms: Option<(f32, f32)>,
 }
 
@@ -214,10 +221,150 @@ impl Default for DeidConfig {
 
 /// The narrowest randomised roll range this engine will accept, in
 /// milliseconds. Below one frame the range has no room to vary in.
-const MIN_RESEED_MS: f32 = 0.05;
+///
+/// Public so that a front end refusing a typed value can name the limit. A
+/// refusal that will not say what the bound is leaves somebody guessing, which
+/// is only marginally better than the clamp it replaced.
+pub const MIN_RESEED_MS: f32 = 0.05;
+
 /// The widest, in milliseconds. Ten minutes is far past any use for a ratchet
 /// and stops an absurd value producing a frame count that overflows.
-const MAX_RESEED_MS: f32 = 600_000.0;
+pub const MAX_RESEED_MS: f32 = 600_000.0;
+
+/// Why a ratchet range typed by a person was not accepted.
+///
+/// **Every one of these is a refusal, never a correction.** Clamping a typed
+/// number to something legal is how somebody ends up running on a setting they
+/// did not choose and cannot see: they typed a value, nothing complained, and
+/// the program used a different one. For a control whose entire purpose is that
+/// the interval should not be predictable, silently substituting a value would
+/// be the worst available failure -- and the roadmap marker asks for exactly
+/// this, in these words: *invalid input refused rather than clamped*.
+#[derive(Clone, Debug, PartialEq)]
+pub enum RangeError {
+    /// The text was not two numbers.
+    NotTwoNumbers(String),
+    /// One of the two was not a number at all.
+    NotANumber(String),
+    /// A number was negative, zero, or not finite.
+    NotPositive(f32),
+    /// The low end was not below the high end.
+    Backwards {
+        /// What was given as the low end.
+        lo: f32,
+        /// What was given as the high end.
+        hi: f32,
+    },
+    /// Below the narrowest range the engine can draw from.
+    TooShort {
+        /// The low end asked for.
+        lo: f32,
+        /// The least this engine accepts.
+        least: f32,
+    },
+    /// Past the longest interval the engine accepts.
+    TooLong {
+        /// The high end asked for.
+        hi: f32,
+        /// The most this engine accepts.
+        most: f32,
+    },
+}
+
+impl std::fmt::Display for RangeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NotTwoNumbers(text) => write!(
+                f,
+                "a ratchet range is two numbers of milliseconds, low first, like \
+                 250,1800 -- got \"{text}\""
+            ),
+            Self::NotANumber(part) => {
+                write!(f, "\"{part}\" is not a number of milliseconds")
+            }
+            Self::NotPositive(value) => write!(
+                f,
+                "{value} is not a length of time; both ends must be above zero"
+            ),
+            Self::Backwards { lo, hi } => write!(
+                f,
+                "the range runs backwards: {lo} is not below {hi}, and the low end \
+                 comes first"
+            ),
+            Self::TooShort { lo, least } => write!(
+                f,
+                "{lo} ms is below the {least} ms floor. The ratchet can only fire on \
+                 a frame boundary, so anything shorter cannot be drawn"
+            ),
+            Self::TooLong { hi, most } => write!(
+                f,
+                "{hi} ms is past the {most} ms ceiling. A ratchet that slow is almost \
+                 certainly a typo, and a long interval weakens forward secrecy without \
+                 buying anything"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for RangeError {}
+
+/// Read a `low,high` ratchet range in milliseconds, or say why not.
+///
+/// A comma or a dash may separate the two, because both are what people type.
+/// Everything else is **refused with the reason** and nothing is ever adjusted
+/// to fit -- see [`RangeError`].
+///
+/// The range is not quantised here. One frame is the smallest gap that can
+/// happen at all, so a range narrower than a frame collapses to a single value
+/// once it meets the engine; [`DeidConfig::effective_reseed_range_ms`] is what
+/// a range really comes to and is what an interface should display beside it.
+pub fn parse_reseed_range(text: &str) -> Result<(f32, f32), RangeError> {
+    let cleaned = text.trim();
+    let parts: Vec<&str> = if cleaned.contains(',') {
+        cleaned.splitn(2, ',').collect()
+    } else if cleaned.len() > 1 {
+        // Searched from the second character so that a leading minus stays part
+        // of the first number and is refused as not-positive, rather than read
+        // as the separator and turning "-5-9" into a valid-looking pair.
+        match cleaned[1..].find('-') {
+            Some(at) => vec![&cleaned[..at + 1], &cleaned[at + 2..]],
+            None => vec![cleaned],
+        }
+    } else {
+        vec![cleaned]
+    };
+    if parts.len() != 2 {
+        return Err(RangeError::NotTwoNumbers(cleaned.to_string()));
+    }
+
+    let mut ends = [0.0f32; 2];
+    for (slot, part) in ends.iter_mut().zip(parts.iter()) {
+        let part = part.trim();
+        *slot = part
+            .parse::<f32>()
+            .map_err(|_| RangeError::NotANumber(part.to_string()))?;
+        if !slot.is_finite() || *slot <= 0.0 {
+            return Err(RangeError::NotPositive(*slot));
+        }
+    }
+    let (lo, hi) = (ends[0], ends[1]);
+    if lo >= hi {
+        return Err(RangeError::Backwards { lo, hi });
+    }
+    if lo < MIN_RESEED_MS {
+        return Err(RangeError::TooShort {
+            lo,
+            least: MIN_RESEED_MS,
+        });
+    }
+    if hi > MAX_RESEED_MS {
+        return Err(RangeError::TooLong {
+            hi,
+            most: MAX_RESEED_MS,
+        });
+    }
+    Ok((lo, hi))
+}
 
 impl DeidConfig {
     fn hop(&self) -> usize {
@@ -1252,5 +1399,171 @@ mod tests {
         assert_eq!(s.blocks, 1);
         assert!(s.last_block_us > 0.0);
         assert!(s.algorithmic_latency_ms > 0.0);
+    }
+}
+
+#[cfg(test)]
+mod reseed_range_tests {
+    use super::*;
+
+    /// **F-73.** The front ends must actually draw a range at launch.
+    ///
+    /// [`DeidConfig::reseed_range_ms`]'s own documentation said "the front ends
+    /// call [`DeidConfig::with_random_reseed_range`] at launch, which is what
+    /// makes the shipped interval something other than a number compiled in".
+    /// Nothing called it. It was written, documented, tested in isolation, and
+    /// reached by no code path for two releases, so every shipped copy rolled
+    /// on the same fixed two-second period -- exactly the thing the sentence
+    /// said was not happening.
+    ///
+    /// A comment cannot be tested, so this tests the code the comment is about.
+    /// It reads both front ends and fails the build if the call is gone.
+    #[test]
+    fn both_front_ends_draw_a_random_range_at_launch() {
+        let here = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let crates = here.parent().expect("crates/");
+        for (crate_name, file) in [
+            ("veilvoice-cli", "src/main.rs"),
+            ("veilvoice-gui", "src/app.rs"),
+        ] {
+            let path = crates.join(crate_name).join(file);
+            let source = std::fs::read_to_string(&path)
+                .unwrap_or_else(|e| panic!("{}: {e}", path.display()))
+                .replace("\r\n", "\n");
+            let code: String = source
+                .lines()
+                .filter(|line| {
+                    let trimmed = line.trim_start();
+                    !trimmed.starts_with("//") && !trimmed.starts_with("///")
+                })
+                .collect::<Vec<_>>()
+                .join("\n");
+            assert!(
+                code.contains("with_random_reseed_range()"),
+                "{crate_name} does not draw a ratchet range at launch, so every copy \
+                 of it ships the same fixed period"
+            );
+        }
+    }
+
+    /// A drawn range is different from run to run. If it were not, it would be
+    /// a compiled-in number wearing a random-looking coat.
+    #[test]
+    fn a_drawn_range_is_not_the_same_twice() {
+        let mut seen = std::collections::BTreeSet::new();
+        for _ in 0..8 {
+            let range = DeidConfig::default()
+                .with_random_reseed_range()
+                .reseed_range_ms
+                .expect("a range");
+            seen.insert(format!("{:.3},{:.3}", range.0, range.1));
+        }
+        assert!(seen.len() > 1, "eight draws produced one range: {seen:?}");
+    }
+
+    /// A drawn range is usable: the right way round, inside the bounds, and
+    /// wide enough to survive quantisation.
+    #[test]
+    fn a_drawn_range_is_always_valid() {
+        for _ in 0..64 {
+            let config = DeidConfig::default().with_random_reseed_range();
+            let (lo, hi) = config.reseed_range_ms.expect("a range");
+            assert!(lo < hi, "{lo} {hi}");
+            assert!(lo >= MIN_RESEED_MS, "{lo}");
+            assert!(hi <= MAX_RESEED_MS, "{hi}");
+            assert!(config.checked().is_ok(), "{lo} {hi}");
+        }
+    }
+
+    /// Everything a person can type that is not a range is **refused**, and
+    /// the refusal says which thing was wrong. Nothing is adjusted to fit:
+    /// that is the whole of marker 28's wording.
+    #[test]
+    fn bad_input_is_refused_with_a_reason_and_never_corrected() {
+        use RangeError::*;
+        for (text, expected) in [
+            ("", NotTwoNumbers(String::new())),
+            ("5", NotTwoNumbers("5".into())),
+            ("abc,def", NotANumber("abc".into())),
+            ("100,zzz", NotANumber("zzz".into())),
+            ("0,100", NotPositive(0.0)),
+            ("-5,100", NotPositive(-5.0)),
+            (
+                "1800,250",
+                Backwards {
+                    lo: 1800.0,
+                    hi: 250.0,
+                },
+            ),
+            (
+                "100,100",
+                Backwards {
+                    lo: 100.0,
+                    hi: 100.0,
+                },
+            ),
+            (
+                "0.001,100",
+                TooShort {
+                    lo: 0.001,
+                    least: MIN_RESEED_MS,
+                },
+            ),
+            (
+                "100,900000",
+                TooLong {
+                    hi: 900_000.0,
+                    most: MAX_RESEED_MS,
+                },
+            ),
+        ] {
+            let got =
+                parse_reseed_range(text).expect_err("a value that is not a range must be refused");
+            assert_eq!(
+                std::mem::discriminant(&got),
+                std::mem::discriminant(&expected),
+                "{text:?} gave {got:?}"
+            );
+            // Every refusal has to be a sentence somebody can act on.
+            let words = got.to_string();
+            assert!(words.len() > 20, "{text:?}: {words}");
+        }
+    }
+
+    /// The shapes people actually type are accepted, and accepted exactly --
+    /// the numbers that come back are the numbers that went in.
+    #[test]
+    fn a_usable_range_survives_unchanged() {
+        for (text, want) in [
+            ("250,1800", (250.0, 1800.0)),
+            (" 250 , 1800 ", (250.0, 1800.0)),
+            ("250-1800", (250.0, 1800.0)),
+            ("0.5,2", (0.5, 2.0)),
+        ] {
+            let got = parse_reseed_range(text).unwrap_or_else(|e| panic!("{text:?}: {e}"));
+            assert_eq!(got, want, "{text:?}");
+        }
+    }
+
+    /// What an interface shows is what the engine will do, not what was asked
+    /// for. The ratchet only fires on a frame boundary, so a range is
+    /// quantised, and displaying the request would describe a spread that does
+    /// not exist.
+    #[test]
+    fn the_effective_range_is_quantised_to_whole_frames() {
+        let config = DeidConfig {
+            reseed_range_ms: Some((250.0, 1800.0)),
+            ..DeidConfig::default()
+        };
+        let (lo, hi) = config.effective_reseed_range_ms().expect("a range");
+        let frame = config.frame_ms();
+        for value in [lo, hi] {
+            let frames = value / frame;
+            assert!(
+                (frames - frames.round()).abs() < 1e-3,
+                "{value} ms is not a whole number of {frame} ms frames"
+            );
+        }
+        assert!(lo >= 250.0 - frame && hi >= 1800.0 - frame, "{lo} {hi}");
     }
 }
