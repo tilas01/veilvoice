@@ -90,7 +90,7 @@ you who makes each one, and installs none of them unless you say so.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>166 lines"])
+    n_lib(["lib.rs<br/>168 lines"])
     n_companions["companions.rs<br/>761 lines"]
     n_install["install.rs<br/>555 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" "open the source"
@@ -106,4 +106,4 @@ flowchart TD
 |---|---:|---|
 | [[`companions.rs`|File-veilvoice-setup-companions]] | 761 | Optional third-party software, detected rather than assumed. |
 | [[`install.rs`|File-veilvoice-setup-install]] | 555 | Put this program somewhere the system can find it. |
-| [[`lib.rs`|File-veilvoice-setup-lib]] | 166 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [[`lib.rs`|File-veilvoice-setup-lib]] | 168 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |

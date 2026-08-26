@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/reduced_motion.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 328 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 336 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs)
 
 ## Contents
 
@@ -59,7 +59,7 @@ motion when it actually saw it say so.
 
 ## What this file contains
 
-328 lines defining **8 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+336 lines defining **8 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

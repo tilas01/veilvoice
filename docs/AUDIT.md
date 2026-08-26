@@ -40,9 +40,14 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Six defects found and fixed (F-66 to F-71.)** **None had shipped**: all
-six are in code written since the seventh round, and `main` has not been
+**Seven defects found and fixed (F-66 to F-72.)** **None had shipped**: all
+seven are in code written since the seventh round, and `main` has not been
 released since v0.1.12.
+
+**Two of the seven were found by continuous integration rather than by
+anybody's judgement**, and both had been watched to pass on the machine they
+failed on. That is the round's real lesson: the checks that matter most are the
+ones that run somewhere the author is not.
 
 This round covers what was added after it: the measured voice limit and the
 one-voice-for-everybody mode, saved projects and application profiles, the
@@ -63,6 +68,50 @@ strength with the accent work **off**. Nothing in the window said so; the
 controls were on a different tab, and the group panel had never been given
 them. That is software quietly doing less than it says, which is the failure
 this whole tree is written against.
+
+### F-72 -- three tests passed on this machine and failed on the same platform
+
+`veilvoice-verify`, `veilvoice-guard`, `veilvoice-gui`, `veilvoice-watch`. Several
+tests read this project's own source with `include_str!` and search it -- for a
+forbidden call inside one function's body, for an ungated `println!`, for a
+probe that looks up a program by name. They locate a function's end by finding
+`"\n}\n"`.
+
+They passed locally and failed on GitHub's Windows runners. Not on a different
+platform: **on the same one**, minutes after being watched to pass. This machine
+has `core.autocrlf=input`, so its checkout uses LF; GitHub's Windows runners
+default to `core.autocrlf=true`, so theirs arrives with CRLF, the pattern
+matches nothing, and `.expect("its end")` panics.
+
+There was no `.gitattributes`, so the line endings of a checkout were whatever
+each contributor's git happened to be set to.
+
+**The tests are the small half.** The serious half is the generators. Every
+artefact here is regenerated and compared **byte for byte** by
+`tools/verify.py`, and every generator writes LF unconditionally. A contributor
+whose git converts text on checkout would find every `--check` failing on files
+they had never touched, with a diff that shows nothing, on their first run --
+and the natural conclusion is that the repository is broken rather than that
+their git is configured differently. Nothing in the tree said otherwise.
+
+So `.gitattributes` pins text to LF for everyone, names the binary formats
+explicitly rather than trusting detection to guess right on a `.wav`, and says
+in the file why. The source-reading tests normalise as well, because a test
+that depends on a git setting is a test somebody will trip over on a machine
+nobody here owns.
+
+Three guards, and the second is the one worth having:
+
+* Every `include_str!` in a test file must be followed by the normalisation, or
+  the suite fails and names the line.
+* The failure mode is a test of its own: a search for `"\n}\n"` is asserted to
+  succeed against LF and to **fail** against CRLF, so it is on record as
+  reachable rather than as a story about it.
+* `.gitattributes` is read from a test and must pin `eol=lf`, because nothing
+  else in the build would notice it being deleted.
+
+Written the first time, the first guard matched its own detection line and
+reported itself as the defect. Its needle is assembled at run time now.
 
 ### F-71 -- the guard against stale claims compared one copy to another
 
@@ -463,7 +512,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 890 tests across 19 crates, plus doctests and 11 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). |
+| Test suite | 893 tests across 19 crates, plus doctests and 11 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -1915,7 +1964,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Seventy-one defects found and fixed across eight audit rounds (F-1 to F-71):**
+**Seventy-two defects found and fixed across eight audit rounds (F-1 to F-72):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

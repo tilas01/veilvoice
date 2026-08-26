@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-watch/src/windows.rs`
 
-[`veilvoice-watch`](../../../crates/veilvoice-watch/README.md) &middot; 589 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs)
+[`veilvoice-watch`](../../../crates/veilvoice-watch/README.md) &middot; 597 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs)
 
 ## Contents
 
@@ -80,7 +80,7 @@ enumerating process handles would miss.
 
 ## What this file contains
 
-589 lines defining **10 functions** (1 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+597 lines defining **10 functions** (1 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
