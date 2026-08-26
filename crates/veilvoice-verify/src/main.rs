@@ -906,18 +906,37 @@ fn do_build(
         return Err(Status::DependenciesMissing.into());
     }
 
-    // Said before the build rather than after, because it is the first thing to
-    // check when two builds disagree, and afterwards nobody scrolls back.
+    // Said before the build rather than after, because these are the first
+    // things to check when two builds disagree and afterwards nobody scrolls
+    // back. The environment especially: a comparison whose settings are
+    // invisible cannot be checked by the person reading the result.
     if let Some(pinned) = builder::pinned_toolchain(root) {
         good(&format!("the source pins Rust {pinned}"));
     }
-    if let Some(triple) = builder::host_triple() {
-        good(&format!("building for {triple}"));
+    let environment = match builder::environment(root, target_dir) {
+        Ok(environment) => environment,
+        Err(why) => {
+            return Err(cannot(
+                "the build environment could not be worked out",
+                &[&why],
+            ))
+        }
+    };
+    good(&format!("building for {}", environment.triple));
+    out!();
+    out!("  The settings a release is built with, reproduced here:");
+    for line in environment.describe() {
+        out!("    {line}");
+    }
+    if environment.source_date_epoch.is_none() {
+        out!();
+        out!("  Without a commit date this build may differ from the published one");
+        out!("  for that reason alone. Build from a git checkout to rule it out.");
     }
 
     out!();
     out!("Building. This takes a few minutes the first time.");
-    let dir = match builder::build(root, target_dir) {
+    let dir = match builder::build(root, target_dir, &environment) {
         Ok(dir) => dir,
         Err(why) => {
             if report::level() >= Loudness::Minimal {

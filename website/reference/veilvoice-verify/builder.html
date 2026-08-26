@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/builder.svg" alt="builder.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/builder.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 758 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1140 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-question-this-answers-and-the-one-it-does-not">The question this answers, and the one it does not</a>
@@ -68,33 +68,37 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>758 lines defining <strong>14 functions</strong> (13 public), <strong>2 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1140 lines defining <strong>20 functions</strong> (16 public), <strong>3 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Built</code> <span style="color:var(--muted)">line 73</span> &mdash; What a build produced.</li>
-<li><code>enum Compared</code> <span style="color:var(--muted)">line 313</span> &mdash; How a built file compared against the published list.</li>
+<li><code>struct Environment</code> <span style="color:var(--muted)">line 250</span> &mdash; Everything that would otherwise differ between two builds of one source.</li>
+<li><code>enum Compared</code> <span style="color:var(--muted)">line 526</span> &mdash; How a built file compared against the published list.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>looks_like_the_source</code> <span style="color:var(--muted)">line 88</span> &mdash; Whether the source tree this is pointed at is really one.
 </li>
 <li><code>pinned_toolchain</code> <span style="color:var(--muted)">line 120</span> &mdash; The compiler version the source tree pins itself to.
 </li>
-<li><code>host_triple</code> <span style="color:var(--muted)">line 133</span> &mdash; The platform triple this build is for, as rustc names it.
+<li><code>Environment::describe</code> <span style="color:var(--muted)">line 272</span> &mdash; The settings, for printing before a build.
 </li>
-<li><code>build</code> <span style="color:var(--muted)">line 231</span> &mdash; Run the release build.
+<li><code>environment</code> <span style="color:var(--muted)">line 366</span> &mdash; The environment the release is built in, for this tree on this machine.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>as_the_compiler_sees_it</code>, <code>cargo_home</code>, <code>commit_date</code>, <code>host_triple</code>, <code>repro_link</code>, <code>target_directory</code>, <code>json_string_field</code></span>
+</li>
+<li><code>build</code> <span style="color:var(--muted)">line 417</span> &mdash; Run the release build.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>target_directory</code>, <code>json_string_field</code></span>
 </li>
-<li><code>hash_what_was_built</code> <span style="color:var(--muted)">line 276</span> &mdash; Hash every binary a release ships, from a directory a build left behind.
+<li><code>hash_what_was_built</code> <span style="color:var(--muted)">line 489</span> &mdash; Hash every binary a release ships, from a directory a build left behind.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>with_platform_extension</code></span>
 </li>
-<li><code>compare</code> <span style="color:var(--muted)">line 346</span> &mdash; Compare a build against a hash list.
+<li><code>compare</code> <span style="color:var(--muted)">line 559</span> &mdash; Compare a build against a hash list.
 </li>
-<li><code>report_dependencies</code> <span style="color:var(--muted)">line 384</span> &mdash; Report what a dependency check found.
+<li><code>report_dependencies</code> <span style="color:var(--muted)">line 597</span> &mdash; Report what a dependency check found.
 </li>
-<li><code>install</code> <span style="color:var(--muted)">line 427</span> &mdash; Run one install command, having been told yes.
+<li><code>install</code> <span style="color:var(--muted)">line 640</span> &mdash; Run one install command, having been told yes.
 </li>
-<li><code>agreed</code> <span style="color:var(--muted)">line 453</span> &mdash; Ask, and take only an unambiguous yes.
+<li><code>agreed</code> <span style="color:var(--muted)">line 666</span> &mdash; Ask, and take only an unambiguous yes.
 </li>
-<li><code>status_for</code> <span style="color:var(--muted)">line 470</span> &mdash; The status a comparison should exit with.
+<li><code>status_for</code> <span style="color:var(--muted)">line 683</span> &mdash; The status a comparison should exit with.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all_matched</code></span>
 </li>
 </ul>
@@ -102,83 +106,119 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 618 494" width="618" height="494" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 694" width="580" height="694" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
-<rect x="0" y="0" width="618" height="494" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M284.4 147.0 C 306.4 147.0, 306.4 147.0, 172.6 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M396.6 174.0 C 396.6 194.0, 400.4 400.0, 400.4 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M360.8 347.0 C 382.8 347.0, 382.8 247.0, 153.6 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M94.8 174.0 C 94.8 194.0, 194.4 400.0, 194.4 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="0" y="0" width="580" height="694" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M246.4 347.0 C 268.4 347.0, 268.4 147.0, 195.8 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M131.6 347.0 C 547.0 347.0, 547.0 247.0, 528.0 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M131.6 347.0 C 180.6 347.0, 180.6 247.0, 161.6 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M131.6 347.0 C 318.2 347.0, 318.2 247.0, 299.2 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M131.6 347.0 C 562.2 347.0, 562.2 47.0, 543.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M131.6 347.0 C 558.4 347.0, 558.4 147.0, 539.4 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M131.6 347.0 C 214.8 347.0, 214.8 147.0, 195.8 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M358.6 374.0 C 358.6 394.0, 381.4 600.0, 381.4 617.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M341.8 547.0 C 363.8 547.0, 363.8 447.0, 134.6 447.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M118.0 174.0 C 118.0 194.0, 175.4 600.0, 175.4 617.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L88" target="_blank" rel="noopener noreferrer">
-<rect x="58.4" y="20.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="152.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">looks_like_the_source</text>
-<text x="152.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 88</text>
+<rect x="39.4" y="20.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="133.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">looks_like_the_source</text>
+<text x="133.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 88</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L120" target="_blank" rel="noopener noreferrer">
-<rect x="272.0" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="346.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">pinned_toolchain</text>
-<text x="346.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 120</text>
+<rect x="253.0" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="327.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">pinned_toolchain</text>
+<text x="327.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 120</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L133" target="_blank" rel="noopener noreferrer">
-<rect x="447.6" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="503.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">host_triple</text>
-<text x="503.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+<rect x="428.6" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="484.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">host_triple</text>
+<text x="484.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L162" target="_blank" rel="noopener noreferrer">
-<rect x="20.0" y="120.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="94.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">target_directory</text>
-<text x="94.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
+<rect x="43.2" y="120.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="118.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">target_directory</text>
+<text x="118.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L193" target="_blank" rel="noopener noreferrer">
-<rect x="115.8" y="420.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="194.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">json_string_field</text>
-<text x="194.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 193</text>
+<rect x="96.8" y="620.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="175.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">json_string_field</text>
+<text x="175.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 193</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L231" target="_blank" rel="noopener noreferrer">
-<rect x="195.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="240.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">build</text>
-<text x="240.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 231</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L272" target="_blank" rel="noopener noreferrer">
+<rect x="218.8" y="120.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="312.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Environment::describe</text>
+<text x="312.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L276" target="_blank" rel="noopener noreferrer">
-<rect x="310.4" y="120.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="396.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hash_what_was_built</text>
-<text x="396.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 276</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L292" target="_blank" rel="noopener noreferrer">
+<rect x="432.4" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="484.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">repro_link</text>
+<text x="484.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 292</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L303" target="_blank" rel="noopener noreferrer">
-<rect x="299.0" y="420.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="400.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">with_platform_extension</text>
-<text x="400.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 303</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L307" target="_blank" rel="noopener noreferrer">
+<rect x="54.6" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="106.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">cargo_home</text>
+<text x="106.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 307</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L346" target="_blank" rel="noopener noreferrer">
-<rect x="508.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="553.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">compare</text>
-<text x="553.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 346</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L316" target="_blank" rel="noopener noreferrer">
+<rect x="184.6" y="220.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="240.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">commit_date</text>
+<text x="240.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L372" target="_blank" rel="noopener noreferrer">
-<rect x="39.0" y="220.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="94.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">all_matched</text>
-<text x="94.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 372</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L341" target="_blank" rel="noopener noreferrer">
+<rect x="322.2" y="220.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="423.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">as_the_compiler_sees_it</text>
+<text x="423.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 341</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L384" target="_blank" rel="noopener noreferrer">
-<rect x="176.6" y="220.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="262.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">report_dependencies</text>
-<text x="262.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 384</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L366" target="_blank" rel="noopener noreferrer">
+<rect x="20.0" y="320.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="75.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">environment</text>
+<text x="75.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 366</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L427" target="_blank" rel="noopener noreferrer">
-<rect x="375.0" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="419.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
-<text x="419.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 427</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L417" target="_blank" rel="noopener noreferrer">
+<rect x="157.6" y="320.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="202.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">build</text>
+<text x="202.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 417</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L453" target="_blank" rel="noopener noreferrer">
-<rect x="489.8" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="534.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">agreed</text>
-<text x="534.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 453</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L489" target="_blank" rel="noopener noreferrer">
+<rect x="272.4" y="320.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="358.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hash_what_was_built</text>
+<text x="358.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 489</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L470" target="_blank" rel="noopener noreferrer">
-<rect x="256.8" y="320.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="308.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status_for</text>
-<text x="308.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 470</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L516" target="_blank" rel="noopener noreferrer">
+<rect x="280.0" y="620.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="381.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">with_platform_extension</text>
+<text x="381.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 516</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L559" target="_blank" rel="noopener noreferrer">
+<rect x="470.8" y="320.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="515.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">compare</text>
+<text x="515.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 559</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L585" target="_blank" rel="noopener noreferrer">
+<rect x="20.0" y="420.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="75.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">all_matched</text>
+<text x="75.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 585</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L597" target="_blank" rel="noopener noreferrer">
+<rect x="157.6" y="420.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="243.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">report_dependencies</text>
+<text x="243.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 597</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L640" target="_blank" rel="noopener noreferrer">
+<rect x="356.0" y="420.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="400.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
+<text x="400.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 640</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L666" target="_blank" rel="noopener noreferrer">
+<rect x="470.8" y="420.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="515.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">agreed</text>
+<text x="515.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 666</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L683" target="_blank" rel="noopener noreferrer">
+<rect x="237.8" y="520.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="289.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status_for</text>
+<text x="289.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 683</text>
 </a>
 </svg>
 </div>
@@ -188,19 +228,31 @@
 flowchart TD
     n_looks_like_the_source([&quot;looks_like_the_source&lt;br/&gt;line 88&quot;])
     n_pinned_toolchain([&quot;pinned_toolchain&lt;br/&gt;line 120&quot;])
-    n_host_triple([&quot;host_triple&lt;br/&gt;line 133&quot;])
+    n_host_triple[&quot;host_triple&lt;br/&gt;line 133&quot;]
     n_target_directory[&quot;target_directory&lt;br/&gt;line 162&quot;]
     n_json_string_field[&quot;json_string_field&lt;br/&gt;line 193&quot;]
-    n_build([&quot;build&lt;br/&gt;line 231&quot;])
-    n_hash_what_was_built([&quot;hash_what_was_built&lt;br/&gt;line 276&quot;])
-    n_with_platform_extension[&quot;with_platform_extension&lt;br/&gt;line 303&quot;]
-    n_compare([&quot;compare&lt;br/&gt;line 346&quot;])
-    n_all_matched[&quot;all_matched&lt;br/&gt;line 372&quot;]
-    n_report_dependencies([&quot;report_dependencies&lt;br/&gt;line 384&quot;])
-    n_install([&quot;install&lt;br/&gt;line 427&quot;])
-    n_agreed([&quot;agreed&lt;br/&gt;line 453&quot;])
-    n_status_for([&quot;status_for&lt;br/&gt;line 470&quot;])
+    n_describe([&quot;Environment::describe&lt;br/&gt;line 272&quot;])
+    n_repro_link[&quot;repro_link&lt;br/&gt;line 292&quot;]
+    n_cargo_home[&quot;cargo_home&lt;br/&gt;line 307&quot;]
+    n_commit_date[&quot;commit_date&lt;br/&gt;line 316&quot;]
+    n_as_the_compiler_sees_it[&quot;as_the_compiler_sees_it&lt;br/&gt;line 341&quot;]
+    n_environment([&quot;environment&lt;br/&gt;line 366&quot;])
+    n_build([&quot;build&lt;br/&gt;line 417&quot;])
+    n_hash_what_was_built([&quot;hash_what_was_built&lt;br/&gt;line 489&quot;])
+    n_with_platform_extension[&quot;with_platform_extension&lt;br/&gt;line 516&quot;]
+    n_compare([&quot;compare&lt;br/&gt;line 559&quot;])
+    n_all_matched[&quot;all_matched&lt;br/&gt;line 585&quot;]
+    n_report_dependencies([&quot;report_dependencies&lt;br/&gt;line 597&quot;])
+    n_install([&quot;install&lt;br/&gt;line 640&quot;])
+    n_agreed([&quot;agreed&lt;br/&gt;line 666&quot;])
+    n_status_for([&quot;status_for&lt;br/&gt;line 683&quot;])
     n_build --&gt; n_target_directory
+    n_environment --&gt; n_as_the_compiler_sees_it
+    n_environment --&gt; n_cargo_home
+    n_environment --&gt; n_commit_date
+    n_environment --&gt; n_host_triple
+    n_environment --&gt; n_repro_link
+    n_environment --&gt; n_target_directory
     n_hash_what_was_built --&gt; n_with_platform_extension
     n_status_for --&gt; n_all_matched
     n_target_directory --&gt; n_json_string_field
@@ -209,21 +261,27 @@ flowchart TD
     click n_host_triple href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L133&quot; &quot;open the source&quot;
     click n_target_directory href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L162&quot; &quot;open the source&quot;
     click n_json_string_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L193&quot; &quot;open the source&quot;
-    click n_build href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L231&quot; &quot;open the source&quot;
-    click n_hash_what_was_built href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L276&quot; &quot;open the source&quot;
-    click n_with_platform_extension href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L303&quot; &quot;open the source&quot;
-    click n_compare href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L346&quot; &quot;open the source&quot;
-    click n_all_matched href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L372&quot; &quot;open the source&quot;
-    click n_report_dependencies href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L384&quot; &quot;open the source&quot;
-    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L427&quot; &quot;open the source&quot;
-    click n_agreed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L453&quot; &quot;open the source&quot;
-    click n_status_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L470&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L272&quot; &quot;open the source&quot;
+    click n_repro_link href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L292&quot; &quot;open the source&quot;
+    click n_cargo_home href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L307&quot; &quot;open the source&quot;
+    click n_commit_date href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L316&quot; &quot;open the source&quot;
+    click n_as_the_compiler_sees_it href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L341&quot; &quot;open the source&quot;
+    click n_environment href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L366&quot; &quot;open the source&quot;
+    click n_build href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L417&quot; &quot;open the source&quot;
+    click n_hash_what_was_built href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L489&quot; &quot;open the source&quot;
+    click n_with_platform_extension href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L516&quot; &quot;open the source&quot;
+    click n_compare href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L559&quot; &quot;open the source&quot;
+    click n_all_matched href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L585&quot; &quot;open the source&quot;
+    click n_report_dependencies href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L597&quot; &quot;open the source&quot;
+    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L640&quot; &quot;open the source&quot;
+    click n_agreed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L666&quot; &quot;open the source&quot;
+    click n_status_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L683&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_looks_like_the_source,n_pinned_toolchain,n_host_triple,n_build,n_hash_what_was_built,n_compare,n_report_dependencies,n_install,n_agreed,n_status_for entry
+    class n_looks_like_the_source,n_pinned_toolchain,n_describe,n_environment,n_build,n_hash_what_was_built,n_compare,n_report_dependencies,n_install,n_agreed,n_status_for entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_target_directory,n_with_platform_extension,n_all_matched api
+    class n_host_triple,n_target_directory,n_repro_link,n_with_platform_extension,n_all_matched api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_json_string_field helper</code></pre>
+    class n_json_string_field,n_cargo_home,n_commit_date,n_as_the_compiler_sees_it helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -239,16 +297,23 @@ flowchart TD
 <tr><td><code>host_triple</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L133" rel="noopener noreferrer">133</a></td><td>The platform triple this build is for, as rustc names it.</td></tr>
 <tr><td><code>target_directory</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L162" rel="noopener noreferrer">162</a></td><td>Where this workspace&#x27;s build output actually goes.</td></tr>
 <tr><td><code>json_string_field</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L193" rel="noopener noreferrer">193</a></td><td>One top-level string out of cargo&#x27;s JSON, without a JSON parser.</td></tr>
-<tr><td><code>build</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L231" rel="noopener noreferrer">231</a></td><td>Run the release build.</td></tr>
-<tr><td><code>hash_what_was_built</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L276" rel="noopener noreferrer">276</a></td><td>Hash every binary a release ships, from a directory a build left behind.</td></tr>
-<tr><td><code>with_platform_extension</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L303" rel="noopener noreferrer">303</a></td><td>A binary&#x27;s name on this platform.</td></tr>
-<tr><td><code>Compared</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L313" rel="noopener noreferrer">313</a></td><td>How a built file compared against the published list.</td></tr>
-<tr><td><code>compare</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L346" rel="noopener noreferrer">346</a></td><td>Compare a build against a hash list.</td></tr>
-<tr><td><code>all_matched</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L372" rel="noopener noreferrer">372</a></td><td>Whether every file that could be compared matched.</td></tr>
-<tr><td><code>report_dependencies</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L384" rel="noopener noreferrer">384</a></td><td>Report what a dependency check found.</td></tr>
-<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L427" rel="noopener noreferrer">427</a></td><td>Run one install command, having been told yes.</td></tr>
-<tr><td><code>agreed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L453" rel="noopener noreferrer">453</a></td><td>Ask, and take only an unambiguous yes.</td></tr>
-<tr><td><code>status_for</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L470" rel="noopener noreferrer">470</a></td><td>The status a comparison should exit with.</td></tr>
+<tr><td><code>Environment</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L250" rel="noopener noreferrer">250</a></td><td>Everything that would otherwise differ between two builds of one source.</td></tr>
+<tr><td><code>Environment::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L272" rel="noopener noreferrer">272</a></td><td>The settings, for printing before a build.</td></tr>
+<tr><td><code>repro_link</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L292" rel="noopener noreferrer">292</a></td><td>Flags that make this platform&#x27;s linker deterministic.</td></tr>
+<tr><td><code>cargo_home</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L307" rel="noopener noreferrer">307</a></td><td>Where cargo keeps downloaded crates, whose paths are also baked in.</td></tr>
+<tr><td><code>commit_date</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L316" rel="noopener noreferrer">316</a></td><td>The date of the commit being built, as seconds since the epoch.</td></tr>
+<tr><td><code>as_the_compiler_sees_it</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L341" rel="noopener noreferrer">341</a></td><td>A path as the compiler will see it, for the remapping to match.</td></tr>
+<tr><td><code>environment</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L366" rel="noopener noreferrer">366</a></td><td>The environment the release is built in, for this tree on this machine.</td></tr>
+<tr><td><code>build</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L417" rel="noopener noreferrer">417</a></td><td>Run the release build.</td></tr>
+<tr><td><code>hash_what_was_built</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L489" rel="noopener noreferrer">489</a></td><td>Hash every binary a release ships, from a directory a build left behind.</td></tr>
+<tr><td><code>with_platform_extension</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L516" rel="noopener noreferrer">516</a></td><td>A binary&#x27;s name on this platform.</td></tr>
+<tr><td><code>Compared</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L526" rel="noopener noreferrer">526</a></td><td>How a built file compared against the published list.</td></tr>
+<tr><td><code>compare</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L559" rel="noopener noreferrer">559</a></td><td>Compare a build against a hash list.</td></tr>
+<tr><td><code>all_matched</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L585" rel="noopener noreferrer">585</a></td><td>Whether every file that could be compared matched.</td></tr>
+<tr><td><code>report_dependencies</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L597" rel="noopener noreferrer">597</a></td><td>Report what a dependency check found.</td></tr>
+<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L640" rel="noopener noreferrer">640</a></td><td>Run one install command, having been told yes.</td></tr>
+<tr><td><code>agreed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L666" rel="noopener noreferrer">666</a></td><td>Ask, and take only an unambiguous yes.</td></tr>
+<tr><td><code>status_for</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L683" rel="noopener noreferrer">683</a></td><td>The status a comparison should exit with.</td></tr>
 </tbody></table>
 </section>
 </div></div>
