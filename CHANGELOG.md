@@ -8,6 +8,45 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Notifications: a card, an alert, or nothing — with the contrast measured
+
+Marker 41. Three ways for the application to tell you something, chosen in
+Settings under *interface*:
+
+- **a card in the corner** — rounded, translucent, fades on its own, will
+  not take focus or interrupt what you are typing, which also means it can be
+  missed;
+- **a message that stops you** — cannot be missed, and cannot be missed
+  quietly, which is what you want when the thing being reported is that
+  something started recording;
+- **nothing** — offered because a monitor that interrupts you every thirty
+  seconds is one you switch off entirely, and then it is watching for nothing.
+
+**The contrast is computed against the colour that is actually on screen.** A
+translucent card is a colour laid *over* the panel behind it, so measuring the
+card's own tint answers a question nobody asked. VeilVoice blends the two,
+takes the WCAG ratio against the result, and picks the text colour by measuring
+every candidate in the palette rather than assuming black or white — a
+user palette can be anything, and an assumed extreme puts a colour on screen
+that is in no theme.
+
+If nothing reaches 4.5:1, the card is drawn **opaque** rather than shipped
+illegible. Translucency is a nicety; reading a warning is not. The preferences
+panel prints the measured ratio and says when translucency had to be given up,
+because a quietly solid card otherwise looks like a design choice.
+
+Alerts from the monitor now queue until they have been shown, so one that
+arrives while you are on another tab is still waiting when you come back rather
+than having scrolled past in a log you were not looking at. One at a time: a
+stack of cards covering the window is how somebody dismisses six warnings
+without reading any of them.
+
+**One honest limit, printed beside the setting.** These appear inside
+VeilVoice's own window and nowhere else. It does not put messages into your
+desktop's notification area, because that needs a registered application
+identity on two of the three platforms and this project is published under a
+pseudonym on purpose.
+
 ### A ratchet interval that is not the same in every copy of the program
 
 ```

@@ -165,6 +165,12 @@ pub struct VeilVoiceApp {
     /// make the value shown beside the slider a lie the moment it was read.
     reseed_range: Option<(f32, f32)>,
 
+    /// What is being shown to the reader right now, if anything.
+    ///
+    /// One at a time. A stack of cards covering the window is how somebody
+    /// dismisses six warnings without reading any of them.
+    notice: Option<crate::notify::Notice>,
+
     // File mode.
     input: Option<PathBuf>,
     output: Option<PathBuf>,
@@ -265,6 +271,7 @@ impl VeilVoiceApp {
             reseed_range: DeidConfig::default()
                 .with_random_reseed_range()
                 .reseed_range_ms,
+            notice: None,
             input: None,
             output: None,
             clean_metadata: true,
@@ -528,6 +535,23 @@ impl eframe::App for VeilVoiceApp {
         // the setup tab's progress strip obeys the same answer rather than
         // asking the question a second time in the same frame.
         let motion = self.preferences.motion(ctx);
+
+        // Above the panel content and below the tab strip, so it is seen
+        // whatever tab is open. Drawn before the tab body rather than after,
+        // for the same reason F-61 moved the dropped-file read to the top:
+        // painting a notice under the thing it is about is a notice a frame
+        // late and half a window away.
+        if let Some(notice) = self.notice.clone() {
+            let style = self.preferences.notify_style();
+            egui::TopBottomPanel::top("notice").show(ctx, |ui| {
+                ui.add_space(6.0);
+                if crate::notify::show(ui, style, &notice) {
+                    self.notice = None;
+                }
+                ui.add_space(6.0);
+            });
+        }
+
         egui::CentralPanel::default().show(ctx, |ui| {
             // While the "unencrypted?" question is open, clicks must not land
             // on the window behind it.
