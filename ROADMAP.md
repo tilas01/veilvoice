@@ -123,11 +123,11 @@ then the smallest thing it does.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 55 | **Build the whole repository from source**, from the tool itself: find or install a toolchain, pin it to `rust-toolchain.toml`, and run the same build the release does | **planned** | 4–6 d |
-| 56 | **Reproducibility check** — build here, hash what came out, and compare it against the published `SHA256SUMS` entry for this platform, saying which files matched and which did not | **planned** | 3–4 d |
-| 57 | **The hashes are trusted only after the signature is** — verify the detached signature over `SHA256SUMS` against the project key *before* any hash from it is compared, and refuse rather than warn if it does not verify | **planned** | 2 d |
-| 58 | **Set the machine up per platform** — the build dependencies each operating system actually needs, detected, named with who ships them, and installed only on an explicit yes | **planned** | 4–5 d |
-| 59 | **Custom install** — CLI, desktop app, or both, from a build you just made or from a download you just verified | **planned** | 2–3 d |
+| 55 | **Build the whole repository from source**, from the tool itself: find or install a toolchain, pin it to `rust-toolchain.toml`, and run the same build the release does | **done** | — |
+| 56 | **Reproducibility check** — build here, hash what came out, and compare it against the published `SHA256SUMS` entry for this platform, saying which files matched and which did not | **done** | — |
+| 57 | **The hashes are trusted only after the signature is** — verify the detached signature over `SHA256SUMS` against the project key *before* any hash from it is compared, and refuse rather than warn if it does not verify | **done** | — |
+| 58 | **Set the machine up per platform** — the build dependencies each operating system actually needs, detected, named with who ships them, and installed only on an explicit yes | **done** | — |
+| 59 | **Custom install** — CLI, desktop app, or both, from a build you just made or from a download you just verified | **done** | — |
 | 60 | **Four verbosity levels** — nothing, minimal, normal (the default) and everything — applied to every one of the above, with the exit status carrying the answer when the output carries nothing | **done** | — |
 
 ## Group mode, where you can see it
@@ -264,6 +264,23 @@ that is a finding to publish, not a bug in the tool to paper over -- and the
 first version will print both hashes and the differing file names rather than a
 verdict, because "not reproducible" has several causes and most of them are
 boring.
+
+**The one thing marker 55 does not do is install the compiler.** It reports
+the Rust toolchain like any other dependency — found or missing, with the
+version — and points at rustup, which is how the Rust project ships it. It
+does not run that installer. rustup downloads a compiler, writes to the home
+directory and edits the shell profile, and all three belong to the person whose
+machine it is rather than to a program acting for them. Every other dependency
+on Linux is offered through the system package manager under the rule below.
+
+**A dependency probe can be wrong in the direction that matters, and one was.**
+The Windows linker check looked for `link` on `PATH` and reported whatever it
+found. On the first machine it ran on that was Git for Windows'
+`usr/bin/link.exe` — GNU coreutils' hardlink utility, which shares a name with
+Microsoft's linker and has nothing to do with building Rust. It said the linker
+was present; the build would then have failed. There is no honest probe for it,
+because cargo finds MSVC through the registry rather than `PATH`, so it now says
+it cannot tell and lets the build be the judge. Recorded as F-68.
 
 **Installing build dependencies means running somebody else's package manager.**
 Marker 58. That is the same trade the companion setup already makes and it gets

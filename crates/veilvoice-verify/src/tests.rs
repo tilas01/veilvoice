@@ -149,48 +149,62 @@ fn an_armoured_block_that_is_not_a_signature_is_refused() {
 /// at the default level, and the only reader who finds out is the one running
 /// it in a pipeline where a stray line is a parse error.
 ///
-/// So the source itself is checked. Every `print!` and `println!` in `main.rs`
-/// must be inside one of the three macros that gate on the level, or in the
-/// short list below of things that are not reports about a check.
+/// So the source itself is checked. Every `print!`, `println!` and `eprintln!`
+/// in `main.rs` must be reached through one of the three macros that gate on
+/// the level, or from inside an explicit `if report::level() >= ...` block, or
+/// be one of the few lines that are not reports about a check at all.
+///
+/// Both streams, in one pass. They were two tests to begin with, and the
+/// standard-output one did not understand the explicit gate, so the first four
+/// commands written after it were flagged for doing exactly the right thing.
+/// A rule enforced two ways is a rule with two definitions.
 #[test]
 fn every_line_printed_by_a_check_goes_through_the_level() {
     let source = include_str!("main.rs");
 
     // What is allowed to print unconditionally, and why.
     //
-    // `--help`, `--version`, `--explain` and `--exit-status` print the thing
-    // that was asked for rather than reporting on a check. Somebody who types
-    // `--help` wants the help, whatever level they also passed.
-    let asked_for_directly = [
-        "print!(\"{USAGE}\");",
-        "print!(\"{EXPLAIN}\");",
-        "print!(\"{}\", Loudness::table());",
-        "print!(\"{}\", Status::table());",
-        "println!(\"veilvoice-verify {}\", env!(\"CARGO_PKG_VERSION\"));",
-        "println!();",
-    ];
+    // The single exception, and it lives in one function so that this list
+    // has one entry rather than one per command that prints its own help.
+    let asked_for_directly = ["print!(\"{text}\");"];
 
     // The macro bodies themselves, which are where the gating lives.
-    let inside_a_gate = [
+    let inside_a_macro = [
         r#"            println!($($arg)*);"#,
         r#"            print!($($arg)*);"#,
         r#"            println!("        {}", format!($($arg)*));"#,
     ];
 
     let mut ungated = Vec::new();
+    let mut gate: Option<usize> = None;
+
     for (number, line) in source.lines().enumerate() {
         let trimmed = line.trim();
-        if !(trimmed.contains("println!(") || trimmed.contains("print!(")) {
+        let indent = line.len() - line.trim_start().len();
+
+        // An explicit gate opens here and closes at the brace that matches its
+        // indentation. Tracked rather than matched by regex because the block
+        // is several lines long and every line inside it is protected.
+        if trimmed.starts_with("if report::level() >= Loudness::")
+            || trimmed.starts_with("if crate::report::level() >= ")
+        {
+            gate = Some(indent);
             continue;
         }
-        // Documentation and comments talk about printing; they do not print.
-        if trimmed.starts_with("//") {
+        if let Some(opened) = gate {
+            if trimmed == "}" && indent == opened {
+                gate = None;
+                continue;
+            }
+        }
+
+        let prints = trimmed.contains("println!(")
+            || trimmed.contains("print!(")
+            || trimmed.contains("eprintln!(");
+        if !prints || trimmed.starts_with("//") {
             continue;
         }
-        if trimmed.starts_with("eprintln!") || trimmed.contains("eprintln!(") {
-            continue;
-        }
-        if inside_a_gate.contains(&line) {
+        if gate.is_some() || inside_a_macro.contains(&line) {
             continue;
         }
         if asked_for_directly.contains(&trimmed) {
@@ -203,44 +217,6 @@ fn every_line_printed_by_a_check_goes_through_the_level() {
         ungated.is_empty(),
         "these lines print without asking the level, so `--quiet` is not quiet:\n{}",
         ungated.join("\n")
-    );
-}
-
-/// The counterpart: standard error is gated too, and by the same rule.
-///
-/// A refusal is the one thing a `--quiet` reader most plausibly still wants,
-/// and the answer is still no -- they asked for nothing, and the exit status
-/// carries it. What must not happen is *some* refusals honouring that and
-/// others not.
-#[test]
-fn every_line_of_a_refusal_goes_through_the_level_too() {
-    let source = include_str!("main.rs");
-    let mut outside = Vec::new();
-    let mut depth_of_gate: Option<usize> = None;
-
-    for (number, line) in source.lines().enumerate() {
-        let indent = line.len() - line.trim_start().len();
-        let trimmed = line.trim();
-
-        if trimmed.starts_with("if report::level() >= Loudness::") {
-            depth_of_gate = Some(indent);
-            continue;
-        }
-        if let Some(gate) = depth_of_gate {
-            if trimmed == "}" && indent == gate {
-                depth_of_gate = None;
-                continue;
-            }
-        }
-        if trimmed.starts_with("eprintln!") && depth_of_gate.is_none() {
-            outside.push(format!("main.rs:{}: {trimmed}", number + 1));
-        }
-    }
-
-    assert!(
-        outside.is_empty(),
-        "these refusal lines print without asking the level:\n{}",
-        outside.join("\n")
     );
 }
 

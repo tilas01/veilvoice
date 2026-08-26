@@ -93,13 +93,19 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>906 lines"])
+    n_main(["main.rs<br/>1377 lines"])
+    n_builder["builder.rs<br/>758 lines"]
+    n_deps["deps.rs<br/>642 lines"]
     n_discover["discover.rs<br/>344 lines"]
     n_fetch["fetch.rs<br/>320 lines"]
     n_report["report.rs<br/>385 lines"]
-    n_tests["tests.rs<br/>270 lines"]
+    n_tests["tests.rs<br/>246 lines"]
+    n_builder --> n_deps
+    n_builder --> n_report
     n_main --> n_report
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs" "open the source"
+    click n_builder href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs" "open the source"
+    click n_deps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs" "open the source"
     click n_discover href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" "open the source"
     click n_fetch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" "open the source"
     click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/report.rs" "open the source"
@@ -112,16 +118,42 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
+| [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 758 | Build VeilVoice here, and compare what came out against what was published. |
+| [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 642 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 344 | Finding a release to check, without being told where it is. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 320 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 906 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 1377 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
-| [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 270 | The verifier's own tests. |
+| [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 246 | The verifier's own tests. |
 
 ## Public items
 
 | Item | Where | What |
 |---|---|---|
+| `const RELEASE_ARGS` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | The profile a release is built with. |
+| `const RELEASE_DIR` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Where a release build leaves its binaries, relative to the target directory. |
+| `const SHIPPED` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | The binaries a release publishes, without any platform extension. |
+| `struct Built` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | What a build produced. |
+| `fn looks_like_the_source` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Whether the source tree this is pointed at is really one. |
+| `fn pinned_toolchain` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | The compiler version the source tree pins itself to. |
+| `fn host_triple` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | The platform triple this build is for, as rustc names it. |
+| `fn target_directory` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Where this workspace's build output actually goes. |
+| `fn build` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Run the release build. |
+| `fn hash_what_was_built` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Hash every binary a release ships, from a directory a build left behind. |
+| `fn with_platform_extension` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | A binary's name on this platform. |
+| `enum Compared` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | How a built file compared against the published list. |
+| `fn compare` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Compare a build against a hash list. |
+| `fn all_matched` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Whether every file that could be compared matched. |
+| `fn report_dependencies` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Report what a dependency check found. |
+| `fn install` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Run one install command, having been told yes. |
+| `fn agreed` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Ask, and take only an unambiguous yes. |
+| `fn status_for` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | The status a comparison should exit with. |
+| `enum Presence` | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | Whether a dependency is here, missing, or unanswerable. |
+| `enum Route` | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | What could be done about a missing dependency, on this machine. |
+| `struct Need` | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | One thing a build needs. |
+| `const ALL` | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | Everything a build can need, on every platform. |
+| `fn for_this_platform` | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | What this platform needs, in the order to report them. |
+| `fn missing` | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | What is missing, split by whether a build stops without it. |
 | `const SUMS` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | The names of the two files a signed release carries beside its archives. |
 | `const SUMS_SIG` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | The detached signature over SUMS. |
 | `struct Found` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | What was found in one directory. |

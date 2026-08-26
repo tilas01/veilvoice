@@ -180,6 +180,8 @@ Ask, when told to, whether a newer VeilVoice release exists. No HTTP client, no 
 
 Verify a VeilVoice release without GnuPG installed
 
+- [[`builder.rs`|File-veilvoice-verify-builder]] &mdash; Build VeilVoice here, and compare what came out against what was published.
+- [[`deps.rs`|File-veilvoice-verify-deps]] &mdash; What this machine needs before it can build VeilVoice, and who ships it.
 - [[`discover.rs`|File-veilvoice-verify-discover]] &mdash; Finding a release to check, without being told where it is.
 - [[`fetch.rs`|File-veilvoice-verify-fetch]] &mdash; Download a release, without putting an HTTP client in the dependency graph.
 - [[`main.rs`|File-veilvoice-verify-main]] &mdash; The portable verifier: check a VeilVoice release without GnuPG installed.

@@ -8,6 +8,98 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Build it yourself, and check the release against what you built
+
+```
+veilvoice-verify deps
+veilvoice-verify reproduce . --sums SHA256SUMS --sig SHA256SUMS.asc
+```
+
+Markers 55 to 59. `veilvoice-verify file` answers *is this download the one
+that was published*. This answers the harder one: **is the published build the
+one this source produces**. A signature says who made a file. Only a build says
+what it is made of.
+
+**The signature is verified before any hash from the list is read.** Not warned
+about — refused, with nothing built and nothing compared. The comparison
+function takes the hash list as *text* rather than as a path, so there is
+nowhere in it that could read an unverified file by accident; a test reads the
+function's own body and fails the build if `std::fs` appears in it.
+
+**A difference is a finding, not an accusation.** Both hashes and the differing
+file names are printed rather than a verdict, and it exits 5, which is
+deliberately not the status that means tampering. Most causes are dull: a
+different compiler version, a path baked into a panic message, a timestamp.
+
+**"Builds for every operating system" means "builds for the one it is on",** and
+the help says so. `veilvoice-cli` cannot be compiled for Linux from Windows
+because `alsa-sys` needs ALSA's headers, and a macOS build needs Apple's SDK,
+which Apple's licence does not allow to be redistributed. Three machines give
+you three platforms verified, which is how a reproducible-build claim is
+normally checked.
+
+**`deps` names what a build needs, who ships it, and why VeilVoice wants it**
+— the toolchain, a linker, `pkg-config`, and ALSA's headers, which only live
+mode needs. Missing pieces are installed **only on an explicit yes**, with the
+exact command line shown before the question, through the package manager the
+system already has. It adds no network client: the claim that this project's
+dependency graph contains no HTTP client is unchanged and still checkable with
+`cargo tree`.
+
+It will not run rustup for you. That installer downloads a compiler, writes to
+your home directory and edits your shell profile, and all three are yours to
+agree to.
+
+**A build with nothing to compare against is not a pass.** It exits 3, and says
+the hash list may be for another platform. A hash list naming nothing that was
+built would otherwise report success by vacuum, which is the failure mode this
+whole exercise is most exposed to.
+
+### F-69 — the build succeeded, and then looked for it in the wrong place
+
+Found by running `build` on this machine. After a release build that took
+several minutes and worked, the tool hashed `root/target/release` — a path it
+computed rather than asked for — and ended with:
+
+```
+  ok    the build finished
+
+FAILED: the build left nothing to hash
+  .\target\release is not there
+```
+
+`CARGO_TARGET_DIR`, `build.target-dir` in a `.cargo/config.toml`, and a target
+directory shared between checkouts all move it. It now asks `cargo metadata`,
+which is the only thing that knows, and the run ends with three hashes instead.
+
+The JSON is read by hand rather than by taking a dependency for one field, and
+the escapes are undone properly: the value is a Windows path, and text taken
+between the first two quotes gives `C:\\Users\\...`, which looks almost right
+and does not open.
+
+**Three of this round's four defects are the same mistake.** F-67 answered from
+a default configuration rather than the one in force, F-68 from a program that
+shared a name with the right one, F-69 from a path that is usually correct.
+None was a logic error, and none would have been found by reading the code.
+
+### F-68 — the linker check found Git's hardlink tool and called it a linker
+
+Found by running `deps` on this machine. The Windows probe looked for `link` on
+`PATH` and reported whatever came back, which was
+`C:\Program Files\Git\usr\bin\link.exe` — GNU coreutils' hardlink utility.
+It shares a name with Microsoft's linker and has nothing whatever to do with
+building Rust.
+
+So the dependency check said the linker was present, and a build on that machine
+would have stopped with a linker error anyway. A probe that answers from the
+wrong program is worse than no probe: it produces a confident wrong answer where
+absence would have produced a useful one.
+
+There is no honest probe for it. `link.exe` is only on `PATH` inside a Developer
+Command Prompt, cargo finds MSVC through the registry instead, and any `link`
+that *is* on `PATH` is more likely to be something else. It now says it cannot
+tell, in those words, and lets the build be the judge.
+
 ### Four verbosity levels, and eight exit statuses that mean something
 
 ```
