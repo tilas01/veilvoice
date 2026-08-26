@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-verify/src/main.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 1377 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 1396 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs)
 
 ## Contents
 
@@ -77,7 +77,7 @@ Give it arguments and it does exactly what you asked.
 
 ## What this file contains
 
-1377 lines defining **26 functions** (0 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1396 lines defining **26 functions** (0 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -212,10 +212,10 @@ flowchart TD
 | `command_deps` <sub>fn</sub> | [804](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L804) | What this machine needs before it can build VeilVoice. |
 | `command_build` <sub>fn</sub> | [876](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L876) | Build the workspace from source and hash what came out. |
 | `do_build` <sub>fn</sub> | [894](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L894) | Everything both build commands do before they differ. |
-| `command_reproduce` <sub>fn</sub> | [944](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L944) | Build here, and compare against the published hashes for this platform. |
-| `command_install` <sub>fn</sub> | [1053](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L1053) | Put binaries where a shell will find them. |
-| `asked_for` <sub>fn</sub> | [1142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L1142) | Print something the reader asked for by name, at any level. |
-| `main` <sub>fn</sub> | [1146](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L1146) |  |
+| `command_reproduce` <sub>fn</sub> | [963](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L963) | Build here, and compare against the published hashes for this platform. |
+| `command_install` <sub>fn</sub> | [1072](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L1072) | Put binaries where a shell will find them. |
+| `asked_for` <sub>fn</sub> | [1161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L1161) | Print something the reader asked for by name, at any level. |
+| `main` <sub>fn</sub> | [1165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/main.rs#L1165) |  |
 
 ---
 
