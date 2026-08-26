@@ -188,6 +188,20 @@ impl Settings {
         self.prefs.always_group
     }
 
+    /// How notifications should be shown.
+    pub fn notify_style(&self) -> crate::notify::Style {
+        crate::notify::Style::from_key(&self.prefs.notify_style)
+    }
+
+    /// Record how notifications should be shown.
+    pub fn set_notify_style(&mut self, style: crate::notify::Style) {
+        if self.notify_style() == style {
+            return;
+        }
+        self.prefs.notify_style = style.key().to_string();
+        self.persist();
+    }
+
     /// Record whether the app should open in group mode.
     pub fn set_always_group(&mut self, always: bool) {
         if self.prefs.always_group == always {
@@ -199,6 +213,64 @@ impl Settings {
 
     /// Which tabs the window offers.
     fn interface_page(&mut self, ui: &mut Ui) {
+        section(
+            ui,
+            "Notifications",
+            "How VeilVoice tells you something while it is running.",
+        );
+
+        let current = self.notify_style();
+        ui.horizontal(|ui| {
+            for style in crate::notify::Style::ALL {
+                if ui
+                    .selectable_label(current == *style, style.label())
+                    .clicked()
+                    && current != *style
+                {
+                    self.set_notify_style(*style);
+                }
+            }
+        });
+        ui.label(
+            RichText::new(format!("  {}", self.notify_style().note()))
+                .small()
+                .color(p::muted()),
+        );
+
+        // The measured contrast, shown rather than asserted. A translucent card
+        // is a colour laid over the panel behind it, so whether its text is
+        // legible depends on the palette in force -- and a reader choosing a
+        // palette should be able to see the number rather than take it on
+        // trust, exactly as the palette editor already shows its own ratios.
+        if self.notify_style() != crate::notify::Style::Off {
+            let card = crate::notify::Card::for_level(crate::notify::Level::Warn, p::bg());
+            let measured = format!(
+                "  warning text measures {:.1}:1 on this palette, against the {:.1}:1 \
+                 a notification needs",
+                card.ratio,
+                crate::notify::LEAST_CONTRAST
+            );
+            ui.label(RichText::new(measured).small().color(p::muted()));
+            if card.opaque {
+                ui.label(
+                    RichText::new(
+                        "  drawn solid rather than translucent here: nothing in this \
+                         palette reads well enough through it, and a warning you \
+                         cannot read is not a warning",
+                    )
+                    .small()
+                    .color(p::muted()),
+                );
+            }
+        }
+
+        ui.label(
+            RichText::new(format!("  {}", crate::notify::SCOPE))
+                .small()
+                .color(p::muted()),
+        );
+        ui.add_space(12.0);
+
         section(
             ui,
             "Tabs",
@@ -799,6 +871,7 @@ mod tests {
                 animations: false,
                 animated_icon: false,
                 configured: true,
+                notify_style: "overlay".into(),
                 hide_install_tab: false,
                 always_group: false,
                 recovered_from_corrupt_file: false,
