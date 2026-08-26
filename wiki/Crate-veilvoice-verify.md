@@ -80,8 +80,8 @@ Give it arguments and it does exactly what you asked.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1377 lines"])
-    n_builder["builder.rs<br/>758 lines"]
+    n_main(["main.rs<br/>1396 lines"])
+    n_builder["builder.rs<br/>1140 lines"]
     n_deps["deps.rs<br/>642 lines"]
     n_discover["discover.rs<br/>344 lines"]
     n_fetch["fetch.rs<br/>320 lines"]
@@ -105,10 +105,10 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`builder.rs`|File-veilvoice-verify-builder]] | 758 | Build VeilVoice here, and compare what came out against what was published. |
+| [[`builder.rs`|File-veilvoice-verify-builder]] | 1140 | Build VeilVoice here, and compare what came out against what was published. |
 | [[`deps.rs`|File-veilvoice-verify-deps]] | 642 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [[`discover.rs`|File-veilvoice-verify-discover]] | 344 | Finding a release to check, without being told where it is. |
 | [[`fetch.rs`|File-veilvoice-verify-fetch]] | 320 | Download a release, without putting an HTTP client in the dependency graph. |
-| [[`main.rs`|File-veilvoice-verify-main]] | 1377 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [[`main.rs`|File-veilvoice-verify-main]] | 1396 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [[`report.rs`|File-veilvoice-verify-report]] | 385 | How much this program says, and what it returns when it says nothing. |
 | [[`tests.rs`|File-veilvoice-verify-tests]] | 246 | The verifier's own tests. |

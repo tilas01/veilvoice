@@ -99,11 +99,11 @@ subtitles; and an optional video of the result.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 46 | **Conversation mode** — tell the engine a recording holds more than one speaker, and give each a distinct voice while destroying every voiceprint | **next** | 4–6 d |
-| 47 | Up to ten speakers, each with a name, carried into the audio and into subtitles | **planned** | 2–3 d |
+| 46 | **Conversation mode** — tell the engine a recording holds more than one speaker, and give each a distinct voice while destroying every voiceprint | **done** | — |
+| 47 | Up to ten speakers, each with a name, carried into the audio and into subtitles | **done** | — |
 | 48 | A rolling seed **per speaker**, at a randomised interval inside a range the user sets, with no interval hardcoded and a fresh one at every launch | **planned** | 2 d |
-| 49 | **Video output** — the waveform, a circle per speaker in their palette colour or their own picture inside a coloured ring, a title, and a black or image background with padding | **planned** | 6–8 d |
-| 50 | A **preview** of the video and of the voices before anything is generated | **planned** | 2–3 d |
+| 49 | **Video output** — the waveform, a circle per speaker in their palette colour or their own picture inside a coloured ring, a title, and a black or image background with padding | **done** | — |
+| 50 | A **preview** of the video and of the voices before anything is generated | **done** | — |
 | 51 | An **asynchronous pipeline**, every speaker rendering at once rather than in sequence | **done** | — |
 | 52 | Every crate and every `.rs` file explained: the technical workflow in a paragraph, then the same thing in plain words | **planned** | 3–4 d |
 | 53 | The website on mobile, and on every engine — not only the one it was written in | **next** | 1–2 d |
@@ -138,8 +138,8 @@ about the signal, which is already done.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **next** | 3–4 d |
-| 62 | **A name and a colour per speaker in the app** — the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **planned** | 2–3 d |
+| 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **done** | — |
+| 62 | **A name and a colour per speaker in the app** — the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **done** | — |
 | 63 | **Live levels and a wave per speaker**, in the app and in the terminal, while a recording is running | **planned** | 3–4 d |
 | 64 | **Speaker detection through software you already have** — detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **blocked** | — |
 
@@ -281,6 +281,30 @@ Microsoft's linker and has nothing to do with building Rust. It said the linker
 was present; the build would then have failed. There is no honest probe for it,
 because cargo finds MSVC through the registry rather than `PATH`, so it now says
 it cannot tell and lets the build be the judge. Recorded as F-68.
+
+**Markers 48 and 63 are each half-built, and stay open until both halves are.**
+Marker 48's per-speaker seeding is done: every speaker gets its own seed and
+its own destination, so there is nothing shared between them. What is missing
+is the *randomised interval inside a range the user sets*, which is marker 28
+and is still open. Marker 63's levels are done and run in the terminal during
+`veilvoice live`; the wave **per speaker** is not, because it needs per-speaker
+capture, which live mode does not have. Rounding either of these up to done
+would be the overstatement this project's second rule exists to prevent.
+
+**A reproducibility checker that always says no is worse than none.** Marker
+56's first version ran `cargo build --release` and nothing else, so it would
+have reported every user's build as differing from the published one — for
+the dull reason this repository has documented since before the checker
+existed: absolute paths are baked into panic messages and debug info, and
+removing them is the build environment's job. Two builds of this tree in two
+directories on this machine produced three differing binaries out of three,
+measured. It now reproduces the release environment instead of approximating
+it — the same `--remap-path-prefix` for source and `CARGO_HOME`, the same
+`SOURCE_DATE_EPOCH` from the commit, the same per-linker flag, the same
+explicit `--target` — and prints every one of them before building, because a
+comparison whose settings are invisible cannot be checked by whoever reads the
+result. A test compares the flags against `release.yml` itself, so changing one
+and not the other fails the build. Recorded as F-70.
 
 **Installing build dependencies means running somebody else's package manager.**
 Marker 58. That is the same trade the companion setup already makes and it gets

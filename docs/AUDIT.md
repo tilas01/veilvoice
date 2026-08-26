@@ -40,8 +40,8 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Four defects found and fixed (F-66 to F-69.)** **None had shipped**: all
-four are in code written since the seventh round, and `main` has not been
+**Six defects found and fixed (F-66 to F-71.)** **None had shipped**: all
+six are in code written since the seventh round, and `main` has not been
 released since v0.1.12.
 
 This round covers what was added after it: the measured voice limit and the
@@ -63,6 +63,125 @@ strength with the accent work **off**. Nothing in the window said so; the
 controls were on a different tab, and the group panel had never been given
 them. That is software quietly doing less than it says, which is the failure
 this whole tree is written against.
+
+### F-71 -- the guard against stale claims compared one copy to another
+
+`tools/site-tests/css.test.js`. The front page said **354 tests** and "no
+unsafe code, in any of the **nine** crates". The tree held 890 tests across 19
+crates. `docs/AUDIT.md` said "354 tests across 9 crates, plus doctests and 10
+site-test suites"; the runner runs 11.
+
+The part that makes this a defect rather than a stale line is that **a guard
+existed and passed**. It was written after an earlier round of exactly this
+drift, and its own comment says so:
+
+> It said "336 tests" and "47 defects across four audit rounds" while the tree
+> had 354 and 59. [...] Everything else in this repository that makes a claim
+> is generated and checked; this was the one place claims were hand-typed with
+> nothing watching them.
+
+And then it chained one hand-typed number to another: it compared the front
+page against `docs/AUDIT.md` and failed only if the two disagreed. Both were
+typed by the same hand at the same time, so both drifted together and the check
+reported success for four rounds. **A check that compares one copy of a claim
+against another copy agrees with itself.** That is the same defect as F-61 and
+F-63 -- a statement that was true when written, with nothing tied to the thing
+it describes -- arriving for the third time in two rounds, this time inside the
+control written to prevent it.
+
+The numbers now come from the tree. `tools/measured/generate.py` writes
+`docs/MEASURED.md`: the test count **by running the tests**, the crate count
+from `Cargo.toml`, and the suite count from `run.js`'s own list. Every claim in
+the page and in this document is compared against that file, and the generator
+runs inside `tools/verify.py` before the suites that read it.
+
+Three details, each of which is a way this would have failed again:
+
+* **The test count is measured, not counted.** A static count of `#[test]`
+  gives 903 against a measured 890: some tests sit behind features that are not
+  on by default. Counting the attribute would have produced a new wrong number
+  with a new reason to trust it.
+* **The suite count comes from the runner's list, not from a directory
+  listing.** A suite file that exists and is not in `SUITES` does not run, and
+  counting it would state a number nobody gets.
+* **Spelled-out numbers are refused.** "the nine crates" is exactly how this
+  drifted with nothing noticing, because no check can compare a word. The suite
+  now fails if the crate count is written as a word.
+
+The guard was checked by breaking it: the page's test count was set back to 354
+and the suite failed with *"the front page's test count says 354, the tree
+measures 890"*, then passed again when restored. A control nobody has watched
+fail is a control nobody has tested.
+
+### F-70 -- the reproducibility checker would have said no to everybody
+
+`veilvoice-verify/src/builder.rs`. The build ran `cargo build --release
+--workspace --locked` and nothing else. No `--remap-path-prefix`, no
+`SOURCE_DATE_EPOCH`, no per-linker determinism flag, and no `--target`.
+
+Every one of those is set by `.github/workflows/release.yml` when the published
+binaries are built, and `docs/REPRODUCIBLE_BUILDS.md` has said since before this
+checker existed that reproducibility depends on the build *environment* setting
+them. So the comparison was decided before it ran: a user's build would differ
+from the published one every time, and the tool would tell them so.
+
+**Measured rather than reasoned about.** Two builds of this tree, in two target
+directories on this machine, with the checker as first written: three binaries,
+three different hashes. The cause is the dull one the module's own documentation
+already listed -- the absolute path of the source tree is baked into panic
+messages and debug info, so a build in one directory and a build in another
+cannot be the same bytes.
+
+The severity is not in the code. It is in what the tool would have taught the
+one reader who took the trouble to build from source: that the release does not
+match its source. **A checker that always answers "not reproducible" is worse
+than no checker at all**, because the next time it says so for a real reason,
+that reader has already learned to ignore it. This is the second rule of the
+project -- never overstate what the software does -- failing in the other
+direction, and it is worth recording that the other direction exists.
+
+It now reproduces the release environment rather than approximating it: the
+same remapping for the source tree and for `CARGO_HOME`, the same
+`SOURCE_DATE_EPOCH` taken from the commit being built, `/Brepro` on MSVC and
+`-no_uuid` on ld64, and the same explicit `--target` -- which also moves the
+output down one level, so F-69's directory question had to be answered again.
+
+Three details worth keeping:
+
+* **The remapped path is the one the compiler is given.** Not
+  `std::fs::canonicalize`, which on Windows returns an extended-length path
+  beginning `\\?\`. Cargo never hands rustc that form, so a remap built from it
+  matches nothing and does nothing, silently, with every check still passing.
+  The release workflow records the same failure on macOS, where `/tmp`
+  canonicalises to `/private/tmp`; this is the same trap through the other
+  platform's door.
+* **`RUSTFLAGS` is set, not appended to.** A value inherited from the
+  terminal is a value the published build did not have.
+* **Outside a git checkout there is no commit date, and it says so** rather
+  than substituting one. An invented timestamp would make the build differ from
+  the published one for a brand new reason.
+
+**A third remap had to be added, and finding it needed the measurement.**
+With the source tree and `CARGO_HOME` remapped, two builds gave two identical
+binaries and one that differed: `veilvoice-gui`. The cause is `OUT_DIR`, which
+lives under the *target* directory and reaches a binary through a build script.
+The release workflow never meets this, because it builds into `target/` inside
+the source tree it is already remapping, so `OUT_DIR` is covered for free -- and
+a checker that compares two builds in two separate target directories does not
+get that for free. Without it the tool would have reported a difference caused
+entirely by where it chose to put its own build output: not a false negative it
+inherited, but one it manufactured.
+
+Measured at each stage, on this machine, two builds in two target directories:
+
+| | `veilvoice` | `veilvoice-gui` | `veilvoice-verify` |
+|---|---|---|---|
+| As first written | differs | differs | differs |
+| Source and `CARGO_HOME` remapped | identical | **differs** | identical |
+| Target directory remapped as well | identical | identical | identical |
+
+Every setting is printed before the build. A test compares the flags against
+`release.yml` itself, so changing one without the other fails the build.
 
 ### F-69 -- the build succeeded, and then looked for it in the wrong place
 
@@ -344,7 +463,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 354 tests across 9 crates, plus doctests and 10 site-test suites in `tools/site-tests`. |
+| Test suite | 890 tests across 19 crates, plus doctests and 11 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -1796,7 +1915,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Sixty-nine defects found and fixed across eight audit rounds (F-1 to F-69):**
+**Seventy-one defects found and fixed across eight audit rounds (F-1 to F-71):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

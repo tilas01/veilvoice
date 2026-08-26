@@ -93,8 +93,8 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1377 lines"])
-    n_builder["builder.rs<br/>758 lines"]
+    n_main(["main.rs<br/>1396 lines"])
+    n_builder["builder.rs<br/>1140 lines"]
     n_deps["deps.rs<br/>642 lines"]
     n_discover["discover.rs<br/>344 lines"]
     n_fetch["fetch.rs<br/>320 lines"]
@@ -118,11 +118,11 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 758 | Build VeilVoice here, and compare what came out against what was published. |
+| [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 1140 | Build VeilVoice here, and compare what came out against what was published. |
 | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 642 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 344 | Finding a release to check, without being told where it is. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 320 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 1377 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 1396 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 246 | The verifier's own tests. |
 
@@ -138,6 +138,9 @@ flowchart TD
 | `fn pinned_toolchain` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | The compiler version the source tree pins itself to. |
 | `fn host_triple` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | The platform triple this build is for, as rustc names it. |
 | `fn target_directory` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Where this workspace's build output actually goes. |
+| `struct Environment` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Everything that would otherwise differ between two builds of one source. |
+| `fn repro_link` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Flags that make this platform's linker deterministic. |
+| `fn environment` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | The environment the release is built in, for this tree on this machine. |
 | `fn build` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Run the release build. |
 | `fn hash_what_was_built` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | Hash every binary a release ships, from a directory a build left behind. |
 | `fn with_platform_extension` | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | A binary's name on this platform. |

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/builder.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 758 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1140 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs)
 
 ## Contents
 
@@ -66,27 +66,30 @@ answers and which files differed, and leaves the conclusion to you.
 
 ## What this file contains
 
-758 lines defining **14 functions** (13 public), **2 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1140 lines defining **20 functions** (16 public), **3 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct Built` (line 73) -- What a build produced.
-- `enum Compared` (line 313) -- How a built file compared against the published list.
+- `struct Environment` (line 250) -- Everything that would otherwise differ between two builds of one source.
+- `enum Compared` (line 526) -- How a built file compared against the published list.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `looks_like_the_source` (line 88) -- Whether the source tree this is pointed at is really one.
 - `pinned_toolchain` (line 120) -- The compiler version the source tree pins itself to.
-- `host_triple` (line 133) -- The platform triple this build is for, as rustc names it.
-- `build` (line 231) -- Run the release build.
+- `Environment::describe` (line 272) -- The settings, for printing before a build.
+- `environment` (line 366) -- The environment the release is built in, for this tree on this machine.
+  - reaches: `as_the_compiler_sees_it`, `cargo_home`, `commit_date`, `host_triple`, `repro_link`, `target_directory`, `json_string_field`
+- `build` (line 417) -- Run the release build.
   - reaches: `target_directory`, `json_string_field`
-- `hash_what_was_built` (line 276) -- Hash every binary a release ships, from a directory a build left behind.
+- `hash_what_was_built` (line 489) -- Hash every binary a release ships, from a directory a build left behind.
   - reaches: `with_platform_extension`
-- `compare` (line 346) -- Compare a build against a hash list.
-- `report_dependencies` (line 384) -- Report what a dependency check found.
-- `install` (line 427) -- Run one install command, having been told yes.
-- `agreed` (line 453) -- Ask, and take only an unambiguous yes.
-- `status_for` (line 470) -- The status a comparison should exit with.
+- `compare` (line 559) -- Compare a build against a hash list.
+- `report_dependencies` (line 597) -- Report what a dependency check found.
+- `install` (line 640) -- Run one install command, having been told yes.
+- `agreed` (line 666) -- Ask, and take only an unambiguous yes.
+- `status_for` (line 683) -- The status a comparison should exit with.
   - reaches: `all_matched`
 
 ## What calls what
@@ -105,19 +108,31 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 flowchart TD
     n_looks_like_the_source(["looks_like_the_source<br/>line 88"])
     n_pinned_toolchain(["pinned_toolchain<br/>line 120"])
-    n_host_triple(["host_triple<br/>line 133"])
+    n_host_triple["host_triple<br/>line 133"]
     n_target_directory["target_directory<br/>line 162"]
     n_json_string_field["json_string_field<br/>line 193"]
-    n_build(["build<br/>line 231"])
-    n_hash_what_was_built(["hash_what_was_built<br/>line 276"])
-    n_with_platform_extension["with_platform_extension<br/>line 303"]
-    n_compare(["compare<br/>line 346"])
-    n_all_matched["all_matched<br/>line 372"]
-    n_report_dependencies(["report_dependencies<br/>line 384"])
-    n_install(["install<br/>line 427"])
-    n_agreed(["agreed<br/>line 453"])
-    n_status_for(["status_for<br/>line 470"])
+    n_describe(["Environment::describe<br/>line 272"])
+    n_repro_link["repro_link<br/>line 292"]
+    n_cargo_home["cargo_home<br/>line 307"]
+    n_commit_date["commit_date<br/>line 316"]
+    n_as_the_compiler_sees_it["as_the_compiler_sees_it<br/>line 341"]
+    n_environment(["environment<br/>line 366"])
+    n_build(["build<br/>line 417"])
+    n_hash_what_was_built(["hash_what_was_built<br/>line 489"])
+    n_with_platform_extension["with_platform_extension<br/>line 516"]
+    n_compare(["compare<br/>line 559"])
+    n_all_matched["all_matched<br/>line 585"]
+    n_report_dependencies(["report_dependencies<br/>line 597"])
+    n_install(["install<br/>line 640"])
+    n_agreed(["agreed<br/>line 666"])
+    n_status_for(["status_for<br/>line 683"])
     n_build --> n_target_directory
+    n_environment --> n_as_the_compiler_sees_it
+    n_environment --> n_cargo_home
+    n_environment --> n_commit_date
+    n_environment --> n_host_triple
+    n_environment --> n_repro_link
+    n_environment --> n_target_directory
     n_hash_what_was_built --> n_with_platform_extension
     n_status_for --> n_all_matched
     n_target_directory --> n_json_string_field
@@ -126,21 +141,27 @@ flowchart TD
     click n_host_triple href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L133" "open the source"
     click n_target_directory href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L162" "open the source"
     click n_json_string_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L193" "open the source"
-    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L231" "open the source"
-    click n_hash_what_was_built href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L276" "open the source"
-    click n_with_platform_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L303" "open the source"
-    click n_compare href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L346" "open the source"
-    click n_all_matched href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L372" "open the source"
-    click n_report_dependencies href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L384" "open the source"
-    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L427" "open the source"
-    click n_agreed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L453" "open the source"
-    click n_status_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L470" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L272" "open the source"
+    click n_repro_link href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L292" "open the source"
+    click n_cargo_home href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L307" "open the source"
+    click n_commit_date href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L316" "open the source"
+    click n_as_the_compiler_sees_it href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L341" "open the source"
+    click n_environment href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L366" "open the source"
+    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L417" "open the source"
+    click n_hash_what_was_built href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L489" "open the source"
+    click n_with_platform_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L516" "open the source"
+    click n_compare href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L559" "open the source"
+    click n_all_matched href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L585" "open the source"
+    click n_report_dependencies href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L597" "open the source"
+    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L640" "open the source"
+    click n_agreed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L666" "open the source"
+    click n_status_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L683" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_looks_like_the_source,n_pinned_toolchain,n_host_triple,n_build,n_hash_what_was_built,n_compare,n_report_dependencies,n_install,n_agreed,n_status_for entry
+    class n_looks_like_the_source,n_pinned_toolchain,n_describe,n_environment,n_build,n_hash_what_was_built,n_compare,n_report_dependencies,n_install,n_agreed,n_status_for entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_target_directory,n_with_platform_extension,n_all_matched api
+    class n_host_triple,n_target_directory,n_repro_link,n_with_platform_extension,n_all_matched api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_json_string_field helper
+    class n_json_string_field,n_cargo_home,n_commit_date,n_as_the_compiler_sees_it helper
 ```
 
 </details>
@@ -158,13 +179,20 @@ flowchart TD
 | `host_triple` <sub>pub fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L133) | The platform triple this build is for, as rustc names it. |
 | `target_directory` <sub>pub fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L162) | Where this workspace's build output actually goes. |
 | `json_string_field` <sub>fn</sub> | [193](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L193) | One top-level string out of cargo's JSON, without a JSON parser. |
-| `build` <sub>pub fn</sub> | [231](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L231) | Run the release build. |
-| `hash_what_was_built` <sub>pub fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L276) | Hash every binary a release ships, from a directory a build left behind. |
-| `with_platform_extension` <sub>pub fn</sub> | [303](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L303) | A binary's name on this platform. |
-| `Compared` <sub>pub enum</sub> | [313](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L313) | How a built file compared against the published list. |
-| `compare` <sub>pub fn</sub> | [346](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L346) | Compare a build against a hash list. |
-| `all_matched` <sub>pub fn</sub> | [372](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L372) | Whether every file that could be compared matched. |
-| `report_dependencies` <sub>pub fn</sub> | [384](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L384) | Report what a dependency check found. |
-| `install` <sub>pub fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L427) | Run one install command, having been told yes. |
-| `agreed` <sub>pub fn</sub> | [453](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L453) | Ask, and take only an unambiguous yes. |
-| `status_for` <sub>pub fn</sub> | [470](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L470) | The status a comparison should exit with. |
+| `Environment` <sub>pub struct</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L250) | Everything that would otherwise differ between two builds of one source. |
+| `Environment::describe` <sub>pub fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L272) | The settings, for printing before a build. |
+| `repro_link` <sub>pub fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L292) | Flags that make this platform's linker deterministic. |
+| `cargo_home` <sub>fn</sub> | [307](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L307) | Where cargo keeps downloaded crates, whose paths are also baked in. |
+| `commit_date` <sub>fn</sub> | [316](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L316) | The date of the commit being built, as seconds since the epoch. |
+| `as_the_compiler_sees_it` <sub>fn</sub> | [341](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L341) | A path as the compiler will see it, for the remapping to match. |
+| `environment` <sub>pub fn</sub> | [366](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L366) | The environment the release is built in, for this tree on this machine. |
+| `build` <sub>pub fn</sub> | [417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L417) | Run the release build. |
+| `hash_what_was_built` <sub>pub fn</sub> | [489](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L489) | Hash every binary a release ships, from a directory a build left behind. |
+| `with_platform_extension` <sub>pub fn</sub> | [516](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L516) | A binary's name on this platform. |
+| `Compared` <sub>pub enum</sub> | [526](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L526) | How a built file compared against the published list. |
+| `compare` <sub>pub fn</sub> | [559](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L559) | Compare a build against a hash list. |
+| `all_matched` <sub>pub fn</sub> | [585](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L585) | Whether every file that could be compared matched. |
+| `report_dependencies` <sub>pub fn</sub> | [597](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L597) | Report what a dependency check found. |
+| `install` <sub>pub fn</sub> | [640](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L640) | Run one install command, having been told yes. |
+| `agreed` <sub>pub fn</sub> | [666](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L666) | Ask, and take only an unambiguous yes. |
+| `status_for` <sub>pub fn</sub> | [683](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs#L683) | The status a comparison should exit with. |

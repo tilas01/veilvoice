@@ -223,24 +223,237 @@ fn json_string_field(json: &str, field: &str) -> Option<String> {
     None
 }
 
+/// Everything that would otherwise differ between two builds of one source.
+///
+/// F-70. The build ran `cargo build --release` and nothing else, which meant a
+/// comparison against a published build was **guaranteed** to differ. Two
+/// builds of this tree in two directories on this machine produced three
+/// different binaries out of three -- measured, not supposed.
+///
+/// The cause is the dull one this module's own documentation already named: the
+/// absolute path of the source tree is baked into panic messages and debug
+/// info, so a build in `C:\src\veilvoice` and a build in `/home/a/veilvoice`
+/// cannot be the same bytes. `docs/REPRODUCIBLE_BUILDS.md` has said so all
+/// along, and the release workflow sets the flags that fix it. The checker did
+/// not.
+///
+/// A reproducibility checker that always answers "not reproducible" is worse
+/// than no checker. It teaches the one reader who took the trouble to build
+/// from source that the release does not match -- and the next time it says so
+/// for a real reason, they will have learned to ignore it.
+///
+/// So this reproduces the release environment rather than approximating it.
+/// Every value here has a counterpart in `.github/workflows/release.yml`, and
+/// [`describe`] prints them, because a comparison whose settings are invisible
+/// cannot be checked by the person reading the result.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Environment {
+    /// `RUSTFLAGS`, with the path remapping and the per-linker flags.
+    ///
+    /// Three remaps: the source tree, `CARGO_HOME`, and the **target
+    /// directory**. The third is the one this checker needs and the release
+    /// workflow does not, because the release builds into `target/` inside the
+    /// source tree it is already remapping.
+    pub rustflags: String,
+    /// `SOURCE_DATE_EPOCH`, from the commit being built.
+    ///
+    /// `None` outside a git checkout, where there is no commit to take a date
+    /// from. Said rather than substituted: a made-up timestamp would make the
+    /// build differ from the published one for a new reason.
+    pub source_date_epoch: Option<String>,
+    /// The target triple, passed explicitly because the release passes it.
+    pub triple: String,
+    /// macOS only: stops `ar` writing timestamps into static archives.
+    pub zero_ar_date: bool,
+}
+
+impl Environment {
+    /// The settings, for printing before a build.
+    pub fn describe(&self) -> Vec<String> {
+        let mut out = vec![
+            format!("target            {}", self.triple),
+            format!("RUSTFLAGS         {}", self.rustflags),
+        ];
+        out.push(match &self.source_date_epoch {
+            Some(epoch) => format!("SOURCE_DATE_EPOCH {epoch}"),
+            None => "SOURCE_DATE_EPOCH not set -- this is not a git checkout".to_string(),
+        });
+        if self.zero_ar_date {
+            out.push("ZERO_AR_DATE      1".to_string());
+        }
+        out
+    }
+}
+
+/// Flags that make this platform's linker deterministic.
+///
+/// Each one is here because that linker writes something into the output that
+/// is not a function of the input, and each is the same flag the release uses.
+pub fn repro_link() -> &'static str {
+    if cfg!(all(windows, target_env = "msvc")) {
+        // MSVC stamps a timestamp and a PDB signature into the PE header;
+        // /Brepro replaces both with a hash of the input.
+        "-C link-arg=/Brepro"
+    } else if cfg!(target_os = "macos") {
+        // ld64 writes an LC_UUID that is not a pure function of the input, so
+        // two identical builds differ by sixteen bytes.
+        "-C link-arg=-Wl,-no_uuid"
+    } else {
+        ""
+    }
+}
+
+/// Where cargo keeps downloaded crates, whose paths are also baked in.
+fn cargo_home() -> Option<PathBuf> {
+    if let Some(home) = std::env::var_os("CARGO_HOME") {
+        return Some(PathBuf::from(home));
+    }
+    let home = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE"))?;
+    Some(PathBuf::from(home).join(".cargo"))
+}
+
+/// The date of the commit being built, as seconds since the epoch.
+fn commit_date(root: &Path) -> Option<String> {
+    let output = Command::new("git")
+        .args(["log", "-1", "--pretty=%ct"])
+        .current_dir(root)
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    // Refused rather than passed through: `SOURCE_DATE_EPOCH` is read by tools
+    // that will do something unhelpful with a value that is not a number.
+    if text.is_empty() || !text.chars().all(|c| c.is_ascii_digit()) {
+        return None;
+    }
+    Some(text)
+}
+
+/// A path as the compiler will see it, for the remapping to match.
+///
+/// Not [`std::fs::canonicalize`], which on Windows returns an extended-length
+/// path beginning `\\?\`. Cargo does not hand rustc that form, so a remap built
+/// from it matches nothing and silently does nothing at all -- the exact
+/// failure the release workflow's own comment warns about on macOS, arriving
+/// through the other platform's door.
+fn as_the_compiler_sees_it(root: &Path) -> Result<PathBuf, String> {
+    let absolute = if root.is_absolute() {
+        root.to_path_buf()
+    } else {
+        std::env::current_dir()
+            .map_err(|error| format!("cannot read the current directory: {error}"))?
+            .join(root)
+    };
+
+    // Resolve `.` and `..` without touching the filesystem, so `build .` and
+    // `build` remap to the same prefix.
+    let mut parts = PathBuf::new();
+    for part in absolute.components() {
+        match part {
+            std::path::Component::CurDir => {}
+            std::path::Component::ParentDir => {
+                parts.pop();
+            }
+            other => parts.push(other.as_os_str()),
+        }
+    }
+    Ok(parts)
+}
+
+/// The environment the release is built in, for this tree on this machine.
+pub fn environment(root: &Path, target_dir: Option<&Path>) -> Result<Environment, String> {
+    let source = as_the_compiler_sees_it(root)?;
+    let mut rustflags = format!("--remap-path-prefix={}=/veilvoice", source.display());
+    if let Some(cargo) = cargo_home() {
+        rustflags.push_str(&format!(" --remap-path-prefix={}=/cargo", cargo.display()));
+    }
+
+    // The target directory too, and this one was learned the hard way.
+    //
+    // With only the two remaps above, two builds of this tree in two target
+    // directories gave two identical binaries and one that differed:
+    // `veilvoice-gui`. The reason is `OUT_DIR`, which lives under the target
+    // directory and reaches a binary through a build script. The release
+    // workflow never notices because it puts `target/` *inside* the source
+    // tree it is already remapping, so `OUT_DIR` is covered for free -- and a
+    // checker that compares two builds in two separate target directories does
+    // not get that for free.
+    //
+    // Without this, the tool reports a difference caused entirely by where it
+    // chose to put its own build output. That is worse than a false negative:
+    // it is a false negative the tool manufactured itself.
+    let target = match target_dir {
+        Some(dir) => as_the_compiler_sees_it(dir)?,
+        None => target_directory(root)?,
+    };
+    rustflags.push_str(&format!(
+        " --remap-path-prefix={}=/target",
+        target.display()
+    ));
+    let link = repro_link();
+    if !link.is_empty() {
+        rustflags.push(' ');
+        rustflags.push_str(link);
+    }
+
+    let triple =
+        host_triple().ok_or_else(|| "rustc would not say what platform this is".to_string())?;
+
+    Ok(Environment {
+        rustflags,
+        source_date_epoch: commit_date(root),
+        triple,
+        zero_ar_date: cfg!(target_os = "macos"),
+    })
+}
+
 /// Run the release build.
 ///
 /// The compiler's own output goes to the terminal at `--verbose` and is
 /// captured otherwise, so a failure can still be shown in full: a build that
 /// stops with its reason discarded is a build nobody can act on.
-pub fn build(root: &Path, target_dir: Option<&Path>) -> Result<PathBuf, String> {
+pub fn build(
+    root: &Path,
+    target_dir: Option<&Path>,
+    environment: &Environment,
+) -> Result<PathBuf, String> {
     let mut command = Command::new("cargo");
-    command.args(RELEASE_ARGS).current_dir(root);
+    command
+        .args(RELEASE_ARGS)
+        .args(["--target", &environment.triple])
+        .current_dir(root);
     if let Some(dir) = target_dir {
         command.env("CARGO_TARGET_DIR", dir);
     }
 
+    // The release environment, not this shell's. `RUSTFLAGS` is set rather than
+    // appended to on purpose: a value inherited from the terminal is a value
+    // the published build did not have, and it would change the answer.
+    command.env("RUSTFLAGS", &environment.rustflags);
+    match &environment.source_date_epoch {
+        Some(epoch) => {
+            command.env("SOURCE_DATE_EPOCH", epoch);
+        }
+        None => {
+            command.env_remove("SOURCE_DATE_EPOCH");
+        }
+    }
+    if environment.zero_ar_date {
+        command.env("ZERO_AR_DATE", "1");
+    }
+
     // Asked before the build rather than after, so a workspace that cannot be
     // read costs a second instead of the length of a compile.
-    let where_it_lands = match target_dir {
-        Some(dir) => dir.join(RELEASE_DIR),
-        None => target_directory(root)?.join(RELEASE_DIR),
+    //
+    // Under the triple, because the release builds with an explicit `--target`
+    // and that moves the output down one level.
+    let base = match target_dir {
+        Some(dir) => dir.to_path_buf(),
+        None => target_directory(root)?,
     };
+    let where_it_lands = base.join(&environment.triple).join(RELEASE_DIR);
 
     let line = format!(
         "cargo {} (in {}, output to {})",
@@ -606,13 +819,9 @@ mod tests {
 
     #[test]
     fn the_pinned_compiler_is_read_out_of_the_tree() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .unwrap()
-            .parent()
-            .unwrap();
-        assert!(looks_like_the_source(root).is_ok(), "{}", root.display());
-        let pinned = pinned_toolchain(root).expect("a pinned channel");
+        let root = repo_root();
+        assert!(looks_like_the_source(&root).is_ok(), "{}", root.display());
+        let pinned = pinned_toolchain(&root).expect("a pinned channel");
         assert!(
             pinned.chars().next().is_some_and(|c| c.is_ascii_digit()),
             "{pinned}"
@@ -679,12 +888,8 @@ mod tests {
     /// `root/target` would disagree with reality right here.
     #[test]
     fn the_target_directory_comes_from_cargo_rather_than_from_a_guess() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .unwrap()
-            .parent()
-            .unwrap();
-        let asked = target_directory(root).expect("cargo knows where it builds");
+        let root = repo_root();
+        let asked = target_directory(&root).expect("cargo knows where it builds");
 
         // `OUT_DIR` is inside the real target directory, whatever it is, so it
         // is an answer that does not depend on this machine's configuration.
@@ -734,6 +939,183 @@ mod tests {
             json_string_field(r#"{"target_directory":42}"#, "target_directory"),
             None
         );
+    }
+
+    /// F-70. The build has to be run in the environment the release is built
+    /// in, or the comparison is decided before it starts.
+    ///
+    /// Measured before it was written: two builds of this tree in two
+    /// directories on this machine produced three differing binaries out of
+    /// three. The cause is the dull one -- the absolute source path is baked
+    /// into panic messages and debug info -- and it is exactly what the
+    /// release workflow's `--remap-path-prefix` exists to remove.
+    #[test]
+    fn the_release_environment_is_reproduced_rather_than_approximated() {
+        let root = repo_root();
+        let environment = environment(&root, None).expect("this is a git checkout");
+
+        // The source tree, so two checkouts in different places agree.
+        assert!(
+            environment.rustflags.contains("--remap-path-prefix="),
+            "{}",
+            environment.rustflags
+        );
+        assert!(
+            environment.rustflags.contains("=/veilvoice"),
+            "the source has to remap to the same name the release uses: {}",
+            environment.rustflags
+        );
+        // And the crate cache, whose paths are baked in just as firmly.
+        assert!(
+            environment.rustflags.contains("=/cargo"),
+            "CARGO_HOME is in the binary too: {}",
+            environment.rustflags
+        );
+        // And the target directory, without which two builds in two target
+        // directories differ for a reason the checker created itself.
+        assert!(
+            environment.rustflags.contains("=/target"),
+            "OUT_DIR lives under the target directory: {}",
+            environment.rustflags
+        );
+
+        // The per-linker flag, which is not optional on the two platforms that
+        // need it: MSVC stamps a timestamp, ld64 writes a UUID.
+        if cfg!(all(windows, target_env = "msvc")) {
+            assert!(environment.rustflags.contains("/Brepro"));
+        }
+        if cfg!(target_os = "macos") {
+            assert!(environment.rustflags.contains("-no_uuid"));
+            assert!(environment.zero_ar_date);
+        }
+
+        // A commit date, because this tree is a checkout.
+        let epoch = environment
+            .source_date_epoch
+            .as_deref()
+            .expect("a git checkout has a commit");
+        assert!(epoch.chars().all(|c| c.is_ascii_digit()), "{epoch}");
+
+        assert!(!environment.triple.is_empty());
+    }
+
+    /// Every setting is printed. A comparison whose settings are invisible
+    /// cannot be checked by the person reading the result, and "not
+    /// reproducible" with no environment attached is unactionable.
+    #[test]
+    fn the_settings_are_shown_rather_than_applied_silently() {
+        let environment = environment(&repo_root(), None).expect("a checkout");
+        let shown = environment.describe().join("\n");
+        assert!(shown.contains(&environment.triple), "{shown}");
+        assert!(shown.contains("RUSTFLAGS"), "{shown}");
+        assert!(shown.contains("SOURCE_DATE_EPOCH"), "{shown}");
+        assert!(
+            shown.contains(environment.source_date_epoch.as_deref().unwrap()),
+            "{shown}"
+        );
+    }
+
+    /// Outside a git checkout there is no commit to date the build from. Said,
+    /// not substituted: an invented timestamp would make the build differ from
+    /// the published one for a brand new reason.
+    #[test]
+    fn a_tree_with_no_commit_says_so_instead_of_inventing_a_date() {
+        let dir = tempfile::tempdir().unwrap();
+        assert_eq!(commit_date(dir.path()), None);
+
+        let missing = Environment {
+            rustflags: String::new(),
+            source_date_epoch: None,
+            triple: "x86_64-unknown-linux-gnu".into(),
+            zero_ar_date: false,
+        };
+        let shown = missing.describe().join("\n");
+        assert!(shown.contains("not set"), "{shown}");
+        assert!(shown.contains("not a git checkout"), "{shown}");
+    }
+
+    /// The remap has to match the path the compiler is given, or it matches
+    /// nothing and does nothing -- silently, with every check still passing.
+    ///
+    /// On Windows `canonicalize` returns an extended-length path beginning
+    /// `\\?\`, which cargo never hands to rustc. The release workflow's own
+    /// comment records the same failure on macOS through `/tmp` against
+    /// `/private/tmp`.
+    #[test]
+    fn the_remapped_path_is_the_one_the_compiler_is_given() {
+        let root = repo_root();
+        let seen = as_the_compiler_sees_it(&root).unwrap();
+        assert!(
+            !seen.to_string_lossy().starts_with(r"\\?\"),
+            "an extended-length path remaps nothing: {}",
+            seen.display()
+        );
+        assert!(seen.is_absolute(), "{}", seen.display());
+
+        // `build .` and `build` have to remap to the same prefix, or two runs
+        // of the same command from the same directory disagree.
+        let dotted = as_the_compiler_sees_it(&root.join(".")).unwrap();
+        assert_eq!(seen, dotted);
+        let up_and_back = as_the_compiler_sees_it(&root.join("crates").join("..")).unwrap();
+        assert_eq!(seen, up_and_back);
+    }
+
+    /// The flags match the release workflow, which is the only thing that makes
+    /// the comparison meaningful. Checked against the workflow file itself, so
+    /// changing one and not the other fails the build.
+    #[test]
+    fn the_flags_are_the_same_ones_the_release_workflow_uses() {
+        let workflow = std::fs::read_to_string(repo_root().join(".github/workflows/release.yml"))
+            .expect("the release workflow");
+
+        for flag in ["--remap-path-prefix", "=/veilvoice", "=/cargo"] {
+            assert!(
+                workflow.contains(flag),
+                "{flag} is used here and not by the release"
+            );
+        }
+        assert!(workflow.contains("SOURCE_DATE_EPOCH"));
+        assert!(workflow.contains("/Brepro"), "the MSVC flag");
+        assert!(workflow.contains("-no_uuid"), "the ld64 flag");
+        assert!(workflow.contains("ZERO_AR_DATE"));
+
+        // And this platform's linker flag is one of the two the workflow sets.
+        let link = repro_link();
+        if !link.is_empty() {
+            let bare = link.rsplit("link-arg=").next().unwrap();
+            assert!(workflow.contains(bare), "{link} is not in the workflow");
+        }
+    }
+
+    /// The build is run with an explicit `--target`, because the release is,
+    /// and that moves the output down a level.
+    #[test]
+    fn the_output_directory_accounts_for_the_explicit_target() {
+        let source = include_str!("builder.rs");
+        let start = source.find("pub fn build(").expect("the function");
+        let end = source[start..].find("\n}\n").expect("its end") + start;
+        let body = &source[start..end];
+        assert!(
+            body.contains(r#".args(["--target", &environment.triple])"#),
+            "the release passes --target; a build without it is a different build"
+        );
+        assert!(
+            body.contains("join(&environment.triple)"),
+            "--target puts the binaries under the triple"
+        );
+        // RUSTFLAGS is set, never appended to: a value inherited from the
+        // terminal is one the published build did not have.
+        assert!(body.contains(r#".env("RUSTFLAGS", &environment.rustflags)"#));
+    }
+
+    /// This repository's own root, for the tests that need a real checkout.
+    fn repo_root() -> PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .to_path_buf()
     }
 
     #[test]

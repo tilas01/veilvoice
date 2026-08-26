@@ -95,6 +95,11 @@ GENERATORS = [
     # edit that file and before the index walks the result.
     ("section pages", [sys.executable, "tools/site/split.py"]),
     ("search index", [sys.executable, "tools/search-index/generate.py"]),
+    # Last, and before the checks: the website suites compare the page's stated
+    # counts against this file, so it has to be current before they run. It
+    # runs the test suite to get the number, which is why it is not cheap and
+    # why it is not first.
+    ("measured numbers", [sys.executable, "tools/measured/generate.py"]),
 ]
 
 CHECKS = [
@@ -106,6 +111,8 @@ CHECKS = [
      [sys.executable, "tools/docs/sources.py", "--check"]),
     ("section pages match index.html", [sys.executable, "tools/site/split.py", "--check"]),
     ("search index matches the tree", [sys.executable, "tools/search-index/generate.py", "--check"]),
+    ("measured numbers match the tree",
+     [sys.executable, "tools/measured/generate.py", "--check"]),
     ("website suites", ["node", "tools/site-tests/run.js"]),
 ]
 
