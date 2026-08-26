@@ -1,0 +1,12 @@
+[package]
+name = "veilvoice-priv"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "What privilege VeilVoice is running with and what each level can see -- reported, never acquired."
+
+# None. It asks a tool the system already ships and returns a value.
+[dependencies]

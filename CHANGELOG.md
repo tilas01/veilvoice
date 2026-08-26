@@ -8,6 +8,46 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### `veilvoice privilege` — what it is running with, and what that lets it see
+
+Marker 39. Most of VeilVoice needs no special permissions — changing a
+voice is something any program can do with your own account. The parts that
+*watch* see further as an administrator, and this says which of those you are
+getting.
+
+**It never raises its own privileges, installs a service, or asks for a
+password.** It prints the command and you decide. A privacy tool that silently
+acquires administrator rights is a privacy tool nobody can reason about. A test
+names every subprocess the crate starts, so that stays true rather than staying
+a comment.
+
+**The opt-in service is deliberately not shipped.** A service outlives the
+window it was started from, starts itself at boot, and runs whether or not
+anybody is using the program — somebody who tried VeilVoice once should
+not find it still running next month. Leaving the window open is the honest
+form of continuous monitoring, because then what it can see is exactly what it
+says it can see.
+
+**Kernel level is not reached and says so.** A driver on 64-bit Windows needs
+an EV code-signing certificate issued to a verified legal entity and then
+Microsoft's attestation signing; macOS needs an Apple Developer ID and an
+entitlement granted case by case. Both are identity checks on a named legal
+person, and this project is published under a pseudonym on purpose.
+
+"I could not tell" is its own answer and never reported as "not elevated" —
+understating what VeilVoice can see sounds like the cautious direction and is
+not, because somebody would conclude a feature is unavailable and stop reading
+its output.
+
+Two details that came from measuring. The Windows probe keys on the well-known
+SID `S-1-5-32-544` rather than the group's *name*, which is translated and
+would report every non-English machine as unprivileged. And the "Group used for
+deny only" attribute — what an administrator account looks like when it
+is **not** elevated — sits on the same 236-character line as the SID; a
+console wraps it so it looks like two rows, and reading it that way would call
+every administrator account elevated. Verified on a machine in exactly that
+state, which reports `your own account`.
+
 ### `veilvoice appctl` — learn what normally runs, then notice what does not
 
 ```

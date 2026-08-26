@@ -110,7 +110,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>2183 lines"])
+    n_main(["main.rs<br/>2197 lines"])
     n_appctl["appctl.rs<br/>272 lines"]
     n_atrest["atrest.rs<br/>275 lines"]
     n_capture["capture.rs<br/>321 lines"]
@@ -120,6 +120,7 @@ flowchart TD
     n_lock["lock.rs<br/>239 lines"]
     n_meter["meter.rs<br/>250 lines"]
     n_policy["policy.rs<br/>236 lines"]
+    n_priv_mode["priv_mode.rs<br/>46 lines"]
     n_sentry["sentry.rs<br/>376 lines"]
     n_theme["theme.rs<br/>135 lines"]
     n_appctl --> n_sentry
@@ -141,6 +142,8 @@ flowchart TD
     n_policy --> n_atrest
     n_policy --> n_sentry
     n_policy --> n_theme
+    n_priv_mode --> n_sentry
+    n_priv_mode --> n_theme
     n_sentry --> n_theme
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" "open the source"
     click n_appctl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs" "open the source"
@@ -152,6 +155,7 @@ flowchart TD
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" "open the source"
     click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" "open the source"
+    click n_priv_mode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/priv_mode.rs" "open the source"
     click n_sentry href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" "open the source"
 ```
@@ -169,9 +173,10 @@ flowchart TD
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 117 | veilvoice input — what running programs can see your keyboard and mouse. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2183 | veilvoice — the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2197 | veilvoice — the command-line interface. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 250 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 236 | veilvoice policy -- settings that can only be tightened. |
+| [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | 46 | veilvoice privilege — what VeilVoice is running with, and what it can see. |
 | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 376 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 135 | Tokyo Night colouring for the terminal. |
 
@@ -217,6 +222,7 @@ flowchart TD
 | `fn seal` | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | Write a policy and seal it. |
 | `fn verify` | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | Check the plain policy against its sealed copy. |
 | `fn remove` | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | Delete both files. |
+| `fn show` | [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | Report the privilege level and what it means. |
 | `fn state_dir` | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | Where the canaries and baselines are kept. |
 | `fn status` | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | What is planted, what is watched, and what this is worth. |
 | `fn plant` | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | Put a canary in dir. |

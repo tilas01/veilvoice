@@ -26,6 +26,7 @@ members = [
     "crates/veilvoice-guard",
     "crates/veilvoice-input",
     "crates/veilvoice-policy",
+    "crates/veilvoice-priv",
     "crates/veilvoice-proc",
     "crates/veilvoice-sentry",
     "crates/veilvoice-setup",

@@ -56,6 +56,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
 - [[`meter.rs`|File-veilvoice-cli-meter]] &mdash; Level meters for veilvoice live, on a scale that means something.
 - [[`policy.rs`|File-veilvoice-cli-policy]] &mdash; veilvoice policy -- settings that can only be tightened.
+- [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] &mdash; veilvoice privilege — what VeilVoice is running with, and what it can see.
 - [[`sentry.rs`|File-veilvoice-cli-sentry]] &mdash; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &mdash; Tokyo Night colouring for the terminal.
 
@@ -166,6 +167,12 @@ Settings that can only be tightened, sealed with the project's own post-quantum 
 
 - [[`lib.rs`|File-veilvoice-policy-lib]] &mdash; Settings somebody else decided, sealed so they cannot be edited without a passphrase — and, more importantly, built so that editing them without one buys nothing worth having.
 - [[`policy.rs`|File-veilvoice-policy-policy]] &mdash; The policy itself: what can be required, and what requiring it does.
+
+## [[veilvoice-priv|Crate-veilvoice-priv]]
+
+What privilege VeilVoice is running with and what each level can see -- reported, never acquired.
+
+- [[`lib.rs`|File-veilvoice-priv-lib]] &mdash; What privilege VeilVoice is running with, and what each level can actually see.
 
 ## [[veilvoice-proc|Crate-veilvoice-proc]]
 
