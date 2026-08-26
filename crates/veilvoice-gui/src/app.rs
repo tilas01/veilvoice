@@ -155,6 +155,15 @@ pub struct VeilVoiceApp {
     intensity: f32,
     neutralise_accent: bool,
     reseed_secs: f32,
+    /// The randomised ratchet range for this run, drawn at launch.
+    ///
+    /// F-73: `DeidConfig::with_random_reseed_range` was documented as "the
+    /// front ends call this at launch" and was called by nothing but its own
+    /// test, so every shipped copy rolled on the same fixed two-second period.
+    /// Drawn once here rather than per render, because it is a property of the
+    /// session -- a fresh one for every file would be no worse, but it would
+    /// make the value shown beside the slider a lie the moment it was read.
+    reseed_range: Option<(f32, f32)>,
 
     // File mode.
     input: Option<PathBuf>,
@@ -252,6 +261,10 @@ impl VeilVoiceApp {
             intensity: 1.0,
             neutralise_accent: true,
             reseed_secs: 2.0,
+            // Drawn from the operating system's random source, once, now.
+            reseed_range: DeidConfig::default()
+                .with_random_reseed_range()
+                .reseed_range_ms,
             input: None,
             output: None,
             clean_metadata: true,
@@ -395,6 +408,7 @@ impl VeilVoiceApp {
                 ..AccentConfig::default()
             },
             reseed_secs: self.reseed_secs,
+            reseed_range_ms: self.reseed_range,
             ..DeidConfig::default()
         }
     }
@@ -651,20 +665,67 @@ impl VeilVoiceApp {
             .small(),
         );
 
-        ui.add(
-            egui::Slider::new(&mut self.reseed_secs, 0.0..=30.0)
-                .text("seed roll (s)")
-                .fixed_decimals(1),
-        );
-        ui.label(
-            RichText::new(if self.reseed_secs <= 0.0 {
-                "one modulation stream for the whole session"
+        // The ratchet. Two ways to set it, and the control that is *not* in
+        // force is disabled rather than left looking live -- a slider that
+        // silently does nothing is how somebody ends up certain they changed a
+        // setting they did not.
+        let mut randomised = self.reseed_range.is_some();
+        if ui
+            .checkbox(&mut randomised, "randomise the seed-roll interval")
+            .on_hover_text(
+                "A fixed interval is a fixed thing to observe. With this on, the gap \
+                 before every roll is drawn fresh, so the ratchet has no period.",
+            )
+            .changed()
+        {
+            self.reseed_range = if randomised {
+                // Drawn again rather than remembered, so turning it off and on
+                // is not a way to get the same range back.
+                DeidConfig::default()
+                    .with_random_reseed_range()
+                    .reseed_range_ms
             } else {
-                "the modulation stream rolls forward; earlier audio is sealed off behind it"
+                None
+            };
+        }
+
+        ui.add_enabled_ui(!randomised, |ui| {
+            ui.add(
+                egui::Slider::new(&mut self.reseed_secs, 0.0..=30.0)
+                    .text("seed roll (s)")
+                    .fixed_decimals(1),
+            );
+        });
+
+        // What the engine will actually do, quantised to whole frames. Showing
+        // the range as asked for would describe a spread that does not exist:
+        // the ratchet can only fire on a frame boundary.
+        let effective = self.config().effective_reseed_range_ms();
+        ui.label(
+            RichText::new(match effective {
+                Some((lo, hi)) => format!(
+                    "{lo:.0}-{hi:.0} ms, drawn fresh before every roll \u{2014} no period to observe"
+                ),
+                None if self.reseed_secs <= 0.0 => {
+                    "one modulation stream for the whole session".to_string()
+                }
+                None => "the modulation stream rolls forward; earlier audio is sealed \
+                         off behind it"
+                    .to_string(),
             })
             .color(p::muted())
             .small(),
         );
+        if effective.is_some() {
+            ui.label(
+                RichText::new(
+                    "drawn from the operating system's random source at launch, so it \
+                     is a property of this run rather than a number compiled in",
+                )
+                .color(p::muted())
+                .small(),
+            );
+        }
     }
 
     fn file_tab(&mut self, ui: &mut egui::Ui) {

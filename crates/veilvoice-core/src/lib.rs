@@ -77,7 +77,10 @@ pub mod voices;
 mod window;
 
 pub use accent::{AccentConfig, AccentNeutralizer, AccentStats, WARMUP_S};
-pub use chain::{DeidConfig, Deidentifier, ProcessStats};
+pub use chain::{
+    parse_reseed_range, DeidConfig, Deidentifier, ProcessStats, RangeError, MAX_RESEED_MS,
+    MIN_RESEED_MS,
+};
 pub use modulation::{ModValues, Modulator};
 pub use pitch::PitchEstimate;
 pub use voices::{voice, Voice, MAX_VOICES};
