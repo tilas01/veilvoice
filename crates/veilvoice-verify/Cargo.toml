@@ -33,6 +33,9 @@ description = "Verify a VeilVoice release without GnuPG installed"
 # holding two. This crate keeps the command line, the reporting, and the
 # download shim; it no longer owns the arithmetic.
 veilvoice-check = { path = "../veilvoice-check" }
+# Where an installation goes on each platform, so the `install` command puts
+# files exactly where the application itself would. No dependencies of its own.
+veilvoice-setup = { path = "../veilvoice-setup" }
 pgp = { version = "0.20", default-features = false }
 sha2 = "0.10"
 
