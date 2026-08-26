@@ -259,14 +259,34 @@ impl Workspace {
              # are and how they were set up. It does hold the speaker names you\n\
              # typed, because putting those back is the point of it.\n",
         );
-        if let Some(title) = &self.title {
-            out.push_str(&format!("title  {}\n", one_line(title)));
+        // A value that trims away to nothing is written as **absent**, not as a
+        // key with an empty value. Otherwise `Some("   ")` goes out as
+        // `title  ` and comes back as `Some("")`, which is neither what was
+        // saved nor `None` -- a round trip that quietly changes its answer.
+        // The reader is symmetric: an empty value is read back as `None`.
+        if let Some(title) = self
+            .title
+            .as_deref()
+            .map(one_line)
+            .filter(|v| !v.is_empty())
+        {
+            out.push_str(&format!("title  {title}\n"));
         }
-        if let Some(input) = &self.input {
-            out.push_str(&format!("input  {}\n", path_text(input)));
+        if let Some(input) = self
+            .input
+            .as_deref()
+            .map(path_text)
+            .filter(|v| !v.is_empty())
+        {
+            out.push_str(&format!("input  {input}\n"));
         }
-        if let Some(plan) = &self.plan {
-            out.push_str(&format!("plan  {}\n", path_text(plan)));
+        if let Some(plan) = self
+            .plan
+            .as_deref()
+            .map(path_text)
+            .filter(|v| !v.is_empty())
+        {
+            out.push_str(&format!("plan  {plan}\n"));
         }
         out.push_str(&format!("profile  {}\n", one_line(&self.profile)));
         out.push_str(&format!("theme  {}\n", one_line(&self.theme)));
@@ -320,9 +340,13 @@ impl Workspace {
             let rest = line[keyword.len()..].trim();
             let at = number + 2;
             match keyword {
-                "title" => work.title = Some(rest.to_string()),
-                "input" => work.input = Some(PathBuf::from(rest)),
-                "plan" => work.plan = Some(PathBuf::from(rest)),
+                // Symmetric with the writer: an empty value is absent, not
+                // present-and-empty. A `plan  ` line naming no plan should not
+                // produce a `Some(PathBuf::from(""))` that later fails to open
+                // with a message about a file called nothing.
+                "title" => work.title = (!rest.is_empty()).then(|| rest.to_string()),
+                "input" => work.input = (!rest.is_empty()).then(|| PathBuf::from(rest)),
+                "plan" => work.plan = (!rest.is_empty()).then(|| PathBuf::from(rest)),
                 "profile" => work.profile = rest.to_string(),
                 "theme" => work.theme = rest.to_string(),
                 "output" => work.outputs.push(rest.to_string()),
@@ -466,6 +490,89 @@ mod tests {
         let work = sample();
         let read_back = Workspace::parse(&work.to_text()).expect("should parse");
         assert_eq!(read_back, work);
+    }
+
+    /// Saving and reading back must give the same project, for every shape a
+    /// project can be in -- not only the tidy one in `sample`.
+    ///
+    /// This is where F-66 came from: `Some("   ")` was written as `title  `
+    /// and read back as `Some("")`, which is neither what was saved nor
+    /// absent. A round trip that quietly changes its answer is worse than one
+    /// that fails, because nothing reports it.
+    #[test]
+    fn every_shape_of_project_round_trips() {
+        let mut shapes = vec![Workspace::new(), sample()];
+
+        // Empty, whitespace, and absent, for each of the three optional values.
+        for value in ["", "   ", "a title"] {
+            let mut work = Workspace::new();
+            work.title = Some(value.to_string());
+            work.input = Some(PathBuf::from(value));
+            work.plan = Some(PathBuf::from(value));
+            shapes.push(work);
+        }
+
+        // No members, one member, the most a plan can hold.
+        for count in [0usize, 1, 10] {
+            let mut work = Workspace::new();
+            work.members = (0..count)
+                .map(|n| Member {
+                    name: format!("Person {n}"),
+                    colour: (n % 2 == 0).then(|| "#73daca".to_string()),
+                })
+                .collect();
+            shapes.push(work);
+        }
+
+        // No outputs at all, which is a thing somebody can tick their way to.
+        let mut none = Workspace::new();
+        none.outputs.clear();
+        shapes.push(none);
+
+        // A name with the separator in it, and one with a line break.
+        let mut awkward = Workspace::new();
+        awkward.members = vec![
+            Member {
+                name: "Two  Spaces".into(),
+                colour: None,
+            },
+            Member {
+                name: "Line\nBreak".into(),
+                colour: None,
+            },
+        ];
+        shapes.push(awkward);
+
+        for shape in shapes {
+            let text = shape.to_text();
+            let read_back = Workspace::parse(&text).unwrap_or_else(|e| panic!("{e}\n---\n{text}"));
+            let again = Workspace::parse(&read_back.to_text()).expect("stable");
+            assert_eq!(
+                read_back, again,
+                "reading twice must give the same thing:\n{text}"
+            );
+        }
+    }
+
+    /// A value that trims to nothing is absent, in both directions.
+    #[test]
+    fn an_empty_value_is_absent_rather_than_present_and_empty() {
+        let mut work = Workspace::new();
+        work.title = Some("   ".into());
+        work.plan = Some(PathBuf::from(""));
+        let text = work.to_text();
+        // By line, not by substring: `output  subtitles` contains "title", and
+        // a looser check here passed for the wrong reason on the first run.
+        let keys: Vec<&str> = text
+            .lines()
+            .filter_map(|line| line.split_whitespace().next())
+            .collect();
+        assert!(!keys.contains(&"title"), "{text}");
+        assert!(!keys.contains(&"plan"), "{text}");
+
+        let read_back = Workspace::parse(&format!("{MAGIC}\ntitle  \nplan  \n")).unwrap();
+        assert_eq!(read_back.title, None);
+        assert_eq!(read_back.plan, None);
     }
 
     #[test]
