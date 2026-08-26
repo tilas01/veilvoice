@@ -11,6 +11,7 @@ Usage: veilvoice.exe capture <COMMAND>
 Commands:
   status  What is running, what is allowed, and what this cannot see
   list    Every program this build knows how to notice
+  calls   Where to point Discord, Signal, Telegram, Element and the rest so your voice goes through VeilVoice first
   allow   Stop notifying about one program
   deny    Start notifying about one program again
   check   Look now, and exit non-zero if something unallowed is running

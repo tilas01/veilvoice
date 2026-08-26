@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-capture/lib.svg" alt="lib.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-capture/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-capture.html">veilvoice-capture</a> &middot; 568 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-capture.html">veilvoice-capture</a> &middot; 570 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#veilvoice-does-not-hide-itself-from-your-recorder">VeilVoice does not hide itself from your recorder</a>
@@ -72,41 +72,41 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>568 lines defining <strong>19 functions</strong> (16 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>570 lines defining <strong>19 functions</strong> (16 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Allowlist</code> <span style="color:var(--muted)">line 100</span> &mdash; Programs the user has said they meant to run.</li>
-<li><code>struct Sighting</code> <span style="color:var(--muted)">line 230</span> &mdash; One capture-capable program found running.</li>
-<li><code>struct Report</code> <span style="color:var(--muted)">line 257</span> &mdash; What is running, and anything that got in the way of finding out.</li>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 324</span> &mdash; Everything that can go wrong in this crate.</li>
+<li><code>struct Allowlist</code> <span style="color:var(--muted)">line 102</span> &mdash; Programs the user has said they meant to run.</li>
+<li><code>struct Sighting</code> <span style="color:var(--muted)">line 232</span> &mdash; One capture-capable program found running.</li>
+<li><code>struct Report</code> <span style="color:var(--muted)">line 259</span> &mdash; What is running, and anything that got in the way of finding out.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 326</span> &mdash; Everything that can go wrong in this crate.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Allowlist::allow</code> <span style="color:var(--muted)">line 118</span> &mdash; Stop notifying about this program.
+<li><code>Allowlist::allow</code> <span style="color:var(--muted)">line 120</span> &mdash; Stop notifying about this program.
 </li>
-<li><code>Allowlist::deny</code> <span style="color:var(--muted)">line 128</span> &mdash; Start notifying about this program again.
+<li><code>Allowlist::deny</code> <span style="color:var(--muted)">line 130</span> &mdash; Start notifying about this program again.
 </li>
-<li><code>Allowlist::allows</code> <span style="color:var(--muted)">line 133</span> &mdash; Whether this program is allowed.
+<li><code>Allowlist::allows</code> <span style="color:var(--muted)">line 135</span> &mdash; Whether this program is allowed.
 </li>
-<li><code>Allowlist::keys</code> <span style="color:var(--muted)">line 138</span> &mdash; The allowed keys, in a stable order.
+<li><code>Allowlist::keys</code> <span style="color:var(--muted)">line 140</span> &mdash; The allowed keys, in a stable order.
 </li>
-<li><code>Allowlist::len</code> <span style="color:var(--muted)">line 143</span> &mdash; How many programs are allowed.
+<li><code>Allowlist::len</code> <span style="color:var(--muted)">line 145</span> &mdash; How many programs are allowed.
 </li>
-<li><code>Allowlist::is_empty</code> <span style="color:var(--muted)">line 148</span> &mdash; Whether nothing is allowed.
+<li><code>Allowlist::is_empty</code> <span style="color:var(--muted)">line 150</span> &mdash; Whether nothing is allowed.
 </li>
-<li><code>Allowlist::save</code> <span style="color:var(--muted)">line 202</span> &mdash; Write the allowlist to path.
+<li><code>Allowlist::save</code> <span style="color:var(--muted)">line 204</span> &mdash; Write the allowlist to path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Allowlist::load</code> <span style="color:var(--muted)">line 219</span> &mdash; Read an allowlist written by Allowlist::save, treating a missing file as &quot;nothing is allowed&quot;.
+<li><code>Allowlist::load</code> <span style="color:var(--muted)">line 221</span> &mdash; Read an allowlist written by Allowlist::save, treating a missing file as &quot;nothing is allowed&quot;.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>new</code>, <code>parse</code></span>
 </li>
-<li><code>Sighting::describe</code> <span style="color:var(--muted)">line 246</span> &mdash; One line for a terminal, a log or a notification.
+<li><code>Sighting::describe</code> <span style="color:var(--muted)">line 248</span> &mdash; One line for a terminal, a log or a notification.
 </li>
-<li><code>Report::take</code> <span style="color:var(--muted)">line 267</span> &mdash; Look at what is running now.
+<li><code>Report::take</code> <span style="color:var(--muted)">line 269</span> &mdash; Look at what is running now.
 </li>
-<li><code>Report::all</code> <span style="color:var(--muted)">line 301</span> &mdash; Everything found, allowed or not.
+<li><code>Report::all</code> <span style="color:var(--muted)">line 303</span> &mdash; Everything found, allowed or not.
 </li>
-<li><code>Report::worth_saying</code> <span style="color:var(--muted)">line 308</span> &mdash; The sightings a notification should raise: the ones not allowed.
+<li><code>Report::worth_saying</code> <span style="color:var(--muted)">line 310</span> &mdash; The sightings a notification should raise: the ones not allowed.
 </li>
-<li><code>Report::is_empty</code> <span style="color:var(--muted)">line 316</span> &mdash; Whether anything at all was found, allowed or not.
+<li><code>Report::is_empty</code> <span style="color:var(--muted)">line 318</span> &mdash; Whether anything at all was found, allowed or not.
 </li>
 </ul>
 </section>
@@ -121,100 +121,100 @@
 <path d="M364.6 347.0 C 585.0 347.0, 585.0 247.0, 566.0 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M563.0 247.0 C 585.0 247.0, 585.0 47.0, 203.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M196.6 347.0 C 409.4 347.0, 409.4 247.0, 390.4 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L109" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L111" target="_blank" rel="noopener noreferrer">
 <rect x="66.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="133.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::new</text>
-<text x="133.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 109</text>
+<text x="133.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L118" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L120" target="_blank" rel="noopener noreferrer">
 <rect x="226.4" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="301.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::allow</text>
-<text x="301.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 118</text>
+<text x="301.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 120</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L128" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L130" target="_blank" rel="noopener noreferrer">
 <rect x="402.0" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="473.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::deny</text>
-<text x="473.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 128</text>
+<text x="473.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L133" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L135" target="_blank" rel="noopener noreferrer">
 <rect x="62.2" y="120.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="140.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::allows</text>
-<text x="140.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+<text x="140.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 135</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L138" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L140" target="_blank" rel="noopener noreferrer">
 <rect x="245.4" y="120.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="316.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::keys</text>
-<text x="316.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 138</text>
+<text x="316.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L143" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L145" target="_blank" rel="noopener noreferrer">
 <rect x="413.4" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="480.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::len</text>
-<text x="480.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
+<text x="480.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 145</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L148" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L150" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="520.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="94.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::is_empty</text>
-<text x="94.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 148</text>
+<text x="94.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L153" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L155" target="_blank" rel="noopener noreferrer">
 <rect x="222.6" y="220.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="305.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::to_text</text>
-<text x="305.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 153</text>
+<text x="305.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 155</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L167" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L169" target="_blank" rel="noopener noreferrer">
 <rect x="413.4" y="220.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="488.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::parse</text>
-<text x="488.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 167</text>
+<text x="488.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 169</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L202" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L204" target="_blank" rel="noopener noreferrer">
 <rect x="54.6" y="320.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="125.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::save</text>
-<text x="125.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
+<text x="125.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 204</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L219" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L221" target="_blank" rel="noopener noreferrer">
 <rect x="222.6" y="320.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="293.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Allowlist::load</text>
-<text x="293.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 219</text>
+<text x="293.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 221</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L246" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L248" target="_blank" rel="noopener noreferrer">
 <rect x="390.6" y="320.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="473.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Sighting::describe</text>
-<text x="473.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 246</text>
+<text x="473.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 248</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L267" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L269" target="_blank" rel="noopener noreferrer">
 <rect x="73.6" y="420.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="133.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::take</text>
-<text x="133.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 267</text>
+<text x="133.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 269</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L301" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L303" target="_blank" rel="noopener noreferrer">
 <rect x="218.8" y="420.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="274.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::all</text>
-<text x="274.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 301</text>
+<text x="274.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 303</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L308" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L310" target="_blank" rel="noopener noreferrer">
 <rect x="356.4" y="420.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="446.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::worth_saying</text>
-<text x="446.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
+<text x="446.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 310</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L316" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L318" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="520.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="94.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::is_empty</text>
-<text x="94.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
+<text x="94.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 318</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L334" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L336" target="_blank" rel="noopener noreferrer">
 <rect x="195.6" y="520.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="251.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::from</text>
-<text x="251.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 334</text>
+<text x="251.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 336</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L340" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L342" target="_blank" rel="noopener noreferrer">
 <rect x="333.2" y="520.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="385.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
-<text x="385.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 340</text>
+<text x="385.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 342</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L359" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L361" target="_blank" rel="noopener noreferrer">
 <rect x="463.2" y="520.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="526.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::source</text>
-<text x="526.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 359</text>
+<text x="526.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 361</text>
 </a>
 </svg>
 </div>
@@ -222,48 +222,48 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_new[&quot;Allowlist::new&lt;br/&gt;line 109&quot;]
-    n_allow([&quot;Allowlist::allow&lt;br/&gt;line 118&quot;])
-    n_deny([&quot;Allowlist::deny&lt;br/&gt;line 128&quot;])
-    n_allows([&quot;Allowlist::allows&lt;br/&gt;line 133&quot;])
-    n_keys([&quot;Allowlist::keys&lt;br/&gt;line 138&quot;])
-    n_len([&quot;Allowlist::len&lt;br/&gt;line 143&quot;])
-    n_is_empty([&quot;Allowlist::is_empty&lt;br/&gt;line 148&quot;])
-    n_to_text[&quot;Allowlist::to_text&lt;br/&gt;line 153&quot;]
-    n_parse[&quot;Allowlist::parse&lt;br/&gt;line 167&quot;]
-    n_save([&quot;Allowlist::save&lt;br/&gt;line 202&quot;])
-    n_load([&quot;Allowlist::load&lt;br/&gt;line 219&quot;])
-    n_describe([&quot;Sighting::describe&lt;br/&gt;line 246&quot;])
-    n_take([&quot;Report::take&lt;br/&gt;line 267&quot;])
-    n_all([&quot;Report::all&lt;br/&gt;line 301&quot;])
-    n_worth_saying([&quot;Report::worth_saying&lt;br/&gt;line 308&quot;])
-    n_is_empty([&quot;Report::is_empty&lt;br/&gt;line 316&quot;])
-    n_from[&quot;Error::from&lt;br/&gt;line 334&quot;]
-    n_fmt[&quot;Error::fmt&lt;br/&gt;line 340&quot;]
-    n_source[&quot;Error::source&lt;br/&gt;line 359&quot;]
+    n_new[&quot;Allowlist::new&lt;br/&gt;line 111&quot;]
+    n_allow([&quot;Allowlist::allow&lt;br/&gt;line 120&quot;])
+    n_deny([&quot;Allowlist::deny&lt;br/&gt;line 130&quot;])
+    n_allows([&quot;Allowlist::allows&lt;br/&gt;line 135&quot;])
+    n_keys([&quot;Allowlist::keys&lt;br/&gt;line 140&quot;])
+    n_len([&quot;Allowlist::len&lt;br/&gt;line 145&quot;])
+    n_is_empty([&quot;Allowlist::is_empty&lt;br/&gt;line 150&quot;])
+    n_to_text[&quot;Allowlist::to_text&lt;br/&gt;line 155&quot;]
+    n_parse[&quot;Allowlist::parse&lt;br/&gt;line 169&quot;]
+    n_save([&quot;Allowlist::save&lt;br/&gt;line 204&quot;])
+    n_load([&quot;Allowlist::load&lt;br/&gt;line 221&quot;])
+    n_describe([&quot;Sighting::describe&lt;br/&gt;line 248&quot;])
+    n_take([&quot;Report::take&lt;br/&gt;line 269&quot;])
+    n_all([&quot;Report::all&lt;br/&gt;line 303&quot;])
+    n_worth_saying([&quot;Report::worth_saying&lt;br/&gt;line 310&quot;])
+    n_is_empty([&quot;Report::is_empty&lt;br/&gt;line 318&quot;])
+    n_from[&quot;Error::from&lt;br/&gt;line 336&quot;]
+    n_fmt[&quot;Error::fmt&lt;br/&gt;line 342&quot;]
+    n_source[&quot;Error::source&lt;br/&gt;line 361&quot;]
     n_load --&gt; n_new
     n_load --&gt; n_parse
     n_parse --&gt; n_new
     n_save --&gt; n_to_text
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L109&quot; &quot;open the source&quot;
-    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L118&quot; &quot;open the source&quot;
-    click n_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L128&quot; &quot;open the source&quot;
-    click n_allows href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L133&quot; &quot;open the source&quot;
-    click n_keys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L138&quot; &quot;open the source&quot;
-    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L143&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L148&quot; &quot;open the source&quot;
-    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L153&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L167&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L202&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L219&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L246&quot; &quot;open the source&quot;
-    click n_take href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L267&quot; &quot;open the source&quot;
-    click n_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L301&quot; &quot;open the source&quot;
-    click n_worth_saying href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L308&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L316&quot; &quot;open the source&quot;
-    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L334&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L340&quot; &quot;open the source&quot;
-    click n_source href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L359&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L111&quot; &quot;open the source&quot;
+    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L120&quot; &quot;open the source&quot;
+    click n_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L130&quot; &quot;open the source&quot;
+    click n_allows href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L135&quot; &quot;open the source&quot;
+    click n_keys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L140&quot; &quot;open the source&quot;
+    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L145&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L150&quot; &quot;open the source&quot;
+    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L155&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L169&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L204&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L221&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L248&quot; &quot;open the source&quot;
+    click n_take href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L269&quot; &quot;open the source&quot;
+    click n_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L303&quot; &quot;open the source&quot;
+    click n_worth_saying href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L310&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L318&quot; &quot;open the source&quot;
+    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L336&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L342&quot; &quot;open the source&quot;
+    click n_source href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L361&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_allow,n_deny,n_allows,n_keys,n_len,n_is_empty,n_save,n_load,n_describe,n_take,n_all,n_worth_saying,n_is_empty entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -276,32 +276,32 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L79" rel="noopener noreferrer">79</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
-<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L85" rel="noopener noreferrer">85</a></td><td>What this is worth, in the words a front end should show.</td></tr>
-<tr><td><code>Allowlist</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L100" rel="noopener noreferrer">100</a></td><td>Programs the user has said they meant to run.</td></tr>
-<tr><td><code>MAGIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L105" rel="noopener noreferrer">105</a></td><td>Magic first line.</td></tr>
-<tr><td><code>Allowlist::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L109" rel="noopener noreferrer">109</a></td><td>An allowlist that allows nothing.</td></tr>
-<tr><td><code>Allowlist::allow</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L118" rel="noopener noreferrer">118</a></td><td>Stop notifying about this program.</td></tr>
-<tr><td><code>Allowlist::deny</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L128" rel="noopener noreferrer">128</a></td><td>Start notifying about this program again.</td></tr>
-<tr><td><code>Allowlist::allows</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L133" rel="noopener noreferrer">133</a></td><td>Whether this program is allowed.</td></tr>
-<tr><td><code>Allowlist::keys</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L138" rel="noopener noreferrer">138</a></td><td>The allowed keys, in a stable order.</td></tr>
-<tr><td><code>Allowlist::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L143" rel="noopener noreferrer">143</a></td><td>How many programs are allowed.</td></tr>
-<tr><td><code>Allowlist::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L148" rel="noopener noreferrer">148</a></td><td>Whether nothing is allowed.</td></tr>
-<tr><td><code>Allowlist::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L153" rel="noopener noreferrer">153</a></td><td>Serialise to a text format, one key per line.</td></tr>
-<tr><td><code>Allowlist::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L167" rel="noopener noreferrer">167</a></td><td>Parse the text format.</td></tr>
-<tr><td><code>Allowlist::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L202" rel="noopener noreferrer">202</a></td><td>Write the allowlist to path.</td></tr>
-<tr><td><code>Allowlist::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L219" rel="noopener noreferrer">219</a></td><td>Read an allowlist written by Allowlist::save, treating a missing file as &quot;nothing is allowed&quot;.</td></tr>
-<tr><td><code>Sighting</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L230" rel="noopener noreferrer">230</a></td><td>One capture-capable program found running.</td></tr>
-<tr><td><code>Sighting::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L246" rel="noopener noreferrer">246</a></td><td>One line for a terminal, a log or a notification.</td></tr>
-<tr><td><code>Report</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L257" rel="noopener noreferrer">257</a></td><td>What is running, and anything that got in the way of finding out.</td></tr>
-<tr><td><code>Report::take</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L267" rel="noopener noreferrer">267</a></td><td>Look at what is running now.</td></tr>
-<tr><td><code>Report::all</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L301" rel="noopener noreferrer">301</a></td><td>Everything found, allowed or not.</td></tr>
-<tr><td><code>Report::worth_saying</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L308" rel="noopener noreferrer">308</a></td><td>The sightings a notification should raise: the ones not allowed.</td></tr>
-<tr><td><code>Report::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L316" rel="noopener noreferrer">316</a></td><td>Whether anything at all was found, allowed or not.</td></tr>
-<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L324" rel="noopener noreferrer">324</a></td><td>Everything that can go wrong in this crate.</td></tr>
-<tr><td><code>Error::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L334" rel="noopener noreferrer">334</a></td><td></td></tr>
-<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L340" rel="noopener noreferrer">340</a></td><td></td></tr>
-<tr><td><code>Error::source</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L359" rel="noopener noreferrer">359</a></td><td></td></tr>
+<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L81" rel="noopener noreferrer">81</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
+<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L87" rel="noopener noreferrer">87</a></td><td>What this is worth, in the words a front end should show.</td></tr>
+<tr><td><code>Allowlist</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L102" rel="noopener noreferrer">102</a></td><td>Programs the user has said they meant to run.</td></tr>
+<tr><td><code>MAGIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L107" rel="noopener noreferrer">107</a></td><td>Magic first line.</td></tr>
+<tr><td><code>Allowlist::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L111" rel="noopener noreferrer">111</a></td><td>An allowlist that allows nothing.</td></tr>
+<tr><td><code>Allowlist::allow</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L120" rel="noopener noreferrer">120</a></td><td>Stop notifying about this program.</td></tr>
+<tr><td><code>Allowlist::deny</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L130" rel="noopener noreferrer">130</a></td><td>Start notifying about this program again.</td></tr>
+<tr><td><code>Allowlist::allows</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L135" rel="noopener noreferrer">135</a></td><td>Whether this program is allowed.</td></tr>
+<tr><td><code>Allowlist::keys</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L140" rel="noopener noreferrer">140</a></td><td>The allowed keys, in a stable order.</td></tr>
+<tr><td><code>Allowlist::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L145" rel="noopener noreferrer">145</a></td><td>How many programs are allowed.</td></tr>
+<tr><td><code>Allowlist::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L150" rel="noopener noreferrer">150</a></td><td>Whether nothing is allowed.</td></tr>
+<tr><td><code>Allowlist::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L155" rel="noopener noreferrer">155</a></td><td>Serialise to a text format, one key per line.</td></tr>
+<tr><td><code>Allowlist::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L169" rel="noopener noreferrer">169</a></td><td>Parse the text format.</td></tr>
+<tr><td><code>Allowlist::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L204" rel="noopener noreferrer">204</a></td><td>Write the allowlist to path.</td></tr>
+<tr><td><code>Allowlist::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L221" rel="noopener noreferrer">221</a></td><td>Read an allowlist written by Allowlist::save, treating a missing file as &quot;nothing is allowed&quot;.</td></tr>
+<tr><td><code>Sighting</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L232" rel="noopener noreferrer">232</a></td><td>One capture-capable program found running.</td></tr>
+<tr><td><code>Sighting::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L248" rel="noopener noreferrer">248</a></td><td>One line for a terminal, a log or a notification.</td></tr>
+<tr><td><code>Report</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L259" rel="noopener noreferrer">259</a></td><td>What is running, and anything that got in the way of finding out.</td></tr>
+<tr><td><code>Report::take</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L269" rel="noopener noreferrer">269</a></td><td>Look at what is running now.</td></tr>
+<tr><td><code>Report::all</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L303" rel="noopener noreferrer">303</a></td><td>Everything found, allowed or not.</td></tr>
+<tr><td><code>Report::worth_saying</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L310" rel="noopener noreferrer">310</a></td><td>The sightings a notification should raise: the ones not allowed.</td></tr>
+<tr><td><code>Report::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L318" rel="noopener noreferrer">318</a></td><td>Whether anything at all was found, allowed or not.</td></tr>
+<tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L326" rel="noopener noreferrer">326</a></td><td>Everything that can go wrong in this crate.</td></tr>
+<tr><td><code>Error::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L336" rel="noopener noreferrer">336</a></td><td></td></tr>
+<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L342" rel="noopener noreferrer">342</a></td><td></td></tr>
+<tr><td><code>Error::source</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L361" rel="noopener noreferrer">361</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

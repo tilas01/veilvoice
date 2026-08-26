@@ -8,6 +8,48 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Talking through VeilVoice on Discord, Signal, Telegram, Matrix and the rest
+
+```
+veilvoice capture calls
+```
+
+It names this machine's virtual cable, says which of those programs are running,
+and gives the exact menu for each one:
+
+```
+  your microphone  ->  veilvoice live  ->  a virtual audio cable
+                                                   |
+                                                   v
+                                       the calling program, with
+                                       the cable as its microphone
+```
+
+**Nothing has to know VeilVoice exists.** The program asks the operating system
+for a microphone, the operating system hands it the cable, and the cable carries
+a voice that is not yours. That is why the table is *not* a list of what is
+supported — anything that lets you pick a microphone works, including programs
+nobody here has tested and ones that do not exist yet — and the command says so.
+
+**Two things it does not do, said as plainly as the rest.**
+
+* It changes **what you send and nothing else**. The other people on the call
+  are not going through VeilVoice; their voices arrive as they always did, and
+  if you record the call, their half is not veiled. Veiling a whole call means
+  capturing what the program plays back, which is a different mechanism on every
+  operating system and is not built.
+* It **does not reach inside any of those programs** — not their traffic, not
+  their audio, not their processes. That is deliberate rather than missing:
+  intercepting an end-to-end encrypted call is the act this project exists to
+  make useless, and a privacy tool that shipped a way to do it would be arguing
+  against itself.
+
+A running chat program is reported at the same low weight the screen-capture
+monitor uses for a program that *can* share a screen: it is running, which is
+not the same as being on a call, and treating the two alike is how a monitor
+becomes noise nobody reads.
+
+
 ### Profiles and projects — `veilvoice-workspace`
 
 Two things that sound alike and are not.
