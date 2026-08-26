@@ -297,7 +297,15 @@ mod tests {
     /// added later without the wrapper fails here rather than on a desktop.
     #[test]
     fn every_subprocess_is_spawned_without_a_console_window() {
-        let source = include_str!("windows.rs");
+        // A source-reading test, so the line endings have to be settled first.
+        // F-72: these searched for "\n}\n" and passed on every machine
+        // whose checkout uses LF. GitHub's Windows runners default to
+        // core.autocrlf=true, so the file arrives with CRLF, the pattern
+        // matches nothing, and three tests failed there and nowhere else --
+        // including on the developer machine that had just run them.
+        // Normalised here as well as pinned in .gitattributes: a test that
+        // depends on a git setting is a test somebody will trip over.
+        let source = include_str!("windows.rs").replace("\r\n", "\n");
         let mut bare = Vec::new();
         for (number, line) in source.lines().enumerate() {
             let trimmed = line.trim_start();

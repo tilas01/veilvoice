@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/builder.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1140 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1148 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs)
 
 ## Contents
 
@@ -66,7 +66,7 @@ answers and which files differed, and leaves the conclusion to you.
 
 ## What this file contains
 
-1140 lines defining **20 functions** (16 public), **3 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1148 lines defining **20 functions** (16 public), **3 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

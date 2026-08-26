@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Line endings are pinned, and this is not a style preference.
+#
+# F-72. Three tests read this project's own source with `include_str!` and
+# searched it for "\n}\n". They passed on every machine whose checkout uses LF
+# and failed on GitHub's Windows runners, which default to `core.autocrlf=true`
+# and therefore hand the compiler a file full of CRLF. The pattern matched
+# nothing, and the failure appeared only in CI -- on the one platform where the
+# developer had just run the same tests and watched them pass.
+#
+# The larger reason is the generators. Every artefact in this repository is
+# regenerated and then compared **byte for byte** by `tools/verify.py`. The
+# generators write LF unconditionally, so a contributor whose git converts text
+# on checkout would find every `--check` failing on files they had not touched,
+# with a diff nothing can show them.
+#
+# So: text is text, and text is LF, everywhere, for everyone.
+* text=auto eol=lf
+
+# Except where bytes are bytes. `text=auto` guesses well and a wrong guess here
+# corrupts a file silently, so the formats this project actually ships are
+# named rather than left to detection.
+*.png   binary
+*.gif   binary
+*.ico   binary
+*.jpg   binary
+*.jpeg  binary
+*.wav   binary
+*.flac  binary
+*.ogg   binary
+*.mp4   binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.zip   binary
+*.gz    binary
+*.xz    binary
+
+# Detached signatures and key material are ASCII-armoured, and a byte of
+# difference makes them fail to verify. Left as text, LF, like everything else,
+# but named here so nobody is tempted to mark them binary and break the diff.
+*.asc   text eol=lf

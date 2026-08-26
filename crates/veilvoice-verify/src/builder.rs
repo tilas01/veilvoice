@@ -796,7 +796,15 @@ mod tests {
     /// here that could skip it.
     #[test]
     fn nothing_in_the_comparison_reads_a_file() {
-        let source = include_str!("builder.rs");
+        // A source-reading test, so the line endings have to be settled first.
+        // F-72: these searched for "\n}\n" and passed on every machine
+        // whose checkout uses LF. GitHub's Windows runners default to
+        // core.autocrlf=true, so the file arrives with CRLF, the pattern
+        // matches nothing, and three tests failed there and nowhere else --
+        // including on the developer machine that had just run them.
+        // Normalised here as well as pinned in .gitattributes: a test that
+        // depends on a git setting is a test somebody will trip over.
+        let source = include_str!("builder.rs").replace("\r\n", "\n");
         let start = source.find("pub fn compare(").expect("the function");
         let end = source[start..].find("\n}\n").expect("its end") + start;
         let body = &source[start..end];
@@ -854,7 +862,7 @@ mod tests {
     /// functions that act, and this is the test that keeps them there.
     #[test]
     fn deciding_and_acting_are_in_different_places() {
-        let source = include_str!("builder.rs");
+        let source = include_str!("builder.rs").replace("\r\n", "\n");
         let start = source.find("pub fn install(").expect("the function");
         let end = source[start..].find("\n}\n").expect("its end") + start;
         let body = &source[start..end];
@@ -1091,7 +1099,7 @@ mod tests {
     /// and that moves the output down a level.
     #[test]
     fn the_output_directory_accounts_for_the_explicit_target() {
-        let source = include_str!("builder.rs");
+        let source = include_str!("builder.rs").replace("\r\n", "\n");
         let start = source.find("pub fn build(").expect("the function");
         let end = source[start..].find("\n}\n").expect("its end") + start;
         let body = &source[start..end];

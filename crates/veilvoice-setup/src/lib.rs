@@ -131,6 +131,8 @@ mod tests {
     fn every_subprocess_is_spawned_without_a_console_window() {
         const NEEDLE: &str = concat!("Command", "::new");
         let sources = [
+            // Normalised where they are read, for the reason in F-72: a
+            // checkout with CRLF makes a search for "\n}\n" match nothing.
             ("lib.rs", include_str!("lib.rs")),
             ("install.rs", include_str!("install.rs")),
             ("companions.rs", include_str!("companions.rs")),

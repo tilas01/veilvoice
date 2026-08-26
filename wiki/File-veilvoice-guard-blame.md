@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-guard/src/blame.rs`
 
-[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 405 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs)
+[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 413 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs)
 
 ## Contents
 
@@ -44,7 +44,7 @@ clean report means.
 
 ## What this file contains
 
-405 lines defining **6 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+413 lines defining **6 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
