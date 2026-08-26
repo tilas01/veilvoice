@@ -106,11 +106,15 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>568 lines"])
+    n_lib(["lib.rs<br/>570 lines"])
+    n_comms["comms.rs<br/>321 lines"]
     n_processes["processes.rs<br/>255 lines"]
     n_programs["programs.rs<br/>342 lines"]
+    n_comms --> n_processes
+    n_comms --> n_programs
     n_processes --> n_programs
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs" "open the source"
+    click n_comms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/comms.rs" "open the source"
     click n_processes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/processes.rs" "open the source"
     click n_programs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs" "open the source"
 ```
@@ -121,7 +125,8 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | 568 | Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do. |
+| [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | 321 | Communication programs, and how to put VeilVoice between you and them. |
+| [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | 570 | Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do. |
 | [`processes.rs`](../../docs/files/veilvoice-capture/processes.md) | 255 | Listing the processes that are running, per platform. |
 | [`programs.rs`](../../docs/files/veilvoice-capture/programs.md) | 342 | The programs this build knows can capture a screen. |
 
@@ -129,6 +134,15 @@ flowchart TD
 
 | Item | Where | What |
 |---|---|---|
+| `struct Comm` | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | One communication program, and where its microphone setting lives. |
+| `const COMMS` | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | The programs this build knows where to look in. |
+| `fn instructions` | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | What to do, for one program. |
+| `const ANY_PROGRAM` | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | The general route, for a program not in the table. |
+| `const INCOMING` | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | What this route does not cover, in the words a front end should show. |
+| `const NO_INTERCEPTION` | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | What this crate will not do, and why that is not an oversight. |
+| `fn running` | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | Which of these are running now, and anything that went wrong looking. |
+| `fn by_key` | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | The program with this identifier. |
+| `fn weight` | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | How a running communication program should be described. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | Crate version string, surfaced in the About panel. |
 | `const SCOPE` | [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | What this is worth, in the words a front end should show. |
 | `struct Allowlist` | [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | Programs the user has said they meant to run. |
