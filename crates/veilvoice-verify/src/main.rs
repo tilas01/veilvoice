@@ -53,8 +53,61 @@
 //! Double-click it and it looks for a downloaded release nearby and checks it.
 //! Give it arguments and it does exactly what you asked.
 
+/// A line of ordinary progress: a step being taken, a check that passed.
+///
+/// Every `println!` in this program goes through one of these three macros, so
+/// the verbosity level is applied in one place rather than remembered at each
+/// call. A quiet mode with one loud line left in it is not a quiet mode, and
+/// that is exactly what "remember to check the level here" produces.
+macro_rules! out {
+    ($($arg:tt)*) => {
+        if crate::report::level() >= crate::report::Loudness::Normal {
+            println!($($arg)*);
+        }
+    };
+}
+
+/// **The answer.** Printed at every level except `--quiet`, where the exit
+/// status carries it instead.
+///
+/// This is what `--brief` is for: the fingerprint, the hash, the verdict on a
+/// file. If a reader at `--brief` would be left without the thing they ran the
+/// command to find out, the line belongs here rather than in `out!`.
+macro_rules! verdict {
+    ($($arg:tt)*) => {
+        if crate::report::level() >= crate::report::Loudness::Minimal {
+            println!($($arg)*);
+        }
+    };
+}
+
+/// The same as [`out`], without the newline, for a progress line that is
+/// finished by a later `out!`.
+macro_rules! outp {
+    ($($arg:tt)*) => {
+        if crate::report::level() >= crate::report::Loudness::Normal {
+            print!($($arg)*);
+            let _ = std::io::Write::flush(&mut std::io::stdout());
+        }
+    };
+}
+
+/// Working detail: a command line, a path, a hash being compared. Only at
+/// `--verbose`.
+#[allow(unused_macros)]
+macro_rules! note {
+    ($($arg:tt)*) => {
+        if crate::report::level() >= crate::report::Loudness::Everything {
+            println!("        {}", format!($($arg)*));
+        }
+    };
+}
+
 mod discover;
 mod fetch;
+mod report;
+
+use report::{Loudness, Status};
 
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -201,7 +254,7 @@ worth something and is not the same as somebody else checking it.
 // ---------------------------------------------------------------------------
 
 fn good(message: &str) {
-    println!("  ok    {message}");
+    out!("  ok    {message}");
 }
 
 /// A failure that is not a refusal: something did not happen, rather than
@@ -212,28 +265,87 @@ fn good(message: &str) {
 /// which one they were told -- the second means somebody may have tampered
 /// with a release, and the first usually means a network hiccup.
 fn fail(reason: &str) -> ExitCode {
-    eprintln!();
-    eprintln!("FAILED: could not complete the check.");
-    for line in reason.lines() {
-        eprintln!("  {line}");
+    if report::level() >= Loudness::Minimal {
+        eprintln!();
+        eprintln!("FAILED: could not complete the check.");
+        for line in reason.lines() {
+            eprintln!("  {line}");
+        }
+        eprintln!();
+        eprintln!("This is not a verification failure -- nothing was checked and");
+        eprintln!("found wrong. Nothing has been proven either. Try again, or");
+        eprintln!("download the files yourself and pass them in.");
     }
-    eprintln!();
-    eprintln!("This is not a verification failure -- nothing was checked and");
-    eprintln!("found wrong. Nothing has been proven either. Try again, or");
-    eprintln!("download the files yourself and pass them in.");
-    ExitCode::FAILURE
+    Status::Incomplete.into()
 }
 
 /// Every refusal goes through here, so every refusal names the check.
 fn deny(reason: &str, detail: &[&str]) -> ExitCode {
-    eprintln!();
-    eprintln!("REFUSED: {reason}");
-    for line in detail {
-        eprintln!("  {line}");
+    if report::level() >= Loudness::Minimal {
+        eprintln!();
+        eprintln!("REFUSED: {reason}");
+        for line in detail {
+            eprintln!("  {line}");
+        }
+        eprintln!();
+        eprintln!("Nothing about this download has been proven. Do not run it.");
     }
-    eprintln!();
-    eprintln!("Nothing about this download has been proven. Do not run it.");
-    ExitCode::FAILURE
+    Status::Refused.into()
+}
+
+/// Nothing could be checked, with the same shape of detail as a refusal.
+///
+/// The distinction that matters is the one in the last line and in the exit
+/// status: a release that is not there has not been found wanting.
+fn incomplete_deny(reason: &str, detail: &[&str]) -> ExitCode {
+    if report::level() >= Loudness::Minimal {
+        eprintln!();
+        eprintln!("FAILED: {reason}");
+        for line in detail {
+            eprintln!("  {line}");
+        }
+        eprintln!();
+        eprintln!("Nothing was checked, so nothing has been proven either way.");
+    }
+    Status::Incomplete.into()
+}
+
+/// A file this program was told to read could not be read.
+///
+/// Nothing was checked and nothing was found wrong, so it carries
+/// [`Status::Incomplete`] and says so in the words -- the old code told a
+/// reader with a mistyped path that their download might be compromised.
+fn cannot(reason: &str, detail: &[&str]) -> ExitCode {
+    if report::level() >= Loudness::Minimal {
+        eprintln!();
+        eprintln!("FAILED: {reason}");
+        for line in detail {
+            eprintln!("  {line}");
+        }
+        eprintln!();
+        eprintln!("Nothing was checked, so nothing has been proven either way.");
+    }
+    Status::Incomplete.into()
+}
+
+/// The command line could not be understood, so nothing was attempted.
+///
+/// Kept apart from [`deny`] because they are different facts and the old code
+/// printed the same words for both. A mistyped path is not a reason to tell
+/// somebody their download may have been tampered with, and "do not run it"
+/// is nonsense advice when nothing was examined. It also carries
+/// [`Status::Usage`], so a script can tell its own mistake from a finding.
+fn usage(reason: &str, detail: &[&str]) -> ExitCode {
+    if report::level() >= Loudness::Minimal {
+        eprintln!();
+        eprintln!("USAGE: {reason}");
+        for line in detail {
+            eprintln!("  {line}");
+        }
+        eprintln!();
+        eprintln!("Nothing was checked. Fix the command and run it again.");
+    }
+    Status::Usage.into()
 }
 
 // ---------------------------------------------------------------------------
@@ -252,16 +364,16 @@ fn command_key() -> ExitCode {
     match embedded_key() {
         Err(why) => deny("the key compiled into this binary is not usable", &[&why]),
         Ok(key) => {
-            println!();
-            println!("  fingerprint  {}", fingerprint_of(&key));
+            out!();
+            verdict!("  fingerprint  {}", fingerprint_of(&key));
             for uid in key.details.users.iter() {
-                println!("  user id      {}", String::from_utf8_lossy(uid.id.id()));
+                verdict!("  user id      {}", String::from_utf8_lossy(uid.id.id()));
             }
-            println!();
-            println!("  Compare that fingerprint against the one published in README.md,");
-            println!("  on https://tilas01.github.io/veilvoice/ and in the release notes.");
-            println!("  If they disagree, stop.");
-            println!();
+            out!();
+            out!("  Compare that fingerprint against the one published in README.md,");
+            out!("  on https://tilas01.github.io/veilvoice/ and in the release notes.");
+            out!("  If they disagree, stop.");
+            out!();
             ExitCode::SUCCESS
         }
     }
@@ -276,21 +388,21 @@ fn command_sums(sums_path: &Path, sig_path: &Path) -> ExitCode {
 
     let sums = match std::fs::read(sums_path) {
         Ok(bytes) => bytes,
-        Err(e) => return deny("the hash list could not be read", &[&format!("{e}")]),
+        Err(e) => return cannot("the hash list could not be read", &[&format!("{e}")]),
     };
     let signature = match read_text(sig_path) {
         Ok(text) => text,
-        Err(e) => return deny("the signature could not be read", &[&e]),
+        Err(e) => return cannot("the signature could not be read", &[&e]),
     };
 
     match verify_detached(&key, &signature, &sums) {
         Ok(()) => {
             good("signature over the hash list is good");
-            println!();
-            println!("  That hash list is genuinely the one signed by {FINGERPRINT}.");
-            println!("  It does not yet say anything about any particular file --");
-            println!("  use `veilvoice-verify file` for that.");
-            println!();
+            out!();
+            verdict!("  That hash list is genuinely the one signed by {FINGERPRINT}.");
+            out!("  It does not yet say anything about any particular file --");
+            out!("  use `veilvoice-verify file` for that.");
+            out!();
             ExitCode::SUCCESS
         }
         Err(why) => deny(
@@ -314,11 +426,11 @@ fn command_file_against_sums(file: &Path, sums_path: &Path, sig_path: &Path) -> 
 
     let sums_bytes = match std::fs::read(sums_path) {
         Ok(bytes) => bytes,
-        Err(e) => return deny("the hash list could not be read", &[&format!("{e}")]),
+        Err(e) => return cannot("the hash list could not be read", &[&format!("{e}")]),
     };
     let signature = match read_text(sig_path) {
         Ok(text) => text,
-        Err(e) => return deny("the signature could not be read", &[&e]),
+        Err(e) => return cannot("the signature could not be read", &[&e]),
     };
 
     // The signature first, always. Checking the file against the list first
@@ -360,7 +472,7 @@ fn command_file_against_sums(file: &Path, sums_path: &Path, sig_path: &Path) -> 
 
     let actual = match sha256_file(file) {
         Ok(digest) => digest,
-        Err(e) => return deny("the file could not be hashed", &[&e]),
+        Err(e) => return cannot("the file could not be hashed", &[&e]),
     };
 
     if !digests_match(&expected, &actual) {
@@ -377,22 +489,22 @@ fn command_file_against_sums(file: &Path, sums_path: &Path, sig_path: &Path) -> 
     }
 
     good(&format!("sha256 matches ({actual})"));
-    println!();
-    println!("  INTACT. This file is byte-for-byte what was published, signed by");
-    println!("  {FINGERPRINT}.");
-    println!();
-    println!("  That is not the same as knowing it was built from the published");
-    println!("  source -- the same person produced the binary and the list. For");
-    println!("  that, compare against a hash somebody else produced from their own");
-    println!("  build:  veilvoice-verify --explain");
-    println!();
+    out!();
+    verdict!("  INTACT. This file is byte-for-byte what was published, signed by");
+    verdict!("  {FINGERPRINT}.");
+    out!();
+    out!("  That is not the same as knowing it was built from the published");
+    out!("  source -- the same person produced the binary and the list. For");
+    out!("  that, compare against a hash somebody else produced from their own");
+    out!("  build:  veilvoice-verify --explain");
+    out!();
     ExitCode::SUCCESS
 }
 
 fn command_file_against_hash(file: &Path, expected: &str) -> ExitCode {
     let cleaned = expected.trim();
     if cleaned.len() != 64 || !cleaned.chars().all(|c| c.is_ascii_hexdigit()) {
-        return deny(
+        return usage(
             "that does not look like a SHA-256 hash",
             &[
                 &format!("got: {cleaned}"),
@@ -406,7 +518,7 @@ fn command_file_against_hash(file: &Path, expected: &str) -> ExitCode {
 
     let actual = match sha256_file(file) {
         Ok(digest) => digest,
-        Err(e) => return deny("the file could not be hashed", &[&e]),
+        Err(e) => return cannot("the file could not be hashed", &[&e]),
     };
 
     if !digests_match(cleaned, &actual) {
@@ -425,32 +537,32 @@ fn command_file_against_hash(file: &Path, expected: &str) -> ExitCode {
     }
 
     good(&format!("sha256 matches ({actual})"));
-    println!();
-    println!("  This file matches the hash you gave.");
-    println!();
-    println!("  What that proves depends entirely on where the hash came from, and");
-    println!("  only you know that:");
-    println!();
-    println!("    - from the published SHA256SUMS: the download is INTACT.");
-    println!("    - from somebody else's independent build of the same tag: the");
-    println!("      release is REPRODUCIBLE, which is the stronger claim.");
-    println!();
-    println!("  This tool cannot tell which, so it does not guess.");
-    println!("  veilvoice-verify --explain");
-    println!();
+    out!();
+    verdict!("  This file matches the hash you gave.");
+    out!();
+    out!("  What that proves depends entirely on where the hash came from, and");
+    out!("  only you know that:");
+    out!();
+    out!("    - from the published SHA256SUMS: the download is INTACT.");
+    out!("    - from somebody else's independent build of the same tag: the");
+    out!("      release is REPRODUCIBLE, which is the stronger claim.");
+    out!();
+    out!("  This tool cannot tell which, so it does not guess.");
+    out!("  veilvoice-verify --explain");
+    out!();
     ExitCode::SUCCESS
 }
 
 fn command_hash(file: &Path) -> ExitCode {
     match sha256_file(file) {
         Ok(digest) => {
-            println!(
+            verdict!(
                 "{digest}  {}",
                 file.file_name().unwrap_or_default().to_string_lossy()
             );
             ExitCode::SUCCESS
         }
-        Err(e) => deny("the file could not be hashed", &[&e]),
+        Err(e) => cannot("the file could not be hashed", &[&e]),
     }
 }
 
@@ -476,14 +588,14 @@ fn take_value(args: &[String], index: usize, flag: &str) -> Result<String, Strin
 /// the release.
 fn command_release(tag: &str, asset: Option<&str>) -> ExitCode {
     if !fetch::valid_tag(tag) {
-        return deny(
+        return usage(
             "that does not look like a release tag",
             &["veilvoice-verify release v0.1.11"],
         );
     }
     if let Some(name) = asset {
         if !fetch::valid_asset(name) {
-            return deny(
+            return usage(
                 "that does not look like a release file name",
                 &["veilvoice-verify release v0.1.11 veilvoice-v0.1.11-linux-x86_64.tar.gz"],
             );
@@ -501,20 +613,20 @@ fn command_release(tag: &str, asset: Option<&str>) -> ExitCode {
         ));
     }
 
-    println!();
-    println!("  fetching into {}", directory.display());
+    out!();
+    out!("  fetching into {}", directory.display());
 
     let mut fetched = Vec::new();
     for name in [fetch::SUMS, fetch::SIGNATURE] {
         let url = fetch::asset_url(tag, name);
-        print!("  {name} ... ");
+        outp!("  {name} ... ");
         match fetch::download(&url, &directory.join(name)) {
             Ok(path) => {
-                println!("ok");
+                out!("ok");
                 fetched.push(path);
             }
             Err(error) => {
-                println!("failed");
+                out!("failed");
                 return fail(&error);
             }
         }
@@ -530,14 +642,14 @@ fn command_release(tag: &str, asset: Option<&str>) -> ExitCode {
     };
 
     let url = fetch::asset_url(tag, name);
-    print!("  {name} ... ");
+    outp!("  {name} ... ");
     let archive = match fetch::download(&url, &directory.join(name)) {
         Ok(path) => {
-            println!("ok");
+            out!("ok");
             path
         }
         Err(error) => {
-            println!("failed");
+            out!("failed");
             return fail(&error);
         }
     };
@@ -559,7 +671,7 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
     let (complete, all) = discover::search(explicit);
 
     if all.is_empty() {
-        return deny(
+        return incomplete_deny(
             "no VeilVoice release was found to check",
             &[
                 "Looked in: the directory given, the current directory, the folder this",
@@ -594,11 +706,11 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
         detail.push(String::new());
         detail.push("Both missing files are on the release page beside the archive.".to_string());
         let borrowed: Vec<&str> = detail.iter().map(String::as_str).collect();
-        return deny("a release was found but cannot be checked", &borrowed);
+        return incomplete_deny("a release was found but cannot be checked", &borrowed);
     };
 
-    println!("Checking what is in {}", found.directory.display());
-    println!();
+    out!("Checking what is in {}", found.directory.display());
+    out!();
     let sums = found.sums.clone().unwrap_or_default();
     let signature = found.signature.clone().unwrap_or_default();
 
@@ -613,10 +725,10 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
             failures += 1;
             worst = outcome;
         }
-        println!();
+        out!();
     }
     if failures > 0 {
-        println!(
+        verdict!(
             "{failures} of {} did not check out. Nothing above should be run.",
             found.archives.len()
         );
@@ -638,14 +750,19 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
 /// running this from a terminal almost always types a subcommand, and somebody
 /// who types the bare name gets one extra keypress.
 fn wait_before_the_window_closes() {
-    println!();
-    println!("Press Enter to close.");
+    out!();
+    out!("Press Enter to close.");
     let mut discard = String::new();
     let _ = std::io::stdin().read_line(&mut discard);
 }
 
 fn main() -> ExitCode {
-    let args: Vec<String> = std::env::args().skip(1).collect();
+    let mut args: Vec<String> = std::env::args().skip(1).collect();
+
+    // Before a single line is printed, and before the arguments are read for
+    // anything else: `--quiet` has to mean quiet from the first word, and the
+    // verbosity flags are not positional.
+    report::set_level(Loudness::take_from(&mut args));
 
     // No arguments is very probably a double-click. Do the useful thing --
     // look for a release nearby and check it -- and then wait, so the window
@@ -658,6 +775,13 @@ fn main() -> ExitCode {
 
     if args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
         print!("{USAGE}");
+        // Printed from the tables rather than written out again here. The
+        // quiet level is only usable because the statuses are documented, and
+        // a copy of that documentation is a copy that goes stale.
+        println!();
+        print!("{}", Loudness::table());
+        println!();
+        print!("{}", Status::table());
         return ExitCode::SUCCESS;
     }
     if args[0] == "--explain" {
@@ -668,6 +792,10 @@ fn main() -> ExitCode {
         println!("veilvoice-verify {}", env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
+    if args[0] == "--exit-status" {
+        print!("{}", Status::table());
+        return ExitCode::SUCCESS;
+    }
 
     match args[0].as_str() {
         "auto" => command_auto(args.get(1).map(Path::new)),
@@ -676,7 +804,7 @@ fn main() -> ExitCode {
 
         "release" => match args.get(1) {
             Some(tag) => command_release(tag, args.get(2).map(String::as_str)),
-            None => deny(
+            None => usage(
                 "`release` needs a tag",
                 &["veilvoice-verify release v0.1.11"],
             ),
@@ -684,12 +812,12 @@ fn main() -> ExitCode {
 
         "hash" => match args.get(1) {
             Some(path) => command_hash(Path::new(path)),
-            None => deny("`hash` needs a file", &["veilvoice-verify hash <FILE>"]),
+            None => usage("`hash` needs a file", &["veilvoice-verify hash <FILE>"]),
         },
 
         "sums" => {
             if args.len() < 3 {
-                return deny(
+                return usage(
                     "`sums` needs a hash list and a signature",
                     &["veilvoice-verify sums <SHA256SUMS> <SHA256SUMS.asc>"],
                 );
@@ -701,7 +829,7 @@ fn main() -> ExitCode {
             let file = match args.get(1).map(PathBuf::from) {
                 Some(path) => path,
                 None => {
-                    return deny(
+                    return usage(
                         "`file` needs a file to check",
                         &["veilvoice-verify file <FILE> --sums <SHA256SUMS> --sig <SIG>"],
                     )
@@ -720,13 +848,13 @@ fn main() -> ExitCode {
                     other => Err(format!("unknown option: {other}")),
                 };
                 if let Err(why) = result {
-                    return deny(&why, &["veilvoice-verify --help"]);
+                    return usage(&why, &["veilvoice-verify --help"]);
                 }
                 index += 2;
             }
 
             match (sha256, sums, sig) {
-                (Some(_), Some(_), _) | (Some(_), _, Some(_)) => deny(
+                (Some(_), Some(_), _) | (Some(_), _, Some(_)) => usage(
                     "--sha256 and --sums are two different checks",
                     &[
                         "They prove different things, so this tool will not run both",
@@ -742,7 +870,7 @@ fn main() -> ExitCode {
                 (None, Some(sums), Some(sig)) => {
                     command_file_against_sums(&file, Path::new(&sums), Path::new(&sig))
                 }
-                (None, Some(_), None) => deny(
+                (None, Some(_), None) => usage(
                     "--sums without --sig",
                     &[
                         "An unsigned hash list proves nothing: whoever could replace the",
@@ -750,8 +878,8 @@ fn main() -> ExitCode {
                         "as well, or use --sha256 with a hash you obtained some other way.",
                     ],
                 ),
-                (None, None, Some(_)) => deny("--sig without --sums", &["Pass both."]),
-                (None, None, None) => deny(
+                (None, None, Some(_)) => usage("--sig without --sums", &["Pass both."]),
+                (None, None, None) => usage(
                     "nothing to check the file against",
                     &[
                         "This binary carries the signing key, but it cannot carry the",
@@ -767,7 +895,7 @@ fn main() -> ExitCode {
             }
         }
 
-        other => deny(
+        other => usage(
             &format!("unknown command: {other}"),
             &["veilvoice-verify --help"],
         ),
