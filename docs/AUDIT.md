@@ -40,13 +40,14 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Two defects found and fixed (F-66 and F-67.)** **Neither had shipped**: both
-are in code written since the seventh round, and `main` has not been released
-since v0.1.12.
+**Four defects found and fixed (F-66 to F-69.)** **None had shipped**: all
+four are in code written since the seventh round, and `main` has not been
+released since v0.1.12.
 
 This round covers what was added after it: the measured voice limit and the
-one-voice-for-everybody mode, saved projects and application profiles, and the
-table of communication programs.
+one-voice-for-everybody mode, saved projects and application profiles, the
+table of communication programs, and the build-and-reproduce half of the
+verifier.
 
 **Both are the same shape as most of the last round, and it is worth naming:**
 a piece of code answering from a *default* rather than from the state actually
@@ -62,6 +63,79 @@ strength with the accent work **off**. Nothing in the window said so; the
 controls were on a different tab, and the group panel had never been given
 them. That is software quietly doing less than it says, which is the failure
 this whole tree is written against.
+
+### F-69 -- the build succeeded, and then looked for it in the wrong place
+
+`veilvoice-verify/src/builder.rs`. After running the release build, the tool
+hashed what came out of `root/target/release` -- a path it computed rather than
+asked for. `CARGO_TARGET_DIR` in the environment, `build.target-dir` in a
+`.cargo/config.toml`, and a target directory shared between checkouts all move
+it, and none of those are exotic. The machine this was written on has the first
+one set.
+
+**The shape of the failure is the interesting part.** The build ran. It took
+several minutes and it succeeded. Then the run ended with
+
+```
+  ok    the build finished
+
+FAILED: the build left nothing to hash
+  .\target\release is not there
+```
+
+and exit status 3. Correct work, thrown away, reported with a message pointing
+at a directory that was never going to exist -- and reported as *incomplete*,
+which is at least honest, but only by accident: nothing in the code knew it had
+guessed.
+
+It now asks `cargo metadata`, which is the only thing that knows. The
+JSON is read by hand rather than by taking a dependency for one field, and the
+escapes are undone properly, because the field is a Windows path and a value
+taken between the first two quotes yields `C:\\Users\\...` -- a path that looks
+almost right and does not open. Malformed input, an unterminated string and a
+non-string value all give `None` rather than something plausible.
+
+The test is written against the environment rather than against a fixture: the
+suite itself runs with `CARGO_TARGET_DIR` set, and `OUT_DIR` is inside the real
+target directory whatever it is, so a function that went back to guessing would
+disagree with reality inside its own test run.
+
+**Three of this round's four are the same mistake**, which is worth stating
+plainly. F-67 answered from a default configuration instead of the one in
+force. F-68 answered from a program that shared a name with the right one. F-69
+answered from a path that is usually correct. None was a logic error and none
+would have been found by reading the code -- each was found by running it and
+looking at what it said. That is the same lesson as F-37 and the fifth round's
+install-script defects, arriving for the third time.
+
+### F-68 -- the linker check found Git's hardlink tool and called it a linker
+
+`veilvoice-verify/src/deps.rs`. The Windows probe for a C linker looked for
+`link` on `PATH` and reported whatever came back. On the machine it was first
+run on that was `C:\Program Files\Git\usr\bin\link.exe` -- GNU coreutils'
+hardlink utility, which shares a name with Microsoft's linker and has nothing
+whatever to do with building Rust.
+
+So the dependency report said `A C compiler and linker  found` and named a path
+that looked entirely convincing, on a machine where a build would then have
+stopped with a linker error. **A probe that answers from the wrong program is
+worse than no probe**: absence would have produced a useful answer, and this
+produced a confident wrong one.
+
+It is in this document rather than in a commit message because of *how it was
+found*. It was found by running the command and reading the path it printed --
+the same route as F-37 and as the three install-script defects in the fifth
+round, and not a route any test was going to take. Nothing was wrong with the
+code as written; `which("link")` did exactly what it says. The mistake was
+believing a name.
+
+There is no honest probe here, and that is the fix. `link.exe` is only on
+`PATH` inside a Developer Command Prompt, cargo locates MSVC through the
+registry instead, and any `link` that *is* on `PATH` is more likely to be
+something else. It now returns "could not tell", in those words, with the
+reason -- and [`Presence::Unknown`] was already distinguished from
+[`Presence::Missing`] precisely so that an unanswerable probe does not become
+an offer to install something that is already there.
 
 ### F-67 -- the group panel rendered with the default settings, not yours
 
@@ -1722,7 +1796,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Sixty-seven defects found and fixed across eight audit rounds (F-1 to F-67):**
+**Sixty-nine defects found and fixed across eight audit rounds (F-1 to F-69):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
