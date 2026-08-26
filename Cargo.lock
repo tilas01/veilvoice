@@ -4817,6 +4817,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "veilvoice-appctl"
+version = "0.1.13"
+
+[[package]]
 name = "veilvoice-audio"
 version = "0.1.13"
 dependencies = [
@@ -4852,6 +4856,7 @@ dependencies = [
  "clap",
  "rpassword",
  "tempfile",
+ "veilvoice-appctl",
  "veilvoice-audio",
  "veilvoice-capture",
  "veilvoice-conversation",
@@ -4861,6 +4866,7 @@ dependencies = [
  "veilvoice-input",
  "veilvoice-meta",
  "veilvoice-policy",
+ "veilvoice-proc",
  "veilvoice-sentry",
  "veilvoice-setup",
  "veilvoice-video",

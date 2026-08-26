@@ -1,0 +1,14 @@
+[package]
+name = "veilvoice-appctl"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Learn what normally runs here, then notice what does not -- with time-limited grants and a log, and no claim to block anything."
+
+# None. The process listing lives in `veilvoice-proc` and the caller supplies
+# the names, so this crate is arithmetic over a list and can be tested without
+# a machine to run on.
+[dependencies]
