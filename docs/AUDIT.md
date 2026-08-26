@@ -40,6 +40,80 @@ longer offered as the explanation for anything.
 
 ## This round
 
+**Two defects found and fixed (F-66 and F-67.)** **Neither had shipped**: both
+are in code written since the seventh round, and `main` has not been released
+since v0.1.12.
+
+This round covers what was added after it: the measured voice limit and the
+one-voice-for-everybody mode, saved projects and application profiles, and the
+table of communication programs.
+
+**Both are the same shape as most of the last round, and it is worth naming:**
+a piece of code answering from a *default* rather than from the state actually
+in force. F-66 wrote a value that had trimmed away to nothing and read it back
+as a different thing than was saved. F-67 computed a group render -- and the
+speaker limit shown beside it -- from `DeidConfig::default()` while the person
+had set the strength and the accent work somewhere else in the window.
+
+F-67 is the serious one, and it is the kind this project's second rule exists
+for. Somebody who set the strength to its highest, turned accent neutralisation
+on, and then rendered a group conversation got a render at the **default**
+strength with the accent work **off**. Nothing in the window said so; the
+controls were on a different tab, and the group panel had never been given
+them. That is software quietly doing less than it says, which is the failure
+this whole tree is written against.
+
+### F-67 -- the group panel rendered with the default settings, not yours
+
+`veilvoice-gui/src/group.rs`. Every question the panel answered about voices --
+how many speakers it would allow, which mode it would let you switch to, what a
+profile could be applied to, and the render itself -- was computed from
+`DeidConfig::default()`. The application's own settings, which is what the rest
+of the window acts on, were never handed to it.
+
+It is wrong twice over.
+
+The render is the serious half: `render_now` built its `Settings` from the
+defaults and overrode only the sample rate, so the intensity, the accent
+configuration and the reseed interval that had been chosen were all discarded.
+A group render was weaker than the one that was asked for and reported success.
+
+The limit is the quieter half. `voices::clear_voices` depends on the frame
+grid, because a coarser grid snaps destination pitches onto wider steps and
+collapses registers onto each other. Under a configuration where fewer than
+eight voices stay clearly apart, the panel still printed "8" and still let
+eight people be added -- and two of them would have shared a voice, discovered
+only by listening to the finished recording.
+
+The panel now carries the configuration, copied from the application before
+anything is painted, and uses it for all four. The regression test moves the
+frame size to something that genuinely lowers the count and checks that the
+number the panel *prints* and the number it *enforces* both follow -- a test
+that would pass against the old code if it only checked the default.
+
+### F-66 -- a saved project could come back different from how it went out
+
+`veilvoice-workspace/src/lib.rs`. A value that trimmed away to nothing was
+written as a key with an empty value: `Some("   ")` went out as `title  ` and
+came back as `Some("")`. Neither what was saved nor absent.
+
+The reachable half is the reader's. A hand-edited or truncated project file
+carrying `plan  ` with nothing after it produced `Some(PathBuf::from(""))`,
+which is a plan path that names no file and fails later with a message about a
+file called nothing, rather than being read as "no plan named" at the point
+where that is still a sentence somebody can act on.
+
+Small, and it is here because of *how it was found*: the round-trip test only
+ever exercised one tidy project. The fix is the property rather than the case
+-- every shape a project can be in is now saved, read, saved and read again,
+including empty and whitespace values, no members, the maximum members, no
+outputs at all, and names containing the field separator and a line break.
+
+Writer and reader are now symmetric in both directions: a value that trims to
+nothing is **absent**, and an empty value read back is `None`.
+
+## The seventh round
+
 **Five defects found and fixed (F-61 to F-65.)** **None had shipped**: every
 one was in code written during this cycle, and `main` has not been released
 since v0.1.12.
@@ -1648,7 +1722,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Sixty-five defects found and fixed across seven audit rounds (F-1 to F-65):**
+**Sixty-seven defects found and fixed across eight audit rounds (F-1 to F-67):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

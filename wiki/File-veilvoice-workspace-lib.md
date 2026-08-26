@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-workspace/src/lib.rs`
 
-[[veilvoice-workspace|Crate-veilvoice-workspace]] &middot; 678 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs)
+[[veilvoice-workspace|Crate-veilvoice-workspace]] &middot; 785 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs)
 
 ## Contents
 
@@ -73,7 +73,7 @@ the point of it.
 
 ## What this file contains
 
-678 lines defining **13 functions** (9 public), **4 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+785 lines defining **13 functions** (9 public), **4 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -86,11 +86,11 @@ the point of it.
 
 - `Profile::applied_to` (line 127) -- The engine settings this profile asks for, over a starting point.
 - `profile` (line 200) -- The profile with this identifier.
-- `Workspace::load` (line 390) -- Read a project file.
+- `Workspace::load` (line 414) -- Read a project file.
   - reaches: `parse`, `new`, `take_token`, `default_profile`
-- `Workspace::save` (line 397) -- Write a project file, creating the directory if needed.
-  - reaches: `to_text`, `one_line`, `path_text`
-- `Workspace::profile` (line 409) -- The profile this project names, if this build has it.
+- `Workspace::save` (line 421) -- Write a project file, creating the directory if needed.
+  - reaches: `to_text`, `one_line`
+- `Workspace::profile` (line 433) -- The profile this project names, if this build has it.
 
 ## What calls what
 
@@ -112,13 +112,13 @@ flowchart TD
     n_default_profile["default_profile<br/>line 205"]
     n_new["Workspace::new<br/>line 239"]
     n_to_text["Workspace::to_text<br/>line 253"]
-    n_parse["Workspace::parse<br/>line 296"]
-    n_load(["Workspace::load<br/>line 390"])
-    n_save(["Workspace::save<br/>line 397"])
-    n_profile(["Workspace::profile<br/>line 409"])
-    n_take_token["take_token<br/>line 418"]
-    n_one_line["one_line<br/>line 431"]
-    n_path_text["path_text<br/>line 436"]
+    n_parse["Workspace::parse<br/>line 316"]
+    n_load(["Workspace::load<br/>line 414"])
+    n_save(["Workspace::save<br/>line 421"])
+    n_profile(["Workspace::profile<br/>line 433"])
+    n_take_token["take_token<br/>line 442"]
+    n_one_line["one_line<br/>line 455"]
+    n_path_text["path_text<br/>line 460"]
     n_load --> n_parse
     n_new --> n_default_profile
     n_parse --> n_new
@@ -126,20 +126,19 @@ flowchart TD
     n_path_text --> n_one_line
     n_save --> n_to_text
     n_to_text --> n_one_line
-    n_to_text --> n_path_text
     click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L80" "open the source"
     click n_applied_to href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L127" "open the source"
     click n_profile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L200" "open the source"
     click n_default_profile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L205" "open the source"
     click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L239" "open the source"
     click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L253" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L296" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L390" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L397" "open the source"
-    click n_profile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L409" "open the source"
-    click n_take_token href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L418" "open the source"
-    click n_one_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L431" "open the source"
-    click n_path_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L436" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L316" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L414" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L421" "open the source"
+    click n_profile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L433" "open the source"
+    click n_take_token href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L442" "open the source"
+    click n_one_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L455" "open the source"
+    click n_path_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L460" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_applied_to,n_profile,n_load,n_save,n_profile entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -169,10 +168,10 @@ flowchart TD
 | `Workspace` <sub>pub struct</sub> | [220](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L220) | One piece of work, saved. |
 | `Workspace::new` <sub>pub fn</sub> | [239](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L239) | A new, empty project under the default profile. |
 | `Workspace::to_text` <sub>pub fn</sub> | [253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L253) | Serialise to the text format. |
-| `Workspace::parse` <sub>pub fn</sub> | [296](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L296) | Parse the text format. |
-| `Workspace::load` <sub>pub fn</sub> | [390](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L390) | Read a project file. |
-| `Workspace::save` <sub>pub fn</sub> | [397](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L397) | Write a project file, creating the directory if needed. |
-| `Workspace::profile` <sub>pub fn</sub> | [409](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L409) | The profile this project names, if this build has it. |
-| `take_token` <sub>fn</sub> | [418](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L418) | The first whitespace-delimited token, and everything after it. |
-| `one_line` <sub>fn</sub> | [431](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L431) | A value with no line break in it. |
-| `path_text` <sub>fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L436) | A path as one line, with Windows separators normalised. |
+| `Workspace::parse` <sub>pub fn</sub> | [316](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L316) | Parse the text format. |
+| `Workspace::load` <sub>pub fn</sub> | [414](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L414) | Read a project file. |
+| `Workspace::save` <sub>pub fn</sub> | [421](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L421) | Write a project file, creating the directory if needed. |
+| `Workspace::profile` <sub>pub fn</sub> | [433](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L433) | The profile this project names, if this build has it. |
+| `take_token` <sub>fn</sub> | [442](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L442) | The first whitespace-delimited token, and everything after it. |
+| `one_line` <sub>fn</sub> | [455](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L455) | A value with no line break in it. |
+| `path_text` <sub>fn</sub> | [460](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L460) | A path as one line, with Windows separators normalised. |

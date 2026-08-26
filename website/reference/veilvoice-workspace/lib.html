@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-workspace/lib.svg" alt="lib.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-workspace/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-workspace.html">veilvoice-workspace</a> &middot; 678 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-workspace.html">veilvoice-workspace</a> &middot; 785 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-project-file-is-worth-having-here-in-particular">Why a project file is worth having here in particular</a>
@@ -73,7 +73,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>678 lines defining <strong>13 functions</strong> (9 public), <strong>4 types</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>785 lines defining <strong>13 functions</strong> (9 public), <strong>4 types</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Error</code> <span style="color:var(--muted)">line 72</span> &mdash; Something that could not be read.</li>
 <li><code>struct Profile</code> <span style="color:var(--muted)">line 98</span> &mdash; A named way of working.</li>
@@ -85,13 +85,13 @@
 </li>
 <li><code>profile</code> <span style="color:var(--muted)">line 200</span> &mdash; The profile with this identifier.
 </li>
-<li><code>Workspace::load</code> <span style="color:var(--muted)">line 390</span> &mdash; Read a project file.
+<li><code>Workspace::load</code> <span style="color:var(--muted)">line 414</span> &mdash; Read a project file.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>new</code>, <code>take_token</code>, <code>default_profile</code></span>
 </li>
-<li><code>Workspace::save</code> <span style="color:var(--muted)">line 397</span> &mdash; Write a project file, creating the directory if needed.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code>, <code>one_line</code>, <code>path_text</code></span>
+<li><code>Workspace::save</code> <span style="color:var(--muted)">line 421</span> &mdash; Write a project file, creating the directory if needed.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code>, <code>one_line</code></span>
 </li>
-<li><code>Workspace::profile</code> <span style="color:var(--muted)">line 409</span> &mdash; The profile this project names, if this build has it.
+<li><code>Workspace::profile</code> <span style="color:var(--muted)">line 433</span> &mdash; The profile this project names, if this build has it.
 </li>
 </ul>
 </section>
@@ -105,11 +105,10 @@
 <path d="M349.4 247.0 C 371.4 247.0, 371.4 247.0, 184.4 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M330.4 147.0 C 352.4 147.0, 352.4 147.0, 173.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M181.4 247.0 C 352.4 247.0, 352.4 147.0, 333.4 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M106.6 274.0 C 106.6 294.0, 156.0 400.0, 156.0 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M445.2 447.0 C 467.2 447.0, 467.2 447.0, 325.8 447.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M106.6 274.0 C 106.6 294.0, 217.2 400.0, 217.2 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M370.0 374.0 C 370.0 394.0, 339.6 400.0, 339.6 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M517.4 247.0 C 543.2 247.0, 543.2 147.0, 524.2 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M438.8 174.0 C 438.8 194.0, 278.4 400.0, 278.4 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M438.8 174.0 C 438.8 194.0, 397.0 400.0, 397.0 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M438.8 174.0 C 438.8 194.0, 339.6 400.0, 339.6 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L80" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="80.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
@@ -121,9 +120,9 @@
 <text x="244.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 127</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L200" target="_blank" rel="noopener noreferrer">
-<rect x="192.2" y="320.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="274.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">profile</text>
-<text x="274.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
+<rect x="131.0" y="320.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="213.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">profile</text>
+<text x="213.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L205" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="120.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
@@ -140,40 +139,40 @@
 <text x="438.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Workspace::to_text</text>
 <text x="438.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 253</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L296" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L316" target="_blank" rel="noopener noreferrer">
 <rect x="31.8" y="220.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="106.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Workspace::parse</text>
-<text x="106.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 296</text>
+<text x="106.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L390" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L414" target="_blank" rel="noopener noreferrer">
 <rect x="207.4" y="220.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="278.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Workspace::load</text>
-<text x="278.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 390</text>
+<text x="278.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 414</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L397" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L421" target="_blank" rel="noopener noreferrer">
 <rect x="375.4" y="220.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="446.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Workspace::save</text>
-<text x="446.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 397</text>
+<text x="446.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 421</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L409" target="_blank" rel="noopener noreferrer">
-<rect x="192.2" y="320.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="274.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Workspace::profile</text>
-<text x="274.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 409</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L433" target="_blank" rel="noopener noreferrer">
+<rect x="131.0" y="320.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="213.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Workspace::profile</text>
+<text x="213.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 433</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L418" target="_blank" rel="noopener noreferrer">
-<rect x="104.0" y="420.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="156.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">take_token</text>
-<text x="156.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 418</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L442" target="_blank" rel="noopener noreferrer">
+<rect x="165.2" y="420.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="217.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">take_token</text>
+<text x="217.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 442</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L431" target="_blank" rel="noopener noreferrer">
-<rect x="234.0" y="420.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="278.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">one_line</text>
-<text x="278.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 431</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L455" target="_blank" rel="noopener noreferrer">
+<rect x="295.2" y="420.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="339.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">one_line</text>
+<text x="339.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 455</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L436" target="_blank" rel="noopener noreferrer">
-<rect x="348.8" y="420.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="397.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">path_text</text>
-<text x="397.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 436</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L460" target="_blank" rel="noopener noreferrer">
+<rect x="321.8" y="320.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="370.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">path_text</text>
+<text x="370.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 460</text>
 </a>
 </svg>
 </div>
@@ -187,13 +186,13 @@ flowchart TD
     n_default_profile[&quot;default_profile&lt;br/&gt;line 205&quot;]
     n_new[&quot;Workspace::new&lt;br/&gt;line 239&quot;]
     n_to_text[&quot;Workspace::to_text&lt;br/&gt;line 253&quot;]
-    n_parse[&quot;Workspace::parse&lt;br/&gt;line 296&quot;]
-    n_load([&quot;Workspace::load&lt;br/&gt;line 390&quot;])
-    n_save([&quot;Workspace::save&lt;br/&gt;line 397&quot;])
-    n_profile([&quot;Workspace::profile&lt;br/&gt;line 409&quot;])
-    n_take_token[&quot;take_token&lt;br/&gt;line 418&quot;]
-    n_one_line[&quot;one_line&lt;br/&gt;line 431&quot;]
-    n_path_text[&quot;path_text&lt;br/&gt;line 436&quot;]
+    n_parse[&quot;Workspace::parse&lt;br/&gt;line 316&quot;]
+    n_load([&quot;Workspace::load&lt;br/&gt;line 414&quot;])
+    n_save([&quot;Workspace::save&lt;br/&gt;line 421&quot;])
+    n_profile([&quot;Workspace::profile&lt;br/&gt;line 433&quot;])
+    n_take_token[&quot;take_token&lt;br/&gt;line 442&quot;]
+    n_one_line[&quot;one_line&lt;br/&gt;line 455&quot;]
+    n_path_text[&quot;path_text&lt;br/&gt;line 460&quot;]
     n_load --&gt; n_parse
     n_new --&gt; n_default_profile
     n_parse --&gt; n_new
@@ -201,20 +200,19 @@ flowchart TD
     n_path_text --&gt; n_one_line
     n_save --&gt; n_to_text
     n_to_text --&gt; n_one_line
-    n_to_text --&gt; n_path_text
     click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L80&quot; &quot;open the source&quot;
     click n_applied_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L127&quot; &quot;open the source&quot;
     click n_profile href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L200&quot; &quot;open the source&quot;
     click n_default_profile href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L205&quot; &quot;open the source&quot;
     click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L239&quot; &quot;open the source&quot;
     click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L253&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L296&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L390&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L397&quot; &quot;open the source&quot;
-    click n_profile href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L409&quot; &quot;open the source&quot;
-    click n_take_token href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L418&quot; &quot;open the source&quot;
-    click n_one_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L431&quot; &quot;open the source&quot;
-    click n_path_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L436&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L316&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L414&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L421&quot; &quot;open the source&quot;
+    click n_profile href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L433&quot; &quot;open the source&quot;
+    click n_take_token href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L442&quot; &quot;open the source&quot;
+    click n_one_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L455&quot; &quot;open the source&quot;
+    click n_path_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L460&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_applied_to,n_profile,n_load,n_save,n_profile entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -242,13 +240,13 @@ flowchart TD
 <tr><td><code>Workspace</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L220" rel="noopener noreferrer">220</a></td><td>One piece of work, saved.</td></tr>
 <tr><td><code>Workspace::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L239" rel="noopener noreferrer">239</a></td><td>A new, empty project under the default profile.</td></tr>
 <tr><td><code>Workspace::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L253" rel="noopener noreferrer">253</a></td><td>Serialise to the text format.</td></tr>
-<tr><td><code>Workspace::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L296" rel="noopener noreferrer">296</a></td><td>Parse the text format.</td></tr>
-<tr><td><code>Workspace::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L390" rel="noopener noreferrer">390</a></td><td>Read a project file.</td></tr>
-<tr><td><code>Workspace::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L397" rel="noopener noreferrer">397</a></td><td>Write a project file, creating the directory if needed.</td></tr>
-<tr><td><code>Workspace::profile</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L409" rel="noopener noreferrer">409</a></td><td>The profile this project names, if this build has it.</td></tr>
-<tr><td><code>take_token</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L418" rel="noopener noreferrer">418</a></td><td>The first whitespace-delimited token, and everything after it.</td></tr>
-<tr><td><code>one_line</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L431" rel="noopener noreferrer">431</a></td><td>A value with no line break in it.</td></tr>
-<tr><td><code>path_text</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L436" rel="noopener noreferrer">436</a></td><td>A path as one line, with Windows separators normalised.</td></tr>
+<tr><td><code>Workspace::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L316" rel="noopener noreferrer">316</a></td><td>Parse the text format.</td></tr>
+<tr><td><code>Workspace::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L414" rel="noopener noreferrer">414</a></td><td>Read a project file.</td></tr>
+<tr><td><code>Workspace::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L421" rel="noopener noreferrer">421</a></td><td>Write a project file, creating the directory if needed.</td></tr>
+<tr><td><code>Workspace::profile</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L433" rel="noopener noreferrer">433</a></td><td>The profile this project names, if this build has it.</td></tr>
+<tr><td><code>take_token</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L442" rel="noopener noreferrer">442</a></td><td>The first whitespace-delimited token, and everything after it.</td></tr>
+<tr><td><code>one_line</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L455" rel="noopener noreferrer">455</a></td><td>A value with no line break in it.</td></tr>
+<tr><td><code>path_text</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-workspace/src/lib.rs#L460" rel="noopener noreferrer">460</a></td><td>A path as one line, with Windows separators normalised.</td></tr>
 </tbody></table>
 </section>
 </div></div>

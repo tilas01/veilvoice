@@ -8,6 +8,46 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### F-67 — the group panel rendered with the default settings, not yours
+
+The eighth audit round, over the voice limit, saved projects and profiles, and
+the table of communication programs. Two defects, neither shipped.
+
+Every question the group panel answered about voices — how many speakers it
+would allow, which mode it would let you switch to, and **the render itself** —
+was computed from the engine's *default* configuration rather than from the
+settings the rest of the window was set to.
+
+So somebody who set the strength to its highest and turned accent
+neutralisation on, then rendered a group conversation, got a render at the
+default strength with the accent work off. It reported success. The controls
+were on another tab and the panel had never been handed them.
+
+The quieter half: how many voices stay clearly apart depends on the frame grid,
+because a coarser grid snaps destination pitches onto wider steps. Under a
+configuration where fewer than eight are separable, the panel still printed "8"
+and still let eight people in — and two of them would have shared a voice,
+discovered by listening to the finished recording.
+
+The panel now carries the configuration, copied from the application before
+anything is painted. The regression test moves the frame size to something that
+genuinely lowers the count, and checks that the number shown *and* the number
+enforced both follow.
+
+### F-66 — a saved project could come back different from how it went out
+
+A value that trimmed away to nothing was written as a key with an empty value:
+`Some("   ")` went out as `title  ` and came back as `Some("")` — neither what
+was saved nor absent. A truncated project file carrying `plan  ` with nothing
+after it yielded a plan path naming no file, which failed later with a message
+about a file called nothing instead of being read as "no plan named".
+
+Writer and reader are symmetric now, in both directions. The fix worth having
+is the test: every shape a project can be in is saved, read, saved and read
+again — empty and whitespace values, no members, the maximum members, no
+outputs at all, and names containing the field separator and a line break. The
+old test only ever exercised one tidy project.
+
 ### Talking through VeilVoice on Discord, Signal, Telegram, Matrix and the rest
 
 ```
