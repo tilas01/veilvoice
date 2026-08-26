@@ -508,6 +508,14 @@ enum CaptureCommand {
     /// Every program this build knows how to notice.
     List,
 
+    /// Where to point Discord, Signal, Telegram, Element and the rest so your
+    /// voice goes through VeilVoice first.
+    ///
+    /// Prints the route, the menu to change in each program found, and the two
+    /// things this does **not** do: it changes only what you send, and it never
+    /// reaches inside any of those programs.
+    Calls,
+
     /// Stop notifying about one program.
     ///
     /// Allowed means muted, not hidden: it still appears in `status`.
@@ -928,6 +936,7 @@ fn run(command: Command) -> Result<(), String> {
         Command::Capture { what } => match what {
             CaptureCommand::Status => capture::status(),
             CaptureCommand::List => capture::list(),
+            CaptureCommand::Calls => capture::calls(),
             CaptureCommand::Allow { key } => capture::allow(&key),
             CaptureCommand::Deny { key } => capture::deny(&key),
             CaptureCommand::Check => {

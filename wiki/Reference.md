@@ -26,6 +26,7 @@ Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable rou
 
 Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of what cannot be seen.
 
+- [[`comms.rs`|File-veilvoice-capture-comms]] &mdash; Communication programs, and how to put VeilVoice between you and them.
 - [[`lib.rs`|File-veilvoice-capture-lib]] &mdash; Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do.
 - [[`processes.rs`|File-veilvoice-capture-processes]] &mdash; Listing the processes that are running, per platform.
 - [[`programs.rs`|File-veilvoice-capture-programs]] &mdash; The programs this build knows can capture a screen.

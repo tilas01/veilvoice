@@ -111,6 +111,87 @@ pub fn status() -> Result<(), String> {
 }
 
 /// Every program in the table, whether it is running or not.
+/// Where to point a calling program so your voice goes through VeilVoice.
+///
+/// Prints the route, which program to change and where, and -- as plainly as
+/// the rest -- the two things it does not do.
+pub fn calls() -> Result<(), String> {
+    use veilvoice_capture::comms;
+
+    println!("{}", heading("Talking through VeilVoice"));
+    println!();
+    println!("  your microphone  ->  veilvoice live  ->  a virtual audio cable");
+    println!("                                                   |");
+    println!("                                                   v");
+    println!("                                       the calling program, with");
+    println!("                                       the cable as its microphone");
+    println!();
+
+    // The cable this machine actually has, named, so the instructions can be
+    // followed rather than translated.
+    #[cfg(feature = "live")]
+    let cable = veilvoice_audio::devices::find_virtual_cable().map(|device| device.name);
+    #[cfg(not(feature = "live"))]
+    let cable: Option<String> = None;
+
+    match &cable {
+        Some(name) => println!("{}", field("this machine's cable", name)),
+        None => {
+            println!(
+                "{}",
+                warn("no virtual audio cable was found on this machine")
+            );
+            println!(
+                "{}",
+                paint(
+                    colour::MUTED,
+                    "  `veilvoice companions` will install VB-CABLE, BlackHole or PipeWire."
+                )
+            );
+        }
+    }
+
+    let (found, problems) = comms::running();
+    println!();
+    println!("{}", heading("Programs found running"));
+    if found.is_empty() {
+        println!(
+            "{}",
+            paint(colour::MUTED, "  none of the ones this build knows")
+        );
+    }
+    for comm in &found {
+        println!("{}", field(comm.name, comm.where_to_look));
+    }
+    for problem in &problems {
+        println!("{}", warn(problem));
+    }
+
+    println!();
+    println!(
+        "{}",
+        heading("Every program this build knows where to look in")
+    );
+    for comm in comms::COMMS {
+        println!("{}", field(comm.name, comm.where_to_look));
+    }
+    println!();
+    for line in crate::sentry::wrap(comms::ANY_PROGRAM, 72) {
+        println!("  {line}");
+    }
+
+    println!();
+    println!("{}", paint(colour::YELLOW, "WHAT THIS DOES NOT DO"));
+    for line in crate::sentry::wrap(comms::INCOMING, 72) {
+        println!("  {line}");
+    }
+    println!();
+    for line in crate::sentry::wrap(comms::NO_INTERCEPTION, 72) {
+        println!("  {line}");
+    }
+    Ok(())
+}
+
 pub fn list() -> Result<(), String> {
     println!("{}", heading("Programs this build knows"));
     println!("  Anything not on this list is not reported. The list will never be");
