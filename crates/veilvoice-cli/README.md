@@ -110,7 +110,8 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>2133 lines"])
+    n_main(["main.rs<br/>2183 lines"])
+    n_appctl["appctl.rs<br/>272 lines"]
     n_atrest["atrest.rs<br/>275 lines"]
     n_capture["capture.rs<br/>321 lines"]
     n_conversation["conversation.rs<br/>789 lines"]
@@ -121,6 +122,8 @@ flowchart TD
     n_policy["policy.rs<br/>236 lines"]
     n_sentry["sentry.rs<br/>376 lines"]
     n_theme["theme.rs<br/>135 lines"]
+    n_appctl --> n_sentry
+    n_appctl --> n_theme
     n_atrest --> n_theme
     n_capture --> n_policy
     n_capture --> n_sentry
@@ -140,6 +143,7 @@ flowchart TD
     n_policy --> n_theme
     n_sentry --> n_theme
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" "open the source"
+    click n_appctl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs" "open the source"
     click n_atrest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" "open the source"
     click n_capture href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs" "open the source"
     click n_conversation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs" "open the source"
@@ -158,13 +162,14 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
+| [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | 272 | veilvoice appctl — learn what normally runs, then notice what does not. |
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | 321 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 789 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 117 | veilvoice input — what running programs can see your keyboard and mouse. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2133 | veilvoice — the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2183 | veilvoice — the command-line interface. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 250 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 236 | veilvoice policy -- settings that can only be tightened. |
 | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 376 | veilvoice sentry -- canaries, baselines, and what changed since. |
@@ -174,6 +179,12 @@ flowchart TD
 
 | Item | Where | What |
 |---|---|---|
+| `fn baseline_path` | [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | Where the baseline is kept. |
+| `fn learn` | [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | Record what is running as ordinary. |
+| `fn check` | [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | Compare what is running against the baseline. |
+| `fn allow` | [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | Allow a program, for a while or for good. |
+| `fn revoke` | [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | Withdraw a grant. |
+| `fn log` | [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | Show the decision log. |
 | `const PLAINTEXT_WARNING` | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | What the user is told before a recording is written in the clear. |
 | `enum Recipient` | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | How a recording is to be sealed. |
 | `fn seal_to_disk` | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | Seal plaintext and write it to <path>.veil, returning where it landed. |
