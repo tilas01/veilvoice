@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/chain.svg" alt="chain.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/chain.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1256 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1569 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-signal-path">The signal path</a>
@@ -85,43 +85,46 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1256 lines defining <strong>21 functions</strong> (16 public), <strong>3 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1569 lines defining <strong>23 functions</strong> (17 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct DeidConfig</code> <span style="color:var(--muted)">line 130</span> &mdash; User-facing configuration for the de-identifier.</li>
-<li><code>struct ProcessStats</code> <span style="color:var(--muted)">line 452</span> &mdash; Rolling performance statistics, surfaced live to the UI.</li>
-<li><code>struct Deidentifier</code> <span style="color:var(--muted)">line 513</span> &mdash; The complete, irreversible voice de-identification chain.</li>
+<li><code>enum RangeError</code> <span style="color:var(--muted)">line 244</span> &mdash; Why a ratchet range typed by a person was not accepted.</li>
+<li><code>struct ProcessStats</code> <span style="color:var(--muted)">line 599</span> &mdash; Rolling performance statistics, surfaced live to the UI.</li>
+<li><code>struct Deidentifier</code> <span style="color:var(--muted)">line 660</span> &mdash; The complete, irreversible voice de-identification chain.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>DeidConfig::effective_reseed_range_ms</code> <span style="color:var(--muted)">line 257</span> &mdash; What DeidConfig::reseed_range_ms actually comes to on this configuration, after quantising to whole frames.
+<li><code>parse_reseed_range</code> <span style="color:var(--muted)">line 321</span> &mdash; Read a low,high ratchet range in milliseconds, or say why not.
+</li>
+<li><code>DeidConfig::effective_reseed_range_ms</code> <span style="color:var(--muted)">line 404</span> &mdash; What DeidConfig::reseed_range_ms actually comes to on this configuration, after quantising to whole frames.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>frame_ms</code>, <code>frames_for_ms</code>, <code>hop</code></span>
 </li>
-<li><code>DeidConfig::reseed_range_is_finer_than_a_frame</code> <span style="color:var(--muted)">line 271</span> &mdash; Whether the requested range is finer than one frame, so the whole of it collapses onto a single interval.
+<li><code>DeidConfig::reseed_range_is_finer_than_a_frame</code> <span style="color:var(--muted)">line 418</span> &mdash; Whether the requested range is finer than one frame, so the whole of it collapses onto a single interval.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>frames_for_ms</code>, <code>frame_ms</code>, <code>hop</code></span>
 </li>
-<li><code>DeidConfig::with_random_reseed_range</code> <span style="color:var(--muted)">line 292</span> &mdash; This configuration with a roll range drawn from the OS CSPRNG.
+<li><code>DeidConfig::with_random_reseed_range</code> <span style="color:var(--muted)">line 439</span> &mdash; This configuration with a roll range drawn from the OS CSPRNG.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>frame_ms</code>, <code>hop</code></span>
 </li>
-<li><code>DeidConfig::checked</code> <span style="color:var(--muted)">line 348</span> &mdash; Validate and normalise; returns an error string on impossible values.
+<li><code>DeidConfig::checked</code> <span style="color:var(--muted)">line 495</span> &mdash; Validate and normalise; returns an error string on impossible values.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>clamp_ratio_bounds</code></span>
 </li>
-<li><code>ProcessStats::last_block_ms</code> <span style="color:var(--muted)">line 484</span> &mdash; Most recent block processing time in milliseconds.
+<li><code>ProcessStats::last_block_ms</code> <span style="color:var(--muted)">line 631</span> &mdash; Most recent block processing time in milliseconds.
 </li>
-<li><code>ProcessStats::worst_block_ms</code> <span style="color:var(--muted)">line 488</span> &mdash; Worst block processing time in milliseconds.
+<li><code>ProcessStats::worst_block_ms</code> <span style="color:var(--muted)">line 635</span> &mdash; Worst block processing time in milliseconds.
 </li>
-<li><code>ProcessStats::ema_block_ms</code> <span style="color:var(--muted)">line 492</span> &mdash; Smoothed block processing time in milliseconds.
+<li><code>ProcessStats::ema_block_ms</code> <span style="color:var(--muted)">line 639</span> &mdash; Smoothed block processing time in milliseconds.
 </li>
-<li><code>ProcessStats::last_realtime_factor</code> <span style="color:var(--muted)">line 497</span> &mdash; Processing time divided by the block&#x27;s real-time duration.
+<li><code>ProcessStats::last_realtime_factor</code> <span style="color:var(--muted)">line 644</span> &mdash; Processing time divided by the block&#x27;s real-time duration.
 </li>
-<li><code>Deidentifier::new</code> <span style="color:var(--muted)">line 543</span> &mdash; Build with a fresh, unpredictable seed from the OS CSPRNG.
+<li><code>Deidentifier::new</code> <span style="color:var(--muted)">line 690</span> &mdash; Build with a fresh, unpredictable seed from the OS CSPRNG.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>from_seed</code></span>
 </li>
-<li><code>Deidentifier::latency_samples</code> <span style="color:var(--muted)">line 618</span> &mdash; Fixed algorithmic latency in samples.
+<li><code>Deidentifier::latency_samples</code> <span style="color:var(--muted)">line 765</span> &mdash; Fixed algorithmic latency in samples.
 </li>
-<li><code>Deidentifier::stats</code> <span style="color:var(--muted)">line 623</span> &mdash; Live performance statistics (copy).
+<li><code>Deidentifier::stats</code> <span style="color:var(--muted)">line 770</span> &mdash; Live performance statistics (copy).
 </li>
-<li><code>Deidentifier::accent_stats</code> <span style="color:var(--muted)">line 628</span> &mdash; Live accent-neutralisation read-out (detected f0, applied ratios).
+<li><code>Deidentifier::accent_stats</code> <span style="color:var(--muted)">line 775</span> &mdash; Live accent-neutralisation read-out (detected f0, applied ratios).
 </li>
-<li><code>Deidentifier::process_vec</code> <span style="color:var(--muted)">line 706</span> &mdash; Convenience: process a whole buffer and return a new Vec.
+<li><code>Deidentifier::process_vec</code> <span style="color:var(--muted)">line 853</span> &mdash; Convenience: process a whole buffer and return a new Vec.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>process</code></span>
 </li>
 </ul>
@@ -129,151 +132,157 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 602 994" width="602" height="994" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 648 994" width="648" height="994" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
-<rect x="0" y="0" width="602" height="994" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M396.6 374.0 C 396.6 394.0, 186.8 900.0, 186.8 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M551.2 147.0 C 596.4 147.0, 596.4 47.0, 577.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M551.2 147.0 C 573.2 147.0, 573.2 147.0, 272.2 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M574.4 47.0 C 596.4 47.0, 596.4 47.0, 371.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M269.2 147.0 C 596.4 147.0, 596.4 47.0, 577.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M164.0 674.0 C 164.0 694.0, 396.6 900.0, 396.6 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M517.0 847.0 C 539.0 847.0, 539.0 847.0, 276.0 847.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M288.2 247.0 C 310.2 247.0, 310.2 147.0, 272.2 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M570.2 247.0 C 596.4 247.0, 596.4 47.0, 577.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L193" target="_blank" rel="noopener noreferrer">
-<rect x="28.0" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="114.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::default</text>
-<text x="114.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 193</text>
+<rect x="0" y="0" width="648" height="994" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M465.0 374.0 C 465.0 394.0, 209.6 900.0, 209.6 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M311.0 247.0 C 398.0 247.0, 398.0 147.0, 379.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M311.0 247.0 C 642.0 247.0, 642.0 147.0, 623.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M376.0 147.0 C 398.0 147.0, 398.0 147.0, 173.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M620.0 147.0 C 642.0 147.0, 642.0 147.0, 379.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M186.8 674.0 C 186.8 694.0, 419.4 900.0, 419.4 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M539.8 847.0 C 561.8 847.0, 561.8 847.0, 298.8 847.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M593.0 247.0 C 642.0 247.0, 642.0 147.0, 623.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M352.8 347.0 C 398.0 347.0, 398.0 147.0, 379.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L200" target="_blank" rel="noopener noreferrer">
+<rect x="58.4" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="144.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::default</text>
+<text x="144.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L223" target="_blank" rel="noopener noreferrer">
-<rect x="226.4" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="297.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::hop</text>
-<text x="297.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 223</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L275" target="_blank" rel="noopener noreferrer">
+<rect x="256.8" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="327.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">RangeError::fmt</text>
+<text x="327.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 275</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L231" target="_blank" rel="noopener noreferrer">
-<rect x="394.4" y="20.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="484.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::frame_ms</text>
-<text x="484.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 231</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L321" target="_blank" rel="noopener noreferrer">
+<rect x="424.8" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="507.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_reseed_range</text>
+<text x="507.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L240" target="_blank" rel="noopener noreferrer">
-<rect x="51.2" y="120.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="160.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::frames_for_ms</text>
-<text x="160.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 240</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L370" target="_blank" rel="noopener noreferrer">
+<rect x="28.0" y="120.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="99.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::hop</text>
+<text x="99.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 370</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L257" target="_blank" rel="noopener noreferrer">
-<rect x="295.2" y="120.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="423.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::effective_reseed_&#8230;</text>
-<text x="423.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L378" target="_blank" rel="noopener noreferrer">
+<rect x="196.0" y="120.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="286.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::frame_ms</text>
+<text x="286.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 378</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L271" target="_blank" rel="noopener noreferrer">
-<rect x="32.2" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="160.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::reseed_range_is_f&#8230;</text>
-<text x="160.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 271</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L387" target="_blank" rel="noopener noreferrer">
+<rect x="402.0" y="120.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="511.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::frames_for_ms</text>
+<text x="511.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 387</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L292" target="_blank" rel="noopener noreferrer">
-<rect x="314.2" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="442.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::with_random_resee&#8230;</text>
-<text x="442.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 292</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L404" target="_blank" rel="noopener noreferrer">
+<rect x="55.0" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="183.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::effective_reseed_&#8230;</text>
+<text x="183.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 404</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L309" target="_blank" rel="noopener noreferrer">
-<rect x="119.6" y="320.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="202.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::scaled</text>
-<text x="202.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L418" target="_blank" rel="noopener noreferrer">
+<rect x="337.0" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="465.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::reseed_range_is_f&#8230;</text>
+<text x="465.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 418</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L348" target="_blank" rel="noopener noreferrer">
-<rect x="310.4" y="320.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="396.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::checked</text>
-<text x="396.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 348</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L439" target="_blank" rel="noopener noreferrer">
+<rect x="96.8" y="320.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="224.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::with_random_resee&#8230;</text>
+<text x="224.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 439</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L438" target="_blank" rel="noopener noreferrer">
-<rect x="104.4" y="920.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="186.8" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clamp_ratio_bounds</text>
-<text x="186.8" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 438</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L495" target="_blank" rel="noopener noreferrer">
+<rect x="378.8" y="320.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="465.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">DeidConfig::checked</text>
+<text x="465.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 495</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L484" target="_blank" rel="noopener noreferrer">
-<rect x="51.2" y="420.0" width="233.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="167.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::last_block_ms</text>
-<text x="167.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 484</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L585" target="_blank" rel="noopener noreferrer">
+<rect x="127.2" y="920.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="209.6" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clamp_ratio_bounds</text>
+<text x="209.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 585</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L488" target="_blank" rel="noopener noreferrer">
-<rect x="310.4" y="420.0" width="240.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="430.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::worst_block_ms</text>
-<text x="430.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 488</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L631" target="_blank" rel="noopener noreferrer">
+<rect x="74.0" y="420.0" width="233.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="190.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::last_block_ms</text>
+<text x="190.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 631</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L492" target="_blank" rel="noopener noreferrer">
-<rect x="47.4" y="520.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="160.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::ema_block_ms</text>
-<text x="160.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 492</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L635" target="_blank" rel="noopener noreferrer">
+<rect x="333.2" y="420.0" width="240.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="453.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::worst_block_ms</text>
+<text x="453.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 635</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L497" target="_blank" rel="noopener noreferrer">
-<rect x="299.0" y="520.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="427.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::last_realtime_f&#8230;</text>
-<text x="427.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 497</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L639" target="_blank" rel="noopener noreferrer">
+<rect x="70.2" y="520.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="183.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::ema_block_ms</text>
+<text x="183.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 639</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L543" target="_blank" rel="noopener noreferrer">
-<rect x="85.4" y="620.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="164.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::new</text>
-<text x="164.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 543</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L644" target="_blank" rel="noopener noreferrer">
+<rect x="321.8" y="520.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="449.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ProcessStats::last_realtime_f&#8230;</text>
+<text x="449.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 644</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L550" target="_blank" rel="noopener noreferrer">
-<rect x="295.2" y="920.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="396.6" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::from_seed</text>
-<text x="396.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 550</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L690" target="_blank" rel="noopener noreferrer">
+<rect x="108.2" y="620.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="186.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::new</text>
+<text x="186.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 690</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L618" target="_blank" rel="noopener noreferrer">
-<rect x="268.6" y="620.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="392.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::latency_samples</text>
-<text x="392.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 618</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L697" target="_blank" rel="noopener noreferrer">
+<rect x="318.0" y="920.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="419.4" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::from_seed</text>
+<text x="419.4" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 697</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L623" target="_blank" rel="noopener noreferrer">
-<rect x="89.2" y="720.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="175.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::stats</text>
-<text x="175.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 623</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L765" target="_blank" rel="noopener noreferrer">
+<rect x="291.4" y="620.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="415.6" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::latency_samples</text>
+<text x="415.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 765</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L628" target="_blank" rel="noopener noreferrer">
-<rect x="287.6" y="720.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="400.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::accent_stats</text>
-<text x="400.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 628</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L770" target="_blank" rel="noopener noreferrer">
+<rect x="112.0" y="720.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="198.2" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::stats</text>
+<text x="198.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 770</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L634" target="_blank" rel="noopener noreferrer">
-<rect x="85.4" y="820.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="179.2" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::process</text>
-<text x="179.2" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 634</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L775" target="_blank" rel="noopener noreferrer">
+<rect x="310.4" y="720.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="423.2" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::accent_stats</text>
+<text x="423.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 775</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L706" target="_blank" rel="noopener noreferrer">
-<rect x="299.0" y="820.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="408.0" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::process_vec</text>
-<text x="408.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 706</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L781" target="_blank" rel="noopener noreferrer">
+<rect x="108.2" y="820.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="202.0" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::process</text>
+<text x="202.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 781</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L853" target="_blank" rel="noopener noreferrer">
+<rect x="321.8" y="820.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="430.8" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Deidentifier::process_vec</text>
+<text x="430.8" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 853</text>
 </a>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 23 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_default[&quot;DeidConfig::default&lt;br/&gt;line 193&quot;]
-    n_hop[&quot;DeidConfig::hop&lt;br/&gt;line 223&quot;]
-    n_frame_ms[&quot;DeidConfig::frame_ms&lt;br/&gt;line 231&quot;]
-    n_frames_for_ms[&quot;DeidConfig::frames_for_ms&lt;br/&gt;line 240&quot;]
-    n_effective_reseed_range_ms([&quot;DeidConfig::effective_reseed_&#8230;&lt;br/&gt;line 257&quot;])
-    n_reseed_range_is_finer_than_a_frame([&quot;DeidConfig::reseed_range_is_f&#8230;&lt;br/&gt;line 271&quot;])
-    n_with_random_reseed_range([&quot;DeidConfig::with_random_resee&#8230;&lt;br/&gt;line 292&quot;])
-    n_scaled[&quot;DeidConfig::scaled&lt;br/&gt;line 309&quot;]
-    n_checked([&quot;DeidConfig::checked&lt;br/&gt;line 348&quot;])
-    n_clamp_ratio_bounds[&quot;clamp_ratio_bounds&lt;br/&gt;line 438&quot;]
-    n_last_block_ms([&quot;ProcessStats::last_block_ms&lt;br/&gt;line 484&quot;])
-    n_worst_block_ms([&quot;ProcessStats::worst_block_ms&lt;br/&gt;line 488&quot;])
-    n_ema_block_ms([&quot;ProcessStats::ema_block_ms&lt;br/&gt;line 492&quot;])
-    n_last_realtime_factor([&quot;ProcessStats::last_realtime_f&#8230;&lt;br/&gt;line 497&quot;])
-    n_new([&quot;Deidentifier::new&lt;br/&gt;line 543&quot;])
-    n_from_seed[&quot;Deidentifier::from_seed&lt;br/&gt;line 550&quot;]
-    n_latency_samples([&quot;Deidentifier::latency_samples&lt;br/&gt;line 618&quot;])
-    n_stats([&quot;Deidentifier::stats&lt;br/&gt;line 623&quot;])
-    n_accent_stats([&quot;Deidentifier::accent_stats&lt;br/&gt;line 628&quot;])
-    n_process[&quot;Deidentifier::process&lt;br/&gt;line 634&quot;]
-    n_process_vec([&quot;Deidentifier::process_vec&lt;br/&gt;line 706&quot;])
+    n_default[&quot;DeidConfig::default&lt;br/&gt;line 200&quot;]
+    n_fmt[&quot;RangeError::fmt&lt;br/&gt;line 275&quot;]
+    n_parse_reseed_range([&quot;parse_reseed_range&lt;br/&gt;line 321&quot;])
+    n_hop[&quot;DeidConfig::hop&lt;br/&gt;line 370&quot;]
+    n_frame_ms[&quot;DeidConfig::frame_ms&lt;br/&gt;line 378&quot;]
+    n_frames_for_ms[&quot;DeidConfig::frames_for_ms&lt;br/&gt;line 387&quot;]
+    n_effective_reseed_range_ms([&quot;DeidConfig::effective_reseed_&#8230;&lt;br/&gt;line 404&quot;])
+    n_reseed_range_is_finer_than_a_frame([&quot;DeidConfig::reseed_range_is_f&#8230;&lt;br/&gt;line 418&quot;])
+    n_with_random_reseed_range([&quot;DeidConfig::with_random_resee&#8230;&lt;br/&gt;line 439&quot;])
+    n_checked([&quot;DeidConfig::checked&lt;br/&gt;line 495&quot;])
+    n_clamp_ratio_bounds[&quot;clamp_ratio_bounds&lt;br/&gt;line 585&quot;]
+    n_last_block_ms([&quot;ProcessStats::last_block_ms&lt;br/&gt;line 631&quot;])
+    n_worst_block_ms([&quot;ProcessStats::worst_block_ms&lt;br/&gt;line 635&quot;])
+    n_ema_block_ms([&quot;ProcessStats::ema_block_ms&lt;br/&gt;line 639&quot;])
+    n_last_realtime_factor([&quot;ProcessStats::last_realtime_f&#8230;&lt;br/&gt;line 644&quot;])
+    n_new([&quot;Deidentifier::new&lt;br/&gt;line 690&quot;])
+    n_from_seed[&quot;Deidentifier::from_seed&lt;br/&gt;line 697&quot;]
+    n_latency_samples([&quot;Deidentifier::latency_samples&lt;br/&gt;line 765&quot;])
+    n_stats([&quot;Deidentifier::stats&lt;br/&gt;line 770&quot;])
+    n_accent_stats([&quot;Deidentifier::accent_stats&lt;br/&gt;line 775&quot;])
+    n_process[&quot;Deidentifier::process&lt;br/&gt;line 781&quot;]
+    n_process_vec([&quot;Deidentifier::process_vec&lt;br/&gt;line 853&quot;])
     n_checked --&gt; n_clamp_ratio_bounds
     n_effective_reseed_range_ms --&gt; n_frame_ms
     n_effective_reseed_range_ms --&gt; n_frames_for_ms
@@ -283,33 +292,34 @@ flowchart TD
     n_process_vec --&gt; n_process
     n_reseed_range_is_finer_than_a_frame --&gt; n_frames_for_ms
     n_with_random_reseed_range --&gt; n_frame_ms
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L193&quot; &quot;open the source&quot;
-    click n_hop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L223&quot; &quot;open the source&quot;
-    click n_frame_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L231&quot; &quot;open the source&quot;
-    click n_frames_for_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L240&quot; &quot;open the source&quot;
-    click n_effective_reseed_range_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L257&quot; &quot;open the source&quot;
-    click n_reseed_range_is_finer_than_a_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L271&quot; &quot;open the source&quot;
-    click n_with_random_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L292&quot; &quot;open the source&quot;
-    click n_scaled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L309&quot; &quot;open the source&quot;
-    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L348&quot; &quot;open the source&quot;
-    click n_clamp_ratio_bounds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L438&quot; &quot;open the source&quot;
-    click n_last_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L484&quot; &quot;open the source&quot;
-    click n_worst_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L488&quot; &quot;open the source&quot;
-    click n_ema_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L492&quot; &quot;open the source&quot;
-    click n_last_realtime_factor href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L497&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L543&quot; &quot;open the source&quot;
-    click n_from_seed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L550&quot; &quot;open the source&quot;
-    click n_latency_samples href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L618&quot; &quot;open the source&quot;
-    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L623&quot; &quot;open the source&quot;
-    click n_accent_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L628&quot; &quot;open the source&quot;
-    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L634&quot; &quot;open the source&quot;
-    click n_process_vec href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L706&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L200&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L275&quot; &quot;open the source&quot;
+    click n_parse_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L321&quot; &quot;open the source&quot;
+    click n_hop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L370&quot; &quot;open the source&quot;
+    click n_frame_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L378&quot; &quot;open the source&quot;
+    click n_frames_for_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L387&quot; &quot;open the source&quot;
+    click n_effective_reseed_range_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L404&quot; &quot;open the source&quot;
+    click n_reseed_range_is_finer_than_a_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L418&quot; &quot;open the source&quot;
+    click n_with_random_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L439&quot; &quot;open the source&quot;
+    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L495&quot; &quot;open the source&quot;
+    click n_clamp_ratio_bounds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L585&quot; &quot;open the source&quot;
+    click n_last_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L631&quot; &quot;open the source&quot;
+    click n_worst_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L635&quot; &quot;open the source&quot;
+    click n_ema_block_ms href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L639&quot; &quot;open the source&quot;
+    click n_last_realtime_factor href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L644&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L690&quot; &quot;open the source&quot;
+    click n_from_seed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L697&quot; &quot;open the source&quot;
+    click n_latency_samples href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L765&quot; &quot;open the source&quot;
+    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L770&quot; &quot;open the source&quot;
+    click n_accent_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L775&quot; &quot;open the source&quot;
+    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L781&quot; &quot;open the source&quot;
+    click n_process_vec href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L853&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_effective_reseed_range_ms,n_reseed_range_is_finer_than_a_frame,n_with_random_reseed_range,n_checked,n_last_block_ms,n_worst_block_ms,n_ema_block_ms,n_last_realtime_factor,n_new,n_latency_samples,n_stats,n_accent_stats,n_process_vec entry
+    class n_parse_reseed_range,n_effective_reseed_range_ms,n_reseed_range_is_finer_than_a_frame,n_with_random_reseed_range,n_checked,n_last_block_ms,n_worst_block_ms,n_ema_block_ms,n_last_realtime_factor,n_new,n_latency_samples,n_stats,n_accent_stats,n_process_vec entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_frame_ms,n_from_seed,n_process api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_default,n_hop,n_frames_for_ms,n_scaled,n_clamp_ratio_bounds helper</code></pre>
+    class n_default,n_fmt,n_hop,n_frames_for_ms,n_clamp_ratio_bounds helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -317,33 +327,37 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>DeidConfig</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L130" rel="noopener noreferrer">130</a></td><td>User-facing configuration for the de-identifier.</td></tr>
-<tr><td><code>DeidConfig::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L193" rel="noopener noreferrer">193</a></td><td></td></tr>
-<tr><td><code>MIN_RESEED_MS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L217" rel="noopener noreferrer">217</a></td><td>The narrowest randomised roll range this engine will accept, in milliseconds.</td></tr>
-<tr><td><code>MAX_RESEED_MS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L220" rel="noopener noreferrer">220</a></td><td>The widest, in milliseconds.</td></tr>
-<tr><td><code>DeidConfig::hop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L223" rel="noopener noreferrer">223</a></td><td></td></tr>
-<tr><td><code>DeidConfig::frame_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L231" rel="noopener noreferrer">231</a></td><td>How long one analysis frame is, in milliseconds.</td></tr>
-<tr><td><code>DeidConfig::frames_for_ms</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L240" rel="noopener noreferrer">240</a></td><td>The number of frames a millisecond interval comes to, at least one.</td></tr>
-<tr><td><code>DeidConfig::effective_reseed_range_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L257" rel="noopener noreferrer">257</a></td><td>What DeidConfig::reseed_range_ms actually comes to on this configuration, after quantising to whole frames.</td></tr>
-<tr><td><code>DeidConfig::reseed_range_is_finer_than_a_frame</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L271" rel="noopener noreferrer">271</a></td><td>Whether the requested range is finer than one frame, so the whole of it collapses onto a single interval.</td></tr>
-<tr><td><code>DeidConfig::with_random_reseed_range</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L292" rel="noopener noreferrer">292</a></td><td>This configuration with a roll range drawn from the OS CSPRNG.</td></tr>
-<tr><td><code>DeidConfig::scaled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L309" rel="noopener noreferrer">309</a></td><td>Scale a (lo, hi) ratio range toward 1.0 by intensity.</td></tr>
-<tr><td><code>DeidConfig::MAX_SAMPLE_RATE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L329" rel="noopener noreferrer">329</a></td><td>The largest sample rate this engine will build for, in Hz.</td></tr>
-<tr><td><code>DeidConfig::MAX_FRAME_SIZE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L337" rel="noopener noreferrer">337</a></td><td>The largest FFT size this engine will build for.</td></tr>
-<tr><td><code>DeidConfig::checked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L348" rel="noopener noreferrer">348</a></td><td>Validate and normalise; returns an error string on impossible values.</td></tr>
-<tr><td><code>clamp_ratio_bounds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L438" rel="noopener noreferrer">438</a></td><td>Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order.</td></tr>
-<tr><td><code>ProcessStats</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L452" rel="noopener noreferrer">452</a></td><td>Rolling performance statistics, surfaced live to the UI.</td></tr>
-<tr><td><code>ProcessStats::last_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L484" rel="noopener noreferrer">484</a></td><td>Most recent block processing time in milliseconds.</td></tr>
-<tr><td><code>ProcessStats::worst_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L488" rel="noopener noreferrer">488</a></td><td>Worst block processing time in milliseconds.</td></tr>
-<tr><td><code>ProcessStats::ema_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L492" rel="noopener noreferrer">492</a></td><td>Smoothed block processing time in milliseconds.</td></tr>
-<tr><td><code>ProcessStats::last_realtime_factor</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L497" rel="noopener noreferrer">497</a></td><td>Processing time divided by the block&#x27;s real-time duration.</td></tr>
-<tr><td><code>Deidentifier</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L513" rel="noopener noreferrer">513</a></td><td>The complete, irreversible voice de-identification chain.</td></tr>
-<tr><td><code>Deidentifier::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L543" rel="noopener noreferrer">543</a></td><td>Build with a fresh, unpredictable seed from the OS CSPRNG.</td></tr>
-<tr><td><code>Deidentifier::from_seed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L550" rel="noopener noreferrer">550</a></td><td>Build with an explicit seed (deterministic; for tests or seed-from-key).</td></tr>
-<tr><td><code>Deidentifier::latency_samples</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L618" rel="noopener noreferrer">618</a></td><td>Fixed algorithmic latency in samples.</td></tr>
-<tr><td><code>Deidentifier::stats</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L623" rel="noopener noreferrer">623</a></td><td>Live performance statistics (copy).</td></tr>
-<tr><td><code>Deidentifier::accent_stats</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L628" rel="noopener noreferrer">628</a></td><td>Live accent-neutralisation read-out (detected f0, applied ratios).</td></tr>
-<tr><td><code>Deidentifier::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L634" rel="noopener noreferrer">634</a></td><td>Process input into output (equal length).</td></tr>
-<tr><td><code>Deidentifier::process_vec</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L706" rel="noopener noreferrer">706</a></td><td>Convenience: process a whole buffer and return a new Vec.</td></tr>
+<tr><td><code>DeidConfig::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L200" rel="noopener noreferrer">200</a></td><td></td></tr>
+<tr><td><code>MIN_RESEED_MS</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L228" rel="noopener noreferrer">228</a></td><td>The narrowest randomised roll range this engine will accept, in milliseconds.</td></tr>
+<tr><td><code>MAX_RESEED_MS</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L232" rel="noopener noreferrer">232</a></td><td>The widest, in milliseconds.</td></tr>
+<tr><td><code>RangeError</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L244" rel="noopener noreferrer">244</a></td><td>Why a ratchet range typed by a person was not accepted.</td></tr>
+<tr><td><code>RangeError::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L275" rel="noopener noreferrer">275</a></td><td></td></tr>
+<tr><td><code>parse_reseed_range</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L321" rel="noopener noreferrer">321</a></td><td>Read a low,high ratchet range in milliseconds, or say why not.</td></tr>
+<tr><td><code>DeidConfig::hop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L370" rel="noopener noreferrer">370</a></td><td></td></tr>
+<tr><td><code>DeidConfig::frame_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L378" rel="noopener noreferrer">378</a></td><td>How long one analysis frame is, in milliseconds.</td></tr>
+<tr><td><code>DeidConfig::frames_for_ms</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L387" rel="noopener noreferrer">387</a></td><td>The number of frames a millisecond interval comes to, at least one.</td></tr>
+<tr><td><code>DeidConfig::effective_reseed_range_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L404" rel="noopener noreferrer">404</a></td><td>What DeidConfig::reseed_range_ms actually comes to on this configuration, after quantising to whole frames.</td></tr>
+<tr><td><code>DeidConfig::reseed_range_is_finer_than_a_frame</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L418" rel="noopener noreferrer">418</a></td><td>Whether the requested range is finer than one frame, so the whole of it collapses onto a single interval.</td></tr>
+<tr><td><code>DeidConfig::with_random_reseed_range</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L439" rel="noopener noreferrer">439</a></td><td>This configuration with a roll range drawn from the OS CSPRNG.</td></tr>
+<tr><td><code>DeidConfig::scaled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L456" rel="noopener noreferrer">456</a></td><td>Scale a (lo, hi) ratio range toward 1.0 by intensity.</td></tr>
+<tr><td><code>DeidConfig::MAX_SAMPLE_RATE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L476" rel="noopener noreferrer">476</a></td><td>The largest sample rate this engine will build for, in Hz.</td></tr>
+<tr><td><code>DeidConfig::MAX_FRAME_SIZE</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L484" rel="noopener noreferrer">484</a></td><td>The largest FFT size this engine will build for.</td></tr>
+<tr><td><code>DeidConfig::checked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L495" rel="noopener noreferrer">495</a></td><td>Validate and normalise; returns an error string on impossible values.</td></tr>
+<tr><td><code>clamp_ratio_bounds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L585" rel="noopener noreferrer">585</a></td><td>Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order.</td></tr>
+<tr><td><code>ProcessStats</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L599" rel="noopener noreferrer">599</a></td><td>Rolling performance statistics, surfaced live to the UI.</td></tr>
+<tr><td><code>ProcessStats::last_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L631" rel="noopener noreferrer">631</a></td><td>Most recent block processing time in milliseconds.</td></tr>
+<tr><td><code>ProcessStats::worst_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L635" rel="noopener noreferrer">635</a></td><td>Worst block processing time in milliseconds.</td></tr>
+<tr><td><code>ProcessStats::ema_block_ms</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L639" rel="noopener noreferrer">639</a></td><td>Smoothed block processing time in milliseconds.</td></tr>
+<tr><td><code>ProcessStats::last_realtime_factor</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L644" rel="noopener noreferrer">644</a></td><td>Processing time divided by the block&#x27;s real-time duration.</td></tr>
+<tr><td><code>Deidentifier</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L660" rel="noopener noreferrer">660</a></td><td>The complete, irreversible voice de-identification chain.</td></tr>
+<tr><td><code>Deidentifier::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L690" rel="noopener noreferrer">690</a></td><td>Build with a fresh, unpredictable seed from the OS CSPRNG.</td></tr>
+<tr><td><code>Deidentifier::from_seed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L697" rel="noopener noreferrer">697</a></td><td>Build with an explicit seed (deterministic; for tests or seed-from-key).</td></tr>
+<tr><td><code>Deidentifier::latency_samples</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L765" rel="noopener noreferrer">765</a></td><td>Fixed algorithmic latency in samples.</td></tr>
+<tr><td><code>Deidentifier::stats</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L770" rel="noopener noreferrer">770</a></td><td>Live performance statistics (copy).</td></tr>
+<tr><td><code>Deidentifier::accent_stats</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L775" rel="noopener noreferrer">775</a></td><td>Live accent-neutralisation read-out (detected f0, applied ratios).</td></tr>
+<tr><td><code>Deidentifier::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L781" rel="noopener noreferrer">781</a></td><td>Process input into output (equal length).</td></tr>
+<tr><td><code>Deidentifier::process_vec</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L853" rel="noopener noreferrer">853</a></td><td>Convenience: process a whole buffer and return a new Vec.</td></tr>
+<tr><td><code>reseed_range_tests</code> <sub>mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L1406" rel="noopener noreferrer">1406</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

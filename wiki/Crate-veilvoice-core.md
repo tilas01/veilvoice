@@ -92,9 +92,9 @@ identify you, this has not touched that.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>86 lines"])
+    n_lib(["lib.rs<br/>89 lines"])
     n_accent["accent.rs<br/>684 lines"]
-    n_chain["chain.rs<br/>1256 lines"]
+    n_chain["chain.rs<br/>1569 lines"]
     n_effects["effects.rs<br/>214 lines"]
     n_modulation["modulation.rs<br/>300 lines"]
     n_pitch["pitch.rs<br/>274 lines"]
@@ -132,9 +132,9 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`accent.rs`|File-veilvoice-core-accent]] | 684 | Accent and speaker-trait neutralisation. |
-| [[`chain.rs`|File-veilvoice-core-chain]] | 1256 | The assembled de-identification chain and its live performance statistics. |
+| [[`chain.rs`|File-veilvoice-core-chain]] | 1569 | The assembled de-identification chain and its live performance statistics. |
 | [[`effects.rs`|File-veilvoice-core-effects]] | 214 | Light time-domain effects applied after resynthesis. |
-| [[`lib.rs`|File-veilvoice-core-lib]] | 86 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
+| [[`lib.rs`|File-veilvoice-core-lib]] | 89 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
 | [[`modulation.rs`|File-veilvoice-core-modulation]] | 300 | Cryptographically-seeded modulation of the effect parameters. |
 | [[`pitch.rs`|File-veilvoice-core-pitch]] | 274 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [[`spectral.rs`|File-veilvoice-core-spectral]] | 428 | Frequency-domain de-identification transform. |

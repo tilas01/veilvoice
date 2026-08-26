@@ -83,7 +83,7 @@ another thread, so the window keeps answering while it is busy.
 flowchart TD
     n_lib(["lib.rs<br/>79 lines"])
     n_main(["main.rs<br/>87 lines"])
-    n_app["app.rs<br/>1520 lines"]
+    n_app["app.rs<br/>1581 lines"]
     n_crashlog["crashlog.rs<br/>254 lines"]
     n_group["group.rs<br/>1627 lines"]
     n_palettes["palettes.rs<br/>691 lines"]
@@ -155,7 +155,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`app.rs`|File-veilvoice-gui-app]] | 1520 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [[`app.rs`|File-veilvoice-gui-app]] | 1581 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [[`crashlog.rs`|File-veilvoice-gui-crashlog]] | 254 | Make a failure that produces no output produce some. |
 | [[`group.rs`|File-veilvoice-gui-group]] | 1627 | Group mode: several people in one recording, each with a name and a colour. |
 | [[`lib.rs`|File-veilvoice-gui-lib]] | 79 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
