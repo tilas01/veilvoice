@@ -171,6 +171,21 @@ pub struct Group {
     pub profile: String,
     /// Where this project was last saved or loaded, if anywhere.
     pub project: Option<PathBuf>,
+    /// The engine settings in force, copied from the application each frame.
+    ///
+    /// F-67: this panel used [`DeidConfig::default`] everywhere -- for the
+    /// voice limit it shows, for the mode it allows, and for the render itself.
+    /// So somebody who set the strength to its highest and turned accent
+    /// neutralisation on got a group render at the *default* strength with the
+    /// accent work off, and nothing said so. The controls were on another tab,
+    /// which is exactly why it went unnoticed.
+    ///
+    /// It matters twice over. The render is weaker than asked for, which is the
+    /// serious half. And [`voices::clear_voices`] depends on the frame grid, so
+    /// a configuration that collapses two registers onto each other makes the
+    /// panel's "8 of 10" wrong in the direction that lets two people share a
+    /// voice.
+    pub config: DeidConfig,
 
     /// The worker, while a render is running.
     job: Option<mpsc::Receiver<Result<Vec<PathBuf>, String>>>,
@@ -195,6 +210,9 @@ impl Default for Group {
             voices: VoiceMode::default(),
             profile: veilvoice_workspace::default_profile().id.to_string(),
             project: None,
+            // Replaced every frame by the application's own settings. The
+            // default is only what a panel built in a test starts from.
+            config: DeidConfig::default(),
             job: None,
             report: None,
         }
@@ -241,9 +259,7 @@ impl Group {
         // The limit is whatever the *mode* can carry, and for a voice each that
         // is how many voices are far enough apart to be told apart -- measured
         // under the engine's configuration, not a number typed here.
-        if let Err(why) =
-            voice_mode::check(self.people.len() + 1, self.voices, &DeidConfig::default())
-        {
+        if let Err(why) = voice_mode::check(self.people.len() + 1, self.voices, &self.config) {
             self.notice = Some(why.to_string());
             return;
         }
@@ -253,7 +269,7 @@ impl Group {
 
     /// How many people this panel can hold in its current mode.
     pub fn limit(&self) -> usize {
-        self.voices.speaker_limit(&DeidConfig::default())
+        self.voices.speaker_limit(&self.config)
     }
 
     /// Remove one person, keeping at least two.
@@ -466,7 +482,7 @@ impl Group {
         // A profile that asks for a voice each cannot be applied to more people
         // than there are voices. Said rather than trimming somebody out of the
         // group to make the preset fit.
-        match voice_mode::check(self.people.len(), one.voices, &DeidConfig::default()) {
+        match voice_mode::check(self.people.len(), one.voices, &self.config) {
             Ok(()) => {
                 self.voices = one.voices;
                 self.notice = None;
@@ -550,7 +566,7 @@ impl Group {
                 {
                     // Switching *to* a mode that cannot carry this many people
                     // is refused, with the same words the engine would use.
-                    match voice_mode::check(self.people.len(), mode, &DeidConfig::default()) {
+                    match voice_mode::check(self.people.len(), mode, &self.config) {
                         Ok(()) => {
                             self.voices = mode;
                             self.notice = None;
@@ -562,7 +578,7 @@ impl Group {
         });
         ui.label(RichText::new(self.voices.note()).color(p::muted()).small());
 
-        let clear = voices::clear_voices(&DeidConfig::default());
+        let clear = voices::clear_voices(&self.config);
         ui.add_space(4.0);
         ui.label(
             RichText::new(format!(
@@ -837,8 +853,7 @@ impl Group {
         // A saved project may hold more people than the current mode can carry
         // -- it was saved under a different one, or by a build with a different
         // measured limit. Said, not silently trimmed.
-        if let Err(why) = voice_mode::check(self.people.len(), self.voices, &DeidConfig::default())
-        {
+        if let Err(why) = voice_mode::check(self.people.len(), self.voices, &self.config) {
             notes.push(why.to_string());
         }
 
@@ -1028,14 +1043,27 @@ impl Group {
         let outputs = self.outputs;
         let theme = self.theme;
         let voices = self.voices;
+        // Copied, not read from `self` on the worker: the settings that were in
+        // force when the button was pressed are the ones this render was asked
+        // for, whatever gets moved on another tab while it runs.
+        let config = self.config;
+
+        let job = Job {
+            input,
+            plan_path,
+            names,
+            title,
+            outputs,
+            theme,
+            voices,
+            config,
+        };
 
         let (tx, rx) = mpsc::channel();
         self.job = Some(rx);
         self.report = None;
         std::thread::spawn(move || {
-            let _ = tx.send(render_now(
-                &input, &plan_path, &names, &title, outputs, theme, voices,
-            ));
+            let _ = tx.send(render_now(&job));
         });
     }
 }
@@ -1047,6 +1075,25 @@ fn file_name(path: &std::path::Path) -> String {
         .unwrap_or_else(|| path.display().to_string())
 }
 
+/// Everything one render needs, taken from the panel at the moment the button
+/// was pressed.
+///
+/// Named fields rather than eight positional arguments: four of them are
+/// interchangeable at the type level, and F-67 was a value that never reached
+/// this function at all. A struct makes both mistakes visible at the call site.
+struct Job {
+    input: PathBuf,
+    plan_path: PathBuf,
+    names: Vec<String>,
+    title: String,
+    outputs: Outputs,
+    theme: &'static Palette,
+    voices: VoiceMode,
+    /// The engine settings in force when this was started -- not the defaults,
+    /// and not whatever the window is set to by the time it finishes.
+    config: DeidConfig,
+}
+
 /// Do the render. Runs on a worker thread and touches no interface state.
 ///
 /// The names come from the panel and the turns come from the plan, and the two
@@ -1054,15 +1101,18 @@ fn file_name(path: &std::path::Path) -> String {
 /// rendered against a panel holding two would put one person's audio in
 /// somebody else's voice, which is the one mistake here that cannot be heard in
 /// the result -- so it is refused rather than reconciled.
-fn render_now(
-    input: &std::path::Path,
-    plan_path: &std::path::Path,
-    names: &[String],
-    title: &str,
-    outputs: Outputs,
-    theme: &'static Palette,
-    voices: VoiceMode,
-) -> Result<Vec<PathBuf>, String> {
+fn render_now(job: &Job) -> Result<Vec<PathBuf>, String> {
+    let Job {
+        input,
+        plan_path,
+        names,
+        title,
+        outputs,
+        theme,
+        voices,
+        config,
+    } = job;
+    let (outputs, theme, voices) = (*outputs, *theme, *voices);
     use veilvoice_conversation::render::{self, Settings};
     use veilvoice_conversation::subtitles::{self, Format};
 
@@ -1083,15 +1133,23 @@ fn render_now(
         .map_err(|error| error.to_string())?;
     // Set before anything is decoded: the refusal is cheap and it names the
     // way out, and there is no reason to read a whole recording first.
-    plan.set_mode(voices, &DeidConfig::default())
+    plan.set_mode(voices, config)
         .map_err(|error| error.to_string())?;
     if !title.is_empty() {
         plan.title = Some(title.to_string());
     }
 
     let audio = veilvoice_audio::io::load(input).map_err(|error| error.to_string())?;
-    let mut settings = Settings::default();
-    settings.config.sample_rate = audio.sample_rate as f32;
+    // The application's settings, not the defaults -- see the note on
+    // [`Group::config`]. The sample rate is the one exception: it comes from
+    // the recording that was actually opened, not from a control.
+    let settings = Settings {
+        config: DeidConfig {
+            sample_rate: audio.sample_rate as f32,
+            ..*config
+        },
+        ..Settings::default()
+    };
     let rendered = render::render(&plan, &audio.samples, &settings, None)
         .map_err(|error| error.to_string())?;
 
@@ -1354,18 +1412,62 @@ mod tests {
         plan.add_speaker(Speaker::named("C")).unwrap();
         plan.save(&path).unwrap();
 
-        let error = render_now(
-            std::path::Path::new("nothing.wav"),
-            &path,
-            &["one".to_string(), "two".to_string()],
-            "",
-            Outputs::default(),
-            veilvoice_video::palette::default_palette(),
-            VoiceMode::default(),
-        )
+        let error = render_now(&Job {
+            input: PathBuf::from("nothing.wav"),
+            plan_path: path.clone(),
+            names: vec!["one".to_string(), "two".to_string()],
+            title: String::new(),
+            outputs: Outputs::default(),
+            theme: veilvoice_video::palette::default_palette(),
+            voices: VoiceMode::default(),
+            config: DeidConfig::default(),
+        })
         .expect_err("three against two");
         assert!(error.contains("wrong voice"), "{error}");
         assert!(error.contains('3') && error.contains('2'), "{error}");
+    }
+
+    /// F-67. The panel's answers have to come from the application's settings,
+    /// not from the defaults, because the controls that change them are on
+    /// another tab and nothing here would say otherwise.
+    ///
+    /// Checked by moving the configuration to something that changes the
+    /// answer: a coarser frame puts the destination pitches on a wider grid,
+    /// registers collapse onto each other, and fewer voices stay clearly
+    /// apart. If the panel were still reading the defaults, the limit would not
+    /// move.
+    #[test]
+    fn the_limit_follows_the_settings_rather_than_the_defaults() {
+        let coarse = DeidConfig {
+            frame_size: 256,
+            ..DeidConfig::default()
+        };
+        let fewer = voices::clear_voices(&coarse);
+        let usual = voices::clear_voices(&DeidConfig::default());
+        assert!(
+            fewer < usual,
+            "a coarser grid should separate fewer voices, not {fewer} against {usual}"
+        );
+
+        let mut panel = Group::default();
+        assert_eq!(panel.limit(), usual, "the default panel");
+        panel.config = coarse;
+        assert_eq!(
+            panel.limit(),
+            fewer,
+            "the panel must answer from the settings in force"
+        );
+
+        // And it stops adding people at the number it is now showing, rather
+        // than at the one it used to show.
+        while panel.people.len() < fewer {
+            panel.add();
+        }
+        assert_eq!(panel.people.len(), fewer);
+        panel.add();
+        assert_eq!(panel.people.len(), fewer, "past the limit it printed");
+        let notice = panel.notice.clone().expect("a refusal, not silence");
+        assert!(notice.contains(&fewer.to_string()), "{notice}");
     }
 
     /// The whole point of a project file: what you had is what you get back.
