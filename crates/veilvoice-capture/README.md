@@ -106,16 +106,12 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>570 lines"])
+    n_lib(["lib.rs<br/>575 lines"])
     n_comms["comms.rs<br/>321 lines"]
-    n_processes["processes.rs<br/>255 lines"]
-    n_programs["programs.rs<br/>342 lines"]
-    n_comms --> n_processes
+    n_programs["programs.rs<br/>372 lines"]
     n_comms --> n_programs
-    n_processes --> n_programs
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs" "open the source"
     click n_comms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/comms.rs" "open the source"
-    click n_processes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/processes.rs" "open the source"
     click n_programs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs" "open the source"
 ```
 
@@ -126,9 +122,8 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | 321 | Communication programs, and how to put VeilVoice between you and them. |
-| [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | 570 | Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do. |
-| [`processes.rs`](../../docs/files/veilvoice-capture/processes.md) | 255 | Listing the processes that are running, per platform. |
-| [`programs.rs`](../../docs/files/veilvoice-capture/programs.md) | 342 | The programs this build knows can capture a screen. |
+| [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | 575 | Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do. |
+| [`programs.rs`](../../docs/files/veilvoice-capture/programs.md) | 372 | The programs this build knows can capture a screen. |
 
 ## Public items
 

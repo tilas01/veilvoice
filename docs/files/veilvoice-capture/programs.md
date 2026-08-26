@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-capture/src/programs.rs`
 
-[`veilvoice-capture`](../../../crates/veilvoice-capture/README.md) &middot; 342 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs)
+[`veilvoice-capture`](../../../crates/veilvoice-capture/README.md) &middot; 372 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs)
 
 ## Contents
 
@@ -49,7 +49,7 @@ session, and reaching that is FFI on every platform here. See
 
 ## What this file contains
 
-342 lines defining **3 functions** (3 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+372 lines defining **3 functions** (3 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

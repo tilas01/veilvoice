@@ -68,7 +68,12 @@
 #![warn(missing_docs)]
 
 pub mod comms;
-mod processes;
+// The process listing moved to `veilvoice-proc` when a second feature needed
+// it. Re-exported under the old name so nothing else in this crate had to
+// change, and so a reader following `crate::processes` still lands somewhere.
+pub(crate) mod processes {
+    pub(crate) use veilvoice_proc::running;
+}
 pub mod programs;
 
 use std::collections::BTreeSet;
