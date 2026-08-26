@@ -55,6 +55,87 @@ the hash list may be for another platform. A hash list naming nothing that was
 built would otherwise report success by vacuum, which is the failure mode this
 whole exercise is most exposed to.
 
+### F-71 — the guard against stale claims compared one copy to another
+
+The front page said **354 tests** and "no unsafe code, in any of the **nine**
+crates". The tree holds 890 tests across 19 crates, and the website runs 11
+suites rather than ten.
+
+A guard existed, and passed. It was written after an earlier round of this
+exact drift — its comment says "this was the one place claims were
+hand-typed with nothing watching them" — and then it compared the
+front page against `docs/AUDIT.md`. Both numbers were typed by the same hand at
+the same time, so both drifted together and the check reported success.
+
+The numbers now come from the tree. `tools/measured/generate.py` writes
+`docs/MEASURED.md` — the test count **by running the tests**, the
+crate count from `Cargo.toml`, the suite count from `run.js`'s own list —
+and every claim on the page and in the audit is compared against it.
+
+Three things that would have let it happen again:
+
+- The test count is **measured, not counted**: a static count of `#[test]`
+  gives 903 against a measured 890, because some tests sit behind features that
+  are off by default.
+- The suite count comes from the runner's list, not a directory listing. A
+  suite that exists and is not in `SUITES` does not run.
+- **Spelled-out numbers are refused.** "the nine crates" is how this drifted
+  unnoticed; no check can compare a word.
+
+The guard was checked by breaking it, then restoring it. A control nobody has
+watched fail is a control nobody has tested.
+
+### F-70 — the reproducibility checker would have said no to everybody
+
+The new `reproduce` command ran `cargo build --release` and nothing else: no
+`--remap-path-prefix`, no `SOURCE_DATE_EPOCH`, no per-linker determinism flag,
+no `--target`. The release sets all four, and `docs/REPRODUCIBLE_BUILDS.md` has
+said since before this checker existed that reproducibility depends on the build
+*environment* setting them.
+
+So the answer was decided before the build started. Measured: two builds of this
+tree in two directories produced three binaries with three different hashes.
+
+The severity is in what it would have taught the one reader who took the trouble
+to build from source — that the release does not match its source.
+**A checker that always answers "not reproducible" is worse than no checker**,
+because the next time it says so for a real reason, that reader has learned to
+ignore it.
+
+It now reproduces the release environment rather than approximating it, and
+prints every setting before building:
+
+```
+  The settings a release is built with, reproduced here:
+    target            x86_64-pc-windows-msvc
+    RUSTFLAGS         --remap-path-prefix=<source>=/veilvoice --remap-path-prefix=<cargo home>=/cargo -C link-arg=/Brepro
+    SOURCE_DATE_EPOCH 1787746339
+```
+
+The remapped path is the one the compiler is actually given — not
+`canonicalize`, which on Windows returns a `\\?\` path that cargo never hands
+to rustc, so a remap built from it matches nothing and does nothing silently.
+`RUSTFLAGS` is set rather than appended to, because a value inherited from the
+terminal is one the published build did not have. Outside a git checkout there
+is no commit date and it says so rather than inventing one.
+
+A third remap had to be added and the measurement is what found it: with the
+source and `CARGO_HOME` remapped, two builds gave two identical binaries and
+one that differed, `veilvoice-gui`, because `OUT_DIR` lives under the *target*
+directory. The release never meets this, since it builds into `target/` inside
+the tree it already remaps.
+
+Measured on this machine, two builds in two separate target directories:
+
+| | `veilvoice` | `veilvoice-gui` | `veilvoice-verify` |
+|---|---|---|---|
+| As first written | differs | differs | differs |
+| Source and `CARGO_HOME` remapped | identical | **differs** | identical |
+| Target directory remapped as well | identical | identical | identical |
+
+A test compares the flags against `release.yml` itself, so changing one without
+the other fails the build.
+
 ### F-69 — the build succeeded, and then looked for it in the wrong place
 
 Found by running `build` on this machine. After a release build that took
