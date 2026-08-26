@@ -171,6 +171,20 @@ pub struct Group {
     pub profile: String,
     /// Where this project was last saved or loaded, if anywhere.
     pub project: Option<PathBuf>,
+    /// The four file pickers this panel can have open.
+    ///
+    /// One each rather than one shared, because they land in different places
+    /// and a single pending answer would have to remember which -- which is
+    /// what the verify tab does, and only because its three slots are
+    /// genuinely the same kind of thing.
+    opening_project: crate::dialog::Pending,
+    /// Where to save the project.
+    saving_project: crate::dialog::Pending,
+    /// The recording.
+    choosing_input: crate::dialog::Pending,
+    /// The plan.
+    choosing_plan: crate::dialog::Pending,
+
     /// The engine settings in force, copied from the application each frame.
     ///
     /// F-67: this panel used [`DeidConfig::default`] everywhere -- for the
@@ -210,6 +224,10 @@ impl Default for Group {
             voices: VoiceMode::default(),
             profile: veilvoice_workspace::default_profile().id.to_string(),
             project: None,
+            opening_project: crate::dialog::Pending::new(),
+            saving_project: crate::dialog::Pending::new(),
+            choosing_input: crate::dialog::Pending::new(),
+            choosing_plan: crate::dialog::Pending::new(),
             // Replaced every frame by the application's own settings. The
             // default is only what a panel built in a test starts from.
             config: DeidConfig::default(),
@@ -317,8 +335,42 @@ impl Group {
             .show(ui, |ui| self.body(ui, settings));
     }
 
+    /// Collect whatever the open pickers have answered.
+    ///
+    /// Called once per frame, before anything is drawn, so a file chosen while
+    /// the reader was browsing is in place by the time the panel that shows it
+    /// is painted -- the same reason F-61 moved the dropped-file read to the
+    /// top of `update`.
+    fn collect_dialogs(&mut self) {
+        if let Some(path) = self.opening_project.taken() {
+            match veilvoice_workspace::Workspace::load(&path) {
+                Ok(work) => {
+                    self.from_workspace(&work);
+                    self.project = Some(path);
+                }
+                Err(why) => self.notice = Some(why.to_string()),
+            }
+        }
+        if let Some(path) = self.saving_project.taken() {
+            match self.to_workspace().save(&path) {
+                Ok(()) => {
+                    self.project = Some(path);
+                    self.notice = None;
+                }
+                Err(why) => self.notice = Some(why.to_string()),
+            }
+        }
+        if let Some(path) = self.choosing_input.taken() {
+            self.input = Some(path);
+        }
+        if let Some(path) = self.choosing_plan.taken() {
+            self.plan = Some(path);
+        }
+    }
+
     /// Everything inside the scroller.
     fn body(&mut self, ui: &mut Ui, settings: &mut crate::settings::Settings) {
+        self.collect_dialogs();
         ui.heading(RichText::new("GROUP MODE").color(p::blue()));
         ui.add_space(4.0);
         ui.label(
@@ -422,35 +474,18 @@ impl Group {
         ui.add_space(8.0);
         ui.horizontal(|ui| {
             if ui.button("open project…").clicked() {
-                if let Some(path) = rfd::FileDialog::new()
-                    .add_filter("VeilVoice project", &["veilwork", "txt"])
-                    .pick_file()
-                {
-                    match Workspace::load(&path) {
-                        Ok(work) => {
-                            self.from_workspace(&work);
-                            self.project = Some(path);
-                        }
-                        Err(why) => self.notice = Some(why.to_string()),
-                    }
-                }
+                self.opening_project
+                    .start(crate::dialog::Ask::open_filtered(
+                        "VeilVoice project",
+                        &["veilwork", "txt"],
+                    ));
             }
             if ui.button("save project…").clicked() {
-                let mut dialog = rfd::FileDialog::new()
-                    .add_filter("VeilVoice project", &["veilwork"])
-                    .set_file_name("project.veilwork");
-                if let Some(previous) = self.project.as_ref().and_then(|p| p.parent()) {
-                    dialog = dialog.set_directory(previous);
-                }
-                if let Some(path) = dialog.save_file() {
-                    match self.to_workspace().save(&path) {
-                        Ok(()) => {
-                            self.project = Some(path);
-                            self.notice = None;
-                        }
-                        Err(why) => self.notice = Some(why.to_string()),
-                    }
-                }
+                self.saving_project.start(crate::dialog::Ask::save_filtered(
+                    "project.veilwork",
+                    "VeilVoice project",
+                    &["veilwork"],
+                ));
             }
             ui.label(
                 RichText::new(match &self.project {
@@ -888,12 +923,10 @@ impl Group {
 
         ui.horizontal(|ui| {
             if ui.button("choose recording…").clicked() {
-                if let Some(path) = rfd::FileDialog::new()
-                    .add_filter("audio", &["wav", "mp3", "flac", "ogg", "m4a", "aac"])
-                    .pick_file()
-                {
-                    self.input = Some(path);
-                }
+                self.choosing_input.start(crate::dialog::Ask::open_filtered(
+                    "audio",
+                    &["wav", "mp3", "flac", "ogg", "m4a", "aac"],
+                ));
             }
             ui.label(
                 RichText::new(match &self.input {
@@ -911,12 +944,8 @@ impl Group {
 
         ui.horizontal(|ui| {
             if ui.button("choose plan…").clicked() {
-                if let Some(path) = rfd::FileDialog::new()
-                    .add_filter("plan", &["txt"])
-                    .pick_file()
-                {
-                    self.plan = Some(path);
-                }
+                self.choosing_plan
+                    .start(crate::dialog::Ask::open_filtered("plan", &["txt"]));
             }
             ui.label(
                 RichText::new(match &self.plan {

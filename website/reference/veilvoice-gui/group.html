@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/group.svg" alt="group.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/group.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1627 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1656 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-toggle-does-not-persist-and-the-tick-that-makes-it-persist-is-separate">The toggle does not persist, and the tick that makes it persist is separate</a>
@@ -64,247 +64,245 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1627 lines defining <strong>38 functions</strong> (17 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1656 lines defining <strong>39 functions</strong> (17 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Person</code> <span style="color:var(--muted)">line 58</span> &mdash; One person, as the panel holds them.</li>
 <li><code>struct Outputs</code> <span style="color:var(--muted)">line 81</span> &mdash; What comes out of a group render.</li>
 <li><code>struct Group</code> <span style="color:var(--muted)">line 146</span> &mdash; The group-mode panel&#x27;s state.</li>
-<li><code>struct Job</code> <span style="color:var(--muted)">line 1084</span> &mdash; Everything one render needs, taken from the panel at the moment the button was pressed.</li>
+<li><code>struct Job</code> <span style="color:var(--muted)">line 1113</span> &mdash; Everything one render needs, taken from the panel at the moment the button was pressed.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Outputs::any</code> <span style="color:var(--muted)">line 102</span> &mdash; Whether anything at all would be written.
 </li>
 <li><code>Outputs::names</code> <span style="color:var(--muted)">line 107</span> &mdash; The ticked ones, by name, for a project file.
 </li>
-<li><code>Group::start_from</code> <span style="color:var(--muted)">line 227</span> &mdash; The panel as it should open, given the saved preference.
+<li><code>Group::start_from</code> <span style="color:var(--muted)">line 245</span> &mdash; The panel as it should open, given the saved preference.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default</code></span>
 </li>
-<li><code>Group::len</code> <span style="color:var(--muted)">line 235</span> &mdash; How many people are in the recording.
+<li><code>Group::len</code> <span style="color:var(--muted)">line 253</span> &mdash; How many people are in the recording.
 </li>
-<li><code>Group::is_empty</code> <span style="color:var(--muted)">line 240</span> &mdash; Whether there is nobody in it.
+<li><code>Group::is_empty</code> <span style="color:var(--muted)">line 258</span> &mdash; Whether there is nobody in it.
 </li>
-<li><code>Group::to_plan</code> <span style="color:var(--muted)">line 293</span> &mdash; Build a plan from the panel: names in slot order, no turns.
+<li><code>Group::to_plan</code> <span style="color:var(--muted)">line 311</span> &mdash; Build a plan from the panel: names in slot order, no turns.
 </li>
-<li><code>Group::tab</code> <span style="color:var(--muted)">line 309</span> &mdash; The whole panel.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>body</code>, <code>files_and_theme</code>, <code>mode_controls</code>, <code>output_controls</code>, <code>people_list</code>, <code>profile_controls</code>, <code>render_controls</code>, <code>strip</code>, <code>voice_mode_controls</code>, <code>file_name</code>, <code>add</code>, <code>colour</code></span>
+<li><code>Group::tab</code> <span style="color:var(--muted)">line 327</span> &mdash; The whole panel.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>body</code>, <code>collect_dialogs</code>, <code>files_and_theme</code>, <code>mode_controls</code>, <code>output_controls</code>, <code>people_list</code>, <code>profile_controls</code>, <code>render_controls</code>, <code>strip</code>, <code>voice_mode_controls</code>, <code>from_workspace</code>, <code>to_workspace</code></span>
 </li>
-<li><code>Group::drain</code> <span style="color:var(--muted)">line 869</span> &mdash; Take the worker&#x27;s answer if it has one.
+<li><code>Group::drain</code> <span style="color:var(--muted)">line 904</span> &mdash; Take the worker&#x27;s answer if it has one.
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 632 994" width="632" height="994" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 618 894" width="618" height="894" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
-<rect x="0" y="0" width="632" height="994" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M154.0 247.0 C 210.6 247.0, 210.6 47.0, 191.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M316.0 474.0 C 316.0 494.0, 430.4 500.0, 430.4 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M316.0 474.0 C 316.0 494.0, 514.4 600.0, 514.4 617.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M316.0 474.0 C 316.0 494.0, 213.0 500.0, 213.0 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M316.0 474.0 C 316.0 494.0, 346.4 600.0, 346.4 617.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M316.0 474.0 C 316.0 494.0, 148.0 600.0, 148.0 617.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M487.8 174.0 C 487.8 194.0, 316.0 900.0, 316.0 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M409.8 847.0 C 569.4 847.0, 569.4 47.0, 550.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M319.8 774.0 C 319.8 794.0, 316.0 900.0, 316.0 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M596.8 647.0 C 618.8 647.0, 618.8 247.0, 157.0 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M596.8 647.0 C 618.8 647.0, 618.8 147.0, 554.2 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M596.8 647.0 C 618.8 647.0, 618.8 247.0, 302.2 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M514.4 674.0 C 514.4 694.0, 319.8 700.0, 319.8 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M596.8 647.0 C 618.8 647.0, 618.8 247.0, 455.0 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M213.0 574.0 C 213.0 594.0, 110.0 700.0, 110.0 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M213.0 574.0 C 213.0 594.0, 316.0 800.0, 316.0 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M213.0 574.0 C 213.0 594.0, 525.8 700.0, 525.8 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<path d="M398.4 147.0 C 420.4 147.0, 420.4 147.0, 218.2 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M406.0 647.0 C 573.2 647.0, 573.2 147.0, 554.2 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M530.0 274.0 C 530.0 294.0, 316.0 400.0, 316.0 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<rect x="0" y="0" width="618" height="894" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M146.8 247.0 C 203.4 247.0, 203.4 47.0, 184.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M158.6 447.0 C 348.2 447.0, 348.2 347.0, 329.2 347.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M102.8 474.0 C 102.8 494.0, 423.2 600.0, 423.2 617.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M102.8 474.0 C 102.8 494.0, 507.2 700.0, 507.2 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M102.8 474.0 C 102.8 494.0, 205.8 600.0, 205.8 617.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M102.8 474.0 C 102.8 494.0, 339.2 700.0, 339.2 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M102.8 474.0 C 102.8 494.0, 140.8 700.0, 140.8 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M228.6 374.0 C 228.6 394.0, 476.8 400.0, 476.8 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M228.6 374.0 C 228.6 394.0, 270.8 400.0, 270.8 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M480.6 174.0 C 480.6 194.0, 308.8 500.0, 308.8 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M570.6 447.0 C 592.6 447.0, 592.6 47.0, 543.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M589.6 747.0 C 611.6 747.0, 611.6 247.0, 149.8 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M589.6 747.0 C 611.6 747.0, 611.6 147.0, 547.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M589.6 747.0 C 611.6 747.0, 611.6 247.0, 295.0 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M589.6 747.0 C 611.6 747.0, 611.6 247.0, 447.8 247.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M205.8 674.0 C 205.8 694.0, 308.8 800.0, 308.8 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
+<path d="M391.2 147.0 C 413.2 147.0, 413.2 147.0, 211.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M398.8 747.0 C 566.0 747.0, 566.0 147.0, 547.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M522.8 274.0 C 522.8 294.0, 102.8 400.0, 102.8 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L67" target="_blank" rel="noopener noreferrer">
-<rect x="84.6" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="136.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Person::at</text>
-<text x="136.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
+<rect x="77.4" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="129.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Person::at</text>
+<text x="129.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L91" target="_blank" rel="noopener noreferrer">
-<rect x="80.8" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="148.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Outputs::default</text>
-<text x="148.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 91</text>
+<rect x="73.6" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="140.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Outputs::default</text>
+<text x="140.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 91</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L126" target="_blank" rel="noopener noreferrer">
-<rect x="375.0" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="461.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Outputs::from_names</text>
-<text x="461.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 126</text>
+<rect x="367.8" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="454.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Outputs::from_names</text>
+<text x="454.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 126</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L197" target="_blank" rel="noopener noreferrer">
-<rect x="80.8" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="148.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::default</text>
-<text x="148.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L227" target="_blank" rel="noopener noreferrer">
-<rect x="241.2" y="120.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="319.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::start_from</text>
-<text x="319.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L211" target="_blank" rel="noopener noreferrer">
+<rect x="73.6" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="140.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::default</text>
+<text x="140.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 211</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L245" target="_blank" rel="noopener noreferrer">
-<rect x="424.4" y="120.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="487.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::colour</text>
-<text x="487.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
+<rect x="234.0" y="120.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="312.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::start_from</text>
+<text x="312.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L258" target="_blank" rel="noopener noreferrer">
-<rect x="50.0" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="102.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::add</text>
-<text x="102.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 258</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L263" target="_blank" rel="noopener noreferrer">
+<rect x="417.2" y="120.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="480.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::colour</text>
+<text x="480.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 263</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L271" target="_blank" rel="noopener noreferrer">
-<rect x="180.0" y="220.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="239.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::limit</text>
-<text x="239.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 271</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L276" target="_blank" rel="noopener noreferrer">
+<rect x="42.8" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="94.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::add</text>
+<text x="94.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 276</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L279" target="_blank" rel="noopener noreferrer">
-<rect x="325.2" y="220.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="388.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::remove</text>
-<text x="388.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L289" target="_blank" rel="noopener noreferrer">
+<rect x="172.8" y="220.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="232.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::limit</text>
+<text x="232.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L309" target="_blank" rel="noopener noreferrer">
-<rect x="478.0" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="530.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::tab</text>
-<text x="530.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L297" target="_blank" rel="noopener noreferrer">
+<rect x="318.0" y="220.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="381.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::remove</text>
+<text x="381.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 297</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L321" target="_blank" rel="noopener noreferrer">
-<rect x="260.2" y="420.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="316.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::body</text>
-<text x="316.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L327" target="_blank" rel="noopener noreferrer">
+<rect x="470.8" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="522.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::tab</text>
+<text x="522.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 327</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L395" target="_blank" rel="noopener noreferrer">
-<rect x="111.6" y="520.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="213.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::profile_controls</text>
-<text x="213.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 395</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L344" target="_blank" rel="noopener noreferrer">
+<rect x="131.0" y="320.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="228.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::collect_dialogs</text>
+<text x="228.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 344</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L479" target="_blank" rel="noopener noreferrer">
-<rect x="20.0" y="720.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="110.0" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::apply_profile</text>
-<text x="110.0" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 479</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L372" target="_blank" rel="noopener noreferrer">
+<rect x="47.0" y="420.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="102.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::body</text>
+<text x="102.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 372</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L500" target="_blank" rel="noopener noreferrer">
-<rect x="340.4" y="520.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="430.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::mode_controls</text>
-<text x="430.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 500</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L447" target="_blank" rel="noopener noreferrer">
+<rect x="104.4" y="620.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="205.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::profile_controls</text>
+<text x="205.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 447</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L557" target="_blank" rel="noopener noreferrer">
-<rect x="35.2" y="620.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="148.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::voice_mode_controls</text>
-<text x="148.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 557</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L514" target="_blank" rel="noopener noreferrer">
+<rect x="218.8" y="820.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="308.8" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::apply_profile</text>
+<text x="308.8" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 514</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L598" target="_blank" rel="noopener noreferrer">
-<rect x="286.8" y="620.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="346.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::strip</text>
-<text x="346.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 598</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L535" target="_blank" rel="noopener noreferrer">
+<rect x="333.2" y="620.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="423.2" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::mode_controls</text>
+<text x="423.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 535</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L592" target="_blank" rel="noopener noreferrer">
+<rect x="28.0" y="720.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="140.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::voice_mode_controls</text>
+<text x="140.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 592</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L633" target="_blank" rel="noopener noreferrer">
-<rect x="432.0" y="620.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="514.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::people_list</text>
-<text x="514.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 633</text>
+<rect x="279.6" y="720.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="339.2" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::strip</text>
+<text x="339.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 633</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L701" target="_blank" rel="noopener noreferrer">
-<rect x="226.0" y="720.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="319.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::palette_picker</text>
-<text x="319.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 701</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L668" target="_blank" rel="noopener noreferrer">
+<rect x="424.8" y="720.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="507.2" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::people_list</text>
+<text x="507.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 668</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L786" target="_blank" rel="noopener noreferrer">
-<rect x="439.6" y="720.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="525.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::to_workspace</text>
-<text x="525.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 786</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L821" target="_blank" rel="noopener noreferrer">
+<rect x="184.6" y="420.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="270.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::to_workspace</text>
+<text x="270.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 821</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L812" target="_blank" rel="noopener noreferrer">
-<rect x="222.2" y="820.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="316.0" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::from_workspace</text>
-<text x="316.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 812</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L847" target="_blank" rel="noopener noreferrer">
+<rect x="383.0" y="420.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="476.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::from_workspace</text>
+<text x="476.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 847</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L864" target="_blank" rel="noopener noreferrer">
-<rect x="248.8" y="320.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="316.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::is_busy</text>
-<text x="316.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 864</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L899" target="_blank" rel="noopener noreferrer">
+<rect x="352.2" y="320.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="419.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Group::is_busy</text>
+<text x="419.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 899</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1214" target="_blank" rel="noopener noreferrer">
-<rect x="245.0" y="920.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="316.0" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">assigned_colour</text>
-<text x="316.0" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1214</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1243" target="_blank" rel="noopener noreferrer">
+<rect x="237.8" y="520.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="308.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">assigned_colour</text>
+<text x="308.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1243</text>
 </a>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 37 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 38 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_at[&quot;Person::at&lt;br/&gt;line 67&quot;]
     n_default[&quot;Outputs::default&lt;br/&gt;line 91&quot;]
     n_from_names[&quot;Outputs::from_names&lt;br/&gt;line 126&quot;]
-    n_default[&quot;Group::default&lt;br/&gt;line 197&quot;]
-    n_start_from([&quot;Group::start_from&lt;br/&gt;line 227&quot;])
-    n_colour[&quot;Group::colour&lt;br/&gt;line 245&quot;]
-    n_add[&quot;Group::add&lt;br/&gt;line 258&quot;]
-    n_limit[&quot;Group::limit&lt;br/&gt;line 271&quot;]
-    n_remove[&quot;Group::remove&lt;br/&gt;line 279&quot;]
-    n_tab([&quot;Group::tab&lt;br/&gt;line 309&quot;])
-    n_body[&quot;Group::body&lt;br/&gt;line 321&quot;]
-    n_profile_controls[&quot;Group::profile_controls&lt;br/&gt;line 395&quot;]
-    n_apply_profile[&quot;Group::apply_profile&lt;br/&gt;line 479&quot;]
-    n_mode_controls[&quot;Group::mode_controls&lt;br/&gt;line 500&quot;]
-    n_voice_mode_controls[&quot;Group::voice_mode_controls&lt;br/&gt;line 557&quot;]
-    n_strip[&quot;Group::strip&lt;br/&gt;line 598&quot;]
-    n_people_list[&quot;Group::people_list&lt;br/&gt;line 633&quot;]
-    n_palette_picker[&quot;Group::palette_picker&lt;br/&gt;line 701&quot;]
-    n_to_workspace[&quot;Group::to_workspace&lt;br/&gt;line 786&quot;]
-    n_from_workspace[&quot;Group::from_workspace&lt;br/&gt;line 812&quot;]
-    n_is_busy[&quot;Group::is_busy&lt;br/&gt;line 864&quot;]
-    n_assigned_colour[&quot;assigned_colour&lt;br/&gt;line 1214&quot;]
+    n_default[&quot;Group::default&lt;br/&gt;line 211&quot;]
+    n_start_from([&quot;Group::start_from&lt;br/&gt;line 245&quot;])
+    n_colour[&quot;Group::colour&lt;br/&gt;line 263&quot;]
+    n_add[&quot;Group::add&lt;br/&gt;line 276&quot;]
+    n_limit[&quot;Group::limit&lt;br/&gt;line 289&quot;]
+    n_remove[&quot;Group::remove&lt;br/&gt;line 297&quot;]
+    n_tab([&quot;Group::tab&lt;br/&gt;line 327&quot;])
+    n_collect_dialogs[&quot;Group::collect_dialogs&lt;br/&gt;line 344&quot;]
+    n_body[&quot;Group::body&lt;br/&gt;line 372&quot;]
+    n_profile_controls[&quot;Group::profile_controls&lt;br/&gt;line 447&quot;]
+    n_apply_profile[&quot;Group::apply_profile&lt;br/&gt;line 514&quot;]
+    n_mode_controls[&quot;Group::mode_controls&lt;br/&gt;line 535&quot;]
+    n_voice_mode_controls[&quot;Group::voice_mode_controls&lt;br/&gt;line 592&quot;]
+    n_strip[&quot;Group::strip&lt;br/&gt;line 633&quot;]
+    n_people_list[&quot;Group::people_list&lt;br/&gt;line 668&quot;]
+    n_to_workspace[&quot;Group::to_workspace&lt;br/&gt;line 821&quot;]
+    n_from_workspace[&quot;Group::from_workspace&lt;br/&gt;line 847&quot;]
+    n_is_busy[&quot;Group::is_busy&lt;br/&gt;line 899&quot;]
+    n_assigned_colour[&quot;assigned_colour&lt;br/&gt;line 1243&quot;]
     n_add --&gt; n_at
+    n_body --&gt; n_collect_dialogs
     n_body --&gt; n_mode_controls
     n_body --&gt; n_people_list
     n_body --&gt; n_profile_controls
     n_body --&gt; n_strip
     n_body --&gt; n_voice_mode_controls
+    n_collect_dialogs --&gt; n_from_workspace
+    n_collect_dialogs --&gt; n_to_workspace
     n_colour --&gt; n_assigned_colour
     n_from_workspace --&gt; n_from_names
-    n_palette_picker --&gt; n_assigned_colour
     n_people_list --&gt; n_add
     n_people_list --&gt; n_colour
     n_people_list --&gt; n_limit
-    n_people_list --&gt; n_palette_picker
     n_people_list --&gt; n_remove
     n_profile_controls --&gt; n_apply_profile
-    n_profile_controls --&gt; n_from_workspace
-    n_profile_controls --&gt; n_to_workspace
     n_start_from --&gt; n_default
     n_strip --&gt; n_colour
     n_tab --&gt; n_body
     click n_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L67&quot; &quot;open the source&quot;
     click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L91&quot; &quot;open the source&quot;
     click n_from_names href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L126&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L197&quot; &quot;open the source&quot;
-    click n_start_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L227&quot; &quot;open the source&quot;
-    click n_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L245&quot; &quot;open the source&quot;
-    click n_add href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L258&quot; &quot;open the source&quot;
-    click n_limit href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L271&quot; &quot;open the source&quot;
-    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L279&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L309&quot; &quot;open the source&quot;
-    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L321&quot; &quot;open the source&quot;
-    click n_profile_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L395&quot; &quot;open the source&quot;
-    click n_apply_profile href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L479&quot; &quot;open the source&quot;
-    click n_mode_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L500&quot; &quot;open the source&quot;
-    click n_voice_mode_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L557&quot; &quot;open the source&quot;
-    click n_strip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L598&quot; &quot;open the source&quot;
-    click n_people_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L633&quot; &quot;open the source&quot;
-    click n_palette_picker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L701&quot; &quot;open the source&quot;
-    click n_to_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L786&quot; &quot;open the source&quot;
-    click n_from_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L812&quot; &quot;open the source&quot;
-    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L864&quot; &quot;open the source&quot;
-    click n_assigned_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1214&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L211&quot; &quot;open the source&quot;
+    click n_start_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L245&quot; &quot;open the source&quot;
+    click n_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L263&quot; &quot;open the source&quot;
+    click n_add href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L276&quot; &quot;open the source&quot;
+    click n_limit href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L289&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L297&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L327&quot; &quot;open the source&quot;
+    click n_collect_dialogs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L344&quot; &quot;open the source&quot;
+    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L372&quot; &quot;open the source&quot;
+    click n_profile_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L447&quot; &quot;open the source&quot;
+    click n_apply_profile href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L514&quot; &quot;open the source&quot;
+    click n_mode_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L535&quot; &quot;open the source&quot;
+    click n_voice_mode_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L592&quot; &quot;open the source&quot;
+    click n_strip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L633&quot; &quot;open the source&quot;
+    click n_people_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L668&quot; &quot;open the source&quot;
+    click n_to_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L821&quot; &quot;open the source&quot;
+    click n_from_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L847&quot; &quot;open the source&quot;
+    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L899&quot; &quot;open the source&quot;
+    click n_assigned_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1243&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start_from,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_from_names,n_colour,n_add,n_limit,n_remove,n_to_workspace,n_from_workspace,n_is_busy,n_assigned_colour api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_at,n_default,n_default,n_body,n_profile_controls,n_apply_profile,n_mode_controls,n_voice_mode_controls,n_strip,n_people_list,n_palette_picker helper</code></pre>
+    class n_at,n_default,n_default,n_collect_dialogs,n_body,n_profile_controls,n_apply_profile,n_mode_controls,n_voice_mode_controls,n_strip,n_people_list helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -321,38 +319,39 @@ flowchart TD
 <tr><td><code>hex_of</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L136" rel="noopener noreferrer">136</a></td><td>An egui colour as #rrggbb.</td></tr>
 <tr><td><code>colour_of</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L141" rel="noopener noreferrer">141</a></td><td>#rrggbb as an egui colour, or None for anything that is not one.</td></tr>
 <tr><td><code>Group</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L146" rel="noopener noreferrer">146</a></td><td>The group-mode panel&#x27;s state.</td></tr>
-<tr><td><code>Group::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L197" rel="noopener noreferrer">197</a></td><td></td></tr>
-<tr><td><code>Group::start_from</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L227" rel="noopener noreferrer">227</a></td><td>The panel as it should open, given the saved preference.</td></tr>
-<tr><td><code>Group::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L235" rel="noopener noreferrer">235</a></td><td>How many people are in the recording.</td></tr>
-<tr><td><code>Group::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L240" rel="noopener noreferrer">240</a></td><td>Whether there is nobody in it.</td></tr>
-<tr><td><code>Group::colour</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L245" rel="noopener noreferrer">245</a></td><td>The colour a slot is drawn in: the override, or the one it is given.</td></tr>
-<tr><td><code>Group::add</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L258" rel="noopener noreferrer">258</a></td><td>Add a person, if there is room for one.</td></tr>
-<tr><td><code>Group::limit</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L271" rel="noopener noreferrer">271</a></td><td>How many people this panel can hold in its current mode.</td></tr>
-<tr><td><code>Group::remove</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L279" rel="noopener noreferrer">279</a></td><td>Remove one person, keeping at least two.</td></tr>
-<tr><td><code>Group::to_plan</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L293" rel="noopener noreferrer">293</a></td><td>Build a plan from the panel: names in slot order, no turns.</td></tr>
-<tr><td><code>Group::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L309" rel="noopener noreferrer">309</a></td><td>The whole panel.</td></tr>
-<tr><td><code>Group::body</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L321" rel="noopener noreferrer">321</a></td><td>Everything inside the scroller.</td></tr>
-<tr><td><code>Group::profile_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L395" rel="noopener noreferrer">395</a></td><td>The named ways of working, and the project this panel came from.</td></tr>
-<tr><td><code>Group::apply_profile</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L479" rel="noopener noreferrer">479</a></td><td>Set the controls this profile names, and change nothing else.</td></tr>
-<tr><td><code>Group::mode_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L500" rel="noopener noreferrer">500</a></td><td>The two controls that decide whether group mode is on.</td></tr>
-<tr><td><code>Group::voice_mode_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L557" rel="noopener noreferrer">557</a></td><td>A voice each, or one voice between everybody.</td></tr>
-<tr><td><code>Group::strip</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L598" rel="noopener noreferrer">598</a></td><td>The picture: a circle per person, in their colour, with their name.</td></tr>
-<tr><td><code>Group::people_list</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L633" rel="noopener noreferrer">633</a></td><td>One row per person: colour, name, and a way to remove them.</td></tr>
-<tr><td><code>Group::palette_picker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L701" rel="noopener noreferrer">701</a></td><td>Every colour in every palette, as swatches.</td></tr>
-<tr><td><code>Group::swatch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L740" rel="noopener noreferrer">740</a></td><td>One clickable colour.</td></tr>
-<tr><td><code>Group::output_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L762" rel="noopener noreferrer">762</a></td><td>What a render writes.</td></tr>
-<tr><td><code>Group::to_workspace</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L786" rel="noopener noreferrer">786</a></td><td>This panel as a saveable project.</td></tr>
-<tr><td><code>Group::from_workspace</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L812" rel="noopener noreferrer">812</a></td><td>Put a saved project back.</td></tr>
-<tr><td><code>Group::is_busy</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L864" rel="noopener noreferrer">864</a></td><td>Whether a render is running, so the window keeps repainting.</td></tr>
-<tr><td><code>Group::drain</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L869" rel="noopener noreferrer">869</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
-<tr><td><code>Group::files_and_theme</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L885" rel="noopener noreferrer">885</a></td><td>The recording, the plan, the title and the palette.</td></tr>
-<tr><td><code>Group::render_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L981" rel="noopener noreferrer">981</a></td><td>The button, and what came of pressing it.</td></tr>
-<tr><td><code>Group::start</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1037" rel="noopener noreferrer">1037</a></td><td>Start a render on a thread of its own.</td></tr>
-<tr><td><code>file_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1072" rel="noopener noreferrer">1072</a></td><td>The last component of a path, for showing beside a button.</td></tr>
-<tr><td><code>Job</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1084" rel="noopener noreferrer">1084</a></td><td>Everything one render needs, taken from the panel at the moment the button was pressed.</td></tr>
-<tr><td><code>render_now</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1104" rel="noopener noreferrer">1104</a></td><td>Do the render.</td></tr>
-<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1202" rel="noopener noreferrer">1202</a></td><td>Replace the last extension, keeping any .veiled before it.</td></tr>
-<tr><td><code>assigned_colour</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1214" rel="noopener noreferrer">1214</a></td><td>The colour a slot is given, as an egui colour.</td></tr>
+<tr><td><code>Group::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L211" rel="noopener noreferrer">211</a></td><td></td></tr>
+<tr><td><code>Group::start_from</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L245" rel="noopener noreferrer">245</a></td><td>The panel as it should open, given the saved preference.</td></tr>
+<tr><td><code>Group::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L253" rel="noopener noreferrer">253</a></td><td>How many people are in the recording.</td></tr>
+<tr><td><code>Group::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L258" rel="noopener noreferrer">258</a></td><td>Whether there is nobody in it.</td></tr>
+<tr><td><code>Group::colour</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L263" rel="noopener noreferrer">263</a></td><td>The colour a slot is drawn in: the override, or the one it is given.</td></tr>
+<tr><td><code>Group::add</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L276" rel="noopener noreferrer">276</a></td><td>Add a person, if there is room for one.</td></tr>
+<tr><td><code>Group::limit</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L289" rel="noopener noreferrer">289</a></td><td>How many people this panel can hold in its current mode.</td></tr>
+<tr><td><code>Group::remove</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L297" rel="noopener noreferrer">297</a></td><td>Remove one person, keeping at least two.</td></tr>
+<tr><td><code>Group::to_plan</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L311" rel="noopener noreferrer">311</a></td><td>Build a plan from the panel: names in slot order, no turns.</td></tr>
+<tr><td><code>Group::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L327" rel="noopener noreferrer">327</a></td><td>The whole panel.</td></tr>
+<tr><td><code>Group::collect_dialogs</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L344" rel="noopener noreferrer">344</a></td><td>Collect whatever the open pickers have answered.</td></tr>
+<tr><td><code>Group::body</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L372" rel="noopener noreferrer">372</a></td><td>Everything inside the scroller.</td></tr>
+<tr><td><code>Group::profile_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L447" rel="noopener noreferrer">447</a></td><td>The named ways of working, and the project this panel came from.</td></tr>
+<tr><td><code>Group::apply_profile</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L514" rel="noopener noreferrer">514</a></td><td>Set the controls this profile names, and change nothing else.</td></tr>
+<tr><td><code>Group::mode_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L535" rel="noopener noreferrer">535</a></td><td>The two controls that decide whether group mode is on.</td></tr>
+<tr><td><code>Group::voice_mode_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L592" rel="noopener noreferrer">592</a></td><td>A voice each, or one voice between everybody.</td></tr>
+<tr><td><code>Group::strip</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L633" rel="noopener noreferrer">633</a></td><td>The picture: a circle per person, in their colour, with their name.</td></tr>
+<tr><td><code>Group::people_list</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L668" rel="noopener noreferrer">668</a></td><td>One row per person: colour, name, and a way to remove them.</td></tr>
+<tr><td><code>Group::palette_picker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L736" rel="noopener noreferrer">736</a></td><td>Every colour in every palette, as swatches.</td></tr>
+<tr><td><code>Group::swatch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L775" rel="noopener noreferrer">775</a></td><td>One clickable colour.</td></tr>
+<tr><td><code>Group::output_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L797" rel="noopener noreferrer">797</a></td><td>What a render writes.</td></tr>
+<tr><td><code>Group::to_workspace</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L821" rel="noopener noreferrer">821</a></td><td>This panel as a saveable project.</td></tr>
+<tr><td><code>Group::from_workspace</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L847" rel="noopener noreferrer">847</a></td><td>Put a saved project back.</td></tr>
+<tr><td><code>Group::is_busy</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L899" rel="noopener noreferrer">899</a></td><td>Whether a render is running, so the window keeps repainting.</td></tr>
+<tr><td><code>Group::drain</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L904" rel="noopener noreferrer">904</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
+<tr><td><code>Group::files_and_theme</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L920" rel="noopener noreferrer">920</a></td><td>The recording, the plan, the title and the palette.</td></tr>
+<tr><td><code>Group::render_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1010" rel="noopener noreferrer">1010</a></td><td>The button, and what came of pressing it.</td></tr>
+<tr><td><code>Group::start</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1066" rel="noopener noreferrer">1066</a></td><td>Start a render on a thread of its own.</td></tr>
+<tr><td><code>file_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1101" rel="noopener noreferrer">1101</a></td><td>The last component of a path, for showing beside a button.</td></tr>
+<tr><td><code>Job</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1113" rel="noopener noreferrer">1113</a></td><td>Everything one render needs, taken from the panel at the moment the button was pressed.</td></tr>
+<tr><td><code>render_now</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1133" rel="noopener noreferrer">1133</a></td><td>Do the render.</td></tr>
+<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1231" rel="noopener noreferrer">1231</a></td><td>Replace the last extension, keeping any .veiled before it.</td></tr>
+<tr><td><code>assigned_colour</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1243" rel="noopener noreferrer">1243</a></td><td>The colour a slot is given, as an egui colour.</td></tr>
 </tbody></table>
 </section>
 </div></div>
