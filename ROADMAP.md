@@ -11,11 +11,17 @@ Estimates are in working days and they are estimates. Where a marker depends on
 something outside this project — a platform's rules, a decision that has not
 been taken — that is written down rather than absorbed into a number.
 
-**Where we are now:** **v0.1.12 is released**, signed and published for eleven
-platforms -- OpenBSD included since v0.1.11 -- and verified by hand after
-publication: fingerprint checked, good signature, hashes matched, and the
-shipped verifier checked its own release with no GnuPG involved. Everything
-below the line marked *shipped* is work in progress.
+**Where we are now:** **v0.1.13 is released**, signed and published for
+eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
+marked *shipped* is work in progress.
+
+Since v0.1.12: the verifier can build this repository and compare what comes
+out against the published hashes, group mode is visible in the desktop
+application, projects and profiles can be saved, the number of speakers is
+capped at a limit that was **measured** rather than chosen, and the eighth
+audit round closed seven defects. The reproducibility check was verified by
+running it: two builds of this tree in two separate target directories, all
+three binaries byte for byte identical.
 
 ---
 
