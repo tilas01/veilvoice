@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/prefs.svg" alt="prefs.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/prefs.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 422 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 439 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#nothing-here-is-secret-and-nothing-here-is-required">Nothing here is secret, and nothing here is required</a>
@@ -63,23 +63,23 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>422 lines defining <strong>9 functions</strong> (7 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>439 lines defining <strong>9 functions</strong> (7 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Prefs</code> <span style="color:var(--muted)">line 41</span> &mdash; Everything the user can choose about presentation.</li>
-<li><code>struct Motion</code> <span style="color:var(--muted)">line 227</span> &mdash; Whether movement is allowed, and how much.</li>
+<li><code>struct Motion</code> <span style="color:var(--muted)">line 242</span> &mdash; Whether movement is allowed, and how much.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>default_path</code> <span style="color:var(--muted)">line 90</span> &mdash; Where preferences live: beside the app lock, in this platform&#x27;s config directory.
+<li><code>default_path</code> <span style="color:var(--muted)">line 98</span> &mdash; Where preferences live: beside the app lock, in this platform&#x27;s config directory.
 </li>
-<li><code>Prefs::load</code> <span style="color:var(--muted)">line 101</span> &mdash; Read preferences from path.
+<li><code>Prefs::load</code> <span style="color:var(--muted)">line 109</span> &mdash; Read preferences from path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default</code>, <code>parse</code>, <code>parse_bool</code></span>
 </li>
-<li><code>Prefs::save</code> <span style="color:var(--muted)">line 199</span> &mdash; Write preferences to path, creating the directory if needed.
+<li><code>Prefs::save</code> <span style="color:var(--muted)">line 214</span> &mdash; Write preferences to path, creating the directory if needed.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Motion::resolve</code> <span style="color:var(--muted)">line 239</span> &mdash; Resolve for this frame.
+<li><code>Motion::resolve</code> <span style="color:var(--muted)">line 254</span> &mdash; Resolve for this frame.
 </li>
-<li><code>Motion::secs</code> <span style="color:var(--muted)">line 257</span> &mdash; A duration scaled by whether motion is allowed.
+<li><code>Motion::secs</code> <span style="color:var(--muted)">line 272</span> &mdash; A duration scaled by whether motion is allowed.
 </li>
 </ul>
 </section>
@@ -95,50 +95,50 @@
 <path d="M376.4 247.0 C 398.4 247.0, 398.4 47.0, 165.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M316.8 274.0 C 316.8 294.0, 316.8 300.0, 316.8 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M216.0 147.0 C 627.6 147.0, 627.6 47.0, 608.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L72" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L79" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="95.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Prefs::default</text>
-<text x="95.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 72</text>
+<text x="95.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 79</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L90" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L98" target="_blank" rel="noopener noreferrer">
 <rect x="188.4" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="248.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_path</text>
-<text x="248.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
+<text x="248.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 98</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L101" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L109" target="_blank" rel="noopener noreferrer">
 <rect x="333.6" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="389.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Prefs::load</text>
-<text x="389.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
+<text x="389.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 109</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L114" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L122" target="_blank" rel="noopener noreferrer">
 <rect x="257.2" y="220.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="316.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Prefs::parse</text>
-<text x="316.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 114</text>
+<text x="316.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L181" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L195" target="_blank" rel="noopener noreferrer">
 <rect x="471.2" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="538.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Prefs::to_text</text>
-<text x="538.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 181</text>
+<text x="538.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 195</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L199" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L214" target="_blank" rel="noopener noreferrer">
 <rect x="104.4" y="120.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="160.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Prefs::save</text>
-<text x="160.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 199</text>
+<text x="160.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 214</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L209" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L224" target="_blank" rel="noopener noreferrer">
 <rect x="264.8" y="320.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="316.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_bool</text>
-<text x="316.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
+<text x="316.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 224</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L239" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L254" target="_blank" rel="noopener noreferrer">
 <rect x="242.0" y="120.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="313.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Motion::resolve</text>
-<text x="313.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 239</text>
+<text x="313.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 254</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L257" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L272" target="_blank" rel="noopener noreferrer">
 <rect x="410.0" y="120.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="469.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Motion::secs</text>
-<text x="469.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
+<text x="469.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
 </a>
 </svg>
 </div>
@@ -146,29 +146,29 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_default[&quot;Prefs::default&lt;br/&gt;line 72&quot;]
-    n_default_path([&quot;default_path&lt;br/&gt;line 90&quot;])
-    n_load([&quot;Prefs::load&lt;br/&gt;line 101&quot;])
-    n_parse[&quot;Prefs::parse&lt;br/&gt;line 114&quot;]
-    n_to_text[&quot;Prefs::to_text&lt;br/&gt;line 181&quot;]
-    n_save([&quot;Prefs::save&lt;br/&gt;line 199&quot;])
-    n_parse_bool[&quot;parse_bool&lt;br/&gt;line 209&quot;]
-    n_resolve([&quot;Motion::resolve&lt;br/&gt;line 239&quot;])
-    n_secs([&quot;Motion::secs&lt;br/&gt;line 257&quot;])
+    n_default[&quot;Prefs::default&lt;br/&gt;line 79&quot;]
+    n_default_path([&quot;default_path&lt;br/&gt;line 98&quot;])
+    n_load([&quot;Prefs::load&lt;br/&gt;line 109&quot;])
+    n_parse[&quot;Prefs::parse&lt;br/&gt;line 122&quot;]
+    n_to_text[&quot;Prefs::to_text&lt;br/&gt;line 195&quot;]
+    n_save([&quot;Prefs::save&lt;br/&gt;line 214&quot;])
+    n_parse_bool[&quot;parse_bool&lt;br/&gt;line 224&quot;]
+    n_resolve([&quot;Motion::resolve&lt;br/&gt;line 254&quot;])
+    n_secs([&quot;Motion::secs&lt;br/&gt;line 272&quot;])
     n_load --&gt; n_default
     n_load --&gt; n_parse
     n_parse --&gt; n_default
     n_parse --&gt; n_parse_bool
     n_save --&gt; n_to_text
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L72&quot; &quot;open the source&quot;
-    click n_default_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L90&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L101&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L114&quot; &quot;open the source&quot;
-    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L181&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L199&quot; &quot;open the source&quot;
-    click n_parse_bool href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L209&quot; &quot;open the source&quot;
-    click n_resolve href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L239&quot; &quot;open the source&quot;
-    click n_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L257&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L79&quot; &quot;open the source&quot;
+    click n_default_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L98&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L109&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L122&quot; &quot;open the source&quot;
+    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L195&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L214&quot; &quot;open the source&quot;
+    click n_parse_bool href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L224&quot; &quot;open the source&quot;
+    click n_resolve href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L254&quot; &quot;open the source&quot;
+    click n_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L272&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_default_path,n_load,n_save,n_resolve,n_secs entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -182,16 +182,16 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>Prefs</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L41" rel="noopener noreferrer">41</a></td><td>Everything the user can choose about presentation.</td></tr>
-<tr><td><code>Prefs::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L72" rel="noopener noreferrer">72</a></td><td></td></tr>
-<tr><td><code>default_path</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L90" rel="noopener noreferrer">90</a></td><td>Where preferences live: beside the app lock, in this platform&#x27;s config directory.</td></tr>
-<tr><td><code>Prefs::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L101" rel="noopener noreferrer">101</a></td><td>Read preferences from path.</td></tr>
-<tr><td><code>Prefs::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L114" rel="noopener noreferrer">114</a></td><td>Parse the key = value format.</td></tr>
-<tr><td><code>Prefs::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L181" rel="noopener noreferrer">181</a></td><td>Serialise to the text format.</td></tr>
-<tr><td><code>Prefs::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L199" rel="noopener noreferrer">199</a></td><td>Write preferences to path, creating the directory if needed.</td></tr>
-<tr><td><code>parse_bool</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L209" rel="noopener noreferrer">209</a></td><td></td></tr>
-<tr><td><code>Motion</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L227" rel="noopener noreferrer">227</a></td><td>Whether movement is allowed, and how much.</td></tr>
-<tr><td><code>Motion::resolve</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L239" rel="noopener noreferrer">239</a></td><td>Resolve for this frame.</td></tr>
-<tr><td><code>Motion::secs</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L257" rel="noopener noreferrer">257</a></td><td>A duration scaled by whether motion is allowed.</td></tr>
+<tr><td><code>Prefs::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L79" rel="noopener noreferrer">79</a></td><td></td></tr>
+<tr><td><code>default_path</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L98" rel="noopener noreferrer">98</a></td><td>Where preferences live: beside the app lock, in this platform&#x27;s config directory.</td></tr>
+<tr><td><code>Prefs::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L109" rel="noopener noreferrer">109</a></td><td>Read preferences from path.</td></tr>
+<tr><td><code>Prefs::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L122" rel="noopener noreferrer">122</a></td><td>Parse the key = value format.</td></tr>
+<tr><td><code>Prefs::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L195" rel="noopener noreferrer">195</a></td><td>Serialise to the text format.</td></tr>
+<tr><td><code>Prefs::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L214" rel="noopener noreferrer">214</a></td><td>Write preferences to path, creating the directory if needed.</td></tr>
+<tr><td><code>parse_bool</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L224" rel="noopener noreferrer">224</a></td><td></td></tr>
+<tr><td><code>Motion</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L242" rel="noopener noreferrer">242</a></td><td>Whether movement is allowed, and how much.</td></tr>
+<tr><td><code>Motion::resolve</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L254" rel="noopener noreferrer">254</a></td><td>Resolve for this frame.</td></tr>
+<tr><td><code>Motion::secs</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L272" rel="noopener noreferrer">272</a></td><td>A duration scaled by whether motion is allowed.</td></tr>
 </tbody></table>
 </section>
 </div></div>

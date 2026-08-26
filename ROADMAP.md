@@ -65,7 +65,7 @@ three binaries byte for byte identical.
 | 18 | Documentation generator — a page, flowchart and banner for every crate and **every** `.rs` file, mirrored to the website and the GitHub wiki | **done** | — |
 | 20 | Repository panel no longer shows a README's own markup as text | **done** | — |
 | 21 | Write the missing module documentation for the 14 files that had almost none | **done** | — |
-| 22 | Website split into a page per section, every published link still working | **planned** | 2 d |
+| 22 | Website split into a page per section, every published link still working | **done** | — |
 | 23 | Motion and polish — smooth loading and scrolling, hover, CSS-first tooltips | **done** | — |
 | 24 | Demonstration animation: a voice going in, the mark lighting up, an unidentifiable wave coming out | **done** | — |
 | 25 | Cycling line of project facts, slow enough to read — CSS rather than an image, so it follows the reader's theme and needs no script | **done** | — |
@@ -93,7 +93,7 @@ it cannot do as plainly as what it can.
 | 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | — |
 | 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **planned** | 5–7 d |
 | 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | — |
-| 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **planned** | 2 d |
+| 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **done** | — |
 | 42 | Duress and decoy passwords | **planned** | 7–10 d |
 | 43 | Transcription through your own API key, given **veiled audio only** | **blocked** | — |
 
@@ -382,6 +382,24 @@ Worth noting that the same decision would not buy very much. A window
 excluded from capture is still visible to a camera pointed at the screen, and
 the thing VeilVoice protects — the recording — is a file, not a picture of a
 window.
+
+**Marker 41's contrast is computed against the colour actually on screen.**
+A translucent card is a colour laid *over* the panel behind it, so measuring
+the card's own tint answers a question nobody asked. The blend is computed, the
+WCAG ratio is taken against that, the text colour is chosen by measuring every
+candidate in the palette rather than assuming black or white — and if nothing
+reaches 4.5:1, the card is drawn **opaque** instead of shipped illegible.
+Translucency is a nicety; reading a warning is not. The preferences panel shows
+the measured ratio and says when it had to give translucency up, rather than
+letting a quietly solid card look like a design choice.
+
+The third mode is *off*, and it is offered for a reason: a monitor that
+interrupts somebody every thirty seconds is one they switch off at the
+operating system, and then it is watching for nothing at all. Better a reader
+who chose silence knowingly. What none of the three do is leave VeilVoice's own
+window — a system notification needs a registered application identity on two
+of the three platforms, and this project is published under a pseudonym on
+purpose. That limit is printed beside the setting.
 
 **Markers 28 and 48 were finished by finding out the engine already did it
 and nothing asked.** The randomised ratchet range was written, documented and

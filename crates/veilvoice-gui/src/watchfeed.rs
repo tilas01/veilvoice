@@ -58,6 +58,8 @@ pub struct Update {
 
 /// The window's end of the monitor.
 pub struct WatchFeed {
+    /// Alerts that have arrived and not yet been shown as a notification.
+    unseen: Vec<String>,
     receiver: Option<mpsc::Receiver<Update>>,
     /// The most recent snapshot, so the header indicator has something to draw
     /// between updates.
@@ -86,6 +88,7 @@ impl WatchFeed {
             receiver: None,
             active: Vec::new(),
             log: Vec::new(),
+            unseen: Vec::new(),
             error: None,
             support: veilvoice_watch::support(),
         }
@@ -137,6 +140,22 @@ impl WatchFeed {
         feed
     }
 
+    /// Alerts that have arrived and not yet been shown as a notification.
+    ///
+    /// Separate from [`WatchFeed::log`], which is the history and stays. This
+    /// is a queue of things still to say, and it is drained by whoever shows
+    /// them -- so an alert that arrives while the reader is on another tab is
+    /// still waiting when they come back, rather than having scrolled past in
+    /// a log they were not looking at.
+    pub fn unseen(&mut self) -> Vec<String> {
+        std::mem::take(&mut self.unseen)
+    }
+
+    /// Whether anything is waiting to be shown.
+    pub fn has_unseen(&self) -> bool {
+        !self.unseen.is_empty()
+    }
+
     /// Take whatever has arrived. Never waits.
     ///
     /// Returns true when something new came in, so the caller can decide
@@ -154,6 +173,14 @@ impl WatchFeed {
                     if self.error.is_none() {
                         self.active = update.active;
                     }
+                    // Queued for notification as well as kept in the log.
+                    // The cap is the same one the log uses: a machine that
+                    // produces alerts faster than they can be read should not
+                    // grow a queue without end, and the log is where the ones
+                    // that overflow can still be found.
+                    self.unseen.extend(update.alerts.iter().cloned());
+                    let spare = self.unseen.len().saturating_sub(MOST_ALERTS);
+                    self.unseen.drain(..spare);
                     self.log.extend(update.alerts);
                     let overflow = self.log.len().saturating_sub(MOST_ALERTS);
                     self.log.drain(..overflow);
@@ -252,6 +279,7 @@ mod tests {
             receiver: Some(receiver),
             active: vec![],
             log: Vec::new(),
+            unseen: Vec::new(),
             error: None,
             support: veilvoice_watch::support(),
         };
@@ -282,6 +310,7 @@ mod tests {
             receiver: Some(receiver),
             active: Vec::new(),
             log: Vec::new(),
+            unseen: Vec::new(),
             error: None,
             support: veilvoice_watch::support(),
         };
@@ -309,6 +338,7 @@ mod tests {
             receiver: Some(receiver),
             active: Vec::new(),
             log: Vec::new(),
+            unseen: Vec::new(),
             error: None,
             support: veilvoice_watch::support(),
         };
