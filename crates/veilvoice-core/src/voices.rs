@@ -324,6 +324,108 @@ pub fn all() -> Vec<Voice> {
     (0..MAX_VOICES).map(voice).collect()
 }
 
+/// How far apart two voices are, as the **larger** of their two separations.
+///
+/// Both axes are expressed as a ratio, because hearing is ratio-based on both:
+/// a 20 Hz pitch difference is enormous at 90 Hz and inaudible at 400, and the
+/// same is true of a vocal-tract scale.
+///
+/// # Why the larger and not the smaller
+///
+/// The first version of this took the *smaller*, reasoning that two voices are
+/// only as separable as their closest resemblance. Measuring it showed that to
+/// be backwards. Slots 0 and 4 have exactly the same rendered pitch and vocal
+/// tracts 45 % apart -- one sounds like a much larger person than the other,
+/// and nobody would confuse them -- and the minimum called them **identical**,
+/// because one axis matched. Taking the minimum reported that three voices were
+/// already indistinguishable, which is plainly false if you listen.
+///
+/// A listener separates two voices by whichever cue is strongest. Two voices
+/// are confusable only when they are close on *both* axes, which is what the
+/// maximum expresses.
+///
+/// `1.0` means identical on both axes. `1.19` means the stronger axis differs
+/// by 19 %, which is three semitones of pitch.
+pub fn separation(a: &Voice, b: &Voice, config: &DeidConfig) -> f32 {
+    fn ratio(x: f32, y: f32) -> f32 {
+        if x <= 0.0 || y <= 0.0 || !x.is_finite() || !y.is_finite() {
+            return 1.0;
+        }
+        if x > y {
+            x / y
+        } else {
+            y / x
+        }
+    }
+    let pitch = ratio(a.rendered_f0_hz(config), b.rendered_f0_hz(config));
+    let tract = ratio(a.target_centroid_hz, b.target_centroid_hz);
+    pitch.max(tract)
+}
+
+/// The separation below which two voices should not be handed to two people.
+///
+/// **Three semitones — a ratio of 1.19.**
+///
+/// A semitone is about 6 % and is audible when two sounds are played back to
+/// back for comparison. That is not the task here. The task is following a
+/// conversation: hearing one voice, then a different one thirty seconds later,
+/// and knowing without being told that the speaker changed. That needs a
+/// margin, not a threshold, and three semitones is the smallest interval that
+/// is unmistakable rather than merely detectable.
+///
+/// Deliberately conservative, because being wrong in the other direction is
+/// worse. A group set up with two voices the listener cannot separate produces
+/// a recording in which two people sound like one — which is not a privacy
+/// failure but is a failure of the thing the feature is *for*, and it is only
+/// discovered after the recording exists.
+pub const CLEAR_SEPARATION: f32 = 1.19;
+
+/// How many voices can be handed out before two of them are too alike.
+///
+/// Slots are given out in table order, so this asks: taking them one at a time,
+/// at what point does a new voice come within [`CLEAR_SEPARATION`] of one
+/// already given out? Everything up to that point is safe to use.
+///
+/// This is a stricter question than [`distinct_voices`], which only asks
+/// whether two voices are *different*. Different is not the same as tellable
+/// apart, and a table of ten technically-different voices can still contain a
+/// pair nobody can separate by ear.
+pub fn clear_voices(config: &DeidConfig) -> usize {
+    let voices = all();
+    let mut given: Vec<Voice> = Vec::with_capacity(voices.len());
+    for candidate in voices {
+        if given
+            .iter()
+            .any(|taken| separation(taken, &candidate, config) < CLEAR_SEPARATION)
+        {
+            return given.len();
+        }
+        given.push(candidate);
+    }
+    given.len()
+}
+
+/// The closest pair among the first `count` voices, as a ratio.
+///
+/// For a front end that wants to say *how* clear a given group size is rather
+/// than only whether it passed. `1.0` for fewer than two voices, since one
+/// voice has nothing to be confused with.
+pub fn closest_pair(count: usize, config: &DeidConfig) -> f32 {
+    let voices = all();
+    let taken = &voices[..count.min(voices.len())];
+    let mut closest = f32::INFINITY;
+    for (index, a) in taken.iter().enumerate() {
+        for b in taken.iter().skip(index + 1) {
+            closest = closest.min(separation(a, b, config));
+        }
+    }
+    if closest.is_finite() {
+        closest
+    } else {
+        1.0
+    }
+}
+
 /// How many of the ten are still distinguishable under `config`.
 ///
 /// Two voices count as the same when they would be **rendered** with the same
@@ -357,6 +459,114 @@ mod tests {
 
     fn default_config() -> DeidConfig {
         DeidConfig::default()
+    }
+
+    /// **Eight**, at the default configuration. Measured, not chosen.
+    ///
+    /// The table holds ten and all ten are *different*; eight is how many are
+    /// far enough apart that a listener following a conversation can tell which
+    /// is which. Adding the ninth brings the closest pair to 1.1842 -- slots 4
+    /// and 8, which have exactly the same rendered pitch and vocal tracts only
+    /// 18 % apart -- and that is under the three-semitone floor.
+    ///
+    /// This number is the one a front end should cap a group at. If it moves,
+    /// something about the table or the frame size moved with it, and the front
+    /// end's limit has to move too.
+    #[test]
+    fn eight_voices_are_clearly_separable_and_the_ninth_is_not() {
+        let config = default_config();
+        assert_eq!(clear_voices(&config), 8, "the measured clear limit");
+        assert!(
+            closest_pair(8, &config) >= CLEAR_SEPARATION,
+            "eight: closest pair {:.4}",
+            closest_pair(8, &config)
+        );
+        assert!(
+            closest_pair(9, &config) < CLEAR_SEPARATION,
+            "nine: closest pair {:.4} should be under the floor",
+            closest_pair(9, &config)
+        );
+        // The exact figures, so a change to the table is visible in the diff of
+        // this test rather than only in a number nobody looks at.
+        assert!((closest_pair(8, &config) - 1.25).abs() < 0.001);
+        assert!((closest_pair(9, &config) - 1.1842).abs() < 0.001);
+    }
+
+    /// Being *different* and being *tellable apart* are different questions,
+    /// and this is the gap between them: ten against eight.
+    #[test]
+    fn distinct_is_a_weaker_test_than_clear() {
+        let config = default_config();
+        assert_eq!(distinct_voices(&config), MAX_VOICES);
+        assert!(clear_voices(&config) < distinct_voices(&config));
+    }
+
+    /// The separation of a voice with itself is 1.0, and the measure is
+    /// symmetric. Both are obvious and both would be silently wrong if the
+    /// ratio helper picked up a sign.
+    #[test]
+    fn separation_is_symmetric_and_one_against_itself() {
+        let config = default_config();
+        for (index, a) in all().iter().enumerate() {
+            assert!(
+                (separation(a, a, &config) - 1.0).abs() < 1e-6,
+                "slot {index}"
+            );
+            for b in all().iter() {
+                assert!((separation(a, b, &config) - separation(b, a, &config)).abs() < 1e-6);
+            }
+            assert!(separation(a, a, &config) >= 1.0);
+        }
+    }
+
+    /// The first version of this took the smaller of the two axes, which
+    /// reported three voices as already indistinguishable. Slots 0 and 4 are
+    /// why that was wrong: identical pitch, vocal tracts 45 % apart -- one
+    /// sounds like a much larger person, and nobody would confuse them.
+    #[test]
+    fn two_voices_differing_on_one_axis_only_are_still_separable() {
+        let config = default_config();
+        let voices = all();
+        let (a, b) = (&voices[0], &voices[4]);
+        assert!(
+            (a.rendered_f0_hz(&config) - b.rendered_f0_hz(&config)).abs() < 0.01,
+            "slots 0 and 4 should share a pitch"
+        );
+        assert!(
+            separation(a, b, &config) > CLEAR_SEPARATION,
+            "same pitch, 45 % apart in tract, and separable on that alone"
+        );
+    }
+
+    /// One voice has nothing to be confused with, and no voices is not an
+    /// error. Both are reachable from a front end with an empty group.
+    #[test]
+    fn a_group_too_small_to_confuse_reports_no_confusion() {
+        let config = default_config();
+        assert_eq!(closest_pair(0, &config), 1.0);
+        assert_eq!(closest_pair(1, &config), 1.0);
+        // And asking for more than the table holds does not index past it.
+        assert_eq!(
+            closest_pair(MAX_VOICES + 5, &config),
+            closest_pair(MAX_VOICES, &config)
+        );
+    }
+
+    /// A coarser frame grid collapses registers onto each other, and the clear
+    /// count has to fall with it rather than keep promising eight.
+    #[test]
+    fn a_coarser_frame_grid_reduces_the_clear_count() {
+        let coarse = DeidConfig {
+            frame_size: 128,
+            ..default_config()
+        };
+        let fine = default_config();
+        assert!(
+            clear_voices(&coarse) <= clear_voices(&fine),
+            "coarse {} should not beat fine {}",
+            clear_voices(&coarse),
+            clear_voices(&fine)
+        );
     }
 
     #[test]

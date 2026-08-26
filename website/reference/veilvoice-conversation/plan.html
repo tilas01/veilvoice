@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-conversation/plan.svg" alt="plan.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-conversation/src/plan.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 837 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 934 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#veilvoice-does-not-work-out-who-is-talking-and-will-not-guess">VeilVoice does not work out who is talking, and will not guess</a>
@@ -71,7 +71,7 @@ turn  4.100  9.050  1</code></pre>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>837 lines defining <strong>19 functions</strong> (19 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>934 lines defining <strong>21 functions</strong> (21 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Speaker</code> <span style="color:var(--muted)">line 58</span> &mdash; One person in the recording.</li>
 <li><code>struct Turn</code> <span style="color:var(--muted)">line 84</span> &mdash; A span of the recording belonging to one speaker.</li>
@@ -80,35 +80,39 @@ turn  4.100  9.050  1</code></pre>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Turn::duration</code> <span style="color:var(--muted)">line 101</span> &mdash; How long this turn lasts, in seconds.
 </li>
-<li><code>Conversation::add_speaker</code> <span style="color:var(--muted)">line 127</span> &mdash; Add a speaker, and return the index they were given.
+<li><code>Conversation::add_speaker</code> <span style="color:var(--muted)">line 134</span> &mdash; Add a speaker, and return the index they were given.
 </li>
-<li><code>Conversation::add_turn</code> <span style="color:var(--muted)">line 149</span> &mdash; Add a turn.
+<li><code>Conversation::add_turn</code> <span style="color:var(--muted)">line 156</span> &mdash; Add a turn.
 </li>
-<li><code>Conversation::rename_speakers</code> <span style="color:var(--muted)">line 215</span> &mdash; Rename everybody, in slot order, keeping every turn where it is.
+<li><code>Conversation::rename_speakers</code> <span style="color:var(--muted)">line 222</span> &mdash; Rename everybody, in slot order, keeping every turn where it is.
 </li>
-<li><code>Conversation::speakers</code> <span style="color:var(--muted)">line 245</span> &mdash; The speakers, in the order they were added.
+<li><code>Conversation::speakers</code> <span style="color:var(--muted)">line 252</span> &mdash; The speakers, in the order they were added.
 </li>
-<li><code>Conversation::turns</code> <span style="color:var(--muted)">line 250</span> &mdash; The turns, in time order.
+<li><code>Conversation::turns</code> <span style="color:var(--muted)">line 257</span> &mdash; The turns, in time order.
 </li>
-<li><code>Conversation::len</code> <span style="color:var(--muted)">line 255</span> &mdash; How many speakers there are.
+<li><code>Conversation::len</code> <span style="color:var(--muted)">line 262</span> &mdash; How many speakers there are.
 </li>
-<li><code>Conversation::is_empty</code> <span style="color:var(--muted)">line 260</span> &mdash; Whether there is nobody in the plan.
+<li><code>Conversation::is_empty</code> <span style="color:var(--muted)">line 267</span> &mdash; Whether there is nobody in the plan.
 </li>
-<li><code>Conversation::voice</code> <span style="color:var(--muted)">line 265</span> &mdash; The destination voice for a speaker.
+<li><code>Conversation::voice</code> <span style="color:var(--muted)">line 272</span> &mdash; The destination voice for a speaker.
 </li>
-<li><code>Conversation::duration</code> <span style="color:var(--muted)">line 270</span> &mdash; When the last turn ends, in seconds.
+<li><code>Conversation::mode</code> <span style="color:var(--muted)">line 283</span> &mdash; Whether every speaker gets their own voice, or one between them.
 </li>
-<li><code>Conversation::overlaps</code> <span style="color:var(--muted)">line 279</span> &mdash; Turns where two people are speaking at once.
+<li><code>Conversation::set_mode</code> <span style="color:var(--muted)">line 292</span> &mdash; Render every speaker as the same voice, or as their own.
 </li>
-<li><code>Conversation::self_overlaps</code> <span style="color:var(--muted)">line 300</span> &mdash; Spans where a speaker&#x27;s turns overlap their own other turns.
+<li><code>Conversation::duration</code> <span style="color:var(--muted)">line 303</span> &mdash; When the last turn ends, in seconds.
 </li>
-<li><code>Conversation::from_channels</code> <span style="color:var(--muted)">line 322</span> &mdash; A plan for a recording with one microphone per person.
+<li><code>Conversation::overlaps</code> <span style="color:var(--muted)">line 312</span> &mdash; Turns where two people are speaking at once.
+</li>
+<li><code>Conversation::self_overlaps</code> <span style="color:var(--muted)">line 333</span> &mdash; Spans where a speaker&#x27;s turns overlap their own other turns.
+</li>
+<li><code>Conversation::from_channels</code> <span style="color:var(--muted)">line 355</span> &mdash; A plan for a recording with one microphone per person.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>named</code>, <code>new</code></span>
 </li>
-<li><code>Conversation::save</code> <span style="color:var(--muted)">line 479</span> &mdash; Write the plan to path.
+<li><code>Conversation::save</code> <span style="color:var(--muted)">line 512</span> &mdash; Write the plan to path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Conversation::load</code> <span style="color:var(--muted)">line 490</span> &mdash; Read a plan written by Conversation::save.
+<li><code>Conversation::load</code> <span style="color:var(--muted)">line 523</span> &mdash; Read a plan written by Conversation::save.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>new</code></span>
 </li>
 </ul>
@@ -116,109 +120,119 @@ turn  4.100  9.050  1</code></pre>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 617 794" width="617" height="794" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 633 894" width="633" height="894" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
-<rect x="0" y="0" width="617" height="794" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M318.2 647.0 C 340.2 647.0, 340.2 47.0, 176.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M318.2 647.0 C 599.8 647.0, 599.8 47.0, 580.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M585.4 747.0 C 607.4 747.0, 607.4 747.0, 206.8 747.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M203.8 747.0 C 599.8 747.0, 599.8 47.0, 580.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M394.6 747.0 C 553.8 747.0, 553.8 647.0, 534.8 647.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<rect x="0" y="0" width="633" height="894" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M562.6 647.0 C 584.6 647.0, 584.6 47.0, 184.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M562.6 647.0 C 607.8 647.0, 607.8 47.0, 588.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M398.8 847.0 C 436.0 847.0, 436.0 747.0, 417.0 747.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M414.0 747.0 C 607.8 747.0, 607.8 47.0, 588.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M604.8 747.0 C 626.8 747.0, 626.8 747.0, 218.6 747.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L74" target="_blank" rel="noopener noreferrer">
-<rect x="39.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="106.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Speaker::named</text>
-<text x="106.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 74</text>
+<rect x="47.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="114.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Speaker::named</text>
+<text x="114.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 74</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L101" target="_blank" rel="noopener noreferrer">
-<rect x="310.0" y="420.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="407.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Turn::duration</text>
-<text x="407.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
+<rect x="108.2" y="520.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="205.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Turn::duration</text>
+<text x="205.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L117" target="_blank" rel="noopener noreferrer">
-<rect x="420.6" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="499.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::new</text>
-<text x="499.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 117</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L124" target="_blank" rel="noopener noreferrer">
+<rect x="428.6" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="507.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::new</text>
+<text x="507.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L127" target="_blank" rel="noopener noreferrer">
-<rect x="88.8" y="120.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="197.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::add_speaker</text>
-<text x="197.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 127</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L134" target="_blank" rel="noopener noreferrer">
+<rect x="96.8" y="120.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="205.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::add_speaker</text>
+<text x="205.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L149" target="_blank" rel="noopener noreferrer">
-<rect x="332.8" y="120.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="430.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::add_turn</text>
-<text x="430.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 149</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L156" target="_blank" rel="noopener noreferrer">
+<rect x="340.8" y="120.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="438.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::add_turn</text>
+<text x="438.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 156</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L215" target="_blank" rel="noopener noreferrer">
-<rect x="73.6" y="220.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="197.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::rename_speakers</text>
-<text x="197.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 215</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L222" target="_blank" rel="noopener noreferrer">
+<rect x="81.6" y="220.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="205.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::rename_speakers</text>
+<text x="205.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 222</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L245" target="_blank" rel="noopener noreferrer">
-<rect x="348.0" y="220.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="445.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::speakers</text>
-<text x="445.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L252" target="_blank" rel="noopener noreferrer">
+<rect x="356.0" y="220.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="453.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::speakers</text>
+<text x="453.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 252</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L250" target="_blank" rel="noopener noreferrer">
-<rect x="20.0" y="320.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="106.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::turns</text>
-<text x="106.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 250</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L257" target="_blank" rel="noopener noreferrer">
+<rect x="28.0" y="320.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="114.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::turns</text>
+<text x="114.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L255" target="_blank" rel="noopener noreferrer">
-<rect x="218.4" y="320.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="297.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::len</text>
-<text x="297.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 255</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L262" target="_blank" rel="noopener noreferrer">
+<rect x="226.4" y="320.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="305.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::len</text>
+<text x="305.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 262</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L260" target="_blank" rel="noopener noreferrer">
-<rect x="401.6" y="320.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="499.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::is_empty</text>
-<text x="499.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L267" target="_blank" rel="noopener noreferrer">
+<rect x="409.6" y="320.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="507.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::is_empty</text>
+<text x="507.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 267</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L265" target="_blank" rel="noopener noreferrer">
-<rect x="111.6" y="420.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="197.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::voice</text>
-<text x="197.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 265</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L272" target="_blank" rel="noopener noreferrer">
+<rect x="24.2" y="420.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="110.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::voice</text>
+<text x="110.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L270" target="_blank" rel="noopener noreferrer">
-<rect x="310.0" y="420.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="407.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::duration</text>
-<text x="407.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L283" target="_blank" rel="noopener noreferrer">
+<rect x="222.6" y="420.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="305.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::mode</text>
+<text x="305.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 283</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L279" target="_blank" rel="noopener noreferrer">
-<rect x="81.2" y="520.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="178.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::overlaps</text>
-<text x="178.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L292" target="_blank" rel="noopener noreferrer">
+<rect x="413.4" y="420.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="511.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::set_mode</text>
+<text x="511.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 292</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L300" target="_blank" rel="noopener noreferrer">
-<rect x="302.4" y="520.0" width="233.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="419.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::self_overlaps</text>
-<text x="419.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 300</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L303" target="_blank" rel="noopener noreferrer">
+<rect x="108.2" y="520.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="205.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::duration</text>
+<text x="205.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 303</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L322" target="_blank" rel="noopener noreferrer">
-<rect x="85.0" y="620.0" width="233.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="201.6" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::from_channels</text>
-<text x="201.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 322</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L312" target="_blank" rel="noopener noreferrer">
+<rect x="329.4" y="520.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="427.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::overlaps</text>
+<text x="427.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 312</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L347" target="_blank" rel="noopener noreferrer">
-<rect x="344.2" y="620.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="438.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::to_text</text>
-<text x="438.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 347</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L333" target="_blank" rel="noopener noreferrer">
+<rect x="70.2" y="620.0" width="233.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="186.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::self_overlaps</text>
+<text x="186.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 333</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L384" target="_blank" rel="noopener noreferrer">
-<rect x="31.4" y="720.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="117.6" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::parse</text>
-<text x="117.6" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 384</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L355" target="_blank" rel="noopener noreferrer">
+<rect x="329.4" y="620.0" width="233.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="446.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::from_channels</text>
+<text x="446.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 355</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L479" target="_blank" rel="noopener noreferrer">
-<rect x="229.8" y="720.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="312.2" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::save</text>
-<text x="312.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 479</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L380" target="_blank" rel="noopener noreferrer">
+<rect x="28.0" y="720.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="121.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::to_text</text>
+<text x="121.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 380</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L490" target="_blank" rel="noopener noreferrer">
-<rect x="420.6" y="720.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="503.0" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::load</text>
-<text x="503.0" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 490</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L417" target="_blank" rel="noopener noreferrer">
+<rect x="241.6" y="720.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="327.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::parse</text>
+<text x="327.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 417</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L512" target="_blank" rel="noopener noreferrer">
+<rect x="440.0" y="720.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="522.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::save</text>
+<text x="522.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 512</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L523" target="_blank" rel="noopener noreferrer">
+<rect x="234.0" y="820.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="316.4" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Conversation::load</text>
+<text x="316.4" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 523</text>
 </a>
 </svg>
 </div>
@@ -228,23 +242,25 @@ turn  4.100  9.050  1</code></pre>
 flowchart TD
     n_named[&quot;Speaker::named&lt;br/&gt;line 74&quot;]
     n_duration([&quot;Turn::duration&lt;br/&gt;line 101&quot;])
-    n_new[&quot;Conversation::new&lt;br/&gt;line 117&quot;]
-    n_add_speaker([&quot;Conversation::add_speaker&lt;br/&gt;line 127&quot;])
-    n_add_turn([&quot;Conversation::add_turn&lt;br/&gt;line 149&quot;])
-    n_rename_speakers([&quot;Conversation::rename_speakers&lt;br/&gt;line 215&quot;])
-    n_speakers([&quot;Conversation::speakers&lt;br/&gt;line 245&quot;])
-    n_turns([&quot;Conversation::turns&lt;br/&gt;line 250&quot;])
-    n_len([&quot;Conversation::len&lt;br/&gt;line 255&quot;])
-    n_is_empty([&quot;Conversation::is_empty&lt;br/&gt;line 260&quot;])
-    n_voice([&quot;Conversation::voice&lt;br/&gt;line 265&quot;])
-    n_duration([&quot;Conversation::duration&lt;br/&gt;line 270&quot;])
-    n_overlaps([&quot;Conversation::overlaps&lt;br/&gt;line 279&quot;])
-    n_self_overlaps([&quot;Conversation::self_overlaps&lt;br/&gt;line 300&quot;])
-    n_from_channels([&quot;Conversation::from_channels&lt;br/&gt;line 322&quot;])
-    n_to_text[&quot;Conversation::to_text&lt;br/&gt;line 347&quot;]
-    n_parse[&quot;Conversation::parse&lt;br/&gt;line 384&quot;]
-    n_save([&quot;Conversation::save&lt;br/&gt;line 479&quot;])
-    n_load([&quot;Conversation::load&lt;br/&gt;line 490&quot;])
+    n_new[&quot;Conversation::new&lt;br/&gt;line 124&quot;]
+    n_add_speaker([&quot;Conversation::add_speaker&lt;br/&gt;line 134&quot;])
+    n_add_turn([&quot;Conversation::add_turn&lt;br/&gt;line 156&quot;])
+    n_rename_speakers([&quot;Conversation::rename_speakers&lt;br/&gt;line 222&quot;])
+    n_speakers([&quot;Conversation::speakers&lt;br/&gt;line 252&quot;])
+    n_turns([&quot;Conversation::turns&lt;br/&gt;line 257&quot;])
+    n_len([&quot;Conversation::len&lt;br/&gt;line 262&quot;])
+    n_is_empty([&quot;Conversation::is_empty&lt;br/&gt;line 267&quot;])
+    n_voice([&quot;Conversation::voice&lt;br/&gt;line 272&quot;])
+    n_mode([&quot;Conversation::mode&lt;br/&gt;line 283&quot;])
+    n_set_mode([&quot;Conversation::set_mode&lt;br/&gt;line 292&quot;])
+    n_duration([&quot;Conversation::duration&lt;br/&gt;line 303&quot;])
+    n_overlaps([&quot;Conversation::overlaps&lt;br/&gt;line 312&quot;])
+    n_self_overlaps([&quot;Conversation::self_overlaps&lt;br/&gt;line 333&quot;])
+    n_from_channels([&quot;Conversation::from_channels&lt;br/&gt;line 355&quot;])
+    n_to_text[&quot;Conversation::to_text&lt;br/&gt;line 380&quot;]
+    n_parse[&quot;Conversation::parse&lt;br/&gt;line 417&quot;]
+    n_save([&quot;Conversation::save&lt;br/&gt;line 512&quot;])
+    n_load([&quot;Conversation::load&lt;br/&gt;line 523&quot;])
     n_from_channels --&gt; n_named
     n_from_channels --&gt; n_new
     n_load --&gt; n_parse
@@ -252,25 +268,27 @@ flowchart TD
     n_save --&gt; n_to_text
     click n_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L74&quot; &quot;open the source&quot;
     click n_duration href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L101&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L117&quot; &quot;open the source&quot;
-    click n_add_speaker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L127&quot; &quot;open the source&quot;
-    click n_add_turn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L149&quot; &quot;open the source&quot;
-    click n_rename_speakers href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L215&quot; &quot;open the source&quot;
-    click n_speakers href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L245&quot; &quot;open the source&quot;
-    click n_turns href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L250&quot; &quot;open the source&quot;
-    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L255&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L260&quot; &quot;open the source&quot;
-    click n_voice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L265&quot; &quot;open the source&quot;
-    click n_duration href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L270&quot; &quot;open the source&quot;
-    click n_overlaps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L279&quot; &quot;open the source&quot;
-    click n_self_overlaps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L300&quot; &quot;open the source&quot;
-    click n_from_channels href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L322&quot; &quot;open the source&quot;
-    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L347&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L384&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L479&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L490&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L124&quot; &quot;open the source&quot;
+    click n_add_speaker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L134&quot; &quot;open the source&quot;
+    click n_add_turn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L156&quot; &quot;open the source&quot;
+    click n_rename_speakers href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L222&quot; &quot;open the source&quot;
+    click n_speakers href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L252&quot; &quot;open the source&quot;
+    click n_turns href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L257&quot; &quot;open the source&quot;
+    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L262&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L267&quot; &quot;open the source&quot;
+    click n_voice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L272&quot; &quot;open the source&quot;
+    click n_mode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L283&quot; &quot;open the source&quot;
+    click n_set_mode href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L292&quot; &quot;open the source&quot;
+    click n_duration href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L303&quot; &quot;open the source&quot;
+    click n_overlaps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L312&quot; &quot;open the source&quot;
+    click n_self_overlaps href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L333&quot; &quot;open the source&quot;
+    click n_from_channels href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L355&quot; &quot;open the source&quot;
+    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L380&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L417&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L512&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L523&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_duration,n_add_speaker,n_add_turn,n_rename_speakers,n_speakers,n_turns,n_len,n_is_empty,n_voice,n_duration,n_overlaps,n_self_overlaps,n_from_channels,n_save,n_load entry
+    class n_duration,n_add_speaker,n_add_turn,n_rename_speakers,n_speakers,n_turns,n_len,n_is_empty,n_voice,n_mode,n_set_mode,n_duration,n_overlaps,n_self_overlaps,n_from_channels,n_save,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_named,n_new,n_to_text,n_parse api</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -285,23 +303,25 @@ flowchart TD
 <tr><td><code>Turn</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L84" rel="noopener noreferrer">84</a></td><td>A span of the recording belonging to one speaker.</td></tr>
 <tr><td><code>Turn::duration</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L101" rel="noopener noreferrer">101</a></td><td>How long this turn lasts, in seconds.</td></tr>
 <tr><td><code>Conversation</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L108" rel="noopener noreferrer">108</a></td><td>The whole plan: who is in the recording, and when each of them speaks.</td></tr>
-<tr><td><code>Conversation::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L117" rel="noopener noreferrer">117</a></td><td>An empty plan.</td></tr>
-<tr><td><code>Conversation::add_speaker</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L127" rel="noopener noreferrer">127</a></td><td>Add a speaker, and return the index they were given.</td></tr>
-<tr><td><code>Conversation::add_turn</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L149" rel="noopener noreferrer">149</a></td><td>Add a turn.</td></tr>
-<tr><td><code>Conversation::rename_speakers</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L215" rel="noopener noreferrer">215</a></td><td>Rename everybody, in slot order, keeping every turn where it is.</td></tr>
-<tr><td><code>Conversation::speakers</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L245" rel="noopener noreferrer">245</a></td><td>The speakers, in the order they were added.</td></tr>
-<tr><td><code>Conversation::turns</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L250" rel="noopener noreferrer">250</a></td><td>The turns, in time order.</td></tr>
-<tr><td><code>Conversation::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L255" rel="noopener noreferrer">255</a></td><td>How many speakers there are.</td></tr>
-<tr><td><code>Conversation::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L260" rel="noopener noreferrer">260</a></td><td>Whether there is nobody in the plan.</td></tr>
-<tr><td><code>Conversation::voice</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L265" rel="noopener noreferrer">265</a></td><td>The destination voice for a speaker.</td></tr>
-<tr><td><code>Conversation::duration</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L270" rel="noopener noreferrer">270</a></td><td>When the last turn ends, in seconds.</td></tr>
-<tr><td><code>Conversation::overlaps</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L279" rel="noopener noreferrer">279</a></td><td>Turns where two people are speaking at once.</td></tr>
-<tr><td><code>Conversation::self_overlaps</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L300" rel="noopener noreferrer">300</a></td><td>Spans where a speaker&#x27;s turns overlap their own other turns.</td></tr>
-<tr><td><code>Conversation::from_channels</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L322" rel="noopener noreferrer">322</a></td><td>A plan for a recording with one microphone per person.</td></tr>
-<tr><td><code>Conversation::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L347" rel="noopener noreferrer">347</a></td><td>Serialise to the text format described at the top of this module.</td></tr>
-<tr><td><code>Conversation::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L384" rel="noopener noreferrer">384</a></td><td>Parse the text format.</td></tr>
-<tr><td><code>Conversation::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L479" rel="noopener noreferrer">479</a></td><td>Write the plan to path.</td></tr>
-<tr><td><code>Conversation::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L490" rel="noopener noreferrer">490</a></td><td>Read a plan written by Conversation::save.</td></tr>
+<tr><td><code>Conversation::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L124" rel="noopener noreferrer">124</a></td><td>An empty plan.</td></tr>
+<tr><td><code>Conversation::add_speaker</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L134" rel="noopener noreferrer">134</a></td><td>Add a speaker, and return the index they were given.</td></tr>
+<tr><td><code>Conversation::add_turn</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L156" rel="noopener noreferrer">156</a></td><td>Add a turn.</td></tr>
+<tr><td><code>Conversation::rename_speakers</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L222" rel="noopener noreferrer">222</a></td><td>Rename everybody, in slot order, keeping every turn where it is.</td></tr>
+<tr><td><code>Conversation::speakers</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L252" rel="noopener noreferrer">252</a></td><td>The speakers, in the order they were added.</td></tr>
+<tr><td><code>Conversation::turns</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L257" rel="noopener noreferrer">257</a></td><td>The turns, in time order.</td></tr>
+<tr><td><code>Conversation::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L262" rel="noopener noreferrer">262</a></td><td>How many speakers there are.</td></tr>
+<tr><td><code>Conversation::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L267" rel="noopener noreferrer">267</a></td><td>Whether there is nobody in the plan.</td></tr>
+<tr><td><code>Conversation::voice</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L272" rel="noopener noreferrer">272</a></td><td>The destination voice for a speaker.</td></tr>
+<tr><td><code>Conversation::mode</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L283" rel="noopener noreferrer">283</a></td><td>Whether every speaker gets their own voice, or one between them.</td></tr>
+<tr><td><code>Conversation::set_mode</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L292" rel="noopener noreferrer">292</a></td><td>Render every speaker as the same voice, or as their own.</td></tr>
+<tr><td><code>Conversation::duration</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L303" rel="noopener noreferrer">303</a></td><td>When the last turn ends, in seconds.</td></tr>
+<tr><td><code>Conversation::overlaps</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L312" rel="noopener noreferrer">312</a></td><td>Turns where two people are speaking at once.</td></tr>
+<tr><td><code>Conversation::self_overlaps</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L333" rel="noopener noreferrer">333</a></td><td>Spans where a speaker&#x27;s turns overlap their own other turns.</td></tr>
+<tr><td><code>Conversation::from_channels</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L355" rel="noopener noreferrer">355</a></td><td>A plan for a recording with one microphone per person.</td></tr>
+<tr><td><code>Conversation::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L380" rel="noopener noreferrer">380</a></td><td>Serialise to the text format described at the top of this module.</td></tr>
+<tr><td><code>Conversation::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L417" rel="noopener noreferrer">417</a></td><td>Parse the text format.</td></tr>
+<tr><td><code>Conversation::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L512" rel="noopener noreferrer">512</a></td><td>Write the plan to path.</td></tr>
+<tr><td><code>Conversation::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L523" rel="noopener noreferrer">523</a></td><td>Read a plan written by Conversation::save.</td></tr>
 </tbody></table>
 </section>
 </div></div>
