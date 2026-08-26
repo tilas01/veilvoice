@@ -103,6 +103,8 @@ macro_rules! note {
     };
 }
 
+mod builder;
+mod deps;
 mod discover;
 mod fetch;
 mod report;
@@ -192,6 +194,39 @@ USAGE
 
   veilvoice-verify --explain
       What 'intact' and 'reproducible' each mean, and why they differ.
+
+BUILDING IT YOURSELF
+  A signature says who made a file. Only a build says what it is made of.
+
+  veilvoice-verify deps
+      What a build needs on this machine, and which of it is already here.
+      Add --install to be offered the missing pieces one at a time, with the
+      exact command shown before each question. --yes answers them all in
+      advance, which is the same explicit yes given in writing.
+
+  veilvoice-verify build [DIR]
+      Build the workspace from source and print the hash of everything a
+      release ships. DIR defaults to the current directory.
+
+  veilvoice-verify reproduce [DIR] --sums SHA256SUMS --sig SHA256SUMS.asc
+      Build here, then compare against the published hashes for this
+      platform. The signature is verified before any hash from the list is
+      read.
+
+      It builds for the machine it is on, and compares against the published
+      build for that platform. That is not a limitation being apologised for:
+      a build needs that platform's headers and linker, and three machines
+      give you three platforms verified, which is how a reproducible-build
+      claim is normally checked.
+
+      A difference is a FINDING, not an accusation. Both hashes are printed
+      and the exit status is 5, which is deliberately not the status that
+      means tampering.
+
+  veilvoice-verify install --from DIR --cli --gui
+      Copy the binaries in DIR to where a shell will find them. This command
+      copies; it does not verify. Check DIR first with `file` or `reproduce`,
+      so the yes you give is to one thing rather than two.
 
 THE NETWORK
   Every command above except `release` is entirely offline.
@@ -756,6 +791,358 @@ fn wait_before_the_window_closes() {
     let _ = std::io::stdin().read_line(&mut discard);
 }
 
+// ---------------------------------------------------------------------------
+// Building it yourself
+// ---------------------------------------------------------------------------
+
+/// What this machine needs before it can build VeilVoice.
+///
+/// `install` here means *offer*: every missing thing is named, described, and
+/// the exact command line is shown before the question. Nothing runs without a
+/// yes typed by a person, or `--yes` typed on this command line -- which is the
+/// same explicit yes, given in advance and in writing.
+fn command_deps(offer_to_install: bool, always_yes: bool) -> ExitCode {
+    out!("What a build of VeilVoice needs on this machine");
+    out!();
+
+    let (satisfied, absent) = builder::report_dependencies();
+
+    if absent.is_empty() {
+        verdict!("Everything a build needs is here.");
+        return Status::Success.into();
+    }
+
+    if !offer_to_install {
+        out!();
+        out!("Nothing has been installed. `veilvoice-verify deps --install` offers to.");
+        return if satisfied {
+            // Only optional things are missing, so a build will still work --
+            // with less in it. That is not a failure.
+            verdict!("A build will work. Live mode will not be built.");
+            Status::Success.into()
+        } else {
+            Status::DependenciesMissing.into()
+        };
+    }
+
+    let mut failures = Vec::new();
+    for need in &absent {
+        let route = need.route();
+        let Some(line) = route.command_line() else {
+            // Nothing to run: the route is something a person does themselves,
+            // and it was printed above with the reason.
+            continue;
+        };
+        out!();
+        let agreed =
+            always_yes || builder::agreed(&format!("Run: {line}\n  Install {}?", need.name));
+        if !agreed {
+            out!("  skipped {}", need.name);
+            continue;
+        }
+        if let Err(why) = builder::install(need) {
+            failures.push(format!("{}: {why}", need.name));
+        }
+    }
+
+    for line in &failures {
+        out!("  FAILED  {line}");
+    }
+
+    // Asked again rather than assumed. An installer exiting zero is not the
+    // same as the header being where the compiler will look for it.
+    let (still_required, _) = deps::missing();
+    if still_required.is_empty() {
+        verdict!("Everything a build needs is here.");
+        Status::Success.into()
+    } else {
+        verdict!(
+            "{} still missing: {}",
+            still_required.len(),
+            still_required
+                .iter()
+                .map(|need| need.name)
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+        Status::DependenciesMissing.into()
+    }
+}
+
+/// Build the workspace from source and hash what came out.
+///
+/// No comparison: this is the half somebody runs to get a build, and it says
+/// what it produced. `reproduce` is the half that checks it against a release.
+fn command_build(root: &Path, target_dir: Option<&Path>) -> ExitCode {
+    let (built, code) = match do_build(root, target_dir) {
+        Ok(built) => built,
+        Err(code) => return code,
+    };
+    let _ = code;
+
+    out!();
+    for (name, digest) in &built.files {
+        verdict!("{digest}  {name}");
+    }
+    for name in &built.absent {
+        out!("  --    {name} was not built (it may be behind a feature here)");
+    }
+    Status::Success.into()
+}
+
+/// Everything both build commands do before they differ.
+fn do_build(
+    root: &Path,
+    target_dir: Option<&Path>,
+) -> Result<(builder::Built, ExitCode), ExitCode> {
+    if let Err(why) = builder::looks_like_the_source(root) {
+        return Err(usage("that is not VeilVoice's source tree", &[&why]));
+    }
+
+    let (satisfied, _) = builder::report_dependencies();
+    if !satisfied {
+        out!();
+        out!("`veilvoice-verify deps --install` offers to install them.");
+        return Err(Status::DependenciesMissing.into());
+    }
+
+    // Said before the build rather than after, because it is the first thing to
+    // check when two builds disagree, and afterwards nobody scrolls back.
+    if let Some(pinned) = builder::pinned_toolchain(root) {
+        good(&format!("the source pins Rust {pinned}"));
+    }
+    if let Some(triple) = builder::host_triple() {
+        good(&format!("building for {triple}"));
+    }
+
+    out!();
+    out!("Building. This takes a few minutes the first time.");
+    let dir = match builder::build(root, target_dir) {
+        Ok(dir) => dir,
+        Err(why) => {
+            if report::level() >= Loudness::Minimal {
+                eprintln!();
+                eprintln!("{why}");
+            }
+            return Err(Status::BuildFailed.into());
+        }
+    };
+    good("the build finished");
+    note!("binaries in {}", dir.display());
+
+    match builder::hash_what_was_built(&dir) {
+        Ok(built) => Ok((built, Status::Success.into())),
+        Err(why) => Err(cannot("the build left nothing to hash", &[&why])),
+    }
+}
+
+/// Build here, and compare against the published hashes for this platform.
+///
+/// **The signature is verified before any hash from the list is read**, by the
+/// same code path `sums` uses. A hash list that has not been verified is a
+/// list of numbers somebody sent you.
+fn command_reproduce(
+    root: &Path,
+    sums_path: &Path,
+    sig_path: &Path,
+    target_dir: Option<&Path>,
+) -> ExitCode {
+    let key = match embedded_key() {
+        Ok(key) => key,
+        Err(why) => return deny("the key compiled into this binary is not usable", &[&why]),
+    };
+    let sums_bytes = match std::fs::read(sums_path) {
+        Ok(bytes) => bytes,
+        Err(e) => return cannot("the hash list could not be read", &[&format!("{e}")]),
+    };
+    let signature = match read_text(sig_path) {
+        Ok(text) => text,
+        Err(e) => return cannot("the signature could not be read", &[&e]),
+    };
+    if let Err(why) = verify_detached(&key, &signature, &sums_bytes) {
+        return deny(
+            "the signature over the hash list is not valid",
+            &[
+                &why,
+                "",
+                "Nothing was built and nothing was compared. A hash list that",
+                "does not verify is a list of numbers somebody sent you.",
+            ],
+        );
+    }
+    good(&format!("the hash list is signed by {FINGERPRINT}"));
+    let sums = String::from_utf8_lossy(&sums_bytes).into_owned();
+
+    let (built, _) = match do_build(root, target_dir) {
+        Ok(pair) => pair,
+        Err(code) => return code,
+    };
+
+    let comparison = builder::compare(&built, &sums);
+    out!();
+    let mut differed = Vec::new();
+    for one in &comparison {
+        match one {
+            builder::Compared::Same { name, digest } => {
+                good(&format!("{name} matches the published build"));
+                note!("{digest}");
+            }
+            builder::Compared::Different {
+                name,
+                built,
+                published,
+            } => {
+                differed.push(name.clone());
+                if report::level() >= Loudness::Minimal {
+                    println!("  DIFFERS  {name}");
+                    println!("    built here  {built}");
+                    println!("    published   {published}");
+                }
+            }
+            builder::Compared::NotPublished { name } => {
+                out!("  --    {name} is not in the published list, so nothing to compare");
+            }
+        }
+    }
+
+    let status = builder::status_for(&comparison);
+    out!();
+    match status {
+        Status::Success => {
+            verdict!("REPRODUCIBLE. What was published is what this source builds.");
+            out!();
+            out!("  You did not take anybody's word for that. You built it.");
+        }
+        Status::NotReproducible => {
+            verdict!(
+                "NOT REPRODUCIBLE here: {} file(s) differ -- {}",
+                differed.len(),
+                differed.join(", ")
+            );
+            if report::level() >= Loudness::Minimal {
+                println!();
+                println!("  This is a finding, not an accusation. Most causes are dull: a");
+                println!("  different compiler version, a path baked into a panic message,");
+                println!("  a timestamp. Both hashes are above so somebody else can check.");
+                println!();
+                println!("  Worth reporting either way, with the compiler version and the");
+                println!("  platform above.");
+            }
+        }
+        _ => {
+            verdict!("Nothing could be compared: none of what was built is in that list.");
+            if report::level() >= Loudness::Minimal {
+                println!();
+                println!("  That is not a pass. The list may be for another platform --");
+                println!(
+                    "  check that it is the SHA256SUMS for {}.",
+                    builder::host_triple().unwrap_or_else(|| "this platform".into())
+                );
+            }
+        }
+    }
+    status.into()
+}
+
+/// Put binaries where a shell will find them.
+///
+/// Only from a directory this program was pointed at, and it says which files
+/// it copied and to where. It does **not** verify anything itself: `file`,
+/// `auto` and `reproduce` are how a directory earns being installed from, and
+/// folding a check into a copy would mean two things happening under one yes.
+fn command_install(from: &Path, cli: bool, gui: bool) -> ExitCode {
+    let Some(destination) = veilvoice_setup::install::bin_dir() else {
+        return cannot(
+            "this system offers no per-user program directory",
+            &["Copy the binaries wherever you keep programs."],
+        );
+    };
+    if !from.is_dir() {
+        return usage(
+            "that is not a directory of binaries",
+            &[&format!("{} is not there", from.display())],
+        );
+    }
+
+    let mut wanted: Vec<&str> = Vec::new();
+    if cli {
+        wanted.push("veilvoice");
+    }
+    if gui {
+        wanted.push("veilvoice-gui");
+    }
+    if wanted.is_empty() {
+        return usage(
+            "nothing was selected to install",
+            &["veilvoice-verify install --from <DIR> --cli --gui"],
+        );
+    }
+
+    if let Err(e) = std::fs::create_dir_all(&destination) {
+        return cannot(
+            "the install directory could not be made",
+            &[&format!("{}: {e}", destination.display())],
+        );
+    }
+
+    let mut copied = Vec::new();
+    for name in wanted {
+        let file = builder::with_platform_extension(name);
+        let source = from.join(&file);
+        if !source.is_file() {
+            return cannot(
+                "one of the binaries asked for is not there",
+                &[&format!("{}", source.display())],
+            );
+        }
+        let target = destination.join(&file);
+        if let Err(e) = std::fs::copy(&source, &target) {
+            return cannot(
+                "a binary could not be copied",
+                &[&format!(
+                    "{} -> {}: {e}",
+                    source.display(),
+                    target.display()
+                )],
+            );
+        }
+        good(&format!("installed {file}"));
+        note!("{} -> {}", source.display(), target.display());
+        copied.push(file);
+    }
+
+    verdict!(
+        "{} installed to {}",
+        copied.join(", "),
+        destination.display()
+    );
+    let status = veilvoice_setup::install::status();
+    if !status.on_path {
+        out!();
+        out!(
+            "  {} is not on this terminal's PATH.",
+            destination.display()
+        );
+        out!("  Add it, or run the binaries by their full path.");
+    }
+    Status::Success.into()
+}
+
+/// Print something the reader asked for by name, at any level.
+///
+/// The one exception to "every line goes through the level", and it is narrow
+/// on purpose: `--help`, `--explain`, `--version` and `--exit-status` are not
+/// reports about a check. Somebody who types `--help` wants the help, whatever
+/// else they passed, and a `--quiet --help` that prints nothing is a bug
+/// dressed as consistency.
+///
+/// One function rather than four bare `print!` calls, so the exception has a
+/// single place, a stated reason, and one line for the source-level test to
+/// know about.
+fn asked_for(text: &str) {
+    print!("{text}");
+}
+
 fn main() -> ExitCode {
     let mut args: Vec<String> = std::env::args().skip(1).collect();
 
@@ -774,26 +1161,27 @@ fn main() -> ExitCode {
     }
 
     if args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
-        print!("{USAGE}");
-        // Printed from the tables rather than written out again here. The
-        // quiet level is only usable because the statuses are documented, and
-        // a copy of that documentation is a copy that goes stale.
-        println!();
-        print!("{}", Loudness::table());
-        println!();
-        print!("{}", Status::table());
+        // The tables are printed from the code that defines them rather than
+        // written out again here. The quiet level is only usable because the
+        // statuses are documented, and a second copy of that documentation is
+        // a copy that goes stale.
+        asked_for(&format!(
+            "{USAGE}\n{}\n{}",
+            Loudness::table(),
+            Status::table()
+        ));
         return ExitCode::SUCCESS;
     }
     if args[0] == "--explain" {
-        print!("{EXPLAIN}");
+        asked_for(EXPLAIN);
         return ExitCode::SUCCESS;
     }
     if args[0] == "--version" {
-        println!("veilvoice-verify {}", env!("CARGO_PKG_VERSION"));
+        asked_for(&format!("veilvoice-verify {}\n", env!("CARGO_PKG_VERSION")));
         return ExitCode::SUCCESS;
     }
     if args[0] == "--exit-status" {
-        print!("{}", Status::table());
+        asked_for(&Status::table());
         return ExitCode::SUCCESS;
     }
 
@@ -801,6 +1189,89 @@ fn main() -> ExitCode {
         "auto" => command_auto(args.get(1).map(Path::new)),
 
         "key" => command_key(),
+
+        "deps" => {
+            let install = args.iter().any(|a| a == "--install");
+            let yes = args.iter().any(|a| a == "--yes");
+            command_deps(install || yes, yes)
+        }
+
+        "build" => {
+            let root = args
+                .get(1)
+                .filter(|a| !a.starts_with("--"))
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("."));
+            command_build(&root, None)
+        }
+
+        "reproduce" => {
+            let root = args
+                .get(1)
+                .filter(|a| !a.starts_with("--"))
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from("."));
+            let mut sums = None;
+            let mut sig = None;
+            let mut index = 1;
+            while index < args.len() {
+                let result = match args[index].as_str() {
+                    "--sums" => take_value(&args, index, "--sums").map(|v| sums = Some(v)),
+                    "--sig" => take_value(&args, index, "--sig").map(|v| sig = Some(v)),
+                    other if other.starts_with("--") => Err(format!("unknown option: {other}")),
+                    _ => Ok(()),
+                };
+                if let Err(why) = result {
+                    return usage(&why, &["veilvoice-verify --help"]);
+                }
+                index += if args[index].starts_with("--") { 2 } else { 1 };
+            }
+            match (sums, sig) {
+                (Some(sums), Some(sig)) => {
+                    command_reproduce(&root, Path::new(&sums), Path::new(&sig), None)
+                }
+                _ => usage(
+                    "`reproduce` needs the published hash list and its signature",
+                    &[
+                        "veilvoice-verify reproduce . --sums SHA256SUMS --sig SHA256SUMS.asc",
+                        "",
+                        "Both are on the release page. Without the signature there is",
+                        "nothing to check the list against, and an unverified list is a",
+                        "list of numbers somebody sent you.",
+                    ],
+                ),
+            }
+        }
+
+        "install" => {
+            let mut from = None;
+            let mut index = 1;
+            while index < args.len() {
+                let result = match args[index].as_str() {
+                    "--from" => take_value(&args, index, "--from").map(|v| from = Some(v)),
+                    "--cli" | "--gui" => Ok(()),
+                    other => Err(format!("unknown option: {other}")),
+                };
+                if let Err(why) = result {
+                    return usage(&why, &["veilvoice-verify --help"]);
+                }
+                index += if args[index] == "--from" { 2 } else { 1 };
+            }
+            let cli = args.iter().any(|a| a == "--cli");
+            let gui = args.iter().any(|a| a == "--gui");
+            match from {
+                Some(dir) => command_install(Path::new(&dir), cli, gui),
+                None => usage(
+                    "`install` needs a directory to install from",
+                    &[
+                        "veilvoice-verify install --from target/release --cli --gui",
+                        "",
+                        "Check that directory first, with `file` or `reproduce`.",
+                        "This command copies; it does not verify.",
+                    ],
+                ),
+            }
+        }
 
         "release" => match args.get(1) {
             Some(tag) => command_release(tag, args.get(2).map(String::as_str)),

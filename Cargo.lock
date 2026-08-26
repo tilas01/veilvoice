@@ -4988,6 +4988,7 @@ dependencies = [
  "sha2",
  "tempfile",
  "veilvoice-check",
+ "veilvoice-setup",
  "winresource",
 ]
 
