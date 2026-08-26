@@ -1,37 +1,69 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! Listing the processes that are running, per platform.
+#![forbid(unsafe_code)]
+#![deny(missing_docs)]
+//! Which processes are running, per platform, and what that cannot tell you.
+//!
+//! # Why this is a crate rather than a module
+//!
+//! Two of this workspace's security features need the same answer: which
+//! programs are running. `veilvoice-capture` asks it about screen recorders,
+//! `veilvoice-input` asks it about keyboard and mouse monitors, and the answer
+//! is one platform-specific listing with one set of limits.
+//!
+//! It began inside `veilvoice-capture` as a private module. Leaving it there
+//! and depending on that crate would mean a keyboard-monitoring feature pulling
+//! in a table of screen recorders it will never look at, which is exactly what
+//! the design note in `ROADMAP.md` says these crates must not do: *each is a
+//! crate of its own, so that another project can depend on one without taking
+//! all of them*. The alternative -- a second copy of the parser -- is worse:
+//! this project already extracted `veilvoice-check` out of the verifier so the
+//! desktop application and the command line could not drift apart, and the
+//! reasoning is the same here.
 //!
 //! # Linux reads files; the other two ask a tool
 //!
 //! On Linux every process publishes its own name at `/proc/<pid>/comm`, so the
 //! list is a directory walk and nothing is spawned. Windows and macOS have no
-//! such file, and their native APIs are FFI — `#![forbid(unsafe_code)]` holds
+//! such file, and their native APIs are FFI -- `#![forbid(unsafe_code)]` holds
 //! here as it does everywhere else in the workspace, so this asks a tool the
 //! system already ships, exactly as `veilvoice-watch` asks the registry and
 //! `veilvoice-drivers` asks `driverquery`.
 //!
-//! # What this can see
+//! # What this can see, and what it cannot
 //!
-//! Processes belonging to the user running VeilVoice, and — depending on the
-//! platform and the privileges — usually not much more. A recorder running as
-//! another user or as a service may not appear at all. That is a real limit and
-//! [`crate::SCOPE`] states it rather than leaving an empty list to be read as
-//! an empty machine.
+//! Processes belonging to the user running VeilVoice, and -- depending on the
+//! platform and the privileges -- usually not much more. A program running as
+//! another user or as a service may not appear at all.
 //!
-//! `comm` on Linux is truncated to fifteen characters by the kernel, so a
-//! longer name in [`crate::programs`] never appears there. Two entries in that
-//! table are longer than fifteen characters and carry **both** spellings for
-//! exactly that reason — `ps` and every Windows listing give the full one. A
-//! test holds the rule that every program with a Unix name has at least one
-//! that survives truncation, because a sixteen-character executable added later
-//! would otherwise stop matching on one platform only, silently.
+//! It sees a program that is **running**. It does not see what that program is
+//! doing. Every caller has to phrase its findings accordingly, and [`SCOPE`]
+//! is the wording to show rather than an invitation to invent one.
+//!
+//! `comm` on Linux is truncated to fifteen characters by the kernel, so any
+//! table matched against this must carry a name of fifteen characters or fewer
+//! for every program it expects to find there. A sixteen-character executable
+//! would otherwise stop matching on one platform only, silently -- and the
+//! tables that do this keep their own tests for it, next to the table, because
+//! that is where somebody adds a row.
+//!
+//! # In plain words
+//!
+//! This asks your computer which programs are open right now, in the way each
+//! operating system prefers to be asked. It is used by the parts of VeilVoice
+//! that warn you when something able to record your screen, or watch your
+//! typing, is running.
+//!
+//! Two honest limits. It can only see programs running as you -- something
+//! hidden well enough, or running as the system, will not appear. And it only
+//! knows a program is **open**, never that it is actually recording or
+//! watching. Anything built on top of this has to say so in those words.
 
 /// Every process name this build can see, lower-cased and without a path.
 ///
 /// The second value is anything that went wrong. A list that came back short
 /// because a tool failed is not a short list, and reporting the difference is
 /// the whole reason this returns two things.
-pub(crate) fn running() -> (Vec<String>, Vec<String>) {
+pub fn running() -> (Vec<String>, Vec<String>) {
     #[cfg(target_os = "linux")]
     {
         linux()
@@ -154,6 +186,16 @@ fn parse(text: &str) -> Vec<String> {
     names
 }
 
+/// What a reader has to be told, in the words to show them.
+///
+/// Here rather than in each caller so that two features cannot describe the
+/// same limit two different ways.
+pub const SCOPE: &str = "\
+This sees programs running as you. Something running as another user, as a \
+system service, or hidden well enough will not appear, so an empty list is not \
+proof that nothing is there. It also sees only that a program is *open* -- \
+never that it is recording, watching or doing anything at all.";
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -206,34 +248,13 @@ mod tests {
         assert!(parse("/\n").is_empty());
     }
 
-    /// The Linux kernel truncates `/proc/<pid>/comm` to fifteen characters, so
-    /// a longer name in the table never matches there -- silently, and on one
-    /// platform only, which is the exact shape of bug this project keeps
-    /// finding in itself.
-    ///
-    /// The rule is therefore not "every name is short" but "every program that
-    /// has a Unix name has **one** that survives truncation". Both spellings
-    /// are listed where they differ, because the full one is still what `ps`
-    /// and every Windows listing give.
+    /// The limit has to be stated outright, not hinted at. A caller that shows
+    /// an empty list without this is telling somebody their machine is clean.
     #[test]
-    fn every_program_has_a_name_that_survives_the_linux_truncation() {
-        for program in crate::programs::ALL {
-            // A `.exe` name is a Windows name and never appears in `comm`.
-            let unix: Vec<&&str> = program
-                .processes
-                .iter()
-                .filter(|process| !process.ends_with(".exe"))
-                .collect();
-            if unix.is_empty() {
-                continue; // a Windows-only program, and there is nothing to check
-            }
-            assert!(
-                unix.iter().any(|process| process.len() <= 15),
-                "{} has no name of fifteen characters or fewer, so it can never match \
-                 on Linux: {unix:?}",
-                program.key
-            );
-        }
+    fn the_scope_note_says_what_an_empty_list_does_not_prove() {
+        let scope = SCOPE.to_lowercase();
+        assert!(scope.contains("not proof that nothing is there"), "{scope}");
+        assert!(scope.contains("never that it is recording"), "{scope}");
     }
 
     /// Asking the real machine must not panic, and must say something when it

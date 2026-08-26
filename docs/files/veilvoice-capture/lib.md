@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-capture/src/lib.rs`
 
-[`veilvoice-capture`](../../../crates/veilvoice-capture/README.md) &middot; 570 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs)
+[`veilvoice-capture`](../../../crates/veilvoice-capture/README.md) &middot; 575 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs)
 
 ## Contents
 
@@ -90,32 +90,32 @@ A camera pointed at the screen would not care anyway.
 
 ## What this file contains
 
-570 lines defining **19 functions** (16 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+575 lines defining **19 functions** (16 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Allowlist` (line 102) -- Programs the user has said they meant to run.
-- `struct Sighting` (line 232) -- One capture-capable program found running.
-- `struct Report` (line 259) -- What is running, and anything that got in the way of finding out.
-- `enum Error` (line 326) -- Everything that can go wrong in this crate.
+- `struct Allowlist` (line 107) -- Programs the user has said they meant to run.
+- `struct Sighting` (line 237) -- One capture-capable program found running.
+- `struct Report` (line 264) -- What is running, and anything that got in the way of finding out.
+- `enum Error` (line 331) -- Everything that can go wrong in this crate.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Allowlist::allow` (line 120) -- Stop notifying about this program.
-- `Allowlist::deny` (line 130) -- Start notifying about this program again.
-- `Allowlist::allows` (line 135) -- Whether this program is allowed.
-- `Allowlist::keys` (line 140) -- The allowed keys, in a stable order.
-- `Allowlist::len` (line 145) -- How many programs are allowed.
-- `Allowlist::is_empty` (line 150) -- Whether nothing is allowed.
-- `Allowlist::save` (line 204) -- Write the allowlist to path.
+- `Allowlist::allow` (line 125) -- Stop notifying about this program.
+- `Allowlist::deny` (line 135) -- Start notifying about this program again.
+- `Allowlist::allows` (line 140) -- Whether this program is allowed.
+- `Allowlist::keys` (line 145) -- The allowed keys, in a stable order.
+- `Allowlist::len` (line 150) -- How many programs are allowed.
+- `Allowlist::is_empty` (line 155) -- Whether nothing is allowed.
+- `Allowlist::save` (line 209) -- Write the allowlist to path.
   - reaches: `to_text`
-- `Allowlist::load` (line 221) -- Read an allowlist written by Allowlist::save, treating a missing file as "nothing is allowed".
+- `Allowlist::load` (line 226) -- Read an allowlist written by Allowlist::save, treating a missing file as "nothing is allowed".
   - reaches: `new`, `parse`
-- `Sighting::describe` (line 248) -- One line for a terminal, a log or a notification.
-- `Report::take` (line 269) -- Look at what is running now.
-- `Report::all` (line 303) -- Everything found, allowed or not.
-- `Report::worth_saying` (line 310) -- The sightings a notification should raise: the ones not allowed.
-- `Report::is_empty` (line 318) -- Whether anything at all was found, allowed or not.
+- `Sighting::describe` (line 253) -- One line for a terminal, a log or a notification.
+- `Report::take` (line 274) -- Look at what is running now.
+- `Report::all` (line 308) -- Everything found, allowed or not.
+- `Report::worth_saying` (line 315) -- The sightings a notification should raise: the ones not allowed.
+- `Report::is_empty` (line 323) -- Whether anything at all was found, allowed or not.
 
 ## What calls what
 
@@ -137,48 +137,48 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new["Allowlist::new<br/>line 111"]
-    n_allow(["Allowlist::allow<br/>line 120"])
-    n_deny(["Allowlist::deny<br/>line 130"])
-    n_allows(["Allowlist::allows<br/>line 135"])
-    n_keys(["Allowlist::keys<br/>line 140"])
-    n_len(["Allowlist::len<br/>line 145"])
-    n_is_empty(["Allowlist::is_empty<br/>line 150"])
-    n_to_text["Allowlist::to_text<br/>line 155"]
-    n_parse["Allowlist::parse<br/>line 169"]
-    n_save(["Allowlist::save<br/>line 204"])
-    n_load(["Allowlist::load<br/>line 221"])
-    n_describe(["Sighting::describe<br/>line 248"])
-    n_take(["Report::take<br/>line 269"])
-    n_all(["Report::all<br/>line 303"])
-    n_worth_saying(["Report::worth_saying<br/>line 310"])
-    n_is_empty(["Report::is_empty<br/>line 318"])
-    n_from["Error::from<br/>line 336"]
-    n_fmt["Error::fmt<br/>line 342"]
-    n_source["Error::source<br/>line 361"]
+    n_new["Allowlist::new<br/>line 116"]
+    n_allow(["Allowlist::allow<br/>line 125"])
+    n_deny(["Allowlist::deny<br/>line 135"])
+    n_allows(["Allowlist::allows<br/>line 140"])
+    n_keys(["Allowlist::keys<br/>line 145"])
+    n_len(["Allowlist::len<br/>line 150"])
+    n_is_empty(["Allowlist::is_empty<br/>line 155"])
+    n_to_text["Allowlist::to_text<br/>line 160"]
+    n_parse["Allowlist::parse<br/>line 174"]
+    n_save(["Allowlist::save<br/>line 209"])
+    n_load(["Allowlist::load<br/>line 226"])
+    n_describe(["Sighting::describe<br/>line 253"])
+    n_take(["Report::take<br/>line 274"])
+    n_all(["Report::all<br/>line 308"])
+    n_worth_saying(["Report::worth_saying<br/>line 315"])
+    n_is_empty(["Report::is_empty<br/>line 323"])
+    n_from["Error::from<br/>line 341"]
+    n_fmt["Error::fmt<br/>line 347"]
+    n_source["Error::source<br/>line 366"]
     n_load --> n_new
     n_load --> n_parse
     n_parse --> n_new
     n_save --> n_to_text
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L111" "open the source"
-    click n_allow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L120" "open the source"
-    click n_deny href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L130" "open the source"
-    click n_allows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L135" "open the source"
-    click n_keys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L140" "open the source"
-    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L145" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L150" "open the source"
-    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L155" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L169" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L204" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L221" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L248" "open the source"
-    click n_take href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L269" "open the source"
-    click n_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L303" "open the source"
-    click n_worth_saying href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L310" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L318" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L336" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L342" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L361" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L116" "open the source"
+    click n_allow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L125" "open the source"
+    click n_deny href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L135" "open the source"
+    click n_allows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L140" "open the source"
+    click n_keys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L145" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L150" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L155" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L160" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L174" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L209" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L226" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L253" "open the source"
+    click n_take href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L274" "open the source"
+    click n_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L308" "open the source"
+    click n_worth_saying href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L315" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L323" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L341" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L347" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L366" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_allow,n_deny,n_allows,n_keys,n_len,n_is_empty,n_save,n_load,n_describe,n_take,n_all,n_worth_saying,n_is_empty entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -193,32 +193,33 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L81) | Crate version string, surfaced in the About panel. |
-| `SCOPE` <sub>pub const</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L87) | What this is worth, in the words a front end should show. |
-| `Allowlist` <sub>pub struct</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L102) | Programs the user has said they meant to run. |
-| `MAGIC` <sub>const</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L107) | Magic first line. |
-| `Allowlist::new` <sub>pub fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L111) | An allowlist that allows nothing. |
-| `Allowlist::allow` <sub>pub fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L120) | Stop notifying about this program. |
-| `Allowlist::deny` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L130) | Start notifying about this program again. |
-| `Allowlist::allows` <sub>pub fn</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L135) | Whether this program is allowed. |
-| `Allowlist::keys` <sub>pub fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L140) | The allowed keys, in a stable order. |
-| `Allowlist::len` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L145) | How many programs are allowed. |
-| `Allowlist::is_empty` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L150) | Whether nothing is allowed. |
-| `Allowlist::to_text` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L155) | Serialise to a text format, one key per line. |
-| `Allowlist::parse` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L169) | Parse the text format. |
-| `Allowlist::save` <sub>pub fn</sub> | [204](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L204) | Write the allowlist to path. |
-| `Allowlist::load` <sub>pub fn</sub> | [221](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L221) | Read an allowlist written by Allowlist::save, treating a missing file as "nothing is allowed". |
-| `Sighting` <sub>pub struct</sub> | [232](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L232) | One capture-capable program found running. |
-| `Sighting::describe` <sub>pub fn</sub> | [248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L248) | One line for a terminal, a log or a notification. |
-| `Report` <sub>pub struct</sub> | [259](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L259) | What is running, and anything that got in the way of finding out. |
-| `Report::take` <sub>pub fn</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L269) | Look at what is running now. |
-| `Report::all` <sub>pub fn</sub> | [303](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L303) | Everything found, allowed or not. |
-| `Report::worth_saying` <sub>pub fn</sub> | [310](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L310) | The sightings a notification should raise: the ones not allowed. |
-| `Report::is_empty` <sub>pub fn</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L318) | Whether anything at all was found, allowed or not. |
-| `Error` <sub>pub enum</sub> | [326](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L326) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L336) |  |
-| `Error::fmt` <sub>fn</sub> | [342](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L342) |  |
-| `Error::source` <sub>fn</sub> | [361](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L361) |  |
+| `processes` <sub>pub(crate) mod</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L74) |  |
+| `VERSION` <sub>pub const</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L86) | Crate version string, surfaced in the About panel. |
+| `SCOPE` <sub>pub const</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L92) | What this is worth, in the words a front end should show. |
+| `Allowlist` <sub>pub struct</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L107) | Programs the user has said they meant to run. |
+| `MAGIC` <sub>const</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L112) | Magic first line. |
+| `Allowlist::new` <sub>pub fn</sub> | [116](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L116) | An allowlist that allows nothing. |
+| `Allowlist::allow` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L125) | Stop notifying about this program. |
+| `Allowlist::deny` <sub>pub fn</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L135) | Start notifying about this program again. |
+| `Allowlist::allows` <sub>pub fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L140) | Whether this program is allowed. |
+| `Allowlist::keys` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L145) | The allowed keys, in a stable order. |
+| `Allowlist::len` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L150) | How many programs are allowed. |
+| `Allowlist::is_empty` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L155) | Whether nothing is allowed. |
+| `Allowlist::to_text` <sub>pub fn</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L160) | Serialise to a text format, one key per line. |
+| `Allowlist::parse` <sub>pub fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L174) | Parse the text format. |
+| `Allowlist::save` <sub>pub fn</sub> | [209](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L209) | Write the allowlist to path. |
+| `Allowlist::load` <sub>pub fn</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L226) | Read an allowlist written by Allowlist::save, treating a missing file as "nothing is allowed". |
+| `Sighting` <sub>pub struct</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L237) | One capture-capable program found running. |
+| `Sighting::describe` <sub>pub fn</sub> | [253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L253) | One line for a terminal, a log or a notification. |
+| `Report` <sub>pub struct</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L264) | What is running, and anything that got in the way of finding out. |
+| `Report::take` <sub>pub fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L274) | Look at what is running now. |
+| `Report::all` <sub>pub fn</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L308) | Everything found, allowed or not. |
+| `Report::worth_saying` <sub>pub fn</sub> | [315](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L315) | The sightings a notification should raise: the ones not allowed. |
+| `Report::is_empty` <sub>pub fn</sub> | [323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L323) | Whether anything at all was found, allowed or not. |
+| `Error` <sub>pub enum</sub> | [331](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L331) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [341](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L341) |  |
+| `Error::fmt` <sub>fn</sub> | [347](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L347) |  |
+| `Error::source` <sub>fn</sub> | [366](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs#L366) |  |
 
 ---
 

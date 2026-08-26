@@ -1,0 +1,13 @@
+[package]
+name = "veilvoice-proc"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Which processes are running, per platform, with the limits of that answer stated rather than implied."
+
+# None, and that is the point: anything in this workspace can depend on it
+# without taking a feature it did not ask for.
+[dependencies]

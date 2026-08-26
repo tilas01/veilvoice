@@ -72,6 +72,7 @@ mod atrest;
 mod capture;
 mod conversation;
 mod guard;
+mod input;
 mod lock;
 // Only the live path draws a meter, and the crate builds without that path on
 // the BSDs, where `cpal` has no backend.
@@ -341,6 +342,24 @@ enum Command {
         what: CaptureCommand,
     },
 
+    /// What running programs can see your keyboard and mouse.
+    ///
+    /// Names the programs that are **able** to observe input -- remote-support
+    /// tools, macro recorders, password managers, screen readers -- and says
+    /// what each one is for. Nearly all of it is software you installed on
+    /// purpose.
+    ///
+    /// It cannot tell you whether anything is logging your keystrokes, and
+    /// nothing can: the mechanisms a logger uses are the mechanisms
+    /// accessibility software uses, and software written to hide is written to
+    /// hide from this. **A result of nothing found does not mean nothing is
+    /// watching.** That sentence is printed with every result, not behind a
+    /// flag.
+    Input {
+        #[command(subcommand)]
+        what: Option<InputCommand>,
+    },
+
     /// Canaries, and how fast a folder is changing.
     ///
     /// Two early warnings that something is going through your files. Neither
@@ -500,6 +519,19 @@ enum ConversationCommand {
 }
 
 /// What `veilvoice capture` can do.
+#[derive(Subcommand, Debug)]
+enum InputCommand {
+    /// What is running now that could see input. The default.
+    Look,
+
+    /// Everything this build can recognise, running or not.
+    ///
+    /// So that an empty result can be checked rather than trusted: a reader
+    /// who is told nothing was found should be able to see what was looked
+    /// for.
+    Known,
+}
+
 #[derive(Subcommand)]
 enum CaptureCommand {
     /// What is running, what is allowed, and what this cannot see.
@@ -931,6 +963,11 @@ fn run(command: Command) -> Result<(), String> {
                 ffmpeg,
                 one_voice,
             ),
+        },
+
+        Command::Input { what } => match what.unwrap_or(InputCommand::Look) {
+            InputCommand::Look => input::look(),
+            InputCommand::Known => input::known(),
         },
 
         Command::Capture { what } => match what {

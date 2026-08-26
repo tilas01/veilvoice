@@ -6,6 +6,57 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## Unreleased
+
+### What can see your keyboard and mouse — and why a clean result proves nothing
+
+```
+veilvoice input
+veilvoice input known
+```
+
+Marker 35. It names the programs running right now that are **able** to observe
+keyboard and mouse — remote-support tools, macro recorders, password
+managers, screen readers — and says what each one is and why it can
+reach input at all. Nearly all of it is software somebody installed on purpose,
+and the crate says that too.
+
+**It does not claim to detect keyloggers, because nothing can.** The mechanisms
+a logger uses are the mechanisms accessibility software uses, and software
+written to hide is written to hide from a process list. So every result, found
+or not, is printed with the sentence that matters:
+
+> a result of nothing found does not mean nothing is watching — it means
+> nothing this build recognises is running, which is a much smaller claim
+
+Somebody who reads "nothing found" as "nothing there" has been made *less* safe
+by running it. A test asserts that the empty-result summary says so, and
+another reads every sentence the crate can print and fails the build if any of
+them accuses a program of doing anything rather than being able to.
+
+**It does not hook the keyboard to find out.** Detecting input monitoring by
+monitoring input would make this the thing it warns about, and on Windows it
+would need exactly the call `#![forbid(unsafe_code)]` rules out. A test reads
+the crate's own source and fails if `SetWindowsHookEx`, `GetAsyncKeyState`,
+`CGEventTap`, `/dev/input` or `evdev` appear in the code.
+
+"I could not look" and "I looked and found nothing" are different answers and
+carry different summaries, because reporting the first as the second is the one
+mistake here that costs somebody something.
+
+### `veilvoice-proc` — one process listing, not two
+
+Screen-capture detection and input-monitor detection need the same answer:
+which programs are running. It was private to `veilvoice-capture`. Depending on
+that crate for it would have meant a keyboard feature pulling in a table of
+screen recorders, which is exactly what `ROADMAP.md` says these crates must not
+do; copying it would have left two parsers to drift apart, which is why
+`veilvoice-check` was extracted out of the verifier in the first place.
+
+So it is a crate of its own with no dependencies, and it carries the limits of
+its own answer: it sees programs running as you, and it sees that they are
+*open* — never what they are doing.
+
 ## v0.1.13
 
 Build it yourself and check the release against what you built; group mode you

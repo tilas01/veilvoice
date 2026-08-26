@@ -24,6 +24,7 @@ veilvoice-crypto = { path = "../veilvoice-crypto" }
 veilvoice-guard = { path = "../veilvoice-guard" }
 veilvoice-audio = { path = "../veilvoice-audio", default-features = false }
 veilvoice-capture = { path = "../veilvoice-capture" }
+veilvoice-input = { path = "../veilvoice-input" }
 veilvoice-conversation = { path = "../veilvoice-conversation" }
 veilvoice-meta = { path = "../veilvoice-meta" }
 veilvoice-policy = { path = "../veilvoice-policy" }

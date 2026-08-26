@@ -28,7 +28,6 @@ Which screen-recording programs are running, an allowlist for the ones you meant
 
 - [[`comms.rs`|File-veilvoice-capture-comms]] &mdash; Communication programs, and how to put VeilVoice between you and them.
 - [[`lib.rs`|File-veilvoice-capture-lib]] &mdash; Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do.
-- [[`processes.rs`|File-veilvoice-capture-processes]] &mdash; Listing the processes that are running, per platform.
 - [[`programs.rs`|File-veilvoice-capture-programs]] &mdash; The programs this build knows can capture a screen.
 
 ## [[veilvoice-check|Crate-veilvoice-check]]
@@ -45,6 +44,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`capture.rs`|File-veilvoice-cli-capture]] &mdash; veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.
 - [[`conversation.rs`|File-veilvoice-cli-conversation]] &mdash; veilvoice conversation -- several speakers, a voice each, and subtitles.
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
+- [[`input.rs`|File-veilvoice-cli-input]] &mdash; veilvoice input — what running programs can see your keyboard and mouse.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
 - [[`meter.rs`|File-veilvoice-cli-meter]] &mdash; Level meters for veilvoice live, on a scale that means something.
@@ -114,6 +114,12 @@ Integrity manifest and tamper detection for VeilVoice's own files, with best-eff
 - [[`lib.rs`|File-veilvoice-guard-lib]] &mdash; Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them".
 - [[`manifest.rs`|File-veilvoice-guard-manifest]] &mdash; The integrity manifest: what the files were, and what they are now.
 
+## [[veilvoice-input|Crate-veilvoice-input]]
+
+Which running programs can see your keyboard and mouse, reported as the heuristic it is -- and why a clean result proves nothing.
+
+- [[`lib.rs`|File-veilvoice-input-lib]] &mdash; What on this machine could be watching the keyboard and the mouse.
+
 ## [[veilvoice-gui|Crate-veilvoice-gui]]
 
 egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
@@ -152,6 +158,12 @@ Settings that can only be tightened, sealed with the project's own post-quantum 
 
 - [[`lib.rs`|File-veilvoice-policy-lib]] &mdash; Settings somebody else decided, sealed so they cannot be edited without a passphrase — and, more importantly, built so that editing them without one buys nothing worth having.
 - [[`policy.rs`|File-veilvoice-policy-policy]] &mdash; The policy itself: what can be required, and what requiring it does.
+
+## [[veilvoice-proc|Crate-veilvoice-proc]]
+
+Which processes are running, per platform, with the limits of that answer stated rather than implied.
+
+- [[`lib.rs`|File-veilvoice-proc-lib]] &mdash; Which processes are running, per platform, and what that cannot tell you.
 
 ## [[veilvoice-sentry|Crate-veilvoice-sentry]]
 
