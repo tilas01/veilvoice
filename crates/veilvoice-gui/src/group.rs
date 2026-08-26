@@ -51,6 +51,7 @@ use veilvoice_conversation::{Conversation, Speaker};
 use veilvoice_core::voices::{self, MAX_VOICES};
 use veilvoice_core::DeidConfig;
 use veilvoice_video::palette::Palette;
+use veilvoice_workspace::{Member, Workspace};
 
 /// One person, as the panel holds them.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -101,6 +102,44 @@ impl Outputs {
     pub fn any(&self) -> bool {
         self.audio || self.subtitles || self.page
     }
+
+    /// The ticked ones, by name, for a project file.
+    pub fn names(&self) -> Vec<String> {
+        let mut out = Vec::new();
+        if self.audio {
+            out.push("audio".to_string());
+        }
+        if self.subtitles {
+            out.push("subtitles".to_string());
+        }
+        if self.page {
+            out.push("page".to_string());
+        }
+        out
+    }
+
+    /// Read back from a project file.
+    ///
+    /// An unrecognised name is ignored rather than refused: the file's own
+    /// parser has already refused anything structurally strange, and an output
+    /// this build cannot write is a thing it simply does not write.
+    pub fn from_names(names: &[String]) -> Self {
+        Self {
+            audio: names.iter().any(|n| n == "audio"),
+            subtitles: names.iter().any(|n| n == "subtitles"),
+            page: names.iter().any(|n| n == "page"),
+        }
+    }
+}
+
+/// An egui colour as `#rrggbb`.
+fn hex_of(colour: Color32) -> String {
+    format!("#{:02x}{:02x}{:02x}", colour.r(), colour.g(), colour.b())
+}
+
+/// `#rrggbb` as an egui colour, or `None` for anything that is not one.
+fn colour_of(text: &str) -> Option<Color32> {
+    veilvoice_video::palette::rgb(text).map(|(r, g, b)| Color32::from_rgb(r, g, b))
 }
 
 /// The group-mode panel's state.
@@ -128,6 +167,10 @@ pub struct Group {
     pub theme: &'static Palette,
     /// A voice each, or one voice between everybody.
     pub voices: VoiceMode,
+    /// Which named way of working this panel is set up as.
+    pub profile: String,
+    /// Where this project was last saved or loaded, if anywhere.
+    pub project: Option<PathBuf>,
 
     /// The worker, while a render is running.
     job: Option<mpsc::Receiver<Result<Vec<PathBuf>, String>>>,
@@ -150,6 +193,8 @@ impl Default for Group {
             title: String::new(),
             theme: veilvoice_video::palette::default_palette(),
             voices: VoiceMode::default(),
+            profile: veilvoice_workspace::default_profile().id.to_string(),
+            project: None,
             job: None,
             report: None,
         }
@@ -270,6 +315,8 @@ impl Group {
         );
         ui.add_space(10.0);
 
+        self.profile_controls(ui);
+        ui.add_space(10.0);
         self.mode_controls(ui, settings);
         ui.add_space(10.0);
         ui.separator();
@@ -321,6 +368,116 @@ impl Group {
             )
             .color(p::muted()),
         );
+    }
+
+    /// The named ways of working, and the project this panel came from.
+    ///
+    /// A profile is a *starting point*, not a lock: picking one sets the
+    /// controls below and then leaves them alone. Anything else would mean a
+    /// preset quietly overriding a choice somebody made after picking it, and
+    /// they would find that out in the output.
+    fn profile_controls(&mut self, ui: &mut Ui) {
+        ui.label(RichText::new("HOW YOU ARE WORKING").color(p::blue()));
+        ui.add_space(4.0);
+
+        ui.horizontal_wrapped(|ui| {
+            for one in veilvoice_workspace::BUILT_IN {
+                let chosen = self.profile == one.id;
+                if ui.selectable_label(chosen, one.name).clicked() && !chosen {
+                    self.apply_profile(one);
+                }
+            }
+        });
+
+        if let Some(one) = veilvoice_workspace::profile(&self.profile) {
+            ui.label(RichText::new(one.note).color(p::muted()).small());
+        } else {
+            ui.label(
+                RichText::new(format!(
+                    "This project was saved under a profile called {:?}, which this \
+                     build does not have.",
+                    self.profile
+                ))
+                .color(p::yellow())
+                .small(),
+            );
+        }
+
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            if ui.button("open project…").clicked() {
+                if let Some(path) = rfd::FileDialog::new()
+                    .add_filter("VeilVoice project", &["veilwork", "txt"])
+                    .pick_file()
+                {
+                    match Workspace::load(&path) {
+                        Ok(work) => {
+                            self.from_workspace(&work);
+                            self.project = Some(path);
+                        }
+                        Err(why) => self.notice = Some(why.to_string()),
+                    }
+                }
+            }
+            if ui.button("save project…").clicked() {
+                let mut dialog = rfd::FileDialog::new()
+                    .add_filter("VeilVoice project", &["veilwork"])
+                    .set_file_name("project.veilwork");
+                if let Some(previous) = self.project.as_ref().and_then(|p| p.parent()) {
+                    dialog = dialog.set_directory(previous);
+                }
+                if let Some(path) = dialog.save_file() {
+                    match self.to_workspace().save(&path) {
+                        Ok(()) => {
+                            self.project = Some(path);
+                            self.notice = None;
+                        }
+                        Err(why) => self.notice = Some(why.to_string()),
+                    }
+                }
+            }
+            ui.label(
+                RichText::new(match &self.project {
+                    Some(path) => path
+                        .file_name()
+                        .map(|n| n.to_string_lossy().into_owned())
+                        .unwrap_or_else(|| path.display().to_string()),
+                    None => "not saved".to_string(),
+                })
+                .color(p::muted())
+                .small(),
+            );
+        });
+        ui.label(
+            RichText::new(
+                "  A project holds where your files are, who is in the recording and what \
+                 you called them. It holds no audio and no passwords, so it is safe to \
+                 keep beside the recording -- but it does hold the names you typed.",
+            )
+            .color(p::muted())
+            .small(),
+        );
+    }
+
+    /// Set the controls this profile names, and change nothing else.
+    fn apply_profile(&mut self, one: &veilvoice_workspace::Profile) {
+        self.profile = one.id.to_string();
+        self.enabled = one.group;
+        // A profile that asks for a voice each cannot be applied to more people
+        // than there are voices. Said rather than trimming somebody out of the
+        // group to make the preset fit.
+        match voice_mode::check(self.people.len(), one.voices, &DeidConfig::default()) {
+            Ok(()) => {
+                self.voices = one.voices;
+                self.notice = None;
+            }
+            Err(why) => {
+                self.notice = Some(format!(
+                    "{}. The rest of the profile has been applied.",
+                    why
+                ));
+            }
+        }
     }
 
     /// The two controls that decide whether group mode is on.
@@ -607,6 +764,85 @@ impl Group {
                     .small(),
             );
         }
+    }
+
+    /// This panel as a saveable project.
+    pub fn to_workspace(&self) -> Workspace {
+        let mut work = Workspace::new();
+        work.title = (!self.title.trim().is_empty()).then(|| self.title.trim().to_string());
+        work.input = self.input.clone();
+        work.plan = self.plan.clone();
+        work.profile = self.profile.clone();
+        work.theme = self.theme.id.to_string();
+        work.outputs = self.outputs.names();
+        work.members = self
+            .people
+            .iter()
+            .map(|person| Member {
+                name: person.name.clone(),
+                colour: person.colour.map(hex_of),
+            })
+            .collect();
+        work
+    }
+
+    /// Put a saved project back.
+    ///
+    /// Anything this build does not recognise -- a profile from a newer
+    /// version, a palette that has been renamed -- is **reported and left
+    /// alone** rather than quietly replaced. Loading a project and silently
+    /// getting different settings is the failure worth avoiding here: the whole
+    /// point of the file is that it puts things back where they were.
+    pub fn from_workspace(&mut self, work: &Workspace) {
+        let mut notes: Vec<String> = Vec::new();
+
+        self.title = work.title.clone().unwrap_or_default();
+        self.input = work.input.clone();
+        self.plan = work.plan.clone();
+
+        match veilvoice_workspace::profile(&work.profile) {
+            Some(found) => {
+                self.profile = found.id.to_string();
+                self.voices = found.voices;
+                self.enabled = found.group;
+            }
+            None => notes.push(format!(
+                "this project was saved under a profile called {:?}, which this build \
+                 does not have. The settings it named have been left as they are.",
+                work.profile
+            )),
+        }
+
+        match veilvoice_video::palette::by_id(&work.theme) {
+            Some(found) => self.theme = found,
+            None => notes.push(format!(
+                "this project's palette, {:?}, is not one this build has.",
+                work.theme
+            )),
+        }
+
+        self.outputs = Outputs::from_names(&work.outputs);
+
+        if !work.members.is_empty() {
+            self.people = work
+                .members
+                .iter()
+                .map(|member| Person {
+                    name: member.name.clone(),
+                    colour: member.colour.as_deref().and_then(colour_of),
+                })
+                .collect();
+        }
+
+        // A saved project may hold more people than the current mode can carry
+        // -- it was saved under a different one, or by a build with a different
+        // measured limit. Said, not silently trimmed.
+        if let Err(why) = voice_mode::check(self.people.len(), self.voices, &DeidConfig::default())
+        {
+            notes.push(why.to_string());
+        }
+
+        self.notice = (!notes.is_empty()).then(|| notes.join(" "));
     }
 
     /// Whether a render is running, so the window keeps repainting.
@@ -1130,6 +1366,148 @@ mod tests {
         .expect_err("three against two");
         assert!(error.contains("wrong voice"), "{error}");
         assert!(error.contains('3') && error.contains('2'), "{error}");
+    }
+
+    /// The whole point of a project file: what you had is what you get back.
+    #[test]
+    fn a_panel_round_trips_through_a_project_file() {
+        let mut group = Group {
+            enabled: true,
+            title: "Two people".into(),
+            input: Some(PathBuf::from("talk.wav")),
+            plan: Some(PathBuf::from("plan.txt")),
+            theme: veilvoice_video::palette::by_id("gruvbox").unwrap(),
+            voices: VoiceMode::Uniform,
+            profile: veilvoice_workspace::GROUP_ONE_VOICE.id.to_string(),
+            outputs: Outputs {
+                audio: true,
+                subtitles: false,
+                page: true,
+            },
+            ..Group::default()
+        };
+        group.people[0].name = "Alex".into();
+        group.people[1].name = "Sam".into();
+        group.people[1].colour = Some(Color32::from_rgb(0x73, 0xda, 0xca));
+
+        let text = group.to_workspace().to_text();
+        let read_back = Workspace::parse(&text).expect("should parse");
+
+        let mut restored = Group::default();
+        restored.from_workspace(&read_back);
+
+        assert_eq!(restored.title, "Two people");
+        assert_eq!(restored.input, group.input);
+        assert_eq!(restored.plan, group.plan);
+        assert_eq!(restored.theme.id, "gruvbox");
+        assert_eq!(restored.voices, VoiceMode::Uniform);
+        assert_eq!(restored.profile, group.profile);
+        assert_eq!(restored.outputs, group.outputs);
+        assert_eq!(restored.people.len(), 2);
+        assert_eq!(restored.people[0].name, "Alex");
+        assert_eq!(restored.people[1].name, "Sam");
+        assert_eq!(restored.people[1].colour, group.people[1].colour);
+        assert!(restored.enabled, "a group profile opens in group mode");
+    }
+
+    /// A colour chosen by hand survives; one left automatic stays automatic
+    /// rather than being frozen into whatever it happened to look like.
+    #[test]
+    fn an_automatic_colour_is_saved_as_automatic() {
+        let group = Group::default();
+        assert!(group.people[0].colour.is_none());
+        let work = group.to_workspace();
+        assert!(work.members[0].colour.is_none());
+
+        let mut restored = Group::default();
+        restored.from_workspace(&work);
+        assert!(
+            restored.people[0].colour.is_none(),
+            "it must come back automatic, not pinned to today's table"
+        );
+    }
+
+    /// A profile this build does not have is reported and the settings left
+    /// alone. Silently opening under different settings is the failure worth
+    /// avoiding: the point of the file is that it puts things back.
+    #[test]
+    fn an_unknown_profile_is_reported_rather_than_silently_replaced() {
+        let mut work = Workspace::new();
+        work.profile = "from-a-newer-build".into();
+        let mut group = Group::default();
+        let before = group.voices;
+        group.from_workspace(&work);
+        assert_eq!(group.voices, before, "nothing may have changed");
+        let notice = group.notice.expect("it has to say so");
+        assert!(notice.contains("from-a-newer-build"), "{notice}");
+    }
+
+    /// And an unknown palette likewise.
+    #[test]
+    fn an_unknown_palette_is_reported_rather_than_silently_replaced() {
+        let mut work = Workspace::new();
+        work.theme = "solarised".into();
+        let mut group = Group::default();
+        group.from_workspace(&work);
+        assert_eq!(group.theme.id, "tokyo-night");
+        assert!(group.notice.unwrap().contains("solarised"));
+    }
+
+    /// A project saved with more people than the current mode can carry is
+    /// loaded and *reported*, not trimmed. Dropping somebody out of a group to
+    /// make a preset fit is a thing nobody would notice until the render.
+    #[test]
+    fn a_project_with_too_many_people_for_the_mode_is_reported_not_trimmed() {
+        let mut work = Workspace::new();
+        work.profile = veilvoice_workspace::GROUP_VOICES.id.to_string();
+        work.members = (0..9)
+            .map(|n| veilvoice_workspace::Member {
+                name: format!("P{n}"),
+                colour: None,
+            })
+            .collect();
+
+        let mut group = Group::default();
+        group.from_workspace(&work);
+        assert_eq!(group.people.len(), 9, "everybody is still here");
+        let notice = group.notice.expect("it has to say so");
+        assert!(notice.contains("one voice for everybody"), "{notice}");
+    }
+
+    /// Picking a profile sets what it names and leaves everything else. A
+    /// preset that overrode a later choice would be found out in the output.
+    #[test]
+    fn a_profile_sets_what_it_names_and_nothing_else() {
+        let mut group = Group {
+            title: "kept".into(),
+            ..Group::default()
+        };
+        group.people[0].name = "Alex".into();
+
+        group.apply_profile(&veilvoice_workspace::GROUP_ONE_VOICE);
+        assert_eq!(group.voices, VoiceMode::Uniform);
+        assert!(group.enabled);
+        assert_eq!(group.title, "kept", "a profile is not a reset");
+        assert_eq!(group.people[0].name, "Alex");
+    }
+
+    #[test]
+    fn outputs_survive_being_named_and_read_back() {
+        for outputs in [
+            Outputs::default(),
+            Outputs {
+                audio: true,
+                subtitles: false,
+                page: false,
+            },
+            Outputs {
+                audio: false,
+                subtitles: false,
+                page: false,
+            },
+        ] {
+            assert_eq!(Outputs::from_names(&outputs.names()), outputs);
+        }
     }
 
     #[test]

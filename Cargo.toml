@@ -28,6 +28,7 @@ members = [
     "crates/veilvoice-setup",
     "crates/veilvoice-update",
     "crates/veilvoice-verify",
+    "crates/veilvoice-workspace",
 ]
 # `fuzz/` is a cargo-fuzz package and needs nightly plus libFuzzer. Excluding it
 # keeps the pinned stable toolchain sufficient for everything else, so a fresh

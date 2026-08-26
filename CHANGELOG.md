@@ -8,6 +8,72 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Profiles and projects — `veilvoice-workspace`
+
+Two things that sound alike and are not.
+
+A **profile** is a named way of working, and three ship:
+
+| | |
+|---|---|
+| **One person** | one speaker, everything this engine has turned on |
+| **A group, a voice each** | capped at the measured number of separable voices |
+| **A group, one voice for everybody** | nobody can be picked out by sound at all |
+
+Every profile carries a paragraph saying what choosing it *means*, and a test
+requires each of those to state a **limit** and not only a capability. A profile
+called "highest security" whose name does the work of an explanation is the
+thing this project refuses everywhere else, so it is refused here too.
+
+Picking one is a starting point, not a lock: it sets the controls it names and
+leaves everything else alone. A preset that overrode a choice made after it was
+picked would be found out in the output.
+
+A **project** is one piece of work: which recording, which plan, who is in it,
+what they are called, what colour each is, which palette, what gets written.
+Saved beside the recording so opening it next week puts everything back.
+
+**It holds no audio and no passwords**, and the file says so in its own header
+— it is a thing you might send somebody so they can set up the same way, and if
+it carried a passphrase, sending it would hand over the recordings too. It
+*does* hold the speaker names you typed, and it says that as well.
+
+Plain text, `VEILWORK1`, the same shape as a plan. An unknown keyword is
+**refused**, not skipped: a project written by a newer build may describe a
+setup this one cannot reproduce, and honouring half of it would render under
+settings nobody chose. A profile or palette this build does not have is
+**reported and left alone** rather than quietly swapped — the whole point of the
+file is that it puts things back.
+
+A gap in the speaker slots is refused too, because the slot *is* the voice: a
+missing slot 1 would move everybody after it onto a different voice from the one
+they were saved with, audible only as "somebody sounds wrong".
+
+### Two things caught by tests rather than by reading
+
+The member parser split on the first whitespace character, and the format
+separates fields with **two** spaces — so `member  0  -  Alex` parsed as a
+colour of `""` and a name of `"-  Alex"`. A round-trip test caught it in the
+first run; reading the line would not have.
+
+And the "no passwords in a project file" test tripped on the file's **own
+denial**: the header says "no audio and no passwords", which contains
+"password". `docs/AUDIT.md` records exactly this trap from a scope note, where a
+search for "prevents" matched "nothing here prevents it". The test reads the
+data now and not the prose about the data.
+
+### The screenshot script stopped remembering where the toggle is
+
+Adding the profile section above the group-mode toggle moved it, and the
+capture's measured click landed elsewhere — group mode stayed off and the
+picture was of an empty panel with nothing to say it was wrong. The same
+failure as the tab coordinates, and the same answer: the capture now turns
+group mode on through the application's own "always start in group mode"
+preference, written before the window opens and **put back exactly as it was**
+afterwards. A screenshot script that leaves a preference changed is one that
+edits somebody's configuration to take a picture.
+
+
 ### Eight voices, not ten — measured, and the group is capped at it
 
 The engine holds ten destination voices and all ten are *different*. Only

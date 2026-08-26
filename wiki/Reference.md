@@ -202,3 +202,9 @@ Detect which applications are currently using the microphone and camera, with al
 - [[`linux.rs`|File-veilvoice-watch-linux]] &mdash; Linux detection, via open file handles in /proc.
 - [[`windows.rs`|File-veilvoice-watch-windows]] &mdash; Windows detection, via the Capability Access Manager.
 - [[`scan_once.rs`|File-veilvoice-watch-examples-scan_once]] &mdash; Print what is using the microphone and camera right now.
+
+## [[veilvoice-workspace|Crate-veilvoice-workspace]]
+
+Named profiles and saved projects: the settings a recording was made with, written down so the next one can be made the same way.
+
+- [[`lib.rs`|File-veilvoice-workspace-lib]] &mdash; Named profiles and saved projects.

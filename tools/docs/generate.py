@@ -98,6 +98,7 @@ CRATES = (
     "veilvoice-verify",
     "veilvoice-video",
     "veilvoice-watch",
+    "veilvoice-workspace",
 )
 
 # Every crate in the workspace, so this script can say what it is *not* yet
@@ -123,6 +124,7 @@ ALL_CRATES = (
     "veilvoice-verify",
     "veilvoice-video",
     "veilvoice-watch",
+    "veilvoice-workspace",
 )
 
 def workspace_crates(root):
