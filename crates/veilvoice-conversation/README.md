@@ -104,11 +104,14 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>178 lines"])
-    n_plan["plan.rs<br/>837 lines"]
+    n_lib(["lib.rs<br/>180 lines"])
+    n_mode["mode.rs<br/>271 lines"]
+    n_plan["plan.rs<br/>934 lines"]
     n_render["render.rs<br/>836 lines"]
     n_subtitles["subtitles.rs<br/>263 lines"]
+    n_plan --> n_mode
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs" "open the source"
+    click n_mode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs" "open the source"
     click n_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" "open the source"
     click n_render href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs" "open the source"
     click n_subtitles href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs" "open the source"
@@ -120,8 +123,9 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | 178 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
-| [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | 837 | Who is in the recording, and who is speaking when. |
+| [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | 180 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
+| [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | 271 | How many voices a group gets, and the trade between the two answers. |
+| [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | 934 | Who is in the recording, and who is speaking when. |
 | [`render.rs`](../../docs/files/veilvoice-conversation/render.md) | 836 | Turning a plan and a recording into veiled audio, one engine per speaker. |
 | [`subtitles.rs`](../../docs/files/veilvoice-conversation/subtitles.md) | 263 | Subtitles, from the same plan the audio is rendered from. |
 
@@ -132,6 +136,9 @@ flowchart TD
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | Crate version string, surfaced in the About panel. |
 | `const SCOPE` | [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | What this crate does to a recording, in the words a front end should show. |
 | `enum Error` | [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | Everything that can go wrong in this crate. |
+| `enum VoiceMode` | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | Whether speakers get different voices or one voice between them. |
+| `enum TooMany` | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | Why a group cannot be rendered as asked. |
+| `fn check` | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | Whether this many speakers can be rendered in this mode. |
 | `struct Speaker` | [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | One person in the recording. |
 | `struct Turn` | [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | A span of the recording belonging to one speaker. |
 | `struct Conversation` | [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | The whole plan: who is in the recording, and when each of them speaks. |

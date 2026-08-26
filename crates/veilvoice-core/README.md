@@ -113,7 +113,7 @@ flowchart TD
     n_pitch["pitch.rs<br/>274 lines"]
     n_spectral["spectral.rs<br/>428 lines"]
     n_stft["stft.rs<br/>246 lines"]
-    n_voices["voices.rs<br/>643 lines"]
+    n_voices["voices.rs<br/>853 lines"]
     n_window["window.rs<br/>91 lines"]
     n_accent --> n_pitch
     n_accent --> n_spectral
@@ -152,7 +152,7 @@ flowchart TD
 | [`pitch.rs`](../../docs/files/veilvoice-core/pitch.md) | 274 | Monophonic fundamental-frequency tracker (decimated YIN). |
 | [`spectral.rs`](../../docs/files/veilvoice-core/spectral.md) | 428 | Frequency-domain de-identification transform. |
 | [`stft.rs`](../../docs/files/veilvoice-core/stft.md) | 246 | Streaming short-time Fourier transform with overlap-add resynthesis. |
-| [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | 643 | Destination voices: several canonical registers instead of one. |
+| [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | 853 | Destination voices: several canonical registers instead of one. |
 | [`window.rs`](../../docs/files/veilvoice-core/window.md) | 91 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
 | [`spectrum_report.rs`](../../docs/files/veilvoice-core/examples-spectrum_report.md) | 99 | Where do the output partials actually land? |
 | [`veil_a_buffer.rs`](../../docs/files/veilvoice-core/examples-veil_a_buffer.md) | 45 | _no module documentation yet_ |
@@ -190,6 +190,10 @@ flowchart TD
 | `fn bin_hz` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The FFT bin spacing of a configuration, in hertz. |
 | `fn voice` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The destination voice for slot index. |
 | `fn all` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | Every destination voice, in the order they are handed out. |
+| `fn separation` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | How far apart two voices are, as the larger of their two separations. |
+| `const CLEAR_SEPARATION` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The separation below which two voices should not be handed to two people. |
+| `fn clear_voices` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | How many voices can be handed out before two of them are too alike. |
+| `fn closest_pair` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | The closest pair among the first count voices, as a ratio. |
 | `fn distinct_voices` | [`voices.rs`](../../docs/files/veilvoice-core/voices.md) | How many of the ten are still distinguishable under config. |
 | `fn hann` | [`window.rs`](../../docs/files/veilvoice-core/window.md) | Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design). |
 | `fn ola_gain` | [`window.rs`](../../docs/files/veilvoice-core/window.md) | Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop. |

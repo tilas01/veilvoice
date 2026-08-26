@@ -466,6 +466,76 @@ function run() {
     pass(`tooltips are pinned to the viewport below ${pinned[1]}px`);
   }
 
+  // ---- `inset` needs its longhands, and one place needs them badly --------
+  //
+  // `inset` arrived in Safari 14.1 (early 2021). An engine older than that
+  // treats the declaration as invalid and drops it, and a `position: fixed`
+  // element with no offsets sits wherever it fell in the flow at its own
+  // content size.
+  //
+  // For the legal gate that is not a cosmetic failure. It is shown with
+  // `body { overflow: hidden }`, so an overlay that does not cover the page
+  // leaves a reader unable to scroll with nothing visible stopping them --
+  // exactly the shape of the `color-mix` degradation this file already guards.
+  {
+    const insetRules = [...main.matchAll(/\{[^}]*\}/g)]
+      .map((m) => m[0])
+      .filter((block) => /(^|[\s;{])inset\s*:/.test(block));
+    if (insetRules.length === 0) {
+      pass("no bare `inset` to guard");
+    } else {
+      const bare = insetRules.filter(
+        (block) => !(/(^|[\s;{])top\s*:/.test(block) && /(^|[\s;{])left\s*:/.test(block))
+      );
+      if (bare.length) {
+        bare.forEach((block) =>
+          fail(
+            "`inset` with no longhand fallback (Safari 14.0 and earlier drop " +
+              "it): " + block.replace(/\s+/g, " ").slice(0, 70)
+          )
+        );
+      } else {
+        pass(`${insetRules.length} \`inset\` rules carry longhand fallbacks`);
+      }
+    }
+  }
+
+  // ---- the page must not describe its own layout by direction -------------
+  //
+  // The demonstration's caption said "the bars on the left" and "on the
+  // right". Below 640 px `.demo-flow` stacks, so on every phone those words
+  // named the wrong thing -- and they never meant anything to a reader using a
+  // screen reader at any width.
+  //
+  // The fix is not a second sentence behind a media query. It is to name the
+  // thing rather than where it happens to be, which is true in every layout
+  // and to every reader. This checks nobody puts the directions back.
+  {
+    const pages = fs
+      .readdirSync(path.join(ROOT, "website"))
+      .filter((name) => name.endsWith(".html"));
+    const directions = /\b(?:on|to) the (?:left|right)\b|\b(?:left|right)-hand (?:column|side|panel)\b/i;
+    const guilty = [];
+    for (const name of pages) {
+      const html = fs.readFileSync(path.join(ROOT, "website", name), "utf8");
+      // Prose only: a `float: left` in an inline style is not a claim about
+      // where something is on a phone.
+      const prose = html.replace(/<style[\s\S]*?<\/style>/g, "").replace(/<[^>]+>/g, " ");
+      const found = prose.match(directions);
+      if (found) guilty.push(`${name}: "${found[0]}"`);
+    }
+    if (guilty.length) {
+      guilty.forEach((where) =>
+        fail(
+          "the page describes its own layout by direction, which is wrong " +
+            "wherever it stacks and meaningless to a screen reader: " + where
+        )
+      );
+    } else {
+      pass(`${pages.length} pages name things rather than directions`);
+    }
+  }
+
   return failures;
 }
 

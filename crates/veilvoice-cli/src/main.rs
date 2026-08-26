@@ -442,6 +442,15 @@ enum ConversationCommand {
         /// lists every one it could have been.
         #[arg(long)]
         theme: Option<String>,
+        /// Give every speaker the **same** voice.
+        ///
+        /// More private: the output then carries no trace of *which* speaker
+        /// somebody was, so two recordings of the same group cannot be lined up
+        /// by voice. The price is that only the names and the picture say who
+        /// is speaking -- by ear alone, nobody can. It also has no speaker
+        /// limit, because one voice cannot collide with itself.
+        #[arg(long)]
+        one_voice: bool,
     },
 
     /// Draw a still of the page, without rendering any audio.
@@ -484,6 +493,9 @@ enum ConversationCommand {
         /// Colour scheme, from the nine the website and the app offer.
         #[arg(long)]
         theme: Option<String>,
+        /// Draw it as if every speaker had the same voice.
+        #[arg(long)]
+        one_voice: bool,
     },
 }
 
@@ -867,6 +879,7 @@ fn run(command: Command) -> Result<(), String> {
                 background,
                 black,
                 theme,
+                one_voice,
             } => {
                 // The picture flags are read whether or not `--page` was given,
                 // so `--width 40 --page` and `--width 40` fail the same way.
@@ -885,6 +898,7 @@ fn run(command: Command) -> Result<(), String> {
                         reseed_secs,
                     }),
                     page.then_some(look),
+                    one_voice,
                 )
             }
             ConversationCommand::Preview {
@@ -899,6 +913,7 @@ fn run(command: Command) -> Result<(), String> {
                 background,
                 black,
                 theme,
+                one_voice,
             } => conversation::preview(
                 &plan,
                 audio,
@@ -906,6 +921,7 @@ fn run(command: Command) -> Result<(), String> {
                 conversation::look_from(width, height, padding, background, black, theme)?,
                 output,
                 ffmpeg,
+                one_voice,
             ),
         },
 
