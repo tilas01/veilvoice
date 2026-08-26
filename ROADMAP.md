@@ -71,7 +71,7 @@ three binaries byte for byte identical.
 | 25 | Cycling line of project facts, slow enough to read — CSS rather than an image, so it follows the reader's theme and needs no script | **done** | — |
 | 26 | Every website theme in the app, plus user-defined palettes with contrast computed rather than assumed | **done** | — |
 | 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **planned** | 3–4 d |
-| 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **planned** | 1–2 d |
+| 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **done** | — |
 | 29 | One single binary — the same executable runs as the desktop app or as the command line, installed or portable | **planned** | 2 d |
 | 30 | Installer with a window: Tokyo Night, animated, and **portable** described as the normal case rather than as something missing | **done** | — |
 | 31 | Optional companion setup — VB-CABLE on Windows, PipeWire on Linux, BlackHole on macOS, and Audacity everywhere — detected if present, installed only if confirmed | **done** | — |
@@ -107,7 +107,7 @@ subtitles; and an optional video of the result.
 |---:|---|---|---|
 | 46 | **Conversation mode** — tell the engine a recording holds more than one speaker, and give each a distinct voice while destroying every voiceprint | **done** | — |
 | 47 | Up to ten speakers, each with a name, carried into the audio and into subtitles | **done** | — |
-| 48 | A rolling seed **per speaker**, at a randomised interval inside a range the user sets, with no interval hardcoded and a fresh one at every launch | **planned** | 2 d |
+| 48 | A rolling seed **per speaker**, at a randomised interval inside a range the user sets, with no interval hardcoded and a fresh one at every launch | **done** | — |
 | 49 | **Video output** — the waveform, a circle per speaker in their palette colour or their own picture inside a coloured ring, a title, and a black or image background with padding | **done** | — |
 | 50 | A **preview** of the video and of the voices before anything is generated | **done** | — |
 | 51 | An **asynchronous pipeline**, every speaker rendering at once rather than in sequence | **done** | — |
@@ -382,6 +382,27 @@ Worth noting that the same decision would not buy very much. A window
 excluded from capture is still visible to a camera pointed at the screen, and
 the thing VeilVoice protects — the recording — is a file, not a picture of a
 window.
+
+**Markers 28 and 48 were finished by finding out the engine already did it
+and nothing asked.** The randomised ratchet range was written, documented and
+tested inside `veilvoice-core`, and the doc comment on it said *"the front ends
+call this at launch"*. Neither front end did. It was reached by nothing but its
+own test for two releases, so every shipped copy rolled the modulation seed on
+the same fixed two-second period — a number compiled into the binary,
+which is exactly what that sentence said was not the case. Recorded as F-73.
+
+Both front ends now draw a range from the operating system's random source at
+launch, and a test reads their source and fails the build if either stops. The
+interval is user-configurable through `--reseed-range 250,1800` and a checkbox
+in the application, and **anything that is not a usable range is refused with
+the reason** — never adjusted to fit, which is marker 28's wording and
+the reason the parser returns six distinct refusals rather than a clamp. What
+is displayed is the *effective* range, quantised to whole frames, because the
+ratchet can only fire on a frame boundary and showing the request would
+describe a spread that does not exist.
+
+Measured: three consecutive runs reported 16-69 ms, 773-1963 ms and
+1088-1120 ms.
 
 **Marker 35 detects what *can* watch, and says so; it does not claim to detect
 keyloggers.** Nothing can. The mechanisms a logger uses are the mechanisms

@@ -40,9 +40,12 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Seven defects found and fixed (F-66 to F-72.)** **None had shipped**: all
-seven are in code written since the seventh round, and `main` has not been
-released since v0.1.12.
+**Eight defects found and fixed (F-66 to F-73.)** Seven had not shipped.
+**F-73 had**: the randomised ratchet interval was implemented, documented as
+being used, and called by nothing, so every released copy rolled on the same
+fixed two-second period. It is the first defect in three rounds that was in a
+shipped release rather than in work in progress, and it was found by looking
+for a function's callers rather than by reading it.
 
 **Two of the seven were found by continuous integration rather than by
 anybody's judgement**, and both had been watched to pass on the machine they
@@ -68,6 +71,52 @@ strength with the accent work **off**. Nothing in the window said so; the
 controls were on a different tab, and the group panel had never been given
 them. That is software quietly doing less than it says, which is the failure
 this whole tree is written against.
+
+### F-73 -- the randomised ratchet was written, documented, and never called
+
+`veilvoice-core/src/chain.rs`, and both front ends. `DeidConfig::reseed_range_ms`
+replaces the fixed roll interval with one drawn fresh before every roll, so the
+ratchet has no period to observe. `with_random_reseed_range` draws that range
+from the OS CSPRNG. Both were implemented, both were tested, and the field's own
+documentation said:
+
+> Not part of `DeidConfig::default`, which stays deterministic so the test suite
+> does. **The front ends call `DeidConfig::with_random_reseed_range` at launch**,
+> which is what makes the shipped interval something other than a number
+> compiled in.
+
+Nothing called it. `with_random_reseed_range` appeared three times in the whole
+tree: its definition, that sentence, and one test of itself. So every shipped
+copy of VeilVoice rolled the modulation seed every two seconds exactly -- a
+number compiled into the binary, which is precisely what the sentence said was
+not happening.
+
+**What it is worth is small and real.** The ratchet is forward secrecy, not
+irreversibility: the many-to-one mapping is what destroys the voiceprint, and it
+does not depend on the ratchet at all. A predictable roll period does not make a
+voice recoverable. What it gives an observer is a clean segment boundary every
+two seconds in every recording VeilVoice has ever produced, in every copy, which
+is a property of the *program* rather than of the session -- and removing that
+is the entire reason the feature was written.
+
+**What makes it worth an entry is the shape.** This is the fourth defect in two
+rounds where a sentence was true about the design and false about the code, and
+the first where the sentence described work that had been *finished* and simply
+never wired up. Nothing was broken; a call was missing. Reading the module would
+not find it, reading the tests would not find it -- the feature had a passing
+test -- and it took looking for the callers of a function to notice there were
+none.
+
+A comment cannot be tested, so the fix tests the code the comment is about: a
+test reads both front ends' source and fails the build if the call is not there.
+
+Marker 28 was completed alongside it, since the engine half already existed:
+the interval is now user-configurable, and **anything that is not a usable range
+is refused with the reason rather than clamped**. Six distinct refusals -- not
+two numbers, not a number, not positive, backwards, too short, too long -- each
+naming which end was wrong and what the bound is. Clamping would leave somebody
+running on a setting they did not choose and cannot see, which for a control
+whose whole purpose is unpredictability is the worst available failure.
 
 ### F-72 -- three tests passed on this machine and failed on the same platform
 
@@ -512,7 +561,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 903 tests across 21 crates, plus doctests and 11 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). |
+| Test suite | 909 tests across 21 crates, plus doctests and 11 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -1964,7 +2013,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Seventy-two defects found and fixed across eight audit rounds (F-1 to F-72):**
+**Seventy-three defects found and fixed across eight audit rounds (F-1 to F-73):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

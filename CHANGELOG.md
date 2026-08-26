@@ -8,6 +8,75 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### A ratchet interval that is not the same in every copy of the program
+
+```
+veilvoice anonymise recording.wav --reseed-range 250,1800
+```
+
+Markers 28 and 48. The modulation seed rolls forward on a ratchet; a fixed
+interval is a fixed thing to observe. The interval is now drawn fresh before
+every roll, from a range that is itself **drawn from the operating system's
+random source at launch** — so it is a property of your run rather
+than of the binary. `--reseed-range fixed`, or the checkbox in the application,
+restores the old fixed interval by name.
+
+**Anything that is not a usable range is refused with the reason, never
+adjusted to fit.** Six distinct refusals, each naming which end was wrong and
+what the bound is:
+
+```
+✗ --reseed-range: the range runs backwards: 1800 is not below 250, and the low end comes first
+✗ --reseed-range: 0 is not a length of time; both ends must be above zero
+✗ --reseed-range: 900000 ms is past the 600000 ms ceiling. A ratchet that slow is
+  almost certainly a typo, and a long interval weakens forward secrecy without
+  buying anything
+```
+
+Clamping would leave somebody running on a setting they did not choose and
+cannot see. For a control whose whole purpose is that the interval should not
+be predictable, that is the worst available failure.
+
+What is displayed is the **effective** range, quantised to whole frames, not
+what was asked for — the ratchet can only fire on a frame boundary, and
+showing the request would describe a spread that does not exist. Asking for
+`250,1800` reports `251-1803 ms`.
+
+### F-73 — the randomised ratchet was written, documented, and never called
+
+**This one had shipped.** `reseed_range_ms` and `with_random_reseed_range` were
+implemented and tested, and the field's documentation said "the front ends call
+this at launch, which is what makes the shipped interval something other than a
+number compiled in".
+
+Nothing called it. The function appeared three times in the tree: its
+definition, that sentence, and one test of itself. Every released copy of
+VeilVoice rolled the modulation seed every two seconds exactly.
+
+What it is worth is small and real. The ratchet is forward secrecy, not
+irreversibility — the many-to-one mapping is what destroys the
+voiceprint and does not depend on the ratchet at all, so a predictable period
+never made a voice recoverable. What it gave an observer was a clean segment
+boundary every two seconds in every recording VeilVoice has ever produced, in
+every copy. Removing that is the entire reason the feature exists.
+
+It is the fourth defect in two rounds where a sentence was true about the design
+and false about the code, and the first where the sentence described work that
+was *finished* and simply never wired up. A passing test covered the feature.
+Reading the module would not have found it; looking for the function's callers
+did.
+
+A comment cannot be tested, so the fix tests the code the comment is about: a
+test reads both front ends' source and fails the build if the call is missing.
+
+Measured across three consecutive runs:
+
+```
+Seed rolls    16-69 ms, drawn fresh before every roll -- no period to observe
+Seed rolls    773-1963 ms, drawn fresh before every roll -- no period to observe
+Seed rolls    1088-1120 ms, drawn fresh before every roll -- no period to observe
+```
+
 ### What can see your keyboard and mouse — and why a clean result proves nothing
 
 ```
