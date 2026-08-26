@@ -128,7 +128,7 @@ then the smallest thing it does.
 | 57 | **The hashes are trusted only after the signature is** — verify the detached signature over `SHA256SUMS` against the project key *before* any hash from it is compared, and refuse rather than warn if it does not verify | **planned** | 2 d |
 | 58 | **Set the machine up per platform** — the build dependencies each operating system actually needs, detected, named with who ships them, and installed only on an explicit yes | **planned** | 4–5 d |
 | 59 | **Custom install** — CLI, desktop app, or both, from a build you just made or from a download you just verified | **planned** | 2–3 d |
-| 60 | **Four verbosity levels** — nothing, minimal, normal (the default) and everything — applied to every one of the above, with the exit status carrying the answer when the output carries nothing | **planned** | 1–2 d |
+| 60 | **Four verbosity levels** — nothing, minimal, normal (the default) and everything — applied to every one of the above, with the exit status carrying the answer when the output carries nothing | **done** | — |
 
 ## Group mode, where you can see it
 
