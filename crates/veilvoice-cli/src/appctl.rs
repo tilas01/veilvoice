@@ -46,7 +46,21 @@ fn save(path: &Path, baseline: &Baseline) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
     }
-    std::fs::write(path, baseline.to_text()).map_err(|e| format!("{}: {e}", path.display()))
+    // F-75. Readable by this account and no other.
+    //
+    // This file decides what counts as ordinary on this machine, which makes it
+    // a security setting rather than a convenience. Written with the default
+    // permissions, another local account could add a line and have a program of
+    // their choosing treated as unremarkable for ever, or read the list to learn
+    // exactly what runs here and when.
+    //
+    // The project already has one place that gets file permissions right, and
+    // the important part is that it sets them **as the file is created** rather
+    // than afterwards: a file that exists for even a moment with the wrong
+    // permissions is a file somebody else's program may have read in that
+    // moment.
+    veilvoice_crypto::privatefile::write_owner_only(path, baseline.to_text().as_bytes())
+        .map_err(|e| format!("{}: {e}", path.display()))
 }
 
 /// The note that goes with every answer.

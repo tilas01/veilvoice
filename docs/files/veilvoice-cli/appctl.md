@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-cli/src/appctl.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 272 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 286 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs)
 
 ## Contents
 
@@ -37,19 +37,19 @@ It does not block anything. It is a way of noticing.
 
 ## What this file contains
 
-272 lines defining **10 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+286 lines defining **10 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `learn` (line 67) -- Record what is running as ordinary.
+- `learn` (line 81) -- Record what is running as ordinary.
   - reaches: `baseline_path`, `load`, `running`, `save`, `scope`
-- `check` (line 120) -- Compare what is running against the baseline.
+- `check` (line 134) -- Compare what is running against the baseline.
   - reaches: `baseline_path`, `load`, `running`, `save`, `scope`
-- `allow` (line 195) -- Allow a program, for a while or for good.
+- `allow` (line 209) -- Allow a program, for a while or for good.
   - reaches: `baseline_path`, `load`, `save`, `scope`
-- `revoke` (line 228) -- Withdraw a grant.
+- `revoke` (line 242) -- Withdraw a grant.
   - reaches: `baseline_path`, `load`, `save`, `scope`
-- `log` (line 240) -- Show the decision log.
+- `log` (line 254) -- Show the decision log.
   - reaches: `baseline_path`, `load`, `scope`
 
 ## What calls what
@@ -75,13 +75,13 @@ flowchart TD
     n_baseline_path["baseline_path<br/>line 23"]
     n_load["load<br/>line 37"]
     n_save["save<br/>line 45"]
-    n_scope["scope<br/>line 53"]
-    n_running["running<br/>line 62"]
-    n_learn(["learn<br/>line 67"])
-    n_check(["check<br/>line 120"])
-    n_allow(["allow<br/>line 195"])
-    n_revoke(["revoke<br/>line 228"])
-    n_log(["log<br/>line 240"])
+    n_scope["scope<br/>line 67"]
+    n_running["running<br/>line 76"]
+    n_learn(["learn<br/>line 81"])
+    n_check(["check<br/>line 134"])
+    n_allow(["allow<br/>line 209"])
+    n_revoke(["revoke<br/>line 242"])
+    n_log(["log<br/>line 254"])
     n_allow --> n_baseline_path
     n_allow --> n_load
     n_allow --> n_save
@@ -106,13 +106,13 @@ flowchart TD
     click n_baseline_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L23" "open the source"
     click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L37" "open the source"
     click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L45" "open the source"
-    click n_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L53" "open the source"
-    click n_running href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L62" "open the source"
-    click n_learn href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L120" "open the source"
-    click n_allow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L195" "open the source"
-    click n_revoke href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L228" "open the source"
-    click n_log href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L240" "open the source"
+    click n_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67" "open the source"
+    click n_running href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L76" "open the source"
+    click n_learn href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L81" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L134" "open the source"
+    click n_allow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L209" "open the source"
+    click n_revoke href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L242" "open the source"
+    click n_log href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L254" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_learn,n_check,n_allow,n_revoke,n_log entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -130,13 +130,13 @@ flowchart TD
 | `baseline_path` <sub>pub fn</sub> | [23](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L23) | Where the baseline is kept. |
 | `load` <sub>fn</sub> | [37](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L37) |  |
 | `save` <sub>fn</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L45) |  |
-| `scope` <sub>fn</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L53) | The note that goes with every answer. |
-| `running` <sub>fn</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L62) | What is running now, through the shared listing. |
-| `learn` <sub>pub fn</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67) | Record what is running as ordinary. |
-| `check` <sub>pub fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L120) | Compare what is running against the baseline. |
-| `allow` <sub>pub fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L195) | Allow a program, for a while or for good. |
-| `revoke` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L228) | Withdraw a grant. |
-| `log` <sub>pub fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L240) | Show the decision log. |
+| `scope` <sub>fn</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67) | The note that goes with every answer. |
+| `running` <sub>fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L76) | What is running now, through the shared listing. |
+| `learn` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L81) | Record what is running as ordinary. |
+| `check` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L134) | Compare what is running against the baseline. |
+| `allow` <sub>pub fn</sub> | [209](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L209) | Allow a program, for a while or for good. |
+| `revoke` <sub>pub fn</sub> | [242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L242) | Withdraw a grant. |
+| `log` <sub>pub fn</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L254) | Show the decision log. |
 
 ---
 
