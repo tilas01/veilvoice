@@ -6,6 +6,50 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+## Unreleased
+
+### `veilvoice accel`: your graphics hardware, and the one place it helps
+
+```
+veilvoice accel
+```
+
+Finds the graphics devices on the machine, says which can encode video, and
+suggests one. NVIDIA through **NVENC**, AMD through **AMF**, Intel integrated
+graphics through **Quick Sync**, Apple silicon through **VideoToolbox**, with
+the driver version each system reports. A separate card is suggested over
+integrated graphics, and the reason says *usually* rather than pretending it
+was measured.
+
+**The audio engine is not offered a graphics card, and the reason is a
+measurement.** Veiling sixty seconds of audio takes about 0.58 seconds on one
+core, roughly a hundred times faster than real time, and live mode finishes
+each 1024-sample frame in about 0.05 ms out of the 21 ms it has. A graphics
+card is fast at doing one thing to a very large batch; moving a frame that
+small onto it and back costs more than the work. A "use the GPU" switch there
+would make VeilVoice slower, so there is not one.
+
+**Video encoding is the opposite shape of problem**, and that is what the
+hardware is offered for. `Encoding::encoder` carries the choice through to
+`ffmpeg`, and the software encoder stays the default: two people rendering the
+same recording should get the same file unless one of them asked not to.
+Asking for hardware also switches `-crf` to `-cq`, because the hardware
+encoders do not have the first and ffmpeg refuses to start rather than
+rendering more slowly.
+
+**Finding a device is not proof it can be used**, and that is printed beside
+every result: hardware encoding also needs a working driver and a copy of
+ffmpeg built with that encoder, neither of which can be determined by reading
+a device name.
+
+Threads are reported too, and documented as being for **batches**. One
+recording cannot be split across cores: the ratchet and the phase state run
+forward in time, so two halves veiled in parallel would not produce the file
+the whole of it would.
+
+Measured on the machine this was written on: one NVIDIA GeForce RTX 4060,
+driver 32.0.16.1062, NVENC, 28 threads.
+
 ## v0.1.14
 
 The safety catch, an interface that reads like English, and a window that does
