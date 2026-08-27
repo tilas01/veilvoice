@@ -110,13 +110,14 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>2217 lines"])
+    n_main(["main.rs<br/>2205 lines"])
     n_appctl["appctl.rs<br/>272 lines"]
     n_atrest["atrest.rs<br/>275 lines"]
     n_capture["capture.rs<br/>321 lines"]
     n_conversation["conversation.rs<br/>789 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
     n_guard["guard.rs<br/>338 lines"]
+    n_gui["gui.rs<br/>247 lines"]
     n_input["input.rs<br/>117 lines"]
     n_lock["lock.rs<br/>239 lines"]
     n_meter["meter.rs<br/>250 lines"]
@@ -137,6 +138,7 @@ flowchart TD
     n_guard --> n_atrest
     n_guard --> n_lock
     n_guard --> n_theme
+    n_gui --> n_theme
     n_input --> n_sentry
     n_input --> n_theme
     n_lock --> n_atrest
@@ -155,6 +157,7 @@ flowchart TD
     click n_conversation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs" "open the source"
     click n_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/failsafe.rs" "open the source"
     click n_guard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" "open the source"
+    click n_gui href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs" "open the source"
     click n_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/input.rs" "open the source"
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs" "open the source"
     click n_meter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs" "open the source"
@@ -176,9 +179,10 @@ flowchart TD
 | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 789 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | 112 | veilvoice failsafe — the safety catch, and what it can and cannot do. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
+| [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | 247 | veilvoice gui — open the desktop application from the command line. |
 | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 117 | veilvoice input — what running programs can see your keyboard and mouse. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2217 | veilvoice — the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2205 | veilvoice — the command-line interface. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 250 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 236 | veilvoice policy -- settings that can only be tightened. |
 | [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | 46 | veilvoice privilege — what VeilVoice is running with, and what it can see. |
@@ -216,6 +220,9 @@ flowchart TD
 | `fn describe` | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | A named finding, for the tests to reach without a machine. |
 | `enum Action` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
 | `fn run` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
+| `fn candidates` | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | Everywhere this looks, in order, and whether each had it. |
+| `fn find` | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | The desktop application, wherever it is. |
+| `fn open` | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | Open the window. |
 | `fn look` | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | Show what can see input on this machine. |
 | `fn known` | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | Everything this build knows how to recognise, whether running or not. |
 | `enum Action` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |

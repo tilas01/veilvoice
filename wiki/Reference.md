@@ -52,6 +52,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`conversation.rs`|File-veilvoice-cli-conversation]] &mdash; veilvoice conversation -- several speakers, a voice each, and subtitles.
 - [[`failsafe.rs`|File-veilvoice-cli-failsafe]] &mdash; veilvoice failsafe — the safety catch, and what it can and cannot do.
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
+- [[`gui.rs`|File-veilvoice-cli-gui]] &mdash; veilvoice gui — open the desktop application from the command line.
 - [[`input.rs`|File-veilvoice-cli-input]] &mdash; veilvoice input — what running programs can see your keyboard and mouse.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
 - [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
