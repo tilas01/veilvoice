@@ -330,9 +330,9 @@ impl Group {
         // the picker simply is not reachable. Found by opening it in the
         // running application and looking, which is also how the speaker strip
         // turned out to be five lines of wrapped text at 96 pixels wide.
-        egui::ScrollArea::vertical()
-            .auto_shrink([false, false])
-            .show(ui, |ui| self.body(ui, settings));
+        // The application scrolls every tab in one place; a second scroller
+        // here would trap the wheel in whichever the pointer was over.
+        self.body(ui, settings);
     }
 
     /// Collect whatever the open pickers have answered.
@@ -371,7 +371,7 @@ impl Group {
     /// Everything inside the scroller.
     fn body(&mut self, ui: &mut Ui, settings: &mut crate::settings::Settings) {
         self.collect_dialogs();
-        ui.heading(RichText::new("GROUP MODE").color(p::blue()));
+        ui.heading(RichText::new("Group mode").color(p::blue()));
         ui.add_space(4.0);
         ui.label(
             RichText::new(
@@ -430,7 +430,7 @@ impl Group {
         ui.label(
             RichText::new(
                 "This panel holds who is in the recording. When each turn starts and ends \
-                 comes from a plan file or from one microphone per person -- VeilVoice \
+                 comes from a plan file or from one microphone per person. VeilVoice \
                  does not guess who is speaking, and audio no turn claims is silenced \
                  rather than passed through.",
             )
@@ -445,7 +445,7 @@ impl Group {
     /// preset quietly overriding a choice somebody made after picking it, and
     /// they would find that out in the output.
     fn profile_controls(&mut self, ui: &mut Ui) {
-        ui.label(RichText::new("HOW YOU ARE WORKING").color(p::blue()));
+        ui.label(RichText::new("How you are working").color(p::blue()));
         ui.add_space(4.0);
 
         ui.horizontal_wrapped(|ui| {
@@ -503,7 +503,7 @@ impl Group {
             RichText::new(
                 "  A project holds where your files are, who is in the recording and what \
                  you called them. It holds no audio and no passwords, so it is safe to \
-                 keep beside the recording -- but it does hold the names you typed.",
+                 keep beside the recording, but it does hold the names you typed.",
             )
             .color(p::muted())
             .small(),
@@ -590,7 +590,7 @@ impl Group {
     /// want the first, and the ones who want the second want it for a reason
     /// they already know.
     fn voice_mode_controls(&mut self, ui: &mut Ui) {
-        ui.label(RichText::new("VOICES").color(p::blue()));
+        ui.label(RichText::new("Voices").color(p::blue()));
         ui.add_space(4.0);
         ui.horizontal(|ui| {
             for mode in [VoiceMode::Distinct, VoiceMode::Uniform] {
@@ -618,7 +618,7 @@ impl Group {
         ui.label(
             RichText::new(format!(
                 "  {clear} of the {MAX_VOICES} destination voices are far enough apart to \
-                 be told apart by ear -- measured, not chosen. Past that, one voice for \
+                 be told apart by ear, measured rather than chosen. Past that, one voice for \
                  everybody is the honest option.",
             ))
             .color(p::muted())
@@ -795,7 +795,7 @@ impl Group {
 
     /// What a render writes.
     fn output_controls(&mut self, ui: &mut Ui) {
-        ui.label(RichText::new("WHAT A RENDER WRITES").color(p::blue()));
+        ui.label(RichText::new("What a render writes").color(p::blue()));
         ui.add_space(4.0);
         ui.horizontal(|ui| {
             ui.checkbox(&mut self.outputs.audio, "audio");
@@ -918,7 +918,7 @@ impl Group {
 
     /// The recording, the plan, the title and the palette.
     fn files_and_theme(&mut self, ui: &mut Ui) {
-        ui.label(RichText::new("THE RECORDING").color(p::blue()));
+        ui.label(RichText::new("The recording").color(p::blue()));
         ui.add_space(4.0);
 
         ui.horizontal(|ui| {
@@ -968,7 +968,7 @@ impl Group {
             RichText::new(
                 "  The plan says when each person speaks. Without one there is nothing to \
                  render against, and audio no turn claims is silenced rather than passed \
-                 through -- so a missing plan would produce a silent file, not a veiled \
+                 through, so a missing plan would produce a silent file, not a veiled \
                  one. `veilvoice conversation inspect` describes a plan you already have.",
             )
             .color(p::muted())

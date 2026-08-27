@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/main.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 87 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 102 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
 
 ## Contents
 
@@ -43,14 +43,21 @@ exist solely to draw a 32x32 square. The length is checked before use, and a
 mismatch means the window simply opens without an icon rather than panicking
 at startup.
 
-**The window has a minimum size.** The layout is monospace and column-based,
-and below roughly 560 by 480 the columns start overlapping rather than
-reflowing -- so the floor is enforced here instead of being left to produce
-an unreadable window on somebody else's machine.
+**The window has a minimum size, and it is about width.** Every tab is
+inside one scroll area, so anything taller than the window can be reached by
+scrolling to it and a short window loses nothing. Width is different: the
+layout is monospace and column-based, and below roughly 720 across, columns
+start overlapping rather than reflowing. So the floor is enforced here
+rather than left to produce an unreadable window on somebody else's machine.
+
+It opens at 1100 by 720, which is large enough to read without resizing and
+still fits a 1366 by 768 laptop with its taskbar. Anything bigger opens
+partly off the bottom of a common screen, which looks like a broken
+application rather than a generous one.
 
 ## What this file contains
 
-87 lines defining **1 function** (0 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+102 lines defining **1 function** (0 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -72,8 +79,8 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main["main<br/>line 45"]
-    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L45" "open the source"
+    n_main["main<br/>line 52"]
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L52" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_main helper
 ```
@@ -84,9 +91,9 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `ICON_RGBA` <sub>const</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L42) | The window icon, as raw 32x32 RGBA produced by assets/generate.py. |
-| `ICON_SIZE` <sub>const</sub> | [43](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L43) |  |
-| `main` <sub>fn</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L45) |  |
+| `ICON_RGBA` <sub>const</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L49) | The window icon, as raw 32x32 RGBA produced by assets/generate.py. |
+| `ICON_SIZE` <sub>const</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L50) |  |
+| `main` <sub>fn</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L52) |  |
 
 ---
 

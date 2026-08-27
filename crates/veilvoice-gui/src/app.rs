@@ -113,7 +113,7 @@ use veilvoice_audio::devices;
 use veilvoice_core::{AccentConfig, DeidConfig};
 
 /// The things VeilVoice does.
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Tab {
     /// Process a file on disk.
     File,
@@ -133,6 +133,47 @@ enum Tab {
     Setup,
     /// Versions, licence and honest scope.
     About,
+}
+
+impl Tab {
+    /// The name this tab answers to on the command line.
+    ///
+    /// Lower case and stable. These are what `--tab` accepts and what
+    /// `tools/shots/gui.ps1` names each picture after, so changing one renames
+    /// a screenshot and breaks a link in the README. They are not the labels
+    /// on screen, which are written for a reader and may be reworded.
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::File => "file",
+            Self::Live => "live",
+            Self::Group => "group",
+            Self::Watch => "monitor",
+            Self::Security => "lock",
+            Self::Verify => "verify",
+            Self::Preferences => "settings",
+            Self::Setup => "install",
+            Self::About => "about",
+        }
+    }
+
+    /// Every tab, in the order the window shows them.
+    pub const ALL: &'static [Tab] = &[
+        Tab::File,
+        Tab::Live,
+        Tab::Group,
+        Tab::Watch,
+        Tab::Security,
+        Tab::Verify,
+        Tab::Preferences,
+        Tab::Setup,
+        Tab::About,
+    ];
+
+    /// The tab with this name, if it is one.
+    pub fn from_key(key: &str) -> Option<Tab> {
+        let key = key.trim().to_ascii_lowercase();
+        Self::ALL.iter().copied().find(|tab| tab.key() == key)
+    }
 }
 
 /// Result of a background file job.
@@ -339,6 +380,32 @@ impl VeilVoiceApp {
     ///
     /// This is where the lock file is read, rather than in `Default`: tests and
     /// anything else constructing the app must not touch the real one.
+    /// Which tab to open on, if one was named on the command line.
+    ///
+    /// `veilvoice-gui --tab verify`. It exists so the screenshot tool can put
+    /// the window on a tab without clicking: driving the interface with
+    /// synthetic mouse events needs the window in the foreground, Windows
+    /// refuses to give a background process the foreground, and the refusal is
+    /// reported by a return value that nothing was reading. Every capture then
+    /// silently showed whichever tab was already open.
+    ///
+    /// A deep link into a tab is a reasonable thing for an application to have
+    /// on its own account, which is why this is a real argument rather than a
+    /// hidden one.
+    fn tab_from_arguments() -> Option<Tab> {
+        let mut args = std::env::args().skip(1);
+        while let Some(arg) = args.next() {
+            if let Some(value) = arg.strip_prefix("--tab=") {
+                return Tab::from_key(value);
+            }
+            if arg == "--tab" {
+                return Tab::from_key(&args.next()?);
+            }
+        }
+        None
+    }
+
+    /// Build the application, ready for its first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         let jetbrains = crate::theme::install_fonts(&cc.egui_ctx);
 
@@ -377,6 +444,11 @@ impl VeilVoiceApp {
             ..Default::default()
         };
         app.apply_policy();
+        // After the policy, so a named tab is what the window opens on rather
+        // than something the policy pass happened to leave selected.
+        if let Some(tab) = Self::tab_from_arguments() {
+            app.tab = tab;
+        }
         app
     }
 
@@ -478,7 +550,7 @@ impl eframe::App for VeilVoiceApp {
                 crate::soundbar::draw(ui, egui::vec2(46.0, 22.0), motion, time)
                     .on_hover_text("VeilVoice");
                 ui.label(
-                    RichText::new("VEILVOICE")
+                    RichText::new("VeilVoice")
                         .size(20.0)
                         .color(p::fg())
                         .strong(),
@@ -518,15 +590,15 @@ impl eframe::App for VeilVoiceApp {
             }
             ui.horizontal(|ui| {
                 for (tab, label) in [
-                    (Tab::File, "anonymise file"),
-                    (Tab::Live, "live scramble"),
-                    (Tab::Group, "group"),
-                    (Tab::Watch, "monitor"),
-                    (Tab::Security, "lock"),
-                    (Tab::Verify, "verify"),
-                    (Tab::Preferences, "settings"),
-                    (Tab::Setup, "install"),
-                    (Tab::About, "about"),
+                    (Tab::File, "Anonymise file"),
+                    (Tab::Live, "Live scramble"),
+                    (Tab::Group, "Group"),
+                    (Tab::Watch, "Monitor"),
+                    (Tab::Security, "Lock"),
+                    (Tab::Verify, "Verify"),
+                    (Tab::Preferences, "Settings"),
+                    (Tab::Setup, "Install"),
+                    (Tab::About, "About"),
                 ] {
                     if tab == Tab::Setup && !offer_install {
                         continue;
@@ -537,6 +609,17 @@ impl eframe::App for VeilVoiceApp {
                     if ui.selectable_label(selected, text).clicked() {
                         self.tab = tab;
                     }
+                    // A real gap between tabs, not just the default padding.
+                    //
+                    // It reads better, and it is load-bearing for
+                    // `tools/shots/gui.ps1`, which finds the tabs by scanning
+                    // the strip for lit columns separated by gaps. Capitalising
+                    // the labels widened them enough to close the space between
+                    // the first two, and the scanner read "Anonymise file Live
+                    // scramble" as one label and refused to continue -- which
+                    // is the failure working as intended, and the fix is to
+                    // give it something unambiguous to see.
+                    ui.add_space(6.0);
                 }
             });
             ui.add_space(6.0);
@@ -573,17 +656,36 @@ impl eframe::App for VeilVoiceApp {
                     self.preferences.first_run_panel(ui);
                     return;
                 }
-                match self.tab {
-                    Tab::File => self.file_tab(ui),
-                    Tab::Live => self.live_tab(ui),
-                    Tab::Group => self.group.tab(ui, &mut self.preferences),
-                    Tab::Watch => self.watch_tab(ui),
-                    Tab::Security => self.security.tab(ui),
-                    Tab::Verify => self.verify.tab(ui),
-                    Tab::Preferences => self.preferences.tab(ui, ctx),
-                    Tab::Setup => self.setup.tab(ui, motion),
-                    Tab::About => self.about_tab(ui),
-                }
+                // Every tab, inside one scroller.
+                //
+                // This is what "nothing is ever out of reach" actually
+                // requires. A window can be any size the person makes it, and
+                // several of these panels are taller than a small one: the
+                // security tab had no scroller at all, so on a short window the
+                // controls below the fold could not be reached by any means --
+                // not scrolled to, not tabbed to, not resized into view without
+                // making the window taller than the screen.
+                //
+                // Here rather than in each tab so that a tab added later gets
+                // it without anybody remembering to, and so there is exactly
+                // one of them: a scroller inside a scroller traps the wheel in
+                // whichever the pointer happens to be over.
+                //
+                // `auto_shrink([false, false])` so a short panel still fills
+                // the window rather than collapsing the layout around itself.
+                egui::ScrollArea::vertical()
+                    .auto_shrink([false, false])
+                    .show(ui, |ui| match self.tab {
+                        Tab::File => self.file_tab(ui),
+                        Tab::Live => self.live_tab(ui),
+                        Tab::Group => self.group.tab(ui, &mut self.preferences),
+                        Tab::Watch => self.watch_tab(ui),
+                        Tab::Security => self.security.tab(ui),
+                        Tab::Verify => self.verify.tab(ui),
+                        Tab::Preferences => self.preferences.tab(ui, ctx),
+                        Tab::Setup => self.setup.tab(ui, motion),
+                        Tab::About => self.about_tab(ui),
+                    });
             });
         });
 
@@ -654,7 +756,7 @@ impl VeilVoiceApp {
     }
 
     fn settings(&mut self, ui: &mut egui::Ui) {
-        ui.label(RichText::new("SETTINGS").color(p::blue()).small());
+        ui.label(RichText::new("Settings").color(p::blue()).small());
 
         // A floor becomes the bottom of the slider's range rather than a value
         // the slider snaps back from. A control that visibly refuses to go
@@ -766,7 +868,7 @@ impl VeilVoiceApp {
 
     fn file_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
-        ui.label(RichText::new("INPUT").color(p::blue()).small());
+        ui.label(RichText::new("Input").color(p::blue()).small());
         ui.horizontal(|ui| {
             // Started, not waited for. The picker runs on its own thread and
             // the answer is collected below, so the window keeps painting
@@ -853,7 +955,7 @@ impl VeilVoiceApp {
         ui.separator();
         ui.label(
             RichText::new(
-                "The words survive on purpose — a scrambler you cannot understand is \
+                "The words survive on purpose. A scrambler you cannot understand is \
                  useless. Encrypting the result at rest is what keeps them from being \
                  read off the disk afterwards, which is why it is on by default.",
             )
@@ -922,7 +1024,7 @@ impl VeilVoiceApp {
         let running = self.session.is_some();
 
         ui.add_space(4.0);
-        ui.label(RichText::new("DEVICES").color(p::blue()).small());
+        ui.label(RichText::new("Devices").color(p::blue()).small());
         ui.add_enabled_ui(!running, |ui| {
             device_picker(ui, "input ", &self.inputs, &mut self.chosen_input);
             device_picker(ui, "output", &self.outputs, &mut self.chosen_output);
@@ -937,7 +1039,7 @@ impl VeilVoiceApp {
         if !routed {
             ui.label(
                 RichText::new(
-                    "no virtual cable selected — other applications will not receive this",
+                    "no virtual cable selected, so other applications will not receive this",
                 )
                 .color(p::yellow())
                 .small(),
@@ -997,12 +1099,12 @@ impl VeilVoiceApp {
             }
 
             ui.add_space(12.0);
-            ui.label(RichText::new("LEVELS").color(p::blue()).small());
+            ui.label(RichText::new("Levels").color(p::blue()).small());
             meter(ui, "in ", self.meter_in, self.hold_in);
             meter(ui, "out", self.meter_out, self.hold_out);
 
             ui.add_space(12.0);
-            ui.label(RichText::new("PERFORMANCE").color(p::blue()).small());
+            ui.label(RichText::new("Performance").color(p::blue()).small());
             field(
                 ui,
                 "processing",
@@ -1161,7 +1263,7 @@ impl VeilVoiceApp {
 
     fn watch_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
-        ui.label(RichText::new("WHAT IS LISTENING").color(p::blue()).small());
+        ui.label(RichText::new("What is listening").color(p::blue()).small());
         let support = self.watch.support();
         ui.label(RichText::new(support.explanation).color(p::muted()).small());
 
@@ -1221,7 +1323,7 @@ impl VeilVoiceApp {
         if !self.watch.log().is_empty() {
             ui.add_space(14.0);
             ui.separator();
-            ui.label(RichText::new("RECENT").color(p::blue()).small());
+            ui.label(RichText::new("Recent").color(p::blue()).small());
             egui::ScrollArea::vertical()
                 .max_height(160.0)
                 .show(ui, |ui| {
@@ -1255,7 +1357,7 @@ impl VeilVoiceApp {
         });
         ui.label(
             RichText::new(format!(
-                "A report was written to {}. It was written on this machine                  and sent nowhere -- VeilVoice has no network code at all.",
+                "A report was written to {}. It was written on this machine and sent \n                 nowhere. VeilVoice has no network code at all.",
                 path.display()
             ))
             .color(p::muted())
@@ -1299,11 +1401,11 @@ impl VeilVoiceApp {
         self.updates.section(ui, env!("CARGO_PKG_VERSION"));
 
         ui.add_space(16.0);
-        ui.label(RichText::new("WHAT THIS PROTECTS").color(p::blue()).small());
+        ui.label(RichText::new("What this protects").color(p::blue()).small());
         ui.label(
             RichText::new(
-                "The biometric voiceprint — pitch, formants, timbre, micro-timing and \
-                 the melody of an accent — is destroyed and cannot be recovered from the \
+                "The biometric voiceprint (pitch, formants, timbre, micro-timing and \
+                 the melody of an accent) is destroyed and cannot be recovered from the \
                  output. Each frame's measured phase is discarded, and every speaker is \
                  mapped onto one canonical register and vocal tract.",
             )
@@ -1311,11 +1413,15 @@ impl VeilVoiceApp {
         );
 
         ui.add_space(12.0);
-        ui.label(RichText::new("WHAT IT DOES NOT").color(p::yellow()).small());
+        ui.label(
+            RichText::new("What it does not do")
+                .color(p::yellow())
+                .small(),
+        );
         ui.label(
             RichText::new(
                 "The words are preserved on purpose, so de-identification alone does \
-                 not keep the message secret — which is why the result is encrypted at \
+                 not keep the message secret, which is why the result is encrypted at \
                  rest by default. Nor can any signal-level transform change which \
                  phonemes you produced, so a strong regional accent may still be \
                  audible even though its melody is gone.",
@@ -1324,7 +1430,7 @@ impl VeilVoiceApp {
         );
 
         ui.add_space(12.0);
-        ui.label(RichText::new("THE APP LOCK").color(p::yellow()).small());
+        ui.label(RichText::new("The app lock").color(p::yellow()).small());
         ui.label(RichText::new(veilvoice_crypto::lock::SCOPE).color(p::fg()));
 
         ui.add_space(16.0);
@@ -1428,6 +1534,25 @@ fn meter(ui: &mut egui::Ui, label: &str, peak: f32, hold: f32) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Every tab has a name, they are unique, and they round trip. The
+    /// screenshot tool names each picture after one of these, so a change here
+    /// renames a file the README links to.
+    #[test]
+    fn every_tab_has_a_stable_unique_name() {
+        let mut keys: Vec<&str> = Tab::ALL.iter().map(|tab| tab.key()).collect();
+        let count = keys.len();
+        keys.sort_unstable();
+        keys.dedup();
+        assert_eq!(keys.len(), count, "two tabs share a name");
+        assert_eq!(count, 9);
+        for tab in Tab::ALL {
+            assert_eq!(Tab::from_key(tab.key()), Some(*tab));
+            assert_eq!(Tab::from_key(&tab.key().to_uppercase()), Some(*tab));
+        }
+        assert_eq!(Tab::from_key("nothing-like-this"), None);
+        assert_eq!(Tab::from_key(""), None);
+    }
 
     /// Device selection is tested against synthetic lists, never the machine.
     /// See `preferred_output` for why that is not merely tidier.

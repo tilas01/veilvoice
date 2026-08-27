@@ -313,3 +313,52 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+mod house_style {
+    /// **No dashes in anything the application shows.**
+    ///
+    /// Not the em dash, and not the doubled hyphen this project used in its
+    /// place. A dash is almost always a colon, a semicolon, a full stop or a
+    /// pair of brackets wearing a disguise, and the sentence reads better once
+    /// it has been made to choose.
+    ///
+    /// Checked across the whole crate rather than in one file, because the
+    /// strings a reader sees are spread through every panel. Comments are
+    /// exempt: this is about the interface, and a sweep of the rest of the
+    /// repository is a separate decision that has not been taken.
+    #[test]
+    fn no_dashes_in_anything_the_interface_says() {
+        let here = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let mut offenders = Vec::new();
+        for entry in std::fs::read_dir(&here).expect("src/") {
+            let path = entry.expect("entry").path();
+            if path.extension().and_then(|e| e.to_str()) != Some("rs") {
+                continue;
+            }
+            let name = path.file_name().unwrap().to_string_lossy().into_owned();
+            let source = std::fs::read_to_string(&path)
+                .unwrap_or_default()
+                .replace("\r\n", "\n");
+            // Code only, and only outside the tests: a test may legitimately
+            // quote a dash in order to assert something about it, and this
+            // very test contains two.
+            let body = source.split("#[cfg(test)]").next().unwrap_or("");
+            for (number, line) in body.lines().enumerate() {
+                let trimmed = line.trim_start();
+                if trimmed.starts_with("//") {
+                    continue;
+                }
+                if line.contains('\u{2014}') || line.contains(" -- ") {
+                    offenders.push(format!("{name}:{}: {}", number + 1, line.trim()));
+                }
+            }
+        }
+        assert!(
+            offenders.is_empty(),
+            "these carry a dash into the interface; rewrite the sentence with a \
+             colon, a semicolon, a full stop or brackets:\n{}",
+            offenders.join("\n")
+        );
+    }
+}

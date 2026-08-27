@@ -338,7 +338,7 @@ impl Settings {
                 "  The install tab already disappears by itself once VeilVoice is \
                  installed: a program offering to install itself when it already is \
                  tells you something untrue about what you are running. This covers the \
-                 other case -- a portable copy, run on purpose, by somebody who does not \
+                 other case: a portable copy, run on purpose, by somebody who does not \
                  want to be asked again. Nothing else changes: `veilvoice install` still \
                  works from the command line.",
             )
@@ -360,7 +360,7 @@ impl Settings {
     pub fn first_run_panel(&mut self, ui: &mut Ui) {
         ui.add_space(18.0);
         ui.label(
-            RichText::new("A COUPLE OF CHOICES")
+            RichText::new("A couple of choices")
                 .size(18.0)
                 .color(p::fg())
                 .strong(),
@@ -419,7 +419,7 @@ impl Settings {
     /// The settings tab.
     pub fn tab(&mut self, ui: &mut Ui, ctx: &egui::Context) {
         ui.add_space(6.0);
-        ui.label(RichText::new("SETTINGS").size(16.0).color(p::fg()).strong());
+        ui.label(RichText::new("Settings").size(16.0).color(p::fg()).strong());
         ui.add_space(2.0);
         ui.label(
             RichText::new("Applies as you change it, and is remembered.")
@@ -505,7 +505,7 @@ impl Settings {
         ui.label(
             egui::RichText::new(
                 "Every one of the twelve tokens must be present, and the colours \
-                 must be readable against each other -- a palette whose text \
+                 must be readable against each other. A palette whose text \
                  fails the contrast check is refused rather than applied.",
             )
             .color(crate::theme::palette::muted())

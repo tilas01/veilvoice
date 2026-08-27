@@ -126,14 +126,69 @@ impl Verify {
 
     /// Put a dropped or chosen file into the slot its name says it belongs in.
     pub fn accept(&mut self, path: PathBuf) {
-        match slot_for(&path) {
-            Slot::Download => self.download = Some(path),
-            Slot::Sums => self.sums = Some(path),
-            Slot::Signature => self.signature = Some(path),
+        let slot = slot_for(&path);
+        match slot {
+            Slot::Download => self.download = Some(path.clone()),
+            Slot::Sums => self.sums = Some(path.clone()),
+            Slot::Signature => self.signature = Some(path.clone()),
         }
+        // A release is downloaded as three files into one folder, and the other
+        // two are almost always sitting beside the one that was just dropped.
+        // Asking somebody to find them by hand three times is asking them to
+        // give up on verifying, which is the outcome this panel exists to
+        // prevent.
+        self.fill_from_beside(&path);
+
         // A new file makes the last answer stale, and a stale verdict beside a
         // different file is the worst thing this panel could show.
         self.report = None;
+    }
+
+    /// Fill the empty slots from the folder this file came from.
+    ///
+    /// **Only the empty ones.** A slot somebody chose themselves is never
+    /// replaced: they said which file they meant, and a guess from a name
+    /// overriding that is how the wrong thing gets verified and reported as
+    /// right.
+    ///
+    /// Only exact names are taken -- `SHA256SUMS` and `SHA256SUMS.asc`, as the
+    /// release publishes them. Anything looser starts matching files that
+    /// happen to be nearby, and a hash list is not something to be clever
+    /// about finding.
+    fn fill_from_beside(&mut self, path: &std::path::Path) {
+        let Some(folder) = path.parent() else {
+            return;
+        };
+        if self.sums.is_none() {
+            let candidate = folder.join("SHA256SUMS");
+            if candidate.is_file() {
+                self.sums = Some(candidate);
+            }
+        }
+        if self.signature.is_none() {
+            let candidate = folder.join("SHA256SUMS.asc");
+            if candidate.is_file() {
+                self.signature = Some(candidate);
+            }
+        }
+    }
+
+    /// Which slots were filled in by looking rather than by being chosen.
+    ///
+    /// Shown beside them, because a file that appeared without being asked for
+    /// is a file somebody should be able to see and change.
+    pub fn found_beside(&self, path: &std::path::Path) -> Vec<&'static str> {
+        let Some(folder) = path.parent() else {
+            return Vec::new();
+        };
+        let mut out = Vec::new();
+        if self.sums.as_deref() == Some(folder.join("SHA256SUMS").as_path()) {
+            out.push("SHA256SUMS");
+        }
+        if self.signature.as_deref() == Some(folder.join("SHA256SUMS.asc").as_path()) {
+            out.push("SHA256SUMS.asc");
+        }
+        out
     }
 
     /// Read what the window was given this frame.
@@ -160,21 +215,41 @@ impl Verify {
 
     /// The whole tab.
     pub fn tab(&mut self, ui: &mut Ui) {
-        egui::ScrollArea::vertical()
-            .auto_shrink([false, false])
-            .show(ui, |ui| self.body(ui));
+        // The application scrolls every tab in one place; a second scroller
+        // here would trap the wheel in whichever the pointer was over.
+        self.body(ui);
     }
 
     fn body(&mut self, ui: &mut Ui) {
-        ui.heading(RichText::new("VERIFY A DOWNLOAD").color(p::blue()));
+        ui.heading(RichText::new("Verify a download").color(p::blue()));
         ui.add_space(4.0);
         ui.label(
             RichText::new(
-                "Drag the three files onto this window, or choose them below. Nothing is \
+                "Drop the downloaded archive on this window and the hash list and \
+                 signature beside it are picked up automatically. Nothing is \
                  downloaded and nothing leaves this machine.",
             )
             .color(p::muted()),
         );
+
+        // What was filled in without being asked for. Shown rather than left to
+        // be noticed: a file that appeared on its own is a file somebody should
+        // be able to see, and change if it is not the one they meant.
+        if let Some(download) = self.download.clone() {
+            let found = self.found_beside(&download);
+            if !found.is_empty() {
+                ui.add_space(4.0);
+                ui.label(
+                    RichText::new(format!(
+                        "  found beside it: {}. Change either below if that is not \
+                         what you meant",
+                        found.join(" and ")
+                    ))
+                    .small()
+                    .color(p::muted()),
+                );
+            }
+        }
 
         ui.add_space(12.0);
         self.drop_target(ui);
@@ -221,7 +296,7 @@ impl Verify {
 
         ui.add_space(14.0);
         ui.label(
-            RichText::new("WHAT A PASS PROVES")
+            RichText::new("What a pass proves")
                 .color(p::yellow())
                 .small(),
         );
@@ -421,6 +496,81 @@ mod tests {
         // named after the thing it signs and would otherwise land in the wrong
         // slot every single time.
         assert_eq!(slot_for(Path::new("SHA256SUMS.asc")), Slot::Signature);
+    }
+
+    /// **The three files arrive together.** A release is downloaded as an
+    /// archive plus `SHA256SUMS` plus `SHA256SUMS.asc`, into one folder.
+    /// Making somebody find each of them by hand is making them give up.
+    #[test]
+    fn dropping_the_archive_finds_the_hash_list_and_signature_beside_it() {
+        let dir = tempfile::tempdir().unwrap();
+        let archive = dir.path().join("veilvoice-v0.1.13-windows-x86_64.zip");
+        std::fs::write(&archive, b"pretend").unwrap();
+        std::fs::write(dir.path().join("SHA256SUMS"), b"list").unwrap();
+        std::fs::write(dir.path().join("SHA256SUMS.asc"), b"sig").unwrap();
+
+        let mut verify = Verify::default();
+        verify.accept(archive.clone());
+
+        assert_eq!(verify.download.as_deref(), Some(archive.as_path()));
+        assert_eq!(
+            verify.sums.as_deref(),
+            Some(dir.path().join("SHA256SUMS").as_path())
+        );
+        assert_eq!(
+            verify.signature.as_deref(),
+            Some(dir.path().join("SHA256SUMS.asc").as_path())
+        );
+        assert_eq!(
+            verify.found_beside(&archive),
+            vec!["SHA256SUMS", "SHA256SUMS.asc"]
+        );
+    }
+
+    /// A slot somebody chose is never replaced by a guess. They said which
+    /// file they meant, and overriding that is how the wrong thing gets
+    /// verified and reported as right.
+    #[test]
+    fn a_file_that_was_chosen_is_never_replaced_by_one_found_nearby() {
+        let dir = tempfile::tempdir().unwrap();
+        let elsewhere = tempfile::tempdir().unwrap();
+        let archive = dir.path().join("release.zip");
+        std::fs::write(&archive, b"pretend").unwrap();
+        std::fs::write(dir.path().join("SHA256SUMS"), b"the one beside it").unwrap();
+
+        let chosen = elsewhere.path().join("SHA256SUMS");
+        std::fs::write(&chosen, b"the one they picked").unwrap();
+
+        let mut verify = Verify {
+            sums: Some(chosen.clone()),
+            ..Verify::default()
+        };
+        verify.accept(archive);
+
+        assert_eq!(
+            verify.sums.as_deref(),
+            Some(chosen.as_path()),
+            "the chosen file must survive"
+        );
+    }
+
+    /// Only the exact published names. Anything looser starts matching files
+    /// that merely happen to be nearby, and a hash list is not something to be
+    /// clever about finding.
+    #[test]
+    fn only_the_exact_names_are_taken_from_the_folder() {
+        let dir = tempfile::tempdir().unwrap();
+        let archive = dir.path().join("release.zip");
+        std::fs::write(&archive, b"pretend").unwrap();
+        for decoy in ["SHA256SUMS.old", "sha256sums.txt", "SHA256SUMS.asc.bak"] {
+            std::fs::write(dir.path().join(decoy), b"no").unwrap();
+        }
+
+        let mut verify = Verify::default();
+        verify.accept(archive.clone());
+        assert_eq!(verify.sums, None, "no decoy may be taken");
+        assert_eq!(verify.signature, None);
+        assert!(verify.found_beside(&archive).is_empty());
     }
 
     #[test]

@@ -81,7 +81,7 @@ impl Updates {
 
     /// The whole section, as it appears under "about".
     pub fn section(&mut self, ui: &mut Ui, current: &str) {
-        ui.label(RichText::new("UPDATES").color(p::blue()).small());
+        ui.label(RichText::new("Updates").color(p::blue()).small());
         ui.add_space(4.0);
 
         ui.horizontal(|ui| {
