@@ -1,0 +1,14 @@
+[package]
+name = "veilvoice-decoy"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "A second passphrase that opens an empty VeilVoice, with the deniability it does not provide stated plainly, and no passphrase that destroys anything."
+
+[dependencies]
+# Argon2id and the salt, so this uses the same derivation the app lock does
+# rather than a second one that could drift from it.
+veilvoice-crypto = { path = "../veilvoice-crypto" }

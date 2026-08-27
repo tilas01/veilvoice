@@ -73,6 +73,7 @@ mod appctl;
 mod atrest;
 mod capture;
 mod conversation;
+mod decoy;
 mod failsafe;
 mod guard;
 mod gui;
@@ -396,6 +397,18 @@ enum Command {
         #[command(subcommand)]
         what: CaptureCommand,
     },
+
+    /// A second passphrase that opens an empty VeilVoice, and its limits.
+    ///
+    /// A decoy is a way to comply with somebody standing over you without
+    /// handing over your recordings. **It does not give you deniability**:
+    /// VeilVoice is open source and this feature is documented, so anybody who
+    /// recognises the program can ask you for the other passphrase.
+    ///
+    /// **No passphrase destroys anything, deliberately.** On modern storage a
+    /// write does not overwrite, so a feature that claimed to would be lying to
+    /// you at the worst possible moment.
+    Decoy,
 
     /// The safety catch: what it watches for, and what it cannot do.
     ///
@@ -920,6 +933,8 @@ fn run(command: Command) -> Result<(), String> {
         // only beside this binary, and never starts anything by a bare name --
         // Windows resolves those through the current directory first.
         Command::Accel => accel::show(),
+
+        Command::Decoy => decoy::explain(),
 
         Command::Gui { quiet } => gui::open(quiet),
 
