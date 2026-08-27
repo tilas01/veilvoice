@@ -53,12 +53,23 @@ pub fn found() -> Option<PathBuf> {
 }
 
 /// How to render the file.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Encoding {
     /// Frames per second.
     pub fps: u32,
     /// Constant rate factor: lower is better quality and a larger file.
     pub crf: u32,
+    /// The video encoder to ask `ffmpeg` for.
+    ///
+    /// `None` means `libx264`, which is the software encoder and is always
+    /// there. A hardware encoder goes here by its `ffmpeg` name, such as
+    /// `h264_nvenc`; `veilvoice_accel` is what finds out which this machine
+    /// has, and it is honest that finding a device is not proof it works.
+    ///
+    /// This changes **how long the video takes to write, and nothing else**.
+    /// The audio is veiled by the same engine either way and the picture is
+    /// drawn by the same code.
+    pub encoder: Option<String>,
 }
 
 impl Default for Encoding {
@@ -69,6 +80,12 @@ impl Default for Encoding {
             fps: 30,
             // Visually lossless for flat colour and text, which is all this is.
             crf: 20,
+            // The software encoder, which every copy of ffmpeg has. Choosing
+            // hardware is a decision somebody makes, not a default that
+            // silently depends on the machine: two people rendering the same
+            // recording should get the same file unless one of them asked not
+            // to.
+            encoder: None,
         }
     }
 }
@@ -102,8 +119,18 @@ pub fn command(
         "-i".to_string(),
         audio.display().to_string(),
         "-c:v".to_string(),
-        "libx264".to_string(),
-        "-crf".to_string(),
+        encoding
+            .encoder
+            .clone()
+            .unwrap_or_else(|| "libx264".to_string()),
+        // `-crf` is libx264's control. The hardware encoders do not have it and
+        // use `-cq` instead, so asking for the wrong one is not a slower
+        // render, it is ffmpeg refusing to start.
+        if encoding.encoder.is_some() {
+            "-cq".to_string()
+        } else {
+            "-crf".to_string()
+        },
         encoding.crf.to_string(),
         // The pixel format every player and every phone accepts. Without it
         // ffmpeg picks yuv444p for RGB input, which a great many devices

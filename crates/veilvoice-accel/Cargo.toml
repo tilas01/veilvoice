@@ -1,0 +1,12 @@
+[package]
+name = "veilvoice-accel"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "What graphics hardware this machine has, which of it can encode video, and the measured reason the audio engine does not use any of it."
+
+# None. It asks the tool each platform already ships and returns values.
+[dependencies]
