@@ -414,6 +414,22 @@ SID, not the next one; a console wraps it so it looks like two rows, and
 reading it that way would report every administrator account as elevated
 whether or not it was. Verified on a machine in exactly that state.
 
+**Who is talking is clear in everything VeilVoice writes, and the engine's
+settings are not.** The page and the video carry each speaker's name and a
+circle that lights on their turn, and the subtitles carry the names as typed.
+What none of them carry is the destination voice's register, vocal tract or
+frequencies. Those are shown in the application, where somebody choosing
+between voices needs them, and a test renders a page and fails the build if any
+of that vocabulary appears in it. It describes the *destination* rather than
+the speaker, so it leaks nothing either way; it is simply noise to a viewer,
+and it invites a reader to think the numbers say something about the people.
+
+**In a live session, who is talking is a different question and an honest one
+to refuse.** One microphone carries one signal, and telling two voices apart
+inside it is diarisation, which is markers 43 and 64 and is blocked for the
+reason recorded there. The path that does work is one microphone per person,
+which is marker 63's other half.
+
 **Marker 63 is half shipped and half blocked, and it moves to blocked rather
 than sitting as planned.** The *levels* are done and have been for some time:
 `veilvoice live` draws them in the terminal and the desktop application draws
