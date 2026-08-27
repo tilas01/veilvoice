@@ -370,7 +370,7 @@ impl Security {
         ui.add_space(40.0);
         ui.vertical_centered(|ui| {
             ui.label(
-                RichText::new("VEILVOICE")
+                RichText::new("VeilVoice")
                     .size(24.0)
                     .color(p::fg())
                     .strong(),
@@ -433,7 +433,7 @@ impl Security {
         if let Some(wait) = cooldown {
             ui.label(
                 RichText::new(format!(
-                    "too many attempts — {} s before the next one",
+                    "too many attempts, {} s before the next one",
                     wait.as_secs()
                 ))
                 .color(p::yellow()),
@@ -455,7 +455,7 @@ impl Security {
         ui.add_space(28.0);
         ui.separator();
         ui.label(
-            RichText::new("WHAT THIS LOCK IS WORTH")
+            RichText::new("What this lock is worth")
                 .color(p::yellow())
                 .small(),
         );
@@ -474,7 +474,7 @@ impl Security {
         }
 
         ui.add_space(4.0);
-        ui.label(RichText::new("APP LOCK").color(p::blue()).small());
+        ui.label(RichText::new("App lock").color(p::blue()).small());
         match &self.path {
             Some(path) => {
                 ui.label(
@@ -512,7 +512,7 @@ impl Security {
             );
             ui.label(
                 RichText::new(
-                    "No lock is set. VeilVoice cannot set one for you -- it needs a                      passphrase only you have -- so it says so here instead of refusing                      to open.",
+                    "No lock is set. VeilVoice cannot set one for you, because it                      needs a passphrase only you have, so it says so here                      instead of refusing to open.",
                 )
                 .small()
                 .color(p::yellow()),
@@ -611,7 +611,7 @@ impl Security {
         ui.add_space(16.0);
         ui.separator();
         ui.label(
-            RichText::new("WHAT THIS LOCK IS WORTH")
+            RichText::new("What this lock is worth")
                 .color(p::yellow())
                 .small(),
         );
@@ -620,7 +620,7 @@ impl Security {
 
     /// The at-rest controls that sit inside the file tab.
     pub fn recording_controls(&mut self, ui: &mut egui::Ui) {
-        ui.label(RichText::new("AT REST").color(p::blue()).small());
+        ui.label(RichText::new("At rest").color(p::blue()).small());
 
         if self.encryption_pinned {
             // Forced here as well as drawn disabled. The dialogue that turns
@@ -660,7 +660,7 @@ impl Security {
         if !self.encrypt_recordings {
             ui.label(
                 RichText::new(
-                    "the recording will be written unencrypted — anyone who reads the \
+                    "the recording will be written unencrypted, so anyone who reads the \
                      file can still hear every word",
                 )
                 .color(p::red())
@@ -729,7 +729,7 @@ impl Security {
                 });
                 ui.label(
                     RichText::new(
-                        "X25519 + ML-KEM-768 hybrid — breaking it requires breaking both, \
+                        "X25519 + ML-KEM-768 hybrid: breaking it requires breaking both, \
                          so a recording stored today survives a quantum adversary later. \
                          Generate a pair with `veilvoice keygen`.",
                     )
@@ -786,8 +786,8 @@ impl Security {
 pub const DISABLE_WARNING: &[&str] = &[
     "VeilVoice destroys the voiceprint, not the words. An unencrypted result is \
      still a recording of everything that was said.",
-    "Anyone who can read the file — another account on this machine, a backup, a \
-     cloud sync client, anyone who later gets the disk — can hear all of it.",
+    "Anyone who can read the file (another account on this machine, a backup, a \
+     cloud sync client, anyone who later gets the disk) can hear all of it.",
     "Deleting it afterwards is not a fix. On an SSD, SD card or USB stick the \
      original blocks can survive every overwrite.",
     "That is why at-rest encryption is the default rather than something you \
