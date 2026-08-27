@@ -11,17 +11,23 @@ Estimates are in working days and they are estimates. Where a marker depends on
 something outside this project — a platform's rules, a decision that has not
 been taken — that is written down rather than absorbed into a number.
 
-**Where we are now:** **v0.1.13 is released**, signed and published for
+**Where we are now:** **v0.1.14 is released**, signed and published for
 eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
 marked *shipped* is work in progress.
 
+Since v0.1.13: **Failsafe**, on by default, which notices the moment another
+program picks up a real microphone while you are being veiled; a baseline that
+learns what normally runs here; a report of what privilege VeilVoice holds; a
+randomised ratchet interval that had been written and never called; and an
+interface that reads like English instead of shouting. Seven file dialogs that
+froze the whole window while they were open are now threaded.
+
 Since v0.1.12: the verifier can build this repository and compare what comes
 out against the published hashes, group mode is visible in the desktop
-application, projects and profiles can be saved, the number of speakers is
-capped at a limit that was **measured** rather than chosen, and the eighth
-audit round closed seven defects. The reproducibility check was verified by
-running it: two builds of this tree in two separate target directories, all
-three binaries byte for byte identical.
+application, projects and profiles can be saved, and the number of speakers is
+capped at a limit that was **measured** rather than chosen. The reproducibility
+check was verified by running it: two builds of this tree in two separate
+target directories, all three binaries byte for byte identical.
 
 ---
 
