@@ -552,91 +552,123 @@ impl eframe::App for VeilVoiceApp {
 
         let dialogue_open = self.security.disable_dialogue(ctx);
 
-        egui::TopBottomPanel::top("header").show(ctx, |ui| {
-            ui.add_space(8.0);
-            let motion = self.preferences.motion(ctx);
-            let time = ui.input(|i| i.time) as f32;
-            ui.horizontal(|ui| {
-                // The mark, animated as on the website unless it has been
-                // stilled. `draw` requests no repaint when it is still, so the
-                // toggle saves the work as well as the movement.
-                crate::soundbar::draw(ui, egui::vec2(46.0, 22.0), motion, time)
-                    .on_hover_text("VeilVoice");
-                ui.label(
-                    RichText::new("VeilVoice")
-                        .size(20.0)
-                        .color(p::fg())
-                        .strong(),
-                );
-                ui.label(
-                    RichText::new(format!("v{}", env!("CARGO_PKG_VERSION"))).color(p::muted()),
-                );
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    ui.label(RichText::new("offline").color(p::green()).small());
-                    if self.security.has_lock()
-                        && ui
-                            .button(RichText::new("lock").color(p::yellow()).small())
-                            .on_hover_text("Lock the app and clear the session passphrase")
-                            .clicked()
-                    {
-                        self.security.lock_now();
+        // The application bar: a band of its own colour across the top, with
+        // room to breathe and rounded lower corners so it reads as a surface
+        // the content sits under rather than a line somebody drew.
+        //
+        // Deliberately still a Windows window. The system's own title bar, its
+        // buttons and its behaviour are all left alone: an application that
+        // draws its own title bar has to reimplement dragging, snapping,
+        // maximising and the accessibility that comes with them, and gets some
+        // of it subtly wrong on somebody else's machine. This is the band below
+        // that, which is ours to make pleasant.
+        egui::TopBottomPanel::top("header")
+            .frame(
+                egui::Frame::none()
+                    .fill(p::bg_dark())
+                    .inner_margin(egui::Margin {
+                        left: 18.0,
+                        right: 18.0,
+                        top: 12.0,
+                        bottom: 10.0,
+                    })
+                    .rounding(egui::Rounding {
+                        nw: 0.0,
+                        ne: 0.0,
+                        sw: 10.0,
+                        se: 10.0,
+                    }),
+            )
+            .show(ctx, |ui| {
+                let motion = self.preferences.motion(ctx);
+                let time = ui.input(|i| i.time) as f32;
+                ui.horizontal(|ui| {
+                    // The mark, animated as on the website unless it has been
+                    // stilled. `draw` requests no repaint when it is still, so the
+                    // toggle saves the work as well as the movement.
+                    crate::soundbar::draw(ui, egui::vec2(46.0, 22.0), motion, time)
+                        .on_hover_text("VeilVoice");
+                    ui.add_space(4.0);
+                    ui.label(
+                        RichText::new("VeilVoice")
+                            .size(21.0)
+                            .color(p::fg())
+                            .strong(),
+                    );
+                    ui.add_space(2.0);
+                    ui.label(
+                        RichText::new(format!("v{}", env!("CARGO_PKG_VERSION")))
+                            .color(p::muted())
+                            .small(),
+                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        ui.label(RichText::new("offline").color(p::green()).small());
+                        if self.security.has_lock()
+                            && ui
+                                .button(RichText::new("lock").color(p::yellow()).small())
+                                .on_hover_text("Lock the app and clear the session passphrase")
+                                .clicked()
+                        {
+                            self.security.lock_now();
+                        }
+                        // A monitor you have to go looking for is not doing its
+                        // job, so the warning rides the header on every tab.
+                        self.watch_indicator(ui);
+                    });
+                });
+                ui.add_space(10.0);
+                // The install tab is not always offered. An installed copy never
+                // shows it -- a program offering to install itself when it already
+                // is tells the user something untrue about what they are running --
+                // and a portable copy shows it unless the reader has ticked it away
+                // under settings, interface.
+                let offer_install = self
+                    .preferences
+                    .show_install_tab(self.setup.running_installed());
+                // A tab that is not shown must not stay selected, or the window
+                // keeps drawing a panel with nothing to reach it by. Sent back to
+                // the first tab, which is where the app opens anyway.
+                if !offer_install && self.tab == Tab::Setup {
+                    self.tab = Tab::File;
+                }
+                ui.horizontal(|ui| {
+                    for (tab, label) in [
+                        (Tab::File, "Anonymise file"),
+                        (Tab::Live, "Live scramble"),
+                        (Tab::Group, "Group"),
+                        (Tab::Watch, "Monitor"),
+                        (Tab::Security, "Lock"),
+                        (Tab::Verify, "Verify"),
+                        (Tab::Preferences, "Settings"),
+                        (Tab::Setup, "Install"),
+                        (Tab::About, "About"),
+                    ] {
+                        if tab == Tab::Setup && !offer_install {
+                            continue;
+                        }
+                        let selected = self.tab == tab;
+                        let text = RichText::new(label).color(if selected {
+                            p::blue()
+                        } else {
+                            p::muted()
+                        });
+                        if ui.selectable_label(selected, text).clicked() {
+                            self.tab = tab;
+                        }
+                        // A real gap between tabs, not just the default padding.
+                        //
+                        // It reads better, and it is load-bearing for
+                        // `tools/shots/gui.ps1`, which finds the tabs by scanning
+                        // the strip for lit columns separated by gaps. Capitalising
+                        // the labels widened them enough to close the space between
+                        // the first two, and the scanner read "Anonymise file Live
+                        // scramble" as one label and refused to continue -- which
+                        // is the failure working as intended, and the fix is to
+                        // give it something unambiguous to see.
+                        ui.add_space(6.0);
                     }
-                    // A monitor you have to go looking for is not doing its
-                    // job, so the warning rides the header on every tab.
-                    self.watch_indicator(ui);
                 });
             });
-            ui.add_space(4.0);
-            // The install tab is not always offered. An installed copy never
-            // shows it -- a program offering to install itself when it already
-            // is tells the user something untrue about what they are running --
-            // and a portable copy shows it unless the reader has ticked it away
-            // under settings, interface.
-            let offer_install = self
-                .preferences
-                .show_install_tab(self.setup.running_installed());
-            // A tab that is not shown must not stay selected, or the window
-            // keeps drawing a panel with nothing to reach it by. Sent back to
-            // the first tab, which is where the app opens anyway.
-            if !offer_install && self.tab == Tab::Setup {
-                self.tab = Tab::File;
-            }
-            ui.horizontal(|ui| {
-                for (tab, label) in [
-                    (Tab::File, "Anonymise file"),
-                    (Tab::Live, "Live scramble"),
-                    (Tab::Group, "Group"),
-                    (Tab::Watch, "Monitor"),
-                    (Tab::Security, "Lock"),
-                    (Tab::Verify, "Verify"),
-                    (Tab::Preferences, "Settings"),
-                    (Tab::Setup, "Install"),
-                    (Tab::About, "About"),
-                ] {
-                    if tab == Tab::Setup && !offer_install {
-                        continue;
-                    }
-                    let selected = self.tab == tab;
-                    let text =
-                        RichText::new(label).color(if selected { p::blue() } else { p::muted() });
-                    if ui.selectable_label(selected, text).clicked() {
-                        self.tab = tab;
-                    }
-                    // A real gap between tabs, not just the default padding.
-                    //
-                    // It reads better, and it is load-bearing for
-                    // `tools/shots/gui.ps1`, which finds the tabs by scanning
-                    // the strip for lit columns separated by gaps. Capitalising
-                    // the labels widened them enough to close the space between
-                    // the first two, and the scanner read "Anonymise file Live
-                    // scramble" as one label and refused to continue -- which
-                    // is the failure working as intended, and the fix is to
-                    // give it something unambiguous to see.
-                    ui.add_space(6.0);
-                }
-            });
-            ui.add_space(6.0);
-        });
 
         // Resolved once above for the header mark, and read again here so
         // the setup tab's progress strip obeys the same answer rather than
@@ -855,7 +887,7 @@ impl VeilVoiceApp {
         ui.label(
             RichText::new(match effective {
                 Some((lo, hi)) => format!(
-                    "{lo:.0}-{hi:.0} ms, drawn fresh before every roll \u{2014} no period to observe"
+                    "{lo:.0}-{hi:.0} ms, drawn fresh before every roll, so there is no period to observe"
                 ),
                 None if self.reseed_secs <= 0.0 => {
                     "one modulation stream for the whole session".to_string()
