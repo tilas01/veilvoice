@@ -13,5 +13,5 @@ Every script and stylesheet this site is made of, each explained technically and
 | [[`website/js/search.js`|Source-website-js-search-js]] | 496 | Search across the whole repository and this website |
 | [[`website/js/theme.js`|Source-website-js-theme-js]] | 104 | Theme switching |
 | [[`website/js/verify.js`|Source-website-js-verify-js]] | 211 | In-browser SHA-256 verification for downloaded release archives |
-| [[`website/css/main.css`|Source-website-css-main-css]] | 1891 | One stylesheet, no framework, no web fonts, no third-party requests of any kind |
+| [[`website/css/main.css`|Source-website-css-main-css]] | 1975 | One stylesheet, no framework, no web fonts, no third-party requests of any kind |
 | [[`website/css/themes.css`|Source-website-css-themes-css]] | 174 | Colour schemes |

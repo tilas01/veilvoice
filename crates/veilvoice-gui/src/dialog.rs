@@ -349,7 +349,12 @@ mod house_style {
                 if trimmed.starts_with("//") {
                     continue;
                 }
-                if line.contains('\u{2014}') || line.contains(" -- ") {
+                // The escape as well as the character. One was written as a
+                // unicode escape inside a format string and this test walked
+                // straight past it: the guard fooled by the same trick twice,
+                // once by its own comments and once by an escape sequence.
+                let escaped = concat!("\\u{", "2014}");
+                if line.contains('\u{2014}') || line.contains(" -- ") || line.contains(escaped) {
                     offenders.push(format!("{name}:{}: {}", number + 1, line.trim()));
                 }
             }
