@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/main.svg" alt="main.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 2216 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 2231 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-is-here">What is here</a>
@@ -79,19 +79,19 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>2216 lines defining <strong>21 functions</strong> (0 public), <strong>11 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>2231 lines defining <strong>21 functions</strong> (0 public), <strong>11 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Cli</code> <span style="color:var(--muted)">line 114</span></li>
-<li><code>enum Command</code> <span style="color:var(--muted)">line 120</span></li>
-<li><code>enum ConversationCommand</code> <span style="color:var(--muted)">line 500</span> &mdash; What veilvoice conversation can do.</li>
-<li><code>enum AppctlCommand</code> <span style="color:var(--muted)">line 636</span> &mdash; What veilvoice capture can do.</li>
-<li><code>enum InputCommand</code> <span style="color:var(--muted)">line 663</span></li>
-<li><code>enum CaptureCommand</code> <span style="color:var(--muted)">line 676</span></li>
-<li><code>enum PolicyCommand</code> <span style="color:var(--muted)">line 716</span> &mdash; What veilvoice policy can do.</li>
-<li><code>enum SentryCommand</code> <span style="color:var(--muted)">line 769</span> &mdash; What veilvoice sentry can do.</li>
-<li><code>enum CleanPolicy</code> <span style="color:var(--muted)">line 830</span></li>
-<li><code>struct Tuning</code> <span style="color:var(--muted)">line 1381</span> &mdash; The engine settings a user can reach from the command line.</li>
-<li><code>struct AtRest</code> <span style="color:var(--muted)">line 1453</span> &mdash; What to do with the result once it exists.</li>
+<li><code>struct Cli</code> <span style="color:var(--muted)">line 115</span></li>
+<li><code>enum Command</code> <span style="color:var(--muted)">line 121</span></li>
+<li><code>enum ConversationCommand</code> <span style="color:var(--muted)">line 513</span> &mdash; What veilvoice conversation can do.</li>
+<li><code>enum AppctlCommand</code> <span style="color:var(--muted)">line 649</span> &mdash; What veilvoice capture can do.</li>
+<li><code>enum InputCommand</code> <span style="color:var(--muted)">line 676</span></li>
+<li><code>enum CaptureCommand</code> <span style="color:var(--muted)">line 689</span></li>
+<li><code>enum PolicyCommand</code> <span style="color:var(--muted)">line 729</span> &mdash; What veilvoice policy can do.</li>
+<li><code>enum SentryCommand</code> <span style="color:var(--muted)">line 782</span> &mdash; What veilvoice sentry can do.</li>
+<li><code>enum CleanPolicy</code> <span style="color:var(--muted)">line 843</span></li>
+<li><code>struct Tuning</code> <span style="color:var(--muted)">line 1396</span> &mdash; The engine settings a user can reach from the command line.</li>
+<li><code>struct AtRest</code> <span style="color:var(--muted)">line 1468</span> &mdash; What to do with the result once it exists.</li>
 </ul>
 </section>
 <section id="s-calls">
@@ -124,110 +124,110 @@
 <path d="M229.0 174.0 C 229.0 194.0, 488.6 200.0, 488.6 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M229.0 174.0 C 229.0 194.0, 251.8 500.0, 251.8 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M229.0 174.0 C 229.0 194.0, 557.8 400.0, 557.8 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L838" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L851" target="_blank" rel="noopener noreferrer">
 <rect x="89.2" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="148.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Policy::from</text>
-<text x="148.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 838</text>
+<text x="148.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 851</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L846" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L859" target="_blank" rel="noopener noreferrer">
 <rect x="234.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="278.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main</text>
-<text x="278.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 846</text>
+<text x="278.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 859</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L857" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L870" target="_blank" rel="noopener noreferrer">
 <rect x="184.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="229.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="229.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 857</text>
+<text x="229.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 870</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1241" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1256" target="_blank" rel="noopener noreferrer">
 <rect x="58.8" y="220.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="129.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_companions</text>
-<text x="129.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1241</text>
+<text x="129.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1256</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1274" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1289" target="_blank" rel="noopener noreferrer">
 <rect x="177.0" y="620.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="229.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">offer_line</text>
-<text x="229.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1274</text>
+<text x="229.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1289</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1298" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1313" target="_blank" rel="noopener noreferrer">
 <rect x="226.8" y="220.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="305.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install_companion</text>
-<text x="305.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1298</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1400" target="_blank" rel="noopener noreferrer">
-<rect x="410.0" y="220.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="488.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reseed_range_from</text>
-<text x="488.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1400</text>
+<text x="305.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1313</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1415" target="_blank" rel="noopener noreferrer">
+<rect x="410.0" y="220.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="488.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reseed_range_from</text>
+<text x="488.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1415</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1430" target="_blank" rel="noopener noreferrer">
 <rect x="69.8" y="320.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="118.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">config</text>
-<text x="118.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1415</text>
+<text x="118.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1430</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1434" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1449" target="_blank" rel="noopener noreferrer">
 <rect x="349.2" y="20.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="443.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed_range</text>
-<text x="443.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1434</text>
+<text x="443.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1449</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1444" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1459" target="_blank" rel="noopener noreferrer">
 <rect x="299.4" y="120.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="370.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed</text>
-<text x="370.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1444</text>
+<text x="370.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1459</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1462" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1477" target="_blank" rel="noopener noreferrer">
 <rect x="192.2" y="320.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="240.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">anonymise</text>
-<text x="240.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1462</text>
+<text x="240.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1477</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1601" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1616" target="_blank" rel="noopener noreferrer">
 <rect x="314.6" y="320.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="362.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">live</text>
-<text x="362.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1601</text>
+<text x="362.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1616</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1712" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1727" target="_blank" rel="noopener noreferrer">
 <rect x="437.0" y="320.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="496.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_devices</text>
-<text x="496.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1712</text>
+<text x="496.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1727</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1744" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1759" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="420.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="68.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean</text>
-<text x="68.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1744</text>
+<text x="68.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1759</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1761" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1776" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="420.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="190.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">encrypt</text>
-<text x="190.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1761</text>
+<text x="190.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1776</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1790" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1805" target="_blank" rel="noopener noreferrer">
 <rect x="264.8" y="420.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="313.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decrypt</text>
-<text x="313.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1790</text>
+<text x="313.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1805</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1822" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1837" target="_blank" rel="noopener noreferrer">
 <rect x="307.0" y="620.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="378.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load_secret_key</text>
-<text x="378.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1822</text>
+<text x="378.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1837</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1830" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1845" target="_blank" rel="noopener noreferrer">
 <rect x="387.2" y="420.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="435.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">keygen</text>
-<text x="435.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1830</text>
+<text x="435.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1845</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1906" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1921" target="_blank" rel="noopener noreferrer">
 <rect x="509.6" y="420.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="557.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">watch</text>
-<text x="557.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1906</text>
+<text x="557.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1921</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1996" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2011" target="_blank" rel="noopener noreferrer">
 <rect x="203.6" y="520.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="251.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">shred</text>
-<text x="251.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1996</text>
+<text x="251.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2011</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2064" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2079" target="_blank" rel="noopener noreferrer">
 <rect x="326.0" y="520.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="374.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">info</text>
-<text x="374.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2064</text>
+<text x="374.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2079</text>
 </a>
 </svg>
 </div>
@@ -235,27 +235,27 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_from[&quot;Policy::from&lt;br/&gt;line 838&quot;]
-    n_main[&quot;main&lt;br/&gt;line 846&quot;]
-    n_run[&quot;run&lt;br/&gt;line 857&quot;]
-    n_list_companions[&quot;list_companions&lt;br/&gt;line 1241&quot;]
-    n_offer_line[&quot;offer_line&lt;br/&gt;line 1274&quot;]
-    n_install_companion[&quot;install_companion&lt;br/&gt;line 1298&quot;]
-    n_reseed_range_from[&quot;reseed_range_from&lt;br/&gt;line 1400&quot;]
-    n_config[&quot;config&lt;br/&gt;line 1415&quot;]
-    n_describe_reseed_range[&quot;describe_reseed_range&lt;br/&gt;line 1434&quot;]
-    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 1444&quot;]
-    n_anonymise[&quot;anonymise&lt;br/&gt;line 1462&quot;]
-    n_live[&quot;live&lt;br/&gt;line 1601&quot;]
-    n_list_devices[&quot;list_devices&lt;br/&gt;line 1712&quot;]
-    n_clean[&quot;clean&lt;br/&gt;line 1744&quot;]
-    n_encrypt[&quot;encrypt&lt;br/&gt;line 1761&quot;]
-    n_decrypt[&quot;decrypt&lt;br/&gt;line 1790&quot;]
-    n_load_secret_key[&quot;load_secret_key&lt;br/&gt;line 1822&quot;]
-    n_keygen[&quot;keygen&lt;br/&gt;line 1830&quot;]
-    n_watch[&quot;watch&lt;br/&gt;line 1906&quot;]
-    n_shred[&quot;shred&lt;br/&gt;line 1996&quot;]
-    n_info[&quot;info&lt;br/&gt;line 2064&quot;]
+    n_from[&quot;Policy::from&lt;br/&gt;line 851&quot;]
+    n_main[&quot;main&lt;br/&gt;line 859&quot;]
+    n_run[&quot;run&lt;br/&gt;line 870&quot;]
+    n_list_companions[&quot;list_companions&lt;br/&gt;line 1256&quot;]
+    n_offer_line[&quot;offer_line&lt;br/&gt;line 1289&quot;]
+    n_install_companion[&quot;install_companion&lt;br/&gt;line 1313&quot;]
+    n_reseed_range_from[&quot;reseed_range_from&lt;br/&gt;line 1415&quot;]
+    n_config[&quot;config&lt;br/&gt;line 1430&quot;]
+    n_describe_reseed_range[&quot;describe_reseed_range&lt;br/&gt;line 1449&quot;]
+    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 1459&quot;]
+    n_anonymise[&quot;anonymise&lt;br/&gt;line 1477&quot;]
+    n_live[&quot;live&lt;br/&gt;line 1616&quot;]
+    n_list_devices[&quot;list_devices&lt;br/&gt;line 1727&quot;]
+    n_clean[&quot;clean&lt;br/&gt;line 1759&quot;]
+    n_encrypt[&quot;encrypt&lt;br/&gt;line 1776&quot;]
+    n_decrypt[&quot;decrypt&lt;br/&gt;line 1805&quot;]
+    n_load_secret_key[&quot;load_secret_key&lt;br/&gt;line 1837&quot;]
+    n_keygen[&quot;keygen&lt;br/&gt;line 1845&quot;]
+    n_watch[&quot;watch&lt;br/&gt;line 1921&quot;]
+    n_shred[&quot;shred&lt;br/&gt;line 2011&quot;]
+    n_info[&quot;info&lt;br/&gt;line 2079&quot;]
     n_anonymise --&gt; n_config
     n_anonymise --&gt; n_describe_reseed_range
     n_decrypt --&gt; n_load_secret_key
@@ -279,27 +279,27 @@ flowchart TD
     n_run --&gt; n_reseed_range_from
     n_run --&gt; n_shred
     n_run --&gt; n_watch
-    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L838&quot; &quot;open the source&quot;
-    click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L846&quot; &quot;open the source&quot;
-    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L857&quot; &quot;open the source&quot;
-    click n_list_companions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1241&quot; &quot;open the source&quot;
-    click n_offer_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1274&quot; &quot;open the source&quot;
-    click n_install_companion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1298&quot; &quot;open the source&quot;
-    click n_reseed_range_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1400&quot; &quot;open the source&quot;
-    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1415&quot; &quot;open the source&quot;
-    click n_describe_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1434&quot; &quot;open the source&quot;
-    click n_describe_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1444&quot; &quot;open the source&quot;
-    click n_anonymise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1462&quot; &quot;open the source&quot;
-    click n_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1601&quot; &quot;open the source&quot;
-    click n_list_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1712&quot; &quot;open the source&quot;
-    click n_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1744&quot; &quot;open the source&quot;
-    click n_encrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1761&quot; &quot;open the source&quot;
-    click n_decrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1790&quot; &quot;open the source&quot;
-    click n_load_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1822&quot; &quot;open the source&quot;
-    click n_keygen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1830&quot; &quot;open the source&quot;
-    click n_watch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1906&quot; &quot;open the source&quot;
-    click n_shred href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1996&quot; &quot;open the source&quot;
-    click n_info href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2064&quot; &quot;open the source&quot;
+    click n_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L851&quot; &quot;open the source&quot;
+    click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L859&quot; &quot;open the source&quot;
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L870&quot; &quot;open the source&quot;
+    click n_list_companions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1256&quot; &quot;open the source&quot;
+    click n_offer_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1289&quot; &quot;open the source&quot;
+    click n_install_companion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1313&quot; &quot;open the source&quot;
+    click n_reseed_range_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1415&quot; &quot;open the source&quot;
+    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1430&quot; &quot;open the source&quot;
+    click n_describe_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1449&quot; &quot;open the source&quot;
+    click n_describe_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1459&quot; &quot;open the source&quot;
+    click n_anonymise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1477&quot; &quot;open the source&quot;
+    click n_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1616&quot; &quot;open the source&quot;
+    click n_list_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1727&quot; &quot;open the source&quot;
+    click n_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1759&quot; &quot;open the source&quot;
+    click n_encrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1776&quot; &quot;open the source&quot;
+    click n_decrypt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1805&quot; &quot;open the source&quot;
+    click n_load_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1837&quot; &quot;open the source&quot;
+    click n_keygen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1845&quot; &quot;open the source&quot;
+    click n_watch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1921&quot; &quot;open the source&quot;
+    click n_shred href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2011&quot; &quot;open the source&quot;
+    click n_info href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2079&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_from,n_main,n_run,n_list_companions,n_offer_line,n_install_companion,n_reseed_range_from,n_config,n_describe_reseed_range,n_describe_reseed,n_anonymise,n_live,n_list_devices,n_clean,n_encrypt,n_decrypt,n_load_secret_key,n_keygen,n_watch,n_shred,n_info helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -308,38 +308,38 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Cli</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L114" rel="noopener noreferrer">114</a></td><td></td></tr>
-<tr><td><code>Command</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L120" rel="noopener noreferrer">120</a></td><td></td></tr>
-<tr><td><code>ConversationCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L500" rel="noopener noreferrer">500</a></td><td>What veilvoice conversation can do.</td></tr>
-<tr><td><code>AppctlCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L636" rel="noopener noreferrer">636</a></td><td>What veilvoice capture can do.</td></tr>
-<tr><td><code>InputCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L663" rel="noopener noreferrer">663</a></td><td></td></tr>
-<tr><td><code>CaptureCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L676" rel="noopener noreferrer">676</a></td><td></td></tr>
-<tr><td><code>PolicyCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L716" rel="noopener noreferrer">716</a></td><td>What veilvoice policy can do.</td></tr>
-<tr><td><code>SentryCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L769" rel="noopener noreferrer">769</a></td><td>What veilvoice sentry can do.</td></tr>
-<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L830" rel="noopener noreferrer">830</a></td><td></td></tr>
-<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L838" rel="noopener noreferrer">838</a></td><td></td></tr>
-<tr><td><code>main</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L846" rel="noopener noreferrer">846</a></td><td></td></tr>
-<tr><td><code>run</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L857" rel="noopener noreferrer">857</a></td><td></td></tr>
-<tr><td><code>list_companions</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1241" rel="noopener noreferrer">1241</a></td><td>Report every companion that means anything on this platform.</td></tr>
-<tr><td><code>offer_line</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1274" rel="noopener noreferrer">1274</a></td><td>One line describing what VeilVoice can do about a missing companion.</td></tr>
-<tr><td><code>install_companion</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1298" rel="noopener noreferrer">1298</a></td><td>Act on one named companion.</td></tr>
-<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1381" rel="noopener noreferrer">1381</a></td><td>The engine settings a user can reach from the command line.</td></tr>
-<tr><td><code>reseed_range_from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1400" rel="noopener noreferrer">1400</a></td><td>Turn --reseed-range into a range, or into the reason it was not one.</td></tr>
-<tr><td><code>config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1415" rel="noopener noreferrer">1415</a></td><td></td></tr>
-<tr><td><code>describe_reseed_range</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1434" rel="noopener noreferrer">1434</a></td><td>How a randomised roll range reads in the output.</td></tr>
-<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1444" rel="noopener noreferrer">1444</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
-<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1453" rel="noopener noreferrer">1453</a></td><td>What to do with the result once it exists.</td></tr>
-<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1462" rel="noopener noreferrer">1462</a></td><td></td></tr>
-<tr><td><code>live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1601" rel="noopener noreferrer">1601</a></td><td></td></tr>
-<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1712" rel="noopener noreferrer">1712</a></td><td></td></tr>
-<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1744" rel="noopener noreferrer">1744</a></td><td></td></tr>
-<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1761" rel="noopener noreferrer">1761</a></td><td></td></tr>
-<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1790" rel="noopener noreferrer">1790</a></td><td></td></tr>
-<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1822" rel="noopener noreferrer">1822</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
-<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1830" rel="noopener noreferrer">1830</a></td><td></td></tr>
-<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1906" rel="noopener noreferrer">1906</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
-<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1996" rel="noopener noreferrer">1996</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
-<tr><td><code>info</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2064" rel="noopener noreferrer">2064</a></td><td></td></tr>
+<tr><td><code>Cli</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L115" rel="noopener noreferrer">115</a></td><td></td></tr>
+<tr><td><code>Command</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L121" rel="noopener noreferrer">121</a></td><td></td></tr>
+<tr><td><code>ConversationCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L513" rel="noopener noreferrer">513</a></td><td>What veilvoice conversation can do.</td></tr>
+<tr><td><code>AppctlCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L649" rel="noopener noreferrer">649</a></td><td>What veilvoice capture can do.</td></tr>
+<tr><td><code>InputCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L676" rel="noopener noreferrer">676</a></td><td></td></tr>
+<tr><td><code>CaptureCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L689" rel="noopener noreferrer">689</a></td><td></td></tr>
+<tr><td><code>PolicyCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L729" rel="noopener noreferrer">729</a></td><td>What veilvoice policy can do.</td></tr>
+<tr><td><code>SentryCommand</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L782" rel="noopener noreferrer">782</a></td><td>What veilvoice sentry can do.</td></tr>
+<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L843" rel="noopener noreferrer">843</a></td><td></td></tr>
+<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L851" rel="noopener noreferrer">851</a></td><td></td></tr>
+<tr><td><code>main</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L859" rel="noopener noreferrer">859</a></td><td></td></tr>
+<tr><td><code>run</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L870" rel="noopener noreferrer">870</a></td><td></td></tr>
+<tr><td><code>list_companions</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1256" rel="noopener noreferrer">1256</a></td><td>Report every companion that means anything on this platform.</td></tr>
+<tr><td><code>offer_line</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1289" rel="noopener noreferrer">1289</a></td><td>One line describing what VeilVoice can do about a missing companion.</td></tr>
+<tr><td><code>install_companion</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1313" rel="noopener noreferrer">1313</a></td><td>Act on one named companion.</td></tr>
+<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1396" rel="noopener noreferrer">1396</a></td><td>The engine settings a user can reach from the command line.</td></tr>
+<tr><td><code>reseed_range_from</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1415" rel="noopener noreferrer">1415</a></td><td>Turn --reseed-range into a range, or into the reason it was not one.</td></tr>
+<tr><td><code>config</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1430" rel="noopener noreferrer">1430</a></td><td></td></tr>
+<tr><td><code>describe_reseed_range</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1449" rel="noopener noreferrer">1449</a></td><td>How a randomised roll range reads in the output.</td></tr>
+<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1459" rel="noopener noreferrer">1459</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
+<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1468" rel="noopener noreferrer">1468</a></td><td>What to do with the result once it exists.</td></tr>
+<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1477" rel="noopener noreferrer">1477</a></td><td></td></tr>
+<tr><td><code>live</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1616" rel="noopener noreferrer">1616</a></td><td></td></tr>
+<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1727" rel="noopener noreferrer">1727</a></td><td></td></tr>
+<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1759" rel="noopener noreferrer">1759</a></td><td></td></tr>
+<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1776" rel="noopener noreferrer">1776</a></td><td></td></tr>
+<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1805" rel="noopener noreferrer">1805</a></td><td></td></tr>
+<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1837" rel="noopener noreferrer">1837</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
+<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1845" rel="noopener noreferrer">1845</a></td><td></td></tr>
+<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1921" rel="noopener noreferrer">1921</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
+<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2011" rel="noopener noreferrer">2011</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
+<tr><td><code>info</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2079" rel="noopener noreferrer">2079</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

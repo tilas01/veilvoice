@@ -4867,6 +4867,7 @@ dependencies = [
  "veilvoice-conversation",
  "veilvoice-core",
  "veilvoice-crypto",
+ "veilvoice-decoy",
  "veilvoice-failsafe",
  "veilvoice-guard",
  "veilvoice-input",
@@ -4918,6 +4919,13 @@ dependencies = [
  "tempfile",
  "x25519-dalek",
  "zeroize",
+]
+
+[[package]]
+name = "veilvoice-decoy"
+version = "0.1.14"
+dependencies = [
+ "veilvoice-crypto",
 ]
 
 [[package]]
