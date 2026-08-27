@@ -25,6 +25,13 @@
 //! pretends otherwise is teaching its user something false. `--yes` is there so
 //! it is not done by accident, and the message says plainly what the
 //! passphrase is and is not for.
+//!
+//! # In plain words
+//!
+//! The command line for settings that can only be tightened.
+//!
+//! It shows what is currently required, and what a job would actually run with
+//! once those requirements are applied, so a value shown is a value used.
 
 use crate::atrest::{prompt_secret, read_new_password};
 use crate::theme::{colour, err, field, heading, ok, paint, warn};

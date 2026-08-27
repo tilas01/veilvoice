@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-update/examples/ask.rs`
 
-[`veilvoice-update`](../../../crates/veilvoice-update/README.md) &middot; 19 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-update/examples/ask.rs)
+[`veilvoice-update`](../../../crates/veilvoice-update/README.md) &middot; 26 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-update/examples/ask.rs)
 
 ## Contents
 
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Run the real check once, by hand.
 
@@ -27,9 +28,16 @@ Not a test: it reaches the network, and a test suite that does is a test
 suite that fails on a train. This exists so the thing can be tried against
 the real page before it is believed.
 
+# In plain words
+
+A short example of asking whether a newer version has been published.
+
+It shows the same thing the application's button does, including that the
+answer only tells you what a release page currently says.
+
 ## What this file contains
 
-19 lines defining **1 function** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+26 lines defining **1 function** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -51,8 +59,8 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main["main<br/>line 9"]
-    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-update/examples/ask.rs#L9" "open the source"
+    n_main["main<br/>line 16"]
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-update/examples/ask.rs#L16" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_main helper
 ```
@@ -63,7 +71,7 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `main` <sub>fn</sub> | [9](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-update/examples/ask.rs#L9) |  |
+| `main` <sub>fn</sub> | [16](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-update/examples/ask.rs#L16) |  |
 
 ---
 

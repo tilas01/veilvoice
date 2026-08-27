@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-conversation/subtitles.svg" alt="subtitles.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-conversation/src/subtitles.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 263 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 276 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-formats-both-written-out-here">Two formats, both written out here</a>
   <a href="#what-goes-in-a-cue-when-nobody-wrote-down-the-words">What goes in a cue when nobody wrote down the words</a>
   <a href="#a-name-in-a-caption-is-not-veiled">A name in a caption is not veiled</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -59,17 +60,22 @@
 <p>VeilVoice does not transcribe. Where a turn has no text, the cue carries the <strong>speaker&#x27;s name and nothing else</strong> &#8212; which is still worth having: after every voice has been replaced, a caption track saying who is talking is often the only way to follow a recording at all.</p>
 <h2 id="a-name-in-a-caption-is-not-veiled">A name in a caption is not veiled</h2>
 <p>Worth saying twice, because it is the mistake this feature invites. The audio has had its voiceprints destroyed. The subtitle file is a text file containing whatever names were typed into it, sitting next to the recording. If the names matter, use labels rather than names &#8212; the plan does not care which, and <code>crate::SCOPE</code> says so where a user will read it.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Writes the subtitles, from the same plan the audio came from.</p>
+<p>Both files come out of one source, so the words on screen and the voice you hear cannot drift apart or disagree about who is speaking.</p>
+<p>Two formats are written: the one browsers use for video on a web page, and the older one nearly every video player and editor understands.</p>
+<p>The names in the subtitles are the ones you typed. Nothing veils those, and the application says so where you type them.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>263 lines defining <strong>4 functions</strong> (2 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>276 lines defining <strong>4 functions</strong> (2 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Format</code> <span style="color:var(--muted)">line 36</span> &mdash; Which subtitle format to write.</li>
+<li><code>enum Format</code> <span style="color:var(--muted)">line 49</span> &mdash; Which subtitle format to write.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Format::extension</code> <span style="color:var(--muted)">line 46</span> &mdash; The conventional file extension, without the dot.
+<li><code>Format::extension</code> <span style="color:var(--muted)">line 59</span> &mdash; The conventional file extension, without the dot.
 </li>
-<li><code>write</code> <span style="color:var(--muted)">line 77</span> &mdash; Render the plan as subtitles.
+<li><code>write</code> <span style="color:var(--muted)">line 90</span> &mdash; Render the plan as subtitles.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>one_line</code>, <code>timestamp</code></span>
 </li>
 </ul>
@@ -83,25 +89,25 @@
 <rect x="0" y="0" width="443" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M374.2 74.0 C 374.2 94.0, 221.4 100.0, 221.4 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M414.8 47.0 C 436.8 47.0, 436.8 47.0, 310.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L46" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L59" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="106.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Format::extension</text>
-<text x="106.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 46</text>
+<text x="106.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 59</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L60" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L73" target="_blank" rel="noopener noreferrer">
 <rect x="211.2" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="259.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">timestamp</text>
-<text x="259.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 60</text>
+<text x="259.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 73</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L77" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L90" target="_blank" rel="noopener noreferrer">
 <rect x="333.6" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="374.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write</text>
-<text x="374.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 77</text>
+<text x="374.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L122" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L135" target="_blank" rel="noopener noreferrer">
 <rect x="177.0" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="221.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">one_line</text>
-<text x="221.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
+<text x="221.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 135</text>
 </a>
 </svg>
 </div>
@@ -109,16 +115,16 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_extension([&quot;Format::extension&lt;br/&gt;line 46&quot;])
-    n_timestamp[&quot;timestamp&lt;br/&gt;line 60&quot;]
-    n_write([&quot;write&lt;br/&gt;line 77&quot;])
-    n_one_line[&quot;one_line&lt;br/&gt;line 122&quot;]
+    n_extension([&quot;Format::extension&lt;br/&gt;line 59&quot;])
+    n_timestamp[&quot;timestamp&lt;br/&gt;line 73&quot;]
+    n_write([&quot;write&lt;br/&gt;line 90&quot;])
+    n_one_line[&quot;one_line&lt;br/&gt;line 135&quot;]
     n_write --&gt; n_one_line
     n_write --&gt; n_timestamp
-    click n_extension href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L46&quot; &quot;open the source&quot;
-    click n_timestamp href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L60&quot; &quot;open the source&quot;
-    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L77&quot; &quot;open the source&quot;
-    click n_one_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L122&quot; &quot;open the source&quot;
+    click n_extension href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L59&quot; &quot;open the source&quot;
+    click n_timestamp href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L73&quot; &quot;open the source&quot;
+    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L90&quot; &quot;open the source&quot;
+    click n_one_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L135&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_extension,n_write entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -129,11 +135,11 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Format</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L36" rel="noopener noreferrer">36</a></td><td>Which subtitle format to write.</td></tr>
-<tr><td><code>Format::extension</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L46" rel="noopener noreferrer">46</a></td><td>The conventional file extension, without the dot.</td></tr>
-<tr><td><code>timestamp</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L60" rel="noopener noreferrer">60</a></td><td>A timestamp as the subtitle formats want it: HH:MM:SS.mmm.</td></tr>
-<tr><td><code>write</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L77" rel="noopener noreferrer">77</a></td><td>Render the plan as subtitles.</td></tr>
-<tr><td><code>one_line</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L122" rel="noopener noreferrer">122</a></td><td>Flatten anything that would break a cue into one line.</td></tr>
+<tr><td><code>Format</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L49" rel="noopener noreferrer">49</a></td><td>Which subtitle format to write.</td></tr>
+<tr><td><code>Format::extension</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L59" rel="noopener noreferrer">59</a></td><td>The conventional file extension, without the dot.</td></tr>
+<tr><td><code>timestamp</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L73" rel="noopener noreferrer">73</a></td><td>A timestamp as the subtitle formats want it: HH:MM:SS.mmm.</td></tr>
+<tr><td><code>write</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L90" rel="noopener noreferrer">90</a></td><td>Render the plan as subtitles.</td></tr>
+<tr><td><code>one_line</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L135" rel="noopener noreferrer">135</a></td><td>Flatten anything that would break a cue into one line.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -39,13 +39,14 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/conversation.svg" alt="conversation.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/conversation.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 789 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 797 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-comes-out">What comes out</a>
   <a href="#the-page-and-why-it-is-not-a-video">The page, and why it is not a video</a>
   <a href="#the-one-warning-this-command-will-not-let-you-miss">The one warning this command will not let you miss</a>
   <a href="#this-does-not-encrypt-what-it-writes">This does not encrypt what it writes</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -68,20 +69,23 @@ out.veiled.html  with `--page`: a player that needs nothing installed</code></pr
 <p>Audio no turn claims is <strong>silenced</strong>, never passed through. A gap in the plan is a span nobody assigned to a speaker, so it has not been veiled, and putting it into the result would place a real voice inside a file whose whole purpose is that it contains none. The amount is printed, loudly, because a plan with a hole in it is something to fix rather than something to discover later.</p>
 <h2 id="this-does-not-encrypt-what-it-writes">This does not encrypt what it writes</h2>
 <p>Unlike <code>anonymise</code>, which seals its output at rest by default. A conversation render produces a set of files -- audio and two subtitle tracks -- and the container this project uses seals one thing. Rather than invent a half-answer, the files are written in the clear and the command says so: <code>veilvoice encrypt</code> seals the audio afterwards, and the subtitles hold whatever names were typed and are not veiled by anything.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>The command line for recordings with several people in them: a voice each, subtitles, a picture, and the command that would turn it into a video.</p>
+<p>All the actual work lives in the shared crate; this is the part that reads what you typed, prints what it is about to do, and reports what it wrote.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>789 lines defining <strong>7 functions</strong> (4 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>797 lines defining <strong>7 functions</strong> (4 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>look_from</code> <span style="color:var(--muted)">line 78</span> &mdash; Turn the picture flags into a Look, or explain why they do not describe a picture that can be drawn.
+<li><code>look_from</code> <span style="color:var(--muted)">line 86</span> &mdash; Turn the picture flags into a Look, or explain why they do not describe a picture that can be drawn.
 </li>
-<li><code>inspect</code> <span style="color:var(--muted)">line 126</span> &mdash; Show a plan without rendering anything.
+<li><code>inspect</code> <span style="color:var(--muted)">line 134</span> &mdash; Show a plan without rendering anything.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load_plan</code></span>
 </li>
-<li><code>run</code> <span style="color:var(--muted)">line 189</span> &mdash; Render a recording according to a plan.
+<li><code>run</code> <span style="color:var(--muted)">line 197</span> &mdash; Render a recording according to a plan.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>file_name</code>, <code>load_plan</code>, <code>with_extension</code></span>
 </li>
-<li><code>preview</code> <span style="color:var(--muted)">line 357</span> &mdash; A still of what the page will look like, and the command that would make a video of it.
+<li><code>preview</code> <span style="color:var(--muted)">line 365</span> &mdash; A still of what the page will look like, and the command that would make a video of it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load_plan</code>, <code>with_extension</code></span>
 </li>
 </ul>
@@ -99,40 +103,40 @@ out.veiled.html  with `--page`: a player that needs nothing installed</code></pr
 <path d="M301.6 74.0 C 301.6 94.0, 99.0 100.0, 99.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M301.6 74.0 C 301.6 94.0, 221.4 100.0, 221.4 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M301.6 74.0 C 301.6 94.0, 362.8 100.0, 362.8 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L78" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L86" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="68.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look_from</text>
-<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 78</text>
+<text x="68.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 86</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L126" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L134" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="186.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">inspect</text>
-<text x="186.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 126</text>
+<text x="186.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L189" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L197" target="_blank" rel="noopener noreferrer">
 <rect x="257.2" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="301.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="301.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 189</text>
+<text x="301.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L357" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L365" target="_blank" rel="noopener noreferrer">
 <rect x="372.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="416.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">preview</text>
-<text x="416.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 357</text>
+<text x="416.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 365</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L471" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L479" target="_blank" rel="noopener noreferrer">
 <rect x="50.8" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="99.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">file_name</text>
-<text x="99.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 471</text>
+<text x="99.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 479</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L478" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L486" target="_blank" rel="noopener noreferrer">
 <rect x="173.2" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="221.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load_plan</text>
-<text x="221.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 478</text>
+<text x="221.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 486</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L483" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L491" target="_blank" rel="noopener noreferrer">
 <rect x="295.6" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="362.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">with_extension</text>
-<text x="362.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 483</text>
+<text x="362.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 491</text>
 </a>
 </svg>
 </div>
@@ -140,26 +144,26 @@ out.veiled.html  with `--page`: a player that needs nothing installed</code></pr
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_look_from([&quot;look_from&lt;br/&gt;line 78&quot;])
-    n_inspect([&quot;inspect&lt;br/&gt;line 126&quot;])
-    n_run([&quot;run&lt;br/&gt;line 189&quot;])
-    n_preview([&quot;preview&lt;br/&gt;line 357&quot;])
-    n_file_name[&quot;file_name&lt;br/&gt;line 471&quot;]
-    n_load_plan[&quot;load_plan&lt;br/&gt;line 478&quot;]
-    n_with_extension[&quot;with_extension&lt;br/&gt;line 483&quot;]
+    n_look_from([&quot;look_from&lt;br/&gt;line 86&quot;])
+    n_inspect([&quot;inspect&lt;br/&gt;line 134&quot;])
+    n_run([&quot;run&lt;br/&gt;line 197&quot;])
+    n_preview([&quot;preview&lt;br/&gt;line 365&quot;])
+    n_file_name[&quot;file_name&lt;br/&gt;line 479&quot;]
+    n_load_plan[&quot;load_plan&lt;br/&gt;line 486&quot;]
+    n_with_extension[&quot;with_extension&lt;br/&gt;line 491&quot;]
     n_inspect --&gt; n_load_plan
     n_preview --&gt; n_load_plan
     n_preview --&gt; n_with_extension
     n_run --&gt; n_file_name
     n_run --&gt; n_load_plan
     n_run --&gt; n_with_extension
-    click n_look_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L78&quot; &quot;open the source&quot;
-    click n_inspect href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L126&quot; &quot;open the source&quot;
-    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L189&quot; &quot;open the source&quot;
-    click n_preview href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L357&quot; &quot;open the source&quot;
-    click n_file_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L471&quot; &quot;open the source&quot;
-    click n_load_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L478&quot; &quot;open the source&quot;
-    click n_with_extension href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L483&quot; &quot;open the source&quot;
+    click n_look_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L86&quot; &quot;open the source&quot;
+    click n_inspect href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L134&quot; &quot;open the source&quot;
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L197&quot; &quot;open the source&quot;
+    click n_preview href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L365&quot; &quot;open the source&quot;
+    click n_file_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L479&quot; &quot;open the source&quot;
+    click n_load_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L486&quot; &quot;open the source&quot;
+    click n_with_extension href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L491&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_look_from,n_inspect,n_run,n_preview entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -170,14 +174,14 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>WAVE_COLUMNS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L70" rel="noopener noreferrer">70</a></td><td>How many columns of waveform to reduce a recording to.</td></tr>
-<tr><td><code>look_from</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L78" rel="noopener noreferrer">78</a></td><td>Turn the picture flags into a Look, or explain why they do not describe a picture that can be drawn.</td></tr>
-<tr><td><code>inspect</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L126" rel="noopener noreferrer">126</a></td><td>Show a plan without rendering anything.</td></tr>
-<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L189" rel="noopener noreferrer">189</a></td><td>Render a recording according to a plan.</td></tr>
-<tr><td><code>preview</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L357" rel="noopener noreferrer">357</a></td><td>A still of what the page will look like, and the command that would make a video of it.</td></tr>
-<tr><td><code>file_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L471" rel="noopener noreferrer">471</a></td><td>The last component of a path, for writing into a page as a relative link.</td></tr>
-<tr><td><code>load_plan</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L478" rel="noopener noreferrer">478</a></td><td>Read a plan, and say where it went wrong rather than only that it did.</td></tr>
-<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L483" rel="noopener noreferrer">483</a></td><td>Replace the last extension, keeping any .veiled before it.</td></tr>
+<tr><td><code>WAVE_COLUMNS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L78" rel="noopener noreferrer">78</a></td><td>How many columns of waveform to reduce a recording to.</td></tr>
+<tr><td><code>look_from</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L86" rel="noopener noreferrer">86</a></td><td>Turn the picture flags into a Look, or explain why they do not describe a picture that can be drawn.</td></tr>
+<tr><td><code>inspect</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L134" rel="noopener noreferrer">134</a></td><td>Show a plan without rendering anything.</td></tr>
+<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L197" rel="noopener noreferrer">197</a></td><td>Render a recording according to a plan.</td></tr>
+<tr><td><code>preview</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L365" rel="noopener noreferrer">365</a></td><td>A still of what the page will look like, and the command that would make a video of it.</td></tr>
+<tr><td><code>file_name</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L479" rel="noopener noreferrer">479</a></td><td>The last component of a path, for writing into a page as a relative link.</td></tr>
+<tr><td><code>load_plan</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L486" rel="noopener noreferrer">486</a></td><td>Read a plan, and say where it went wrong rather than only that it did.</td></tr>
+<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L491" rel="noopener noreferrer">491</a></td><td>Replace the last extension, keeping any .veiled before it.</td></tr>
 </tbody></table>
 </section>
 </div></div>

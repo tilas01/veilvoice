@@ -39,9 +39,10 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/modulation.svg" alt="modulation.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/modulation.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 300 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 313 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -51,26 +52,30 @@
 <p>Cryptographically-seeded modulation of the effect parameters.</p>
 <p>The pitch and formant ratios are never constant: a ChaCha20 CSPRNG picks a new random target every <code>frames_per_target</code> STFT frames, and a one-pole filter glides continuously toward it. Because the transform is therefore non-stationary and unpredictable, an attacker cannot &quot;undo&quot; it by assuming a single fixed shift &#8212; there is no single shift to undo, and the target sequence is unknowable without the seed (which never leaves the process and is zeroized on drop).</p>
 <p>The seed does not stay put either. It is rolled forward every couple of seconds by default (see <code>Modulator::reseed</code>), so the stream driving any given stretch of audio is closed off permanently once that stretch is past.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>The amount by which the voice is altered is never held still. It drifts, constantly and unpredictably.</p>
+<p>The drift comes from the same kind of random number generator used for encryption, so it cannot be guessed, worked out from what came before, or reproduced by somebody who has the recording. It slides between values rather than jumping, so nothing about it can be heard.</p>
+<p>This is what stops the transform from being reversed by anybody who works out the settings, because there is no single setting to work out.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>300 lines defining <strong>9 functions</strong> (5 public), <strong>3 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>313 lines defining <strong>9 functions</strong> (5 public), <strong>3 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Param</code> <span style="color:var(--muted)">line 23</span> &mdash; One smoothly-varying parameter bounded to lo, hi.</li>
-<li><code>struct ModValues</code> <span style="color:var(--muted)">line 53</span> &mdash; The values handed to the spectral transform for one frame.</li>
-<li><code>struct Modulator</code> <span style="color:var(--muted)">line 61</span> &mdash; Non-stationary parameter generator.</li>
+<li><code>struct Param</code> <span style="color:var(--muted)">line 36</span> &mdash; One smoothly-varying parameter bounded to lo, hi.</li>
+<li><code>struct ModValues</code> <span style="color:var(--muted)">line 66</span> &mdash; The values handed to the spectral transform for one frame.</li>
+<li><code>struct Modulator</code> <span style="color:var(--muted)">line 74</span> &mdash; Non-stationary parameter generator.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Modulator::from_seed</code> <span style="color:var(--muted)">line 73</span> &mdash; Build from an explicit 32-byte seed (deterministic; used by tests and by session-key-derived seeding).
+<li><code>Modulator::from_seed</code> <span style="color:var(--muted)">line 86</span> &mdash; Build from an explicit 32-byte seed (deterministic; used by tests and by session-key-derived seeding).
 <br><span style="color:var(--muted);font-size:12px">reaches <code>new</code></span>
 </li>
-<li><code>Modulator::fill_phase_offsets</code> <span style="color:var(--muted)">line 92</span> &mdash; The 32 fixed per-bin phase offsets consumer needs are derived from the same stream; expose a helper that fills out with values in [0, 2&#960;).
+<li><code>Modulator::fill_phase_offsets</code> <span style="color:var(--muted)">line 105</span> &mdash; The 32 fixed per-bin phase offsets consumer needs are derived from the same stream; expose a helper that fills out with values in [0, 2&#960;).
 </li>
-<li><code>Modulator::reseed</code> <span style="color:var(--muted)">line 120</span> &mdash; Roll onto a fresh seed, drawn from the current stream.
+<li><code>Modulator::reseed</code> <span style="color:var(--muted)">line 133</span> &mdash; Roll onto a fresh seed, drawn from the current stream.
 </li>
-<li><code>Modulator::draw_frames</code> <span style="color:var(--muted)">line 141</span> &mdash; Draw a whole number of frames uniformly from lo..=hi.
+<li><code>Modulator::draw_frames</code> <span style="color:var(--muted)">line 154</span> &mdash; Draw a whole number of frames uniformly from lo..=hi.
 </li>
-<li><code>Modulator::next_frame</code> <span style="color:var(--muted)">line 151</span> &mdash; Advance one STFT frame and return the parameters to apply.
+<li><code>Modulator::next_frame</code> <span style="color:var(--muted)">line 164</span> &mdash; Advance one STFT frame and return the parameters to apply.
 </li>
 </ul>
 </section>
@@ -82,50 +87,50 @@
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="632" height="394" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M268.8 147.0 C 290.8 147.0, 290.8 47.0, 218.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L32" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45" target="_blank" rel="noopener noreferrer">
 <rect x="111.2" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="163.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Param::new</text>
-<text x="163.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 32</text>
+<text x="163.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 45</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L42" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L55" target="_blank" rel="noopener noreferrer">
 <rect x="241.2" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="312.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Param::retarget</text>
-<text x="312.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 42</text>
+<text x="312.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 55</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L58" target="_blank" rel="noopener noreferrer">
 <rect x="409.2" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="465.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Param::step</text>
-<text x="465.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 45</text>
+<text x="465.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 58</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L73" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L86" target="_blank" rel="noopener noreferrer">
 <rect x="88.8" y="120.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="178.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Modulator::from_seed</text>
-<text x="178.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 73</text>
+<text x="178.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 86</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L92" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L105" target="_blank" rel="noopener noreferrer">
 <rect x="294.8" y="120.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="419.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Modulator::fill_phase_offsets</text>
-<text x="419.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<text x="419.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L120" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L133" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="220.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="98.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Modulator::reseed</text>
-<text x="98.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 120</text>
+<text x="98.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L141" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L154" target="_blank" rel="noopener noreferrer">
 <rect x="203.2" y="220.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="300.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Modulator::draw_frames</text>
-<text x="300.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 141</text>
+<text x="300.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L151" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L164" target="_blank" rel="noopener noreferrer">
 <rect x="424.4" y="220.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="518.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Modulator::next_frame</text>
-<text x="518.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 151</text>
+<text x="518.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 164</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L165" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L178" target="_blank" rel="noopener noreferrer">
 <rect x="245.0" y="320.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="316.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Modulator::drop</text>
-<text x="316.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 165</text>
+<text x="316.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 178</text>
 </a>
 </svg>
 </div>
@@ -133,25 +138,25 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_new[&quot;Param::new&lt;br/&gt;line 32&quot;]
-    n_retarget[&quot;Param::retarget&lt;br/&gt;line 42&quot;]
-    n_step[&quot;Param::step&lt;br/&gt;line 45&quot;]
-    n_from_seed([&quot;Modulator::from_seed&lt;br/&gt;line 73&quot;])
-    n_fill_phase_offsets([&quot;Modulator::fill_phase_offsets&lt;br/&gt;line 92&quot;])
-    n_reseed([&quot;Modulator::reseed&lt;br/&gt;line 120&quot;])
-    n_draw_frames([&quot;Modulator::draw_frames&lt;br/&gt;line 141&quot;])
-    n_next_frame([&quot;Modulator::next_frame&lt;br/&gt;line 151&quot;])
-    n_drop[&quot;Modulator::drop&lt;br/&gt;line 165&quot;]
+    n_new[&quot;Param::new&lt;br/&gt;line 45&quot;]
+    n_retarget[&quot;Param::retarget&lt;br/&gt;line 55&quot;]
+    n_step[&quot;Param::step&lt;br/&gt;line 58&quot;]
+    n_from_seed([&quot;Modulator::from_seed&lt;br/&gt;line 86&quot;])
+    n_fill_phase_offsets([&quot;Modulator::fill_phase_offsets&lt;br/&gt;line 105&quot;])
+    n_reseed([&quot;Modulator::reseed&lt;br/&gt;line 133&quot;])
+    n_draw_frames([&quot;Modulator::draw_frames&lt;br/&gt;line 154&quot;])
+    n_next_frame([&quot;Modulator::next_frame&lt;br/&gt;line 164&quot;])
+    n_drop[&quot;Modulator::drop&lt;br/&gt;line 178&quot;]
     n_from_seed --&gt; n_new
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L32&quot; &quot;open the source&quot;
-    click n_retarget href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L42&quot; &quot;open the source&quot;
-    click n_step href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45&quot; &quot;open the source&quot;
-    click n_from_seed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L73&quot; &quot;open the source&quot;
-    click n_fill_phase_offsets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L92&quot; &quot;open the source&quot;
-    click n_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L120&quot; &quot;open the source&quot;
-    click n_draw_frames href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L141&quot; &quot;open the source&quot;
-    click n_next_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L151&quot; &quot;open the source&quot;
-    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L165&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45&quot; &quot;open the source&quot;
+    click n_retarget href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L55&quot; &quot;open the source&quot;
+    click n_step href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L58&quot; &quot;open the source&quot;
+    click n_from_seed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L86&quot; &quot;open the source&quot;
+    click n_fill_phase_offsets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L105&quot; &quot;open the source&quot;
+    click n_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L133&quot; &quot;open the source&quot;
+    click n_draw_frames href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L154&quot; &quot;open the source&quot;
+    click n_next_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L164&quot; &quot;open the source&quot;
+    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L178&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_from_seed,n_fill_phase_offsets,n_reseed,n_draw_frames,n_next_frame entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -162,18 +167,18 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Param</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L23" rel="noopener noreferrer">23</a></td><td>One smoothly-varying parameter bounded to lo, hi.</td></tr>
-<tr><td><code>Param::new</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L32" rel="noopener noreferrer">32</a></td><td></td></tr>
-<tr><td><code>Param::retarget</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L42" rel="noopener noreferrer">42</a></td><td></td></tr>
-<tr><td><code>Param::step</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45" rel="noopener noreferrer">45</a></td><td></td></tr>
-<tr><td><code>ModValues</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L53" rel="noopener noreferrer">53</a></td><td>The values handed to the spectral transform for one frame.</td></tr>
-<tr><td><code>Modulator</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L61" rel="noopener noreferrer">61</a></td><td>Non-stationary parameter generator.</td></tr>
-<tr><td><code>Modulator::from_seed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L73" rel="noopener noreferrer">73</a></td><td>Build from an explicit 32-byte seed (deterministic; used by tests and by session-key-derived seeding).</td></tr>
-<tr><td><code>Modulator::fill_phase_offsets</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L92" rel="noopener noreferrer">92</a></td><td>The 32 fixed per-bin phase offsets consumer needs are derived from the same stream; expose a helper that fills out with values in [0, 2&#960;).</td></tr>
-<tr><td><code>Modulator::reseed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L120" rel="noopener noreferrer">120</a></td><td>Roll onto a fresh seed, drawn from the current stream.</td></tr>
-<tr><td><code>Modulator::draw_frames</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L141" rel="noopener noreferrer">141</a></td><td>Draw a whole number of frames uniformly from lo..=hi.</td></tr>
-<tr><td><code>Modulator::next_frame</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L151" rel="noopener noreferrer">151</a></td><td>Advance one STFT frame and return the parameters to apply.</td></tr>
-<tr><td><code>Modulator::drop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L165" rel="noopener noreferrer">165</a></td><td></td></tr>
+<tr><td><code>Param</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L36" rel="noopener noreferrer">36</a></td><td>One smoothly-varying parameter bounded to lo, hi.</td></tr>
+<tr><td><code>Param::new</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45" rel="noopener noreferrer">45</a></td><td></td></tr>
+<tr><td><code>Param::retarget</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L55" rel="noopener noreferrer">55</a></td><td></td></tr>
+<tr><td><code>Param::step</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L58" rel="noopener noreferrer">58</a></td><td></td></tr>
+<tr><td><code>ModValues</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L66" rel="noopener noreferrer">66</a></td><td>The values handed to the spectral transform for one frame.</td></tr>
+<tr><td><code>Modulator</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L74" rel="noopener noreferrer">74</a></td><td>Non-stationary parameter generator.</td></tr>
+<tr><td><code>Modulator::from_seed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L86" rel="noopener noreferrer">86</a></td><td>Build from an explicit 32-byte seed (deterministic; used by tests and by session-key-derived seeding).</td></tr>
+<tr><td><code>Modulator::fill_phase_offsets</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L105" rel="noopener noreferrer">105</a></td><td>The 32 fixed per-bin phase offsets consumer needs are derived from the same stream; expose a helper that fills out with values in [0, 2&#960;).</td></tr>
+<tr><td><code>Modulator::reseed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L133" rel="noopener noreferrer">133</a></td><td>Roll onto a fresh seed, drawn from the current stream.</td></tr>
+<tr><td><code>Modulator::draw_frames</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L154" rel="noopener noreferrer">154</a></td><td>Draw a whole number of frames uniformly from lo..=hi.</td></tr>
+<tr><td><code>Modulator::next_frame</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L164" rel="noopener noreferrer">164</a></td><td>Advance one STFT frame and return the parameters to apply.</td></tr>
+<tr><td><code>Modulator::drop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L178" rel="noopener noreferrer">178</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

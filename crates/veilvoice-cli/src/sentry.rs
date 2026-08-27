@@ -33,6 +33,14 @@
 //!
 //! [`veilvoice_sentry::SCOPE`] is printed by `status` rather than paraphrased
 //! here, so there is one wording and the tests guard it.
+//!
+//! # In plain words
+//!
+//! The command line for the tripwires: the decoy files that should never change,
+//! and how much of a folder has changed since you last looked.
+//!
+//! Both are early warnings and neither stops anything. What they buy is finding
+//! out quickly.
 
 use crate::theme::{colour, err, field, heading, ok, paint, warn};
 use std::path::{Path, PathBuf};

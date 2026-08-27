@@ -3,13 +3,14 @@
 
 # `crates/veilvoice-gui/src/soundbar.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 349 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 360 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
 
 ## Contents
 
 - [The same mark as the website](#the-same-mark-as-the-website)
 - [Why it is drawn rather than rendered from a GIF](#why-it-is-drawn-rather-than-rendered-from-a-gif)
 - [Cost when it is switched off](#cost-when-it-is-switched-off)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -43,13 +44,24 @@ schedules a frame every 16 ms has turned the animation off visually and left
 the battery cost behind. The caller decides by passing a `Motion`, and the
 only way to animate is to ask for it.
 
+# In plain words
+
+The little row of bars in the corner that rises and falls.
+
+It is the same mark the website uses, drawn rather than loaded as a picture, so
+it takes the colours of whichever scheme you have chosen.
+
+It stops moving if your system is set to reduce motion. That setting is a
+request from somebody who has a reason for making it, and animation that
+ignores it is animation that makes an application unusable for them.
+
 ## What this file contains
 
-349 lines defining **3 functions** (1 public), **0 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+360 lines defining **3 functions** (1 public), **0 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `draw` (line 68) -- Draw the mark at size, returning the response so it can carry a tooltip.
+- `draw` (line 79) -- Draw the mark at size, returning the response so it can carry a tooltip.
   - reaches: `colour_for`, `height_fraction`
 
 ## What calls what
@@ -66,14 +78,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_height_fraction["height_fraction<br/>line 52"]
-    n_draw(["draw<br/>line 68"])
-    n_colour_for["colour_for<br/>line 114"]
+    n_height_fraction["height_fraction<br/>line 63"]
+    n_draw(["draw<br/>line 79"])
+    n_colour_for["colour_for<br/>line 125"]
     n_draw --> n_colour_for
     n_draw --> n_height_fraction
-    click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L52" "open the source"
-    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L68" "open the source"
-    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L114" "open the source"
+    click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L63" "open the source"
+    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L79" "open the source"
+    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L125" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_draw entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -86,10 +98,10 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `PERIOD` <sub>const</sub> | [37](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L37) | Seconds for one full rise and fall. |
-| `DELAYS` <sub>const</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L42) | Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html. |
-| `MIN_FRACTION` <sub>const</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L47) | Height as a fraction of the available box, matching 16% and 82%. |
-| `MAX_FRACTION` <sub>const</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L48) |  |
-| `height_fraction` <sub>fn</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L52) | How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases. |
-| `draw` <sub>pub fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L68) | Draw the mark at size, returning the response so it can carry a tooltip. |
-| `colour_for` <sub>fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L114) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |
+| `PERIOD` <sub>const</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L48) | Seconds for one full rise and fall. |
+| `DELAYS` <sub>const</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L53) | Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html. |
+| `MIN_FRACTION` <sub>const</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L58) | Height as a fraction of the available box, matching 16% and 82%. |
+| `MAX_FRACTION` <sub>const</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L59) |  |
+| `height_fraction` <sub>fn</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L63) | How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases. |
+| `draw` <sub>pub fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L79) | Draw the mark at size, returning the response so it can carry a tooltip. |
+| `colour_for` <sub>fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L125) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |

@@ -106,9 +106,9 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>748 lines"])
-    n_linux["linux.rs<br/>230 lines"]
-    n_macos["macos.rs<br/>206 lines"]
-    n_windows["windows.rs<br/>232 lines"]
+    n_linux["linux.rs<br/>239 lines"]
+    n_macos["macos.rs<br/>214 lines"]
+    n_windows["windows.rs<br/>241 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/lib.rs" "open the source"
     click n_linux href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs" "open the source"
     click n_macos href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs" "open the source"
@@ -122,9 +122,9 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`lib.rs`](../../docs/files/veilvoice-drivers/lib.md) | 748 | What is loaded into the kernel, recorded, and compared later. |
-| [`linux.rs`](../../docs/files/veilvoice-drivers/linux.md) | 230 | Linux: /proc/modules, cross-checked against /sys/module. |
-| [`macos.rs`](../../docs/files/veilvoice-drivers/macos.md) | 206 | macOS: kmutil showloaded, falling back to kextstat. |
-| [`windows.rs`](../../docs/files/veilvoice-drivers/windows.md) | 232 | Windows: driverquery.exe, which the system already ships. |
+| [`linux.rs`](../../docs/files/veilvoice-drivers/linux.md) | 239 | Linux: /proc/modules, cross-checked against /sys/module. |
+| [`macos.rs`](../../docs/files/veilvoice-drivers/macos.md) | 214 | macOS: kmutil showloaded, falling back to kextstat. |
+| [`windows.rs`](../../docs/files/veilvoice-drivers/windows.md) | 241 | Windows: driverquery.exe, which the system already ships. |
 
 ## Public items
 

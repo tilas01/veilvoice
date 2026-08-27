@@ -30,6 +30,18 @@
 //! a constant a reader can compare with the README. `veilvoice-verify` is
 //! still the tool for fetching a release, because it is the one that can be
 //! checked before it is run.
+//!
+//! # In plain words
+//!
+//! Drop a download on the window and be told whether it is genuine.
+//!
+//! It checks the signature over the list of hashes first, and only then compares
+//! your file against that list. That order matters: a list of hashes that has not
+//! been checked is just some numbers somebody sent you.
+//!
+//! Drop the downloaded archive and the hash list and signature sitting beside it
+//! are picked up on their own. Nothing is downloaded and nothing leaves the
+//! machine.
 
 use crate::theme::palette as p;
 use eframe::egui::{self, RichText, Ui};

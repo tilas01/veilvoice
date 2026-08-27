@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-gui/src/policy.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 311 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 320 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs)
 
 ## Contents
 
 - [A control that is disabled without a reason is a bug report](#a-control-that-is-disabled-without-a-reason-is-a-bug-report)
 - [Enforcement is not the drawing code](#enforcement-is-not-the-drawing-code)
 - [Reading it costs nothing, and proves nothing](#reading-it-costs-nothing-and-proves-nothing)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -52,25 +53,34 @@ The reason it is safe to apply an unverified policy is the one-way property
 `veilvoice_policy` is built around, and `InForce::panel` states it
 rather than leaving the reader to infer it.
 
+# In plain words
+
+Reads the rules that say which settings must stay on, and makes the window obey
+them.
+
+The controls show the value that will actually be used, rather than one that
+silently changes when you press the button. A slider showing something a job
+will not honour is worse than a slider you cannot move.
+
 ## What this file contains
 
-311 lines defining **10 functions** (10 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+320 lines defining **10 functions** (10 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct InForce` (line 39) -- The policy this machine is running under, if any.
+- `struct InForce` (line 48) -- The policy this machine is running under, if any.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `InForce::from_policy` (line 68) -- A policy supplied directly, for tests.
-- `InForce::load` (line 77) -- Read the plain policy from the usual place.
+- `InForce::from_policy` (line 77) -- A policy supplied directly, for tests.
+- `InForce::load` (line 86) -- Read the plain policy from the usual place.
   - reaches: `default_dir`, `none`
-- `InForce::is_active` (line 101) -- Whether anything is fixed.
-- `InForce::minimum_intensity` (line 117) -- The intensity floor, or 0.0 when none is set.
-- `InForce::constrain` (line 125) -- Apply the policy to a posture.
-- `InForce::note` (line 136) -- Draw the reason a control is fixed, under that control.
+- `InForce::is_active` (line 110) -- Whether anything is fixed.
+- `InForce::minimum_intensity` (line 126) -- The intensity floor, or 0.0 when none is set.
+- `InForce::constrain` (line 134) -- Apply the policy to a posture.
+- `InForce::note` (line 145) -- Draw the reason a control is fixed, under that control.
   - reaches: `requires`
-- `InForce::panel` (line 148) -- The summary panel, for the about tab.
+- `InForce::panel` (line 157) -- The summary panel, for the about tab.
 
 ## What calls what
 
@@ -92,29 +102,29 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default_dir["default_dir<br/>line 57"]
-    n_none["InForce::none<br/>line 63"]
-    n_from_policy(["InForce::from_policy<br/>line 68"])
-    n_load(["InForce::load<br/>line 77"])
-    n_is_active(["InForce::is_active<br/>line 101"])
-    n_requires["InForce::requires<br/>line 109"]
-    n_minimum_intensity(["InForce::minimum_intensity<br/>line 117"])
-    n_constrain(["InForce::constrain<br/>line 125"])
-    n_note(["InForce::note<br/>line 136"])
-    n_panel(["InForce::panel<br/>line 148"])
+    n_default_dir["default_dir<br/>line 66"]
+    n_none["InForce::none<br/>line 72"]
+    n_from_policy(["InForce::from_policy<br/>line 77"])
+    n_load(["InForce::load<br/>line 86"])
+    n_is_active(["InForce::is_active<br/>line 110"])
+    n_requires["InForce::requires<br/>line 118"]
+    n_minimum_intensity(["InForce::minimum_intensity<br/>line 126"])
+    n_constrain(["InForce::constrain<br/>line 134"])
+    n_note(["InForce::note<br/>line 145"])
+    n_panel(["InForce::panel<br/>line 157"])
     n_load --> n_default_dir
     n_load --> n_none
     n_note --> n_requires
-    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L57" "open the source"
-    click n_none href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L63" "open the source"
-    click n_from_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L68" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L77" "open the source"
-    click n_is_active href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L101" "open the source"
-    click n_requires href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L109" "open the source"
-    click n_minimum_intensity href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L117" "open the source"
-    click n_constrain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L125" "open the source"
-    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L136" "open the source"
-    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L148" "open the source"
+    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L66" "open the source"
+    click n_none href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L72" "open the source"
+    click n_from_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L77" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L86" "open the source"
+    click n_is_active href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L110" "open the source"
+    click n_requires href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L118" "open the source"
+    click n_minimum_intensity href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L126" "open the source"
+    click n_constrain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L134" "open the source"
+    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L145" "open the source"
+    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L157" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_from_policy,n_load,n_is_active,n_minimum_intensity,n_constrain,n_note,n_panel entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -127,17 +137,17 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `InForce` <sub>pub struct</sub> | [39](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L39) | The policy this machine is running under, if any. |
-| `default_dir` <sub>pub fn</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L57) | Where the policy files live, beside everything else VeilVoice keeps. |
-| `InForce::none` <sub>pub fn</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L63) | No policy. |
-| `InForce::from_policy` <sub>pub fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L68) | A policy supplied directly, for tests. |
-| `InForce::load` <sub>pub fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L77) | Read the plain policy from the usual place. |
-| `InForce::is_active` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L101) | Whether anything is fixed. |
-| `InForce::requires` <sub>pub fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L109) | Whether a particular requirement is in force. |
-| `InForce::minimum_intensity` <sub>pub fn</sub> | [117](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L117) | The intensity floor, or 0.0 when none is set. |
-| `InForce::constrain` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L125) | Apply the policy to a posture. |
-| `InForce::note` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L136) | Draw the reason a control is fixed, under that control. |
-| `InForce::panel` <sub>pub fn</sub> | [148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L148) | The summary panel, for the about tab. |
+| `InForce` <sub>pub struct</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L48) | The policy this machine is running under, if any. |
+| `default_dir` <sub>pub fn</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L66) | Where the policy files live, beside everything else VeilVoice keeps. |
+| `InForce::none` <sub>pub fn</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L72) | No policy. |
+| `InForce::from_policy` <sub>pub fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L77) | A policy supplied directly, for tests. |
+| `InForce::load` <sub>pub fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L86) | Read the plain policy from the usual place. |
+| `InForce::is_active` <sub>pub fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L110) | Whether anything is fixed. |
+| `InForce::requires` <sub>pub fn</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L118) | Whether a particular requirement is in force. |
+| `InForce::minimum_intensity` <sub>pub fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L126) | The intensity floor, or 0.0 when none is set. |
+| `InForce::constrain` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L134) | Apply the policy to a posture. |
+| `InForce::note` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L145) | Draw the reason a control is fixed, under that control. |
+| `InForce::panel` <sub>pub fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/policy.rs#L157) | The summary panel, for the about tab. |
 
 ---
 

@@ -31,6 +31,14 @@
 //! builds Windows on a Windows runner, so shipped binaries have one, and the
 //! release fails if they do not -- `tools/release/check-windows-icons.py` reads
 //! the built PE rather than trusting this file.
+//!
+//! # In plain words
+//!
+//! Runs while the verifier is being compiled, not while it is running.
+//!
+//! On Windows it embeds the icon and version information. This matters more here
+//! than elsewhere: the verifier is the program people download to check a
+//! download, so it is the one most worth looking like what it claims to be.
 
 fn main() {
     #[cfg(windows)]

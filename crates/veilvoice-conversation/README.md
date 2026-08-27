@@ -105,10 +105,10 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>180 lines"])
-    n_mode["mode.rs<br/>271 lines"]
-    n_plan["plan.rs<br/>934 lines"]
-    n_render["render.rs<br/>836 lines"]
-    n_subtitles["subtitles.rs<br/>263 lines"]
+    n_mode["mode.rs<br/>286 lines"]
+    n_plan["plan.rs<br/>947 lines"]
+    n_render["render.rs<br/>851 lines"]
+    n_subtitles["subtitles.rs<br/>276 lines"]
     n_plan --> n_mode
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs" "open the source"
     click n_mode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs" "open the source"
@@ -124,10 +124,10 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | 180 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
-| [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | 271 | How many voices a group gets, and the trade between the two answers. |
-| [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | 934 | Who is in the recording, and who is speaking when. |
-| [`render.rs`](../../docs/files/veilvoice-conversation/render.md) | 836 | Turning a plan and a recording into veiled audio, one engine per speaker. |
-| [`subtitles.rs`](../../docs/files/veilvoice-conversation/subtitles.md) | 263 | Subtitles, from the same plan the audio is rendered from. |
+| [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | 286 | How many voices a group gets, and the trade between the two answers. |
+| [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | 947 | Who is in the recording, and who is speaking when. |
+| [`render.rs`](../../docs/files/veilvoice-conversation/render.md) | 851 | Turning a plan and a recording into veiled audio, one engine per speaker. |
+| [`subtitles.rs`](../../docs/files/veilvoice-conversation/subtitles.md) | 276 | Subtitles, from the same plan the audio is rendered from. |
 
 ## Public items
 

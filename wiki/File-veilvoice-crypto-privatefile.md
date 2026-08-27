@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-crypto/src/privatefile.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 157 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 169 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs)
 
 ## Contents
 
 - [Why this is not std::fs::write plus a chmod](#why-this-is-not-stdfswrite-plus-a-chmod)
 - [What this does not do](#what-this-does-not-do)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -47,15 +48,27 @@ no portable tightening to apply beyond that -- so on Windows this is an
 ordinary write, and says so rather than implying a protection it did not
 obtain.
 
+# In plain words
+
+Writes a file that only you can read.
+
+The important part is the order. The permissions are set as the file is
+created, not afterwards, because a file that exists for even a moment with the
+wrong permissions is a file somebody else's program may have read in that
+moment.
+
+When it cannot manage that, it says exactly why rather than just failing, since
+"could not write the key" is not something anybody can act on.
+
 ## What this file contains
 
-157 lines defining **3 functions** (2 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+169 lines defining **3 functions** (2 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `write_owner_only` (line 44) -- Create path containing bytes, readable only by the current user.
+- `write_owner_only` (line 56) -- Create path containing bytes, readable only by the current user.
   - reaches: `write_inner`
-- `write_owner_only_new` (line 55) -- As write_owner_only, but fail if anything is already at path.
+- `write_owner_only_new` (line 67) -- As write_owner_only, but fail if anything is already at path.
   - reaches: `write_inner`
 
 ## What calls what
@@ -72,14 +85,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_write_owner_only(["write_owner_only<br/>line 44"])
-    n_write_owner_only_new(["write_owner_only_new<br/>line 55"])
-    n_write_inner["write_inner<br/>line 59"]
+    n_write_owner_only(["write_owner_only<br/>line 56"])
+    n_write_owner_only_new(["write_owner_only_new<br/>line 67"])
+    n_write_inner["write_inner<br/>line 71"]
     n_write_owner_only --> n_write_inner
     n_write_owner_only_new --> n_write_inner
-    click n_write_owner_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L44" "open the source"
-    click n_write_owner_only_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L55" "open the source"
-    click n_write_inner href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L59" "open the source"
+    click n_write_owner_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56" "open the source"
+    click n_write_owner_only_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67" "open the source"
+    click n_write_inner href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L71" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_write_owner_only,n_write_owner_only_new entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -92,6 +105,6 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `write_owner_only` <sub>pub fn</sub> | [44](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L44) | Create path containing bytes, readable only by the current user. |
-| `write_owner_only_new` <sub>pub fn</sub> | [55](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L55) | As write_owner_only, but fail if anything is already at path. |
-| `write_inner` <sub>fn</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L59) |  |
+| `write_owner_only` <sub>pub fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56) | Create path containing bytes, readable only by the current user. |
+| `write_owner_only_new` <sub>pub fn</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67) | As write_owner_only, but fail if anything is already at path. |
+| `write_inner` <sub>fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L71) |  |

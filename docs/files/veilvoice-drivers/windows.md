@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-drivers/src/windows.rs`
 
-[`veilvoice-drivers`](../../../crates/veilvoice-drivers/README.md) &middot; 232 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs)
+[`veilvoice-drivers`](../../../crates/veilvoice-drivers/README.md) &middot; 241 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs)
 
 ## Contents
 
 - [Why a subprocess](#why-a-subprocess)
 - [The format](#the-format)
 - [What it lists, and what that means](#what-it-lists-and-what-that-means)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -57,9 +58,18 @@ appearing here is therefore "something installed a driver", not "something
 is running in the kernel" — a real distinction, and the front end wording
 keeps it.
 
+# In plain words
+
+Asks Windows which drivers are loaded, using a tool Windows already ships.
+
+A driver runs inside the operating system itself, so one that arrived without
+you installing it is worth knowing about. Reading that list directly would mean
+writing code that talks to Windows at a level this project has chosen not to,
+so it asks the existing tool and reads the answer.
+
 ## What this file contains
 
-232 lines defining **3 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+241 lines defining **3 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -81,14 +91,14 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_csv_fields["csv_fields<br/>line 48"]
-    n_parse_driverquery["parse_driverquery<br/>line 72"]
-    n_read["read<br/>line 115"]
+    n_csv_fields["csv_fields<br/>line 57"]
+    n_parse_driverquery["parse_driverquery<br/>line 81"]
+    n_read["read<br/>line 124"]
     n_parse_driverquery --> n_csv_fields
     n_read --> n_parse_driverquery
-    click n_csv_fields href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L48" "open the source"
-    click n_parse_driverquery href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L72" "open the source"
-    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L115" "open the source"
+    click n_csv_fields href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L57" "open the source"
+    click n_parse_driverquery href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L81" "open the source"
+    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L124" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_csv_fields,n_parse_driverquery,n_read helper
 ```
@@ -99,9 +109,9 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `csv_fields` <sub>fn</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L48) | Split one CSV line into its quoted fields. |
-| `parse_driverquery` <sub>pub(crate) fn</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L72) | Parse driverquery /FO CSV /NH output. |
-| `read` <sub>pub(crate) fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L115) | Run driverquery and parse what it says. |
+| `csv_fields` <sub>fn</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L57) | Split one CSV line into its quoted fields. |
+| `parse_driverquery` <sub>pub(crate) fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L81) | Parse driverquery /FO CSV /NH output. |
+| `read` <sub>pub(crate) fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/windows.rs#L124) | Run driverquery and parse what it says. |
 
 ---
 

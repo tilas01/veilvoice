@@ -54,6 +54,15 @@
 //! [`DeviceUse::pid`] is `None` here. The trade is worth it: this sees packaged
 //! apps, background services and anything else the OS accounts for, which
 //! enumerating process handles would miss.
+//!
+//! # In plain words
+//!
+//! Finds out which applications are using the microphone or camera on Windows.
+//!
+//! Windows keeps that in its own records of what has been granted access and when,
+//! and this reads them. It reports per application rather than per running
+//! program, because that is how Windows stores it, and the difference is stated
+//! rather than papered over.
 
 use crate::{DeviceKind, DeviceUse, Error};
 use std::process::Command;

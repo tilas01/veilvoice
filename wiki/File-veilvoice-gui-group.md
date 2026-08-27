@@ -3,13 +3,14 @@
 
 # `crates/veilvoice-gui/src/group.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1656 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1668 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs)
 
 ## Contents
 
 - [The toggle does not persist, and the tick that makes it persist is separate](#the-toggle-does-not-persist-and-the-tick-that-makes-it-persist-is-separate)
 - [Colour is assigned, never guessed from the voice](#colour-is-assigned-never-guessed-from-the-voice)
 - [Colour is never the only signal](#colour-is-never-the-only-signal)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -56,29 +57,41 @@ Somebody who cannot separate two of these colours has the name, everywhere.
 A panel that distinguished speakers by colour alone would be one about eight
 per cent of men could not use.
 
+# In plain words
+
+The panel for a recording with several people in it.
+
+Each person gets a name and a colour, so you can see at a glance who is who.
+The colours are chosen to be as different from each other as possible, and you
+can pick your own from any of the palettes the website offers.
+
+Group mode is off when the application opens unless you have said otherwise,
+and turning it on lasts only for that run. A mode that quietly survived a
+restart is a mode somebody eventually forgets is on.
+
 ## What this file contains
 
-1656 lines defining **39 functions** (17 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1668 lines defining **39 functions** (17 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Person` (line 58) -- One person, as the panel holds them.
-- `struct Outputs` (line 81) -- What comes out of a group render.
-- `struct Group` (line 146) -- The group-mode panel's state.
-- `struct Job` (line 1113) -- Everything one render needs, taken from the panel at the moment the button was pressed.
+- `struct Person` (line 70) -- One person, as the panel holds them.
+- `struct Outputs` (line 93) -- What comes out of a group render.
+- `struct Group` (line 158) -- The group-mode panel's state.
+- `struct Job` (line 1125) -- Everything one render needs, taken from the panel at the moment the button was pressed.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Outputs::any` (line 102) -- Whether anything at all would be written.
-- `Outputs::names` (line 107) -- The ticked ones, by name, for a project file.
-- `Group::start_from` (line 245) -- The panel as it should open, given the saved preference.
+- `Outputs::any` (line 114) -- Whether anything at all would be written.
+- `Outputs::names` (line 119) -- The ticked ones, by name, for a project file.
+- `Group::start_from` (line 257) -- The panel as it should open, given the saved preference.
   - reaches: `default`
-- `Group::len` (line 253) -- How many people are in the recording.
-- `Group::is_empty` (line 258) -- Whether there is nobody in it.
-- `Group::to_plan` (line 311) -- Build a plan from the panel: names in slot order, no turns.
-- `Group::tab` (line 327) -- The whole panel.
+- `Group::len` (line 265) -- How many people are in the recording.
+- `Group::is_empty` (line 270) -- Whether there is nobody in it.
+- `Group::to_plan` (line 323) -- Build a plan from the panel: names in slot order, no turns.
+- `Group::tab` (line 339) -- The whole panel.
   - reaches: `body`, `collect_dialogs`, `files_and_theme`, `mode_controls`, `output_controls`, `people_list`, `profile_controls`, `render_controls`, `strip`, `voice_mode_controls`, `from_workspace`, `to_workspace`
-- `Group::drain` (line 904) -- Take the worker's answer if it has one.
+- `Group::drain` (line 916) -- Take the worker's answer if it has one.
 
 ## What calls what
 
@@ -96,28 +109,28 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_at["Person::at<br/>line 67"]
-    n_default["Outputs::default<br/>line 91"]
-    n_from_names["Outputs::from_names<br/>line 126"]
-    n_default["Group::default<br/>line 211"]
-    n_start_from(["Group::start_from<br/>line 245"])
-    n_colour["Group::colour<br/>line 263"]
-    n_add["Group::add<br/>line 276"]
-    n_limit["Group::limit<br/>line 289"]
-    n_remove["Group::remove<br/>line 297"]
-    n_tab(["Group::tab<br/>line 327"])
-    n_collect_dialogs["Group::collect_dialogs<br/>line 344"]
-    n_body["Group::body<br/>line 372"]
-    n_profile_controls["Group::profile_controls<br/>line 447"]
-    n_apply_profile["Group::apply_profile<br/>line 514"]
-    n_mode_controls["Group::mode_controls<br/>line 535"]
-    n_voice_mode_controls["Group::voice_mode_controls<br/>line 592"]
-    n_strip["Group::strip<br/>line 633"]
-    n_people_list["Group::people_list<br/>line 668"]
-    n_to_workspace["Group::to_workspace<br/>line 821"]
-    n_from_workspace["Group::from_workspace<br/>line 847"]
-    n_is_busy["Group::is_busy<br/>line 899"]
-    n_assigned_colour["assigned_colour<br/>line 1243"]
+    n_at["Person::at<br/>line 79"]
+    n_default["Outputs::default<br/>line 103"]
+    n_from_names["Outputs::from_names<br/>line 138"]
+    n_default["Group::default<br/>line 223"]
+    n_start_from(["Group::start_from<br/>line 257"])
+    n_colour["Group::colour<br/>line 275"]
+    n_add["Group::add<br/>line 288"]
+    n_limit["Group::limit<br/>line 301"]
+    n_remove["Group::remove<br/>line 309"]
+    n_tab(["Group::tab<br/>line 339"])
+    n_collect_dialogs["Group::collect_dialogs<br/>line 356"]
+    n_body["Group::body<br/>line 384"]
+    n_profile_controls["Group::profile_controls<br/>line 459"]
+    n_apply_profile["Group::apply_profile<br/>line 526"]
+    n_mode_controls["Group::mode_controls<br/>line 547"]
+    n_voice_mode_controls["Group::voice_mode_controls<br/>line 604"]
+    n_strip["Group::strip<br/>line 645"]
+    n_people_list["Group::people_list<br/>line 680"]
+    n_to_workspace["Group::to_workspace<br/>line 833"]
+    n_from_workspace["Group::from_workspace<br/>line 859"]
+    n_is_busy["Group::is_busy<br/>line 911"]
+    n_assigned_colour["assigned_colour<br/>line 1255"]
     n_add --> n_at
     n_body --> n_collect_dialogs
     n_body --> n_mode_controls
@@ -137,28 +150,28 @@ flowchart TD
     n_start_from --> n_default
     n_strip --> n_colour
     n_tab --> n_body
-    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L67" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L91" "open the source"
-    click n_from_names href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L126" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L211" "open the source"
-    click n_start_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L245" "open the source"
-    click n_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L263" "open the source"
-    click n_add href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L276" "open the source"
-    click n_limit href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L289" "open the source"
-    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L297" "open the source"
-    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L327" "open the source"
-    click n_collect_dialogs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L344" "open the source"
-    click n_body href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L372" "open the source"
-    click n_profile_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L447" "open the source"
-    click n_apply_profile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L514" "open the source"
-    click n_mode_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L535" "open the source"
-    click n_voice_mode_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L592" "open the source"
-    click n_strip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L633" "open the source"
-    click n_people_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L668" "open the source"
-    click n_to_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L821" "open the source"
-    click n_from_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L847" "open the source"
-    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L899" "open the source"
-    click n_assigned_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1243" "open the source"
+    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L79" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L103" "open the source"
+    click n_from_names href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L138" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L223" "open the source"
+    click n_start_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L257" "open the source"
+    click n_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L275" "open the source"
+    click n_add href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L288" "open the source"
+    click n_limit href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L301" "open the source"
+    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L309" "open the source"
+    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L339" "open the source"
+    click n_collect_dialogs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L356" "open the source"
+    click n_body href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L384" "open the source"
+    click n_profile_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L459" "open the source"
+    click n_apply_profile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L526" "open the source"
+    click n_mode_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L547" "open the source"
+    click n_voice_mode_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L604" "open the source"
+    click n_strip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L645" "open the source"
+    click n_people_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L680" "open the source"
+    click n_to_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L833" "open the source"
+    click n_from_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L859" "open the source"
+    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L911" "open the source"
+    click n_assigned_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1255" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start_from,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -173,46 +186,46 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Person` <sub>pub struct</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L58) | One person, as the panel holds them. |
-| `Person::at` <sub>fn</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L67) | A person with the default name for their slot. |
-| `Outputs` <sub>pub struct</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L81) | What comes out of a group render. |
-| `Outputs::default` <sub>fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L91) |  |
-| `Outputs::any` <sub>pub fn</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L102) | Whether anything at all would be written. |
-| `Outputs::names` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L107) | The ticked ones, by name, for a project file. |
-| `Outputs::from_names` <sub>pub fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L126) | Read back from a project file. |
-| `hex_of` <sub>fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L136) | An egui colour as #rrggbb. |
-| `colour_of` <sub>fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L141) | #rrggbb as an egui colour, or None for anything that is not one. |
-| `Group` <sub>pub struct</sub> | [146](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L146) | The group-mode panel's state. |
-| `Group::default` <sub>fn</sub> | [211](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L211) |  |
-| `Group::start_from` <sub>pub fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L245) | The panel as it should open, given the saved preference. |
-| `Group::len` <sub>pub fn</sub> | [253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L253) | How many people are in the recording. |
-| `Group::is_empty` <sub>pub fn</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L258) | Whether there is nobody in it. |
-| `Group::colour` <sub>pub fn</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L263) | The colour a slot is drawn in: the override, or the one it is given. |
-| `Group::add` <sub>pub fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L276) | Add a person, if there is room for one. |
-| `Group::limit` <sub>pub fn</sub> | [289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L289) | How many people this panel can hold in its current mode. |
-| `Group::remove` <sub>pub fn</sub> | [297](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L297) | Remove one person, keeping at least two. |
-| `Group::to_plan` <sub>pub fn</sub> | [311](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L311) | Build a plan from the panel: names in slot order, no turns. |
-| `Group::tab` <sub>pub fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L327) | The whole panel. |
-| `Group::collect_dialogs` <sub>fn</sub> | [344](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L344) | Collect whatever the open pickers have answered. |
-| `Group::body` <sub>fn</sub> | [372](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L372) | Everything inside the scroller. |
-| `Group::profile_controls` <sub>fn</sub> | [447](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L447) | The named ways of working, and the project this panel came from. |
-| `Group::apply_profile` <sub>fn</sub> | [514](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L514) | Set the controls this profile names, and change nothing else. |
-| `Group::mode_controls` <sub>fn</sub> | [535](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L535) | The two controls that decide whether group mode is on. |
-| `Group::voice_mode_controls` <sub>fn</sub> | [592](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L592) | A voice each, or one voice between everybody. |
-| `Group::strip` <sub>fn</sub> | [633](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L633) | The picture: a circle per person, in their colour, with their name. |
-| `Group::people_list` <sub>fn</sub> | [668](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L668) | One row per person: colour, name, and a way to remove them. |
-| `Group::palette_picker` <sub>fn</sub> | [736](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L736) | Every colour in every palette, as swatches. |
-| `Group::swatch` <sub>fn</sub> | [775](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L775) | One clickable colour. |
-| `Group::output_controls` <sub>fn</sub> | [797](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L797) | What a render writes. |
-| `Group::to_workspace` <sub>pub fn</sub> | [821](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L821) | This panel as a saveable project. |
-| `Group::from_workspace` <sub>pub fn</sub> | [847](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L847) | Put a saved project back. |
-| `Group::is_busy` <sub>pub fn</sub> | [899](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L899) | Whether a render is running, so the window keeps repainting. |
-| `Group::drain` <sub>pub fn</sub> | [904](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L904) | Take the worker's answer if it has one. |
-| `Group::files_and_theme` <sub>fn</sub> | [920](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L920) | The recording, the plan, the title and the palette. |
-| `Group::render_controls` <sub>fn</sub> | [1010](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1010) | The button, and what came of pressing it. |
-| `Group::start` <sub>fn</sub> | [1066](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1066) | Start a render on a thread of its own. |
-| `file_name` <sub>fn</sub> | [1101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1101) | The last component of a path, for showing beside a button. |
-| `Job` <sub>struct</sub> | [1113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1113) | Everything one render needs, taken from the panel at the moment the button was pressed. |
-| `render_now` <sub>fn</sub> | [1133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1133) | Do the render. |
-| `with_extension` <sub>fn</sub> | [1231](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1231) | Replace the last extension, keeping any .veiled before it. |
-| `assigned_colour` <sub>pub fn</sub> | [1243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1243) | The colour a slot is given, as an egui colour. |
+| `Person` <sub>pub struct</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L70) | One person, as the panel holds them. |
+| `Person::at` <sub>fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L79) | A person with the default name for their slot. |
+| `Outputs` <sub>pub struct</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L93) | What comes out of a group render. |
+| `Outputs::default` <sub>fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L103) |  |
+| `Outputs::any` <sub>pub fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L114) | Whether anything at all would be written. |
+| `Outputs::names` <sub>pub fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L119) | The ticked ones, by name, for a project file. |
+| `Outputs::from_names` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L138) | Read back from a project file. |
+| `hex_of` <sub>fn</sub> | [148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L148) | An egui colour as #rrggbb. |
+| `colour_of` <sub>fn</sub> | [153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L153) | #rrggbb as an egui colour, or None for anything that is not one. |
+| `Group` <sub>pub struct</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L158) | The group-mode panel's state. |
+| `Group::default` <sub>fn</sub> | [223](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L223) |  |
+| `Group::start_from` <sub>pub fn</sub> | [257](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L257) | The panel as it should open, given the saved preference. |
+| `Group::len` <sub>pub fn</sub> | [265](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L265) | How many people are in the recording. |
+| `Group::is_empty` <sub>pub fn</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L270) | Whether there is nobody in it. |
+| `Group::colour` <sub>pub fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L275) | The colour a slot is drawn in: the override, or the one it is given. |
+| `Group::add` <sub>pub fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L288) | Add a person, if there is room for one. |
+| `Group::limit` <sub>pub fn</sub> | [301](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L301) | How many people this panel can hold in its current mode. |
+| `Group::remove` <sub>pub fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L309) | Remove one person, keeping at least two. |
+| `Group::to_plan` <sub>pub fn</sub> | [323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L323) | Build a plan from the panel: names in slot order, no turns. |
+| `Group::tab` <sub>pub fn</sub> | [339](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L339) | The whole panel. |
+| `Group::collect_dialogs` <sub>fn</sub> | [356](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L356) | Collect whatever the open pickers have answered. |
+| `Group::body` <sub>fn</sub> | [384](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L384) | Everything inside the scroller. |
+| `Group::profile_controls` <sub>fn</sub> | [459](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L459) | The named ways of working, and the project this panel came from. |
+| `Group::apply_profile` <sub>fn</sub> | [526](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L526) | Set the controls this profile names, and change nothing else. |
+| `Group::mode_controls` <sub>fn</sub> | [547](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L547) | The two controls that decide whether group mode is on. |
+| `Group::voice_mode_controls` <sub>fn</sub> | [604](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L604) | A voice each, or one voice between everybody. |
+| `Group::strip` <sub>fn</sub> | [645](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L645) | The picture: a circle per person, in their colour, with their name. |
+| `Group::people_list` <sub>fn</sub> | [680](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L680) | One row per person: colour, name, and a way to remove them. |
+| `Group::palette_picker` <sub>fn</sub> | [748](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L748) | Every colour in every palette, as swatches. |
+| `Group::swatch` <sub>fn</sub> | [787](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L787) | One clickable colour. |
+| `Group::output_controls` <sub>fn</sub> | [809](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L809) | What a render writes. |
+| `Group::to_workspace` <sub>pub fn</sub> | [833](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L833) | This panel as a saveable project. |
+| `Group::from_workspace` <sub>pub fn</sub> | [859](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L859) | Put a saved project back. |
+| `Group::is_busy` <sub>pub fn</sub> | [911](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L911) | Whether a render is running, so the window keeps repainting. |
+| `Group::drain` <sub>pub fn</sub> | [916](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L916) | Take the worker's answer if it has one. |
+| `Group::files_and_theme` <sub>fn</sub> | [932](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L932) | The recording, the plan, the title and the palette. |
+| `Group::render_controls` <sub>fn</sub> | [1022](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1022) | The button, and what came of pressing it. |
+| `Group::start` <sub>fn</sub> | [1078](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1078) | Start a render on a thread of its own. |
+| `file_name` <sub>fn</sub> | [1113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1113) | The last component of a path, for showing beside a button. |
+| `Job` <sub>struct</sub> | [1125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1125) | Everything one render needs, taken from the panel at the moment the button was pressed. |
+| `render_now` <sub>fn</sub> | [1145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1145) | Do the render. |
+| `with_extension` <sub>fn</sub> | [1243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1243) | Replace the last extension, keeping any .veiled before it. |
+| `assigned_colour` <sub>pub fn</sub> | [1255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1255) | The colour a slot is given, as an egui colour. |

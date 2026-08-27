@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-capture/src/programs.rs`
 
-[`veilvoice-capture`](../../../crates/veilvoice-capture/README.md) &middot; 372 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs)
+[`veilvoice-capture`](../../../crates/veilvoice-capture/README.md) &middot; 385 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs)
 
 ## Contents
 
 - [A list, and therefore incomplete](#a-list-and-therefore-incomplete)
 - [Capable of capturing is not the same as capturing](#capable-of-capturing-is-not-the-same-as-capturing)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -47,20 +48,33 @@ Telling the difference needs the compositor to say who is holding a capture
 session, and reaching that is FFI on every platform here. See
 `crate` for what that costs and why it is not paid.
 
+# In plain words
+
+A list of programs that can record a screen, with what each one is and whether
+recording is its purpose or merely something it can do.
+
+The difference matters. A screen recorder being open is worth telling you
+about. A chat program being open is worth much less, because it can share a
+screen and almost never is, and treating the two the same is how a warning
+becomes noise that everybody learns to ignore.
+
+This is a list of names, not a list of threats. Almost everything on it is
+software somebody installed on purpose.
+
 ## What this file contains
 
-372 lines defining **3 functions** (3 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+385 lines defining **3 functions** (3 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Program` (line 30) -- One program known to be able to capture a screen.
-- `enum Purpose` (line 50) -- Why a program is in the table.
+- `struct Program` (line 43) -- One program known to be able to capture a screen.
+- `enum Purpose` (line 63) -- Why a program is in the table.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Purpose::phrasing` (line 63) -- The wording a front end should use for this kind of program.
-- `matching` (line 205) -- Find the program a process name belongs to, if this build knows it.
-- `by_key` (line 224) -- Find a program by its Program::key.
+- `Purpose::phrasing` (line 76) -- The wording a front end should use for this kind of program.
+- `matching` (line 218) -- Find the program a process name belongs to, if this build knows it.
+- `by_key` (line 237) -- Find a program by its Program::key.
 
 ## What calls what
 
@@ -82,12 +96,12 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_phrasing(["Purpose::phrasing<br/>line 63"])
-    n_matching(["matching<br/>line 205"])
-    n_by_key(["by_key<br/>line 224"])
-    click n_phrasing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L63" "open the source"
-    click n_matching href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L205" "open the source"
-    click n_by_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L224" "open the source"
+    n_phrasing(["Purpose::phrasing<br/>line 76"])
+    n_matching(["matching<br/>line 218"])
+    n_by_key(["by_key<br/>line 237"])
+    click n_phrasing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L76" "open the source"
+    click n_matching href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L218" "open the source"
+    click n_by_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L237" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_phrasing,n_matching,n_by_key entry
 ```
@@ -98,12 +112,12 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Program` <sub>pub struct</sub> | [30](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L30) | One program known to be able to capture a screen. |
-| `Purpose` <sub>pub enum</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L50) | Why a program is in the table. |
-| `Purpose::phrasing` <sub>pub fn</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L63) | The wording a front end should use for this kind of program. |
-| `ALL` <sub>pub const</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L78) | Every program in the table. |
-| `matching` <sub>pub fn</sub> | [205](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L205) | Find the program a process name belongs to, if this build knows it. |
-| `by_key` <sub>pub fn</sub> | [224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L224) | Find a program by its Program::key. |
+| `Program` <sub>pub struct</sub> | [43](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L43) | One program known to be able to capture a screen. |
+| `Purpose` <sub>pub enum</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L63) | Why a program is in the table. |
+| `Purpose::phrasing` <sub>pub fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L76) | The wording a front end should use for this kind of program. |
+| `ALL` <sub>pub const</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L91) | Every program in the table. |
+| `matching` <sub>pub fn</sub> | [218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L218) | Find the program a process name belongs to, if this build knows it. |
+| `by_key` <sub>pub fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/programs.rs#L237) | Find a program by its Program::key. |
 
 ---
 

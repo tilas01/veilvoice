@@ -21,6 +21,18 @@
 //! The algorithm is YIN's cumulative mean normalised difference function
 //! (de Cheveigné & Kawahara, 2002) with parabolic interpolation, minus the
 //! optimisations that only matter for offline accuracy.
+//!
+//! # In plain words
+//!
+//! This works out how high or low somebody is speaking, moment by moment.
+//!
+//! It is needed for the accent work: to replace the rise and fall of somebody's
+//! voice with a flatter, more ordinary pattern, you first have to know what the
+//! rise and fall currently is.
+//!
+//! It is built to be quick rather than perfect, because it has to keep up with a
+//! live conversation. When it is not sure, it says so instead of guessing, and the
+//! accent work simply leaves that moment alone.
 
 /// Lowest fundamental the tracker will report, in hertz.
 const F0_MIN_HZ: f32 = 60.0;

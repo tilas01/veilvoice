@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-core/src/stft.rs`
 
-[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 246 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs)
+[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 259 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs)
 
 ## Contents
 
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Streaming short-time Fourier transform with overlap-add resynthesis.
 
@@ -34,19 +35,32 @@ useful frame sizes is far too coarse for that — and handing over the frame
 that produced the spectrum keeps the two perfectly aligned. Its newest `hop`
 samples are the tail.
 
+# In plain words
+
+Sound arrives as a long stream of numbers. To change a voice you have to look
+at it in terms of pitch and tone rather than raw numbers, and this is the part
+that converts back and forth.
+
+It takes a short slice of sound, works out which frequencies are in it, hands
+that picture to the code that alters it, and turns the result back into sound.
+The slices overlap and are faded together, so the joins cannot be heard.
+
+Everything else in the engine is written in terms of those pictures. This file
+is the door between the two ways of looking at the same thing.
+
 ## What this file contains
 
-246 lines defining **4 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+259 lines defining **4 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct StftEngine` (line 23) -- Reusable streaming STFT engine (single channel).
+- `struct StftEngine` (line 36) -- Reusable streaming STFT engine (single channel).
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `StftEngine::new` (line 47) -- n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4).
-- `StftEngine::latency_samples` (line 85) -- End-to-end algorithmic latency (group delay) in samples.
-- `StftEngine::process` (line 92) -- Process input into output (equal length).
+- `StftEngine::new` (line 60) -- n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4).
+- `StftEngine::latency_samples` (line 98) -- End-to-end algorithmic latency (group delay) in samples.
+- `StftEngine::process` (line 105) -- Process input into output (equal length).
   - reaches: `process_frame`
 
 ## What calls what
@@ -69,15 +83,15 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new(["StftEngine::new<br/>line 47"])
-    n_latency_samples(["StftEngine::latency_samples<br/>line 85"])
-    n_process(["StftEngine::process<br/>line 92"])
-    n_process_frame["StftEngine::process_frame<br/>line 141"]
+    n_new(["StftEngine::new<br/>line 60"])
+    n_latency_samples(["StftEngine::latency_samples<br/>line 98"])
+    n_process(["StftEngine::process<br/>line 105"])
+    n_process_frame["StftEngine::process_frame<br/>line 154"]
     n_process --> n_process_frame
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L47" "open the source"
-    click n_latency_samples href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L85" "open the source"
-    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L92" "open the source"
-    click n_process_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L141" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L60" "open the source"
+    click n_latency_samples href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L98" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L105" "open the source"
+    click n_process_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L154" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_latency_samples,n_process entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -90,11 +104,11 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `StftEngine` <sub>pub struct</sub> | [23](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L23) | Reusable streaming STFT engine (single channel). |
-| `StftEngine::new` <sub>pub fn</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L47) | n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4). |
-| `StftEngine::latency_samples` <sub>pub fn</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L85) | End-to-end algorithmic latency (group delay) in samples. |
-| `StftEngine::process` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L92) | Process input into output (equal length). |
-| `StftEngine::process_frame` <sub>fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L141) |  |
+| `StftEngine` <sub>pub struct</sub> | [36](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L36) | Reusable streaming STFT engine (single channel). |
+| `StftEngine::new` <sub>pub fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L60) | n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4). |
+| `StftEngine::latency_samples` <sub>pub fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L98) | End-to-end algorithmic latency (group delay) in samples. |
+| `StftEngine::process` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L105) | Process input into output (equal length). |
+| `StftEngine::process_frame` <sub>fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L154) |  |
 
 ---
 

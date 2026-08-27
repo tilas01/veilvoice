@@ -49,6 +49,15 @@
 //! **Only one host is ever contacted**, and it is compiled in. A URL cannot be
 //! supplied on the command line, so this cannot be turned into a general
 //! downloader by an argument.
+//!
+//! # In plain words
+//!
+//! Downloads a release, without VeilVoice containing any networking code.
+//!
+//! It asks the tool your system already has to do the fetching. That is what keeps
+//! a real promise the rest of the project makes: there is no HTTP client anywhere
+//! in what VeilVoice is built from, which you can check yourself, and this is the
+//! one command that touches the network at all.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;

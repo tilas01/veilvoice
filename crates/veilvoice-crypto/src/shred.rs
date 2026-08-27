@@ -35,6 +35,20 @@
 //! random, complement, random — which satisfies the common
 //! three-pass expectation without pretending that thirty-five would be stronger.
 //! Time is better spent enabling disk encryption than on passes 4 through 35.
+//!
+//! # In plain words
+//!
+//! This is meant to destroy a file, and the first thing it does is tell you how
+//! much that is worth.
+//!
+//! On the drives most computers now have, overwriting a file does not reliably
+//! remove it. The drive puts the new data somewhere else and leaves the original
+//! sitting in a place no ordinary program can reach, until it is cleaned up later,
+//! which may be never.
+//!
+//! So this does what it can and refuses to promise more. If you need something to
+//! be genuinely unrecoverable, encrypt it from the start and never write it
+//! unencrypted anywhere.
 
 use crate::Error;
 use std::fs::OpenOptions;

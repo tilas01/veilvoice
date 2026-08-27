@@ -20,6 +20,15 @@
 //! Paths are stored with forward slashes so a manifest written on Windows still
 //! reads on Linux, and are rejected if they contain a newline -- otherwise a
 //! filename could forge a record.
+//!
+//! # In plain words
+//!
+//! The written record of what VeilVoice's files were, so a later check can tell
+//! whether they still are.
+//!
+//! It is plain text on purpose: you can read it, diff it and keep a copy
+//! somewhere else. A record you cannot inspect is one you have to take on trust,
+//! which rather defeats the point of having it.
 
 use crate::Error;
 use sha2::{Digest, Sha256};

@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-drivers/macos.svg" alt="macos.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-drivers/src/macos.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-drivers.html">veilvoice-drivers</a> &middot; 206 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-drivers.html">veilvoice-drivers</a> &middot; 214 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-tools-because-apple-is-mid-transition">Two tools, because Apple is mid-transition</a>
   <a href="#why-a-subprocess">Why a subprocess</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -60,10 +61,13 @@
 <p>The <strong>address is deliberately dropped</strong>, for the same reason as on Linux: it is zeroed for an unprivileged reader on a machine with kernel-pointer restriction, and changes at every boot on one without. Recording it would make every extension look altered after a restart, and a report that is entirely false positives after every reboot is a report nobody opens twice.</p>
 <h2 id="why-a-subprocess">Why a subprocess</h2>
 <p>The native answer is IOKit, which is FFI. <code>#![forbid(unsafe_code)]</code> holds here as everywhere else in the workspace, so this asks a tool the system already ships &#8212; the same trade the Windows and Linux readers make.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Asks macOS which system extensions are loaded.</p>
+<p>There are two tools depending on how new the machine is, because Apple is part way through replacing one with the other. The newer one is tried first and the older is the fallback, so this works on both without being told which you have.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>206 lines defining <strong>2 functions</strong> (0 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>214 lines defining <strong>2 functions</strong> (0 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -73,15 +77,15 @@
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="298" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M269.6 47.0 C 291.6 47.0, 291.6 47.0, 165.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L39" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L47" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="95.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_kextstat</text>
-<text x="95.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 39</text>
+<text x="95.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 47</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L87" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L95" target="_blank" rel="noopener noreferrer">
 <rect x="188.4" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="229.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read</text>
-<text x="229.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
+<text x="229.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 95</text>
 </a>
 </svg>
 </div>
@@ -89,11 +93,11 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_parse_kextstat[&quot;parse_kextstat&lt;br/&gt;line 39&quot;]
-    n_read[&quot;read&lt;br/&gt;line 87&quot;]
+    n_parse_kextstat[&quot;parse_kextstat&lt;br/&gt;line 47&quot;]
+    n_read[&quot;read&lt;br/&gt;line 95&quot;]
     n_read --&gt; n_parse_kextstat
-    click n_parse_kextstat href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L39&quot; &quot;open the source&quot;
-    click n_read href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L87&quot; &quot;open the source&quot;
+    click n_parse_kextstat href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L47&quot; &quot;open the source&quot;
+    click n_read href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L95&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_parse_kextstat,n_read helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -102,8 +106,8 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>parse_kextstat</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L39" rel="noopener noreferrer">39</a></td><td>Parse kextstat-style output, which kmutil showloaded also produces.</td></tr>
-<tr><td><code>read</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L87" rel="noopener noreferrer">87</a></td><td>Ask kmutil, then kextstat.</td></tr>
+<tr><td><code>parse_kextstat</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L47" rel="noopener noreferrer">47</a></td><td>Parse kextstat-style output, which kmutil showloaded also produces.</td></tr>
+<tr><td><code>read</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L95" rel="noopener noreferrer">95</a></td><td>Ask kmutil, then kextstat.</td></tr>
 </tbody></table>
 </section>
 </div></div>

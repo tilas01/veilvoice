@@ -35,6 +35,20 @@
 //! `hound::WavWriter::finalize` consumes the writer, so the encode has to borrow
 //! the cursor (`WavWriter::new(&mut cursor, spec)`) and read the bytes back
 //! through `cursor.into_inner()` after the writer has been dropped.
+//!
+//! # In plain words
+//!
+//! This opens sound files and writes them back out.
+//!
+//! It can read the usual formats, and it always writes plain WAV. That is
+//! deliberate: WAV throws nothing away. Saving as MP3 after the voice has been
+//! veiled would lose quality for no reason, and anybody who wants a smaller file
+//! can convert it afterwards with whatever they already use.
+//!
+//! Opening a sound file means reading a file somebody else made, which is the part
+//! of any program most worth being careful in. A file that is damaged, or built on
+//! purpose to cause trouble, is refused with a reason rather than being allowed to
+//! bring the program down.
 
 use crate::Error;
 use std::io::{Read, Seek, SeekFrom};

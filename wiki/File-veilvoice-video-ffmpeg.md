@@ -3,13 +3,14 @@
 
 # `crates/veilvoice-video/src/ffmpeg.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 305 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs)
+[[veilvoice-video|Crate-veilvoice-video]] &middot; 316 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs)
 
 ## Contents
 
 - [Why there is no encoder here](#why-there-is-no-encoder-here)
 - [And VeilVoice will not run it for you](#and-veilvoice-will-not-run-it-for-you)
 - [If the machine has no ffmpeg, nothing has failed](#if-the-machine-has-no-ffmpeg-nothing-has-failed)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -41,19 +42,30 @@ the companion installer follows, for the same reason.
 `crate::page::player` has already written a file that plays everywhere
 and needs nothing installed. The video file is the extra, not the product.
 
+# In plain words
+
+This works out the command that would turn the pictures and the veiled audio
+into a video file, and prints it for you to run.
+
+It does not run it, and VeilVoice does not contain a video encoder. Every
+usable one is a large piece of C code, and adding one would mean this project
+no longer being something you can read the whole of. So it writes out the
+command for `ffmpeg`, which many people already have, and leaves running it to
+you.
+
 ## What this file contains
 
-305 lines defining **5 functions** (4 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+316 lines defining **5 functions** (4 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Encoding` (line 57) -- How to render the file.
+- `struct Encoding` (line 68) -- How to render the file.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `command` (line 101) -- The command that turns a directory of numbered frames and a WAV into a video file.
-- `command_line` (line 156) -- The command as one line, for printing.
-- `describe` (line 170) -- What to tell the user about their machine's ffmpeg.
+- `command` (line 112) -- The command that turns a directory of numbered frames and a WAV into a video file.
+- `command_line` (line 167) -- The command as one line, for printing.
+- `describe` (line 181) -- What to tell the user about their machine's ffmpeg.
   - reaches: `found`
 
 ## What calls what
@@ -70,17 +82,17 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_found["found<br/>line 37"]
-    n_default["Encoding::default<br/>line 76"]
-    n_command(["command<br/>line 101"])
-    n_command_line(["command_line<br/>line 156"])
-    n_describe(["describe<br/>line 170"])
+    n_found["found<br/>line 48"]
+    n_default["Encoding::default<br/>line 87"]
+    n_command(["command<br/>line 112"])
+    n_command_line(["command_line<br/>line 167"])
+    n_describe(["describe<br/>line 181"])
     n_describe --> n_found
-    click n_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L37" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L76" "open the source"
-    click n_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L101" "open the source"
-    click n_command_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L156" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L170" "open the source"
+    click n_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L48" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L87" "open the source"
+    click n_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L112" "open the source"
+    click n_command_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L167" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L181" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_command,n_command_line,n_describe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -95,9 +107,9 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `found` <sub>pub fn</sub> | [37](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L37) | Where ffmpeg is, if this machine has one. |
-| `Encoding` <sub>pub struct</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L57) | How to render the file. |
-| `Encoding::default` <sub>fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L76) |  |
-| `command` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L101) | The command that turns a directory of numbered frames and a WAV into a video file. |
-| `command_line` <sub>pub fn</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L156) | The command as one line, for printing. |
-| `describe` <sub>pub fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L170) | What to tell the user about their machine's ffmpeg. |
+| `found` <sub>pub fn</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L48) | Where ffmpeg is, if this machine has one. |
+| `Encoding` <sub>pub struct</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L68) | How to render the file. |
+| `Encoding::default` <sub>fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L87) |  |
+| `command` <sub>pub fn</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L112) | The command that turns a directory of numbered frames and a WAV into a video file. |
+| `command_line` <sub>pub fn</sub> | [167](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L167) | The command as one line, for printing. |
+| `describe` <sub>pub fn</sub> | [181](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L181) | What to tell the user about their machine's ffmpeg. |

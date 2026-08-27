@@ -28,6 +28,15 @@
 //! The reason it is safe to apply an unverified policy is the one-way property
 //! [`veilvoice_policy`] is built around, and [`InForce::panel`] states it
 //! rather than leaving the reader to infer it.
+//!
+//! # In plain words
+//!
+//! Reads the rules that say which settings must stay on, and makes the window obey
+//! them.
+//!
+//! The controls show the value that will actually be used, rather than one that
+//! silently changes when you press the button. A slider showing something a job
+//! will not honour is worse than a slider you cannot move.
 
 use crate::theme::palette as p;
 use egui::{RichText, Ui};

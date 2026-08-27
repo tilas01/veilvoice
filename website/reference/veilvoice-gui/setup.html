@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/setup.svg" alt="setup.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/setup.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 740 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 753 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#portable-is-the-default-and-this-tab-says-so-first">Portable is the default, and this tab says so first</a>
   <a href="#nothing-is-ticked-because-there-is-nothing-to-tick">Nothing is ticked, because there is nothing to tick</a>
   <a href="#nothing-slow-runs-on-the-ui-thread">Nothing slow runs on the UI thread</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -61,21 +62,25 @@
 <h2 id="nothing-slow-runs-on-the-ui-thread">Nothing slow runs on the UI thread</h2>
 <p>Copying binaries, editing the registry and running a package manager all take real time &#8212; a package manager can take minutes. Each runs on a worker and reports back through an <code>std::sync::mpsc</code> channel, exactly as the file job in <code>crate::VeilVoiceApp</code> does, so the window keeps painting and the progress strip keeps moving.</p>
 <p>The strip honours the reduced-motion decision like everything else: with motion off it is a static bar and a word, not a frozen animation.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>The tab that installs this copy, removes it again, and points at the optional extra software.</p>
+<p>It is only a front end: every decision about where files go and what gets changed lives in one place shared with the command line, so the two cannot disagree about what &quot;installed&quot; means.</p>
+<p>Nothing here installs anything belonging to somebody else without being asked. What each thing is, who makes it and what it is for are shown first, and the exact command is shown before the question.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>740 lines defining <strong>15 functions</strong> (5 public), <strong>3 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>753 lines defining <strong>15 functions</strong> (5 public), <strong>3 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Done</code> <span style="color:var(--muted)">line 49</span> &mdash; What a worker finished doing: lines to show, and whether it went well.</li>
-<li><code>struct Row</code> <span style="color:var(--muted)">line 55</span> &mdash; One companion as this tab needs it: the facts, plus what was found.</li>
-<li><code>struct Setup</code> <span style="color:var(--muted)">line 62</span> &mdash; The setup tab&#x27;s state.</li>
+<li><code>struct Done</code> <span style="color:var(--muted)">line 62</span> &mdash; What a worker finished doing: lines to show, and whether it went well.</li>
+<li><code>struct Row</code> <span style="color:var(--muted)">line 68</span> &mdash; One companion as this tab needs it: the facts, plus what was found.</li>
+<li><code>struct Setup</code> <span style="color:var(--muted)">line 75</span> &mdash; The setup tab&#x27;s state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Setup::running_installed</code> <span style="color:var(--muted)">line 99</span> &mdash; Whether this copy is the installed one.
+<li><code>Setup::running_installed</code> <span style="color:var(--muted)">line 112</span> &mdash; Whether this copy is the installed one.
 </li>
-<li><code>Setup::is_busy</code> <span style="color:var(--muted)">line 104</span> &mdash; True while a worker is running, so the app can keep repainting.
+<li><code>Setup::is_busy</code> <span style="color:var(--muted)">line 117</span> &mdash; True while a worker is running, so the app can keep repainting.
 </li>
-<li><code>Setup::tab</code> <span style="color:var(--muted)">line 142</span> &mdash; Draw the tab.
+<li><code>Setup::tab</code> <span style="color:var(--muted)">line 155</span> &mdash; Draw the tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>companion_rows</code>, <code>install_controls</code>, <code>poll</code>, <code>where_this_copy_lives</code>, <code>detect_all</code>, <code>start</code>, <code>install_changes</code>, <code>progress</code>, <code>field</code>, <code>visibility_note</code></span>
 </li>
 </ul>
@@ -101,80 +106,80 @@
 <path d="M278.0 174.0 C 278.0 194.0, 270.4 200.0, 270.4 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M270.4 274.0 C 270.4 294.0, 319.8 500.0, 319.8 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M390.8 247.0 C 573.2 247.0, 573.2 147.0, 554.2 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L75" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L88" target="_blank" rel="noopener noreferrer">
 <rect x="54.2" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="121.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::default</text>
-<text x="121.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 75</text>
+<text x="121.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 88</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L82" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L95" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="72.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::new</text>
-<text x="72.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 82</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L99" target="_blank" rel="noopener noreferrer">
-<rect x="214.6" y="20.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="319.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::running_installed</text>
-<text x="319.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 99</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L104" target="_blank" rel="noopener noreferrer">
-<rect x="451.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="518.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::is_busy</text>
-<text x="518.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 104</text>
+<text x="72.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 95</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L112" target="_blank" rel="noopener noreferrer">
+<rect x="214.6" y="20.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="319.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::running_installed</text>
+<text x="319.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 112</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L117" target="_blank" rel="noopener noreferrer">
+<rect x="451.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="518.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::is_busy</text>
+<text x="518.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 117</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L125" target="_blank" rel="noopener noreferrer">
 <rect x="88.4" y="120.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="144.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::poll</text>
-<text x="144.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 112</text>
+<text x="144.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 125</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L142" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L155" target="_blank" rel="noopener noreferrer">
 <rect x="226.0" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="278.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::tab</text>
-<text x="278.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 142</text>
+<text x="278.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 155</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L170" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L183" target="_blank" rel="noopener noreferrer">
 <rect x="356.0" y="120.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="453.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::visibility_note</text>
-<text x="453.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
+<text x="453.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 183</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L187" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L200" target="_blank" rel="noopener noreferrer">
 <rect x="150.0" y="220.0" width="240.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="270.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::where_this_copy_lives</text>
-<text x="270.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 187</text>
+<text x="270.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L254" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L267" target="_blank" rel="noopener noreferrer">
 <rect x="416.8" y="220.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="518.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::install_controls</text>
-<text x="518.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 254</text>
+<text x="518.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 267</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L359" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L372" target="_blank" rel="noopener noreferrer">
 <rect x="27.2" y="420.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="86.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::start</text>
-<text x="86.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 359</text>
+<text x="86.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 372</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L383" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L396" target="_blank" rel="noopener noreferrer">
 <rect x="172.4" y="420.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="243.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::progress</text>
-<text x="243.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 383</text>
+<text x="243.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 396</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L423" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L436" target="_blank" rel="noopener noreferrer">
 <rect x="226.0" y="320.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="319.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Setup::companion_rows</text>
-<text x="319.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 423</text>
+<text x="319.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 436</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L580" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L593" target="_blank" rel="noopener noreferrer">
 <rect x="340.4" y="420.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="392.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">detect_all</text>
-<text x="392.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 580</text>
+<text x="392.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 593</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L596" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L609" target="_blank" rel="noopener noreferrer">
 <rect x="470.4" y="420.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="541.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install_changes</text>
-<text x="541.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 596</text>
+<text x="541.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 609</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L608" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L621" target="_blank" rel="noopener noreferrer">
 <rect x="275.4" y="520.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="319.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
-<text x="319.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 608</text>
+<text x="319.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 621</text>
 </a>
 </svg>
 </div>
@@ -182,21 +187,21 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_default[&quot;Setup::default&lt;br/&gt;line 75&quot;]
-    n_new[&quot;Setup::new&lt;br/&gt;line 82&quot;]
-    n_running_installed([&quot;Setup::running_installed&lt;br/&gt;line 99&quot;])
-    n_is_busy([&quot;Setup::is_busy&lt;br/&gt;line 104&quot;])
-    n_poll[&quot;Setup::poll&lt;br/&gt;line 112&quot;]
-    n_tab([&quot;Setup::tab&lt;br/&gt;line 142&quot;])
-    n_visibility_note[&quot;Setup::visibility_note&lt;br/&gt;line 170&quot;]
-    n_where_this_copy_lives[&quot;Setup::where_this_copy_lives&lt;br/&gt;line 187&quot;]
-    n_install_controls[&quot;Setup::install_controls&lt;br/&gt;line 254&quot;]
-    n_start[&quot;Setup::start&lt;br/&gt;line 359&quot;]
-    n_progress[&quot;Setup::progress&lt;br/&gt;line 383&quot;]
-    n_companion_rows[&quot;Setup::companion_rows&lt;br/&gt;line 423&quot;]
-    n_detect_all[&quot;detect_all&lt;br/&gt;line 580&quot;]
-    n_install_changes[&quot;install_changes&lt;br/&gt;line 596&quot;]
-    n_field[&quot;field&lt;br/&gt;line 608&quot;]
+    n_default[&quot;Setup::default&lt;br/&gt;line 88&quot;]
+    n_new[&quot;Setup::new&lt;br/&gt;line 95&quot;]
+    n_running_installed([&quot;Setup::running_installed&lt;br/&gt;line 112&quot;])
+    n_is_busy([&quot;Setup::is_busy&lt;br/&gt;line 117&quot;])
+    n_poll[&quot;Setup::poll&lt;br/&gt;line 125&quot;]
+    n_tab([&quot;Setup::tab&lt;br/&gt;line 155&quot;])
+    n_visibility_note[&quot;Setup::visibility_note&lt;br/&gt;line 183&quot;]
+    n_where_this_copy_lives[&quot;Setup::where_this_copy_lives&lt;br/&gt;line 200&quot;]
+    n_install_controls[&quot;Setup::install_controls&lt;br/&gt;line 267&quot;]
+    n_start[&quot;Setup::start&lt;br/&gt;line 372&quot;]
+    n_progress[&quot;Setup::progress&lt;br/&gt;line 396&quot;]
+    n_companion_rows[&quot;Setup::companion_rows&lt;br/&gt;line 436&quot;]
+    n_detect_all[&quot;detect_all&lt;br/&gt;line 593&quot;]
+    n_install_changes[&quot;install_changes&lt;br/&gt;line 609&quot;]
+    n_field[&quot;field&lt;br/&gt;line 621&quot;]
     n_companion_rows --&gt; n_detect_all
     n_companion_rows --&gt; n_start
     n_default --&gt; n_new
@@ -211,21 +216,21 @@ flowchart TD
     n_tab --&gt; n_where_this_copy_lives
     n_where_this_copy_lives --&gt; n_field
     n_where_this_copy_lives --&gt; n_visibility_note
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L75&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L82&quot; &quot;open the source&quot;
-    click n_running_installed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L99&quot; &quot;open the source&quot;
-    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L104&quot; &quot;open the source&quot;
-    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L112&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L142&quot; &quot;open the source&quot;
-    click n_visibility_note href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L170&quot; &quot;open the source&quot;
-    click n_where_this_copy_lives href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L187&quot; &quot;open the source&quot;
-    click n_install_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L254&quot; &quot;open the source&quot;
-    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L359&quot; &quot;open the source&quot;
-    click n_progress href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L383&quot; &quot;open the source&quot;
-    click n_companion_rows href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L423&quot; &quot;open the source&quot;
-    click n_detect_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L580&quot; &quot;open the source&quot;
-    click n_install_changes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L596&quot; &quot;open the source&quot;
-    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L608&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L88&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L95&quot; &quot;open the source&quot;
+    click n_running_installed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L112&quot; &quot;open the source&quot;
+    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L117&quot; &quot;open the source&quot;
+    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L125&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L155&quot; &quot;open the source&quot;
+    click n_visibility_note href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L183&quot; &quot;open the source&quot;
+    click n_where_this_copy_lives href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L200&quot; &quot;open the source&quot;
+    click n_install_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L267&quot; &quot;open the source&quot;
+    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L372&quot; &quot;open the source&quot;
+    click n_progress href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L396&quot; &quot;open the source&quot;
+    click n_companion_rows href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L436&quot; &quot;open the source&quot;
+    click n_detect_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L593&quot; &quot;open the source&quot;
+    click n_install_changes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L609&quot; &quot;open the source&quot;
+    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L621&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_running_installed,n_is_busy,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -238,24 +243,24 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Done</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L49" rel="noopener noreferrer">49</a></td><td>What a worker finished doing: lines to show, and whether it went well.</td></tr>
-<tr><td><code>Row</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L55" rel="noopener noreferrer">55</a></td><td>One companion as this tab needs it: the facts, plus what was found.</td></tr>
-<tr><td><code>Setup</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L62" rel="noopener noreferrer">62</a></td><td>The setup tab&#x27;s state.</td></tr>
-<tr><td><code>Setup::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L75" rel="noopener noreferrer">75</a></td><td></td></tr>
-<tr><td><code>Setup::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L82" rel="noopener noreferrer">82</a></td><td>Read the machine&#x27;s current state.</td></tr>
-<tr><td><code>Setup::running_installed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L99" rel="noopener noreferrer">99</a></td><td>Whether this copy is the installed one.</td></tr>
-<tr><td><code>Setup::is_busy</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L104" rel="noopener noreferrer">104</a></td><td>True while a worker is running, so the app can keep repainting.</td></tr>
-<tr><td><code>Setup::poll</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L112" rel="noopener noreferrer">112</a></td><td>Drain the worker channel.</td></tr>
-<tr><td><code>Setup::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L142" rel="noopener noreferrer">142</a></td><td>Draw the tab.</td></tr>
-<tr><td><code>Setup::visibility_note</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L170" rel="noopener noreferrer">170</a></td><td>Why this tab is here, and how to make it not be.</td></tr>
-<tr><td><code>Setup::where_this_copy_lives</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L187" rel="noopener noreferrer">187</a></td><td></td></tr>
-<tr><td><code>Setup::install_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L254" rel="noopener noreferrer">254</a></td><td></td></tr>
-<tr><td><code>Setup::start</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L359" rel="noopener noreferrer">359</a></td><td>Start a worker, and remember what it is doing so the strip can say.</td></tr>
-<tr><td><code>Setup::progress</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L383" rel="noopener noreferrer">383</a></td><td>The progress strip: a travelling highlight, or a plain bar when motion is off.</td></tr>
-<tr><td><code>Setup::companion_rows</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L423" rel="noopener noreferrer">423</a></td><td></td></tr>
-<tr><td><code>detect_all</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L580" rel="noopener noreferrer">580</a></td><td>Probe for every companion that applies to this platform.</td></tr>
-<tr><td><code>install_changes</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L596" rel="noopener noreferrer">596</a></td><td>Exactly what an install changes, in the order it changes it.</td></tr>
-<tr><td><code>field</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L608" rel="noopener noreferrer">608</a></td><td></td></tr>
+<tr><td><code>Done</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L62" rel="noopener noreferrer">62</a></td><td>What a worker finished doing: lines to show, and whether it went well.</td></tr>
+<tr><td><code>Row</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L68" rel="noopener noreferrer">68</a></td><td>One companion as this tab needs it: the facts, plus what was found.</td></tr>
+<tr><td><code>Setup</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L75" rel="noopener noreferrer">75</a></td><td>The setup tab&#x27;s state.</td></tr>
+<tr><td><code>Setup::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L88" rel="noopener noreferrer">88</a></td><td></td></tr>
+<tr><td><code>Setup::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L95" rel="noopener noreferrer">95</a></td><td>Read the machine&#x27;s current state.</td></tr>
+<tr><td><code>Setup::running_installed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L112" rel="noopener noreferrer">112</a></td><td>Whether this copy is the installed one.</td></tr>
+<tr><td><code>Setup::is_busy</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L117" rel="noopener noreferrer">117</a></td><td>True while a worker is running, so the app can keep repainting.</td></tr>
+<tr><td><code>Setup::poll</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L125" rel="noopener noreferrer">125</a></td><td>Drain the worker channel.</td></tr>
+<tr><td><code>Setup::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L155" rel="noopener noreferrer">155</a></td><td>Draw the tab.</td></tr>
+<tr><td><code>Setup::visibility_note</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L183" rel="noopener noreferrer">183</a></td><td>Why this tab is here, and how to make it not be.</td></tr>
+<tr><td><code>Setup::where_this_copy_lives</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L200" rel="noopener noreferrer">200</a></td><td></td></tr>
+<tr><td><code>Setup::install_controls</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L267" rel="noopener noreferrer">267</a></td><td></td></tr>
+<tr><td><code>Setup::start</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L372" rel="noopener noreferrer">372</a></td><td>Start a worker, and remember what it is doing so the strip can say.</td></tr>
+<tr><td><code>Setup::progress</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L396" rel="noopener noreferrer">396</a></td><td>The progress strip: a travelling highlight, or a plain bar when motion is off.</td></tr>
+<tr><td><code>Setup::companion_rows</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L436" rel="noopener noreferrer">436</a></td><td></td></tr>
+<tr><td><code>detect_all</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L593" rel="noopener noreferrer">593</a></td><td>Probe for every companion that applies to this platform.</td></tr>
+<tr><td><code>install_changes</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L609" rel="noopener noreferrer">609</a></td><td>Exactly what an install changes, in the order it changes it.</td></tr>
+<tr><td><code>field</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L621" rel="noopener noreferrer">621</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

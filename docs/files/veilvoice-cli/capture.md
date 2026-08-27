@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-cli/src/capture.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 321 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 330 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs)
 
 ## Contents
 
 - [Where the allowlist lives](#where-the-allowlist-lives)
 - [The exit code](#the-exit-code)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -50,21 +51,30 @@ A check that cannot see is not a check that passed, but neither is it a
 reason to fail a script — the difference is in the words, and the words are
 printed.
 
+# In plain words
+
+Tells you which screen recorders are running, and lets you say you meant to
+start one so it stops being mentioned.
+
+It cannot tell whether a program is actually recording, only that it is open,
+and it says so. A meeting application being open is not somebody watching your
+screen.
+
 ## What this file contains
 
-321 lines defining **10 functions** (7 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+330 lines defining **10 functions** (7 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `status` (line 66) -- What is running, what is allowed, and what this cannot see.
+- `status` (line 75) -- What is running, what is allowed, and what this cannot see.
   - reaches: `load`, `allow_path`, `capture_dir`
-- `calls` (line 118) -- Every program in the table, whether it is running or not.
-- `list` (line 195)
-- `allow` (line 228) -- Stop notifying about one program.
+- `calls` (line 127) -- Every program in the table, whether it is running or not.
+- `list` (line 204)
+- `allow` (line 237) -- Stop notifying about one program.
   - reaches: `load`, `save`, `allow_path`, `capture_dir`
-- `deny` (line 245) -- Start notifying about one program again.
+- `deny` (line 254) -- Start notifying about one program again.
   - reaches: `load`, `save`, `allow_path`, `capture_dir`
-- `check` (line 261) -- Look now, and let the exit code answer.
+- `check` (line 270) -- Look now, and let the exit code answer.
   - reaches: `load`, `allow_path`, `capture_dir`
 
 ## What calls what
@@ -87,16 +97,16 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_capture_dir["capture_dir<br/>line 39"]
-    n_allow_path["allow_path<br/>line 43"]
-    n_load["load<br/>line 53"]
-    n_save["save<br/>line 58"]
-    n_status(["status<br/>line 66"])
-    n_calls(["calls<br/>line 118"])
-    n_list(["list<br/>line 195"])
-    n_allow(["allow<br/>line 228"])
-    n_deny(["deny<br/>line 245"])
-    n_check(["check<br/>line 261"])
+    n_capture_dir["capture_dir<br/>line 48"]
+    n_allow_path["allow_path<br/>line 52"]
+    n_load["load<br/>line 62"]
+    n_save["save<br/>line 67"]
+    n_status(["status<br/>line 75"])
+    n_calls(["calls<br/>line 127"])
+    n_list(["list<br/>line 204"])
+    n_allow(["allow<br/>line 237"])
+    n_deny(["deny<br/>line 254"])
+    n_check(["check<br/>line 270"])
     n_allow --> n_load
     n_allow --> n_save
     n_allow_path --> n_capture_dir
@@ -106,16 +116,16 @@ flowchart TD
     n_load --> n_allow_path
     n_save --> n_allow_path
     n_status --> n_load
-    click n_capture_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L39" "open the source"
-    click n_allow_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L43" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L53" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L58" "open the source"
-    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L66" "open the source"
-    click n_calls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L118" "open the source"
-    click n_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L195" "open the source"
-    click n_allow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L228" "open the source"
-    click n_deny href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L245" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L261" "open the source"
+    click n_capture_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L48" "open the source"
+    click n_allow_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L52" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L62" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L67" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L75" "open the source"
+    click n_calls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L127" "open the source"
+    click n_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L204" "open the source"
+    click n_allow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L237" "open the source"
+    click n_deny href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L254" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L270" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_calls,n_list,n_allow,n_deny,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -130,16 +140,16 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `capture_dir` <sub>pub fn</sub> | [39](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L39) | Where the allowlist is kept. |
-| `allow_path` <sub>fn</sub> | [43](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L43) |  |
-| `load` <sub>fn</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L53) |  |
-| `save` <sub>fn</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L58) |  |
-| `status` <sub>pub fn</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L66) | What is running, what is allowed, and what this cannot see. |
-| `calls` <sub>pub fn</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L118) | Every program in the table, whether it is running or not. |
-| `list` <sub>pub fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L195) |  |
-| `allow` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L228) | Stop notifying about one program. |
-| `deny` <sub>pub fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L245) | Start notifying about one program again. |
-| `check` <sub>pub fn</sub> | [261](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L261) | Look now, and let the exit code answer. |
+| `capture_dir` <sub>pub fn</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L48) | Where the allowlist is kept. |
+| `allow_path` <sub>fn</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L52) |  |
+| `load` <sub>fn</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L62) |  |
+| `save` <sub>fn</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L67) |  |
+| `status` <sub>pub fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L75) | What is running, what is allowed, and what this cannot see. |
+| `calls` <sub>pub fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L127) | Every program in the table, whether it is running or not. |
+| `list` <sub>pub fn</sub> | [204](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L204) |  |
+| `allow` <sub>pub fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L237) | Stop notifying about one program. |
+| `deny` <sub>pub fn</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L254) | Start notifying about one program again. |
+| `check` <sub>pub fn</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L270) | Look now, and let the exit code answer. |
 
 ---
 

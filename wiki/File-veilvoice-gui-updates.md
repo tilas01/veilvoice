@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-gui/src/updates.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 234 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 246 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs)
 
 ## Contents
 
 - [It runs on a thread, and the window never waits for it](#it-runs-on-a-thread-and-the-window-never-waits-for-it)
 - [Nothing here is automatic](#nothing-here-is-automatic)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -33,18 +34,30 @@ There is no timer, no check at startup, and no "check again" on a schedule.
 `Updates` holds no clock. The only path into `veilvoice_update::check` is
 a click, and a test asserts the state a freshly built panel is in.
 
+# In plain words
+
+The update check, as a button you press.
+
+VeilVoice never checks on its own and never contacts anything unless you ask.
+An update check that runs by itself is a message to somebody else's server
+saying that this copy exists and is running now.
+
+When you do press it, it compares your version against the newest published one
+and tells you what it found, including that the answer only tells you what a
+release page says.
+
 ## What this file contains
 
-234 lines defining **5 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+246 lines defining **5 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Updates` (line 30) -- The panel's state.
+- `struct Updates` (line 42) -- The panel's state.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Updates::drain` (line 48) -- Take the worker's answer if it has one.
-- `Updates::section` (line 83) -- The whole section, as it appears under "about".
+- `Updates::drain` (line 60) -- Take the worker's answer if it has one.
+- `Updates::section` (line 95) -- The whole section, as it appears under "about".
   - reaches: `is_busy`, `start`, `verdict`
 
 ## What calls what
@@ -61,19 +74,19 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_is_busy["Updates::is_busy<br/>line 39"]
-    n_drain(["Updates::drain<br/>line 48"])
-    n_start["Updates::start<br/>line 66"]
-    n_section(["Updates::section<br/>line 83"])
-    n_verdict["Updates::verdict<br/>line 132"]
+    n_is_busy["Updates::is_busy<br/>line 51"]
+    n_drain(["Updates::drain<br/>line 60"])
+    n_start["Updates::start<br/>line 78"]
+    n_section(["Updates::section<br/>line 95"])
+    n_verdict["Updates::verdict<br/>line 144"]
     n_section --> n_is_busy
     n_section --> n_start
     n_section --> n_verdict
-    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L39" "open the source"
-    click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L48" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L66" "open the source"
-    click n_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L83" "open the source"
-    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L132" "open the source"
+    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L51" "open the source"
+    click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L60" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L78" "open the source"
+    click n_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L95" "open the source"
+    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L144" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_drain,n_section entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -88,9 +101,9 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Updates` <sub>pub struct</sub> | [30](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L30) | The panel's state. |
-| `Updates::is_busy` <sub>pub fn</sub> | [39](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L39) | Whether a check is running, so the app knows to keep repainting. |
-| `Updates::drain` <sub>pub fn</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L48) | Take the worker's answer if it has one. |
-| `Updates::start` <sub>fn</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L66) | Start a check. |
-| `Updates::section` <sub>pub fn</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L83) | The whole section, as it appears under "about". |
-| `Updates::verdict` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L132) | The answer itself, in the colour it deserves. |
+| `Updates` <sub>pub struct</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L42) | The panel's state. |
+| `Updates::is_busy` <sub>pub fn</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L51) | Whether a check is running, so the app knows to keep repainting. |
+| `Updates::drain` <sub>pub fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L60) | Take the worker's answer if it has one. |
+| `Updates::start` <sub>fn</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L78) | Start a check. |
+| `Updates::section` <sub>pub fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L95) | The whole section, as it appears under "about". |
+| `Updates::verdict` <sub>fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L144) | The answer itself, in the colour it deserves. |

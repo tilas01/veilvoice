@@ -39,6 +39,15 @@
 //! the last [`HOLD`] is kept and drawn as a single marker, and it decays rather
 //! than sticking, so the bar stays honest about what is happening *now* while
 //! still showing what just happened.
+//!
+//! # In plain words
+//!
+//! Draws the input and output level meters during a live session.
+//!
+//! The bar and the decibel number beside it are worked out from the same piece of
+//! arithmetic the window uses, so the two halves of VeilVoice cannot disagree
+//! about the same reading. They did once, and a meter you have caught contradicting
+//! itself is a meter you stop believing.
 
 // The scale lives in `veilvoice-audio`, beside the thing that produces the
 // peaks, because the desktop application draws the same readings and the two

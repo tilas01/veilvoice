@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-meta/audio.svg" alt="audio.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-meta/src/audio.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 268 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 278 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-tags-give-away">What tags give away</a>
   <a href="#removal-or-plausible-replacement">Removal, or plausible replacement</a>
   <a href="#the-gap-lofty-cannot-close">The gap lofty cannot close</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -60,15 +61,18 @@
 <p><code>crate::Policy</code> chooses between deleting tags outright and writing bland ones. Both are legitimate: an empty tag block is itself a signal that a file has been processed, and in some situations looking ordinary matters more than being empty.</p>
 <h2 id="the-gap-lofty-cannot-close">The gap <code>lofty</code> cannot close</h2>
 <p><code>lofty</code> understands ID3v1/ID3v2, Vorbis comments, MP4 atoms and APE through one interface -- but <strong>it cannot remove an ID3v2 block from a WAV file</strong>. A WAV is a RIFF container and an ID3 chunk inside one is a chunk, not a tag, so the tag library does not see it. That is what <code>crate::wav</code> is for: a chunk-level cleaner that walks the RIFF structure directly. Without it, cleaning a WAV reported success and left the identifying block in place.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Strips the hidden information out of an audio file: the artist, the title, the comments, the software that made it, the date, and anything else somebody wrote into it.</p>
+<p>None of that is audible, and all of it travels with the file. A recording whose voice has been carefully veiled is not anonymous if the file still says who recorded it and on what.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>268 lines defining <strong>3 functions</strong> (2 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>278 lines defining <strong>3 functions</strong> (2 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>clean_audio_file</code> <span style="color:var(--muted)">line 71</span> &mdash; Strip or replace the tags of an audio file, in place.
+<li><code>clean_audio_file</code> <span style="color:var(--muted)">line 81</span> &mdash; Strip or replace the tags of an audio file, in place.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>read_head</code></span>
 </li>
-<li><code>clean_audio_tags</code> <span style="color:var(--muted)">line 124</span> &mdash; Report which tag blocks a file carries, without modifying it.
+<li><code>clean_audio_tags</code> <span style="color:var(--muted)">line 134</span> &mdash; Report which tag blocks a file carries, without modifying it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>read_head</code></span>
 </li>
 </ul>
@@ -82,20 +86,20 @@
 <rect x="0" y="0" width="504" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M300.0 47.0 C 322.0 47.0, 322.0 47.0, 127.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M475.6 47.0 C 497.6 47.0, 497.6 47.0, 127.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L47" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L57" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="76.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_head</text>
-<text x="76.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 47</text>
+<text x="76.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 57</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L81" target="_blank" rel="noopener noreferrer">
 <rect x="150.4" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="225.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean_audio_file</text>
-<text x="225.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 71</text>
+<text x="225.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 81</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L124" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L134" target="_blank" rel="noopener noreferrer">
 <rect x="326.0" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="400.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean_audio_tags</text>
-<text x="400.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
+<text x="400.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
 </svg>
 </div>
@@ -103,14 +107,14 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_read_head[&quot;read_head&lt;br/&gt;line 47&quot;]
-    n_clean_audio_file([&quot;clean_audio_file&lt;br/&gt;line 71&quot;])
-    n_clean_audio_tags([&quot;clean_audio_tags&lt;br/&gt;line 124&quot;])
+    n_read_head[&quot;read_head&lt;br/&gt;line 57&quot;]
+    n_clean_audio_file([&quot;clean_audio_file&lt;br/&gt;line 81&quot;])
+    n_clean_audio_tags([&quot;clean_audio_tags&lt;br/&gt;line 134&quot;])
     n_clean_audio_file --&gt; n_read_head
     n_clean_audio_tags --&gt; n_read_head
-    click n_read_head href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L47&quot; &quot;open the source&quot;
-    click n_clean_audio_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71&quot; &quot;open the source&quot;
-    click n_clean_audio_tags href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L124&quot; &quot;open the source&quot;
+    click n_read_head href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L57&quot; &quot;open the source&quot;
+    click n_clean_audio_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L81&quot; &quot;open the source&quot;
+    click n_clean_audio_tags href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L134&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_audio_file,n_clean_audio_tags entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -121,10 +125,10 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>read_head</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L47" rel="noopener noreferrer">47</a></td><td>Read just enough of a file to identify its container.</td></tr>
-<tr><td><code>REALISTIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L61" rel="noopener noreferrer">61</a></td><td>Tags written in Policy::Realistic mode.</td></tr>
-<tr><td><code>clean_audio_file</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71" rel="noopener noreferrer">71</a></td><td>Strip or replace the tags of an audio file, in place.</td></tr>
-<tr><td><code>clean_audio_tags</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L124" rel="noopener noreferrer">124</a></td><td>Report which tag blocks a file carries, without modifying it.</td></tr>
+<tr><td><code>read_head</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L57" rel="noopener noreferrer">57</a></td><td>Read just enough of a file to identify its container.</td></tr>
+<tr><td><code>REALISTIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71" rel="noopener noreferrer">71</a></td><td>Tags written in Policy::Realistic mode.</td></tr>
+<tr><td><code>clean_audio_file</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L81" rel="noopener noreferrer">81</a></td><td>Strip or replace the tags of an audio file, in place.</td></tr>
+<tr><td><code>clean_audio_tags</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L134" rel="noopener noreferrer">134</a></td><td>Report which tag blocks a file carries, without modifying it.</td></tr>
 </tbody></table>
 </section>
 </div></div>

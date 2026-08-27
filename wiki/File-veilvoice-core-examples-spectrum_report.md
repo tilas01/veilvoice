@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-core/examples/spectrum_report.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 99 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs)
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 107 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs)
 
 ## Contents
 
-- [What calls what](#what-calls-what)
-- [Items](#items)
+- [In plain words](#in-plain-words)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Where do the output partials actually land?
 
@@ -24,9 +25,17 @@ partial), which is what makes it sound metallic.
 
 Run with `cargo run -p veilvoice-core --example diag_spectrum`.
 
+# In plain words
+
+A small program that runs the engine over a recording and prints what changed
+about its frequencies.
+
+It is here so that the claims about what VeilVoice does to a voice can be
+checked by anybody, rather than taken on trust from a paragraph of prose.
+
 ## What this file contains
 
-99 lines defining **3 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+107 lines defining **3 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -42,14 +51,14 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_speaker["speaker<br/>line 19"]
-    n_peaks["peaks<br/>line 41"]
-    n_main["main<br/>line 71"]
+    n_speaker["speaker<br/>line 27"]
+    n_peaks["peaks<br/>line 49"]
+    n_main["main<br/>line 79"]
     n_main --> n_peaks
     n_main --> n_speaker
-    click n_speaker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L19" "open the source"
-    click n_peaks href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L41" "open the source"
-    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L71" "open the source"
+    click n_speaker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L27" "open the source"
+    click n_peaks href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L49" "open the source"
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L79" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_speaker,n_peaks,n_main helper
 ```
@@ -60,6 +69,6 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `speaker` <sub>fn</sub> | [19](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L19) |  |
-| `peaks` <sub>fn</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L41) |  |
-| `main` <sub>fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L71) |  |
+| `speaker` <sub>fn</sub> | [27](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L27) |  |
+| `peaks` <sub>fn</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L49) |  |
+| `main` <sub>fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs#L79) |  |

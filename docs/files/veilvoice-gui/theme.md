@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-gui/src/theme.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 745 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 753 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs)
 
 ## Contents
 
 - [One palette, three front-ends](#one-palette-three-front-ends)
 - [Why the active theme is an index, not a lock](#why-the-active-theme-is-an-index-not-a-lock)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -50,20 +51,28 @@ out of range would otherwise panic on a slice index, in a paint loop, which
 is the worst possible place for it -- so the read saturates to the default
 instead.
 
+# In plain words
+
+The colour schemes the application ships with, and the fonts.
+
+They are the same schemes the website offers, defined once so the two cannot
+drift apart. Choosing one applies it straight away and it is remembered for
+next time.
+
 ## What this file contains
 
-745 lines defining **8 functions** (7 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+753 lines defining **8 functions** (7 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Theme` (line 46) -- One complete colour scheme.
+- `struct Theme` (line 54) -- One complete colour scheme.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `load_custom` (line 286) -- Read the user's palettes and add them to the table.
-- `set_by_id` (line 307) -- Switch to id, and apply it to ctx.
+- `load_custom` (line 294) -- Read the user's palettes and add them to the table.
+- `set_by_id` (line 315) -- Switch to id, and apply it to ctx.
   - reaches: `by_id`, `install`, `themes`, `active`
-- `install_fonts` (line 427) -- Load JetBrains Mono if the system has it.
+- `install_fonts` (line 435) -- Load JetBrains Mono if the system has it.
   - reaches: `user_font_paths`
 
 ## What calls what
@@ -86,28 +95,28 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_active["active<br/>line 256"]
-    n_themes["themes<br/>line 273"]
-    n_load_custom(["load_custom<br/>line 286"])
-    n_by_id["by_id<br/>line 300"]
-    n_set_by_id(["set_by_id<br/>line 307"])
-    n_user_font_paths["user_font_paths<br/>line 412"]
-    n_install_fonts(["install_fonts<br/>line 427"])
-    n_install["install<br/>line 450"]
+    n_active["active<br/>line 264"]
+    n_themes["themes<br/>line 281"]
+    n_load_custom(["load_custom<br/>line 294"])
+    n_by_id["by_id<br/>line 308"]
+    n_set_by_id(["set_by_id<br/>line 315"])
+    n_user_font_paths["user_font_paths<br/>line 420"]
+    n_install_fonts(["install_fonts<br/>line 435"])
+    n_install["install<br/>line 458"]
     n_active --> n_themes
     n_by_id --> n_themes
     n_install --> n_active
     n_install_fonts --> n_user_font_paths
     n_set_by_id --> n_by_id
     n_set_by_id --> n_install
-    click n_active href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L256" "open the source"
-    click n_themes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L273" "open the source"
-    click n_load_custom href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L286" "open the source"
-    click n_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L300" "open the source"
-    click n_set_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L307" "open the source"
-    click n_user_font_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L412" "open the source"
-    click n_install_fonts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L427" "open the source"
-    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L450" "open the source"
+    click n_active href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L264" "open the source"
+    click n_themes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L281" "open the source"
+    click n_load_custom href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L294" "open the source"
+    click n_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L308" "open the source"
+    click n_set_by_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L315" "open the source"
+    click n_user_font_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L420" "open the source"
+    click n_install_fonts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L435" "open the source"
+    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L458" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load_custom,n_set_by_id,n_install_fonts entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -122,21 +131,21 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `TABLE` <sub>static</sub> | [39](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L39) | The theme table, once the user's palettes have been folded in. |
-| `Theme` <sub>pub struct</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L46) | One complete colour scheme. |
-| `fn` <sub>const</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L82) |  |
-| `THEMES` <sub>pub const</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L93) | Every theme, in the order the picker shows them. |
-| `ACTIVE` <sub>static</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L250) | The index of the theme currently in force. |
-| `active` <sub>pub fn</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L256) | The theme currently in force. |
-| `themes` <sub>pub fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L273) | Every theme the picker offers: the built-in ones, then any the user added. |
-| `load_custom` <sub>pub fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L286) | Read the user's palettes and add them to the table. |
-| `by_id` <sub>pub fn</sub> | [300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L300) | Look a theme up by its stable identifier. |
-| `set_by_id` <sub>pub fn</sub> | [307](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L307) | Switch to id, and apply it to ctx. |
-| `palette` <sub>pub mod</sub> | [324](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L324) | Shorthand accessors, so call sites read as p::fg() rather than theme::active().fg. |
-| `JETBRAINS_MONO_PATHS` <sub>const</sub> | [400](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L400) | Places JetBrains Mono is normally installed. |
-| `user_font_paths` <sub>fn</sub> | [412](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L412) |  |
-| `install_fonts` <sub>pub fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L427) | Load JetBrains Mono if the system has it. |
-| `install` <sub>pub fn</sub> | [450](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L450) | Apply the active theme's visuals and a monospace-everywhere type scale. |
+| `TABLE` <sub>static</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L47) | The theme table, once the user's palettes have been folded in. |
+| `Theme` <sub>pub struct</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L54) | One complete colour scheme. |
+| `fn` <sub>const</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L90) |  |
+| `THEMES` <sub>pub const</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L101) | Every theme, in the order the picker shows them. |
+| `ACTIVE` <sub>static</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L258) | The index of the theme currently in force. |
+| `active` <sub>pub fn</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L264) | The theme currently in force. |
+| `themes` <sub>pub fn</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L281) | Every theme the picker offers: the built-in ones, then any the user added. |
+| `load_custom` <sub>pub fn</sub> | [294](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L294) | Read the user's palettes and add them to the table. |
+| `by_id` <sub>pub fn</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L308) | Look a theme up by its stable identifier. |
+| `set_by_id` <sub>pub fn</sub> | [315](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L315) | Switch to id, and apply it to ctx. |
+| `palette` <sub>pub mod</sub> | [332](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L332) | Shorthand accessors, so call sites read as p::fg() rather than theme::active().fg. |
+| `JETBRAINS_MONO_PATHS` <sub>const</sub> | [408](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L408) | Places JetBrains Mono is normally installed. |
+| `user_font_paths` <sub>fn</sub> | [420](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L420) |  |
+| `install_fonts` <sub>pub fn</sub> | [435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L435) | Load JetBrains Mono if the system has it. |
+| `install` <sub>pub fn</sub> | [458](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L458) | Apply the active theme's visuals and a monospace-everywhere type scale. |
 
 ---
 

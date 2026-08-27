@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-conversation/src/subtitles.rs`
 
-[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 263 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs)
+[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 276 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs)
 
 ## Contents
 
 - [Two formats, both written out here](#two-formats-both-written-out-here)
 - [What goes in a cue when nobody wrote down the words](#what-goes-in-a-cue-when-nobody-wrote-down-the-words)
 - [A name in a caption is not veiled](#a-name-in-a-caption-is-not-veiled)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -52,18 +53,31 @@ containing whatever names were typed into it, sitting next to the recording.
 If the names matter, use labels rather than names — the plan does not care
 which, and `crate::SCOPE` says so where a user will read it.
 
+# In plain words
+
+Writes the subtitles, from the same plan the audio came from.
+
+Both files come out of one source, so the words on screen and the voice you
+hear cannot drift apart or disagree about who is speaking.
+
+Two formats are written: the one browsers use for video on a web page, and the
+older one nearly every video player and editor understands.
+
+The names in the subtitles are the ones you typed. Nothing veils those, and the
+application says so where you type them.
+
 ## What this file contains
 
-263 lines defining **4 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+276 lines defining **4 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Format` (line 36) -- Which subtitle format to write.
+- `enum Format` (line 49) -- Which subtitle format to write.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Format::extension` (line 46) -- The conventional file extension, without the dot.
-- `write` (line 77) -- Render the plan as subtitles.
+- `Format::extension` (line 59) -- The conventional file extension, without the dot.
+- `write` (line 90) -- Render the plan as subtitles.
   - reaches: `one_line`, `timestamp`
 
 ## What calls what
@@ -86,16 +100,16 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_extension(["Format::extension<br/>line 46"])
-    n_timestamp["timestamp<br/>line 60"]
-    n_write(["write<br/>line 77"])
-    n_one_line["one_line<br/>line 122"]
+    n_extension(["Format::extension<br/>line 59"])
+    n_timestamp["timestamp<br/>line 73"]
+    n_write(["write<br/>line 90"])
+    n_one_line["one_line<br/>line 135"]
     n_write --> n_one_line
     n_write --> n_timestamp
-    click n_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L46" "open the source"
-    click n_timestamp href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L60" "open the source"
-    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L77" "open the source"
-    click n_one_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L122" "open the source"
+    click n_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L59" "open the source"
+    click n_timestamp href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L73" "open the source"
+    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L90" "open the source"
+    click n_one_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L135" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_extension,n_write entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -108,11 +122,11 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Format` <sub>pub enum</sub> | [36](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L36) | Which subtitle format to write. |
-| `Format::extension` <sub>pub fn</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L46) | The conventional file extension, without the dot. |
-| `timestamp` <sub>fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L60) | A timestamp as the subtitle formats want it: HH:MM:SS.mmm. |
-| `write` <sub>pub fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L77) | Render the plan as subtitles. |
-| `one_line` <sub>fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L122) | Flatten anything that would break a cue into one line. |
+| `Format` <sub>pub enum</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L49) | Which subtitle format to write. |
+| `Format::extension` <sub>pub fn</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L59) | The conventional file extension, without the dot. |
+| `timestamp` <sub>fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L73) | A timestamp as the subtitle formats want it: HH:MM:SS.mmm. |
+| `write` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L90) | Render the plan as subtitles. |
+| `one_line` <sub>fn</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs#L135) | Flatten anything that would break a cue into one line. |
 
 ---
 

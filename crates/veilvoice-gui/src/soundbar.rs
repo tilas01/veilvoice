@@ -28,6 +28,17 @@
 //! schedules a frame every 16 ms has turned the animation off visually and left
 //! the battery cost behind. The caller decides by passing a [`Motion`], and the
 //! only way to animate is to ask for it.
+//!
+//! # In plain words
+//!
+//! The little row of bars in the corner that rises and falls.
+//!
+//! It is the same mark the website uses, drawn rather than loaded as a picture, so
+//! it takes the colours of whichever scheme you have chosen.
+//!
+//! It stops moving if your system is set to reduce motion. That setting is a
+//! request from somebody who has a reason for making it, and animation that
+//! ignores it is animation that makes an application unusable for them.
 
 use crate::prefs::Motion;
 use crate::theme::palette as p;

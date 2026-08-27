@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-cli/src/policy.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 236 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 243 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs)
 
 ## Contents
 
 - [Where the policy lives](#where-the-policy-lives)
 - [Why remove needs no passphrase](#why-remove-needs-no-passphrase)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -48,19 +49,26 @@ pretends otherwise is teaching its user something false. `--yes` is there so
 it is not done by accident, and the message says plainly what the
 passphrase is and is not for.
 
+# In plain words
+
+The command line for settings that can only be tightened.
+
+It shows what is currently required, and what a job would actually run with
+once those requirements are applied, so a value shown is a value used.
+
 ## What this file contains
 
-236 lines defining **6 functions** (5 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+243 lines defining **6 functions** (5 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `status` (line 51) -- What is in force, and what is known about the seal.
+- `status` (line 58) -- What is in force, and what is known about the seal.
   - reaches: `dir`, `policy_dir`
-- `seal` (line 98) -- Write a policy and seal it.
+- `seal` (line 105) -- Write a policy and seal it.
   - reaches: `dir`, `policy_dir`
-- `verify` (line 155) -- Check the plain policy against its sealed copy.
+- `verify` (line 162) -- Check the plain policy against its sealed copy.
   - reaches: `dir`, `policy_dir`
-- `remove` (line 182) -- Delete both files.
+- `remove` (line 189) -- Delete both files.
   - reaches: `dir`, `policy_dir`
 
 ## What calls what
@@ -83,23 +91,23 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_policy_dir["policy_dir<br/>line 38"]
-    n_dir["dir<br/>line 42"]
-    n_status(["status<br/>line 51"])
-    n_seal(["seal<br/>line 98"])
-    n_verify(["verify<br/>line 155"])
-    n_remove(["remove<br/>line 182"])
+    n_policy_dir["policy_dir<br/>line 45"]
+    n_dir["dir<br/>line 49"]
+    n_status(["status<br/>line 58"])
+    n_seal(["seal<br/>line 105"])
+    n_verify(["verify<br/>line 162"])
+    n_remove(["remove<br/>line 189"])
     n_dir --> n_policy_dir
     n_remove --> n_dir
     n_seal --> n_dir
     n_status --> n_dir
     n_verify --> n_dir
-    click n_policy_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L38" "open the source"
-    click n_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L42" "open the source"
-    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L51" "open the source"
-    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L98" "open the source"
-    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L155" "open the source"
-    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L182" "open the source"
+    click n_policy_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L45" "open the source"
+    click n_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L49" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L58" "open the source"
+    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L105" "open the source"
+    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L162" "open the source"
+    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L189" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_seal,n_verify,n_remove entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -114,12 +122,12 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `policy_dir` <sub>pub fn</sub> | [38](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L38) | Where the policy files live. |
-| `dir` <sub>fn</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L42) |  |
-| `status` <sub>pub fn</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L51) | What is in force, and what is known about the seal. |
-| `seal` <sub>pub fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L98) | Write a policy and seal it. |
-| `verify` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L155) | Check the plain policy against its sealed copy. |
-| `remove` <sub>pub fn</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L182) | Delete both files. |
+| `policy_dir` <sub>pub fn</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L45) | Where the policy files live. |
+| `dir` <sub>fn</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L49) |  |
+| `status` <sub>pub fn</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L58) | What is in force, and what is known about the seal. |
+| `seal` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L105) | Write a policy and seal it. |
+| `verify` <sub>pub fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L162) | Check the plain policy against its sealed copy. |
+| `remove` <sub>pub fn</sub> | [189](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L189) | Delete both files. |
 
 ---
 
