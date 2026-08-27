@@ -78,7 +78,7 @@ target directories, all three binaries byte for byte identical.
 | 26 | Every website theme in the app, plus user-defined palettes with contrast computed rather than assumed | **done** | — |
 | 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **planned** | 3–4 d |
 | 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **done** | — |
-| 29 | One single binary — the same executable runs as the desktop app or as the command line, installed or portable | **planned** | 2 d |
+| 29 | One single binary — the same executable runs as the desktop app or as the command line, installed or portable | **blocked** | — |
 | 30 | Installer with a window: Tokyo Night, animated, and **portable** described as the normal case rather than as something missing | **done** | — |
 | 31 | Optional companion setup — VB-CABLE on Windows, PipeWire on Linux, BlackHole on macOS, and Audacity everywhere — detected if present, installed only if confirmed | **done** | — |
 | 32 | The site's search presented as an **index**, and animated | **done** | — |
@@ -119,8 +119,8 @@ subtitles; and an optional video of the result.
 | 50 | A **preview** of the video and of the voices before anything is generated | **done** | — |
 | 51 | An **asynchronous pipeline**, every speaker rendering at once rather than in sequence | **done** | — |
 | 52 | Every crate and every `.rs` file explained: the technical workflow in a paragraph, then the same thing in plain words | **done** | — |
-| 53 | The website on mobile, and on every engine — not only the one it was written in | **next** | 1–2 d |
-| 54 | **Seventh audit round** across the whole tree, then the production deploy | **next** | 3–5 d |
+| 53 | The website on mobile, and on every engine — not only the one it was written in | **done** | — |
+| 54 | **Seventh audit round** across the whole tree, then the production deploy | **done** | — |
 
 ## Building it yourself, and proving the download matches
 
@@ -444,6 +444,34 @@ start, which is the same overstatement in the other direction. What could be
 built without diarisation — a wave per speaker in a *rendered* conversation,
 where the plan already says who speaks when — exists, and is what the video
 output and the HTML player draw.
+
+**Marker 29 moves to blocked, because it is a decision rather than a task.**
+One executable that opens a window when double-clicked and takes subcommands
+when given them needs `AttachConsole` and `FreeConsole` on Windows: a PE
+declares exactly one subsystem, so a console binary that opened a window would
+flash a console every time, and a windowed one would send its output nowhere
+when run from a terminal. Switching at run time is FFI, and every crate here
+carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
+maintainer's call and not something to slip in, so it waits for one.
+
+**Marker 53 is done for the engine it can be tested on, and says which.** The
+mobile half was measured: twelve pages at five widths, with and without
+scripts, eight separate causes of horizontal scrolling found and fixed. The
+deployed site was checked again at 375 across and the page itself does not
+scroll sideways at all; the wide things inside it, tables and code blocks,
+scroll within their own boxes, which is the intended design rather than an
+accident.
+
+That was Chromium, which is what is available here. **Firefox and WebKit are
+still unverified by anybody sitting in front of them.** The stylesheet carries
+fallbacks written for both and the suite refuses several constructs that break
+on older engines, which is reasoning rather than evidence. This page will not
+say those two work until somebody has looked.
+
+**Marker 54's audit rounds are done and its deploy has been happening all
+along.** Nine rounds, seventy-five defects, and releases published from tags
+with reproducibility checked per platform. There was never a single production
+deploy to save up for.
 
 **Marker 65, Failsafe, is the one feature here that is on by default**, and
 the reason is the shape of the accident it guards against. You are talking
