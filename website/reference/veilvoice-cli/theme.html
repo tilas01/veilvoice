@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/theme.svg" alt="theme.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/theme.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 135 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 144 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-command-line-tool-has-a-palette-at-all">Why a command-line tool has a palette at all</a>
   <a href="#colour-is-suppressed-rather-than-assumed">Colour is suppressed rather than assumed</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -57,24 +58,27 @@
 <h2 id="colour-is-suppressed-rather-than-assumed">Colour is suppressed rather than assumed</h2>
 <p>Three independent conditions turn it off, and all three are checked: output that is not a terminal, <code>NO_COLOR</code> set to anything at all (the widely-honoured convention), and <code>TERM=dumb</code>. The check runs once through a <code>std::sync::OnceLock</code> rather than per call, because this is used inside loops that print a line per file.</p>
 <p>Escape sequences in a log file are worse than no colour: they survive into bug reports, pasted output and issue trackers, where they are noise that obscures the message somebody was trying to show you.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>The colours and the layout of what the terminal prints.</p>
+<p>The same palette the window uses, so the two halves of VeilVoice look like one program. Colour is dropped automatically when the output is going into a file or another program rather than to a person, because escape codes in a log are noise.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>135 lines defining <strong>7 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>144 lines defining <strong>7 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>ok</code> <span style="color:var(--muted)">line 82</span> &mdash; A success line.
+<li><code>ok</code> <span style="color:var(--muted)">line 91</span> &mdash; A success line.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
-<li><code>warn</code> <span style="color:var(--muted)">line 87</span> &mdash; A warning line.
+<li><code>warn</code> <span style="color:var(--muted)">line 96</span> &mdash; A warning line.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
-<li><code>err</code> <span style="color:var(--muted)">line 92</span> &mdash; An error line.
+<li><code>err</code> <span style="color:var(--muted)">line 101</span> &mdash; An error line.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
-<li><code>heading</code> <span style="color:var(--muted)">line 97</span> &mdash; A section heading.
+<li><code>heading</code> <span style="color:var(--muted)">line 106</span> &mdash; A section heading.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
-<li><code>field</code> <span style="color:var(--muted)">line 102</span> &mdash; A label: value line with the value highlighted.
+<li><code>field</code> <span style="color:var(--muted)">line 111</span> &mdash; A label: value line with the value highlighted.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
 </ul>
@@ -82,50 +86,50 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 566 194" width="566" height="194" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 574 194" width="574" height="194" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
-<rect x="0" y="0" width="566" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M538.0 47.0 C 560.0 47.0, 560.0 47.0, 219.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M381.0 147.0 C 403.0 147.0, 403.0 47.0, 219.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M266.2 147.0 C 288.2 147.0, 288.2 47.0, 219.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<rect x="0" y="0" width="574" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M545.6 47.0 C 567.6 47.0, 567.6 47.0, 219.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M388.6 147.0 C 410.6 147.0, 410.6 47.0, 219.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M273.8 147.0 C 295.8 147.0, 295.8 47.0, 219.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M323.6 47.0 C 345.6 47.0, 345.6 47.0, 219.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M216.4 47.0 C 238.4 47.0, 238.4 47.0, 112.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M430.8 47.0 C 452.8 47.0, 452.8 47.0, 219.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L59" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L68" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="68.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">enabled</text>
-<text x="68.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 59</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L73" target="_blank" rel="noopener noreferrer">
-<rect x="135.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="175.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">paint</text>
-<text x="175.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 73</text>
+<text x="68.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 68</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82" target="_blank" rel="noopener noreferrer">
+<rect x="135.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="175.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">paint</text>
+<text x="175.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 82</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L91" target="_blank" rel="noopener noreferrer">
 <rect x="242.4" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="283.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ok</text>
-<text x="283.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 82</text>
+<text x="283.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 91</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L87" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L96" target="_blank" rel="noopener noreferrer">
 <rect x="349.6" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="390.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">warn</text>
-<text x="390.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
+<text x="390.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 96</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L92" target="_blank" rel="noopener noreferrer">
-<rect x="456.8" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="497.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">err</text>
-<text x="497.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L101" target="_blank" rel="noopener noreferrer">
+<rect x="456.8" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="501.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">err</text>
+<text x="501.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L97" target="_blank" rel="noopener noreferrer">
-<rect x="185.0" y="120.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="225.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">heading</text>
-<text x="225.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 97</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L106" target="_blank" rel="noopener noreferrer">
+<rect x="185.0" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="229.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">heading</text>
+<text x="229.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 106</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L102" target="_blank" rel="noopener noreferrer">
-<rect x="292.2" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="336.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
-<text x="336.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 102</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L111" target="_blank" rel="noopener noreferrer">
+<rect x="299.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="344.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
+<text x="344.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
 </a>
 </svg>
 </div>
@@ -133,26 +137,26 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_enabled[&quot;enabled&lt;br/&gt;line 59&quot;]
-    n_paint[&quot;paint&lt;br/&gt;line 73&quot;]
-    n_ok([&quot;ok&lt;br/&gt;line 82&quot;])
-    n_warn([&quot;warn&lt;br/&gt;line 87&quot;])
-    n_err([&quot;err&lt;br/&gt;line 92&quot;])
-    n_heading([&quot;heading&lt;br/&gt;line 97&quot;])
-    n_field([&quot;field&lt;br/&gt;line 102&quot;])
+    n_enabled[&quot;enabled&lt;br/&gt;line 68&quot;]
+    n_paint[&quot;paint&lt;br/&gt;line 82&quot;]
+    n_ok([&quot;ok&lt;br/&gt;line 91&quot;])
+    n_warn([&quot;warn&lt;br/&gt;line 96&quot;])
+    n_err([&quot;err&lt;br/&gt;line 101&quot;])
+    n_heading([&quot;heading&lt;br/&gt;line 106&quot;])
+    n_field([&quot;field&lt;br/&gt;line 111&quot;])
     n_err --&gt; n_paint
     n_field --&gt; n_paint
     n_heading --&gt; n_paint
     n_ok --&gt; n_paint
     n_paint --&gt; n_enabled
     n_warn --&gt; n_paint
-    click n_enabled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L59&quot; &quot;open the source&quot;
-    click n_paint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L73&quot; &quot;open the source&quot;
-    click n_ok href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82&quot; &quot;open the source&quot;
-    click n_warn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L87&quot; &quot;open the source&quot;
-    click n_err href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L92&quot; &quot;open the source&quot;
-    click n_heading href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L97&quot; &quot;open the source&quot;
-    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L102&quot; &quot;open the source&quot;
+    click n_enabled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L68&quot; &quot;open the source&quot;
+    click n_paint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82&quot; &quot;open the source&quot;
+    click n_ok href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L91&quot; &quot;open the source&quot;
+    click n_warn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L96&quot; &quot;open the source&quot;
+    click n_err href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L101&quot; &quot;open the source&quot;
+    click n_heading href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L106&quot; &quot;open the source&quot;
+    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L111&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_ok,n_warn,n_err,n_heading,n_field entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -165,14 +169,14 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>colour</code> <sub>pub mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L40" rel="noopener noreferrer">40</a></td><td>Tokyo Night, as 24-bit foreground escape sequences.</td></tr>
-<tr><td><code>enabled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L59" rel="noopener noreferrer">59</a></td><td></td></tr>
-<tr><td><code>paint</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L73" rel="noopener noreferrer">73</a></td><td>Wrap text in colour, or return it unchanged when colour is off.</td></tr>
-<tr><td><code>ok</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82" rel="noopener noreferrer">82</a></td><td>A success line.</td></tr>
-<tr><td><code>warn</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L87" rel="noopener noreferrer">87</a></td><td>A warning line.</td></tr>
-<tr><td><code>err</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L92" rel="noopener noreferrer">92</a></td><td>An error line.</td></tr>
-<tr><td><code>heading</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L97" rel="noopener noreferrer">97</a></td><td>A section heading.</td></tr>
-<tr><td><code>field</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L102" rel="noopener noreferrer">102</a></td><td>A label: value line with the value highlighted.</td></tr>
+<tr><td><code>colour</code> <sub>pub mod</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L49" rel="noopener noreferrer">49</a></td><td>Tokyo Night, as 24-bit foreground escape sequences.</td></tr>
+<tr><td><code>enabled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L68" rel="noopener noreferrer">68</a></td><td></td></tr>
+<tr><td><code>paint</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82" rel="noopener noreferrer">82</a></td><td>Wrap text in colour, or return it unchanged when colour is off.</td></tr>
+<tr><td><code>ok</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L91" rel="noopener noreferrer">91</a></td><td>A success line.</td></tr>
+<tr><td><code>warn</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L96" rel="noopener noreferrer">96</a></td><td>A warning line.</td></tr>
+<tr><td><code>err</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L101" rel="noopener noreferrer">101</a></td><td>An error line.</td></tr>
+<tr><td><code>heading</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L106" rel="noopener noreferrer">106</a></td><td>A section heading.</td></tr>
+<tr><td><code>field</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L111" rel="noopener noreferrer">111</a></td><td>A label: value line with the value highlighted.</td></tr>
 </tbody></table>
 </section>
 </div></div>

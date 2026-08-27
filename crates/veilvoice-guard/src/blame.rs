@@ -28,6 +28,14 @@
 //! of either is reported rather than hidden. Setting them up is a deliberate
 //! act by an administrator, and pretending otherwise would misrepresent what a
 //! clean report means.
+//!
+//! # In plain words
+//!
+//! Tries to say which program changed a file, and is careful about how sure it is.
+//!
+//! It is a guess built from what was running at the time. It can be wrong, and it
+//! says so with every answer. Naming the wrong program confidently is worse than
+//! naming none, because somebody acts on it.
 
 use std::path::Path;
 

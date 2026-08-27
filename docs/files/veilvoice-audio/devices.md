@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-audio/src/devices.rs`
 
-[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 228 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs)
+[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 243 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs)
 
 ## Contents
 
 - [What this is for](#what-this-is-for)
 - [The detection is name matching, and that is a limitation, not an oversight](#the-detection-is-name-matching-and-that-is-a-limitation-not-an-oversight)
 - [Enumeration can fail, and does](#enumeration-can-fail-and-does)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -64,21 +65,36 @@ function here returns a `crate::Error` rather than panicking or quietly
 returning an empty list, because an empty list and a failed query mean very
 different things to somebody trying to work out why they cannot be heard.
 
+# In plain words
+
+This asks your computer which microphones and speakers it has, and works out
+which of them are **virtual cables**.
+
+A virtual cable is a small piece of software that pretends to be a speaker on
+one side and a microphone on the other. It is how a veiled voice gets into a
+call: VeilVoice plays into the cable, and the calling program picks the cable
+as its microphone and never knows the difference.
+
+Working out which device is a cable is done by recognising the names the common
+ones use, so it is a good guess rather than a certainty. Nothing depends on the
+guess being right: it decides which device is *suggested*, never which ones you
+are allowed to choose.
+
 ## What this file contains
 
-228 lines defining **5 functions** (4 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+243 lines defining **5 functions** (4 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Direction` (line 49) -- Which direction a device carries audio.
-- `struct DeviceInfo` (line 58) -- A device the user can choose.
+- `enum Direction` (line 64) -- Which direction a device carries audio.
+- `struct DeviceInfo` (line 73) -- A device the user can choose.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `find_virtual_cable` (line 125) -- Find the first output device that looks like a virtual audio cable.
+- `find_virtual_cable` (line 140) -- Find the first output device that looks like a virtual audio cable.
   - reaches: `list`, `looks_virtual`
-- `name_of` (line 135) -- The name of an opened device, or a placeholder when the OS will not say.
-- `open` (line 140) -- Look up a device by exact name, or the host default when name is None.
+- `name_of` (line 150) -- The name of an opened device, or a placeholder when the OS will not say.
+- `open` (line 155) -- Look up a device by exact name, or the host default when name is None.
 
 ## What calls what
 
@@ -100,18 +116,18 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_looks_virtual["looks_virtual<br/>line 86"]
-    n_list["list<br/>line 92"]
-    n_find_virtual_cable(["find_virtual_cable<br/>line 125"])
-    n_name_of(["name_of<br/>line 135"])
-    n_open(["open<br/>line 140"])
+    n_looks_virtual["looks_virtual<br/>line 101"]
+    n_list["list<br/>line 107"]
+    n_find_virtual_cable(["find_virtual_cable<br/>line 140"])
+    n_name_of(["name_of<br/>line 150"])
+    n_open(["open<br/>line 155"])
     n_find_virtual_cable --> n_list
     n_list --> n_looks_virtual
-    click n_looks_virtual href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L86" "open the source"
-    click n_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L92" "open the source"
-    click n_find_virtual_cable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L125" "open the source"
-    click n_name_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L135" "open the source"
-    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L140" "open the source"
+    click n_looks_virtual href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L101" "open the source"
+    click n_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L107" "open the source"
+    click n_find_virtual_cable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L140" "open the source"
+    click n_name_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L150" "open the source"
+    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L155" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_find_virtual_cable,n_name_of,n_open entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -126,14 +142,14 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Direction` <sub>pub enum</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L49) | Which direction a device carries audio. |
-| `DeviceInfo` <sub>pub struct</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L58) | A device the user can choose. |
-| `VIRTUAL_CABLE_HINTS` <sub>const</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L74) | Name fragments used by the common virtual audio cables. |
-| `looks_virtual` <sub>fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L86) |  |
-| `list` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L92) | List the devices available in one direction. |
-| `find_virtual_cable` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L125) | Find the first output device that looks like a virtual audio cable. |
-| `name_of` <sub>pub fn</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L135) | The name of an opened device, or a placeholder when the OS will not say. |
-| `open` <sub>pub fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L140) | Look up a device by exact name, or the host default when name is None. |
+| `Direction` <sub>pub enum</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L64) | Which direction a device carries audio. |
+| `DeviceInfo` <sub>pub struct</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L73) | A device the user can choose. |
+| `VIRTUAL_CABLE_HINTS` <sub>const</sub> | [89](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L89) | Name fragments used by the common virtual audio cables. |
+| `looks_virtual` <sub>fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L101) |  |
+| `list` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L107) | List the devices available in one direction. |
+| `find_virtual_cable` <sub>pub fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L140) | Find the first output device that looks like a virtual audio cable. |
+| `name_of` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L150) | The name of an opened device, or a placeholder when the OS will not say. |
+| `open` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L155) | Look up a device by exact name, or the host default when name is None. |
 
 ---
 

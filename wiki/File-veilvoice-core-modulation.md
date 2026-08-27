@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-core/src/modulation.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 300 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs)
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 313 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs)
 
 ## Contents
 
-- [What calls what](#what-calls-what)
-- [Items](#items)
+- [In plain words](#in-plain-words)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Cryptographically-seeded modulation of the effect parameters.
 
@@ -24,24 +25,37 @@ The seed does not stay put either. It is rolled forward every couple of
 seconds by default (see `Modulator::reseed`), so the stream driving any
 given stretch of audio is closed off permanently once that stretch is past.
 
+# In plain words
+
+The amount by which the voice is altered is never held still. It drifts,
+constantly and unpredictably.
+
+The drift comes from the same kind of random number generator used for
+encryption, so it cannot be guessed, worked out from what came before, or
+reproduced by somebody who has the recording. It slides between values rather
+than jumping, so nothing about it can be heard.
+
+This is what stops the transform from being reversed by anybody who works out
+the settings, because there is no single setting to work out.
+
 ## What this file contains
 
-300 lines defining **9 functions** (5 public), **3 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+313 lines defining **9 functions** (5 public), **3 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Param` (line 23) -- One smoothly-varying parameter bounded to lo, hi.
-- `struct ModValues` (line 53) -- The values handed to the spectral transform for one frame.
-- `struct Modulator` (line 61) -- Non-stationary parameter generator.
+- `struct Param` (line 36) -- One smoothly-varying parameter bounded to lo, hi.
+- `struct ModValues` (line 66) -- The values handed to the spectral transform for one frame.
+- `struct Modulator` (line 74) -- Non-stationary parameter generator.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Modulator::from_seed` (line 73) -- Build from an explicit 32-byte seed (deterministic; used by tests and by session-key-derived seeding).
+- `Modulator::from_seed` (line 86) -- Build from an explicit 32-byte seed (deterministic; used by tests and by session-key-derived seeding).
   - reaches: `new`
-- `Modulator::fill_phase_offsets` (line 92) -- The 32 fixed per-bin phase offsets consumer needs are derived from the same stream; expose a helper that fills out with values in [0, 2π).
-- `Modulator::reseed` (line 120) -- Roll onto a fresh seed, drawn from the current stream.
-- `Modulator::draw_frames` (line 141) -- Draw a whole number of frames uniformly from lo..=hi.
-- `Modulator::next_frame` (line 151) -- Advance one STFT frame and return the parameters to apply.
+- `Modulator::fill_phase_offsets` (line 105) -- The 32 fixed per-bin phase offsets consumer needs are derived from the same stream; expose a helper that fills out with values in [0, 2π).
+- `Modulator::reseed` (line 133) -- Roll onto a fresh seed, drawn from the current stream.
+- `Modulator::draw_frames` (line 154) -- Draw a whole number of frames uniformly from lo..=hi.
+- `Modulator::next_frame` (line 164) -- Advance one STFT frame and return the parameters to apply.
 
 ## What calls what
 
@@ -57,25 +71,25 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new["Param::new<br/>line 32"]
-    n_retarget["Param::retarget<br/>line 42"]
-    n_step["Param::step<br/>line 45"]
-    n_from_seed(["Modulator::from_seed<br/>line 73"])
-    n_fill_phase_offsets(["Modulator::fill_phase_offsets<br/>line 92"])
-    n_reseed(["Modulator::reseed<br/>line 120"])
-    n_draw_frames(["Modulator::draw_frames<br/>line 141"])
-    n_next_frame(["Modulator::next_frame<br/>line 151"])
-    n_drop["Modulator::drop<br/>line 165"]
+    n_new["Param::new<br/>line 45"]
+    n_retarget["Param::retarget<br/>line 55"]
+    n_step["Param::step<br/>line 58"]
+    n_from_seed(["Modulator::from_seed<br/>line 86"])
+    n_fill_phase_offsets(["Modulator::fill_phase_offsets<br/>line 105"])
+    n_reseed(["Modulator::reseed<br/>line 133"])
+    n_draw_frames(["Modulator::draw_frames<br/>line 154"])
+    n_next_frame(["Modulator::next_frame<br/>line 164"])
+    n_drop["Modulator::drop<br/>line 178"]
     n_from_seed --> n_new
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L32" "open the source"
-    click n_retarget href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L42" "open the source"
-    click n_step href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45" "open the source"
-    click n_from_seed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L73" "open the source"
-    click n_fill_phase_offsets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L92" "open the source"
-    click n_reseed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L120" "open the source"
-    click n_draw_frames href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L141" "open the source"
-    click n_next_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L151" "open the source"
-    click n_drop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L165" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45" "open the source"
+    click n_retarget href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L55" "open the source"
+    click n_step href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L58" "open the source"
+    click n_from_seed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L86" "open the source"
+    click n_fill_phase_offsets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L105" "open the source"
+    click n_reseed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L133" "open the source"
+    click n_draw_frames href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L154" "open the source"
+    click n_next_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L164" "open the source"
+    click n_drop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L178" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_from_seed,n_fill_phase_offsets,n_reseed,n_draw_frames,n_next_frame entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -88,15 +102,15 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Param` <sub>struct</sub> | [23](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L23) | One smoothly-varying parameter bounded to lo, hi. |
-| `Param::new` <sub>fn</sub> | [32](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L32) |  |
-| `Param::retarget` <sub>fn</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L42) |  |
-| `Param::step` <sub>fn</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45) |  |
-| `ModValues` <sub>pub struct</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L53) | The values handed to the spectral transform for one frame. |
-| `Modulator` <sub>pub struct</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L61) | Non-stationary parameter generator. |
-| `Modulator::from_seed` <sub>pub fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L73) | Build from an explicit 32-byte seed (deterministic; used by tests and by session-key-derived seeding). |
-| `Modulator::fill_phase_offsets` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L92) | The 32 fixed per-bin phase offsets consumer needs are derived from the same stream; expose a helper that fills out with values in [0, 2π). |
-| `Modulator::reseed` <sub>pub fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L120) | Roll onto a fresh seed, drawn from the current stream. |
-| `Modulator::draw_frames` <sub>pub fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L141) | Draw a whole number of frames uniformly from lo..=hi. |
-| `Modulator::next_frame` <sub>pub fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L151) | Advance one STFT frame and return the parameters to apply. |
-| `Modulator::drop` <sub>fn</sub> | [165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L165) |  |
+| `Param` <sub>struct</sub> | [36](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L36) | One smoothly-varying parameter bounded to lo, hi. |
+| `Param::new` <sub>fn</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L45) |  |
+| `Param::retarget` <sub>fn</sub> | [55](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L55) |  |
+| `Param::step` <sub>fn</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L58) |  |
+| `ModValues` <sub>pub struct</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L66) | The values handed to the spectral transform for one frame. |
+| `Modulator` <sub>pub struct</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L74) | Non-stationary parameter generator. |
+| `Modulator::from_seed` <sub>pub fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L86) | Build from an explicit 32-byte seed (deterministic; used by tests and by session-key-derived seeding). |
+| `Modulator::fill_phase_offsets` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L105) | The 32 fixed per-bin phase offsets consumer needs are derived from the same stream; expose a helper that fills out with values in [0, 2π). |
+| `Modulator::reseed` <sub>pub fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L133) | Roll onto a fresh seed, drawn from the current stream. |
+| `Modulator::draw_frames` <sub>pub fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L154) | Draw a whole number of frames uniformly from lo..=hi. |
+| `Modulator::next_frame` <sub>pub fn</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L164) | Advance one STFT frame and return the parameters to apply. |
+| `Modulator::drop` <sub>fn</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/modulation.rs#L178) |  |

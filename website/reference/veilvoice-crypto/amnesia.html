@@ -39,13 +39,14 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/amnesia.svg" alt="amnesia.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/amnesia.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 313 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 326 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#no-unsafe-even-here">No unsafe, even here</a>
   <a href="#what-locking-does-and-does-not-buy">What locking does and does not buy</a>
   <a href="#why-each-secret-owns-whole-pages">Why each secret owns whole pages</a>
   <a href="#why-the-lock-is-not-held-by-an-raii-guard">Why the lock is not held by an RAII guard</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -63,29 +64,33 @@
 <p>Each <code>Secret</code> therefore over-allocates and locks a page-aligned, page-sized span lying entirely within its own allocation. No other allocation can occupy those bytes, so none can be inside those pages: lock and unlock are exact, and locking a secret never drags unrelated data into physical memory alongside it.</p>
 <h2 id="why-the-lock-is-not-held-by-an-raii-guard">Why the lock is not held by an RAII guard</h2>
 <p><code>region::lock</code> hands back a guard that unlocks on drop &#8212; but its destructor <strong>panics</strong> if unlocking fails, and unlocking can fail for reasons that are nobody&#x27;s fault: Windows does not reference-count <code>VirtualLock</code> and may drop pages from a process working set on its own, after which <code>VirtualUnlock</code> reports <code>ERROR_NOT_LOCKED</code>. A type whose entire job is holding key material must not abort the process while being dropped. The lock is released explicitly instead, and a failure to unlock is ignored: it leaves pages pinned, which is harmless, rather than unwinding out of a destructor.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>A place to hold a passphrase or a key while it is being used, which tries hard to forget it afterwards.</p>
+<p>It asks the operating system not to write that memory out to disk, wipes it as soon as it is finished with, and refuses to print itself. That last one matters more than it sounds: secrets most often escape not by being stolen but by appearing in an error message or a log that somebody later sends on.</p>
+<p>Comparisons take the same amount of time whether or not they match, so nothing is given away by how long an answer took.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>313 lines defining <strong>13 functions</strong> (9 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>326 lines defining <strong>13 functions</strong> (9 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Secret</code> <span style="color:var(--muted)">line 57</span> &mdash; A byte buffer holding key material.</li>
+<li><code>struct Secret</code> <span style="color:var(--muted)">line 70</span> &mdash; A byte buffer holding key material.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Secret::new</code> <span style="color:var(--muted)">line 69</span> &mdash; Wrap bytes, taking ownership and wiping the caller&#x27;s copy.
+<li><code>Secret::new</code> <span style="color:var(--muted)">line 82</span> &mdash; Wrap bytes, taking ownership and wiping the caller&#x27;s copy.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>zeroed</code></span>
 </li>
-<li><code>Secret::random</code> <span style="color:var(--muted)">line 113</span> &mdash; Fill len bytes from the operating-system CSPRNG.
+<li><code>Secret::random</code> <span style="color:var(--muted)">line 126</span> &mdash; Fill len bytes from the operating-system CSPRNG.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>zeroed</code></span>
 </li>
-<li><code>Secret::is_locked</code> <span style="color:var(--muted)">line 124</span> &mdash; Whether the pages were successfully locked out of swap.
+<li><code>Secret::is_locked</code> <span style="color:var(--muted)">line 137</span> &mdash; Whether the pages were successfully locked out of swap.
 </li>
-<li><code>Secret::len</code> <span style="color:var(--muted)">line 129</span> &mdash; Length in bytes.
+<li><code>Secret::len</code> <span style="color:var(--muted)">line 142</span> &mdash; Length in bytes.
 </li>
-<li><code>Secret::is_empty</code> <span style="color:var(--muted)">line 134</span> &mdash; Whether the secret is empty.
+<li><code>Secret::is_empty</code> <span style="color:var(--muted)">line 147</span> &mdash; Whether the secret is empty.
 </li>
-<li><code>Secret::expose_mut</code> <span style="color:var(--muted)">line 145</span> &mdash; Borrow mutably, for filling in place.
+<li><code>Secret::expose_mut</code> <span style="color:var(--muted)">line 158</span> &mdash; Borrow mutably, for filling in place.
 </li>
-<li><code>Secret::wipe</code> <span style="color:var(--muted)">line 153</span> &mdash; Wipe the contents now, before the value goes out of scope.
+<li><code>Secret::wipe</code> <span style="color:var(--muted)">line 166</span> &mdash; Wipe the contents now, before the value goes out of scope.
 </li>
 </ul>
 </section>
@@ -101,70 +106,70 @@
 <path d="M590.0 247.0 C 612.0 247.0, 612.0 147.0, 379.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M75.8 74.0 C 75.8 94.0, 316.4 400.0, 316.4 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M224.8 74.0 C 224.8 94.0, 316.4 400.0, 316.4 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L69" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L82" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="75.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::new</text>
-<text x="75.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 69</text>
+<text x="75.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 82</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L77" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L90" target="_blank" rel="noopener noreferrer">
 <rect x="249.2" y="420.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="316.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::zeroed</text>
-<text x="316.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 77</text>
+<text x="316.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L113" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L126" target="_blank" rel="noopener noreferrer">
 <rect x="157.6" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="224.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::random</text>
-<text x="224.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 113</text>
+<text x="224.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 126</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L124" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L137" target="_blank" rel="noopener noreferrer">
 <rect x="318.0" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="396.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::is_locked</text>
-<text x="396.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
+<text x="396.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 137</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L129" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L142" target="_blank" rel="noopener noreferrer">
 <rect x="501.2" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="557.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::len</text>
-<text x="557.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 129</text>
+<text x="557.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 142</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L134" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L147" target="_blank" rel="noopener noreferrer">
 <rect x="66.0" y="120.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="140.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::is_empty</text>
-<text x="140.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L140" target="_blank" rel="noopener noreferrer">
-<rect x="241.6" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="308.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::expose</text>
-<text x="308.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L145" target="_blank" rel="noopener noreferrer">
-<rect x="402.0" y="120.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="484.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::expose_mut</text>
-<text x="484.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 145</text>
+<text x="140.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L153" target="_blank" rel="noopener noreferrer">
+<rect x="241.6" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="308.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::expose</text>
+<text x="308.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 153</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L158" target="_blank" rel="noopener noreferrer">
+<rect x="402.0" y="120.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="484.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::expose_mut</text>
+<text x="484.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 158</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L166" target="_blank" rel="noopener noreferrer">
 <rect x="42.8" y="220.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="102.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::wipe</text>
-<text x="102.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 153</text>
+<text x="102.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 166</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L159" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L172" target="_blank" rel="noopener noreferrer">
 <rect x="188.0" y="220.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="247.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::drop</text>
-<text x="247.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 159</text>
+<text x="247.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 172</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L170" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L183" target="_blank" rel="noopener noreferrer">
 <rect x="333.2" y="220.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="396.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::clone</text>
-<text x="396.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
+<text x="396.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 183</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L180" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L193" target="_blank" rel="noopener noreferrer">
 <rect x="486.0" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="538.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::eq</text>
-<text x="538.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 180</text>
+<text x="538.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 193</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L189" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L202" target="_blank" rel="noopener noreferrer">
 <rect x="260.6" y="320.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="316.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::fmt</text>
-<text x="316.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 189</text>
+<text x="316.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
 </a>
 </svg>
 </div>
@@ -172,37 +177,37 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_new([&quot;Secret::new&lt;br/&gt;line 69&quot;])
-    n_zeroed[&quot;Secret::zeroed&lt;br/&gt;line 77&quot;]
-    n_random([&quot;Secret::random&lt;br/&gt;line 113&quot;])
-    n_is_locked([&quot;Secret::is_locked&lt;br/&gt;line 124&quot;])
-    n_len([&quot;Secret::len&lt;br/&gt;line 129&quot;])
-    n_is_empty([&quot;Secret::is_empty&lt;br/&gt;line 134&quot;])
-    n_expose[&quot;Secret::expose&lt;br/&gt;line 140&quot;]
-    n_expose_mut([&quot;Secret::expose_mut&lt;br/&gt;line 145&quot;])
-    n_wipe([&quot;Secret::wipe&lt;br/&gt;line 153&quot;])
-    n_drop[&quot;Secret::drop&lt;br/&gt;line 159&quot;]
-    n_clone[&quot;Secret::clone&lt;br/&gt;line 170&quot;]
-    n_eq[&quot;Secret::eq&lt;br/&gt;line 180&quot;]
-    n_fmt[&quot;Secret::fmt&lt;br/&gt;line 189&quot;]
+    n_new([&quot;Secret::new&lt;br/&gt;line 82&quot;])
+    n_zeroed[&quot;Secret::zeroed&lt;br/&gt;line 90&quot;]
+    n_random([&quot;Secret::random&lt;br/&gt;line 126&quot;])
+    n_is_locked([&quot;Secret::is_locked&lt;br/&gt;line 137&quot;])
+    n_len([&quot;Secret::len&lt;br/&gt;line 142&quot;])
+    n_is_empty([&quot;Secret::is_empty&lt;br/&gt;line 147&quot;])
+    n_expose[&quot;Secret::expose&lt;br/&gt;line 153&quot;]
+    n_expose_mut([&quot;Secret::expose_mut&lt;br/&gt;line 158&quot;])
+    n_wipe([&quot;Secret::wipe&lt;br/&gt;line 166&quot;])
+    n_drop[&quot;Secret::drop&lt;br/&gt;line 172&quot;]
+    n_clone[&quot;Secret::clone&lt;br/&gt;line 183&quot;]
+    n_eq[&quot;Secret::eq&lt;br/&gt;line 193&quot;]
+    n_fmt[&quot;Secret::fmt&lt;br/&gt;line 202&quot;]
     n_clone --&gt; n_expose
     n_clone --&gt; n_zeroed
     n_eq --&gt; n_expose
     n_new --&gt; n_zeroed
     n_random --&gt; n_zeroed
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L69&quot; &quot;open the source&quot;
-    click n_zeroed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L77&quot; &quot;open the source&quot;
-    click n_random href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L113&quot; &quot;open the source&quot;
-    click n_is_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L124&quot; &quot;open the source&quot;
-    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L129&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L134&quot; &quot;open the source&quot;
-    click n_expose href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L140&quot; &quot;open the source&quot;
-    click n_expose_mut href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L145&quot; &quot;open the source&quot;
-    click n_wipe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L153&quot; &quot;open the source&quot;
-    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L159&quot; &quot;open the source&quot;
-    click n_clone href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L170&quot; &quot;open the source&quot;
-    click n_eq href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L180&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L189&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L82&quot; &quot;open the source&quot;
+    click n_zeroed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L90&quot; &quot;open the source&quot;
+    click n_random href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L126&quot; &quot;open the source&quot;
+    click n_is_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L137&quot; &quot;open the source&quot;
+    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L142&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L147&quot; &quot;open the source&quot;
+    click n_expose href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L153&quot; &quot;open the source&quot;
+    click n_expose_mut href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L158&quot; &quot;open the source&quot;
+    click n_wipe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L166&quot; &quot;open the source&quot;
+    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L172&quot; &quot;open the source&quot;
+    click n_clone href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L183&quot; &quot;open the source&quot;
+    click n_eq href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L193&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L202&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_random,n_is_locked,n_len,n_is_empty,n_expose_mut,n_wipe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -215,20 +220,20 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Secret</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L57" rel="noopener noreferrer">57</a></td><td>A byte buffer holding key material.</td></tr>
-<tr><td><code>Secret::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L69" rel="noopener noreferrer">69</a></td><td>Wrap bytes, taking ownership and wiping the caller&#x27;s copy.</td></tr>
-<tr><td><code>Secret::zeroed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L77" rel="noopener noreferrer">77</a></td><td>Allocate len zero bytes, ready to be filled in place.</td></tr>
-<tr><td><code>Secret::random</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L113" rel="noopener noreferrer">113</a></td><td>Fill len bytes from the operating-system CSPRNG.</td></tr>
-<tr><td><code>Secret::is_locked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L124" rel="noopener noreferrer">124</a></td><td>Whether the pages were successfully locked out of swap.</td></tr>
-<tr><td><code>Secret::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L129" rel="noopener noreferrer">129</a></td><td>Length in bytes.</td></tr>
-<tr><td><code>Secret::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L134" rel="noopener noreferrer">134</a></td><td>Whether the secret is empty.</td></tr>
-<tr><td><code>Secret::expose</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L140" rel="noopener noreferrer">140</a></td><td>Borrow the raw bytes.</td></tr>
-<tr><td><code>Secret::expose_mut</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L145" rel="noopener noreferrer">145</a></td><td>Borrow mutably, for filling in place.</td></tr>
-<tr><td><code>Secret::wipe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L153" rel="noopener noreferrer">153</a></td><td>Wipe the contents now, before the value goes out of scope.</td></tr>
-<tr><td><code>Secret::drop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L159" rel="noopener noreferrer">159</a></td><td></td></tr>
-<tr><td><code>Secret::clone</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L170" rel="noopener noreferrer">170</a></td><td></td></tr>
-<tr><td><code>Secret::eq</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L180" rel="noopener noreferrer">180</a></td><td></td></tr>
-<tr><td><code>Secret::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L189" rel="noopener noreferrer">189</a></td><td></td></tr>
+<tr><td><code>Secret</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L70" rel="noopener noreferrer">70</a></td><td>A byte buffer holding key material.</td></tr>
+<tr><td><code>Secret::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L82" rel="noopener noreferrer">82</a></td><td>Wrap bytes, taking ownership and wiping the caller&#x27;s copy.</td></tr>
+<tr><td><code>Secret::zeroed</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L90" rel="noopener noreferrer">90</a></td><td>Allocate len zero bytes, ready to be filled in place.</td></tr>
+<tr><td><code>Secret::random</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L126" rel="noopener noreferrer">126</a></td><td>Fill len bytes from the operating-system CSPRNG.</td></tr>
+<tr><td><code>Secret::is_locked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L137" rel="noopener noreferrer">137</a></td><td>Whether the pages were successfully locked out of swap.</td></tr>
+<tr><td><code>Secret::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L142" rel="noopener noreferrer">142</a></td><td>Length in bytes.</td></tr>
+<tr><td><code>Secret::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L147" rel="noopener noreferrer">147</a></td><td>Whether the secret is empty.</td></tr>
+<tr><td><code>Secret::expose</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L153" rel="noopener noreferrer">153</a></td><td>Borrow the raw bytes.</td></tr>
+<tr><td><code>Secret::expose_mut</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L158" rel="noopener noreferrer">158</a></td><td>Borrow mutably, for filling in place.</td></tr>
+<tr><td><code>Secret::wipe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L166" rel="noopener noreferrer">166</a></td><td>Wipe the contents now, before the value goes out of scope.</td></tr>
+<tr><td><code>Secret::drop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L172" rel="noopener noreferrer">172</a></td><td></td></tr>
+<tr><td><code>Secret::clone</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L183" rel="noopener noreferrer">183</a></td><td></td></tr>
+<tr><td><code>Secret::eq</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L193" rel="noopener noreferrer">193</a></td><td></td></tr>
+<tr><td><code>Secret::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L202" rel="noopener noreferrer">202</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

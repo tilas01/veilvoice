@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-gui/src/palettes.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 691 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 700 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs)
 
 ## Contents
 
 - [A palette file is untrusted input](#a-palette-file-is-untrusted-input)
 - [Contrast is computed, not trusted](#contrast-is-computed-not-trusted)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -66,18 +67,27 @@ secondary text that is meant to recede, every built-in theme would fail at
 4.5, and pretending otherwise would mean shipping a rule the project's own
 themes break.
 
+# In plain words
+
+Lets you write your own colour scheme and have VeilVoice use it.
+
+Drop a small text file in a folder and it appears in the list. Every colour has
+to be there, and the text has to be readable against the background: a scheme
+whose text fails that check is refused rather than applied, with the measured
+numbers so you know how far off it is and which way to move.
+
 ## What this file contains
 
-691 lines defining **8 functions** (4 public), **1 type** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+700 lines defining **8 functions** (4 public), **1 type** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Parsed` (line 147) -- One parsed colour scheme, before it is accepted.
+- `struct Parsed` (line 156) -- One parsed colour scheme, before it is accepted.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `default_dir` (line 282) -- Where palettes live, beside the preferences file.
-- `load` (line 309) -- Read every palette in dir, returning the usable ones and every complaint.
+- `default_dir` (line 291) -- Where palettes live, beside the preferences file.
+- `load` (line 318) -- Read every palette in dir, returning the usable ones and every complaint.
   - reaches: `build`, `contrast_problems`, `parse`, `contrast`, `parse_hex`, `luminance`
 
 ## What calls what
@@ -94,28 +104,28 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_luminance["luminance<br/>line 85"]
-    n_contrast["contrast<br/>line 101"]
-    n_contrast_problems["contrast_problems<br/>line 121"]
-    n_parse_hex["parse_hex<br/>line 154"]
-    n_parse["parse<br/>line 171"]
-    n_build["build<br/>line 249"]
-    n_default_dir(["default_dir<br/>line 282"])
-    n_load(["load<br/>line 309"])
+    n_luminance["luminance<br/>line 94"]
+    n_contrast["contrast<br/>line 110"]
+    n_contrast_problems["contrast_problems<br/>line 130"]
+    n_parse_hex["parse_hex<br/>line 163"]
+    n_parse["parse<br/>line 180"]
+    n_build["build<br/>line 258"]
+    n_default_dir(["default_dir<br/>line 291"])
+    n_load(["load<br/>line 318"])
     n_contrast --> n_luminance
     n_contrast_problems --> n_contrast
     n_load --> n_build
     n_load --> n_contrast_problems
     n_load --> n_parse
     n_parse --> n_parse_hex
-    click n_luminance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L85" "open the source"
-    click n_contrast href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L101" "open the source"
-    click n_contrast_problems href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L121" "open the source"
-    click n_parse_hex href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L154" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L171" "open the source"
-    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L249" "open the source"
-    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L282" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L309" "open the source"
+    click n_luminance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L94" "open the source"
+    click n_contrast href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L110" "open the source"
+    click n_contrast_problems href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L130" "open the source"
+    click n_parse_hex href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L163" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L180" "open the source"
+    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L258" "open the source"
+    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L291" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L318" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_default_dir,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -130,16 +140,16 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `REQUIRED` <sub>pub const</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L64) | Every token a palette file has to define. |
-| `MAX_PALETTES` <sub>pub const</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L75) | The most palette files that will be read from the directory. |
-| `MAX_BYTES` <sub>pub const</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L78) | The largest palette file that will be read. |
-| `luminance` <sub>fn</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L85) | Relative luminance, as defined by WCAG 2.1. |
-| `contrast` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L101) | The WCAG contrast ratio between two colours, from 1.0 to 21.0. |
-| `PAIRS` <sub>const</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L108) | The contrast pairs a palette has to satisfy, with the reason for each. |
-| `contrast_problems` <sub>pub fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L121) | Check a palette's contrast, returning one message per failing pair. |
-| `Parsed` <sub>struct</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L147) | One parsed colour scheme, before it is accepted. |
-| `parse_hex` <sub>fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L154) |  |
-| `parse` <sub>fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L171) | Parse a palette file's text. |
-| `build` <sub>fn</sub> | [249](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L249) |  |
-| `default_dir` <sub>pub fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L282) | Where palettes live, beside the preferences file. |
-| `load` <sub>pub fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L309) | Read every palette in dir, returning the usable ones and every complaint. |
+| `REQUIRED` <sub>pub const</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L73) | Every token a palette file has to define. |
+| `MAX_PALETTES` <sub>pub const</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L84) | The most palette files that will be read from the directory. |
+| `MAX_BYTES` <sub>pub const</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L87) | The largest palette file that will be read. |
+| `luminance` <sub>fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L94) | Relative luminance, as defined by WCAG 2.1. |
+| `contrast` <sub>pub fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L110) | The WCAG contrast ratio between two colours, from 1.0 to 21.0. |
+| `PAIRS` <sub>const</sub> | [117](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L117) | The contrast pairs a palette has to satisfy, with the reason for each. |
+| `contrast_problems` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L130) | Check a palette's contrast, returning one message per failing pair. |
+| `Parsed` <sub>struct</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L156) | One parsed colour scheme, before it is accepted. |
+| `parse_hex` <sub>fn</sub> | [163](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L163) |  |
+| `parse` <sub>fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L180) | Parse a palette file's text. |
+| `build` <sub>fn</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L258) |  |
+| `default_dir` <sub>pub fn</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L291) | Where palettes live, beside the preferences file. |
+| `load` <sub>pub fn</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L318) | Read every palette in dir, returning the usable ones and every complaint. |

@@ -27,6 +27,20 @@
 //! sentence ends. That is the same turn-taking structure a conversation render
 //! keeps on purpose, drawn rather than heard, and it is not additional exposure
 //! beyond what the audio already carries.
+//!
+//! # In plain words
+//!
+//! Turns a recording into the wavy shape you see drawn along the bottom of an
+//! audio player.
+//!
+//! A minute of sound is nearly three million numbers, which is far more than a
+//! picture a few hundred pixels wide can show or a web page should carry. So the
+//! sound is divided into as many pieces as there are columns to draw, and each
+//! piece is reduced to its loudest point.
+//!
+//! The loudest point rather than the average, because averaging smooths a
+//! recording into a flat sausage and loses exactly the peaks that make a waveform
+//! worth looking at.
 
 /// The peak envelope of a signal: one minimum and one maximum per column.
 #[derive(Clone, Debug, PartialEq)]

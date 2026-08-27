@@ -31,6 +31,14 @@
 //! builds Windows on a Windows runner, so shipped binaries have one, and the
 //! release fails if they do not -- `tools/release/check-windows-icons.py` reads
 //! the built PE rather than trusting this file.
+//!
+//! # In plain words
+//!
+//! Runs while the desktop application is being compiled, not while it is running.
+//!
+//! On Windows it embeds the icon and the version information into the executable,
+//! which is what gives the window its title-bar icon and makes the file's
+//! properties say what it is.
 
 fn main() {
     #[cfg(windows)]

@@ -116,6 +116,18 @@
 //! read from a file and handed to a library without a bound killed the process
 //! (F-2, F-3). The engine keeps persistent state, so a bad value is not one bad
 //! block -- it is every block from then on.
+//!
+//! # In plain words
+//!
+//! This is the file to read first if you want to know what VeilVoice actually does
+//! to a voice.
+//!
+//! Every other file in the engine does one job. This one puts them in order and
+//! decides what happens to each piece of sound: what is measured, what is thrown
+//! away, what is replaced, and in which order.
+//!
+//! It also keeps count of how long the work is taking, which is what live mode
+//! needs in order to tell you honestly if the computer is not keeping up.
 
 use crate::accent::{AccentConfig, AccentNeutralizer, AccentStats};
 use crate::effects::{Chorus, Reverb, SoftClip};

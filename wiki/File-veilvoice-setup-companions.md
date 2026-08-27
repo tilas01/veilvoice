@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-setup/src/companions.rs`
 
-[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 761 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs)
+[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 771 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs)
 
 ## Contents
 
 - [Three rules, and none of them relaxes](#three-rules-and-none-of-them-relaxes)
 - [Detection is a probe, and says when it could not tell](#detection-is-a-probe-and-says-when-it-could-not-tell)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -55,30 +56,40 @@ has put Audacity somewhere unusual will be told it was not detected, which
 is exactly what the words say — `Presence::NotDetected` is not a claim
 that the software is absent from the machine.
 
+# In plain words
+
+Optional extra software that makes VeilVoice easier to live with, none of which
+is part of VeilVoice.
+
+Each one is looked for rather than assumed, and each is described first: what
+it is, who makes it, what licence it has and why VeilVoice mentions it at all.
+Nothing is installed without an explicit yes, and the exact command is shown
+before the question.
+
 ## What this file contains
 
-761 lines defining **19 functions** (10 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+771 lines defining **19 functions** (10 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Presence` (line 49) -- What a probe found.
-- `enum Offer` (line 82) -- What VeilVoice can offer to do about a companion that is not there.
-- `struct Companion` (line 140) -- One piece of optional third-party software.
+- `enum Presence` (line 59) -- What a probe found.
+- `enum Offer` (line 92) -- What VeilVoice can offer to do about a companion that is not there.
+- `struct Companion` (line 150) -- One piece of optional third-party software.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Presence::is_present` (line 66) -- True only for Presence::Present.
-- `Presence::describe` (line 71) -- A short line for a user interface, in the project's usual register.
-- `Offer::is_runnable` (line 114) -- True when a front end may run this itself.
-- `Offer::command_line` (line 126) -- The command as a single line, for showing or copying.
-- `Companion::detect` (line 159) -- Look for it, without changing anything.
+- `Presence::is_present` (line 76) -- True only for Presence::Present.
+- `Presence::describe` (line 81) -- A short line for a user interface, in the project's usual register.
+- `Offer::is_runnable` (line 124) -- True when a front end may run this itself.
+- `Offer::command_line` (line 136) -- The command as a single line, for showing or copying.
+- `Companion::detect` (line 169) -- Look for it, without changing anything.
   - reaches: `detect_audacity`, `detect_blackhole`, `detect_pipewire`, `detect_vb_cable`, `env_path`, `first_existing`, `on_path`
-- `Companion::offer` (line 170) -- What could be done about it on this platform.
+- `Companion::offer` (line 180) -- What could be done about it on this platform.
   - reaches: `audacity_offer`, `brew`, `on_path`
-- `for_this_platform` (line 265) -- The companions that mean anything on the platform this is running on.
-- `by_key` (line 272) -- Find one by Companion::key.
-- `run` (line 282) -- Run an offer, and return what it printed.
-- `open_page` (line 323) -- Open a companion's own page in the user's browser.
+- `for_this_platform` (line 275) -- The companions that mean anything on the platform this is running on.
+- `by_key` (line 282) -- Find one by Companion::key.
+- `run` (line 292) -- Run an offer, and return what it printed.
+- `open_page` (line 333) -- Open a companion's own page in the user's browser.
 
 ## What calls what
 
@@ -94,25 +105,25 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_is_present(["Presence::is_present<br/>line 66"])
-    n_describe(["Presence::describe<br/>line 71"])
-    n_is_runnable(["Offer::is_runnable<br/>line 114"])
-    n_command_line(["Offer::command_line<br/>line 126"])
-    n_detect(["Companion::detect<br/>line 159"])
-    n_offer(["Companion::offer<br/>line 170"])
-    n_for_this_platform(["for_this_platform<br/>line 265"])
-    n_by_key(["by_key<br/>line 272"])
-    n_run(["run<br/>line 282"])
-    n_open_page(["open_page<br/>line 323"])
-    n_on_path["on_path<br/>line 358"]
-    n_first_existing["first_existing<br/>line 377"]
-    n_env_path["env_path<br/>line 381"]
-    n_detect_vb_cable["detect_vb_cable<br/>line 394"]
-    n_detect_blackhole["detect_blackhole<br/>line 417"]
-    n_detect_pipewire["detect_pipewire<br/>line 439"]
-    n_detect_audacity["detect_audacity<br/>line 450"]
-    n_brew["brew<br/>line 476"]
-    n_audacity_offer["audacity_offer<br/>line 501"]
+    n_is_present(["Presence::is_present<br/>line 76"])
+    n_describe(["Presence::describe<br/>line 81"])
+    n_is_runnable(["Offer::is_runnable<br/>line 124"])
+    n_command_line(["Offer::command_line<br/>line 136"])
+    n_detect(["Companion::detect<br/>line 169"])
+    n_offer(["Companion::offer<br/>line 180"])
+    n_for_this_platform(["for_this_platform<br/>line 275"])
+    n_by_key(["by_key<br/>line 282"])
+    n_run(["run<br/>line 292"])
+    n_open_page(["open_page<br/>line 333"])
+    n_on_path["on_path<br/>line 368"]
+    n_first_existing["first_existing<br/>line 387"]
+    n_env_path["env_path<br/>line 391"]
+    n_detect_vb_cable["detect_vb_cable<br/>line 404"]
+    n_detect_blackhole["detect_blackhole<br/>line 427"]
+    n_detect_pipewire["detect_pipewire<br/>line 449"]
+    n_detect_audacity["detect_audacity<br/>line 460"]
+    n_brew["brew<br/>line 486"]
+    n_audacity_offer["audacity_offer<br/>line 511"]
     n_audacity_offer --> n_brew
     n_audacity_offer --> n_on_path
     n_brew --> n_on_path
@@ -127,25 +138,25 @@ flowchart TD
     n_detect_vb_cable --> n_env_path
     n_offer --> n_audacity_offer
     n_offer --> n_brew
-    click n_is_present href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L66" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L71" "open the source"
-    click n_is_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L114" "open the source"
-    click n_command_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L126" "open the source"
-    click n_detect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L159" "open the source"
-    click n_offer href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L170" "open the source"
-    click n_for_this_platform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L265" "open the source"
-    click n_by_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L272" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L282" "open the source"
-    click n_open_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L323" "open the source"
-    click n_on_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L358" "open the source"
-    click n_first_existing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L377" "open the source"
-    click n_env_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L381" "open the source"
-    click n_detect_vb_cable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L394" "open the source"
-    click n_detect_blackhole href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L417" "open the source"
-    click n_detect_pipewire href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L439" "open the source"
-    click n_detect_audacity href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L450" "open the source"
-    click n_brew href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L476" "open the source"
-    click n_audacity_offer href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L501" "open the source"
+    click n_is_present href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L76" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L81" "open the source"
+    click n_is_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L124" "open the source"
+    click n_command_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L136" "open the source"
+    click n_detect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L169" "open the source"
+    click n_offer href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L180" "open the source"
+    click n_for_this_platform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L275" "open the source"
+    click n_by_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L282" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L292" "open the source"
+    click n_open_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L333" "open the source"
+    click n_on_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L368" "open the source"
+    click n_first_existing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L387" "open the source"
+    click n_env_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L391" "open the source"
+    click n_detect_vb_cable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L404" "open the source"
+    click n_detect_blackhole href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L427" "open the source"
+    click n_detect_pipewire href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L449" "open the source"
+    click n_detect_audacity href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L460" "open the source"
+    click n_brew href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L486" "open the source"
+    click n_audacity_offer href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L511" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_present,n_describe,n_is_runnable,n_command_line,n_detect,n_offer,n_for_this_platform,n_by_key,n_run,n_open_page entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -158,27 +169,27 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Presence` <sub>pub enum</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L49) | What a probe found. |
-| `Presence::is_present` <sub>pub fn</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L66) | True only for Presence::Present. |
-| `Presence::describe` <sub>pub fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L71) | A short line for a user interface, in the project's usual register. |
-| `Offer` <sub>pub enum</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L82) | What VeilVoice can offer to do about a companion that is not there. |
-| `Offer::is_runnable` <sub>pub fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L114) | True when a front end may run this itself. |
-| `Offer::command_line` <sub>pub fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L126) | The command as a single line, for showing or copying. |
-| `Companion` <sub>pub struct</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L140) | One piece of optional third-party software. |
-| `Companion::detect` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L159) | Look for it, without changing anything. |
-| `Companion::offer` <sub>pub fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L170) | What could be done about it on this platform. |
-| `ALL` <sub>pub const</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L214) | Every companion this project knows about, in the order a front end should show them. |
-| `for_this_platform` <sub>pub fn</sub> | [265](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L265) | The companions that mean anything on the platform this is running on. |
-| `by_key` <sub>pub fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L272) | Find one by Companion::key. |
-| `run` <sub>pub fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L282) | Run an offer, and return what it printed. |
-| `open_page` <sub>pub fn</sub> | [323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L323) | Open a companion's own page in the user's browser. |
-| `on_path` <sub>fn</sub> | [358](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L358) | Is stem an executable on this process's PATH? |
-| `first_existing` <sub>fn</sub> | [377](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L377) | The first of candidates that exists. |
-| `env_path` <sub>fn</sub> | [381](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L381) |  |
-| `detect_vb_cable` <sub>fn</sub> | [394](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L394) | VB-CABLE installs an audio driver, and a driver is a file in a directory any user can read. |
-| `detect_blackhole` <sub>fn</sub> | [417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L417) | BlackHole is a HAL plug-in, and those live in exactly one place. |
-| `detect_pipewire` <sub>fn</sub> | [439](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L439) | PipeWire is running or it is not, and pw-cli beside it is the sign that the userspace tools are installed. |
-| `detect_audacity` <sub>fn</sub> | [450](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L450) | Audacity is on PATH on Unix and in one of three directories on Windows. |
-| `brew` <sub>fn</sub> | [476](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L476) |  |
-| `audacity_offer` <sub>fn</sub> | [501](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L501) | The route to Audacity differs per platform, and on Linux per distribution. |
-| `UNIX_PACKAGE_MANAGERS` <sub>const</sub> | [551](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L551) | Package managers, and the arguments that install one named package non-interactively. |
+| `Presence` <sub>pub enum</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L59) | What a probe found. |
+| `Presence::is_present` <sub>pub fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L76) | True only for Presence::Present. |
+| `Presence::describe` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L81) | A short line for a user interface, in the project's usual register. |
+| `Offer` <sub>pub enum</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L92) | What VeilVoice can offer to do about a companion that is not there. |
+| `Offer::is_runnable` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L124) | True when a front end may run this itself. |
+| `Offer::command_line` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L136) | The command as a single line, for showing or copying. |
+| `Companion` <sub>pub struct</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L150) | One piece of optional third-party software. |
+| `Companion::detect` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L169) | Look for it, without changing anything. |
+| `Companion::offer` <sub>pub fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L180) | What could be done about it on this platform. |
+| `ALL` <sub>pub const</sub> | [224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L224) | Every companion this project knows about, in the order a front end should show them. |
+| `for_this_platform` <sub>pub fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L275) | The companions that mean anything on the platform this is running on. |
+| `by_key` <sub>pub fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L282) | Find one by Companion::key. |
+| `run` <sub>pub fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L292) | Run an offer, and return what it printed. |
+| `open_page` <sub>pub fn</sub> | [333](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L333) | Open a companion's own page in the user's browser. |
+| `on_path` <sub>fn</sub> | [368](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L368) | Is stem an executable on this process's PATH? |
+| `first_existing` <sub>fn</sub> | [387](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L387) | The first of candidates that exists. |
+| `env_path` <sub>fn</sub> | [391](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L391) |  |
+| `detect_vb_cable` <sub>fn</sub> | [404](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L404) | VB-CABLE installs an audio driver, and a driver is a file in a directory any user can read. |
+| `detect_blackhole` <sub>fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L427) | BlackHole is a HAL plug-in, and those live in exactly one place. |
+| `detect_pipewire` <sub>fn</sub> | [449](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L449) | PipeWire is running or it is not, and pw-cli beside it is the sign that the userspace tools are installed. |
+| `detect_audacity` <sub>fn</sub> | [460](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L460) | Audacity is on PATH on Unix and in one of three directories on Windows. |
+| `brew` <sub>fn</sub> | [486](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L486) |  |
+| `audacity_offer` <sub>fn</sub> | [511](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L511) | The route to Audacity differs per platform, and on Linux per distribution. |
+| `UNIX_PACKAGE_MANAGERS` <sub>const</sub> | [561](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs#L561) | Package managers, and the arguments that install one named package non-interactively. |

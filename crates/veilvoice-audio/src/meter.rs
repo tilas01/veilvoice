@@ -32,6 +32,18 @@
 //! sample exceeding 1.0. Catching those needs oversampling. A front end may say
 //! `CLIP` when a sample reaches full scale, and must not imply it caught the
 //! ones it cannot see.
+//!
+//! # In plain words
+//!
+//! This decides how a level meter is drawn, so that the bar and the number beside
+//! it always agree.
+//!
+//! They did not, once. Both the window and the terminal drew the bar filling
+//! evenly with the signal, while the number beside it was in decibels, which do
+//! not rise evenly at all. So the number could read -12 dB while the bar looked a
+//! quarter full, and a reader who noticed stopped trusting both.
+//!
+//! One piece of arithmetic, in one place, used by both. Now they cannot disagree.
 
 /// The quietest level worth drawing. Below this is silence.
 ///

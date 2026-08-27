@@ -9,6 +9,15 @@
 // `docs/USING_THE_CRATES.md` is compiled on every commit rather than written
 // out by hand and left to rot. `cargo clippy --workspace --all-targets` builds
 // examples, so a signature change breaks CI here before it misleads a reader.
+//
+// In plain words
+// --------------
+//
+// The shortest possible example of using VeilVoice's engine from your own
+// program: hand it some audio, get veiled audio back.
+//
+// It is here for somebody who wants the voice changing without the rest of
+// VeilVoice, and needs to see the whole thing on one screen before deciding.
 
 use veilvoice_core::{DeidConfig, Deidentifier};
 

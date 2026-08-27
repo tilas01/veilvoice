@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-drivers/src/macos.rs`
 
-[`veilvoice-drivers`](../../../crates/veilvoice-drivers/README.md) &middot; 206 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs)
+[`veilvoice-drivers`](../../../crates/veilvoice-drivers/README.md) &middot; 214 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs)
 
 ## Contents
 
 - [Two tools, because Apple is mid-transition](#two-tools-because-apple-is-mid-transition)
 - [Why a subprocess](#why-a-subprocess)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -51,9 +52,17 @@ The native answer is IOKit, which is FFI. `#![forbid(unsafe_code)]` holds
 here as everywhere else in the workspace, so this asks a tool the system
 already ships — the same trade the Windows and Linux readers make.
 
+# In plain words
+
+Asks macOS which system extensions are loaded.
+
+There are two tools depending on how new the machine is, because Apple is part
+way through replacing one with the other. The newer one is tried first and the
+older is the fallback, so this works on both without being told which you have.
+
 ## What this file contains
 
-206 lines defining **2 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+214 lines defining **2 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -75,11 +84,11 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_parse_kextstat["parse_kextstat<br/>line 39"]
-    n_read["read<br/>line 87"]
+    n_parse_kextstat["parse_kextstat<br/>line 47"]
+    n_read["read<br/>line 95"]
     n_read --> n_parse_kextstat
-    click n_parse_kextstat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L39" "open the source"
-    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L87" "open the source"
+    click n_parse_kextstat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L47" "open the source"
+    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L95" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_parse_kextstat,n_read helper
 ```
@@ -90,8 +99,8 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `parse_kextstat` <sub>pub(crate) fn</sub> | [39](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L39) | Parse kextstat-style output, which kmutil showloaded also produces. |
-| `read` <sub>pub(crate) fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L87) | Ask kmutil, then kextstat. |
+| `parse_kextstat` <sub>pub(crate) fn</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L47) | Parse kextstat-style output, which kmutil showloaded also produces. |
+| `read` <sub>pub(crate) fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/macos.rs#L95) | Ask kmutil, then kextstat. |
 
 ---
 

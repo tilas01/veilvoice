@@ -23,6 +23,17 @@
 //! The app lock and the at-rest passphrase have their own tab and stay there.
 //! A password field sitting between "animations" and "colour scheme" invites
 //! being treated with the same weight, and it is not the same weight.
+//!
+//! # In plain words
+//!
+//! The settings, arranged as a short menu rather than one long list.
+//!
+//! There are enough of them now that a single column meant scrolling past things
+//! you were not looking for, and finding a setting is most of what anybody does in
+//! a settings screen.
+//!
+//! Each page is a titled group with a sentence saying what it covers, and every
+//! choice applies as you make it and is remembered.
 
 use crate::prefs::{Motion, Prefs};
 use crate::theme::palette as p;

@@ -24,6 +24,21 @@
 //! ring is intentionally short — enough to absorb jitter between two clocks
 //! that are not synchronised, not enough to accumulate a delay the user would
 //! notice while speaking.
+//!
+//! # In plain words
+//!
+//! This is live mode: your microphone in one end, a voice that is not yours out
+//! the other, fast enough to hold a conversation.
+//!
+//! Sound arrives from the microphone in small pieces, and each one has to be dealt
+//! with before the next arrives. There is no room to be late. So the veiling
+//! happens on the same short path the sound is already travelling, with nothing
+//! queued up behind it and nothing that could pause to allocate memory or wait for
+//! another part of the program.
+//!
+//! If the computer ever cannot keep up, that is counted and shown rather than
+//! hidden. A gap in the sound you can see explained is far better than one you
+//! cannot.
 
 use crate::Error;
 use cpal::traits::{DeviceTrait, StreamTrait};

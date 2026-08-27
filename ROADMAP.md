@@ -118,7 +118,7 @@ subtitles; and an optional video of the result.
 | 49 | **Video output** — the waveform, a circle per speaker in their palette colour or their own picture inside a coloured ring, a title, and a black or image background with padding | **done** | — |
 | 50 | A **preview** of the video and of the voices before anything is generated | **done** | — |
 | 51 | An **asynchronous pipeline**, every speaker rendering at once rather than in sequence | **done** | — |
-| 52 | Every crate and every `.rs` file explained: the technical workflow in a paragraph, then the same thing in plain words | **planned** | 3–4 d |
+| 52 | Every crate and every `.rs` file explained: the technical workflow in a paragraph, then the same thing in plain words | **done** | — |
 | 53 | The website on mobile, and on every engine — not only the one it was written in | **next** | 1–2 d |
 | 54 | **Seventh audit round** across the whole tree, then the production deploy | **next** | 3–5 d |
 

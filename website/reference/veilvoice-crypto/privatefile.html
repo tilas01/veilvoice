@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/privatefile.svg" alt="privatefile.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/privatefile.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 157 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 169 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-not-stdfswrite-plus-a-chmod">Why this is not std::fs::write plus a chmod</a>
   <a href="#what-this-does-not-do">What this does not do</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -58,15 +59,19 @@
 <h2 id="what-this-does-not-do">What this does not do</h2>
 <p>It is a Unix permission, not a security boundary against root, against someone holding the disk, or against a backup client running as you. It narrows one specific, avoidable exposure: another unprivileged user on the same machine.</p>
 <p>On Windows there is no <code>mode</code>. A file created under the user profile inherits an ACL that already excludes other unprivileged users, and there is no portable tightening to apply beyond that -- so on Windows this is an ordinary write, and says so rather than implying a protection it did not obtain.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Writes a file that only you can read.</p>
+<p>The important part is the order. The permissions are set as the file is created, not afterwards, because a file that exists for even a moment with the wrong permissions is a file somebody else&#x27;s program may have read in that moment.</p>
+<p>When it cannot manage that, it says exactly why rather than just failing, since &quot;could not write the key&quot; is not something anybody can act on.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>157 lines defining <strong>3 functions</strong> (2 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>169 lines defining <strong>3 functions</strong> (2 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>write_owner_only</code> <span style="color:var(--muted)">line 44</span> &mdash; Create path containing bytes, readable only by the current user.
+<li><code>write_owner_only</code> <span style="color:var(--muted)">line 56</span> &mdash; Create path containing bytes, readable only by the current user.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>write_inner</code></span>
 </li>
-<li><code>write_owner_only_new</code> <span style="color:var(--muted)">line 55</span> &mdash; As write_owner_only, but fail if anything is already at path.
+<li><code>write_owner_only_new</code> <span style="color:var(--muted)">line 67</span> &mdash; As write_owner_only, but fail if anything is already at path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>write_inner</code></span>
 </li>
 </ul>
@@ -80,20 +85,20 @@
 <rect x="0" y="0" width="396" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M94.8 74.0 C 94.8 94.0, 197.8 100.0, 197.8 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M285.6 74.0 C 285.6 94.0, 197.8 100.0, 197.8 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L44" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="94.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_owner_only</text>
-<text x="94.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 44</text>
+<text x="94.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 56</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L55" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67" target="_blank" rel="noopener noreferrer">
 <rect x="195.6" y="20.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="285.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_owner_only_new</text>
-<text x="285.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 55</text>
+<text x="285.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L59" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L71" target="_blank" rel="noopener noreferrer">
 <rect x="142.0" y="120.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="197.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_inner</text>
-<text x="197.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 59</text>
+<text x="197.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 71</text>
 </a>
 </svg>
 </div>
@@ -101,14 +106,14 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_write_owner_only([&quot;write_owner_only&lt;br/&gt;line 44&quot;])
-    n_write_owner_only_new([&quot;write_owner_only_new&lt;br/&gt;line 55&quot;])
-    n_write_inner[&quot;write_inner&lt;br/&gt;line 59&quot;]
+    n_write_owner_only([&quot;write_owner_only&lt;br/&gt;line 56&quot;])
+    n_write_owner_only_new([&quot;write_owner_only_new&lt;br/&gt;line 67&quot;])
+    n_write_inner[&quot;write_inner&lt;br/&gt;line 71&quot;]
     n_write_owner_only --&gt; n_write_inner
     n_write_owner_only_new --&gt; n_write_inner
-    click n_write_owner_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L44&quot; &quot;open the source&quot;
-    click n_write_owner_only_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L55&quot; &quot;open the source&quot;
-    click n_write_inner href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L59&quot; &quot;open the source&quot;
+    click n_write_owner_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56&quot; &quot;open the source&quot;
+    click n_write_owner_only_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67&quot; &quot;open the source&quot;
+    click n_write_inner href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L71&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_write_owner_only,n_write_owner_only_new entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -119,9 +124,9 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>write_owner_only</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L44" rel="noopener noreferrer">44</a></td><td>Create path containing bytes, readable only by the current user.</td></tr>
-<tr><td><code>write_owner_only_new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L55" rel="noopener noreferrer">55</a></td><td>As write_owner_only, but fail if anything is already at path.</td></tr>
-<tr><td><code>write_inner</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L59" rel="noopener noreferrer">59</a></td><td></td></tr>
+<tr><td><code>write_owner_only</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56" rel="noopener noreferrer">56</a></td><td>Create path containing bytes, readable only by the current user.</td></tr>
+<tr><td><code>write_owner_only_new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67" rel="noopener noreferrer">67</a></td><td>As write_owner_only, but fail if anything is already at path.</td></tr>
+<tr><td><code>write_inner</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L71" rel="noopener noreferrer">71</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

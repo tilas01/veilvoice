@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-verify/src/tests.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 346 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 357 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
 
 ## Contents
 
-- [What this file contains](#what-this-file-contains)
-- [What calls what](#what-calls-what)
-- [Items](#items)
+- [In plain words](#in-plain-words)
+  - [What this file contains](#what-this-file-contains)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 The verifier's own tests.
 
@@ -33,9 +34,20 @@ whether to trust `veilvoice-verify` should be able to see what it was tested
 *against* without cloning the repository, because the whole purpose of that
 binary is to be the thing you check a download with.
 
+# In plain words
+
+The verifier's own tests, and most of them are about failure rather than
+success.
+
+That is deliberate. A verifier that accepted everything would pass every
+happy-path test ever written and would ship looking perfect while doing the
+opposite of its job. So most of what is here is corrupted signatures, wrong
+keys, truncated files and mismatched hashes, and the question each time is
+whether it says no.
+
 ## What this file contains
 
-346 lines defining **18 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+357 lines defining **18 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -57,42 +69,42 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_the_embedded_key_parses_and_is_the_expected_one["the_embedded_key_parses_and_i…<br/>line 19"]
-    n_the_embedded_key_carries_no_email_address["the_embedded_key_carries_no_e…<br/>line 25"]
-    n_the_fingerprint_constant_is_written_out_not_computed["the_fingerprint_constant_is_w…<br/>line 40"]
-    n_a_hash_is_found_by_its_file_name["a_hash_is_found_by_its_file_n…<br/>line 53"]
-    n_a_binary_mode_star_is_not_part_of_the_name["a_binary_mode_star_is_not_par…<br/>line 65"]
-    n_a_file_that_is_not_listed_is_not_found["a_file_that_is_not_listed_is_…<br/>line 77"]
-    n_a_name_that_merely_contains_the_wanted_one_does_not_match["a_name_that_merely_contains_t…<br/>line 83"]
-    n_blank_and_comment_lines_are_skipped["blank_and_comment_lines_are_s…<br/>line 90"]
-    n_a_malformed_line_is_skipped_rather_than_panicking["a_malformed_line_is_skipped_r…<br/>line 99"]
-    n_digests_compare_case_insensitively_and_ignore_surrounding_space["digests_compare_case_insensit…<br/>line 110"]
-    n_a_signature_that_is_not_openpgp_is_refused["a_signature_that_is_not_openp…<br/>line 119"]
-    n_an_empty_signature_is_refused["an_empty_signature_is_refused<br/>line 126"]
-    n_an_armoured_block_that_is_not_a_signature_is_refused["an_armoured_block_that_is_not…<br/>line 132"]
-    n_every_line_printed_by_a_check_goes_through_the_level["every_line_printed_by_a_check…<br/>line 162"]
-    n_nothing_exits_with_an_undocumented_status["nothing_exits_with_an_undocum…<br/>line 237"]
-    n_every_test_that_reads_source_normalises_its_line_endings["every_test_that_reads_source_…<br/>line 274"]
-    n_searching_for_a_brace_on_its_own_line_fails_against_crlf["searching_for_a_brace_on_its_…<br/>line 306"]
-    n_the_repository_pins_its_line_endings["the_repository_pins_its_line_…<br/>line 325"]
-    click n_the_embedded_key_parses_and_is_the_expected_one href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L19" "open the source"
-    click n_the_embedded_key_carries_no_email_address href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L25" "open the source"
-    click n_the_fingerprint_constant_is_written_out_not_computed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L40" "open the source"
-    click n_a_hash_is_found_by_its_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L53" "open the source"
-    click n_a_binary_mode_star_is_not_part_of_the_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L65" "open the source"
-    click n_a_file_that_is_not_listed_is_not_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L77" "open the source"
-    click n_a_name_that_merely_contains_the_wanted_one_does_not_match href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L83" "open the source"
-    click n_blank_and_comment_lines_are_skipped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L90" "open the source"
-    click n_a_malformed_line_is_skipped_rather_than_panicking href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L99" "open the source"
-    click n_digests_compare_case_insensitively_and_ignore_surrounding_space href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L110" "open the source"
-    click n_a_signature_that_is_not_openpgp_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L119" "open the source"
-    click n_an_empty_signature_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L126" "open the source"
-    click n_an_armoured_block_that_is_not_a_signature_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L132" "open the source"
-    click n_every_line_printed_by_a_check_goes_through_the_level href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L162" "open the source"
-    click n_nothing_exits_with_an_undocumented_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L237" "open the source"
-    click n_every_test_that_reads_source_normalises_its_line_endings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L274" "open the source"
-    click n_searching_for_a_brace_on_its_own_line_fails_against_crlf href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L306" "open the source"
-    click n_the_repository_pins_its_line_endings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L325" "open the source"
+    n_the_embedded_key_parses_and_is_the_expected_one["the_embedded_key_parses_and_i…<br/>line 30"]
+    n_the_embedded_key_carries_no_email_address["the_embedded_key_carries_no_e…<br/>line 36"]
+    n_the_fingerprint_constant_is_written_out_not_computed["the_fingerprint_constant_is_w…<br/>line 51"]
+    n_a_hash_is_found_by_its_file_name["a_hash_is_found_by_its_file_n…<br/>line 64"]
+    n_a_binary_mode_star_is_not_part_of_the_name["a_binary_mode_star_is_not_par…<br/>line 76"]
+    n_a_file_that_is_not_listed_is_not_found["a_file_that_is_not_listed_is_…<br/>line 88"]
+    n_a_name_that_merely_contains_the_wanted_one_does_not_match["a_name_that_merely_contains_t…<br/>line 94"]
+    n_blank_and_comment_lines_are_skipped["blank_and_comment_lines_are_s…<br/>line 101"]
+    n_a_malformed_line_is_skipped_rather_than_panicking["a_malformed_line_is_skipped_r…<br/>line 110"]
+    n_digests_compare_case_insensitively_and_ignore_surrounding_space["digests_compare_case_insensit…<br/>line 121"]
+    n_a_signature_that_is_not_openpgp_is_refused["a_signature_that_is_not_openp…<br/>line 130"]
+    n_an_empty_signature_is_refused["an_empty_signature_is_refused<br/>line 137"]
+    n_an_armoured_block_that_is_not_a_signature_is_refused["an_armoured_block_that_is_not…<br/>line 143"]
+    n_every_line_printed_by_a_check_goes_through_the_level["every_line_printed_by_a_check…<br/>line 173"]
+    n_nothing_exits_with_an_undocumented_status["nothing_exits_with_an_undocum…<br/>line 248"]
+    n_every_test_that_reads_source_normalises_its_line_endings["every_test_that_reads_source_…<br/>line 285"]
+    n_searching_for_a_brace_on_its_own_line_fails_against_crlf["searching_for_a_brace_on_its_…<br/>line 317"]
+    n_the_repository_pins_its_line_endings["the_repository_pins_its_line_…<br/>line 336"]
+    click n_the_embedded_key_parses_and_is_the_expected_one href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L30" "open the source"
+    click n_the_embedded_key_carries_no_email_address href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L36" "open the source"
+    click n_the_fingerprint_constant_is_written_out_not_computed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L51" "open the source"
+    click n_a_hash_is_found_by_its_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L64" "open the source"
+    click n_a_binary_mode_star_is_not_part_of_the_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L76" "open the source"
+    click n_a_file_that_is_not_listed_is_not_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L88" "open the source"
+    click n_a_name_that_merely_contains_the_wanted_one_does_not_match href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L94" "open the source"
+    click n_blank_and_comment_lines_are_skipped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L101" "open the source"
+    click n_a_malformed_line_is_skipped_rather_than_panicking href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L110" "open the source"
+    click n_digests_compare_case_insensitively_and_ignore_surrounding_space href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L121" "open the source"
+    click n_a_signature_that_is_not_openpgp_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L130" "open the source"
+    click n_an_empty_signature_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L137" "open the source"
+    click n_an_armoured_block_that_is_not_a_signature_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L143" "open the source"
+    click n_every_line_printed_by_a_check_goes_through_the_level href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L173" "open the source"
+    click n_nothing_exits_with_an_undocumented_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L248" "open the source"
+    click n_every_test_that_reads_source_normalises_its_line_endings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L285" "open the source"
+    click n_searching_for_a_brace_on_its_own_line_fails_against_crlf href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L317" "open the source"
+    click n_the_repository_pins_its_line_endings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L336" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_the_embedded_key_parses_and_is_the_expected_one,n_the_embedded_key_carries_no_email_address,n_the_fingerprint_constant_is_written_out_not_computed,n_a_hash_is_found_by_its_file_name,n_a_binary_mode_star_is_not_part_of_the_name,n_a_file_that_is_not_listed_is_not_found,n_a_name_that_merely_contains_the_wanted_one_does_not_match,n_blank_and_comment_lines_are_skipped,n_a_malformed_line_is_skipped_rather_than_panicking,n_digests_compare_case_insensitively_and_ignore_surrounding_space,n_a_signature_that_is_not_openpgp_is_refused,n_an_empty_signature_is_refused,n_an_armoured_block_that_is_not_a_signature_is_refused,n_every_line_printed_by_a_check_goes_through_the_level,n_nothing_exits_with_an_undocumented_status,n_every_test_that_reads_source_normalises_its_line_endings,n_searching_for_a_brace_on_its_own_line_fails_against_crlf,n_the_repository_pins_its_line_endings helper
 ```
@@ -103,24 +115,24 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `the_embedded_key_parses_and_is_the_expected_one` <sub>fn</sub> | [19](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L19) |  |
-| `the_embedded_key_carries_no_email_address` <sub>fn</sub> | [25](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L25) |  |
-| `the_fingerprint_constant_is_written_out_not_computed` <sub>fn</sub> | [40](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L40) |  |
-| `a_hash_is_found_by_its_file_name` <sub>fn</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L53) |  |
-| `a_binary_mode_star_is_not_part_of_the_name` <sub>fn</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L65) |  |
-| `a_file_that_is_not_listed_is_not_found` <sub>fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L77) |  |
-| `a_name_that_merely_contains_the_wanted_one_does_not_match` <sub>fn</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L83) |  |
-| `blank_and_comment_lines_are_skipped` <sub>fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L90) |  |
-| `a_malformed_line_is_skipped_rather_than_panicking` <sub>fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L99) |  |
-| `digests_compare_case_insensitively_and_ignore_surrounding_space` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L110) |  |
-| `a_signature_that_is_not_openpgp_is_refused` <sub>fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L119) |  |
-| `an_empty_signature_is_refused` <sub>fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L126) |  |
-| `an_armoured_block_that_is_not_a_signature_is_refused` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L132) |  |
-| `every_line_printed_by_a_check_goes_through_the_level` <sub>fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L162) | Nothing may print without asking the level first. |
-| `nothing_exits_with_an_undocumented_status` <sub>fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L237) | Every exit this program can take is one of the documented statuses. |
-| `every_test_that_reads_source_normalises_its_line_endings` <sub>fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L274) | F-72. |
-| `searching_for_a_brace_on_its_own_line_fails_against_crlf` <sub>fn</sub> | [306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L306) | The failure mode itself, so it is on record as reachable rather than theoretical. |
-| `the_repository_pins_its_line_endings` <sub>fn</sub> | [325](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L325) | .gitattributes exists and pins text to LF. |
+| `the_embedded_key_parses_and_is_the_expected_one` <sub>fn</sub> | [30](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L30) |  |
+| `the_embedded_key_carries_no_email_address` <sub>fn</sub> | [36](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L36) |  |
+| `the_fingerprint_constant_is_written_out_not_computed` <sub>fn</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L51) |  |
+| `a_hash_is_found_by_its_file_name` <sub>fn</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L64) |  |
+| `a_binary_mode_star_is_not_part_of_the_name` <sub>fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L76) |  |
+| `a_file_that_is_not_listed_is_not_found` <sub>fn</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L88) |  |
+| `a_name_that_merely_contains_the_wanted_one_does_not_match` <sub>fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L94) |  |
+| `blank_and_comment_lines_are_skipped` <sub>fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L101) |  |
+| `a_malformed_line_is_skipped_rather_than_panicking` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L110) |  |
+| `digests_compare_case_insensitively_and_ignore_surrounding_space` <sub>fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L121) |  |
+| `a_signature_that_is_not_openpgp_is_refused` <sub>fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L130) |  |
+| `an_empty_signature_is_refused` <sub>fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L137) |  |
+| `an_armoured_block_that_is_not_a_signature_is_refused` <sub>fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L143) |  |
+| `every_line_printed_by_a_check_goes_through_the_level` <sub>fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L173) | Nothing may print without asking the level first. |
+| `nothing_exits_with_an_undocumented_status` <sub>fn</sub> | [248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L248) | Every exit this program can take is one of the documented statuses. |
+| `every_test_that_reads_source_normalises_its_line_endings` <sub>fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L285) | F-72. |
+| `searching_for_a_brace_on_its_own_line_fails_against_crlf` <sub>fn</sub> | [317](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L317) | The failure mode itself, so it is on record as reachable rather than theoretical. |
+| `the_repository_pins_its_line_endings` <sub>fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L336) | .gitattributes exists and pins text to LF. |
 
 ---
 

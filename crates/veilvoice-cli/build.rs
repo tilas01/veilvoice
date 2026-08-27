@@ -31,6 +31,15 @@
 //! builds Windows on a Windows runner, so shipped binaries have one, and the
 //! release fails if they do not -- `tools/release/check-windows-icons.py` reads
 //! the built PE rather than trusting this file.
+//!
+//! # In plain words
+//!
+//! Runs while VeilVoice is being compiled, not while it is running.
+//!
+//! On Windows it puts the icon and the version information into the finished
+//! program, so the file looks right in Explorer and its properties say what it is.
+//! It is a build-time step only and nothing it uses ends up inside the shipped
+//! program.
 
 fn main() {
     #[cfg(windows)]

@@ -24,6 +24,19 @@
 //! and prevents an attacker who can substitute one half from steering the
 //! result. Feeding the full transcript is what makes the combiner robust when
 //! one KEM's ciphertexts are malleable.
+//!
+//! # In plain words
+//!
+//! This is for encrypting a recording to somebody else's key rather than to a
+//! passphrase, and it uses two different systems at once.
+//!
+//! One is the kind in use everywhere today. The other is designed to resist a
+//! quantum computer, which does not yet exist in a useful form but which somebody
+//! recording traffic now would be counting on later.
+//!
+//! Both have to be broken to read the file. Using two means that if the newer one
+//! turns out to have a flaw, you are no worse off than with the old one alone, and
+//! if the old one falls to a quantum computer, the newer one still holds.
 
 use crate::{Error, Secret};
 use hkdf::Hkdf;

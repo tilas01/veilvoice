@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/hybrid.svg" alt="hybrid.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/hybrid.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 435 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 448 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-hybrid">Why hybrid</a>
   <a href="#the-combiner">The combiner</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -56,37 +57,41 @@
 <p>It matters here specifically because of <em>harvest-now-decrypt-later</em>: a recording captured today can be stored until quantum hardware exists. A tool whose whole purpose is protecting who is speaking has to assume the adversary is patient.</p>
 <h2 id="the-combiner">The combiner</h2>
 <p>The two shared secrets are mixed with HKDF-SHA256 rather than concatenated or XORed. Both secrets, both ciphertexts and both public keys go into the input, which binds the derived key to the exact transcript that produced it and prevents an attacker who can substitute one half from steering the result. Feeding the full transcript is what makes the combiner robust when one KEM&#x27;s ciphertexts are malleable.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is for encrypting a recording to somebody else&#x27;s key rather than to a passphrase, and it uses two different systems at once.</p>
+<p>One is the kind in use everywhere today. The other is designed to resist a quantum computer, which does not yet exist in a useful form but which somebody recording traffic now would be counting on later.</p>
+<p>Both have to be broken to read the file. Using two means that if the newer one turns out to have a flaw, you are no worse off than with the old one alone, and if the old one falls to a quantum computer, the newer one still holds.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>435 lines defining <strong>15 functions</strong> (10 public), <strong>4 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>448 lines defining <strong>15 functions</strong> (10 public), <strong>4 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct PublicKey</code> <span style="color:var(--muted)">line 63</span> &mdash; A recipient&#x27;s public key: an X25519 point plus an ML-KEM-768 encapsulation key.</li>
-<li><code>struct SecretKey</code> <span style="color:var(--muted)">line 69</span> &mdash; A recipient&#x27;s private key.</li>
-<li><code>struct Encapsulation</code> <span style="color:var(--muted)">line 77</span> &mdash; The public values a sender transmits so the recipient can recover the shared secret.</li>
-<li><code>struct OsRng</code> <span style="color:var(--muted)">line 271</span> &mdash; Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.</li>
+<li><code>struct PublicKey</code> <span style="color:var(--muted)">line 76</span> &mdash; A recipient&#x27;s public key: an X25519 point plus an ML-KEM-768 encapsulation key.</li>
+<li><code>struct SecretKey</code> <span style="color:var(--muted)">line 82</span> &mdash; A recipient&#x27;s private key.</li>
+<li><code>struct Encapsulation</code> <span style="color:var(--muted)">line 90</span> &mdash; The public values a sender transmits so the recipient can recover the shared secret.</li>
+<li><code>struct OsRng</code> <span style="color:var(--muted)">line 284</span> &mdash; Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>PublicKey::to_bytes</code> <span style="color:var(--muted)">line 86</span> &mdash; Serialise to PUBLIC_KEY_LEN bytes.
+<li><code>PublicKey::to_bytes</code> <span style="color:var(--muted)">line 99</span> &mdash; Serialise to PUBLIC_KEY_LEN bytes.
 </li>
-<li><code>PublicKey::from_bytes</code> <span style="color:var(--muted)">line 94</span> &mdash; Parse from exactly PUBLIC_KEY_LEN bytes.
+<li><code>PublicKey::from_bytes</code> <span style="color:var(--muted)">line 107</span> &mdash; Parse from exactly PUBLIC_KEY_LEN bytes.
 </li>
-<li><code>Encapsulation::to_bytes</code> <span style="color:var(--muted)">line 111</span> &mdash; Serialise to ENCAPSULATION_LEN bytes.
+<li><code>Encapsulation::to_bytes</code> <span style="color:var(--muted)">line 124</span> &mdash; Serialise to ENCAPSULATION_LEN bytes.
 </li>
-<li><code>Encapsulation::from_bytes</code> <span style="color:var(--muted)">line 119</span> &mdash; Parse from exactly ENCAPSULATION_LEN bytes.
+<li><code>Encapsulation::from_bytes</code> <span style="color:var(--muted)">line 132</span> &mdash; Parse from exactly ENCAPSULATION_LEN bytes.
 </li>
-<li><code>SecretKey::generate</code> <span style="color:var(--muted)">line 136</span> &mdash; Generate a fresh key pair from the OS CSPRNG.
+<li><code>SecretKey::generate</code> <span style="color:var(--muted)">line 149</span> &mdash; Generate a fresh key pair from the OS CSPRNG.
 </li>
-<li><code>SecretKey::to_bytes</code> <span style="color:var(--muted)">line 157</span> &mdash; Serialise to SECRET_KEY_LEN bytes.
+<li><code>SecretKey::to_bytes</code> <span style="color:var(--muted)">line 170</span> &mdash; Serialise to SECRET_KEY_LEN bytes.
 </li>
-<li><code>SecretKey::from_bytes</code> <span style="color:var(--muted)">line 166</span> &mdash; Parse from exactly SECRET_KEY_LEN bytes.
+<li><code>SecretKey::from_bytes</code> <span style="color:var(--muted)">line 179</span> &mdash; Parse from exactly SECRET_KEY_LEN bytes.
 </li>
-<li><code>SecretKey::public_key</code> <span style="color:var(--muted)">line 181</span> &mdash; The matching public key.
+<li><code>SecretKey::public_key</code> <span style="color:var(--muted)">line 194</span> &mdash; The matching public key.
 </li>
-<li><code>SecretKey::decapsulate</code> <span style="color:var(--muted)">line 189</span> &mdash; Recover the shared secret from a sender&#x27;s Encapsulation.
+<li><code>SecretKey::decapsulate</code> <span style="color:var(--muted)">line 202</span> &mdash; Recover the shared secret from a sender&#x27;s Encapsulation.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>combine</code></span>
 </li>
-<li><code>PublicKey::encapsulate</code> <span style="color:var(--muted)">line 211</span> &mdash; Produce a shared secret for this recipient, plus the public values they need in order to recover it.
+<li><code>PublicKey::encapsulate</code> <span style="color:var(--muted)">line 224</span> &mdash; Produce a shared secret for this recipient, plus the public values they need in order to recover it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>combine</code></span>
 </li>
 </ul>
@@ -102,80 +107,80 @@
 <path d="M338.8 374.0 C 338.8 394.0, 220.6 500.0, 220.6 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M533.4 374.0 C 533.4 394.0, 369.6 500.0, 369.6 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M205.4 474.0 C 205.4 494.0, 369.6 500.0, 369.6 517.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L86" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L99" target="_blank" rel="noopener noreferrer">
 <rect x="432.0" y="120.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="518.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PublicKey::to_bytes</text>
-<text x="518.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 86</text>
+<text x="518.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 99</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L94" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L107" target="_blank" rel="noopener noreferrer">
 <rect x="111.6" y="220.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="205.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PublicKey::from_bytes</text>
-<text x="205.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
+<text x="205.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 107</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L111" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L124" target="_blank" rel="noopener noreferrer">
 <rect x="432.0" y="120.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="518.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Encapsulation::to_bytes</text>
-<text x="518.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
+<text x="518.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L119" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L132" target="_blank" rel="noopener noreferrer">
 <rect x="111.6" y="220.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="205.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Encapsulation::from_bytes</text>
-<text x="205.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 119</text>
+<text x="205.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L136" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L149" target="_blank" rel="noopener noreferrer">
 <rect x="233.6" y="120.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="319.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::generate</text>
-<text x="319.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
+<text x="319.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 149</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L157" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L170" target="_blank" rel="noopener noreferrer">
 <rect x="432.0" y="120.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="518.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::to_bytes</text>
-<text x="518.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 157</text>
+<text x="518.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L166" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L179" target="_blank" rel="noopener noreferrer">
 <rect x="111.6" y="220.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="205.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::from_bytes</text>
-<text x="205.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 166</text>
+<text x="205.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L181" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L194" target="_blank" rel="noopener noreferrer">
 <rect x="325.2" y="220.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="419.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::public_key</text>
-<text x="419.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 181</text>
+<text x="419.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 194</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L189" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L202" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="320.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="117.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SecretKey::decapsulate</text>
-<text x="117.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 189</text>
+<text x="117.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L211" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L224" target="_blank" rel="noopener noreferrer">
 <rect x="241.2" y="320.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="338.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PublicKey::encapsulate</text>
-<text x="338.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 211</text>
+<text x="338.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 224</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L238" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L251" target="_blank" rel="noopener noreferrer">
 <rect x="176.2" y="520.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="220.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">combine</text>
-<text x="220.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 238</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L274" target="_blank" rel="noopener noreferrer">
-<rect x="462.4" y="320.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="533.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::next_u32</text>
-<text x="533.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 274</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L279" target="_blank" rel="noopener noreferrer">
-<rect x="134.4" y="420.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="205.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::next_u64</text>
-<text x="205.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L284" target="_blank" rel="noopener noreferrer">
-<rect x="291.0" y="520.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="369.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::fill_bytes</text>
-<text x="369.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 284</text>
+<text x="220.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 251</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287" target="_blank" rel="noopener noreferrer">
+<rect x="462.4" y="320.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="533.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::next_u32</text>
+<text x="533.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L292" target="_blank" rel="noopener noreferrer">
+<rect x="134.4" y="420.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="205.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::next_u64</text>
+<text x="205.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 292</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L297" target="_blank" rel="noopener noreferrer">
+<rect x="291.0" y="520.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="369.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::fill_bytes</text>
+<text x="369.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 297</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L300" target="_blank" rel="noopener noreferrer">
 <rect x="302.4" y="420.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="396.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">OsRng::try_fill_bytes</text>
-<text x="396.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
+<text x="396.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 300</text>
 </a>
 </svg>
 </div>
@@ -183,40 +188,40 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_to_bytes([&quot;PublicKey::to_bytes&lt;br/&gt;line 86&quot;])
-    n_from_bytes([&quot;PublicKey::from_bytes&lt;br/&gt;line 94&quot;])
-    n_to_bytes([&quot;Encapsulation::to_bytes&lt;br/&gt;line 111&quot;])
-    n_from_bytes([&quot;Encapsulation::from_bytes&lt;br/&gt;line 119&quot;])
-    n_generate([&quot;SecretKey::generate&lt;br/&gt;line 136&quot;])
-    n_to_bytes([&quot;SecretKey::to_bytes&lt;br/&gt;line 157&quot;])
-    n_from_bytes([&quot;SecretKey::from_bytes&lt;br/&gt;line 166&quot;])
-    n_public_key([&quot;SecretKey::public_key&lt;br/&gt;line 181&quot;])
-    n_decapsulate([&quot;SecretKey::decapsulate&lt;br/&gt;line 189&quot;])
-    n_encapsulate([&quot;PublicKey::encapsulate&lt;br/&gt;line 211&quot;])
-    n_combine[&quot;combine&lt;br/&gt;line 238&quot;]
-    n_next_u32[&quot;OsRng::next_u32&lt;br/&gt;line 274&quot;]
-    n_next_u64[&quot;OsRng::next_u64&lt;br/&gt;line 279&quot;]
-    n_fill_bytes[&quot;OsRng::fill_bytes&lt;br/&gt;line 284&quot;]
-    n_try_fill_bytes[&quot;OsRng::try_fill_bytes&lt;br/&gt;line 287&quot;]
+    n_to_bytes([&quot;PublicKey::to_bytes&lt;br/&gt;line 99&quot;])
+    n_from_bytes([&quot;PublicKey::from_bytes&lt;br/&gt;line 107&quot;])
+    n_to_bytes([&quot;Encapsulation::to_bytes&lt;br/&gt;line 124&quot;])
+    n_from_bytes([&quot;Encapsulation::from_bytes&lt;br/&gt;line 132&quot;])
+    n_generate([&quot;SecretKey::generate&lt;br/&gt;line 149&quot;])
+    n_to_bytes([&quot;SecretKey::to_bytes&lt;br/&gt;line 170&quot;])
+    n_from_bytes([&quot;SecretKey::from_bytes&lt;br/&gt;line 179&quot;])
+    n_public_key([&quot;SecretKey::public_key&lt;br/&gt;line 194&quot;])
+    n_decapsulate([&quot;SecretKey::decapsulate&lt;br/&gt;line 202&quot;])
+    n_encapsulate([&quot;PublicKey::encapsulate&lt;br/&gt;line 224&quot;])
+    n_combine[&quot;combine&lt;br/&gt;line 251&quot;]
+    n_next_u32[&quot;OsRng::next_u32&lt;br/&gt;line 287&quot;]
+    n_next_u64[&quot;OsRng::next_u64&lt;br/&gt;line 292&quot;]
+    n_fill_bytes[&quot;OsRng::fill_bytes&lt;br/&gt;line 297&quot;]
+    n_try_fill_bytes[&quot;OsRng::try_fill_bytes&lt;br/&gt;line 300&quot;]
     n_decapsulate --&gt; n_combine
     n_encapsulate --&gt; n_combine
     n_next_u32 --&gt; n_fill_bytes
     n_next_u64 --&gt; n_fill_bytes
-    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L86&quot; &quot;open the source&quot;
-    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L94&quot; &quot;open the source&quot;
-    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L111&quot; &quot;open the source&quot;
-    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L119&quot; &quot;open the source&quot;
-    click n_generate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L136&quot; &quot;open the source&quot;
-    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L157&quot; &quot;open the source&quot;
-    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L166&quot; &quot;open the source&quot;
-    click n_public_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L181&quot; &quot;open the source&quot;
-    click n_decapsulate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L189&quot; &quot;open the source&quot;
-    click n_encapsulate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L211&quot; &quot;open the source&quot;
-    click n_combine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L238&quot; &quot;open the source&quot;
-    click n_next_u32 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L274&quot; &quot;open the source&quot;
-    click n_next_u64 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L279&quot; &quot;open the source&quot;
-    click n_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L284&quot; &quot;open the source&quot;
-    click n_try_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L99&quot; &quot;open the source&quot;
+    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L107&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L124&quot; &quot;open the source&quot;
+    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L132&quot; &quot;open the source&quot;
+    click n_generate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L149&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L170&quot; &quot;open the source&quot;
+    click n_from_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L179&quot; &quot;open the source&quot;
+    click n_public_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L194&quot; &quot;open the source&quot;
+    click n_decapsulate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L202&quot; &quot;open the source&quot;
+    click n_encapsulate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L224&quot; &quot;open the source&quot;
+    click n_combine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L251&quot; &quot;open the source&quot;
+    click n_next_u32 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287&quot; &quot;open the source&quot;
+    click n_next_u64 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L292&quot; &quot;open the source&quot;
+    click n_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L297&quot; &quot;open the source&quot;
+    click n_try_fill_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L300&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_from_bytes,n_to_bytes,n_from_bytes,n_generate,n_to_bytes,n_from_bytes,n_public_key,n_decapsulate,n_encapsulate entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -227,36 +232,36 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>HKDF_INFO</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L38" rel="noopener noreferrer">38</a></td><td>Domain separation string, so keys derived here can never collide with keys derived by any other part of the system.</td></tr>
-<tr><td><code>X25519_PUB_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L41" rel="noopener noreferrer">41</a></td><td>Encoded length of the X25519 public key.</td></tr>
-<tr><td><code>MLKEM_EK_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L43" rel="noopener noreferrer">43</a></td><td>Encoded length of the ML-KEM-768 encapsulation (public) key.</td></tr>
-<tr><td><code>MLKEM_CT_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L45" rel="noopener noreferrer">45</a></td><td>Encoded length of an ML-KEM-768 ciphertext.</td></tr>
-<tr><td><code>MLKEM_DK_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L47" rel="noopener noreferrer">47</a></td><td>Encoded length of the ML-KEM-768 decapsulation (private) key.</td></tr>
-<tr><td><code>X25519_SECRET_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L49" rel="noopener noreferrer">49</a></td><td>Encoded length of the X25519 private scalar.</td></tr>
-<tr><td><code>SECRET_KEY_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L51" rel="noopener noreferrer">51</a></td><td>Total encoded length of a SecretKey.</td></tr>
-<tr><td><code>PUBLIC_KEY_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L53" rel="noopener noreferrer">53</a></td><td>Total encoded length of a PublicKey.</td></tr>
-<tr><td><code>ENCAPSULATION_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L55" rel="noopener noreferrer">55</a></td><td>Total encoded length of an Encapsulation.</td></tr>
-<tr><td><code>MlKemDk</code> <sub>type</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L57" rel="noopener noreferrer">57</a></td><td></td></tr>
-<tr><td><code>MlKemEk</code> <sub>type</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L58" rel="noopener noreferrer">58</a></td><td></td></tr>
-<tr><td><code>PublicKey</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L63" rel="noopener noreferrer">63</a></td><td>A recipient&#x27;s public key: an X25519 point plus an ML-KEM-768 encapsulation key.</td></tr>
-<tr><td><code>SecretKey</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L69" rel="noopener noreferrer">69</a></td><td>A recipient&#x27;s private key.</td></tr>
-<tr><td><code>Encapsulation</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L77" rel="noopener noreferrer">77</a></td><td>The public values a sender transmits so the recipient can recover the shared secret.</td></tr>
-<tr><td><code>PublicKey::to_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L86" rel="noopener noreferrer">86</a></td><td>Serialise to PUBLIC_KEY_LEN bytes.</td></tr>
-<tr><td><code>PublicKey::from_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L94" rel="noopener noreferrer">94</a></td><td>Parse from exactly PUBLIC_KEY_LEN bytes.</td></tr>
-<tr><td><code>Encapsulation::to_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L111" rel="noopener noreferrer">111</a></td><td>Serialise to ENCAPSULATION_LEN bytes.</td></tr>
-<tr><td><code>Encapsulation::from_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L119" rel="noopener noreferrer">119</a></td><td>Parse from exactly ENCAPSULATION_LEN bytes.</td></tr>
-<tr><td><code>SecretKey::generate</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L136" rel="noopener noreferrer">136</a></td><td>Generate a fresh key pair from the OS CSPRNG.</td></tr>
-<tr><td><code>SecretKey::to_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L157" rel="noopener noreferrer">157</a></td><td>Serialise to SECRET_KEY_LEN bytes.</td></tr>
-<tr><td><code>SecretKey::from_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L166" rel="noopener noreferrer">166</a></td><td>Parse from exactly SECRET_KEY_LEN bytes.</td></tr>
-<tr><td><code>SecretKey::public_key</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L181" rel="noopener noreferrer">181</a></td><td>The matching public key.</td></tr>
-<tr><td><code>SecretKey::decapsulate</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L189" rel="noopener noreferrer">189</a></td><td>Recover the shared secret from a sender&#x27;s Encapsulation.</td></tr>
-<tr><td><code>PublicKey::encapsulate</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L211" rel="noopener noreferrer">211</a></td><td>Produce a shared secret for this recipient, plus the public values they need in order to recover it.</td></tr>
-<tr><td><code>combine</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L238" rel="noopener noreferrer">238</a></td><td>Mix both shared secrets with the full transcript.</td></tr>
-<tr><td><code>OsRng</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L271" rel="noopener noreferrer">271</a></td><td>Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.</td></tr>
-<tr><td><code>OsRng::next_u32</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L274" rel="noopener noreferrer">274</a></td><td></td></tr>
-<tr><td><code>OsRng::next_u64</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L279" rel="noopener noreferrer">279</a></td><td></td></tr>
-<tr><td><code>OsRng::fill_bytes</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L284" rel="noopener noreferrer">284</a></td><td></td></tr>
-<tr><td><code>OsRng::try_fill_bytes</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287" rel="noopener noreferrer">287</a></td><td></td></tr>
+<tr><td><code>HKDF_INFO</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L51" rel="noopener noreferrer">51</a></td><td>Domain separation string, so keys derived here can never collide with keys derived by any other part of the system.</td></tr>
+<tr><td><code>X25519_PUB_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L54" rel="noopener noreferrer">54</a></td><td>Encoded length of the X25519 public key.</td></tr>
+<tr><td><code>MLKEM_EK_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L56" rel="noopener noreferrer">56</a></td><td>Encoded length of the ML-KEM-768 encapsulation (public) key.</td></tr>
+<tr><td><code>MLKEM_CT_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L58" rel="noopener noreferrer">58</a></td><td>Encoded length of an ML-KEM-768 ciphertext.</td></tr>
+<tr><td><code>MLKEM_DK_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L60" rel="noopener noreferrer">60</a></td><td>Encoded length of the ML-KEM-768 decapsulation (private) key.</td></tr>
+<tr><td><code>X25519_SECRET_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L62" rel="noopener noreferrer">62</a></td><td>Encoded length of the X25519 private scalar.</td></tr>
+<tr><td><code>SECRET_KEY_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L64" rel="noopener noreferrer">64</a></td><td>Total encoded length of a SecretKey.</td></tr>
+<tr><td><code>PUBLIC_KEY_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L66" rel="noopener noreferrer">66</a></td><td>Total encoded length of a PublicKey.</td></tr>
+<tr><td><code>ENCAPSULATION_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L68" rel="noopener noreferrer">68</a></td><td>Total encoded length of an Encapsulation.</td></tr>
+<tr><td><code>MlKemDk</code> <sub>type</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L70" rel="noopener noreferrer">70</a></td><td></td></tr>
+<tr><td><code>MlKemEk</code> <sub>type</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L71" rel="noopener noreferrer">71</a></td><td></td></tr>
+<tr><td><code>PublicKey</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L76" rel="noopener noreferrer">76</a></td><td>A recipient&#x27;s public key: an X25519 point plus an ML-KEM-768 encapsulation key.</td></tr>
+<tr><td><code>SecretKey</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L82" rel="noopener noreferrer">82</a></td><td>A recipient&#x27;s private key.</td></tr>
+<tr><td><code>Encapsulation</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L90" rel="noopener noreferrer">90</a></td><td>The public values a sender transmits so the recipient can recover the shared secret.</td></tr>
+<tr><td><code>PublicKey::to_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L99" rel="noopener noreferrer">99</a></td><td>Serialise to PUBLIC_KEY_LEN bytes.</td></tr>
+<tr><td><code>PublicKey::from_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L107" rel="noopener noreferrer">107</a></td><td>Parse from exactly PUBLIC_KEY_LEN bytes.</td></tr>
+<tr><td><code>Encapsulation::to_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L124" rel="noopener noreferrer">124</a></td><td>Serialise to ENCAPSULATION_LEN bytes.</td></tr>
+<tr><td><code>Encapsulation::from_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L132" rel="noopener noreferrer">132</a></td><td>Parse from exactly ENCAPSULATION_LEN bytes.</td></tr>
+<tr><td><code>SecretKey::generate</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L149" rel="noopener noreferrer">149</a></td><td>Generate a fresh key pair from the OS CSPRNG.</td></tr>
+<tr><td><code>SecretKey::to_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L170" rel="noopener noreferrer">170</a></td><td>Serialise to SECRET_KEY_LEN bytes.</td></tr>
+<tr><td><code>SecretKey::from_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L179" rel="noopener noreferrer">179</a></td><td>Parse from exactly SECRET_KEY_LEN bytes.</td></tr>
+<tr><td><code>SecretKey::public_key</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L194" rel="noopener noreferrer">194</a></td><td>The matching public key.</td></tr>
+<tr><td><code>SecretKey::decapsulate</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L202" rel="noopener noreferrer">202</a></td><td>Recover the shared secret from a sender&#x27;s Encapsulation.</td></tr>
+<tr><td><code>PublicKey::encapsulate</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L224" rel="noopener noreferrer">224</a></td><td>Produce a shared secret for this recipient, plus the public values they need in order to recover it.</td></tr>
+<tr><td><code>combine</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L251" rel="noopener noreferrer">251</a></td><td>Mix both shared secrets with the full transcript.</td></tr>
+<tr><td><code>OsRng</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L284" rel="noopener noreferrer">284</a></td><td>Bridges the OS CSPRNG to the rand_core traits the KEM crates expect.</td></tr>
+<tr><td><code>OsRng::next_u32</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L287" rel="noopener noreferrer">287</a></td><td></td></tr>
+<tr><td><code>OsRng::next_u64</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L292" rel="noopener noreferrer">292</a></td><td></td></tr>
+<tr><td><code>OsRng::fill_bytes</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L297" rel="noopener noreferrer">297</a></td><td></td></tr>
+<tr><td><code>OsRng::try_fill_bytes</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs#L300" rel="noopener noreferrer">300</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

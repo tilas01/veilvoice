@@ -42,6 +42,18 @@
 //! are kept different: they are domain-separated in the derivation, so
 //! unlocking the application does not unseal recordings and one cannot be
 //! derived from the other.
+//!
+//! # In plain words
+//!
+//! This turns a passphrase into a key.
+//!
+//! A passphrase somebody can remember is far too short and too predictable to use
+//! directly, so it is put through a process designed to be slow and to need a
+//! large amount of memory. That does not slow you down noticeably once, but it
+//! makes guessing millions of passphrases enormously expensive for anybody trying.
+//!
+//! The settings are stored with each file, so an old recording still opens after
+//! the defaults are made stronger.
 
 use crate::{Error, Secret};
 use argon2::{Algorithm, Argon2, Params, Version};

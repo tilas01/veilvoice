@@ -39,9 +39,10 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-meta/tests-wav_fuzz.svg" alt="wav_fuzz.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-meta/tests/wav_fuzz.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 291 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 299 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -53,12 +54,15 @@
 <p>The properties asserted, for any input at all:</p>
 <p>1. <strong>It returns.</strong> No panic, and no unbounded loop: every iteration must advance <code>pos</code>, whatever the chunk sizes claim. 2. <strong>A success is a valid WAV.</strong> If it hands back bytes, those bytes must parse as RIFF/WAVE with a length field that matches what was written &#8212; it is not permitted to emit something the next tool chokes on. 3. <strong>It never invents audio.</strong> Output length is bounded by input length.</p>
 <p>Set <code>VEILVOICE_FUZZ_ROUNDS</code> to run it longer than the default.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Throws damaged and hostile WAV files at the metadata stripper.</p>
+<p>A WAV file is a series of labelled sections, and a section that lies about its own size is the classic way to make a program read past the end of what it was given. Every malformed file here has to be refused rather than trusted.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>291 lines defining <strong>15 functions</strong> (0 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>299 lines defining <strong>15 functions</strong> (0 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Rng</code> <span style="color:var(--muted)">line 22</span></li>
+<li><code>struct Rng</code> <span style="color:var(--muted)">line 30</span></li>
 </ul>
 </section>
 <section id="s-calls">
@@ -89,80 +93,80 @@
 <path d="M566.0 247.0 C 588.0 247.0, 588.0 147.0, 157.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M566.0 247.0 C 588.0 247.0, 588.0 147.0, 271.8 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M425.0 547.0 C 543.2 547.0, 543.2 147.0, 524.2 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L25" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L33" target="_blank" rel="noopener noreferrer">
 <rect x="50.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="94.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Rng::new</text>
-<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 25</text>
+<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 33</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L28" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L36" target="_blank" rel="noopener noreferrer">
 <rect x="164.8" y="20.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="228.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Rng::next_u32</text>
-<text x="228.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 28</text>
+<text x="228.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 36</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L34" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L42" target="_blank" rel="noopener noreferrer">
 <rect x="317.6" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="369.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Rng::below</text>
-<text x="369.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 34</text>
+<text x="369.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 42</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L41" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L49" target="_blank" rel="noopener noreferrer">
 <rect x="447.6" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="495.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Rng::byte</text>
-<text x="495.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 41</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L46" target="_blank" rel="noopener noreferrer">
-<rect x="72.8" y="120.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="113.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">rounds</text>
-<text x="113.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 46</text>
+<text x="495.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 49</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L54" target="_blank" rel="noopener noreferrer">
+<rect x="72.8" y="120.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="113.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">rounds</text>
+<text x="113.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 54</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L62" target="_blank" rel="noopener noreferrer">
 <rect x="180.0" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="224.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seed_wav</text>
-<text x="224.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 54</text>
+<text x="224.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 62</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L86" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L94" target="_blank" rel="noopener noreferrer">
 <rect x="294.8" y="120.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="335.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">mutate</text>
-<text x="335.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 86</text>
+<text x="335.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L160" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L168" target="_blank" rel="noopener noreferrer">
 <rect x="402.0" y="120.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="461.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check_output</text>
-<text x="461.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 160</text>
+<text x="461.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L184" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L192" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="156.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">the_chunk_walker_survives_hos&#8230;</text>
-<text x="156.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 184</text>
+<text x="156.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L200" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L208" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="438.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">the_realistic_policy_survives&#8230;</text>
-<text x="438.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
+<text x="438.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 208</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L216" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L224" target="_blank" rel="noopener noreferrer">
 <rect x="58.4" y="320.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="186.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">pure_noise_is_rejected_or_han&#8230;</text>
-<text x="186.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 216</text>
+<text x="186.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 224</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L230" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L238" target="_blank" rel="noopener noreferrer">
 <rect x="340.4" y="320.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="438.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">cleaning_is_idempotent</text>
-<text x="438.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 230</text>
+<text x="438.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 238</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L242" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L250" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="420.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="156.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">every_truncation_of_a_valid_f&#8230;</text>
-<text x="156.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 242</text>
+<text x="156.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 250</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L257" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L265" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="420.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="438.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_riff_size_of_u32_max_does_n&#8230;</text>
-<text x="438.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
+<text x="438.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 265</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L274" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L282" target="_blank" rel="noopener noreferrer">
 <rect x="169.0" y="520.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="297.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">zero_sized_chunks_do_not_stal&#8230;</text>
-<text x="297.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 274</text>
+<text x="297.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 282</text>
 </a>
 </svg>
 </div>
@@ -170,21 +174,21 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_new[&quot;Rng::new&lt;br/&gt;line 25&quot;]
-    n_next_u32[&quot;Rng::next_u32&lt;br/&gt;line 28&quot;]
-    n_below[&quot;Rng::below&lt;br/&gt;line 34&quot;]
-    n_byte[&quot;Rng::byte&lt;br/&gt;line 41&quot;]
-    n_rounds[&quot;rounds&lt;br/&gt;line 46&quot;]
-    n_seed_wav[&quot;seed_wav&lt;br/&gt;line 54&quot;]
-    n_mutate[&quot;mutate&lt;br/&gt;line 86&quot;]
-    n_check_output[&quot;check_output&lt;br/&gt;line 160&quot;]
-    n_the_chunk_walker_survives_hostile_input[&quot;the_chunk_walker_survives_hos&#8230;&lt;br/&gt;line 184&quot;]
-    n_the_realistic_policy_survives_hostile_input[&quot;the_realistic_policy_survives&#8230;&lt;br/&gt;line 200&quot;]
-    n_pure_noise_is_rejected_or_handled[&quot;pure_noise_is_rejected_or_han&#8230;&lt;br/&gt;line 216&quot;]
-    n_cleaning_is_idempotent[&quot;cleaning_is_idempotent&lt;br/&gt;line 230&quot;]
-    n_every_truncation_of_a_valid_file_is_handled[&quot;every_truncation_of_a_valid_f&#8230;&lt;br/&gt;line 242&quot;]
-    n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic[&quot;a_riff_size_of_u32_max_does_n&#8230;&lt;br/&gt;line 257&quot;]
-    n_zero_sized_chunks_do_not_stall_the_walker[&quot;zero_sized_chunks_do_not_stal&#8230;&lt;br/&gt;line 274&quot;]
+    n_new[&quot;Rng::new&lt;br/&gt;line 33&quot;]
+    n_next_u32[&quot;Rng::next_u32&lt;br/&gt;line 36&quot;]
+    n_below[&quot;Rng::below&lt;br/&gt;line 42&quot;]
+    n_byte[&quot;Rng::byte&lt;br/&gt;line 49&quot;]
+    n_rounds[&quot;rounds&lt;br/&gt;line 54&quot;]
+    n_seed_wav[&quot;seed_wav&lt;br/&gt;line 62&quot;]
+    n_mutate[&quot;mutate&lt;br/&gt;line 94&quot;]
+    n_check_output[&quot;check_output&lt;br/&gt;line 168&quot;]
+    n_the_chunk_walker_survives_hostile_input[&quot;the_chunk_walker_survives_hos&#8230;&lt;br/&gt;line 192&quot;]
+    n_the_realistic_policy_survives_hostile_input[&quot;the_realistic_policy_survives&#8230;&lt;br/&gt;line 208&quot;]
+    n_pure_noise_is_rejected_or_handled[&quot;pure_noise_is_rejected_or_han&#8230;&lt;br/&gt;line 224&quot;]
+    n_cleaning_is_idempotent[&quot;cleaning_is_idempotent&lt;br/&gt;line 238&quot;]
+    n_every_truncation_of_a_valid_file_is_handled[&quot;every_truncation_of_a_valid_f&#8230;&lt;br/&gt;line 250&quot;]
+    n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic[&quot;a_riff_size_of_u32_max_does_n&#8230;&lt;br/&gt;line 265&quot;]
+    n_zero_sized_chunks_do_not_stall_the_walker[&quot;zero_sized_chunks_do_not_stal&#8230;&lt;br/&gt;line 282&quot;]
     n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic --&gt; n_check_output
     n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic --&gt; n_seed_wav
     n_below --&gt; n_next_u32
@@ -206,21 +210,21 @@ flowchart TD
     n_the_realistic_policy_survives_hostile_input --&gt; n_rounds
     n_the_realistic_policy_survives_hostile_input --&gt; n_seed_wav
     n_zero_sized_chunks_do_not_stall_the_walker --&gt; n_check_output
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L25&quot; &quot;open the source&quot;
-    click n_next_u32 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L28&quot; &quot;open the source&quot;
-    click n_below href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L34&quot; &quot;open the source&quot;
-    click n_byte href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L41&quot; &quot;open the source&quot;
-    click n_rounds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L46&quot; &quot;open the source&quot;
-    click n_seed_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L54&quot; &quot;open the source&quot;
-    click n_mutate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L86&quot; &quot;open the source&quot;
-    click n_check_output href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L160&quot; &quot;open the source&quot;
-    click n_the_chunk_walker_survives_hostile_input href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L184&quot; &quot;open the source&quot;
-    click n_the_realistic_policy_survives_hostile_input href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L200&quot; &quot;open the source&quot;
-    click n_pure_noise_is_rejected_or_handled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L216&quot; &quot;open the source&quot;
-    click n_cleaning_is_idempotent href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L230&quot; &quot;open the source&quot;
-    click n_every_truncation_of_a_valid_file_is_handled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L242&quot; &quot;open the source&quot;
-    click n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L257&quot; &quot;open the source&quot;
-    click n_zero_sized_chunks_do_not_stall_the_walker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L274&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L33&quot; &quot;open the source&quot;
+    click n_next_u32 href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L36&quot; &quot;open the source&quot;
+    click n_below href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L42&quot; &quot;open the source&quot;
+    click n_byte href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L49&quot; &quot;open the source&quot;
+    click n_rounds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L54&quot; &quot;open the source&quot;
+    click n_seed_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L62&quot; &quot;open the source&quot;
+    click n_mutate href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L94&quot; &quot;open the source&quot;
+    click n_check_output href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L168&quot; &quot;open the source&quot;
+    click n_the_chunk_walker_survives_hostile_input href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L192&quot; &quot;open the source&quot;
+    click n_the_realistic_policy_survives_hostile_input href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L208&quot; &quot;open the source&quot;
+    click n_pure_noise_is_rejected_or_handled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L224&quot; &quot;open the source&quot;
+    click n_cleaning_is_idempotent href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L238&quot; &quot;open the source&quot;
+    click n_every_truncation_of_a_valid_file_is_handled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L250&quot; &quot;open the source&quot;
+    click n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L265&quot; &quot;open the source&quot;
+    click n_zero_sized_chunks_do_not_stall_the_walker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L282&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_new,n_next_u32,n_below,n_byte,n_rounds,n_seed_wav,n_mutate,n_check_output,n_the_chunk_walker_survives_hostile_input,n_the_realistic_policy_survives_hostile_input,n_pure_noise_is_rejected_or_handled,n_cleaning_is_idempotent,n_every_truncation_of_a_valid_file_is_handled,n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic,n_zero_sized_chunks_do_not_stall_the_walker helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -229,22 +233,22 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Rng</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L22" rel="noopener noreferrer">22</a></td><td></td></tr>
-<tr><td><code>Rng::new</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L25" rel="noopener noreferrer">25</a></td><td></td></tr>
-<tr><td><code>Rng::next_u32</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L28" rel="noopener noreferrer">28</a></td><td></td></tr>
-<tr><td><code>Rng::below</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L34" rel="noopener noreferrer">34</a></td><td></td></tr>
-<tr><td><code>Rng::byte</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L41" rel="noopener noreferrer">41</a></td><td></td></tr>
-<tr><td><code>rounds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L46" rel="noopener noreferrer">46</a></td><td></td></tr>
-<tr><td><code>seed_wav</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L54" rel="noopener noreferrer">54</a></td><td>A minimal but genuinely valid WAV to mutate from.</td></tr>
-<tr><td><code>mutate</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L86" rel="noopener noreferrer">86</a></td><td>Mutations aimed at the chunk walker specifically: the interesting bytes are the 32-bit sizes, so a fifth of the rounds corrupt one deliberately.</td></tr>
-<tr><td><code>check_output</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L160" rel="noopener noreferrer">160</a></td><td></td></tr>
-<tr><td><code>the_chunk_walker_survives_hostile_input</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L184" rel="noopener noreferrer">184</a></td><td></td></tr>
-<tr><td><code>the_realistic_policy_survives_hostile_input</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L200" rel="noopener noreferrer">200</a></td><td>Policy::Realistic appends a chunk of its own, which is the one path that can make the output larger than the input.</td></tr>
-<tr><td><code>pure_noise_is_rejected_or_handled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L216" rel="noopener noreferrer">216</a></td><td></td></tr>
-<tr><td><code>cleaning_is_idempotent</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L230" rel="noopener noreferrer">230</a></td><td>A cleaned file must clean again to itself.</td></tr>
-<tr><td><code>every_truncation_of_a_valid_file_is_handled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L242" rel="noopener noreferrer">242</a></td><td>Every truncation of a valid file, which is what a partial download or an interrupted recording actually looks like.</td></tr>
-<tr><td><code>a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L257" rel="noopener noreferrer">257</a></td><td>The RIFF size field is a u32 widened to usize and then had 8 added to it.</td></tr>
-<tr><td><code>zero_sized_chunks_do_not_stall_the_walker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L274" rel="noopener noreferrer">274</a></td><td>A chunk that declares a size of zero must still advance the walker.</td></tr>
+<tr><td><code>Rng</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L30" rel="noopener noreferrer">30</a></td><td></td></tr>
+<tr><td><code>Rng::new</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L33" rel="noopener noreferrer">33</a></td><td></td></tr>
+<tr><td><code>Rng::next_u32</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L36" rel="noopener noreferrer">36</a></td><td></td></tr>
+<tr><td><code>Rng::below</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L42" rel="noopener noreferrer">42</a></td><td></td></tr>
+<tr><td><code>Rng::byte</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L49" rel="noopener noreferrer">49</a></td><td></td></tr>
+<tr><td><code>rounds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L54" rel="noopener noreferrer">54</a></td><td></td></tr>
+<tr><td><code>seed_wav</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L62" rel="noopener noreferrer">62</a></td><td>A minimal but genuinely valid WAV to mutate from.</td></tr>
+<tr><td><code>mutate</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L94" rel="noopener noreferrer">94</a></td><td>Mutations aimed at the chunk walker specifically: the interesting bytes are the 32-bit sizes, so a fifth of the rounds corrupt one deliberately.</td></tr>
+<tr><td><code>check_output</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L168" rel="noopener noreferrer">168</a></td><td></td></tr>
+<tr><td><code>the_chunk_walker_survives_hostile_input</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L192" rel="noopener noreferrer">192</a></td><td></td></tr>
+<tr><td><code>the_realistic_policy_survives_hostile_input</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L208" rel="noopener noreferrer">208</a></td><td>Policy::Realistic appends a chunk of its own, which is the one path that can make the output larger than the input.</td></tr>
+<tr><td><code>pure_noise_is_rejected_or_handled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L224" rel="noopener noreferrer">224</a></td><td></td></tr>
+<tr><td><code>cleaning_is_idempotent</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L238" rel="noopener noreferrer">238</a></td><td>A cleaned file must clean again to itself.</td></tr>
+<tr><td><code>every_truncation_of_a_valid_file_is_handled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L250" rel="noopener noreferrer">250</a></td><td>Every truncation of a valid file, which is what a partial download or an interrupted recording actually looks like.</td></tr>
+<tr><td><code>a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L265" rel="noopener noreferrer">265</a></td><td>The RIFF size field is a u32 widened to usize and then had 8 added to it.</td></tr>
+<tr><td><code>zero_sized_chunks_do_not_stall_the_walker</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L282" rel="noopener noreferrer">282</a></td><td>A chunk that declares a size of zero must still advance the walker.</td></tr>
 </tbody></table>
 </section>
 </div></div>

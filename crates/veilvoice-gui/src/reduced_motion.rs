@@ -32,6 +32,18 @@
 //! cannot read, which is a worse failure than missing the preference for the
 //! few who set it. The settings panel only claims the system asked for reduced
 //! motion when it actually saw it say so.
+//!
+//! # In plain words
+//!
+//! Asks the operating system whether you have said you would rather things did not
+//! animate.
+//!
+//! Some people get motion sickness from moving interfaces, and every system has a
+//! setting for it. Honouring it is not decoration: an application that animates
+//! regardless is one those people cannot comfortably use.
+//!
+//! When the answer cannot be determined, animation stays on, and the setting can
+//! be overridden by hand either way.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;

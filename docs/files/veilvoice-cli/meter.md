@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-cli/src/meter.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 250 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 259 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs)
 
 ## Contents
 
 - [Why the old one was wrong](#why-the-old-one-was-wrong)
 - [What it measures, and what it does not](#what-it-measures-and-what-it-does-not)
 - [Peak hold](#peak-hold)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -63,19 +64,28 @@ the last `HOLD` is kept and drawn as a single marker, and it decays rather
 than sticking, so the bar stays honest about what is happening *now* while
 still showing what just happened.
 
+# In plain words
+
+Draws the input and output level meters during a live session.
+
+The bar and the decibel number beside it are worked out from the same piece of
+arithmetic the window uses, so the two halves of VeilVoice cannot disagree
+about the same reading. They did once, and a meter you have caught contradicting
+itself is a meter you stop believing.
+
 ## What this file contains
 
-250 lines defining **4 functions** (3 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+259 lines defining **4 functions** (3 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Channel` (line 120) -- One channel's meter, keeping the peak between reads.
+- `struct Channel` (line 129) -- One channel's meter, keeping the peak between reads.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Channel::update` (line 138) -- Take a new reading and give back the meter to print.
+- `Channel::update` (line 147) -- Take a new reading and give back the meter to print.
   - reaches: `render`
-- `Channel::has_clipped` (line 159) -- Whether this channel has clipped at any point in the session.
+- `Channel::has_clipped` (line 168) -- Whether this channel has clipped at any point in the session.
 
 ## What calls what
 
@@ -97,15 +107,15 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_render["render<br/>line 65"]
-    n_default["Channel::default<br/>line 127"]
-    n_update(["Channel::update<br/>line 138"])
-    n_has_clipped(["Channel::has_clipped<br/>line 159"])
+    n_render["render<br/>line 74"]
+    n_default["Channel::default<br/>line 136"]
+    n_update(["Channel::update<br/>line 147"])
+    n_has_clipped(["Channel::has_clipped<br/>line 168"])
     n_update --> n_render
-    click n_render href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L65" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L127" "open the source"
-    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L138" "open the source"
-    click n_has_clipped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L159" "open the source"
+    click n_render href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L74" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L136" "open the source"
+    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L147" "open the source"
+    click n_has_clipped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L168" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_update,n_has_clipped entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -120,13 +130,13 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `HOLD` <sub>pub const</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L53) | How long a peak marker is held before it falls back. |
-| `EIGHTHS` <sub>const</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L60) | The eighth-block characters, so a bar of n characters has 8n steps. |
-| `render` <sub>pub fn</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L65) | One meter: the bar, the peak marker, and the number. |
-| `Channel` <sub>pub struct</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L120) | One channel's meter, keeping the peak between reads. |
-| `Channel::default` <sub>fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L127) |  |
-| `Channel::update` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L138) | Take a new reading and give back the meter to print. |
-| `Channel::has_clipped` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L159) | Whether this channel has clipped at any point in the session. |
+| `HOLD` <sub>pub const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L62) | How long a peak marker is held before it falls back. |
+| `EIGHTHS` <sub>const</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L69) | The eighth-block characters, so a bar of n characters has 8n steps. |
+| `render` <sub>pub fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L74) | One meter: the bar, the peak marker, and the number. |
+| `Channel` <sub>pub struct</sub> | [129](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L129) | One channel's meter, keeping the peak between reads. |
+| `Channel::default` <sub>fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L136) |  |
+| `Channel::update` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L147) | Take a new reading and give back the meter to print. |
+| `Channel::has_clipped` <sub>pub fn</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L168) | Whether this channel has clipped at any point in the session. |
 
 ---
 

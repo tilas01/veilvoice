@@ -105,7 +105,7 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>165 lines"])
-    n_policy["policy.rs<br/>892 lines"]
+    n_policy["policy.rs<br/>905 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs" "open the source"
 ```
@@ -117,7 +117,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`lib.rs`](../../docs/files/veilvoice-policy/lib.md) | 165 | Settings somebody else decided, sealed so they cannot be edited without a passphrase — and, more importantly, built so that editing them without one buys nothing worth having. |
-| [`policy.rs`](../../docs/files/veilvoice-policy/policy.md) | 892 | The policy itself: what can be required, and what requiring it does. |
+| [`policy.rs`](../../docs/files/veilvoice-policy/policy.md) | 905 | The policy itself: what can be required, and what requiring it does. |
 
 ## Public items
 

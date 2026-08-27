@@ -37,6 +37,19 @@
 //! script — no file, no library, no network — and a `<noscript>` saying what it
 //! does. Without it the audio plays, the subtitles appear, the waveform is
 //! drawn and the circles simply stay dim.
+//!
+//! # In plain words
+//!
+//! Draws the picture: a waveform, a circle for each person that lights up when it
+//! is their turn, and the names.
+//!
+//! It produces two things. A still, so you can see what you will get before
+//! anything is rendered, and a self-contained web page that plays the veiled audio
+//! with the picture moving along beside it.
+//!
+//! A page rather than a video file, because a page needs nothing installed to
+//! watch and can be opened by anybody. If you want an actual video file, the
+//! command to make one is printed for you.
 
 use crate::palette;
 use crate::waveform::{self, Envelope};

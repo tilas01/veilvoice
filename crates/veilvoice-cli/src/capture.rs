@@ -27,6 +27,15 @@
 //! A check that cannot see is not a check that passed, but neither is it a
 //! reason to fail a script — the difference is in the words, and the words are
 //! printed.
+//!
+//! # In plain words
+//!
+//! Tells you which screen recorders are running, and lets you say you meant to
+//! start one so it stops being mentioned.
+//!
+//! It cannot tell whether a program is actually recording, only that it is open,
+//! and it says so. A meeting application being open is not somebody watching your
+//! screen.
 
 use crate::theme::{colour, err, field, heading, ok, paint, warn};
 use std::path::PathBuf;

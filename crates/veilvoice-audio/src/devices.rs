@@ -40,6 +40,21 @@
 //! function here returns a [`crate::Error`] rather than panicking or quietly
 //! returning an empty list, because an empty list and a failed query mean very
 //! different things to somebody trying to work out why they cannot be heard.
+//!
+//! # In plain words
+//!
+//! This asks your computer which microphones and speakers it has, and works out
+//! which of them are **virtual cables**.
+//!
+//! A virtual cable is a small piece of software that pretends to be a speaker on
+//! one side and a microphone on the other. It is how a veiled voice gets into a
+//! call: VeilVoice plays into the cable, and the calling program picks the cable
+//! as its microphone and never knows the difference.
+//!
+//! Working out which device is a cable is done by recognising the names the common
+//! ones use, so it is a good guess rather than a certainty. Nothing depends on the
+//! guess being right: it decides which device is *suggested*, never which ones you
+//! are allowed to choose.
 
 use crate::Error;
 use cpal::traits::{DeviceTrait, HostTrait};

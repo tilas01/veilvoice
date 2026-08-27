@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/verify.svg" alt="verify.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/verify.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 655 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 667 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-exists-here-rather-than-in-the-verifier">Why this exists here rather than in the verifier</a>
   <a href="#three-files-and-the-tab-says-so-before-it-is-given-any">Three files, and the tab says so before it is given any</a>
   <a href="#nothing-here-downloads-anything">Nothing here downloads anything</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -59,23 +60,27 @@
 <p>Verifying needs the download, the <code>SHA256SUMS</code> and the <code>SHA256SUMS.asc</code>. Dropping one file on a window and getting a verdict would be a lie, and an interface that discovers the other two are missing <em>after</em> the drop teaches people that verification is fiddly rather than that it needs three things. All three slots are visible from the start, and a drop fills whichever one the file&#x27;s name says it is.</p>
 <h2 id="nothing-here-downloads-anything">Nothing here downloads anything</h2>
 <p>Not even the key: it is compiled in, and its fingerprint is checked against a constant a reader can compare with the README. <code>veilvoice-verify</code> is still the tool for fetching a release, because it is the one that can be checked before it is run.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Drop a download on the window and be told whether it is genuine.</p>
+<p>It checks the signature over the list of hashes first, and only then compares your file against that list. That order matters: a list of hashes that has not been checked is just some numbers somebody sent you.</p>
+<p>Drop the downloaded archive and the hash list and signature sitting beside it are picked up on their own. Nothing is downloaded and nothing leaves the machine.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>655 lines defining <strong>14 functions</strong> (7 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>667 lines defining <strong>14 functions</strong> (7 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Slot</code> <span style="color:var(--muted)">line 42</span> &mdash; Which of the three files a dropped path is.</li>
-<li><code>struct Verify</code> <span style="color:var(--muted)">line 71</span> &mdash; The tab&#x27;s state.</li>
+<li><code>enum Slot</code> <span style="color:var(--muted)">line 54</span> &mdash; Which of the three files a dropped path is.</li>
+<li><code>struct Verify</code> <span style="color:var(--muted)">line 83</span> &mdash; The tab&#x27;s state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Verify::wants_repaint</code> <span style="color:var(--muted)">line 105</span> &mdash; Whether the window has to keep drawing for this panel&#x27;s sake.
+<li><code>Verify::wants_repaint</code> <span style="color:var(--muted)">line 117</span> &mdash; Whether the window has to keep drawing for this panel&#x27;s sake.
 </li>
-<li><code>Verify::drain</code> <span style="color:var(--muted)">line 110</span> &mdash; Take the worker&#x27;s answer if it has one.
+<li><code>Verify::drain</code> <span style="color:var(--muted)">line 122</span> &mdash; Take the worker&#x27;s answer if it has one.
 </li>
-<li><code>Verify::take_dropped</code> <span style="color:var(--muted)">line 199</span> &mdash; Read what the window was given this frame.
+<li><code>Verify::take_dropped</code> <span style="color:var(--muted)">line 211</span> &mdash; Read what the window was given this frame.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>accept</code>, <code>fill_from_beside</code>, <code>slot_for</code></span>
 </li>
-<li><code>Verify::tab</code> <span style="color:var(--muted)">line 217</span> &mdash; The whole tab.
+<li><code>Verify::tab</code> <span style="color:var(--muted)">line 229</span> &mdash; The whole tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>body</code>, <code>drop_target</code>, <code>found_beside</code>, <code>is_busy</code>, <code>slot_row</code>, <code>start</code>, <code>verdict</code></span>
 </li>
 </ul>
@@ -97,75 +102,75 @@
 <path d="M396.2 374.0 C 396.2 394.0, 465.0 400.0, 465.0 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M381.0 274.0 C 381.0 294.0, 396.2 300.0, 396.2 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M299.2 247.0 C 340.6 247.0, 340.6 147.0, 321.6 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L55" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L67" target="_blank" rel="noopener noreferrer">
 <rect x="42.8" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="87.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">slot_for</text>
-<text x="87.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 55</text>
+<text x="87.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L95" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L107" target="_blank" rel="noopener noreferrer">
 <rect x="157.6" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="228.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::is_busy</text>
-<text x="228.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 95</text>
+<text x="228.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 107</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L105" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L117" target="_blank" rel="noopener noreferrer">
 <rect x="325.6" y="20.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="419.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::wants_repaint</text>
-<text x="419.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
+<text x="419.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 117</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L110" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L122" target="_blank" rel="noopener noreferrer">
 <rect x="31.4" y="120.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="94.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::drain</text>
-<text x="94.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
+<text x="94.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L128" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L140" target="_blank" rel="noopener noreferrer">
 <rect x="184.2" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="251.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::accept</text>
-<text x="251.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 128</text>
+<text x="251.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L158" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L170" target="_blank" rel="noopener noreferrer">
 <rect x="100.2" y="320.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="205.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::fill_from_beside</text>
-<text x="205.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 158</text>
+<text x="205.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L180" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L192" target="_blank" rel="noopener noreferrer">
 <rect x="344.6" y="120.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="434.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::found_beside</text>
-<text x="434.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 180</text>
+<text x="434.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L199" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L211" target="_blank" rel="noopener noreferrer">
 <rect x="119.2" y="220.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="209.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::take_dropped</text>
-<text x="209.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 199</text>
+<text x="209.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 211</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L217" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L229" target="_blank" rel="noopener noreferrer">
 <rect x="325.2" y="220.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="381.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::tab</text>
-<text x="381.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 217</text>
+<text x="381.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 229</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L223" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L235" target="_blank" rel="noopener noreferrer">
 <rect x="336.6" y="320.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="396.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::body</text>
-<text x="396.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 223</text>
+<text x="396.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L321" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L333" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="420.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="106.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::drop_target</text>
-<text x="106.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
+<text x="106.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 333</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L343" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L355" target="_blank" rel="noopener noreferrer">
 <rect x="218.4" y="420.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="293.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::slot_row</text>
-<text x="293.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 343</text>
+<text x="293.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 355</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L398" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L410" target="_blank" rel="noopener noreferrer">
 <rect x="394.0" y="420.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="465.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::verdict</text>
-<text x="465.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 398</text>
+<text x="465.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 410</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L457" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L469" target="_blank" rel="noopener noreferrer">
 <rect x="214.6" y="520.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="278.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::start</text>
-<text x="278.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 457</text>
+<text x="278.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 469</text>
 </a>
 </svg>
 </div>
@@ -173,20 +178,20 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_slot_for[&quot;slot_for&lt;br/&gt;line 55&quot;]
-    n_is_busy[&quot;Verify::is_busy&lt;br/&gt;line 95&quot;]
-    n_wants_repaint([&quot;Verify::wants_repaint&lt;br/&gt;line 105&quot;])
-    n_drain([&quot;Verify::drain&lt;br/&gt;line 110&quot;])
-    n_accept[&quot;Verify::accept&lt;br/&gt;line 128&quot;]
-    n_fill_from_beside[&quot;Verify::fill_from_beside&lt;br/&gt;line 158&quot;]
-    n_found_beside[&quot;Verify::found_beside&lt;br/&gt;line 180&quot;]
-    n_take_dropped([&quot;Verify::take_dropped&lt;br/&gt;line 199&quot;])
-    n_tab([&quot;Verify::tab&lt;br/&gt;line 217&quot;])
-    n_body[&quot;Verify::body&lt;br/&gt;line 223&quot;]
-    n_drop_target[&quot;Verify::drop_target&lt;br/&gt;line 321&quot;]
-    n_slot_row[&quot;Verify::slot_row&lt;br/&gt;line 343&quot;]
-    n_verdict[&quot;Verify::verdict&lt;br/&gt;line 398&quot;]
-    n_start[&quot;Verify::start&lt;br/&gt;line 457&quot;]
+    n_slot_for[&quot;slot_for&lt;br/&gt;line 67&quot;]
+    n_is_busy[&quot;Verify::is_busy&lt;br/&gt;line 107&quot;]
+    n_wants_repaint([&quot;Verify::wants_repaint&lt;br/&gt;line 117&quot;])
+    n_drain([&quot;Verify::drain&lt;br/&gt;line 122&quot;])
+    n_accept[&quot;Verify::accept&lt;br/&gt;line 140&quot;]
+    n_fill_from_beside[&quot;Verify::fill_from_beside&lt;br/&gt;line 170&quot;]
+    n_found_beside[&quot;Verify::found_beside&lt;br/&gt;line 192&quot;]
+    n_take_dropped([&quot;Verify::take_dropped&lt;br/&gt;line 211&quot;])
+    n_tab([&quot;Verify::tab&lt;br/&gt;line 229&quot;])
+    n_body[&quot;Verify::body&lt;br/&gt;line 235&quot;]
+    n_drop_target[&quot;Verify::drop_target&lt;br/&gt;line 333&quot;]
+    n_slot_row[&quot;Verify::slot_row&lt;br/&gt;line 355&quot;]
+    n_verdict[&quot;Verify::verdict&lt;br/&gt;line 410&quot;]
+    n_start[&quot;Verify::start&lt;br/&gt;line 469&quot;]
     n_accept --&gt; n_fill_from_beside
     n_accept --&gt; n_slot_for
     n_body --&gt; n_drop_target
@@ -197,20 +202,20 @@ flowchart TD
     n_body --&gt; n_verdict
     n_tab --&gt; n_body
     n_take_dropped --&gt; n_accept
-    click n_slot_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L55&quot; &quot;open the source&quot;
-    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L95&quot; &quot;open the source&quot;
-    click n_wants_repaint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L105&quot; &quot;open the source&quot;
-    click n_drain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L110&quot; &quot;open the source&quot;
-    click n_accept href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L128&quot; &quot;open the source&quot;
-    click n_fill_from_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L158&quot; &quot;open the source&quot;
-    click n_found_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L180&quot; &quot;open the source&quot;
-    click n_take_dropped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L199&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L217&quot; &quot;open the source&quot;
-    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L223&quot; &quot;open the source&quot;
-    click n_drop_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L321&quot; &quot;open the source&quot;
-    click n_slot_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L343&quot; &quot;open the source&quot;
-    click n_verdict href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L398&quot; &quot;open the source&quot;
-    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L457&quot; &quot;open the source&quot;
+    click n_slot_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L67&quot; &quot;open the source&quot;
+    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L107&quot; &quot;open the source&quot;
+    click n_wants_repaint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L117&quot; &quot;open the source&quot;
+    click n_drain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L122&quot; &quot;open the source&quot;
+    click n_accept href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L140&quot; &quot;open the source&quot;
+    click n_fill_from_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L170&quot; &quot;open the source&quot;
+    click n_found_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L192&quot; &quot;open the source&quot;
+    click n_take_dropped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L211&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L229&quot; &quot;open the source&quot;
+    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L235&quot; &quot;open the source&quot;
+    click n_drop_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L333&quot; &quot;open the source&quot;
+    click n_slot_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L355&quot; &quot;open the source&quot;
+    click n_verdict href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L410&quot; &quot;open the source&quot;
+    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L469&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_wants_repaint,n_drain,n_take_dropped,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -223,22 +228,22 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Slot</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L42" rel="noopener noreferrer">42</a></td><td>Which of the three files a dropped path is.</td></tr>
-<tr><td><code>slot_for</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L55" rel="noopener noreferrer">55</a></td><td>Work out what a dropped file is from its name.</td></tr>
-<tr><td><code>Verify</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L71" rel="noopener noreferrer">71</a></td><td>The tab&#x27;s state.</td></tr>
-<tr><td><code>Verify::is_busy</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L95" rel="noopener noreferrer">95</a></td><td>Whether a check is running, so the app keeps repainting.</td></tr>
-<tr><td><code>Verify::wants_repaint</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L105" rel="noopener noreferrer">105</a></td><td>Whether the window has to keep drawing for this panel&#x27;s sake.</td></tr>
-<tr><td><code>Verify::drain</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L110" rel="noopener noreferrer">110</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
-<tr><td><code>Verify::accept</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L128" rel="noopener noreferrer">128</a></td><td>Put a dropped or chosen file into the slot its name says it belongs in.</td></tr>
-<tr><td><code>Verify::fill_from_beside</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L158" rel="noopener noreferrer">158</a></td><td>Fill the empty slots from the folder this file came from.</td></tr>
-<tr><td><code>Verify::found_beside</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L180" rel="noopener noreferrer">180</a></td><td>Which slots were filled in by looking rather than by being chosen.</td></tr>
-<tr><td><code>Verify::take_dropped</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L199" rel="noopener noreferrer">199</a></td><td>Read what the window was given this frame.</td></tr>
-<tr><td><code>Verify::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L217" rel="noopener noreferrer">217</a></td><td>The whole tab.</td></tr>
-<tr><td><code>Verify::body</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L223" rel="noopener noreferrer">223</a></td><td></td></tr>
-<tr><td><code>Verify::drop_target</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L321" rel="noopener noreferrer">321</a></td><td>The rectangle that lights up while files are over the window.</td></tr>
-<tr><td><code>Verify::slot_row</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L343" rel="noopener noreferrer">343</a></td><td>One file slot: what it is, what is in it, and a way to change it.</td></tr>
-<tr><td><code>Verify::verdict</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L398" rel="noopener noreferrer">398</a></td><td>The answer, in the colour it deserves.</td></tr>
-<tr><td><code>Verify::start</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L457" rel="noopener noreferrer">457</a></td><td>Run the check on a thread of its own.</td></tr>
+<tr><td><code>Slot</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L54" rel="noopener noreferrer">54</a></td><td>Which of the three files a dropped path is.</td></tr>
+<tr><td><code>slot_for</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L67" rel="noopener noreferrer">67</a></td><td>Work out what a dropped file is from its name.</td></tr>
+<tr><td><code>Verify</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L83" rel="noopener noreferrer">83</a></td><td>The tab&#x27;s state.</td></tr>
+<tr><td><code>Verify::is_busy</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L107" rel="noopener noreferrer">107</a></td><td>Whether a check is running, so the app keeps repainting.</td></tr>
+<tr><td><code>Verify::wants_repaint</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L117" rel="noopener noreferrer">117</a></td><td>Whether the window has to keep drawing for this panel&#x27;s sake.</td></tr>
+<tr><td><code>Verify::drain</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L122" rel="noopener noreferrer">122</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
+<tr><td><code>Verify::accept</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L140" rel="noopener noreferrer">140</a></td><td>Put a dropped or chosen file into the slot its name says it belongs in.</td></tr>
+<tr><td><code>Verify::fill_from_beside</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L170" rel="noopener noreferrer">170</a></td><td>Fill the empty slots from the folder this file came from.</td></tr>
+<tr><td><code>Verify::found_beside</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L192" rel="noopener noreferrer">192</a></td><td>Which slots were filled in by looking rather than by being chosen.</td></tr>
+<tr><td><code>Verify::take_dropped</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L211" rel="noopener noreferrer">211</a></td><td>Read what the window was given this frame.</td></tr>
+<tr><td><code>Verify::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L229" rel="noopener noreferrer">229</a></td><td>The whole tab.</td></tr>
+<tr><td><code>Verify::body</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L235" rel="noopener noreferrer">235</a></td><td></td></tr>
+<tr><td><code>Verify::drop_target</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L333" rel="noopener noreferrer">333</a></td><td>The rectangle that lights up while files are over the window.</td></tr>
+<tr><td><code>Verify::slot_row</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L355" rel="noopener noreferrer">355</a></td><td>One file slot: what it is, what is in it, and a way to change it.</td></tr>
+<tr><td><code>Verify::verdict</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L410" rel="noopener noreferrer">410</a></td><td>The answer, in the colour it deserves.</td></tr>
+<tr><td><code>Verify::start</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L469" rel="noopener noreferrer">469</a></td><td>Run the check on a thread of its own.</td></tr>
 </tbody></table>
 </section>
 </div></div>

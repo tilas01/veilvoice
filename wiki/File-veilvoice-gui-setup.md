@@ -3,13 +3,14 @@
 
 # `crates/veilvoice-gui/src/setup.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 740 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 753 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs)
 
 ## Contents
 
 - [Portable is the default, and this tab says so first](#portable-is-the-default-and-this-tab-says-so-first)
 - [Nothing is ticked, because there is nothing to tick](#nothing-is-ticked-because-there-is-nothing-to-tick)
 - [Nothing slow runs on the UI thread](#nothing-slow-runs-on-the-ui-thread)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -53,21 +54,34 @@ progress strip keeps moving.
 The strip honours the reduced-motion decision like everything else: with
 motion off it is a static bar and a word, not a frozen animation.
 
+# In plain words
+
+The tab that installs this copy, removes it again, and points at the optional
+extra software.
+
+It is only a front end: every decision about where files go and what gets
+changed lives in one place shared with the command line, so the two cannot
+disagree about what "installed" means.
+
+Nothing here installs anything belonging to somebody else without being asked.
+What each thing is, who makes it and what it is for are shown first, and the
+exact command is shown before the question.
+
 ## What this file contains
 
-740 lines defining **15 functions** (5 public), **3 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+753 lines defining **15 functions** (5 public), **3 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Done` (line 49) -- What a worker finished doing: lines to show, and whether it went well.
-- `struct Row` (line 55) -- One companion as this tab needs it: the facts, plus what was found.
-- `struct Setup` (line 62) -- The setup tab's state.
+- `struct Done` (line 62) -- What a worker finished doing: lines to show, and whether it went well.
+- `struct Row` (line 68) -- One companion as this tab needs it: the facts, plus what was found.
+- `struct Setup` (line 75) -- The setup tab's state.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Setup::running_installed` (line 99) -- Whether this copy is the installed one.
-- `Setup::is_busy` (line 104) -- True while a worker is running, so the app can keep repainting.
-- `Setup::tab` (line 142) -- Draw the tab.
+- `Setup::running_installed` (line 112) -- Whether this copy is the installed one.
+- `Setup::is_busy` (line 117) -- True while a worker is running, so the app can keep repainting.
+- `Setup::tab` (line 155) -- Draw the tab.
   - reaches: `companion_rows`, `install_controls`, `poll`, `where_this_copy_lives`, `detect_all`, `start`, `install_changes`, `progress`, `field`, `visibility_note`
 
 ## What calls what
@@ -84,21 +98,21 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["Setup::default<br/>line 75"]
-    n_new["Setup::new<br/>line 82"]
-    n_running_installed(["Setup::running_installed<br/>line 99"])
-    n_is_busy(["Setup::is_busy<br/>line 104"])
-    n_poll["Setup::poll<br/>line 112"]
-    n_tab(["Setup::tab<br/>line 142"])
-    n_visibility_note["Setup::visibility_note<br/>line 170"]
-    n_where_this_copy_lives["Setup::where_this_copy_lives<br/>line 187"]
-    n_install_controls["Setup::install_controls<br/>line 254"]
-    n_start["Setup::start<br/>line 359"]
-    n_progress["Setup::progress<br/>line 383"]
-    n_companion_rows["Setup::companion_rows<br/>line 423"]
-    n_detect_all["detect_all<br/>line 580"]
-    n_install_changes["install_changes<br/>line 596"]
-    n_field["field<br/>line 608"]
+    n_default["Setup::default<br/>line 88"]
+    n_new["Setup::new<br/>line 95"]
+    n_running_installed(["Setup::running_installed<br/>line 112"])
+    n_is_busy(["Setup::is_busy<br/>line 117"])
+    n_poll["Setup::poll<br/>line 125"]
+    n_tab(["Setup::tab<br/>line 155"])
+    n_visibility_note["Setup::visibility_note<br/>line 183"]
+    n_where_this_copy_lives["Setup::where_this_copy_lives<br/>line 200"]
+    n_install_controls["Setup::install_controls<br/>line 267"]
+    n_start["Setup::start<br/>line 372"]
+    n_progress["Setup::progress<br/>line 396"]
+    n_companion_rows["Setup::companion_rows<br/>line 436"]
+    n_detect_all["detect_all<br/>line 593"]
+    n_install_changes["install_changes<br/>line 609"]
+    n_field["field<br/>line 621"]
     n_companion_rows --> n_detect_all
     n_companion_rows --> n_start
     n_default --> n_new
@@ -113,21 +127,21 @@ flowchart TD
     n_tab --> n_where_this_copy_lives
     n_where_this_copy_lives --> n_field
     n_where_this_copy_lives --> n_visibility_note
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L75" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L82" "open the source"
-    click n_running_installed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L99" "open the source"
-    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L104" "open the source"
-    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L112" "open the source"
-    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L142" "open the source"
-    click n_visibility_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L170" "open the source"
-    click n_where_this_copy_lives href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L187" "open the source"
-    click n_install_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L254" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L359" "open the source"
-    click n_progress href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L383" "open the source"
-    click n_companion_rows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L423" "open the source"
-    click n_detect_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L580" "open the source"
-    click n_install_changes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L596" "open the source"
-    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L608" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L88" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L95" "open the source"
+    click n_running_installed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L112" "open the source"
+    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L117" "open the source"
+    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L125" "open the source"
+    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L155" "open the source"
+    click n_visibility_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L183" "open the source"
+    click n_where_this_copy_lives href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L200" "open the source"
+    click n_install_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L267" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L372" "open the source"
+    click n_progress href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L396" "open the source"
+    click n_companion_rows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L436" "open the source"
+    click n_detect_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L593" "open the source"
+    click n_install_changes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L609" "open the source"
+    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L621" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_running_installed,n_is_busy,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -142,21 +156,21 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Done` <sub>struct</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L49) | What a worker finished doing: lines to show, and whether it went well. |
-| `Row` <sub>struct</sub> | [55](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L55) | One companion as this tab needs it: the facts, plus what was found. |
-| `Setup` <sub>pub struct</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L62) | The setup tab's state. |
-| `Setup::default` <sub>fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L75) |  |
-| `Setup::new` <sub>pub fn</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L82) | Read the machine's current state. |
-| `Setup::running_installed` <sub>pub fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L99) | Whether this copy is the installed one. |
-| `Setup::is_busy` <sub>pub fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L104) | True while a worker is running, so the app can keep repainting. |
-| `Setup::poll` <sub>pub fn</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L112) | Drain the worker channel. |
-| `Setup::tab` <sub>pub fn</sub> | [142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L142) | Draw the tab. |
-| `Setup::visibility_note` <sub>fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L170) | Why this tab is here, and how to make it not be. |
-| `Setup::where_this_copy_lives` <sub>fn</sub> | [187](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L187) |  |
-| `Setup::install_controls` <sub>fn</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L254) |  |
-| `Setup::start` <sub>fn</sub> | [359](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L359) | Start a worker, and remember what it is doing so the strip can say. |
-| `Setup::progress` <sub>fn</sub> | [383](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L383) | The progress strip: a travelling highlight, or a plain bar when motion is off. |
-| `Setup::companion_rows` <sub>fn</sub> | [423](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L423) |  |
-| `detect_all` <sub>fn</sub> | [580](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L580) | Probe for every companion that applies to this platform. |
-| `install_changes` <sub>fn</sub> | [596](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L596) | Exactly what an install changes, in the order it changes it. |
-| `field` <sub>fn</sub> | [608](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L608) |  |
+| `Done` <sub>struct</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L62) | What a worker finished doing: lines to show, and whether it went well. |
+| `Row` <sub>struct</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L68) | One companion as this tab needs it: the facts, plus what was found. |
+| `Setup` <sub>pub struct</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L75) | The setup tab's state. |
+| `Setup::default` <sub>fn</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L88) |  |
+| `Setup::new` <sub>pub fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L95) | Read the machine's current state. |
+| `Setup::running_installed` <sub>pub fn</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L112) | Whether this copy is the installed one. |
+| `Setup::is_busy` <sub>pub fn</sub> | [117](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L117) | True while a worker is running, so the app can keep repainting. |
+| `Setup::poll` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L125) | Drain the worker channel. |
+| `Setup::tab` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L155) | Draw the tab. |
+| `Setup::visibility_note` <sub>fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L183) | Why this tab is here, and how to make it not be. |
+| `Setup::where_this_copy_lives` <sub>fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L200) |  |
+| `Setup::install_controls` <sub>fn</sub> | [267](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L267) |  |
+| `Setup::start` <sub>fn</sub> | [372](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L372) | Start a worker, and remember what it is doing so the strip can say. |
+| `Setup::progress` <sub>fn</sub> | [396](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L396) | The progress strip: a travelling highlight, or a plain bar when motion is off. |
+| `Setup::companion_rows` <sub>fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L436) |  |
+| `detect_all` <sub>fn</sub> | [593](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L593) | Probe for every companion that applies to this platform. |
+| `install_changes` <sub>fn</sub> | [609](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L609) | Exactly what an install changes, in the order it changes it. |
+| `field` <sub>fn</sub> | [621](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L621) |  |

@@ -3,13 +3,14 @@
 
 # `crates/veilvoice-meta/src/audio.rs`
 
-[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 268 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs)
+[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 278 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs)
 
 ## Contents
 
 - [What tags give away](#what-tags-give-away)
 - [Removal, or plausible replacement](#removal-or-plausible-replacement)
 - [The gap lofty cannot close](#the-gap-lofty-cannot-close)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -48,15 +49,25 @@ the tag library does not see it. That is what `crate::wav` is for: a
 chunk-level cleaner that walks the RIFF structure directly. Without it,
 cleaning a WAV reported success and left the identifying block in place.
 
+# In plain words
+
+Strips the hidden information out of an audio file: the artist, the title, the
+comments, the software that made it, the date, and anything else somebody wrote
+into it.
+
+None of that is audible, and all of it travels with the file. A recording whose
+voice has been carefully veiled is not anonymous if the file still says who
+recorded it and on what.
+
 ## What this file contains
 
-268 lines defining **3 functions** (2 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+278 lines defining **3 functions** (2 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `clean_audio_file` (line 71) -- Strip or replace the tags of an audio file, in place.
+- `clean_audio_file` (line 81) -- Strip or replace the tags of an audio file, in place.
   - reaches: `read_head`
-- `clean_audio_tags` (line 124) -- Report which tag blocks a file carries, without modifying it.
+- `clean_audio_tags` (line 134) -- Report which tag blocks a file carries, without modifying it.
   - reaches: `read_head`
 
 ## What calls what
@@ -73,14 +84,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_read_head["read_head<br/>line 47"]
-    n_clean_audio_file(["clean_audio_file<br/>line 71"])
-    n_clean_audio_tags(["clean_audio_tags<br/>line 124"])
+    n_read_head["read_head<br/>line 57"]
+    n_clean_audio_file(["clean_audio_file<br/>line 81"])
+    n_clean_audio_tags(["clean_audio_tags<br/>line 134"])
     n_clean_audio_file --> n_read_head
     n_clean_audio_tags --> n_read_head
-    click n_read_head href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L47" "open the source"
-    click n_clean_audio_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71" "open the source"
-    click n_clean_audio_tags href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L124" "open the source"
+    click n_read_head href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L57" "open the source"
+    click n_clean_audio_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L81" "open the source"
+    click n_clean_audio_tags href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L134" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_audio_file,n_clean_audio_tags entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -93,7 +104,7 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `read_head` <sub>fn</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L47) | Read just enough of a file to identify its container. |
-| `REALISTIC` <sub>const</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L61) | Tags written in Policy::Realistic mode. |
-| `clean_audio_file` <sub>pub fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71) | Strip or replace the tags of an audio file, in place. |
-| `clean_audio_tags` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L124) | Report which tag blocks a file carries, without modifying it. |
+| `read_head` <sub>fn</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L57) | Read just enough of a file to identify its container. |
+| `REALISTIC` <sub>const</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71) | Tags written in Policy::Realistic mode. |
+| `clean_audio_file` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L81) | Strip or replace the tags of an audio file, in place. |
+| `clean_audio_tags` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L134) | Report which tag blocks a file carries, without modifying it. |

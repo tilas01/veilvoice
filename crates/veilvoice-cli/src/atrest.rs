@@ -21,6 +21,17 @@
 //! and then encrypted, because a plaintext file that is created and deleted is
 //! precisely what [`veilvoice_crypto::shred`] explains cannot be reliably taken
 //! back on flash storage.
+//!
+//! # In plain words
+//!
+//! Asks for a passphrase and encrypts the recording VeilVoice has just written.
+//!
+//! It is on by default, and the reason is worth stating: the words survive
+//! de-identification on purpose, so an unencrypted result is still a recording of
+//! everything that was said. Veiling the voice and leaving the file open protects
+//! the speaker and not the conversation.
+//!
+//! Writing one unencrypted is allowed, and asks first.
 
 use crate::theme::{colour, err, paint, warn};
 use std::io::IsTerminal;

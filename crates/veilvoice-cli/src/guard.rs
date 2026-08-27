@@ -36,6 +36,14 @@
 //! can write the manifest beside them. That is why the passphrase-sealed record
 //! exists, why [`veilvoice_guard::SCOPE`] is printed on every path through this
 //! module, and why the word "tamper-proof" appears nowhere in it.
+//!
+//! # In plain words
+//!
+//! Writes down what VeilVoice's own files should look like, and checks later that
+//! they still do.
+//!
+//! It notices changes. It does not prevent them, and every path through it says
+//! so, because a check somebody believes is a lock is worse than no check.
 
 use crate::theme::{colour, err, field, heading, ok, paint, warn};
 use clap::Subcommand;

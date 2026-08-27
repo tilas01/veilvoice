@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-meta/wav.svg" alt="wav.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-meta/src/wav.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 332 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 344 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-wav-gets-its-own-path">Why WAV gets its own path</a>
   <a href="#whitelist-not-blacklist">Whitelist, not blacklist</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -56,12 +57,16 @@
 <h2 id="whitelist-not-blacklist">Whitelist, not blacklist</h2>
 <p>A RIFF file is a flat list of chunks, and metadata hides in a lot of them: <code>LIST</code>/<code>INFO</code> (artist, software, comments), <code>id3 </code> and <code>ID3 </code>, <code>bext</code> (broadcast extension &#8212; originator, date, even a coding history), <code>iXML</code>, <code>_PMX</code> (XMP), <code>axml</code>, <code>cart</code>. Enumerating those would leave every chunk nobody thought of, and new ones keep being invented.</p>
 <p>So this keeps only the chunks needed to decode the audio and drops everything else. Anything unrecognised is discarded by default, which is the right bias for a privacy tool: the worst case is a lost non-essential chunk, not a leaked identity.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Strips the hidden information out of a WAV file specifically.</p>
+<p>WAV is built as a series of labelled sections, and the ones carrying the sound sit alongside ones carrying text somebody or some program wrote. Those are removed and the sound is copied through exactly, byte for byte.</p>
+<p>It gets its own path because WAV is what VeilVoice writes, so this is the one that runs on nearly every file it produces, and doing it directly means not handing VeilVoice&#x27;s own output to a general-purpose parser.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>332 lines defining <strong>4 functions</strong> (2 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>344 lines defining <strong>4 functions</strong> (2 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>clean_wav_bytes</code> <span style="color:var(--muted)">line 47</span> &mdash; Rewrite a WAV, keeping only the chunks needed to decode it.
+<li><code>clean_wav_bytes</code> <span style="color:var(--muted)">line 59</span> &mdash; Rewrite a WAV, keeping only the chunks needed to decode it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>info_chunk</code>, <code>is_wav</code>, <code>show</code></span>
 </li>
 </ul>
@@ -76,25 +81,25 @@
 <path d="M206.2 74.0 C 206.2 94.0, 95.2 100.0, 95.2 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M277.2 47.0 C 299.2 47.0, 299.2 47.0, 112.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M206.2 74.0 C 206.2 94.0, 217.6 100.0, 217.6 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L42" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L54" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="68.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">is_wav</text>
-<text x="68.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 42</text>
+<text x="68.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 54</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L47" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L59" target="_blank" rel="noopener noreferrer">
 <rect x="135.2" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="206.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean_wav_bytes</text>
-<text x="206.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 47</text>
+<text x="206.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 59</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L131" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L143" target="_blank" rel="noopener noreferrer">
 <rect x="43.2" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="95.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">info_chunk</text>
-<text x="95.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 131</text>
+<text x="95.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L150" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L162" target="_blank" rel="noopener noreferrer">
 <rect x="173.2" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="217.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">show</text>
-<text x="217.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
+<text x="217.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
 </a>
 </svg>
 </div>
@@ -102,17 +107,17 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_is_wav[&quot;is_wav&lt;br/&gt;line 42&quot;]
-    n_clean_wav_bytes([&quot;clean_wav_bytes&lt;br/&gt;line 47&quot;])
-    n_info_chunk[&quot;info_chunk&lt;br/&gt;line 131&quot;]
-    n_show[&quot;show&lt;br/&gt;line 150&quot;]
+    n_is_wav[&quot;is_wav&lt;br/&gt;line 54&quot;]
+    n_clean_wav_bytes([&quot;clean_wav_bytes&lt;br/&gt;line 59&quot;])
+    n_info_chunk[&quot;info_chunk&lt;br/&gt;line 143&quot;]
+    n_show[&quot;show&lt;br/&gt;line 162&quot;]
     n_clean_wav_bytes --&gt; n_info_chunk
     n_clean_wav_bytes --&gt; n_is_wav
     n_clean_wav_bytes --&gt; n_show
-    click n_is_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L42&quot; &quot;open the source&quot;
-    click n_clean_wav_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L47&quot; &quot;open the source&quot;
-    click n_info_chunk href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L131&quot; &quot;open the source&quot;
-    click n_show href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L150&quot; &quot;open the source&quot;
+    click n_is_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L54&quot; &quot;open the source&quot;
+    click n_clean_wav_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L59&quot; &quot;open the source&quot;
+    click n_info_chunk href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L143&quot; &quot;open the source&quot;
+    click n_show href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L162&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_wav_bytes entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -125,12 +130,12 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>KEEP</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L28" rel="noopener noreferrer">28</a></td><td>Chunks required to interpret the audio.</td></tr>
-<tr><td><code>REALISTIC_INFO</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L35" rel="noopener noreferrer">35</a></td><td>Tags written in Policy::Realistic mode, as LIST/INFO sub-chunks.</td></tr>
-<tr><td><code>is_wav</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L42" rel="noopener noreferrer">42</a></td><td>Whether bytes looks like a RIFF/WAVE file.</td></tr>
-<tr><td><code>clean_wav_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L47" rel="noopener noreferrer">47</a></td><td>Rewrite a WAV, keeping only the chunks needed to decode it.</td></tr>
-<tr><td><code>info_chunk</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L131" rel="noopener noreferrer">131</a></td><td>Build a bland LIST/INFO chunk.</td></tr>
-<tr><td><code>show</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L150" rel="noopener noreferrer">150</a></td><td></td></tr>
+<tr><td><code>KEEP</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L40" rel="noopener noreferrer">40</a></td><td>Chunks required to interpret the audio.</td></tr>
+<tr><td><code>REALISTIC_INFO</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L47" rel="noopener noreferrer">47</a></td><td>Tags written in Policy::Realistic mode, as LIST/INFO sub-chunks.</td></tr>
+<tr><td><code>is_wav</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L54" rel="noopener noreferrer">54</a></td><td>Whether bytes looks like a RIFF/WAVE file.</td></tr>
+<tr><td><code>clean_wav_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L59" rel="noopener noreferrer">59</a></td><td>Rewrite a WAV, keeping only the chunks needed to decode it.</td></tr>
+<tr><td><code>info_chunk</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L143" rel="noopener noreferrer">143</a></td><td>Build a bland LIST/INFO chunk.</td></tr>
+<tr><td><code>show</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L162" rel="noopener noreferrer">162</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

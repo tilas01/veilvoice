@@ -10,6 +10,15 @@
 //! Every path through this module prints [`veilvoice_crypto::lock::SCOPE`], for
 //! one reason: a lock the user believes is stronger than it is has made them
 //! *less* safe, not more.
+//!
+//! # In plain words
+//!
+//! Sets, changes and clears the passphrase that opens the desktop application,
+//! from a terminal.
+//!
+//! It is the same lock the window uses and the same file, so the two cannot get
+//! out of step. What it is worth is printed with it: it stops somebody who picks
+//! up your unlocked computer, and it does not stop somebody holding your disk.
 
 use crate::atrest::{prompt_secret, read_new_password};
 use crate::theme::{colour, field, heading, ok, paint, warn};

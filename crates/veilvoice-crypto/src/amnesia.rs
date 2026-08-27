@@ -44,6 +44,19 @@
 //! must not abort the process while being dropped. The lock is released
 //! explicitly instead, and a failure to unlock is ignored: it leaves pages
 //! pinned, which is harmless, rather than unwinding out of a destructor.
+//!
+//! # In plain words
+//!
+//! A place to hold a passphrase or a key while it is being used, which tries hard
+//! to forget it afterwards.
+//!
+//! It asks the operating system not to write that memory out to disk, wipes it as
+//! soon as it is finished with, and refuses to print itself. That last one matters
+//! more than it sounds: secrets most often escape not by being stolen but by
+//! appearing in an error message or a log that somebody later sends on.
+//!
+//! Comparisons take the same amount of time whether or not they match, so nothing
+//! is given away by how long an answer took.
 
 use zeroize::Zeroize;
 

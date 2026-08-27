@@ -28,6 +28,14 @@
 //! The native answer is IOKit, which is FFI. `#![forbid(unsafe_code)]` holds
 //! here as everywhere else in the workspace, so this asks a tool the system
 //! already ships — the same trade the Windows and Linux readers make.
+//!
+//! # In plain words
+//!
+//! Asks macOS which system extensions are loaded.
+//!
+//! There are two tools depending on how new the machine is, because Apple is part
+//! way through replacing one with the other. The newer one is tried first and the
+//! older is the fallback, so this works on both without being told which you have.
 
 #[cfg(any(target_os = "macos", test))]
 use crate::Module;

@@ -50,6 +50,14 @@
 //! half-answer, the files are written in the clear and the command says so:
 //! `veilvoice encrypt` seals the audio afterwards, and the subtitles hold
 //! whatever names were typed and are not veiled by anything.
+//!
+//! # In plain words
+//!
+//! The command line for recordings with several people in them: a voice each,
+//! subtitles, a picture, and the command that would turn it into a video.
+//!
+//! All the actual work lives in the shared crate; this is the part that reads what
+//! you typed, prints what it is about to do, and reports what it wrote.
 
 use crate::theme::{colour, err, field, heading, ok, paint, warn};
 use std::path::{Path, PathBuf};

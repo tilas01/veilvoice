@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-video/src/waveform.rs`
 
-[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 245 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs)
+[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 259 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs)
 
 ## Contents
 
 - [Peaks, not samples](#peaks-not-samples)
 - [It is drawn from the veiled audio](#it-is-drawn-from-the-veiled-audio)
 - [What a waveform still shows](#what-a-waveform-still-shows)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -51,20 +52,34 @@ sentence ends. That is the same turn-taking structure a conversation render
 keeps on purpose, drawn rather than heard, and it is not additional exposure
 beyond what the audio already carries.
 
+# In plain words
+
+Turns a recording into the wavy shape you see drawn along the bottom of an
+audio player.
+
+A minute of sound is nearly three million numbers, which is far more than a
+picture a few hundred pixels wide can show or a web page should carry. So the
+sound is divided into as many pieces as there are columns to draw, and each
+piece is reduced to its loudest point.
+
+The loudest point rather than the average, because averaging smooths a
+recording into a flat sausage and loses exactly the peaks that make a waveform
+worth looking at.
+
 ## What this file contains
 
-245 lines defining **4 functions** (4 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+259 lines defining **4 functions** (4 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Envelope` (line 33) -- The peak envelope of a signal: one minimum and one maximum per column.
+- `struct Envelope` (line 47) -- The peak envelope of a signal: one minimum and one maximum per column.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Envelope::len` (line 42) -- How many columns this envelope has.
-- `Envelope::is_empty` (line 47) -- Whether there are no columns at all.
-- `envelope` (line 58) -- Reduce samples to columns peak pairs.
-- `svg_path` (line 101) -- The envelope as an SVG path, filled, inside a box.
+- `Envelope::len` (line 56) -- How many columns this envelope has.
+- `Envelope::is_empty` (line 61) -- Whether there are no columns at all.
+- `envelope` (line 72) -- Reduce samples to columns peak pairs.
+- `svg_path` (line 115) -- The envelope as an SVG path, filled, inside a box.
 
 ## What calls what
 
@@ -86,14 +101,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_len(["Envelope::len<br/>line 42"])
-    n_is_empty(["Envelope::is_empty<br/>line 47"])
-    n_envelope(["envelope<br/>line 58"])
-    n_svg_path(["svg_path<br/>line 101"])
-    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L42" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L47" "open the source"
-    click n_envelope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L58" "open the source"
-    click n_svg_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L101" "open the source"
+    n_len(["Envelope::len<br/>line 56"])
+    n_is_empty(["Envelope::is_empty<br/>line 61"])
+    n_envelope(["envelope<br/>line 72"])
+    n_svg_path(["svg_path<br/>line 115"])
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L56" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L61" "open the source"
+    click n_envelope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L72" "open the source"
+    click n_svg_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L115" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_len,n_is_empty,n_envelope,n_svg_path entry
 ```
@@ -104,11 +119,11 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Envelope` <sub>pub struct</sub> | [33](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L33) | The peak envelope of a signal: one minimum and one maximum per column. |
-| `Envelope::len` <sub>pub fn</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L42) | How many columns this envelope has. |
-| `Envelope::is_empty` <sub>pub fn</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L47) | Whether there are no columns at all. |
-| `envelope` <sub>pub fn</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L58) | Reduce samples to columns peak pairs. |
-| `svg_path` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L101) | The envelope as an SVG path, filled, inside a box. |
+| `Envelope` <sub>pub struct</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L47) | The peak envelope of a signal: one minimum and one maximum per column. |
+| `Envelope::len` <sub>pub fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L56) | How many columns this envelope has. |
+| `Envelope::is_empty` <sub>pub fn</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L61) | Whether there are no columns at all. |
+| `envelope` <sub>pub fn</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L72) | Reduce samples to columns peak pairs. |
+| `svg_path` <sub>pub fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L115) | The envelope as an SVG path, filled, inside a box. |
 
 ---
 

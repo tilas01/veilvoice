@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/voices.svg" alt="voices.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/voices.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 853 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 866 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for">What this is for</a>
@@ -48,6 +48,7 @@
   <a href="#a-register-has-to-land-on-a-bin-and-that-is-the-whole-constraint">A register has to land on a bin, and that is the whole constraint</a>
   <a href="#ten-voices-from-four-registers-and-three-vocal-tracts">Ten voices, from four registers and three vocal tracts</a>
   <a href="#if-you-change-the-frame-size-check-the-table-again">If you change the frame size, check the table again</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -80,30 +81,34 @@
 <p>Four registers times three tracts is twelve, and <code>MAX_VOICES</code> ships ten of them. Twenty, which was asked for, is not available: it would need either registers a single bin apart at a frame size four times longer &#8212; which quadruples the latency &#8212; or vocal tracts close enough to be heard as the same person on a different day.</p>
 <h2 id="if-you-change-the-frame-size-check-the-table-again">If you change the frame size, check the table again</h2>
 <p>The registers are exact at the <em>default</em> configuration. A caller who changes <code>crate::DeidConfig::frame_size</code> or the sample rate moves the bin grid underneath them, and two registers can collide again. <code>Voice::rendered_f0_hz</code> reports what a given configuration will actually produce, and <code>distinct_voices</code> counts how many of the ten survive it &#8212; so a front end can say &quot;this frame size gives you six distinguishable voices&quot; rather than handing out ten labels for six sounds.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>The set of voices a recording can be turned into.</p>
+<p>By default everyone comes out as the same one. That is on purpose: if every speaker sounds identical, there is nothing in the result that distinguishes one from another, and nothing to trace back.</p>
+<p>When a recording has several people in it that becomes a problem, because a listener cannot follow who is who. So there is a small set of destination voices to hand out instead, chosen to be as far apart as the arithmetic allows, and a measured limit on how many of them can genuinely be told apart by ear.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>853 lines defining <strong>11 functions</strong> (11 public), <strong>1 type</strong> and <strong>11 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>866 lines defining <strong>11 functions</strong> (11 public), <strong>1 type</strong> and <strong>11 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Voice</code> <span style="color:var(--muted)">line 120</span> &mdash; One destination voice: the canonical values every speaker in this slot is mapped onto.</li>
+<li><code>struct Voice</code> <span style="color:var(--muted)">line 133</span> &mdash; One destination voice: the canonical values every speaker in this slot is mapped onto.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Voice::applied_to</code> <span style="color:var(--muted)">line 142</span> &mdash; Apply this voice to an AccentConfig.
+<li><code>Voice::applied_to</code> <span style="color:var(--muted)">line 155</span> &mdash; Apply this voice to an AccentConfig.
 </li>
-<li><code>Voice::checked</code> <span style="color:var(--muted)">line 169</span> &mdash; Whether this voice is inside the range the engine can render usefully.
+<li><code>Voice::checked</code> <span style="color:var(--muted)">line 182</span> &mdash; Whether this voice is inside the range the engine can render usefully.
 </li>
-<li><code>Voice::describe</code> <span style="color:var(--muted)">line 213</span> &mdash; A short label for an interface: &quot;low register, narrow tract&quot;.
+<li><code>Voice::describe</code> <span style="color:var(--muted)">line 226</span> &mdash; A short label for an interface: &quot;low register, narrow tract&quot;.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>rendered_f0_hz</code>, <code>bin_hz</code></span>
 </li>
-<li><code>voice</code> <span style="color:var(--muted)">line 312</span> &mdash; The destination voice for slot index.
+<li><code>voice</code> <span style="color:var(--muted)">line 325</span> &mdash; The destination voice for slot index.
 </li>
-<li><code>clear_voices</code> <span style="color:var(--muted)">line 393</span> &mdash; How many voices can be handed out before two of them are too alike.
+<li><code>clear_voices</code> <span style="color:var(--muted)">line 406</span> &mdash; How many voices can be handed out before two of them are too alike.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code>, <code>separation</code></span>
 </li>
-<li><code>closest_pair</code> <span style="color:var(--muted)">line 413</span> &mdash; The closest pair among the first count voices, as a ratio.
+<li><code>closest_pair</code> <span style="color:var(--muted)">line 426</span> &mdash; The closest pair among the first count voices, as a ratio.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code>, <code>separation</code></span>
 </li>
-<li><code>distinct_voices</code> <span style="color:var(--muted)">line 439</span> &mdash; How many of the ten are still distinguishable under config.
+<li><code>distinct_voices</code> <span style="color:var(--muted)">line 452</span> &mdash; How many of the ten are still distinguishable under config.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code></span>
 </li>
 </ul>
@@ -122,60 +127,60 @@
 <path d="M176.8 147.0 C 412.8 147.0, 412.8 47.0, 393.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M501.8 247.0 C 523.8 247.0, 523.8 147.0, 409.4 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M297.0 74.0 C 297.0 94.0, 285.6 300.0, 285.6 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L142" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L155" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="98.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Voice::applied_to</text>
-<text x="98.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 142</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L156" target="_blank" rel="noopener noreferrer">
-<rect x="203.2" y="20.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="297.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Voice::rendered_f0_hz</text>
-<text x="297.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 156</text>
+<text x="98.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 155</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169" target="_blank" rel="noopener noreferrer">
+<rect x="203.2" y="20.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="297.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Voice::rendered_f0_hz</text>
+<text x="297.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 169</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L182" target="_blank" rel="noopener noreferrer">
 <rect x="416.8" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="484.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Voice::checked</text>
-<text x="484.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 169</text>
+<text x="484.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 182</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L213" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L226" target="_blank" rel="noopener noreferrer">
 <rect x="34.8" y="120.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="105.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Voice::describe</text>
-<text x="105.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 213</text>
+<text x="105.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 226</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L256" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L269" target="_blank" rel="noopener noreferrer">
 <rect x="241.2" y="320.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="285.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">bin_hz</text>
-<text x="285.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 256</text>
+<text x="285.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 269</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L312" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L325" target="_blank" rel="noopener noreferrer">
 <rect x="202.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="247.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">voice</text>
-<text x="247.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 312</text>
+<text x="247.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 325</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L323" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L336" target="_blank" rel="noopener noreferrer">
 <rect x="317.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="362.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">all</text>
-<text x="362.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 323</text>
+<text x="362.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 336</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L349" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L362" target="_blank" rel="noopener noreferrer">
 <rect x="432.4" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="484.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">separation</text>
-<text x="484.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 349</text>
+<text x="484.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 362</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L393" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L406" target="_blank" rel="noopener noreferrer">
 <rect x="69.4" y="220.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="129.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clear_voices</text>
-<text x="129.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 393</text>
+<text x="129.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 406</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L413" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L426" target="_blank" rel="noopener noreferrer">
 <rect x="214.6" y="220.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="274.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">closest_pair</text>
-<text x="274.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 413</text>
+<text x="274.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 426</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L439" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L452" target="_blank" rel="noopener noreferrer">
 <rect x="359.8" y="220.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="430.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">distinct_voices</text>
-<text x="430.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 439</text>
+<text x="430.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 452</text>
 </a>
 </svg>
 </div>
@@ -183,17 +188,17 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_applied_to([&quot;Voice::applied_to&lt;br/&gt;line 142&quot;])
-    n_rendered_f0_hz[&quot;Voice::rendered_f0_hz&lt;br/&gt;line 156&quot;]
-    n_checked([&quot;Voice::checked&lt;br/&gt;line 169&quot;])
-    n_describe([&quot;Voice::describe&lt;br/&gt;line 213&quot;])
-    n_bin_hz[&quot;bin_hz&lt;br/&gt;line 256&quot;]
-    n_voice([&quot;voice&lt;br/&gt;line 312&quot;])
-    n_all[&quot;all&lt;br/&gt;line 323&quot;]
-    n_separation[&quot;separation&lt;br/&gt;line 349&quot;]
-    n_clear_voices([&quot;clear_voices&lt;br/&gt;line 393&quot;])
-    n_closest_pair([&quot;closest_pair&lt;br/&gt;line 413&quot;])
-    n_distinct_voices([&quot;distinct_voices&lt;br/&gt;line 439&quot;])
+    n_applied_to([&quot;Voice::applied_to&lt;br/&gt;line 155&quot;])
+    n_rendered_f0_hz[&quot;Voice::rendered_f0_hz&lt;br/&gt;line 169&quot;]
+    n_checked([&quot;Voice::checked&lt;br/&gt;line 182&quot;])
+    n_describe([&quot;Voice::describe&lt;br/&gt;line 226&quot;])
+    n_bin_hz[&quot;bin_hz&lt;br/&gt;line 269&quot;]
+    n_voice([&quot;voice&lt;br/&gt;line 325&quot;])
+    n_all[&quot;all&lt;br/&gt;line 336&quot;]
+    n_separation[&quot;separation&lt;br/&gt;line 362&quot;]
+    n_clear_voices([&quot;clear_voices&lt;br/&gt;line 406&quot;])
+    n_closest_pair([&quot;closest_pair&lt;br/&gt;line 426&quot;])
+    n_distinct_voices([&quot;distinct_voices&lt;br/&gt;line 452&quot;])
     n_clear_voices --&gt; n_all
     n_clear_voices --&gt; n_separation
     n_closest_pair --&gt; n_all
@@ -201,17 +206,17 @@ flowchart TD
     n_describe --&gt; n_rendered_f0_hz
     n_distinct_voices --&gt; n_all
     n_rendered_f0_hz --&gt; n_bin_hz
-    click n_applied_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L142&quot; &quot;open the source&quot;
-    click n_rendered_f0_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L156&quot; &quot;open the source&quot;
-    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L213&quot; &quot;open the source&quot;
-    click n_bin_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L256&quot; &quot;open the source&quot;
-    click n_voice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L312&quot; &quot;open the source&quot;
-    click n_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L323&quot; &quot;open the source&quot;
-    click n_separation href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L349&quot; &quot;open the source&quot;
-    click n_clear_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L393&quot; &quot;open the source&quot;
-    click n_closest_pair href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L413&quot; &quot;open the source&quot;
-    click n_distinct_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L439&quot; &quot;open the source&quot;
+    click n_applied_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L155&quot; &quot;open the source&quot;
+    click n_rendered_f0_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169&quot; &quot;open the source&quot;
+    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L182&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L226&quot; &quot;open the source&quot;
+    click n_bin_hz href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L269&quot; &quot;open the source&quot;
+    click n_voice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L325&quot; &quot;open the source&quot;
+    click n_all href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L336&quot; &quot;open the source&quot;
+    click n_separation href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L362&quot; &quot;open the source&quot;
+    click n_clear_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L406&quot; &quot;open the source&quot;
+    click n_closest_pair href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L426&quot; &quot;open the source&quot;
+    click n_distinct_voices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L452&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_applied_to,n_checked,n_describe,n_voice,n_clear_voices,n_closest_pair,n_distinct_voices entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -222,29 +227,29 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>MAX_VOICES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L115" rel="noopener noreferrer">115</a></td><td>How many distinct destination voices this engine hands out.</td></tr>
-<tr><td><code>Voice</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L120" rel="noopener noreferrer">120</a></td><td>One destination voice: the canonical values every speaker in this slot is mapped onto.</td></tr>
-<tr><td><code>Voice::applied_to</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L142" rel="noopener noreferrer">142</a></td><td>Apply this voice to an AccentConfig.</td></tr>
-<tr><td><code>Voice::rendered_f0_hz</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L156" rel="noopener noreferrer">156</a></td><td>The fundamental this voice will actually be rendered at, under config.</td></tr>
-<tr><td><code>Voice::checked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169" rel="noopener noreferrer">169</a></td><td>Whether this voice is inside the range the engine can render usefully.</td></tr>
-<tr><td><code>Voice::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L213" rel="noopener noreferrer">213</a></td><td>A short label for an interface: &quot;low register, narrow tract&quot;.</td></tr>
-<tr><td><code>F0_MIN_HZ</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L239" rel="noopener noreferrer">239</a></td><td>The lowest fundamental a resynthesised voice stays intelligible at.</td></tr>
-<tr><td><code>F0_MAX_HZ</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L241" rel="noopener noreferrer">241</a></td><td>The highest fundamental that still reads as a speaking register.</td></tr>
-<tr><td><code>CENTROID_MIN_HZ</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L243" rel="noopener noreferrer">243</a></td><td>The narrowest canonical vocal tract offered.</td></tr>
-<tr><td><code>CENTROID_MAX_HZ</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L245" rel="noopener noreferrer">245</a></td><td>The widest canonical vocal tract offered.</td></tr>
-<tr><td><code>TILT_MIN_DB_OCT</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L247" rel="noopener noreferrer">247</a></td><td>The steepest permitted long-term slope, in dB per octave.</td></tr>
-<tr><td><code>TILT_MAX_DB_OCT</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L249" rel="noopener noreferrer">249</a></td><td>The flattest permitted long-term slope, in dB per octave.</td></tr>
-<tr><td><code>bin_hz</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L256" rel="noopener noreferrer">256</a></td><td>The FFT bin spacing of a configuration, in hertz.</td></tr>
-<tr><td><code>REGISTERS_HZ</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L269" rel="noopener noreferrer">269</a></td><td>The four registers, each a whole number of bins at the default configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz.</td></tr>
-<tr><td><code>TRACTS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L273" rel="noopener noreferrer">273</a></td><td>The three vocal-tract scales, about 22 % apart.</td></tr>
-<tr><td><code>TABLE</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L291" rel="noopener noreferrer">291</a></td><td>The ten destination voices, in the order they are handed out.</td></tr>
-<tr><td><code>voice</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L312" rel="noopener noreferrer">312</a></td><td>The destination voice for slot index.</td></tr>
-<tr><td><code>all</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L323" rel="noopener noreferrer">323</a></td><td>Every destination voice, in the order they are handed out.</td></tr>
-<tr><td><code>separation</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L349" rel="noopener noreferrer">349</a></td><td>How far apart two voices are, as the larger of their two separations.</td></tr>
-<tr><td><code>CLEAR_SEPARATION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L381" rel="noopener noreferrer">381</a></td><td>The separation below which two voices should not be handed to two people.</td></tr>
-<tr><td><code>clear_voices</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L393" rel="noopener noreferrer">393</a></td><td>How many voices can be handed out before two of them are too alike.</td></tr>
-<tr><td><code>closest_pair</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L413" rel="noopener noreferrer">413</a></td><td>The closest pair among the first count voices, as a ratio.</td></tr>
-<tr><td><code>distinct_voices</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L439" rel="noopener noreferrer">439</a></td><td>How many of the ten are still distinguishable under config.</td></tr>
+<tr><td><code>MAX_VOICES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L128" rel="noopener noreferrer">128</a></td><td>How many distinct destination voices this engine hands out.</td></tr>
+<tr><td><code>Voice</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L133" rel="noopener noreferrer">133</a></td><td>One destination voice: the canonical values every speaker in this slot is mapped onto.</td></tr>
+<tr><td><code>Voice::applied_to</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L155" rel="noopener noreferrer">155</a></td><td>Apply this voice to an AccentConfig.</td></tr>
+<tr><td><code>Voice::rendered_f0_hz</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169" rel="noopener noreferrer">169</a></td><td>The fundamental this voice will actually be rendered at, under config.</td></tr>
+<tr><td><code>Voice::checked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L182" rel="noopener noreferrer">182</a></td><td>Whether this voice is inside the range the engine can render usefully.</td></tr>
+<tr><td><code>Voice::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L226" rel="noopener noreferrer">226</a></td><td>A short label for an interface: &quot;low register, narrow tract&quot;.</td></tr>
+<tr><td><code>F0_MIN_HZ</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L252" rel="noopener noreferrer">252</a></td><td>The lowest fundamental a resynthesised voice stays intelligible at.</td></tr>
+<tr><td><code>F0_MAX_HZ</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L254" rel="noopener noreferrer">254</a></td><td>The highest fundamental that still reads as a speaking register.</td></tr>
+<tr><td><code>CENTROID_MIN_HZ</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L256" rel="noopener noreferrer">256</a></td><td>The narrowest canonical vocal tract offered.</td></tr>
+<tr><td><code>CENTROID_MAX_HZ</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L258" rel="noopener noreferrer">258</a></td><td>The widest canonical vocal tract offered.</td></tr>
+<tr><td><code>TILT_MIN_DB_OCT</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L260" rel="noopener noreferrer">260</a></td><td>The steepest permitted long-term slope, in dB per octave.</td></tr>
+<tr><td><code>TILT_MAX_DB_OCT</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L262" rel="noopener noreferrer">262</a></td><td>The flattest permitted long-term slope, in dB per octave.</td></tr>
+<tr><td><code>bin_hz</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L269" rel="noopener noreferrer">269</a></td><td>The FFT bin spacing of a configuration, in hertz.</td></tr>
+<tr><td><code>REGISTERS_HZ</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L282" rel="noopener noreferrer">282</a></td><td>The four registers, each a whole number of bins at the default configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz.</td></tr>
+<tr><td><code>TRACTS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L286" rel="noopener noreferrer">286</a></td><td>The three vocal-tract scales, about 22 % apart.</td></tr>
+<tr><td><code>TABLE</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L304" rel="noopener noreferrer">304</a></td><td>The ten destination voices, in the order they are handed out.</td></tr>
+<tr><td><code>voice</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L325" rel="noopener noreferrer">325</a></td><td>The destination voice for slot index.</td></tr>
+<tr><td><code>all</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L336" rel="noopener noreferrer">336</a></td><td>Every destination voice, in the order they are handed out.</td></tr>
+<tr><td><code>separation</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L362" rel="noopener noreferrer">362</a></td><td>How far apart two voices are, as the larger of their two separations.</td></tr>
+<tr><td><code>CLEAR_SEPARATION</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L394" rel="noopener noreferrer">394</a></td><td>The separation below which two voices should not be handed to two people.</td></tr>
+<tr><td><code>clear_voices</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L406" rel="noopener noreferrer">406</a></td><td>How many voices can be handed out before two of them are too alike.</td></tr>
+<tr><td><code>closest_pair</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L426" rel="noopener noreferrer">426</a></td><td>The closest pair among the first count voices, as a ratio.</td></tr>
+<tr><td><code>distinct_voices</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L452" rel="noopener noreferrer">452</a></td><td>How many of the ten are still distinguishable under config.</td></tr>
 </tbody></table>
 </section>
 </div></div>

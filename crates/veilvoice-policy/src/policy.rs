@@ -34,6 +34,19 @@
 //! written by a newer build says something this one cannot honour, and quietly
 //! honouring the rest would leave the machine less restricted than the person
 //! who wrote it believes. Refusing says so.
+//!
+//! # In plain words
+//!
+//! A way to say "these settings must always be on", so that they cannot be turned
+//! off later by accident.
+//!
+//! Everything here only ever tightens. There is deliberately no way to write a
+//! rule that makes VeilVoice do less, because a settings file that could weaken
+//! the program would be the first thing worth attacking.
+//!
+//! If a rule and a control disagree, the rule wins and the window shows you the
+//! value that will actually be used, rather than one that quietly changes when you
+//! press the button.
 
 use crate::Error;
 use std::collections::BTreeSet;

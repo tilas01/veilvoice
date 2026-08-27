@@ -101,8 +101,8 @@ can be fooled by anything patient enough to go slowly.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>247 lines"])
-    n_canary["canary.rs<br/>750 lines"]
-    n_rate["rate.rs<br/>942 lines"]
+    n_canary["canary.rs<br/>761 lines"]
+    n_rate["rate.rs<br/>953 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/lib.rs" "open the source"
     click n_canary href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs" "open the source"
     click n_rate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs" "open the source"
@@ -114,6 +114,6 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`canary.rs`|File-veilvoice-sentry-canary]] | 750 | Decoy files that should never change, and a record of what they were. |
+| [[`canary.rs`|File-veilvoice-sentry-canary]] | 761 | Decoy files that should never change, and a record of what they were. |
 | [[`lib.rs`|File-veilvoice-sentry-lib]] | 247 | An early warning that something is going through your files: decoy files that should never change, and a measure of how fast a directory tree is changing. |
-| [[`rate.rs`|File-veilvoice-sentry-rate]] | 942 | How much of a directory tree changed, and how fast. |
+| [[`rate.rs`|File-veilvoice-sentry-rate]] | 953 | How much of a directory tree changed, and how fast. |

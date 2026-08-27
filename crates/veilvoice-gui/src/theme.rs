@@ -27,6 +27,14 @@
 //! out of range would otherwise panic on a slice index, in a paint loop, which
 //! is the worst possible place for it -- so the read saturates to the default
 //! instead.
+//!
+//! # In plain words
+//!
+//! The colour schemes the application ships with, and the fonts.
+//!
+//! They are the same schemes the website offers, defined once so the two cannot
+//! drift apart. Choosing one applies it straight away and it is remembered for
+//! next time.
 
 use egui::{Color32, FontFamily, FontId, Rounding, Stroke, TextStyle, Visuals};
 use std::sync::atomic::{AtomicUsize, Ordering};

@@ -3,13 +3,14 @@
 
 # `crates/veilvoice-drivers/src/linux.rs`
 
-[[veilvoice-drivers|Crate-veilvoice-drivers]] &middot; 230 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs)
+[[veilvoice-drivers|Crate-veilvoice-drivers]] &middot; 239 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs)
 
 ## Contents
 
 - [Two files, no subprocess](#two-files-no-subprocess)
 - [The format](#the-format)
 - [The cross-view check](#the-cross-view-check)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -50,9 +51,18 @@ have no `initstate` file, so only directories that have one are compared —
 otherwise the check would produce dozens of discrepancies on every machine
 and be switched off within a day.
 
+# In plain words
+
+Asks Linux which kernel modules are loaded, by reading two files the system
+keeps.
+
+Nothing is run at all: the answer is already written down. Both files are read
+and compared, because a module that appears in one and not the other is itself
+worth reporting.
+
 ## What this file contains
 
-230 lines defining **3 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+239 lines defining **3 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -68,14 +78,14 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_parse_proc_modules["parse_proc_modules<br/>line 48"]
-    n_read["read<br/>line 78"]
-    n_sys_module_names["sys_module_names<br/>line 121"]
+    n_parse_proc_modules["parse_proc_modules<br/>line 57"]
+    n_read["read<br/>line 87"]
+    n_sys_module_names["sys_module_names<br/>line 130"]
     n_read --> n_parse_proc_modules
     n_read --> n_sys_module_names
-    click n_parse_proc_modules href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L48" "open the source"
-    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L78" "open the source"
-    click n_sys_module_names href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L121" "open the source"
+    click n_parse_proc_modules href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L57" "open the source"
+    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L87" "open the source"
+    click n_sys_module_names href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L130" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_parse_proc_modules,n_read,n_sys_module_names helper
 ```
@@ -86,6 +96,6 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `parse_proc_modules` <sub>pub(crate) fn</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L48) | Parse the contents of /proc/modules. |
-| `read` <sub>pub(crate) fn</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L78) | Read both views and compare them. |
-| `sys_module_names` <sub>fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L121) | The names under /sys/module that correspond to loadable modules. |
+| `parse_proc_modules` <sub>pub(crate) fn</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L57) | Parse the contents of /proc/modules. |
+| `read` <sub>pub(crate) fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L87) | Read both views and compare them. |
+| `sys_module_names` <sub>fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L130) | The names under /sys/module that correspond to loadable modules. |

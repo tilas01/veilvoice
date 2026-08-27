@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-meta/src/wav.rs`
 
-[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 332 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs)
+[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 344 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs)
 
 ## Contents
 
 - [Why WAV gets its own path](#why-wav-gets-its-own-path)
 - [Whitelist, not blacklist](#whitelist-not-blacklist)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -35,13 +36,25 @@ everything else. Anything unrecognised is discarded by default, which is the
 right bias for a privacy tool: the worst case is a lost non-essential chunk,
 not a leaked identity.
 
+# In plain words
+
+Strips the hidden information out of a WAV file specifically.
+
+WAV is built as a series of labelled sections, and the ones carrying the sound
+sit alongside ones carrying text somebody or some program wrote. Those are
+removed and the sound is copied through exactly, byte for byte.
+
+It gets its own path because WAV is what VeilVoice writes, so this is the one
+that runs on nearly every file it produces, and doing it directly means not
+handing VeilVoice's own output to a general-purpose parser.
+
 ## What this file contains
 
-332 lines defining **4 functions** (2 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+344 lines defining **4 functions** (2 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `clean_wav_bytes` (line 47) -- Rewrite a WAV, keeping only the chunks needed to decode it.
+- `clean_wav_bytes` (line 59) -- Rewrite a WAV, keeping only the chunks needed to decode it.
   - reaches: `info_chunk`, `is_wav`, `show`
 
 ## What calls what
@@ -58,17 +71,17 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_is_wav["is_wav<br/>line 42"]
-    n_clean_wav_bytes(["clean_wav_bytes<br/>line 47"])
-    n_info_chunk["info_chunk<br/>line 131"]
-    n_show["show<br/>line 150"]
+    n_is_wav["is_wav<br/>line 54"]
+    n_clean_wav_bytes(["clean_wav_bytes<br/>line 59"])
+    n_info_chunk["info_chunk<br/>line 143"]
+    n_show["show<br/>line 162"]
     n_clean_wav_bytes --> n_info_chunk
     n_clean_wav_bytes --> n_is_wav
     n_clean_wav_bytes --> n_show
-    click n_is_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L42" "open the source"
-    click n_clean_wav_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L47" "open the source"
-    click n_info_chunk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L131" "open the source"
-    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L150" "open the source"
+    click n_is_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L54" "open the source"
+    click n_clean_wav_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L59" "open the source"
+    click n_info_chunk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L143" "open the source"
+    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L162" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_wav_bytes entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -83,9 +96,9 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `KEEP` <sub>const</sub> | [28](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L28) | Chunks required to interpret the audio. |
-| `REALISTIC_INFO` <sub>const</sub> | [35](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L35) | Tags written in Policy::Realistic mode, as LIST/INFO sub-chunks. |
-| `is_wav` <sub>pub fn</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L42) | Whether bytes looks like a RIFF/WAVE file. |
-| `clean_wav_bytes` <sub>pub fn</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L47) | Rewrite a WAV, keeping only the chunks needed to decode it. |
-| `info_chunk` <sub>fn</sub> | [131](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L131) | Build a bland LIST/INFO chunk. |
-| `show` <sub>fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L150) |  |
+| `KEEP` <sub>const</sub> | [40](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L40) | Chunks required to interpret the audio. |
+| `REALISTIC_INFO` <sub>const</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L47) | Tags written in Policy::Realistic mode, as LIST/INFO sub-chunks. |
+| `is_wav` <sub>pub fn</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L54) | Whether bytes looks like a RIFF/WAVE file. |
+| `clean_wav_bytes` <sub>pub fn</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L59) | Rewrite a WAV, keeping only the chunks needed to decode it. |
+| `info_chunk` <sub>fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L143) | Build a bland LIST/INFO chunk. |
+| `show` <sub>fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L162) |  |

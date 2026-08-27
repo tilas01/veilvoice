@@ -39,6 +39,21 @@
 //! Uniform mode has **no speaker limit** from voices, because there is no
 //! second voice to collide with. The plan's own ten-speaker limit still
 //! applies, because ten names is already a great deal to follow.
+//!
+//! # In plain words
+//!
+//! How many people can be in one recording, and the choice between two ways of
+//! handling them.
+//!
+//! Give everybody a different voice and a listener can follow the conversation by
+//! ear, but only so many of the available voices are far enough apart to actually
+//! be told apart. That number was measured rather than picked, and the limit is
+//! real: past it, two people would sound like one person and you would only find
+//! out by listening to the finished recording.
+//!
+//! Give everybody the *same* voice and there is no limit, and it is more private,
+//! because the result no longer carries even the fact of who was speaker three.
+//! The price is that names and pictures become the only way to tell who is talking.
 
 use veilvoice_core::voices::{self, Voice};
 use veilvoice_core::DeidConfig;

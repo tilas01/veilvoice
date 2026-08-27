@@ -39,9 +39,10 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/stft.svg" alt="stft.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/stft.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 246 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 259 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -51,19 +52,23 @@
 <p>Streaming short-time Fourier transform with overlap-add resynthesis.</p>
 <p>Structure follows the classic FIFO/overlap-add pipeline (as popularised by Bernsee&#x27;s SMB pitch shifter): samples flow in and out one-for-one with a fixed latency of <code>n - hop</code> samples, and a full frame is analysed/synthesised every <code>hop</code> input samples. The caller supplies a closure that rewrites the complex spectrum in place, keeping the FFT plumbing and the de-identification maths cleanly separated.</p>
 <p>The closure also receives the raw (unwindowed) analysis frame. Accent neutralisation needs a time-domain view to track f0 &#8212; the FFT resolution at useful frame sizes is far too coarse for that &#8212; and handing over the frame that produced the spectrum keeps the two perfectly aligned. Its newest <code>hop</code> samples are the tail.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Sound arrives as a long stream of numbers. To change a voice you have to look at it in terms of pitch and tone rather than raw numbers, and this is the part that converts back and forth.</p>
+<p>It takes a short slice of sound, works out which frequencies are in it, hands that picture to the code that alters it, and turns the result back into sound. The slices overlap and are faded together, so the joins cannot be heard.</p>
+<p>Everything else in the engine is written in terms of those pictures. This file is the door between the two ways of looking at the same thing.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>246 lines defining <strong>4 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>259 lines defining <strong>4 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct StftEngine</code> <span style="color:var(--muted)">line 23</span> &mdash; Reusable streaming STFT engine (single channel).</li>
+<li><code>struct StftEngine</code> <span style="color:var(--muted)">line 36</span> &mdash; Reusable streaming STFT engine (single channel).</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>StftEngine::new</code> <span style="color:var(--muted)">line 47</span> &mdash; n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4).
+<li><code>StftEngine::new</code> <span style="color:var(--muted)">line 60</span> &mdash; n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4).
 </li>
-<li><code>StftEngine::latency_samples</code> <span style="color:var(--muted)">line 85</span> &mdash; End-to-end algorithmic latency (group delay) in samples.
+<li><code>StftEngine::latency_samples</code> <span style="color:var(--muted)">line 98</span> &mdash; End-to-end algorithmic latency (group delay) in samples.
 </li>
-<li><code>StftEngine::process</code> <span style="color:var(--muted)">line 92</span> &mdash; Process input into output (equal length).
+<li><code>StftEngine::process</code> <span style="color:var(--muted)">line 105</span> &mdash; Process input into output (equal length).
 <br><span style="color:var(--muted);font-size:12px">reaches <code>process_frame</code></span>
 </li>
 </ul>
@@ -76,25 +81,25 @@
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="640" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M533.4 74.0 C 533.4 94.0, 319.8 100.0, 319.8 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L47" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L60" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="91.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StftEngine::new</text>
-<text x="91.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 47</text>
+<text x="91.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 60</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L85" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L98" target="_blank" rel="noopener noreferrer">
 <rect x="188.0" y="20.0" width="233.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="304.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StftEngine::latency_samples</text>
-<text x="304.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 85</text>
+<text x="304.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 98</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L92" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L105" target="_blank" rel="noopener noreferrer">
 <rect x="447.2" y="20.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="533.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StftEngine::process</text>
-<text x="533.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<text x="533.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L141" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L154" target="_blank" rel="noopener noreferrer">
 <rect x="210.8" y="120.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="319.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StftEngine::process_frame</text>
-<text x="319.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 141</text>
+<text x="319.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
 </a>
 </svg>
 </div>
@@ -102,15 +107,15 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_new([&quot;StftEngine::new&lt;br/&gt;line 47&quot;])
-    n_latency_samples([&quot;StftEngine::latency_samples&lt;br/&gt;line 85&quot;])
-    n_process([&quot;StftEngine::process&lt;br/&gt;line 92&quot;])
-    n_process_frame[&quot;StftEngine::process_frame&lt;br/&gt;line 141&quot;]
+    n_new([&quot;StftEngine::new&lt;br/&gt;line 60&quot;])
+    n_latency_samples([&quot;StftEngine::latency_samples&lt;br/&gt;line 98&quot;])
+    n_process([&quot;StftEngine::process&lt;br/&gt;line 105&quot;])
+    n_process_frame[&quot;StftEngine::process_frame&lt;br/&gt;line 154&quot;]
     n_process --&gt; n_process_frame
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L47&quot; &quot;open the source&quot;
-    click n_latency_samples href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L85&quot; &quot;open the source&quot;
-    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L92&quot; &quot;open the source&quot;
-    click n_process_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L141&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L60&quot; &quot;open the source&quot;
+    click n_latency_samples href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L98&quot; &quot;open the source&quot;
+    click n_process href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L105&quot; &quot;open the source&quot;
+    click n_process_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L154&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_latency_samples,n_process entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -121,11 +126,11 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>StftEngine</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L23" rel="noopener noreferrer">23</a></td><td>Reusable streaming STFT engine (single channel).</td></tr>
-<tr><td><code>StftEngine::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L47" rel="noopener noreferrer">47</a></td><td>n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4).</td></tr>
-<tr><td><code>StftEngine::latency_samples</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L85" rel="noopener noreferrer">85</a></td><td>End-to-end algorithmic latency (group delay) in samples.</td></tr>
-<tr><td><code>StftEngine::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L92" rel="noopener noreferrer">92</a></td><td>Process input into output (equal length).</td></tr>
-<tr><td><code>StftEngine::process_frame</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L141" rel="noopener noreferrer">141</a></td><td></td></tr>
+<tr><td><code>StftEngine</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L36" rel="noopener noreferrer">36</a></td><td>Reusable streaming STFT engine (single channel).</td></tr>
+<tr><td><code>StftEngine::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L60" rel="noopener noreferrer">60</a></td><td>n must be even; hop must divide evenly for constant overlap-add (typical: hop = n/4).</td></tr>
+<tr><td><code>StftEngine::latency_samples</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L98" rel="noopener noreferrer">98</a></td><td>End-to-end algorithmic latency (group delay) in samples.</td></tr>
+<tr><td><code>StftEngine::process</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L105" rel="noopener noreferrer">105</a></td><td>Process input into output (equal length).</td></tr>
+<tr><td><code>StftEngine::process_frame</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs#L154" rel="noopener noreferrer">154</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

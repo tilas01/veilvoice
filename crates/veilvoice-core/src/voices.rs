@@ -105,6 +105,19 @@
 //! produce, and [`distinct_voices`] counts how many of the ten survive it — so
 //! a front end can say "this frame size gives you six distinguishable voices"
 //! rather than handing out ten labels for six sounds.
+//!
+//! # In plain words
+//!
+//! The set of voices a recording can be turned into.
+//!
+//! By default everyone comes out as the same one. That is on purpose: if every
+//! speaker sounds identical, there is nothing in the result that distinguishes one
+//! from another, and nothing to trace back.
+//!
+//! When a recording has several people in it that becomes a problem, because a
+//! listener cannot follow who is who. So there is a small set of destination
+//! voices to hand out instead, chosen to be as far apart as the arithmetic allows,
+//! and a measured limit on how many of them can genuinely be told apart by ear.
 
 use crate::{AccentConfig, DeidConfig};
 

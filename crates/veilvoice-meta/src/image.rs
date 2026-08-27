@@ -9,6 +9,14 @@
 //! GPS coordinates are the reason this matters most. A single holiday snapshot
 //! attached to an otherwise anonymous message can place someone within a few
 //! metres, and no amount of voice processing helps with that.
+//!
+//! # In plain words
+//!
+//! Strips the hidden information out of a picture, including where it was taken.
+//!
+//! Photographs from a phone routinely carry the exact location, the time, the
+//! device and its serial number. The picture is copied through untouched and only
+//! those sections are dropped, so nothing about how it looks changes.
 
 use crate::{Error, Policy, Report};
 use img_parts::{DynImage, ImageEXIF, ImageICC};

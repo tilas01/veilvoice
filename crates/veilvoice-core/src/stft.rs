@@ -13,6 +13,19 @@
 //! useful frame sizes is far too coarse for that — and handing over the frame
 //! that produced the spectrum keeps the two perfectly aligned. Its newest `hop`
 //! samples are the tail.
+//!
+//! # In plain words
+//!
+//! Sound arrives as a long stream of numbers. To change a voice you have to look
+//! at it in terms of pitch and tone rather than raw numbers, and this is the part
+//! that converts back and forth.
+//!
+//! It takes a short slice of sound, works out which frequencies are in it, hands
+//! that picture to the code that alters it, and turns the result back into sound.
+//! The slices overlap and are faded together, so the joins cannot be heard.
+//!
+//! Everything else in the engine is written in terms of those pictures. This file
+//! is the door between the two ways of looking at the same thing.
 
 use crate::window::{hann, ola_gain};
 use realfft::num_complex::Complex;

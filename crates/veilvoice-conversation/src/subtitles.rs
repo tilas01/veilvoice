@@ -28,6 +28,19 @@
 //! containing whatever names were typed into it, sitting next to the recording.
 //! If the names matter, use labels rather than names — the plan does not care
 //! which, and [`crate::SCOPE`] says so where a user will read it.
+//!
+//! # In plain words
+//!
+//! Writes the subtitles, from the same plan the audio came from.
+//!
+//! Both files come out of one source, so the words on screen and the voice you
+//! hear cannot drift apart or disagree about who is speaking.
+//!
+//! Two formats are written: the one browsers use for video on a web page, and the
+//! older one nearly every video player and editor understands.
+//!
+//! The names in the subtitles are the ones you typed. Nothing veils those, and the
+//! application says so where you type them.
 
 use crate::Conversation;
 

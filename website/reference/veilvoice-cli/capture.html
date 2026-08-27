@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/capture.svg" alt="capture.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/capture.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 321 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 330 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#where-the-allowlist-lives">Where the allowlist lives</a>
   <a href="#the-exit-code">The exit code</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -58,25 +59,28 @@
 <h2 id="the-exit-code">The exit code</h2>
 <p><code>veilvoice capture check</code> exits non-zero when something <strong>not allowed</strong> is running, so it can be a step in a script that refuses to start recording something sensitive while a recorder is open. Allowing a program is precisely how you tell that script you meant it.</p>
 <p>It exits zero when the listing itself failed, and says so on the way past. A check that cannot see is not a check that passed, but neither is it a reason to fail a script &#8212; the difference is in the words, and the words are printed.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Tells you which screen recorders are running, and lets you say you meant to start one so it stops being mentioned.</p>
+<p>It cannot tell whether a program is actually recording, only that it is open, and it says so. A meeting application being open is not somebody watching your screen.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>321 lines defining <strong>10 functions</strong> (7 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>330 lines defining <strong>10 functions</strong> (7 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>status</code> <span style="color:var(--muted)">line 66</span> &mdash; What is running, what is allowed, and what this cannot see.
+<li><code>status</code> <span style="color:var(--muted)">line 75</span> &mdash; What is running, what is allowed, and what this cannot see.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>allow_path</code>, <code>capture_dir</code></span>
 </li>
-<li><code>calls</code> <span style="color:var(--muted)">line 118</span> &mdash; Every program in the table, whether it is running or not.
+<li><code>calls</code> <span style="color:var(--muted)">line 127</span> &mdash; Every program in the table, whether it is running or not.
 </li>
-<li><code>list</code> <span style="color:var(--muted)">line 195</span>
+<li><code>list</code> <span style="color:var(--muted)">line 204</span>
 </li>
-<li><code>allow</code> <span style="color:var(--muted)">line 228</span> &mdash; Stop notifying about one program.
+<li><code>allow</code> <span style="color:var(--muted)">line 237</span> &mdash; Stop notifying about one program.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>save</code>, <code>allow_path</code>, <code>capture_dir</code></span>
 </li>
-<li><code>deny</code> <span style="color:var(--muted)">line 245</span> &mdash; Start notifying about one program again.
+<li><code>deny</code> <span style="color:var(--muted)">line 254</span> &mdash; Start notifying about one program again.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>save</code>, <code>allow_path</code>, <code>capture_dir</code></span>
 </li>
-<li><code>check</code> <span style="color:var(--muted)">line 261</span> &mdash; Look now, and let the exit code answer.
+<li><code>check</code> <span style="color:var(--muted)">line 270</span> &mdash; Look now, and let the exit code answer.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>allow_path</code>, <code>capture_dir</code></span>
 </li>
 </ul>
@@ -97,55 +101,55 @@
 <path d="M376.8 47.0 C 398.8 47.0, 398.8 47.0, 272.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M484.0 47.0 C 506.0 47.0, 506.0 47.0, 272.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M591.2 47.0 C 613.2 47.0, 613.2 47.0, 379.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L39" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L48" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="83.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">capture_dir</text>
-<text x="83.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 39</text>
+<text x="83.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 48</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L43" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L52" target="_blank" rel="noopener noreferrer">
 <rect x="165.6" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="217.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">allow_path</text>
-<text x="217.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 43</text>
+<text x="217.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 52</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L53" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L62" target="_blank" rel="noopener noreferrer">
 <rect x="295.6" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="336.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load</text>
-<text x="336.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 53</text>
+<text x="336.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 62</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L58" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L67" target="_blank" rel="noopener noreferrer">
 <rect x="402.8" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="443.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">save</text>
-<text x="443.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 58</text>
+<text x="443.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L66" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L75" target="_blank" rel="noopener noreferrer">
 <rect x="510.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="550.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status</text>
-<text x="550.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 66</text>
+<text x="550.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 75</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L118" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L127" target="_blank" rel="noopener noreferrer">
 <rect x="35.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="80.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">calls</text>
-<text x="80.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 118</text>
+<text x="80.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 127</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L195" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L204" target="_blank" rel="noopener noreferrer">
 <rect x="150.4" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="194.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list</text>
-<text x="194.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 195</text>
+<text x="194.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 204</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L228" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L237" target="_blank" rel="noopener noreferrer">
 <rect x="265.2" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="309.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">allow</text>
-<text x="309.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
+<text x="309.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 237</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L245" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L254" target="_blank" rel="noopener noreferrer">
 <rect x="380.0" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="424.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">deny</text>
-<text x="424.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
+<text x="424.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 254</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L261" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L270" target="_blank" rel="noopener noreferrer">
 <rect x="494.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="539.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check</text>
-<text x="539.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 261</text>
+<text x="539.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
 </a>
 </svg>
 </div>
@@ -153,16 +157,16 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_capture_dir[&quot;capture_dir&lt;br/&gt;line 39&quot;]
-    n_allow_path[&quot;allow_path&lt;br/&gt;line 43&quot;]
-    n_load[&quot;load&lt;br/&gt;line 53&quot;]
-    n_save[&quot;save&lt;br/&gt;line 58&quot;]
-    n_status([&quot;status&lt;br/&gt;line 66&quot;])
-    n_calls([&quot;calls&lt;br/&gt;line 118&quot;])
-    n_list([&quot;list&lt;br/&gt;line 195&quot;])
-    n_allow([&quot;allow&lt;br/&gt;line 228&quot;])
-    n_deny([&quot;deny&lt;br/&gt;line 245&quot;])
-    n_check([&quot;check&lt;br/&gt;line 261&quot;])
+    n_capture_dir[&quot;capture_dir&lt;br/&gt;line 48&quot;]
+    n_allow_path[&quot;allow_path&lt;br/&gt;line 52&quot;]
+    n_load[&quot;load&lt;br/&gt;line 62&quot;]
+    n_save[&quot;save&lt;br/&gt;line 67&quot;]
+    n_status([&quot;status&lt;br/&gt;line 75&quot;])
+    n_calls([&quot;calls&lt;br/&gt;line 127&quot;])
+    n_list([&quot;list&lt;br/&gt;line 204&quot;])
+    n_allow([&quot;allow&lt;br/&gt;line 237&quot;])
+    n_deny([&quot;deny&lt;br/&gt;line 254&quot;])
+    n_check([&quot;check&lt;br/&gt;line 270&quot;])
     n_allow --&gt; n_load
     n_allow --&gt; n_save
     n_allow_path --&gt; n_capture_dir
@@ -172,16 +176,16 @@ flowchart TD
     n_load --&gt; n_allow_path
     n_save --&gt; n_allow_path
     n_status --&gt; n_load
-    click n_capture_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L39&quot; &quot;open the source&quot;
-    click n_allow_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L43&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L53&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L58&quot; &quot;open the source&quot;
-    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L66&quot; &quot;open the source&quot;
-    click n_calls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L118&quot; &quot;open the source&quot;
-    click n_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L195&quot; &quot;open the source&quot;
-    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L228&quot; &quot;open the source&quot;
-    click n_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L245&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L261&quot; &quot;open the source&quot;
+    click n_capture_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L48&quot; &quot;open the source&quot;
+    click n_allow_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L52&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L62&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L67&quot; &quot;open the source&quot;
+    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L75&quot; &quot;open the source&quot;
+    click n_calls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L127&quot; &quot;open the source&quot;
+    click n_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L204&quot; &quot;open the source&quot;
+    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L237&quot; &quot;open the source&quot;
+    click n_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L254&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L270&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_calls,n_list,n_allow,n_deny,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -194,16 +198,16 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>capture_dir</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L39" rel="noopener noreferrer">39</a></td><td>Where the allowlist is kept.</td></tr>
-<tr><td><code>allow_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L43" rel="noopener noreferrer">43</a></td><td></td></tr>
-<tr><td><code>load</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L53" rel="noopener noreferrer">53</a></td><td></td></tr>
-<tr><td><code>save</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L58" rel="noopener noreferrer">58</a></td><td></td></tr>
-<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L66" rel="noopener noreferrer">66</a></td><td>What is running, what is allowed, and what this cannot see.</td></tr>
-<tr><td><code>calls</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L118" rel="noopener noreferrer">118</a></td><td>Every program in the table, whether it is running or not.</td></tr>
-<tr><td><code>list</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L195" rel="noopener noreferrer">195</a></td><td></td></tr>
-<tr><td><code>allow</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L228" rel="noopener noreferrer">228</a></td><td>Stop notifying about one program.</td></tr>
-<tr><td><code>deny</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L245" rel="noopener noreferrer">245</a></td><td>Start notifying about one program again.</td></tr>
-<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L261" rel="noopener noreferrer">261</a></td><td>Look now, and let the exit code answer.</td></tr>
+<tr><td><code>capture_dir</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L48" rel="noopener noreferrer">48</a></td><td>Where the allowlist is kept.</td></tr>
+<tr><td><code>allow_path</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L52" rel="noopener noreferrer">52</a></td><td></td></tr>
+<tr><td><code>load</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L62" rel="noopener noreferrer">62</a></td><td></td></tr>
+<tr><td><code>save</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L67" rel="noopener noreferrer">67</a></td><td></td></tr>
+<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L75" rel="noopener noreferrer">75</a></td><td>What is running, what is allowed, and what this cannot see.</td></tr>
+<tr><td><code>calls</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L127" rel="noopener noreferrer">127</a></td><td>Every program in the table, whether it is running or not.</td></tr>
+<tr><td><code>list</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L204" rel="noopener noreferrer">204</a></td><td></td></tr>
+<tr><td><code>allow</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L237" rel="noopener noreferrer">237</a></td><td>Stop notifying about one program.</td></tr>
+<tr><td><code>deny</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L254" rel="noopener noreferrer">254</a></td><td>Start notifying about one program again.</td></tr>
+<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs#L270" rel="noopener noreferrer">270</a></td><td>Look now, and let the exit code answer.</td></tr>
 </tbody></table>
 </section>
 </div></div>

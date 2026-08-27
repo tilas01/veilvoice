@@ -33,6 +33,16 @@
 //! the tag library does not see it. That is what [`crate::wav`] is for: a
 //! chunk-level cleaner that walks the RIFF structure directly. Without it,
 //! cleaning a WAV reported success and left the identifying block in place.
+//!
+//! # In plain words
+//!
+//! Strips the hidden information out of an audio file: the artist, the title, the
+//! comments, the software that made it, the date, and anything else somebody wrote
+//! into it.
+//!
+//! None of that is audible, and all of it travels with the file. A recording whose
+//! voice has been carefully veiled is not anonymous if the file still says who
+//! recorded it and on what.
 
 use crate::{Error, Policy, Report};
 use lofty::config::WriteOptions;

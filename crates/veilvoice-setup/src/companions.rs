@@ -41,6 +41,16 @@
 //! has put Audacity somewhere unusual will be told it was not detected, which
 //! is exactly what the words say — [`Presence::NotDetected`] is not a claim
 //! that the software is absent from the machine.
+//!
+//! # In plain words
+//!
+//! Optional extra software that makes VeilVoice easier to live with, none of which
+//! is part of VeilVoice.
+//!
+//! Each one is looked for rather than assumed, and each is described first: what
+//! it is, who makes it, what licence it has and why VeilVoice mentions it at all.
+//! Nothing is installed without an explicit yes, and the exact command is shown
+//! before the question.
 
 use std::path::{Path, PathBuf};
 

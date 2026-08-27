@@ -100,6 +100,19 @@
 //! if that wording is softened, because a user who over-trusts the app lock is
 //! left worse off than one who never had it. If you are editing text in this
 //! file and a test starts failing, it is that rule, and it is working.
+//!
+//! # In plain words
+//!
+//! The window itself: the tabs along the top, what each one shows, and the state
+//! they all share.
+//!
+//! One window with tabs, no menus, and no settings file to go hunting for.
+//! Everything VeilVoice can do is reachable from something visible.
+//!
+//! The one rule this file follows without exception is that painting the window
+//! never waits for anything. Reading a recording or running the engine takes
+//! seconds; if that happened here the window would stop responding, so it is
+//! started on another thread and the answer is collected later.
 
 use crate::policy::InForce;
 use crate::security::Security;

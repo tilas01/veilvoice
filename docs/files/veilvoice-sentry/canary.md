@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-sentry/src/canary.rs`
 
-[`veilvoice-sentry`](../../../crates/veilvoice-sentry/README.md) &middot; 750 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs)
+[`veilvoice-sentry`](../../../crates/veilvoice-sentry/README.md) &middot; 761 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs)
 
 ## Contents
 
@@ -20,6 +20,7 @@
 - [The name is a deliberate trade, and the default takes the honest side](#the-name-is-a-deliberate-trade-and-the-default-takes-the-honest-side)
 - [A deletion and an encryption look the same](#a-deletion-and-an-encryption-look-the-same)
 - [Format](#format)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -80,35 +81,46 @@ VEILSENTRY-NEST1
 <sha256 hex>  <size>  <planted unix seconds>  <path>
 ```
 
+# In plain words
+
+Files VeilVoice puts in a folder and never touches again.
+
+Nothing should ever read or change them. If one does change, something has
+walked through that folder writing to everything in it, which is what
+ransomware does, and you have found out early.
+
+It does not stop anything. It is a tripwire, and its whole value is being
+noticed quickly.
+
 ## What this file contains
 
-750 lines defining **20 functions** (16 public), **4 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+761 lines defining **20 functions** (16 public), **4 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Canary` (line 83) -- One planted decoy, and what it was when it was planted.
-- `enum State` (line 96) -- What a canary looks like now.
-- `struct Sighting` (line 166) -- One canary and what became of it.
-- `struct Nest` (line 175) -- The set of planted canaries.
+- `struct Canary` (line 94) -- One planted decoy, and what it was when it was planted.
+- `enum State` (line 107) -- What a canary looks like now.
+- `struct Sighting` (line 177) -- One canary and what became of it.
+- `struct Nest` (line 186) -- The set of planted canaries.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `State::is_trip` (line 123) -- Whether this is anything other than State::Intact.
-- `State::stopped_being_text` (line 132) -- Whether the contents stopped looking like the text that was planted.
-- `State::describe` (line 140) -- A single line for a terminal or a log.
-- `Nest::new` (line 254) -- An empty nest.
-- `Nest::len` (line 259) -- How many canaries are planted.
-- `Nest::is_empty` (line 264) -- Whether nothing is planted.
-- `Nest::canaries` (line 269) -- The planted canaries, in a stable order.
-- `Nest::plant` (line 281) -- Write a canary into dir and record it.
+- `State::is_trip` (line 134) -- Whether this is anything other than State::Intact.
+- `State::stopped_being_text` (line 143) -- Whether the contents stopped looking like the text that was planted.
+- `State::describe` (line 151) -- A single line for a terminal or a log.
+- `Nest::new` (line 265) -- An empty nest.
+- `Nest::len` (line 270) -- How many canaries are planted.
+- `Nest::is_empty` (line 275) -- Whether nothing is planted.
+- `Nest::canaries` (line 280) -- The planted canaries, in a stable order.
+- `Nest::plant` (line 292) -- Write a canary into dir and record it.
   - reaches: `contents`, `digest_of`, `normalise`, `now_seconds`
-- `Nest::pull_up` (line 329) -- Stop watching a canary, and delete it.
+- `Nest::pull_up` (line 340) -- Stop watching a canary, and delete it.
   - reaches: `normalise`
-- `Nest::trips` (line 355) -- Only the canaries that are not intact.
+- `Nest::trips` (line 366) -- Only the canaries that are not intact.
   - reaches: `check`, `state_of`, `digest_of`
-- `Nest::save` (line 435) -- Write the nest to path.
+- `Nest::save` (line 446) -- Write the nest to path.
   - reaches: `to_text`
-- `Nest::load` (line 446) -- Read a nest written by Nest::save.
+- `Nest::load` (line 457) -- Read a nest written by Nest::save.
   - reaches: `parse`
 
 ## What calls what
@@ -131,26 +143,26 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_is_trip(["State::is_trip<br/>line 123"])
-    n_stopped_being_text(["State::stopped_being_text<br/>line 132"])
-    n_describe(["State::describe<br/>line 140"])
-    n_normalise["normalise<br/>line 184"]
-    n_digest_of["digest_of<br/>line 188"]
-    n_now_seconds["now_seconds<br/>line 198"]
-    n_contents["contents<br/>line 215"]
-    n_new(["Nest::new<br/>line 254"])
-    n_len(["Nest::len<br/>line 259"])
-    n_is_empty(["Nest::is_empty<br/>line 264"])
-    n_canaries(["Nest::canaries<br/>line 269"])
-    n_plant(["Nest::plant<br/>line 281"])
-    n_pull_up(["Nest::pull_up<br/>line 329"])
-    n_check["Nest::check<br/>line 344"]
-    n_trips(["Nest::trips<br/>line 355"])
-    n_to_text["Nest::to_text<br/>line 363"]
-    n_parse["Nest::parse<br/>line 376"]
-    n_save(["Nest::save<br/>line 435"])
-    n_load(["Nest::load<br/>line 446"])
-    n_state_of["state_of<br/>line 451"]
+    n_is_trip(["State::is_trip<br/>line 134"])
+    n_stopped_being_text(["State::stopped_being_text<br/>line 143"])
+    n_describe(["State::describe<br/>line 151"])
+    n_normalise["normalise<br/>line 195"]
+    n_digest_of["digest_of<br/>line 199"]
+    n_now_seconds["now_seconds<br/>line 209"]
+    n_contents["contents<br/>line 226"]
+    n_new(["Nest::new<br/>line 265"])
+    n_len(["Nest::len<br/>line 270"])
+    n_is_empty(["Nest::is_empty<br/>line 275"])
+    n_canaries(["Nest::canaries<br/>line 280"])
+    n_plant(["Nest::plant<br/>line 292"])
+    n_pull_up(["Nest::pull_up<br/>line 340"])
+    n_check["Nest::check<br/>line 355"]
+    n_trips(["Nest::trips<br/>line 366"])
+    n_to_text["Nest::to_text<br/>line 374"]
+    n_parse["Nest::parse<br/>line 387"]
+    n_save(["Nest::save<br/>line 446"])
+    n_load(["Nest::load<br/>line 457"])
+    n_state_of["state_of<br/>line 462"]
     n_check --> n_state_of
     n_load --> n_parse
     n_plant --> n_contents
@@ -161,26 +173,26 @@ flowchart TD
     n_save --> n_to_text
     n_state_of --> n_digest_of
     n_trips --> n_check
-    click n_is_trip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L123" "open the source"
-    click n_stopped_being_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L132" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L140" "open the source"
-    click n_normalise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L184" "open the source"
-    click n_digest_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L188" "open the source"
-    click n_now_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L198" "open the source"
-    click n_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L215" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L254" "open the source"
-    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L259" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L264" "open the source"
-    click n_canaries href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L269" "open the source"
-    click n_plant href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L281" "open the source"
-    click n_pull_up href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L329" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L344" "open the source"
-    click n_trips href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L355" "open the source"
-    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L363" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L376" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L435" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L446" "open the source"
-    click n_state_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L451" "open the source"
+    click n_is_trip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L134" "open the source"
+    click n_stopped_being_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L143" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L151" "open the source"
+    click n_normalise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L195" "open the source"
+    click n_digest_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L199" "open the source"
+    click n_now_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L209" "open the source"
+    click n_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L226" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L265" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L270" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L275" "open the source"
+    click n_canaries href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L280" "open the source"
+    click n_plant href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L292" "open the source"
+    click n_pull_up href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L340" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L355" "open the source"
+    click n_trips href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L366" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L374" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L387" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L446" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L457" "open the source"
+    click n_state_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L462" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_trip,n_stopped_being_text,n_describe,n_new,n_len,n_is_empty,n_canaries,n_plant,n_pull_up,n_trips,n_save,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -195,34 +207,34 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `MAGIC` <sub>const</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L65) | Magic first line. |
-| `DEFAULT_NAME` <sub>pub const</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L71) | The default filename for a canary. |
-| `PROSE_CEILING` <sub>pub const</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L79) | Below this, a canary that was prose has stopped being prose. |
-| `Canary` <sub>pub struct</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L83) | One planted decoy, and what it was when it was planted. |
-| `State` <sub>pub enum</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L96) | What a canary looks like now. |
-| `State::is_trip` <sub>pub fn</sub> | [123](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L123) | Whether this is anything other than State::Intact. |
-| `State::stopped_being_text` <sub>pub fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L132) | Whether the contents stopped looking like the text that was planted. |
-| `State::describe` <sub>pub fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L140) | A single line for a terminal or a log. |
-| `Sighting` <sub>pub struct</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L166) | One canary and what became of it. |
-| `Nest` <sub>pub struct</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L175) | The set of planted canaries. |
-| `normalise` <sub>fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L184) | Normalise a path for storage: forward slashes, as the tamper manifest does, so a nest written on Windows still reads on Linux. |
-| `digest_of` <sub>fn</sub> | [188](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L188) |  |
-| `now_seconds` <sub>fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L198) |  |
-| `contents` <sub>pub fn</sub> | [215](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L215) | The text a canary is filled with. |
-| `FILLER` <sub>const</sub> | [244](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L244) | Plain sentences, in the project's own register, repeated to make a body. |
-| `Nest::new` <sub>pub fn</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L254) | An empty nest. |
-| `Nest::len` <sub>pub fn</sub> | [259](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L259) | How many canaries are planted. |
-| `Nest::is_empty` <sub>pub fn</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L264) | Whether nothing is planted. |
-| `Nest::canaries` <sub>pub fn</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L269) | The planted canaries, in a stable order. |
-| `Nest::plant` <sub>pub fn</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L281) | Write a canary into dir and record it. |
-| `Nest::pull_up` <sub>pub fn</sub> | [329](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L329) | Stop watching a canary, and delete it. |
-| `Nest::check` <sub>pub fn</sub> | [344](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L344) | Look at every canary. |
-| `Nest::trips` <sub>pub fn</sub> | [355](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L355) | Only the canaries that are not intact. |
-| `Nest::to_text` <sub>pub fn</sub> | [363](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L363) | Serialise to the text format described at the top of this module. |
-| `Nest::parse` <sub>pub fn</sub> | [376](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L376) | Parse the text format. |
-| `Nest::save` <sub>pub fn</sub> | [435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L435) | Write the nest to path. |
-| `Nest::load` <sub>pub fn</sub> | [446](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L446) | Read a nest written by Nest::save. |
-| `state_of` <sub>fn</sub> | [451](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L451) |  |
+| `MAGIC` <sub>const</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L76) | Magic first line. |
+| `DEFAULT_NAME` <sub>pub const</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L82) | The default filename for a canary. |
+| `PROSE_CEILING` <sub>pub const</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L90) | Below this, a canary that was prose has stopped being prose. |
+| `Canary` <sub>pub struct</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L94) | One planted decoy, and what it was when it was planted. |
+| `State` <sub>pub enum</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L107) | What a canary looks like now. |
+| `State::is_trip` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L134) | Whether this is anything other than State::Intact. |
+| `State::stopped_being_text` <sub>pub fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L143) | Whether the contents stopped looking like the text that was planted. |
+| `State::describe` <sub>pub fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L151) | A single line for a terminal or a log. |
+| `Sighting` <sub>pub struct</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L177) | One canary and what became of it. |
+| `Nest` <sub>pub struct</sub> | [186](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L186) | The set of planted canaries. |
+| `normalise` <sub>fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L195) | Normalise a path for storage: forward slashes, as the tamper manifest does, so a nest written on Windows still reads on Linux. |
+| `digest_of` <sub>fn</sub> | [199](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L199) |  |
+| `now_seconds` <sub>fn</sub> | [209](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L209) |  |
+| `contents` <sub>pub fn</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L226) | The text a canary is filled with. |
+| `FILLER` <sub>const</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L255) | Plain sentences, in the project's own register, repeated to make a body. |
+| `Nest::new` <sub>pub fn</sub> | [265](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L265) | An empty nest. |
+| `Nest::len` <sub>pub fn</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L270) | How many canaries are planted. |
+| `Nest::is_empty` <sub>pub fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L275) | Whether nothing is planted. |
+| `Nest::canaries` <sub>pub fn</sub> | [280](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L280) | The planted canaries, in a stable order. |
+| `Nest::plant` <sub>pub fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L292) | Write a canary into dir and record it. |
+| `Nest::pull_up` <sub>pub fn</sub> | [340](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L340) | Stop watching a canary, and delete it. |
+| `Nest::check` <sub>pub fn</sub> | [355](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L355) | Look at every canary. |
+| `Nest::trips` <sub>pub fn</sub> | [366](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L366) | Only the canaries that are not intact. |
+| `Nest::to_text` <sub>pub fn</sub> | [374](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L374) | Serialise to the text format described at the top of this module. |
+| `Nest::parse` <sub>pub fn</sub> | [387](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L387) | Parse the text format. |
+| `Nest::save` <sub>pub fn</sub> | [446](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L446) | Write the nest to path. |
+| `Nest::load` <sub>pub fn</sub> | [457](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L457) | Read a nest written by Nest::save. |
+| `state_of` <sub>fn</sub> | [462](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L462) |  |
 
 ---
 
