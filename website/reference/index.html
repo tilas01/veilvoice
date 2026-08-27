@@ -95,6 +95,7 @@
 <li><a href="veilvoice-cli/atrest.html"><code>atrest.rs</code></a> <span style="color:var(--muted)">Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.</span></li>
 <li><a href="veilvoice-cli/capture.html"><code>capture.rs</code></a> <span style="color:var(--muted)">veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.</span></li>
 <li><a href="veilvoice-cli/conversation.html"><code>conversation.rs</code></a> <span style="color:var(--muted)">veilvoice conversation -- several speakers, a voice each, and subtitles.</span></li>
+<li><a href="veilvoice-cli/failsafe.html"><code>failsafe.rs</code></a> <span style="color:var(--muted)">veilvoice failsafe &#8212; the safety catch, and what it can and cannot do.</span></li>
 <li><a href="veilvoice-cli/guard.html"><code>guard.rs</code></a> <span style="color:var(--muted)">veilvoice guard -- record what VeilVoice&#x27;s files should be, and check them.</span></li>
 <li><a href="veilvoice-cli/input.html"><code>input.rs</code></a> <span style="color:var(--muted)">veilvoice input &#8212; what running programs can see your keyboard and mouse.</span></li>
 <li><a href="veilvoice-cli/lock.html"><code>lock.rs</code></a> <span style="color:var(--muted)">veilvoice lock &#8212; manage the application lock from the command line.</span></li>
@@ -162,6 +163,14 @@
 <li><a href="veilvoice-drivers/linux.html"><code>linux.rs</code></a> <span style="color:var(--muted)">Linux: /proc/modules, cross-checked against /sys/module.</span></li>
 <li><a href="veilvoice-drivers/macos.html"><code>macos.rs</code></a> <span style="color:var(--muted)">macOS: kmutil showloaded, falling back to kextstat.</span></li>
 <li><a href="veilvoice-drivers/windows.html"><code>windows.rs</code></a> <span style="color:var(--muted)">Windows: driverquery.exe, which the system already ships.</span></li>
+</ul>
+</section>
+<section id="veilvoice-failsafe">
+<h2><a href="veilvoice-failsafe.html">veilvoice-failsafe</a></h2>
+<p>The safety catch: notice the moment another program takes a real microphone while you are being veiled, and act -- without ever claiming to have prevented it.</p>
+<ul>
+<li><a href="veilvoice-failsafe/act.html"><code>act.rs</code></a> <span style="color:var(--muted)">Actually closing a program, kept apart from deciding to.</span></li>
+<li><a href="veilvoice-failsafe/lib.html"><code>lib.rs</code></a> <span style="color:var(--muted)">Failsafe: nothing leaves this machine in your own voice by accident.</span></li>
 </ul>
 </section>
 <section id="veilvoice-guard">

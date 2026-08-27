@@ -188,6 +188,20 @@ impl Settings {
         self.prefs.always_group
     }
 
+    /// The Failsafe posture in force.
+    pub fn failsafe(&self) -> veilvoice_failsafe::Posture {
+        veilvoice_failsafe::Posture::from_key(&self.prefs.failsafe)
+    }
+
+    /// Record the Failsafe posture.
+    pub fn set_failsafe(&mut self, posture: veilvoice_failsafe::Posture) {
+        if self.failsafe() == posture {
+            return;
+        }
+        self.prefs.failsafe = posture.key().to_string();
+        self.persist();
+    }
+
     /// How notifications should be shown.
     pub fn notify_style(&self) -> crate::notify::Style {
         crate::notify::Style::from_key(&self.prefs.notify_style)
@@ -213,6 +227,40 @@ impl Settings {
 
     /// Which tabs the window offers.
     fn interface_page(&mut self, ui: &mut Ui) {
+        section(ui, "Failsafe", "The safety catch. On by default.");
+
+        let current = self.failsafe();
+        ui.horizontal(|ui| {
+            for posture in veilvoice_failsafe::Posture::ALL {
+                if ui
+                    .selectable_label(current == *posture, posture.label())
+                    .clicked()
+                    && current != *posture
+                {
+                    self.set_failsafe(*posture);
+                }
+            }
+        });
+        ui.label(
+            RichText::new(format!("  {}", self.failsafe().note()))
+                .small()
+                .color(if self.failsafe().is_on() {
+                    p::muted()
+                } else {
+                    // Off is a real choice and it is not a neutral one. The
+                    // colour says so without the words having to shout.
+                    p::yellow()
+                }),
+        );
+        ui.add_space(4.0);
+        for note in [
+            veilvoice_failsafe::CANNOT_PREVENT,
+            veilvoice_failsafe::NEVER_CLOSES,
+        ] {
+            ui.label(RichText::new(format!("  {note}")).small().color(p::muted()));
+        }
+        ui.add_space(12.0);
+
         section(
             ui,
             "Notifications",
@@ -872,6 +920,7 @@ mod tests {
                 animated_icon: false,
                 configured: true,
                 notify_style: "overlay".into(),
+                failsafe: "close".into(),
                 hide_install_tab: false,
                 always_group: false,
                 recovered_from_corrupt_file: false,
