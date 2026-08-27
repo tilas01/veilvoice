@@ -1,0 +1,13 @@
+[package]
+name = "veilvoice-failsafe"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "The safety catch: notice the moment another program takes a real microphone while you are being veiled, and act -- without ever claiming to have prevented it."
+
+# None. The caller supplies who holds what, so this crate is arithmetic over a
+# list and its tests need no machine, no microphone and no platform.
+[dependencies]

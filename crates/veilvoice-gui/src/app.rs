@@ -168,6 +168,11 @@ pub struct VeilVoiceApp {
     /// The input-file picker, while it is open.
     choosing_input: crate::dialog::Pending,
 
+    /// The safety catch. On by default; see `veilvoice_failsafe`.
+    failsafe: veilvoice_failsafe::Guard,
+    /// What Failsafe last found, so the panel and the notice agree.
+    failsafe_finding: Option<veilvoice_failsafe::Finding>,
+
     /// What is being shown to the reader right now, if anything.
     ///
     /// One at a time. A stack of cards covering the window is how somebody
@@ -276,6 +281,8 @@ impl VeilVoiceApp {
                 .reseed_range_ms,
             notice: None,
             choosing_input: crate::dialog::Pending::new(),
+            failsafe: veilvoice_failsafe::Guard::new(),
+            failsafe_finding: None,
             input: None,
             output: None,
             clean_metadata: true,
@@ -581,6 +588,7 @@ impl eframe::App for VeilVoiceApp {
         });
 
         self.watch.drain();
+        self.check_failsafe();
         self.updates.drain();
         self.group.drain();
         self.verify.drain();
@@ -1034,6 +1042,89 @@ impl VeilVoiceApp {
             Ok(session) => self.session = Some(session),
             Err(e) => self.live_error = Some(e.to_string()),
         }
+    }
+
+    /// Ask the safety catch what it makes of what is holding a microphone.
+    ///
+    /// Called once a frame, straight after the watch feed is drained, because
+    /// that is where the information arrives. The decision is arithmetic over a
+    /// list -- see `veilvoice_failsafe` -- so doing it every frame costs
+    /// nothing and means the answer is never a frame out of date.
+    ///
+    /// **Closing a program is done here and nowhere else**, and only when the
+    /// guard has said it may be.
+    fn check_failsafe(&mut self) {
+        self.failsafe.posture = self.preferences.failsafe();
+        if !self.failsafe.posture.is_on() {
+            self.failsafe_finding = None;
+            return;
+        }
+
+        // What VeilVoice is itself veiling, so a program on our own cable is
+        // not mistaken for the accident.
+        self.failsafe.live = self.session.is_some();
+        self.failsafe.veiling = self.chosen_output.clone();
+
+        let holders: Vec<veilvoice_failsafe::Holder> = self
+            .watch
+            .active()
+            .iter()
+            .filter(|use_| use_.kind == veilvoice_watch::DeviceKind::Microphone)
+            .map(|use_| veilvoice_failsafe::Holder {
+                app: use_.app.clone(),
+                pid: use_.pid,
+                device: use_.device.clone(),
+            })
+            .collect();
+        let problems: Vec<String> = self
+            .watch
+            .error()
+            .map(|e| e.to_string())
+            .into_iter()
+            .collect();
+
+        let finding = self.failsafe.look(&holders, &problems);
+
+        // Only act on a *change*, or the same program is closed and reported
+        // sixty times a second for as long as it takes to die.
+        let fresh = self.failsafe_finding.as_ref() != Some(&finding);
+        if fresh {
+            if let veilvoice_failsafe::Finding::Foreign {
+                app,
+                pid,
+                closeable,
+                ..
+            } = &finding
+            {
+                let words = finding.phrasing();
+                self.notice = Some(crate::notify::Notice::warn(words.clone()));
+                if *closeable {
+                    match veilvoice_failsafe::act::close(app, *pid) {
+                        Ok(done) => {
+                            self.failsafe
+                                .record(std::time::SystemTime::now(), app, true, &done)
+                        }
+                        Err(why) => {
+                            self.failsafe
+                                .record(std::time::SystemTime::now(), app, false, &why);
+                            // Said, not swallowed. A guard that tried and could
+                            // not is a different situation from one that did.
+                            self.notice = Some(crate::notify::Notice::warn(format!(
+                                "{words} It could not be closed: {why}"
+                            )));
+                        }
+                    }
+                } else {
+                    self.failsafe.record(
+                        std::time::SystemTime::now(),
+                        app,
+                        false,
+                        "left alone: protected, or the posture is warn-only",
+                    );
+                }
+            }
+        }
+        self.failsafe_finding = Some(finding);
     }
 
     /// Re-scan on a timer rather than every frame.

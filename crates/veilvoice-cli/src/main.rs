@@ -72,6 +72,7 @@ mod appctl;
 mod atrest;
 mod capture;
 mod conversation;
+mod failsafe;
 mod guard;
 mod input;
 mod lock;
@@ -374,6 +375,23 @@ enum Command {
     Capture {
         #[command(subcommand)]
         what: CaptureCommand,
+    },
+
+    /// The safety catch: what it watches for, and what it cannot do.
+    ///
+    /// Failsafe notices the moment another program picks up a **real**
+    /// microphone while you are being veiled -- the accident where you plug in
+    /// a headset and your computer quietly switches a call over to it, so your
+    /// own voice goes out with nothing on screen looking any different.
+    ///
+    /// It is on by default. **It cannot stop your computer handing a
+    /// microphone over**; it notices within about a second and acts, and the
+    /// difference between those two things is printed every time.
+    Failsafe {
+        /// The device VeilVoice is veiling into, so a program on that cable is
+        /// not mistaken for the accident.
+        #[arg(long)]
+        veiling: Option<String>,
     },
 
     /// What VeilVoice is running with, and what that lets it see.
@@ -1072,6 +1090,8 @@ fn run(command: Command) -> Result<(), String> {
                 one_voice,
             ),
         },
+
+        Command::Failsafe { veiling } => failsafe::show(veiling.as_deref()),
 
         Command::Privilege => priv_mode::show(),
 

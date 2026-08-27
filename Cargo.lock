@@ -4862,6 +4862,7 @@ dependencies = [
  "veilvoice-conversation",
  "veilvoice-core",
  "veilvoice-crypto",
+ "veilvoice-failsafe",
  "veilvoice-guard",
  "veilvoice-input",
  "veilvoice-meta",
@@ -4922,6 +4923,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "veilvoice-failsafe"
+version = "0.1.13"
+
+[[package]]
 name = "veilvoice-guard"
 version = "0.1.13"
 dependencies = [
@@ -4943,6 +4948,7 @@ dependencies = [
  "veilvoice-conversation",
  "veilvoice-core",
  "veilvoice-crypto",
+ "veilvoice-failsafe",
  "veilvoice-meta",
  "veilvoice-policy",
  "veilvoice-setup",
