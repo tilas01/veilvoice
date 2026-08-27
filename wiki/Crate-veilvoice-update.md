@@ -105,4 +105,4 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`lib.rs`|File-veilvoice-update-lib]] | 536 | Ask, only when told to, whether a newer VeilVoice release exists. |
-| [[`ask.rs`|File-veilvoice-update-examples-ask]] | 19 | Run the real check once, by hand. |
+| [[`ask.rs`|File-veilvoice-update-examples-ask]] | 26 | Run the real check once, by hand. |

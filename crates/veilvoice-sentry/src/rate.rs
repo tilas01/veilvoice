@@ -63,6 +63,17 @@
 //! A modification time the platform did not report is written as `-`, which is
 //! not the same as zero: zero is a real instant in 1970 and files claiming it
 //! do exist.
+//!
+//! # In plain words
+//!
+//! Watches how much of a folder is changing and how quickly.
+//!
+//! A few files changing is somebody working. Hundreds changing in a minute is
+//! something else, and worth being told about.
+//!
+//! It measures how much and how fast, and nothing more. It does not know which
+//! program is responsible and does not guess, because a monitor that names the
+//! wrong program is worse than one that names none.
 
 use crate::Error;
 use std::collections::BTreeMap;

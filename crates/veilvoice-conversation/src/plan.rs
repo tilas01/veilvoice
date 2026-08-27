@@ -45,6 +45,19 @@
 //!
 //! Overlapping turns are allowed, because people talk over each other, and
 //! [`crate::render`] mixes them rather than picking a winner.
+//!
+//! # In plain words
+//!
+//! A list of who is in a recording and when each of them speaks.
+//!
+//! VeilVoice does not work this out for itself. Deciding who is talking at any
+//! moment is a hard problem that needs a trained model, and this project does not
+//! ship one, so it asks instead. You either write the times down, or you record
+//! each person on their own microphone.
+//!
+//! That is less convenient and it is honest. A program that guessed would
+//! sometimes put one person's words in another person's voice, and you would not
+//! find out by listening, because the result would sound perfectly fine.
 
 use crate::Error;
 use std::path::PathBuf;

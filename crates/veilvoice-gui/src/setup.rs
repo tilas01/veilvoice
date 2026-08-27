@@ -38,6 +38,19 @@
 //!
 //! The strip honours the reduced-motion decision like everything else: with
 //! motion off it is a static bar and a word, not a frozen animation.
+//!
+//! # In plain words
+//!
+//! The tab that installs this copy, removes it again, and points at the optional
+//! extra software.
+//!
+//! It is only a front end: every decision about where files go and what gets
+//! changed lives in one place shared with the command line, so the two cannot
+//! disagree about what "installed" means.
+//!
+//! Nothing here installs anything belonging to somebody else without being asked.
+//! What each thing is, who makes it and what it is for are shown first, and the
+//! exact command is shown before the question.
 
 use crate::theme::palette as p;
 use egui::{RichText, Ui};

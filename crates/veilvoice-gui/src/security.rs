@@ -40,6 +40,19 @@
 //! than implying otherwise. What it does is stop a passphrase lingering in a
 //! heap allocation long after it was needed, where a core dump or a swapped
 //! page could pick it up.
+//!
+//! # In plain words
+//!
+//! The lock on the window, and the encryption of the files VeilVoice writes.
+//!
+//! There are two passphrases and they do different jobs. One opens the
+//! application. The other encrypts a recording, and it is asked for separately
+//! because they protect different things and losing one should not mean losing the
+//! other.
+//!
+//! The panel says what the lock is worth and what it is not: it stops somebody who
+//! picks up your unlocked computer, and it does not stop somebody who has the
+//! disk. Encrypting the recording is what protects the recording.
 
 use crate::theme::palette as p;
 use egui::{Color32, RichText};

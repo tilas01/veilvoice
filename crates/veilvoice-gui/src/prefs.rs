@@ -33,6 +33,18 @@
 //! has told their operating system they do not want movement has already
 //! answered this question, and a privacy tool asking again -- and defaulting to
 //! yes -- would be ignoring them.
+//!
+//! # In plain words
+//!
+//! What you have chosen about how VeilVoice looks and behaves, kept in a small
+//! text file.
+//!
+//! Nothing in it is secret and nothing in it is required: delete the file and the
+//! application opens with its defaults. You can read it and edit it by hand.
+//!
+//! A setting this version does not recognise falls back to the default rather than
+//! stopping the program, and where the safe direction matters, the default is the
+//! one that keeps a protection on.
 
 use std::path::{Path, PathBuf};
 

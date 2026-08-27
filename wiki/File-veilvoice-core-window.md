@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-core/src/window.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 91 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs)
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 101 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs)
 
 ## Contents
 
 - [Why the periodic Hann window](#why-the-periodic-hann-window)
 - [Why the gain is computed rather than assumed](#why-the-gain-is-computed-rather-than-assumed)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -51,14 +52,24 @@ degenerate `sum(w^2) == 0` returns unity rather than infinity: this is a
 gain that gets multiplied into every output sample, and one non-finite value
 entering an engine with persistent state is permanent.
 
+# In plain words
+
+Two small pieces of arithmetic that decide how the overlapping slices of sound
+are faded in and out.
+
+They are short and they are easy to get subtly wrong in a way that does not
+look wrong: the sound still comes out, and it quietly has a faint hum through
+it, or the volume ripples. So both are written here once, with the reason, and
+checked.
+
 ## What this file contains
 
-91 lines defining **2 functions** (2 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+101 lines defining **2 functions** (2 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `hann` (line 47) -- Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design).
-- `ola_gain` (line 63) -- Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop.
+- `hann` (line 57) -- Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design).
+- `ola_gain` (line 73) -- Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop.
 
 ## What calls what
 
@@ -74,10 +85,10 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_hann(["hann<br/>line 47"])
-    n_ola_gain(["ola_gain<br/>line 63"])
-    click n_hann href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L47" "open the source"
-    click n_ola_gain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L63" "open the source"
+    n_hann(["hann<br/>line 57"])
+    n_ola_gain(["ola_gain<br/>line 73"])
+    click n_hann href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L57" "open the source"
+    click n_ola_gain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L73" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_hann,n_ola_gain entry
 ```
@@ -88,5 +99,5 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `hann` <sub>pub fn</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L47) | Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design). |
-| `ola_gain` <sub>pub fn</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L63) | Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop. |
+| `hann` <sub>pub fn</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L57) | Periodic Hann window of length n (the correct variant for STFT overlap-add, as opposed to the symmetric variant used for filter design). |
+| `ola_gain` <sub>pub fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs#L73) | Overlap-add normalisation for a window applied on both analysis and synthesis at the given hop. |

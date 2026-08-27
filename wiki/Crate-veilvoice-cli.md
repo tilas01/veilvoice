@@ -100,20 +100,20 @@ flowchart TD
     n_main(["main.rs<br/>2231 lines"])
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>272 lines"]
-    n_atrest["atrest.rs<br/>275 lines"]
-    n_capture["capture.rs<br/>321 lines"]
-    n_conversation["conversation.rs<br/>789 lines"]
+    n_atrest["atrest.rs<br/>286 lines"]
+    n_capture["capture.rs<br/>330 lines"]
+    n_conversation["conversation.rs<br/>797 lines"]
     n_decoy["decoy.rs<br/>58 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
-    n_guard["guard.rs<br/>338 lines"]
+    n_guard["guard.rs<br/>346 lines"]
     n_gui["gui.rs<br/>247 lines"]
     n_input["input.rs<br/>117 lines"]
-    n_lock["lock.rs<br/>239 lines"]
-    n_meter["meter.rs<br/>250 lines"]
-    n_policy["policy.rs<br/>236 lines"]
+    n_lock["lock.rs<br/>248 lines"]
+    n_meter["meter.rs<br/>259 lines"]
+    n_policy["policy.rs<br/>243 lines"]
     n_priv_mode["priv_mode.rs<br/>46 lines"]
-    n_sentry["sentry.rs<br/>376 lines"]
-    n_theme["theme.rs<br/>135 lines"]
+    n_sentry["sentry.rs<br/>384 lines"]
+    n_theme["theme.rs<br/>144 lines"]
     n_accel --> n_sentry
     n_accel --> n_theme
     n_appctl --> n_sentry
@@ -170,18 +170,18 @@ flowchart TD
 |---|---:|---|
 | [[`accel.rs`|File-veilvoice-cli-accel]] | 90 | veilvoice accel — the graphics hardware here, and what it is good for. |
 | [[`appctl.rs`|File-veilvoice-cli-appctl]] | 272 | veilvoice appctl — learn what normally runs, then notice what does not. |
-| [[`atrest.rs`|File-veilvoice-cli-atrest]] | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
-| [[`capture.rs`|File-veilvoice-cli-capture]] | 321 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
-| [[`conversation.rs`|File-veilvoice-cli-conversation]] | 789 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
+| [[`atrest.rs`|File-veilvoice-cli-atrest]] | 286 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
+| [[`capture.rs`|File-veilvoice-cli-capture]] | 330 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
+| [[`conversation.rs`|File-veilvoice-cli-conversation]] | 797 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [[`decoy.rs`|File-veilvoice-cli-decoy]] | 58 | veilvoice decoy — what a second passphrase is worth, and what it is not. |
 | [[`failsafe.rs`|File-veilvoice-cli-failsafe]] | 112 | veilvoice failsafe — the safety catch, and what it can and cannot do. |
-| [[`guard.rs`|File-veilvoice-cli-guard]] | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
+| [[`guard.rs`|File-veilvoice-cli-guard]] | 346 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [[`gui.rs`|File-veilvoice-cli-gui]] | 247 | veilvoice gui — open the desktop application from the command line. |
 | [[`input.rs`|File-veilvoice-cli-input]] | 117 | veilvoice input — what running programs can see your keyboard and mouse. |
-| [[`lock.rs`|File-veilvoice-cli-lock]] | 239 | veilvoice lock — manage the application lock from the command line. |
+| [[`lock.rs`|File-veilvoice-cli-lock]] | 248 | veilvoice lock — manage the application lock from the command line. |
 | [[`main.rs`|File-veilvoice-cli-main]] | 2231 | veilvoice — the command-line interface. |
-| [[`meter.rs`|File-veilvoice-cli-meter]] | 250 | Level meters for veilvoice live, on a scale that means something. |
-| [[`policy.rs`|File-veilvoice-cli-policy]] | 236 | veilvoice policy -- settings that can only be tightened. |
+| [[`meter.rs`|File-veilvoice-cli-meter]] | 259 | Level meters for veilvoice live, on a scale that means something. |
+| [[`policy.rs`|File-veilvoice-cli-policy]] | 243 | veilvoice policy -- settings that can only be tightened. |
 | [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] | 46 | veilvoice privilege — what VeilVoice is running with, and what it can see. |
-| [[`sentry.rs`|File-veilvoice-cli-sentry]] | 376 | veilvoice sentry -- canaries, baselines, and what changed since. |
-| [[`theme.rs`|File-veilvoice-cli-theme]] | 135 | Tokyo Night colouring for the terminal. |
+| [[`sentry.rs`|File-veilvoice-cli-sentry]] | 384 | veilvoice sentry -- canaries, baselines, and what changed since. |
+| [[`theme.rs`|File-veilvoice-cli-theme]] | 144 | Tokyo Night colouring for the terminal. |

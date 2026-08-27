@@ -26,6 +26,17 @@
 //!
 //! [`crate::page::player`] has already written a file that plays everywhere
 //! and needs nothing installed. The video file is the extra, not the product.
+//!
+//! # In plain words
+//!
+//! This works out the command that would turn the pictures and the veiled audio
+//! into a video file, and prints it for you to run.
+//!
+//! It does not run it, and VeilVoice does not contain a video encoder. Every
+//! usable one is a large piece of C code, and adding one would mean this project
+//! no longer being something you can read the whole of. So it writes out the
+//! command for `ffmpeg`, which many people already have, and leaves running it to
+//! you.
 
 use std::path::{Path, PathBuf};
 

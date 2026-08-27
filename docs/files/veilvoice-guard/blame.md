@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-guard/src/blame.rs`
 
-[`veilvoice-guard`](../../../crates/veilvoice-guard/README.md) &middot; 413 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs)
+[`veilvoice-guard`](../../../crates/veilvoice-guard/README.md) &middot; 421 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs)
 
 ## Contents
 
 - [Read this before relying on it](#read-this-before-relying-on-it)
 - [Where an answer can come from](#where-an-answer-can-come-from)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -51,19 +52,27 @@ of either is reported rather than hidden. Setting them up is a deliberate
 act by an administrator, and pretending otherwise would misrepresent what a
 clean report means.
 
+# In plain words
+
+Tries to say which program changed a file, and is careful about how sure it is.
+
+It is a guess built from what was running at the time. It can be wrong, and it
+says so with every answer. Naming the wrong program confidently is worse than
+naming none, because somebody acts on it.
+
 ## What this file contains
 
-413 lines defining **6 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+421 lines defining **6 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Blame` (line 94) -- What, if anything, is known about who changed a file.
+- `enum Blame` (line 102) -- What, if anything, is known about who changed a file.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Blame::describe` (line 115) -- A single line for a terminal, an alert or a log.
-- `Blame::is_known` (line 126) -- Whether an actual name was found.
-- `who_touched` (line 151) -- Try to name the program that last wrote to path.
+- `Blame::describe` (line 123) -- A single line for a terminal, an alert or a log.
+- `Blame::is_known` (line 134) -- Whether an actual name was found.
+- `who_touched` (line 159) -- Try to name the program that last wrote to path.
   - reaches: `unconfigured`
 
 ## What calls what
@@ -86,19 +95,19 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_no_window["no_window<br/>line 52"]
-    n_system_tool["system_tool<br/>line 79"]
-    n_describe(["Blame::describe<br/>line 115"])
-    n_is_known(["Blame::is_known<br/>line 126"])
-    n_unconfigured["unconfigured<br/>line 132"]
-    n_who_touched(["who_touched<br/>line 151"])
+    n_no_window["no_window<br/>line 60"]
+    n_system_tool["system_tool<br/>line 87"]
+    n_describe(["Blame::describe<br/>line 123"])
+    n_is_known(["Blame::is_known<br/>line 134"])
+    n_unconfigured["unconfigured<br/>line 140"]
+    n_who_touched(["who_touched<br/>line 159"])
     n_who_touched --> n_unconfigured
-    click n_no_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L52" "open the source"
-    click n_system_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L79" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L115" "open the source"
-    click n_is_known href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L126" "open the source"
-    click n_unconfigured href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L132" "open the source"
-    click n_who_touched href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L151" "open the source"
+    click n_no_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L60" "open the source"
+    click n_system_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L87" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L123" "open the source"
+    click n_is_known href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L134" "open the source"
+    click n_unconfigured href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L140" "open the source"
+    click n_who_touched href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L159" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_describe,n_is_known,n_who_touched entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -111,15 +120,15 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `no_window` <sub>fn</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L52) | Spawn without a console window. |
-| `system_tool` <sub>fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L79) | Resolve a system tool to an absolute path, rather than letting the operating system search for it. |
-| `Blame` <sub>pub enum</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L94) | What, if anything, is known about who changed a file. |
-| `Blame::describe` <sub>pub fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L115) | A single line for a terminal, an alert or a log. |
-| `Blame::is_known` <sub>pub fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L126) | Whether an actual name was found. |
-| `unconfigured` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L132) | Build the "nobody configured auditing" answer for this platform. |
-| `who_touched` <sub>pub fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L151) | Try to name the program that last wrote to path. |
-| `linux` <sub>mod</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L168) |  |
-| `windows` <sub>mod</sub> | [246](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L246) |  |
+| `no_window` <sub>fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L60) | Spawn without a console window. |
+| `system_tool` <sub>fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L87) | Resolve a system tool to an absolute path, rather than letting the operating system search for it. |
+| `Blame` <sub>pub enum</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L102) | What, if anything, is known about who changed a file. |
+| `Blame::describe` <sub>pub fn</sub> | [123](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L123) | A single line for a terminal, an alert or a log. |
+| `Blame::is_known` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L134) | Whether an actual name was found. |
+| `unconfigured` <sub>fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L140) | Build the "nobody configured auditing" answer for this platform. |
+| `who_touched` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L159) | Try to name the program that last wrote to path. |
+| `linux` <sub>mod</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L176) |  |
+| `windows` <sub>mod</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L254) |  |
 
 ---
 

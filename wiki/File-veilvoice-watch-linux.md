@@ -3,13 +3,14 @@
 
 # `crates/veilvoice-watch/src/linux.rs`
 
-[[veilvoice-watch|Crate-veilvoice-watch]] &middot; 192 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs)
+[[veilvoice-watch|Crate-veilvoice-watch]] &middot; 201 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs)
 
 ## Contents
 
 - [How it works](#how-it-works)
 - [Sound servers](#sound-servers)
 - [The permission boundary](#the-permission-boundary)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -43,13 +44,22 @@ root you therefore see your own processes; another user's are invisible.
 That is a kernel boundary, not a gap in this code, and `crate::support`
 says so rather than letting an empty list imply an empty machine.
 
+# In plain words
+
+Finds out which programs are using the microphone or camera on Linux, by
+looking at which of them have the device open.
+
+That is exactly what the system already knows and nothing has to be installed
+to ask. It sees what your own account can see, so something running as another
+user may not appear, and an empty list is not proof of a quiet machine.
+
 ## What this file contains
 
-192 lines defining **5 functions** (1 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+201 lines defining **5 functions** (1 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `scan` (line 37)
+- `scan` (line 46)
   - reaches: `classify`, `process_name`, `started_at`
 
 ## What calls what
@@ -66,19 +76,19 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_scan(["scan<br/>line 37"])
-    n_classify["classify<br/>line 94"]
-    n_process_name["process_name<br/>line 115"]
-    n_started_at["started_at<br/>line 126"]
-    n_approx_now_minus["approx_now_minus<br/>line 132"]
+    n_scan(["scan<br/>line 46"])
+    n_classify["classify<br/>line 103"]
+    n_process_name["process_name<br/>line 124"]
+    n_started_at["started_at<br/>line 135"]
+    n_approx_now_minus["approx_now_minus<br/>line 141"]
     n_scan --> n_classify
     n_scan --> n_process_name
     n_scan --> n_started_at
-    click n_scan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L37" "open the source"
-    click n_classify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L94" "open the source"
-    click n_process_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L115" "open the source"
-    click n_started_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L126" "open the source"
-    click n_approx_now_minus href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L132" "open the source"
+    click n_scan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L46" "open the source"
+    click n_classify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L103" "open the source"
+    click n_process_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L124" "open the source"
+    click n_started_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L135" "open the source"
+    click n_approx_now_minus href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L141" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_scan entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -91,8 +101,8 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `scan` <sub>pub fn</sub> | [37](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L37) |  |
-| `classify` <sub>fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L94) | Decide whether an open handle means capture. |
-| `process_name` <sub>fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L115) |  |
-| `started_at` <sub>fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L126) | When the process started, from the modification time of its /proc entry. |
-| `approx_now_minus` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L132) | Unused today; kept because a future PipeWire client lookup will want it. |
+| `scan` <sub>pub fn</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L46) |  |
+| `classify` <sub>fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L103) | Decide whether an open handle means capture. |
+| `process_name` <sub>fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L124) |  |
+| `started_at` <sub>fn</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L135) | When the process started, from the modification time of its /proc entry. |
+| `approx_now_minus` <sub>fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L141) | Unused today; kept because a future PipeWire client lookup will want it. |

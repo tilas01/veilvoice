@@ -25,6 +25,15 @@
 //! Escape sequences in a log file are worse than no colour: they survive into
 //! bug reports, pasted output and issue trackers, where they are noise that
 //! obscures the message somebody was trying to show you.
+//!
+//! # In plain words
+//!
+//! The colours and the layout of what the terminal prints.
+//!
+//! The same palette the window uses, so the two halves of VeilVoice look like one
+//! program. Colour is dropped automatically when the output is going into a file
+//! or another program rather than to a person, because escape codes in a log are
+//! noise.
 
 use std::io::IsTerminal;
 use std::sync::OnceLock;

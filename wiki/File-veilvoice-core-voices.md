@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-core/src/voices.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 853 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs)
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 866 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs)
 
 ## Contents
 
@@ -13,6 +13,7 @@
 - [A register has to land on a bin, and that is the whole constraint](#a-register-has-to-land-on-a-bin-and-that-is-the-whole-constraint)
 - [Ten voices, from four registers and three vocal tracts](#ten-voices-from-four-registers-and-three-vocal-tracts)
 - [If you change the frame size, check the table again](#if-you-change-the-frame-size-check-the-table-again)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -123,26 +124,39 @@ produce, and `distinct_voices` counts how many of the ten survive it — so
 a front end can say "this frame size gives you six distinguishable voices"
 rather than handing out ten labels for six sounds.
 
+# In plain words
+
+The set of voices a recording can be turned into.
+
+By default everyone comes out as the same one. That is on purpose: if every
+speaker sounds identical, there is nothing in the result that distinguishes one
+from another, and nothing to trace back.
+
+When a recording has several people in it that becomes a problem, because a
+listener cannot follow who is who. So there is a small set of destination
+voices to hand out instead, chosen to be as far apart as the arithmetic allows,
+and a measured limit on how many of them can genuinely be told apart by ear.
+
 ## What this file contains
 
-853 lines defining **11 functions** (11 public), **1 type** and **11 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+866 lines defining **11 functions** (11 public), **1 type** and **11 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Voice` (line 120) -- One destination voice: the canonical values every speaker in this slot is mapped onto.
+- `struct Voice` (line 133) -- One destination voice: the canonical values every speaker in this slot is mapped onto.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Voice::applied_to` (line 142) -- Apply this voice to an AccentConfig.
-- `Voice::checked` (line 169) -- Whether this voice is inside the range the engine can render usefully.
-- `Voice::describe` (line 213) -- A short label for an interface: "low register, narrow tract".
+- `Voice::applied_to` (line 155) -- Apply this voice to an AccentConfig.
+- `Voice::checked` (line 182) -- Whether this voice is inside the range the engine can render usefully.
+- `Voice::describe` (line 226) -- A short label for an interface: "low register, narrow tract".
   - reaches: `rendered_f0_hz`, `bin_hz`
-- `voice` (line 312) -- The destination voice for slot index.
-- `clear_voices` (line 393) -- How many voices can be handed out before two of them are too alike.
+- `voice` (line 325) -- The destination voice for slot index.
+- `clear_voices` (line 406) -- How many voices can be handed out before two of them are too alike.
   - reaches: `all`, `separation`
-- `closest_pair` (line 413) -- The closest pair among the first count voices, as a ratio.
+- `closest_pair` (line 426) -- The closest pair among the first count voices, as a ratio.
   - reaches: `all`, `separation`
-- `distinct_voices` (line 439) -- How many of the ten are still distinguishable under config.
+- `distinct_voices` (line 452) -- How many of the ten are still distinguishable under config.
   - reaches: `all`
 
 ## What calls what
@@ -159,17 +173,17 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_applied_to(["Voice::applied_to<br/>line 142"])
-    n_rendered_f0_hz["Voice::rendered_f0_hz<br/>line 156"]
-    n_checked(["Voice::checked<br/>line 169"])
-    n_describe(["Voice::describe<br/>line 213"])
-    n_bin_hz["bin_hz<br/>line 256"]
-    n_voice(["voice<br/>line 312"])
-    n_all["all<br/>line 323"]
-    n_separation["separation<br/>line 349"]
-    n_clear_voices(["clear_voices<br/>line 393"])
-    n_closest_pair(["closest_pair<br/>line 413"])
-    n_distinct_voices(["distinct_voices<br/>line 439"])
+    n_applied_to(["Voice::applied_to<br/>line 155"])
+    n_rendered_f0_hz["Voice::rendered_f0_hz<br/>line 169"]
+    n_checked(["Voice::checked<br/>line 182"])
+    n_describe(["Voice::describe<br/>line 226"])
+    n_bin_hz["bin_hz<br/>line 269"]
+    n_voice(["voice<br/>line 325"])
+    n_all["all<br/>line 336"]
+    n_separation["separation<br/>line 362"]
+    n_clear_voices(["clear_voices<br/>line 406"])
+    n_closest_pair(["closest_pair<br/>line 426"])
+    n_distinct_voices(["distinct_voices<br/>line 452"])
     n_clear_voices --> n_all
     n_clear_voices --> n_separation
     n_closest_pair --> n_all
@@ -177,17 +191,17 @@ flowchart TD
     n_describe --> n_rendered_f0_hz
     n_distinct_voices --> n_all
     n_rendered_f0_hz --> n_bin_hz
-    click n_applied_to href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L142" "open the source"
-    click n_rendered_f0_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L156" "open the source"
-    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L213" "open the source"
-    click n_bin_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L256" "open the source"
-    click n_voice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L312" "open the source"
-    click n_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L323" "open the source"
-    click n_separation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L349" "open the source"
-    click n_clear_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L393" "open the source"
-    click n_closest_pair href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L413" "open the source"
-    click n_distinct_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L439" "open the source"
+    click n_applied_to href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L155" "open the source"
+    click n_rendered_f0_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169" "open the source"
+    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L182" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L226" "open the source"
+    click n_bin_hz href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L269" "open the source"
+    click n_voice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L325" "open the source"
+    click n_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L336" "open the source"
+    click n_separation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L362" "open the source"
+    click n_clear_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L406" "open the source"
+    click n_closest_pair href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L426" "open the source"
+    click n_distinct_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L452" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_applied_to,n_checked,n_describe,n_voice,n_clear_voices,n_closest_pair,n_distinct_voices entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -200,26 +214,26 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `MAX_VOICES` <sub>pub const</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L115) | How many distinct destination voices this engine hands out. |
-| `Voice` <sub>pub struct</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L120) | One destination voice: the canonical values every speaker in this slot is mapped onto. |
-| `Voice::applied_to` <sub>pub fn</sub> | [142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L142) | Apply this voice to an AccentConfig. |
-| `Voice::rendered_f0_hz` <sub>pub fn</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L156) | The fundamental this voice will actually be rendered at, under config. |
-| `Voice::checked` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169) | Whether this voice is inside the range the engine can render usefully. |
-| `Voice::describe` <sub>pub fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L213) | A short label for an interface: "low register, narrow tract". |
-| `F0_MIN_HZ` <sub>pub const</sub> | [239](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L239) | The lowest fundamental a resynthesised voice stays intelligible at. |
-| `F0_MAX_HZ` <sub>pub const</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L241) | The highest fundamental that still reads as a speaking register. |
-| `CENTROID_MIN_HZ` <sub>pub const</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L243) | The narrowest canonical vocal tract offered. |
-| `CENTROID_MAX_HZ` <sub>pub const</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L245) | The widest canonical vocal tract offered. |
-| `TILT_MIN_DB_OCT` <sub>pub const</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L247) | The steepest permitted long-term slope, in dB per octave. |
-| `TILT_MAX_DB_OCT` <sub>pub const</sub> | [249](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L249) | The flattest permitted long-term slope, in dB per octave. |
-| `bin_hz` <sub>pub fn</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L256) | The FFT bin spacing of a configuration, in hertz. |
-| `REGISTERS_HZ` <sub>const</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L269) | The four registers, each a whole number of bins at the default configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz. |
-| `TRACTS` <sub>const</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L273) | The three vocal-tract scales, about 22 % apart. |
-| `TABLE` <sub>const</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L291) | The ten destination voices, in the order they are handed out. |
-| `voice` <sub>pub fn</sub> | [312](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L312) | The destination voice for slot index. |
-| `all` <sub>pub fn</sub> | [323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L323) | Every destination voice, in the order they are handed out. |
-| `separation` <sub>pub fn</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L349) | How far apart two voices are, as the larger of their two separations. |
-| `CLEAR_SEPARATION` <sub>pub const</sub> | [381](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L381) | The separation below which two voices should not be handed to two people. |
-| `clear_voices` <sub>pub fn</sub> | [393](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L393) | How many voices can be handed out before two of them are too alike. |
-| `closest_pair` <sub>pub fn</sub> | [413](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L413) | The closest pair among the first count voices, as a ratio. |
-| `distinct_voices` <sub>pub fn</sub> | [439](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L439) | How many of the ten are still distinguishable under config. |
+| `MAX_VOICES` <sub>pub const</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L128) | How many distinct destination voices this engine hands out. |
+| `Voice` <sub>pub struct</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L133) | One destination voice: the canonical values every speaker in this slot is mapped onto. |
+| `Voice::applied_to` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L155) | Apply this voice to an AccentConfig. |
+| `Voice::rendered_f0_hz` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L169) | The fundamental this voice will actually be rendered at, under config. |
+| `Voice::checked` <sub>pub fn</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L182) | Whether this voice is inside the range the engine can render usefully. |
+| `Voice::describe` <sub>pub fn</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L226) | A short label for an interface: "low register, narrow tract". |
+| `F0_MIN_HZ` <sub>pub const</sub> | [252](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L252) | The lowest fundamental a resynthesised voice stays intelligible at. |
+| `F0_MAX_HZ` <sub>pub const</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L254) | The highest fundamental that still reads as a speaking register. |
+| `CENTROID_MIN_HZ` <sub>pub const</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L256) | The narrowest canonical vocal tract offered. |
+| `CENTROID_MAX_HZ` <sub>pub const</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L258) | The widest canonical vocal tract offered. |
+| `TILT_MIN_DB_OCT` <sub>pub const</sub> | [260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L260) | The steepest permitted long-term slope, in dB per octave. |
+| `TILT_MAX_DB_OCT` <sub>pub const</sub> | [262](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L262) | The flattest permitted long-term slope, in dB per octave. |
+| `bin_hz` <sub>pub fn</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L269) | The FFT bin spacing of a configuration, in hertz. |
+| `REGISTERS_HZ` <sub>const</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L282) | The four registers, each a whole number of bins at the default configuration: bins 2, 3, 4 and 5 of a 1024-point frame at 48 kHz. |
+| `TRACTS` <sub>const</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L286) | The three vocal-tract scales, about 22 % apart. |
+| `TABLE` <sub>const</sub> | [304](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L304) | The ten destination voices, in the order they are handed out. |
+| `voice` <sub>pub fn</sub> | [325](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L325) | The destination voice for slot index. |
+| `all` <sub>pub fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L336) | Every destination voice, in the order they are handed out. |
+| `separation` <sub>pub fn</sub> | [362](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L362) | How far apart two voices are, as the larger of their two separations. |
+| `CLEAR_SEPARATION` <sub>pub const</sub> | [394](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L394) | The separation below which two voices should not be handed to two people. |
+| `clear_voices` <sub>pub fn</sub> | [406](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L406) | How many voices can be handed out before two of them are too alike. |
+| `closest_pair` <sub>pub fn</sub> | [426](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L426) | The closest pair among the first count voices, as a ratio. |
+| `distinct_voices` <sub>pub fn</sub> | [452](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs#L452) | How many of the ten are still distinguishable under config. |

@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-conversation/src/mode.rs`
 
-[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 271 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs)
+[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 286 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs)
 
 ## Contents
 
 - [The limit is measured, not chosen](#the-limit-is-measured-not-chosen)
 - [Two ways to be told apart, and the second one is safer](#two-ways-to-be-told-apart-and-the-second-one-is-safer)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -62,22 +63,37 @@ Uniform mode has **no speaker limit** from voices, because there is no
 second voice to collide with. The plan's own ten-speaker limit still
 applies, because ten names is already a great deal to follow.
 
+# In plain words
+
+How many people can be in one recording, and the choice between two ways of
+handling them.
+
+Give everybody a different voice and a listener can follow the conversation by
+ear, but only so many of the available voices are far enough apart to actually
+be told apart. That number was measured rather than picked, and the limit is
+real: past it, two people would sound like one person and you would only find
+out by listening to the finished recording.
+
+Give everybody the *same* voice and there is no limit, and it is more private,
+because the result no longer carries even the fact of who was speaker three.
+The price is that names and pictures become the only way to tell who is talking.
+
 ## What this file contains
 
-271 lines defining **6 functions** (5 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+286 lines defining **6 functions** (5 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum VoiceMode` (line 48) -- Whether speakers get different voices or one voice between them.
-- `enum TooMany` (line 113) -- Why a group cannot be rendered as asked.
+- `enum VoiceMode` (line 63) -- Whether speakers get different voices or one voice between them.
+- `enum TooMany` (line 128) -- Why a group cannot be rendered as asked.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `VoiceMode::label` (line 59) -- A short name, for a picker.
-- `VoiceMode::speaker_limit` (line 71) -- The most speakers this mode can carry under config.
-- `VoiceMode::voice_for` (line 84) -- The voice a slot gets in this mode.
-- `VoiceMode::note` (line 92) -- What this mode costs and buys, in the words a front end should show.
-- `check` (line 153) -- Whether this many speakers can be rendered in this mode.
+- `VoiceMode::label` (line 74) -- A short name, for a picker.
+- `VoiceMode::speaker_limit` (line 86) -- The most speakers this mode can carry under config.
+- `VoiceMode::voice_for` (line 99) -- The voice a slot gets in this mode.
+- `VoiceMode::note` (line 107) -- What this mode costs and buys, in the words a front end should show.
+- `check` (line 168) -- Whether this many speakers can be rendered in this mode.
 
 ## What calls what
 
@@ -99,18 +115,18 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_label(["VoiceMode::label<br/>line 59"])
-    n_speaker_limit(["VoiceMode::speaker_limit<br/>line 71"])
-    n_voice_for(["VoiceMode::voice_for<br/>line 84"])
-    n_note(["VoiceMode::note<br/>line 92"])
-    n_fmt["TooMany::fmt<br/>line 131"]
-    n_check(["check<br/>line 153"])
-    click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L59" "open the source"
-    click n_speaker_limit href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L71" "open the source"
-    click n_voice_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L84" "open the source"
-    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L92" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L131" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L153" "open the source"
+    n_label(["VoiceMode::label<br/>line 74"])
+    n_speaker_limit(["VoiceMode::speaker_limit<br/>line 86"])
+    n_voice_for(["VoiceMode::voice_for<br/>line 99"])
+    n_note(["VoiceMode::note<br/>line 107"])
+    n_fmt["TooMany::fmt<br/>line 146"]
+    n_check(["check<br/>line 168"])
+    click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L74" "open the source"
+    click n_speaker_limit href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L86" "open the source"
+    click n_voice_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L99" "open the source"
+    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L107" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L146" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L168" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_speaker_limit,n_voice_for,n_note,n_check entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -123,14 +139,14 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VoiceMode` <sub>pub enum</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L48) | Whether speakers get different voices or one voice between them. |
-| `VoiceMode::label` <sub>pub fn</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L59) | A short name, for a picker. |
-| `VoiceMode::speaker_limit` <sub>pub fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L71) | The most speakers this mode can carry under config. |
-| `VoiceMode::voice_for` <sub>pub fn</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L84) | The voice a slot gets in this mode. |
-| `VoiceMode::note` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L92) | What this mode costs and buys, in the words a front end should show. |
-| `TooMany` <sub>pub enum</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L113) | Why a group cannot be rendered as asked. |
-| `TooMany::fmt` <sub>fn</sub> | [131](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L131) |  |
-| `check` <sub>pub fn</sub> | [153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L153) | Whether this many speakers can be rendered in this mode. |
+| `VoiceMode` <sub>pub enum</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L63) | Whether speakers get different voices or one voice between them. |
+| `VoiceMode::label` <sub>pub fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L74) | A short name, for a picker. |
+| `VoiceMode::speaker_limit` <sub>pub fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L86) | The most speakers this mode can carry under config. |
+| `VoiceMode::voice_for` <sub>pub fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L99) | The voice a slot gets in this mode. |
+| `VoiceMode::note` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L107) | What this mode costs and buys, in the words a front end should show. |
+| `TooMany` <sub>pub enum</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L128) | Why a group cannot be rendered as asked. |
+| `TooMany::fmt` <sub>fn</sub> | [146](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L146) |  |
+| `check` <sub>pub fn</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L168) | Whether this many speakers can be rendered in this mode. |
 
 ---
 

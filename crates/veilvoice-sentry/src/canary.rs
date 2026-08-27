@@ -54,6 +54,17 @@
 //! VEILSENTRY-NEST1
 //! <sha256 hex>  <size>  <planted unix seconds>  <path>
 //! ```
+//!
+//! # In plain words
+//!
+//! Files VeilVoice puts in a folder and never touches again.
+//!
+//! Nothing should ever read or change them. If one does change, something has
+//! walked through that folder writing to everything in it, which is what
+//! ransomware does, and you have found out early.
+//!
+//! It does not stop anything. It is a tripwire, and its whole value is being
+//! noticed quickly.
 
 use crate::{entropy, Error};
 use sha2::{Digest, Sha256};

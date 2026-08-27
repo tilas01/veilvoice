@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/ffmpeg.svg" alt="ffmpeg.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/ffmpeg.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 305 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 316 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-there-is-no-encoder-here">Why there is no encoder here</a>
   <a href="#and-veilvoice-will-not-run-it-for-you">And VeilVoice will not run it for you</a>
   <a href="#if-the-machine-has-no-ffmpeg-nothing-has-failed">If the machine has no ffmpeg, nothing has failed</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -59,19 +60,22 @@
 <p><code>command</code> builds the argument list. Running it is the caller&#x27;s, and a front end should print it rather than execute it silently &#8212; the same rule the companion installer follows, for the same reason.</p>
 <h2 id="if-the-machine-has-no-ffmpeg-nothing-has-failed">If the machine has no ffmpeg, nothing has failed</h2>
 <p><code>crate::page::player</code> has already written a file that plays everywhere and needs nothing installed. The video file is the extra, not the product.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This works out the command that would turn the pictures and the veiled audio into a video file, and prints it for you to run.</p>
+<p>It does not run it, and VeilVoice does not contain a video encoder. Every usable one is a large piece of C code, and adding one would mean this project no longer being something you can read the whole of. So it writes out the command for <code>ffmpeg</code>, which many people already have, and leaves running it to you.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>305 lines defining <strong>5 functions</strong> (4 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>316 lines defining <strong>5 functions</strong> (4 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Encoding</code> <span style="color:var(--muted)">line 57</span> &mdash; How to render the file.</li>
+<li><code>struct Encoding</code> <span style="color:var(--muted)">line 68</span> &mdash; How to render the file.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>command</code> <span style="color:var(--muted)">line 101</span> &mdash; The command that turns a directory of numbered frames and a WAV into a video file.
+<li><code>command</code> <span style="color:var(--muted)">line 112</span> &mdash; The command that turns a directory of numbered frames and a WAV into a video file.
 </li>
-<li><code>command_line</code> <span style="color:var(--muted)">line 156</span> &mdash; The command as one line, for printing.
+<li><code>command_line</code> <span style="color:var(--muted)">line 167</span> &mdash; The command as one line, for printing.
 </li>
-<li><code>describe</code> <span style="color:var(--muted)">line 170</span> &mdash; What to tell the user about their machine&#x27;s ffmpeg.
+<li><code>describe</code> <span style="color:var(--muted)">line 181</span> &mdash; What to tell the user about their machine&#x27;s ffmpeg.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>found</code></span>
 </li>
 </ul>
@@ -84,30 +88,30 @@
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="564" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M326.6 147.0 C 348.6 147.0, 348.6 47.0, 104.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L37" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L48" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="60.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">found</text>
-<text x="60.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 37</text>
+<text x="60.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 48</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L76" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L87" target="_blank" rel="noopener noreferrer">
 <rect x="127.2" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="205.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Encoding::default</text>
-<text x="205.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 76</text>
+<text x="205.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L101" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L112" target="_blank" rel="noopener noreferrer">
 <rect x="310.4" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="354.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command</text>
-<text x="354.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
+<text x="354.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 112</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L156" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L167" target="_blank" rel="noopener noreferrer">
 <rect x="425.2" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="484.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_line</text>
-<text x="484.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 156</text>
+<text x="484.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 167</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L170" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L181" target="_blank" rel="noopener noreferrer">
 <rect x="237.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="282.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe</text>
-<text x="282.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
+<text x="282.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 181</text>
 </a>
 </svg>
 </div>
@@ -115,17 +119,17 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_found[&quot;found&lt;br/&gt;line 37&quot;]
-    n_default[&quot;Encoding::default&lt;br/&gt;line 76&quot;]
-    n_command([&quot;command&lt;br/&gt;line 101&quot;])
-    n_command_line([&quot;command_line&lt;br/&gt;line 156&quot;])
-    n_describe([&quot;describe&lt;br/&gt;line 170&quot;])
+    n_found[&quot;found&lt;br/&gt;line 48&quot;]
+    n_default[&quot;Encoding::default&lt;br/&gt;line 87&quot;]
+    n_command([&quot;command&lt;br/&gt;line 112&quot;])
+    n_command_line([&quot;command_line&lt;br/&gt;line 167&quot;])
+    n_describe([&quot;describe&lt;br/&gt;line 181&quot;])
     n_describe --&gt; n_found
-    click n_found href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L37&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L76&quot; &quot;open the source&quot;
-    click n_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L101&quot; &quot;open the source&quot;
-    click n_command_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L156&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L170&quot; &quot;open the source&quot;
+    click n_found href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L48&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L87&quot; &quot;open the source&quot;
+    click n_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L112&quot; &quot;open the source&quot;
+    click n_command_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L167&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L181&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_command,n_command_line,n_describe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -138,12 +142,12 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>found</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L37" rel="noopener noreferrer">37</a></td><td>Where ffmpeg is, if this machine has one.</td></tr>
-<tr><td><code>Encoding</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L57" rel="noopener noreferrer">57</a></td><td>How to render the file.</td></tr>
-<tr><td><code>Encoding::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L76" rel="noopener noreferrer">76</a></td><td></td></tr>
-<tr><td><code>command</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L101" rel="noopener noreferrer">101</a></td><td>The command that turns a directory of numbered frames and a WAV into a video file.</td></tr>
-<tr><td><code>command_line</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L156" rel="noopener noreferrer">156</a></td><td>The command as one line, for printing.</td></tr>
-<tr><td><code>describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L170" rel="noopener noreferrer">170</a></td><td>What to tell the user about their machine&#x27;s ffmpeg.</td></tr>
+<tr><td><code>found</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L48" rel="noopener noreferrer">48</a></td><td>Where ffmpeg is, if this machine has one.</td></tr>
+<tr><td><code>Encoding</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L68" rel="noopener noreferrer">68</a></td><td>How to render the file.</td></tr>
+<tr><td><code>Encoding::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L87" rel="noopener noreferrer">87</a></td><td></td></tr>
+<tr><td><code>command</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L112" rel="noopener noreferrer">112</a></td><td>The command that turns a directory of numbered frames and a WAV into a video file.</td></tr>
+<tr><td><code>command_line</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L167" rel="noopener noreferrer">167</a></td><td>The command as one line, for printing.</td></tr>
+<tr><td><code>describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L181" rel="noopener noreferrer">181</a></td><td>What to tell the user about their machine&#x27;s ffmpeg.</td></tr>
 </tbody></table>
 </section>
 </div></div>

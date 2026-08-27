@@ -34,6 +34,15 @@
 //! nothing at all — it is how candidates are found, never how they are judged.
 //! Every candidate still has to survive the signature and the hash, and a file
 //! that merely looks the part fails exactly as loudly as one that does not.
+//!
+//! # In plain words
+//!
+//! Looks for a downloaded release to check, so you can double-click the verifier
+//! and have it work.
+//!
+//! It looks in the folder it is in, the current folder, and your Downloads and
+//! Desktop. If it finds nothing it says exactly where it looked, rather than
+//! reporting a failure that leaves you guessing.
 
 use std::path::{Path, PathBuf};
 

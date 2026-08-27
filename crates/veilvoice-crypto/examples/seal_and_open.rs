@@ -8,6 +8,16 @@
 //
 // Compiled on every commit by `cargo clippy --workspace --all-targets`, so the
 // copy of this in `docs/USING_THE_CRATES.md` cannot quietly stop being true.
+//
+// In plain words
+// --------------
+//
+// A short example of encrypting a recording and opening it again, for somebody
+// who wants to use VeilVoice's encryption in their own program.
+//
+// It also shows the care taken with a typed passphrase: it is wiped as soon as
+// it has been used rather than left sitting in memory, which is the part most
+// examples of this kind quietly skip.
 
 use veilvoice_crypto::{container, kdf::KdfParams, Secret};
 

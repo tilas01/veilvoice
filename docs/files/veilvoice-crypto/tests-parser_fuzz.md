@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-crypto/tests/parser_fuzz.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 306 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 315 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs)
 
 ## Contents
 
 - [What is being defended](#what-is-being-defended)
 - [Why this and not cargo fuzz](#why-this-and-not-cargo-fuzz)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -56,13 +57,22 @@ commit, on every platform, by everybody.
 
 Set `VEILVOICE_FUZZ_ROUNDS` to run it longer than the default.
 
+# In plain words
+
+Throws malformed and deliberately hostile encrypted files at the code that
+reads them, in bulk.
+
+Reading a file somebody else made is where most security problems live. Every
+one of these has to be refused with a reason: never accepted, and never able to
+bring the program down.
+
 ## What this file contains
 
-306 lines defining **12 functions** (0 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+315 lines defining **12 functions** (0 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Rng` (line 41) -- xorshift32.
+- `struct Rng` (line 50) -- xorshift32.
 
 ## What calls what
 
@@ -84,18 +94,18 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new["Rng::new<br/>line 44"]
-    n_next_u32["Rng::next_u32<br/>line 47"]
-    n_below["Rng::below<br/>line 53"]
-    n_byte["Rng::byte<br/>line 60"]
-    n_rounds["rounds<br/>line 65"]
-    n_mutate["mutate<br/>line 77"]
-    n_weak["weak<br/>line 151"]
-    n_cheap["cheap<br/>line 169"]
-    n_the_container_header_parser_survives_hostile_input["the_container_header_parser_s…<br/>line 174"]
-    n_the_app_lock_parser_survives_hostile_input["the_app_lock_parser_survives_…<br/>line 225"]
-    n_both_parsers_survive_pure_noise["both_parsers_survive_pure_noi…<br/>line 265"]
-    n_every_length_around_a_boundary_is_handled["every_length_around_a_boundar…<br/>line 285"]
+    n_new["Rng::new<br/>line 53"]
+    n_next_u32["Rng::next_u32<br/>line 56"]
+    n_below["Rng::below<br/>line 62"]
+    n_byte["Rng::byte<br/>line 69"]
+    n_rounds["rounds<br/>line 74"]
+    n_mutate["mutate<br/>line 86"]
+    n_weak["weak<br/>line 160"]
+    n_cheap["cheap<br/>line 178"]
+    n_the_container_header_parser_survives_hostile_input["the_container_header_parser_s…<br/>line 183"]
+    n_the_app_lock_parser_survives_hostile_input["the_app_lock_parser_survives_…<br/>line 234"]
+    n_both_parsers_survive_pure_noise["both_parsers_survive_pure_noi…<br/>line 274"]
+    n_every_length_around_a_boundary_is_handled["every_length_around_a_boundar…<br/>line 294"]
     n_below --> n_next_u32
     n_both_parsers_survive_pure_noise --> n_cheap
     n_both_parsers_survive_pure_noise --> n_new
@@ -112,18 +122,18 @@ flowchart TD
     n_the_container_header_parser_survives_hostile_input --> n_new
     n_the_container_header_parser_survives_hostile_input --> n_rounds
     n_the_container_header_parser_survives_hostile_input --> n_weak
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L44" "open the source"
-    click n_next_u32 href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L47" "open the source"
-    click n_below href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L53" "open the source"
-    click n_byte href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L60" "open the source"
-    click n_rounds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L65" "open the source"
-    click n_mutate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L77" "open the source"
-    click n_weak href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L151" "open the source"
-    click n_cheap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L169" "open the source"
-    click n_the_container_header_parser_survives_hostile_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L174" "open the source"
-    click n_the_app_lock_parser_survives_hostile_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L225" "open the source"
-    click n_both_parsers_survive_pure_noise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L265" "open the source"
-    click n_every_length_around_a_boundary_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L285" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L53" "open the source"
+    click n_next_u32 href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L56" "open the source"
+    click n_below href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L62" "open the source"
+    click n_byte href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L69" "open the source"
+    click n_rounds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L74" "open the source"
+    click n_mutate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L86" "open the source"
+    click n_weak href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L160" "open the source"
+    click n_cheap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L178" "open the source"
+    click n_the_container_header_parser_survives_hostile_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L183" "open the source"
+    click n_the_app_lock_parser_survives_hostile_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L234" "open the source"
+    click n_both_parsers_survive_pure_noise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L274" "open the source"
+    click n_every_length_around_a_boundary_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L294" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_new,n_next_u32,n_below,n_byte,n_rounds,n_mutate,n_weak,n_cheap,n_the_container_header_parser_survives_hostile_input,n_the_app_lock_parser_survives_hostile_input,n_both_parsers_survive_pure_noise,n_every_length_around_a_boundary_is_handled helper
 ```
@@ -134,19 +144,19 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Rng` <sub>struct</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L41) | xorshift32. |
-| `Rng::new` <sub>fn</sub> | [44](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L44) |  |
-| `Rng::next_u32` <sub>fn</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L47) |  |
-| `Rng::below` <sub>fn</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L53) |  |
-| `Rng::byte` <sub>fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L60) |  |
-| `rounds` <sub>fn</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L65) |  |
-| `mutate` <sub>fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L77) | Mutate seed_bytes in one of the ways that break parsers in practice. |
-| `weak` <sub>fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L151) |  |
-| `cheap` <sub>fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L169) | Whether it is worth actually running the KDF for these parameters. |
-| `the_container_header_parser_survives_hostile_input` <sub>fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L174) |  |
-| `the_app_lock_parser_survives_hostile_input` <sub>fn</sub> | [225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L225) |  |
-| `both_parsers_survive_pure_noise` <sub>fn</sub> | [265](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L265) | Pure noise, with no valid seed to start from. |
-| `every_length_around_a_boundary_is_handled` <sub>fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L285) | The lengths a parser gets wrong are the ones either side of a boundary, and a random campaign hits them only by luck. |
+| `Rng` <sub>struct</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L50) | xorshift32. |
+| `Rng::new` <sub>fn</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L53) |  |
+| `Rng::next_u32` <sub>fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L56) |  |
+| `Rng::below` <sub>fn</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L62) |  |
+| `Rng::byte` <sub>fn</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L69) |  |
+| `rounds` <sub>fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L74) |  |
+| `mutate` <sub>fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L86) | Mutate seed_bytes in one of the ways that break parsers in practice. |
+| `weak` <sub>fn</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L160) |  |
+| `cheap` <sub>fn</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L178) | Whether it is worth actually running the KDF for these parameters. |
+| `the_container_header_parser_survives_hostile_input` <sub>fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L183) |  |
+| `the_app_lock_parser_survives_hostile_input` <sub>fn</sub> | [234](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L234) |  |
+| `both_parsers_survive_pure_noise` <sub>fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L274) | Pure noise, with no valid seed to start from. |
+| `every_length_around_a_boundary_is_handled` <sub>fn</sub> | [294](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L294) | The lengths a parser gets wrong are the ones either side of a boundary, and a random campaign hits them only by luck. |
 
 ---
 

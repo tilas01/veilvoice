@@ -37,6 +37,19 @@
 //! dropped, the next `send` fails, and the loop ends — which is the whole
 //! shutdown protocol and needs no flag, no channel back and no chance of
 //! hanging on exit waiting for a sleep to finish.
+//!
+//! # In plain words
+//!
+//! Keeps the microphone and camera monitor running somewhere other than the thread
+//! that draws the window.
+//!
+//! Asking the operating system which programs are using a device takes long enough
+//! to be visible if it happens while the window is being painted. So it happens on
+//! its own thread and the window reads whatever has arrived.
+//!
+//! If that thread ever stops, the panel says so plainly, because a monitor that
+//! has quietly not updated for an hour looks exactly like a machine where nothing
+//! is listening.
 
 use std::sync::mpsc;
 use std::time::Duration;

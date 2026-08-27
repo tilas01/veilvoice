@@ -33,6 +33,15 @@
 //! appearing here is therefore "something installed a driver", not "something
 //! is running in the kernel" — a real distinction, and the front end wording
 //! keeps it.
+//!
+//! # In plain words
+//!
+//! Asks Windows which drivers are loaded, using a tool Windows already ships.
+//!
+//! A driver runs inside the operating system itself, so one that arrived without
+//! you installing it is worth knowing about. Reading that list directly would mean
+//! writing code that talks to Windows at a level this project has chosen not to,
+//! so it asks the existing tool and reads the answer.
 
 #[cfg(any(target_os = "windows", test))]
 use crate::Module;

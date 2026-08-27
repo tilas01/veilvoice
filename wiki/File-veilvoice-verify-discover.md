@@ -3,13 +3,14 @@
 
 # `crates/veilvoice-verify/src/discover.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 344 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 353 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs)
 
 ## Contents
 
 - [Why this exists](#why-this-exists)
 - [Where it looks, and why in that order](#where-it-looks-and-why-in-that-order)
 - [What counts as a release archive](#what-counts-as-a-release-archive)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -49,20 +50,29 @@ nothing at all — it is how candidates are found, never how they are judged.
 Every candidate still has to survive the signature and the hash, and a file
 that merely looks the part fails exactly as loudly as one that does not.
 
+# In plain words
+
+Looks for a downloaded release to check, so you can double-click the verifier
+and have it work.
+
+It looks in the folder it is in, the current folder, and your Downloads and
+Desktop. If it finds nothing it says exactly where it looked, rather than
+reporting a failure that leaves you guessing.
+
 ## What this file contains
 
-344 lines defining **7 functions** (7 public), **1 type** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+353 lines defining **7 functions** (7 public), **1 type** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Found` (line 50) -- What was found in one directory.
+- `struct Found` (line 59) -- What was found in one directory.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Found::is_complete` (line 63) -- Whether this directory holds everything needed to verify offline.
-- `Found::is_empty` (line 68) -- Whether anything at all turned up.
-- `Found::missing` (line 73) -- What is missing, in words, for a message to the user.
-- `search` (line 171) -- Look everywhere worth looking and return the first directory that holds a complete, checkable set — or, failing that, everything that turned up.
+- `Found::is_complete` (line 72) -- Whether this directory holds everything needed to verify offline.
+- `Found::is_empty` (line 77) -- Whether anything at all turned up.
+- `Found::missing` (line 82) -- What is missing, in words, for a message to the user.
+- `search` (line 180) -- Look everywhere worth looking and return the first directory that holds a complete, checkable set — or, failing that, everything that turned up.
   - reaches: `look_in`, `places`, `looks_like_archive`
 
 ## What calls what
@@ -79,23 +89,23 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_is_complete(["Found::is_complete<br/>line 63"])
-    n_is_empty(["Found::is_empty<br/>line 68"])
-    n_missing(["Found::missing<br/>line 73"])
-    n_looks_like_archive["looks_like_archive<br/>line 91"]
-    n_look_in["look_in<br/>line 97"]
-    n_places["places<br/>line 130"]
-    n_search(["search<br/>line 171"])
+    n_is_complete(["Found::is_complete<br/>line 72"])
+    n_is_empty(["Found::is_empty<br/>line 77"])
+    n_missing(["Found::missing<br/>line 82"])
+    n_looks_like_archive["looks_like_archive<br/>line 100"]
+    n_look_in["look_in<br/>line 106"]
+    n_places["places<br/>line 139"]
+    n_search(["search<br/>line 180"])
     n_look_in --> n_looks_like_archive
     n_search --> n_look_in
     n_search --> n_places
-    click n_is_complete href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L63" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L68" "open the source"
-    click n_missing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L73" "open the source"
-    click n_looks_like_archive href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L91" "open the source"
-    click n_look_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L97" "open the source"
-    click n_places href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L130" "open the source"
-    click n_search href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L171" "open the source"
+    click n_is_complete href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L72" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L77" "open the source"
+    click n_missing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L82" "open the source"
+    click n_looks_like_archive href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L100" "open the source"
+    click n_look_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L106" "open the source"
+    click n_places href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L139" "open the source"
+    click n_search href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L180" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_complete,n_is_empty,n_missing,n_search entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -108,14 +118,14 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `ARCHIVES` <sub>const</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L41) | The extensions this project publishes releases as. |
-| `SUMS` <sub>pub const</sub> | [44](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L44) | The names of the two files a signed release carries beside its archives. |
-| `SUMS_SIG` <sub>pub const</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L46) | The detached signature over SUMS. |
-| `Found` <sub>pub struct</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L50) | What was found in one directory. |
-| `Found::is_complete` <sub>pub fn</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L63) | Whether this directory holds everything needed to verify offline. |
-| `Found::is_empty` <sub>pub fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L68) | Whether anything at all turned up. |
-| `Found::missing` <sub>pub fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L73) | What is missing, in words, for a message to the user. |
-| `looks_like_archive` <sub>pub fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L91) | Whether a filename looks like one of this project's release archives. |
-| `look_in` <sub>pub fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L97) | Look in one directory, one level deep. |
-| `places` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L130) | Every place worth looking, in order, without duplicates. |
-| `search` <sub>pub fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L171) | Look everywhere worth looking and return the first directory that holds a complete, checkable set — or, failing that, everything that turned up. |
+| `ARCHIVES` <sub>const</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L50) | The extensions this project publishes releases as. |
+| `SUMS` <sub>pub const</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L53) | The names of the two files a signed release carries beside its archives. |
+| `SUMS_SIG` <sub>pub const</sub> | [55](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L55) | The detached signature over SUMS. |
+| `Found` <sub>pub struct</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L59) | What was found in one directory. |
+| `Found::is_complete` <sub>pub fn</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L72) | Whether this directory holds everything needed to verify offline. |
+| `Found::is_empty` <sub>pub fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L77) | Whether anything at all turned up. |
+| `Found::missing` <sub>pub fn</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L82) | What is missing, in words, for a message to the user. |
+| `looks_like_archive` <sub>pub fn</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L100) | Whether a filename looks like one of this project's release archives. |
+| `look_in` <sub>pub fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L106) | Look in one directory, one level deep. |
+| `places` <sub>pub fn</sub> | [139](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L139) | Every place worth looking, in order, without duplicates. |
+| `search` <sub>pub fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L180) | Look everywhere worth looking and return the first directory that holds a complete, checkable set — or, failing that, everything that turned up. |

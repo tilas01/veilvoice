@@ -39,10 +39,11 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/spectral.svg" alt="spectral.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/spectral.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 428 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 442 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#voiced-frames-an-explicit-harmonic-comb">Voiced frames: an explicit harmonic comb</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -59,19 +60,23 @@
 <p>None of this weakens irreversibility. The measured phase is still discarded in full, and pinning the output to one canonical fundamental destroys <em>more</em> pitch information than randomising it would &#8212; a constant carries nothing.</p>
 <p>Between steps 2 and 4 the optional <code>crate::accent</code> neutraliser folds in its long-term corrections: it reads the unwarped envelope to measure the speaker&#x27;s vocal-tract scale, contributes extra pitch and formant ratios, and rotates the warped envelope toward a canonical spectral tilt.</p>
 <p>The measured phase is never reused, so no amount of downstream processing can reconstruct the original excitation phase &#8212; the transform is one-way.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is the part that actually destroys the voiceprint, and the step that cannot be undone.</p>
+<p>Sound carries two things: which frequencies are present, and how they line up in time. The second one, the timing, is a great deal of what makes a voice recognisably yours, and it is thrown away here and replaced. It is not scrambled or hidden; it is discarded, and there is nothing left to recover it from.</p>
+<p>What is kept is enough for the words to stay clear. That is the whole trade: the sentence survives, the speaker does not.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>428 lines defining <strong>5 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>442 lines defining <strong>5 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct SpectralState</code> <span style="color:var(--muted)">line 66</span> &mdash; Persistent per-instance state for the spectral transform.</li>
+<li><code>struct SpectralState</code> <span style="color:var(--muted)">line 80</span> &mdash; Persistent per-instance state for the spectral transform.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>SpectralState::new</code> <span style="color:var(--muted)">line 90</span> &mdash; n = FFT size, hop = analysis/synthesis hop, rand_phase = fixed per-bin phase offsets in radians (length n/2+1) drawn from the CSPRNG.
+<li><code>SpectralState::new</code> <span style="color:var(--muted)">line 104</span> &mdash; n = FFT size, hop = analysis/synthesis hop, rand_phase = fixed per-bin phase offsets in radians (length n/2+1) drawn from the CSPRNG.
 </li>
-<li><code>SpectralState::retarget_phase_offsets</code> <span style="color:var(--muted)">line 131</span> &mdash; Aim the per-bin phase offsets at fresh values.
+<li><code>SpectralState::retarget_phase_offsets</code> <span style="color:var(--muted)">line 145</span> &mdash; Aim the per-bin phase offsets at fresh values.
 </li>
-<li><code>SpectralState::transform</code> <span style="color:var(--muted)">line 145</span> &mdash; Rewrite spec (length n/2+1) in place, given the current modulation.
+<li><code>SpectralState::transform</code> <span style="color:var(--muted)">line 159</span> &mdash; Rewrite spec (length n/2+1) in place, given the current modulation.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>box_smooth</code>, <code>resample_linear</code></span>
 </li>
 </ul>
@@ -85,30 +90,30 @@
 <rect x="0" y="0" width="487" height="294" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M243.4 174.0 C 243.4 194.0, 327.4 200.0, 327.4 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M243.4 174.0 C 243.4 194.0, 178.4 200.0, 178.4 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L90" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L104" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="102.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SpectralState::new</text>
-<text x="102.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L131" target="_blank" rel="noopener noreferrer">
-<rect x="210.8" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="338.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SpectralState::retarget_phase&#8230;</text>
-<text x="338.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 131</text>
+<text x="102.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 104</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L145" target="_blank" rel="noopener noreferrer">
+<rect x="210.8" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="338.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SpectralState::retarget_phase&#8230;</text>
+<text x="338.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 145</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L159" target="_blank" rel="noopener noreferrer">
 <rect x="138.2" y="120.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="243.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">SpectralState::transform</text>
-<text x="243.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 145</text>
+<text x="243.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 159</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L279" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L293" target="_blank" rel="noopener noreferrer">
 <rect x="107.4" y="220.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="178.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">resample_linear</text>
-<text x="178.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
+<text x="178.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 293</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L300" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L314" target="_blank" rel="noopener noreferrer">
 <rect x="275.4" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="327.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">box_smooth</text>
-<text x="327.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 300</text>
+<text x="327.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 314</text>
 </a>
 </svg>
 </div>
@@ -116,18 +121,18 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_new([&quot;SpectralState::new&lt;br/&gt;line 90&quot;])
-    n_retarget_phase_offsets([&quot;SpectralState::retarget_phase&#8230;&lt;br/&gt;line 131&quot;])
-    n_transform([&quot;SpectralState::transform&lt;br/&gt;line 145&quot;])
-    n_resample_linear[&quot;resample_linear&lt;br/&gt;line 279&quot;]
-    n_box_smooth[&quot;box_smooth&lt;br/&gt;line 300&quot;]
+    n_new([&quot;SpectralState::new&lt;br/&gt;line 104&quot;])
+    n_retarget_phase_offsets([&quot;SpectralState::retarget_phase&#8230;&lt;br/&gt;line 145&quot;])
+    n_transform([&quot;SpectralState::transform&lt;br/&gt;line 159&quot;])
+    n_resample_linear[&quot;resample_linear&lt;br/&gt;line 293&quot;]
+    n_box_smooth[&quot;box_smooth&lt;br/&gt;line 314&quot;]
     n_transform --&gt; n_box_smooth
     n_transform --&gt; n_resample_linear
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L90&quot; &quot;open the source&quot;
-    click n_retarget_phase_offsets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L131&quot; &quot;open the source&quot;
-    click n_transform href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L145&quot; &quot;open the source&quot;
-    click n_resample_linear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L279&quot; &quot;open the source&quot;
-    click n_box_smooth href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L300&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L104&quot; &quot;open the source&quot;
+    click n_retarget_phase_offsets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L145&quot; &quot;open the source&quot;
+    click n_transform href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L159&quot; &quot;open the source&quot;
+    click n_resample_linear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L293&quot; &quot;open the source&quot;
+    click n_box_smooth href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L314&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_retarget_phase_offsets,n_transform entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -138,12 +143,12 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>SpectralState</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L66" rel="noopener noreferrer">66</a></td><td>Persistent per-instance state for the spectral transform.</td></tr>
-<tr><td><code>SpectralState::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L90" rel="noopener noreferrer">90</a></td><td>n = FFT size, hop = analysis/synthesis hop, rand_phase = fixed per-bin phase offsets in radians (length n/2+1) drawn from the CSPRNG.</td></tr>
-<tr><td><code>SpectralState::retarget_phase_offsets</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L131" rel="noopener noreferrer">131</a></td><td>Aim the per-bin phase offsets at fresh values.</td></tr>
-<tr><td><code>SpectralState::transform</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L145" rel="noopener noreferrer">145</a></td><td>Rewrite spec (length n/2+1) in place, given the current modulation.</td></tr>
-<tr><td><code>resample_linear</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L279" rel="noopener noreferrer">279</a></td><td>Linear resampling of a non-negative spectral function.</td></tr>
-<tr><td><code>box_smooth</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L300" rel="noopener noreferrer">300</a></td><td>In-place-ish box smoother using a running sum.</td></tr>
+<tr><td><code>SpectralState</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L80" rel="noopener noreferrer">80</a></td><td>Persistent per-instance state for the spectral transform.</td></tr>
+<tr><td><code>SpectralState::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L104" rel="noopener noreferrer">104</a></td><td>n = FFT size, hop = analysis/synthesis hop, rand_phase = fixed per-bin phase offsets in radians (length n/2+1) drawn from the CSPRNG.</td></tr>
+<tr><td><code>SpectralState::retarget_phase_offsets</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L145" rel="noopener noreferrer">145</a></td><td>Aim the per-bin phase offsets at fresh values.</td></tr>
+<tr><td><code>SpectralState::transform</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L159" rel="noopener noreferrer">159</a></td><td>Rewrite spec (length n/2+1) in place, given the current modulation.</td></tr>
+<tr><td><code>resample_linear</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L293" rel="noopener noreferrer">293</a></td><td>Linear resampling of a non-negative spectral function.</td></tr>
+<tr><td><code>box_smooth</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/spectral.rs#L314" rel="noopener noreferrer">314</a></td><td>In-place-ish box smoother using a running sum.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -21,6 +21,18 @@
 //! everything else. Anything unrecognised is discarded by default, which is the
 //! right bias for a privacy tool: the worst case is a lost non-essential chunk,
 //! not a leaked identity.
+//!
+//! # In plain words
+//!
+//! Strips the hidden information out of a WAV file specifically.
+//!
+//! WAV is built as a series of labelled sections, and the ones carrying the sound
+//! sit alongside ones carrying text somebody or some program wrote. Those are
+//! removed and the sound is copied through exactly, byte for byte.
+//!
+//! It gets its own path because WAV is what VeilVoice writes, so this is the one
+//! that runs on nearly every file it produces, and doing it directly means not
+//! handing VeilVoice's own output to a general-purpose parser.
 
 use crate::{Error, Policy, Report};
 

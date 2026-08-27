@@ -33,6 +33,18 @@
 //! no portable tightening to apply beyond that -- so on Windows this is an
 //! ordinary write, and says so rather than implying a protection it did not
 //! obtain.
+//!
+//! # In plain words
+//!
+//! Writes a file that only you can read.
+//!
+//! The important part is the order. The permissions are set as the file is
+//! created, not afterwards, because a file that exists for even a moment with the
+//! wrong permissions is a file somebody else's program may have read in that
+//! moment.
+//!
+//! When it cannot manage that, it says exactly why rather than just failing, since
+//! "could not write the key" is not something anybody can act on.
 
 use std::io::Write;
 use std::path::Path;

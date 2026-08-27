@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/io.svg" alt="io.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/io.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 555 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 569 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#a-decoder-is-a-parser-and-this-one-reads-files-somebody-else-made">A decoder is a parser, and this one reads files somebody else made</a>
   <a href="#writing-is-wav-only-and-that-is-a-decision">Writing is WAV only, and that is a decision</a>
   <a href="#in-memory-encoding-so-plaintext-never-reaches-the-disk">In-memory encoding, so plaintext never reaches the disk</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -60,22 +61,26 @@
 <p>Re-encoding to a lossy format after de-identification would throw away quality for no privacy benefit -- the voiceprint is already gone, and what remains is the words, which is the part worth keeping intact.</p>
 <h2 id="in-memory-encoding-so-plaintext-never-reaches-the-disk">In-memory encoding, so plaintext never reaches the disk</h2>
 <p><code>wav_bytes</code> exists so a recording can be encoded and then sealed without ever being written in the clear. It has an awkward shape for a real reason: <code>hound::WavWriter::finalize</code> consumes the writer, so the encode has to borrow the cursor (<code>WavWriter::new(&amp;mut cursor, spec)</code>) and read the bytes back through <code>cursor.into_inner()</code> after the writer has been dropped.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This opens sound files and writes them back out.</p>
+<p>It can read the usual formats, and it always writes plain WAV. That is deliberate: WAV throws nothing away. Saving as MP3 after the voice has been veiled would lose quality for no reason, and anybody who wants a smaller file can convert it afterwards with whatever they already use.</p>
+<p>Opening a sound file means reading a file somebody else made, which is the part of any program most worth being careful in. A file that is damaged, or built on purpose to cause trouble, is refused with a reason rather than being allowed to bring the program down.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>555 lines defining <strong>7 functions</strong> (6 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>569 lines defining <strong>7 functions</strong> (6 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Audio</code> <span style="color:var(--muted)">line 137</span> &mdash; Mono audio in memory.</li>
+<li><code>struct Audio</code> <span style="color:var(--muted)">line 151</span> &mdash; Mono audio in memory.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Audio::duration_secs</code> <span style="color:var(--muted)">line 146</span> &mdash; Duration in seconds.
+<li><code>Audio::duration_secs</code> <span style="color:var(--muted)">line 160</span> &mdash; Duration in seconds.
 </li>
-<li><code>Audio::peak</code> <span style="color:var(--muted)">line 154</span> &mdash; Peak absolute sample value.
+<li><code>Audio::peak</code> <span style="color:var(--muted)">line 168</span> &mdash; Peak absolute sample value.
 </li>
-<li><code>load</code> <span style="color:var(--muted)">line 165</span> &mdash; Decode any supported audio file to mono f32.
+<li><code>load</code> <span style="color:var(--muted)">line 179</span> &mdash; Decode any supported audio file to mono f32.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>preflight</code>, <code>read_up_to</code></span>
 </li>
-<li><code>save_wav</code> <span style="color:var(--muted)">line 309</span> &mdash; Write mono f32 audio to a 16-bit PCM WAV file.
+<li><code>save_wav</code> <span style="color:var(--muted)">line 323</span> &mdash; Write mono f32 audio to a 16-bit PCM WAV file.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>wav_bytes</code></span>
 </li>
 </ul>
@@ -90,40 +95,40 @@
 <path d="M582.8 47.0 C 604.8 47.0, 604.8 47.0, 127.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M538.4 74.0 C 538.4 94.0, 305.4 200.0, 305.4 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M411.0 147.0 C 433.0 147.0, 433.0 147.0, 299.2 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L92" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L106" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="76.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">preflight</text>
-<text x="76.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<text x="76.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 106</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L146" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L160" target="_blank" rel="noopener noreferrer">
 <rect x="150.4" y="20.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="240.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Audio::duration_secs</text>
-<text x="240.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 146</text>
+<text x="240.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 160</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L154" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L168" target="_blank" rel="noopener noreferrer">
 <rect x="356.4" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="412.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Audio::peak</text>
-<text x="412.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+<text x="412.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L165" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L179" target="_blank" rel="noopener noreferrer">
 <rect x="494.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="538.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load</text>
-<text x="538.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 165</text>
+<text x="538.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L268" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L282" target="_blank" rel="noopener noreferrer">
 <rect x="253.4" y="220.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="305.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_up_to</text>
-<text x="305.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 268</text>
+<text x="305.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 282</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L289" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L303" target="_blank" rel="noopener noreferrer">
 <rect x="199.8" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="248.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wav_bytes</text>
-<text x="248.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
+<text x="248.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 303</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L309" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L323" target="_blank" rel="noopener noreferrer">
 <rect x="322.2" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="366.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">save_wav</text>
-<text x="366.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 309</text>
+<text x="366.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 323</text>
 </a>
 </svg>
 </div>
@@ -131,23 +136,23 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_preflight[&quot;preflight&lt;br/&gt;line 92&quot;]
-    n_duration_secs([&quot;Audio::duration_secs&lt;br/&gt;line 146&quot;])
-    n_peak([&quot;Audio::peak&lt;br/&gt;line 154&quot;])
-    n_load([&quot;load&lt;br/&gt;line 165&quot;])
-    n_read_up_to[&quot;read_up_to&lt;br/&gt;line 268&quot;]
-    n_wav_bytes[&quot;wav_bytes&lt;br/&gt;line 289&quot;]
-    n_save_wav([&quot;save_wav&lt;br/&gt;line 309&quot;])
+    n_preflight[&quot;preflight&lt;br/&gt;line 106&quot;]
+    n_duration_secs([&quot;Audio::duration_secs&lt;br/&gt;line 160&quot;])
+    n_peak([&quot;Audio::peak&lt;br/&gt;line 168&quot;])
+    n_load([&quot;load&lt;br/&gt;line 179&quot;])
+    n_read_up_to[&quot;read_up_to&lt;br/&gt;line 282&quot;]
+    n_wav_bytes[&quot;wav_bytes&lt;br/&gt;line 303&quot;]
+    n_save_wav([&quot;save_wav&lt;br/&gt;line 323&quot;])
     n_load --&gt; n_preflight
     n_load --&gt; n_read_up_to
     n_save_wav --&gt; n_wav_bytes
-    click n_preflight href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L92&quot; &quot;open the source&quot;
-    click n_duration_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L146&quot; &quot;open the source&quot;
-    click n_peak href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L154&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L165&quot; &quot;open the source&quot;
-    click n_read_up_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L268&quot; &quot;open the source&quot;
-    click n_wav_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L289&quot; &quot;open the source&quot;
-    click n_save_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L309&quot; &quot;open the source&quot;
+    click n_preflight href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L106&quot; &quot;open the source&quot;
+    click n_duration_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L160&quot; &quot;open the source&quot;
+    click n_peak href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L168&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L179&quot; &quot;open the source&quot;
+    click n_read_up_to href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L282&quot; &quot;open the source&quot;
+    click n_wav_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L303&quot; &quot;open the source&quot;
+    click n_save_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L323&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_duration_secs,n_peak,n_load,n_save_wav entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -160,15 +165,15 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>MAX_DECODED_SAMPLES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L62" rel="noopener noreferrer">62</a></td><td>The most decoded audio load will hold, in mono f32 samples.</td></tr>
-<tr><td><code>preflight</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L92" rel="noopener noreferrer">92</a></td><td>Reject a file whose own header carries a value that will crash the decoder, before the decoder is given the file.</td></tr>
-<tr><td><code>Audio</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L137" rel="noopener noreferrer">137</a></td><td>Mono audio in memory.</td></tr>
-<tr><td><code>Audio::duration_secs</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L146" rel="noopener noreferrer">146</a></td><td>Duration in seconds.</td></tr>
-<tr><td><code>Audio::peak</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L154" rel="noopener noreferrer">154</a></td><td>Peak absolute sample value.</td></tr>
-<tr><td><code>load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L165" rel="noopener noreferrer">165</a></td><td>Decode any supported audio file to mono f32.</td></tr>
-<tr><td><code>read_up_to</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L268" rel="noopener noreferrer">268</a></td><td>Fill as much of buf as the file has, tolerating short reads.</td></tr>
-<tr><td><code>wav_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L289" rel="noopener noreferrer">289</a></td><td>Encode mono f32 audio as a 16-bit PCM WAV, in memory.</td></tr>
-<tr><td><code>save_wav</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L309" rel="noopener noreferrer">309</a></td><td>Write mono f32 audio to a 16-bit PCM WAV file.</td></tr>
+<tr><td><code>MAX_DECODED_SAMPLES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L76" rel="noopener noreferrer">76</a></td><td>The most decoded audio load will hold, in mono f32 samples.</td></tr>
+<tr><td><code>preflight</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L106" rel="noopener noreferrer">106</a></td><td>Reject a file whose own header carries a value that will crash the decoder, before the decoder is given the file.</td></tr>
+<tr><td><code>Audio</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L151" rel="noopener noreferrer">151</a></td><td>Mono audio in memory.</td></tr>
+<tr><td><code>Audio::duration_secs</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L160" rel="noopener noreferrer">160</a></td><td>Duration in seconds.</td></tr>
+<tr><td><code>Audio::peak</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L168" rel="noopener noreferrer">168</a></td><td>Peak absolute sample value.</td></tr>
+<tr><td><code>load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L179" rel="noopener noreferrer">179</a></td><td>Decode any supported audio file to mono f32.</td></tr>
+<tr><td><code>read_up_to</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L282" rel="noopener noreferrer">282</a></td><td>Fill as much of buf as the file has, tolerating short reads.</td></tr>
+<tr><td><code>wav_bytes</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L303" rel="noopener noreferrer">303</a></td><td>Encode mono f32 audio as a 16-bit PCM WAV, in memory.</td></tr>
+<tr><td><code>save_wav</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L323" rel="noopener noreferrer">323</a></td><td>Write mono f32 audio to a 16-bit PCM WAV file.</td></tr>
 </tbody></table>
 </section>
 </div></div>

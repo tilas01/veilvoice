@@ -28,6 +28,15 @@
 //! root you therefore see your own processes; another user's are invisible.
 //! That is a kernel boundary, not a gap in this code, and [`crate::support`]
 //! says so rather than letting an empty list imply an empty machine.
+//!
+//! # In plain words
+//!
+//! Finds out which programs are using the microphone or camera on Linux, by
+//! looking at which of them have the device open.
+//!
+//! That is exactly what the system already knows and nothing has to be installed
+//! to ask. It sees what your own account can see, so something running as another
+//! user may not appear, and an empty list is not proof of a quiet machine.
 
 use crate::{DeviceKind, DeviceUse, Error};
 use std::fs;

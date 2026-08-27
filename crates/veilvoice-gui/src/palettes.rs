@@ -52,6 +52,15 @@
 //! secondary text that is meant to recede, every built-in theme would fail at
 //! 4.5, and pretending otherwise would mean shipping a rule the project's own
 //! themes break.
+//!
+//! # In plain words
+//!
+//! Lets you write your own colour scheme and have VeilVoice use it.
+//!
+//! Drop a small text file in a folder and it appears in the list. Every colour has
+//! to be there, and the text has to be readable against the background: a scheme
+//! whose text fails that check is refused rather than applied, with the measured
+//! numbers so you know how far off it is and which way to move.
 
 use crate::theme::Theme;
 use egui::Color32;

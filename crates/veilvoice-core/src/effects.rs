@@ -43,6 +43,18 @@
 //! [`Chorus`] and [`Reverb`] own their delay lines and index them with wrapping
 //! arithmetic, so changing sample rate means building a new one rather than
 //! resizing a live one.
+//!
+//! # In plain words
+//!
+//! A few small finishing touches applied to the sound after the main work is done.
+//!
+//! They do two things. They loosen what remains of the connection between the
+//! result and the original recording, and they fill in the picture a spectrogram
+//! would show, so it looks like a dense, ordinary voice rather than something
+//! obviously processed.
+//!
+//! Every one of them is set gently by default, because all of them can hurt how
+//! clear the words are if pushed, and clear words are the point.
 
 use std::f32::consts::TAU;
 

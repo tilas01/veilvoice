@@ -3,13 +3,14 @@
 
 # `crates/veilvoice-audio/src/meter.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 154 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs)
+[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 166 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs)
 
 ## Contents
 
 - [Why this is here rather than in a front end](#why-this-is-here-rather-than-in-a-front-end)
 - [Why not linear](#why-not-linear)
 - [What it measures, and what it does not](#what-it-measures-and-what-it-does-not)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -47,15 +48,27 @@ sample exceeding 1.0. Catching those needs oversampling. A front end may say
 `CLIP` when a sample reaches full scale, and must not imply it caught the
 ones it cannot see.
 
+# In plain words
+
+This decides how a level meter is drawn, so that the bar and the number beside
+it always agree.
+
+They did not, once. Both the window and the terminal drew the bar filling
+evenly with the signal, while the number beside it was in decibels, which do
+not rise evenly at all. So the number could read -12 dB while the bar looked a
+quarter full, and a reader who noticed stopped trusting both.
+
+One piece of arithmetic, in one place, used by both. Now they cannot disagree.
+
 ## What this file contains
 
-154 lines defining **3 functions** (3 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+166 lines defining **3 functions** (3 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `position` (line 76) -- Where a level sits along a bar: 0.0 at the floor, 1.0 at full scale.
+- `position` (line 88) -- Where a level sits along a bar: 0.0 at the floor, 1.0 at full scale.
   - reaches: `dbfs`
-- `clipping` (line 81) -- Whether a reading counts as clipping.
+- `clipping` (line 93) -- Whether a reading counts as clipping.
   - reaches: `dbfs`
 
 ## What calls what
@@ -72,14 +85,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_dbfs["dbfs<br/>line 68"]
-    n_position(["position<br/>line 76"])
-    n_clipping(["clipping<br/>line 81"])
+    n_dbfs["dbfs<br/>line 80"]
+    n_position(["position<br/>line 88"])
+    n_clipping(["clipping<br/>line 93"])
     n_clipping --> n_dbfs
     n_position --> n_dbfs
-    click n_dbfs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L68" "open the source"
-    click n_position href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L76" "open the source"
-    click n_clipping href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L81" "open the source"
+    click n_dbfs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L80" "open the source"
+    click n_position href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L88" "open the source"
+    click n_clipping href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L93" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_position,n_clipping entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -92,8 +105,8 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `FLOOR_DB` <sub>pub const</sub> | [40](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L40) | The quietest level worth drawing. |
-| `CLIP_DB` <sub>pub const</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L51) | At or above this, the level is called clipping. |
-| `dbfs` <sub>pub fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L68) | Level in decibels relative to full scale. |
-| `position` <sub>pub fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L76) | Where a level sits along a bar: 0.0 at the floor, 1.0 at full scale. |
-| `clipping` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L81) | Whether a reading counts as clipping. |
+| `FLOOR_DB` <sub>pub const</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L52) | The quietest level worth drawing. |
+| `CLIP_DB` <sub>pub const</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L63) | At or above this, the level is called clipping. |
+| `dbfs` <sub>pub fn</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L80) | Level in decibels relative to full scale. |
+| `position` <sub>pub fn</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L88) | Where a level sits along a bar: 0.0 at the floor, 1.0 at full scale. |
+| `clipping` <sub>pub fn</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs#L93) | Whether a reading counts as clipping. |

@@ -8,6 +8,35 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Every file in the tree now explains itself twice
+
+Marker 52. Every crate already carried a technical note and a plain-words one.
+Now every **file** does: all 125 of them, including the build scripts, the
+examples and the test files.
+
+Eighty-five were written for this. None of them is a template. A formulaic
+sentence about each file would have satisfied the check and taught nobody
+anything, which is worse than the check failing, so each was written from what
+that file actually does and says the thing worth knowing about it:
+
+> **`spectral.rs`.** Sound carries two things: which frequencies are present,
+> and how they line up in time. The second one, the timing, is a great deal of
+> what makes a voice recognisably yours, and it is thrown away here and
+> replaced. It is not scrambled or hidden; it is discarded, and there is
+> nothing left to recover it from.
+
+> **`shred.rs`.** This is meant to destroy a file, and the first thing it does
+> is tell you how much that is worth. On the drives most computers now have,
+> overwriting a file does not reliably remove it.
+
+> **`plan.rs`.** VeilVoice does not work this out for itself. A program that
+> guessed would sometimes put one person's words in another person's voice, and
+> you would not find out by listening, because the result would sound perfectly
+> fine.
+
+The website, the wiki and the reference pages are regenerated from these, so
+every file's page now carries both halves.
+
 ### A second passphrase, and the one that does not exist
 
 ```

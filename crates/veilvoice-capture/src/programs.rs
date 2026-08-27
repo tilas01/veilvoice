@@ -24,6 +24,19 @@
 //! Telling the difference needs the compositor to say who is holding a capture
 //! session, and reaching that is FFI on every platform here. See
 //! [`crate`] for what that costs and why it is not paid.
+//!
+//! # In plain words
+//!
+//! A list of programs that can record a screen, with what each one is and whether
+//! recording is its purpose or merely something it can do.
+//!
+//! The difference matters. A screen recorder being open is worth telling you
+//! about. A chat program being open is worth much less, because it can share a
+//! screen and almost never is, and treating the two the same is how a warning
+//! becomes noise that everybody learns to ignore.
+//!
+//! This is a list of names, not a list of threats. Almost everything on it is
+//! software somebody installed on purpose.
 
 /// One program known to be able to capture a screen.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

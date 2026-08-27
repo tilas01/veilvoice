@@ -26,6 +26,18 @@
 //! decryption fail rather than silently changing behaviour. Unused fields are
 //! written as zero and are still authenticated, so they cannot be used as a
 //! covert channel or a downgrade vector.
+//!
+//! # In plain words
+//!
+//! The shape of an encrypted `.veil` file.
+//!
+//! Everything needed to open it travels inside it, apart from the passphrase or
+//! the key. That means a file made today still opens years later, even after
+//! VeilVoice has changed how hard it makes the encryption by default: the file
+//! remembers what it was made with.
+//!
+//! The part at the front that describes the file is itself covered by the tamper
+//! check, so it cannot be edited to make the rest open more easily.
 
 use crate::{aead, hybrid, kdf, Error, Secret};
 

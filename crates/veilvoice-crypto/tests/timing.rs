@@ -20,6 +20,15 @@
 //! *catastrophic* regression — someone replacing a constant-time comparison
 //! with `==`, which shows up as a difference of orders of magnitude — not to
 //! certify a bound in nanoseconds, which this method cannot honestly do.
+//!
+//! # In plain words
+//!
+//! Measures whether checking a password takes a different amount of time depending
+//! on how wrong it is.
+//!
+//! If it did, somebody could work out a password one character at a time by
+//! watching the clock rather than by guessing. This runs the comparison many times
+//! and checks that the timing says nothing.
 
 use std::time::{Duration, Instant};
 use veilvoice_crypto::{container, kdf, lock};

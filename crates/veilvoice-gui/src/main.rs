@@ -34,6 +34,15 @@
 //! still fits a 1366 by 768 laptop with its taskbar. Anything bigger opens
 //! partly off the bottom of a common screen, which looks like a broken
 //! application rather than a generous one.
+//!
+//! # In plain words
+//!
+//! Opens the window and hands over to the rest of the application.
+//!
+//! Almost nothing happens here. Everything of substance lives beside it in code
+//! that can be tested without a screen, and this file holds only the few things
+//! that genuinely need a window to exist: its size, its icon, and making sure a
+//! failure to open leaves a message behind.
 // No console window on Windows for a release build; a debug build keeps it so
 // panics and `eprintln!` stay visible while developing.
 #![cfg_attr(

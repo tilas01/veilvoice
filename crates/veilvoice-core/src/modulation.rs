@@ -12,6 +12,19 @@
 //! The seed does not stay put either. It is rolled forward every couple of
 //! seconds by default (see [`Modulator::reseed`]), so the stream driving any
 //! given stretch of audio is closed off permanently once that stretch is past.
+//!
+//! # In plain words
+//!
+//! The amount by which the voice is altered is never held still. It drifts,
+//! constantly and unpredictably.
+//!
+//! The drift comes from the same kind of random number generator used for
+//! encryption, so it cannot be guessed, worked out from what came before, or
+//! reproduced by somebody who has the recording. It slides between values rather
+//! than jumping, so nothing about it can be heard.
+//!
+//! This is what stops the transform from being reversed by anybody who works out
+//! the settings, because there is no single setting to work out.
 
 use rand::Rng;
 use rand::RngCore;

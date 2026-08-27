@@ -19,6 +19,18 @@
 //! There is no timer, no check at startup, and no "check again" on a schedule.
 //! [`Updates`] holds no clock. The only path into `veilvoice_update::check` is
 //! a click, and a test asserts the state a freshly built panel is in.
+//!
+//! # In plain words
+//!
+//! The update check, as a button you press.
+//!
+//! VeilVoice never checks on its own and never contacts anything unless you ask.
+//! An update check that runs by itself is a message to somebody else's server
+//! saying that this copy exists and is running now.
+//!
+//! When you do press it, it compares your version against the newest published one
+//! and tells you what it found, including that the answer only tells you what a
+//! release page says.
 
 use crate::theme::palette as p;
 use eframe::egui::{self, RichText, Ui};

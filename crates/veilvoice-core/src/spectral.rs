@@ -56,6 +56,20 @@
 //!
 //! The measured phase is never reused, so no amount of downstream processing can
 //! reconstruct the original excitation phase — the transform is one-way.
+//!
+//! # In plain words
+//!
+//! This is the part that actually destroys the voiceprint, and the step that
+//! cannot be undone.
+//!
+//! Sound carries two things: which frequencies are present, and how they line up
+//! in time. The second one, the timing, is a great deal of what makes a voice
+//! recognisably yours, and it is thrown away here and replaced. It is not
+//! scrambled or hidden; it is discarded, and there is nothing left to recover it
+//! from.
+//!
+//! What is kept is enough for the words to stay clear. That is the whole trade:
+//! the sentence survives, the speaker does not.
 
 use crate::accent::AccentNeutralizer;
 use crate::pitch::PitchEstimate;

@@ -43,6 +43,18 @@
 //! the vowels along with the accent. Vocal-tract and tilt corrections therefore
 //! use multi-second time constants, so they track the speaker and leave the
 //! phonemes moving freely underneath.
+//!
+//! # In plain words
+//!
+//! This is the part that works on accent, and it is careful about what it claims.
+//!
+//! An accent is two different things at once. Some of it is in the sound: how high
+//! the voice sits, how it rises and falls, the shape of the vowels. That part can
+//! be changed here, and is.
+//!
+//! The rest of it is in the words themselves, and in the choices somebody makes
+//! between them. No amount of altering sound touches that, because it is not in
+//! the sound. So VeilVoice says accent removal is **partial**, and means it.
 
 use crate::pitch::PitchEstimate;
 

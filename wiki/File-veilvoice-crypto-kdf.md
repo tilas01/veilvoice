@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-crypto/src/kdf.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 387 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 399 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs)
 
 ## Contents
 
 - [Cost parameters arrive from a file, so they are hostile input](#cost-parameters-arrive-from-a-file-so-they-are-hostile-input)
 - [Domain separation](#domain-separation)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -56,21 +57,33 @@ are kept different: they are domain-separated in the derivation, so
 unlocking the application does not unseal recordings and one cannot be
 derived from the other.
 
+# In plain words
+
+This turns a passphrase into a key.
+
+A passphrase somebody can remember is far too short and too predictable to use
+directly, so it is put through a process designed to be slow and to need a
+large amount of memory. That does not slow you down noticeably once, but it
+makes guessing millions of passphrases enormously expensive for anybody trying.
+
+The settings are stored with each file, so an old recording still opens after
+the defaults are made stronger.
+
 ## What this file contains
 
-387 lines defining **7 functions** (5 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+399 lines defining **7 functions** (5 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct KdfParams` (line 51) -- Argon2id cost parameters.
+- `struct KdfParams` (line 63) -- Argon2id cost parameters.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `KdfParams::weak_for_tests` (line 78) -- A deliberately cheap profile for tests and low-memory devices.
-- `KdfParams::within` (line 136) -- Check the costs against a caller-chosen memory ceiling as well as the built-in one.
+- `KdfParams::weak_for_tests` (line 90) -- A deliberately cheap profile for tests and low-memory devices.
+- `KdfParams::within` (line 148) -- Check the costs against a caller-chosen memory ceiling as well as the built-in one.
   - reaches: `checked`
-- `derive_key` (line 202) -- Derive a 32-byte key from password and salt.
-- `random_salt` (line 215) -- Draw a fresh random salt from the OS CSPRNG.
+- `derive_key` (line 214) -- Derive a 32-byte key from password and salt.
+- `random_salt` (line 227) -- Draw a fresh random salt from the OS CSPRNG.
 
 ## What calls what
 
@@ -86,22 +99,22 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["KdfParams::default<br/>line 65"]
-    n_weak_for_tests(["KdfParams::weak_for_tests<br/>line 78"])
-    n_within(["KdfParams::within<br/>line 136"])
-    n_checked["KdfParams::checked<br/>line 165"]
-    n_build["KdfParams::build<br/>line 185"]
-    n_derive_key(["derive_key<br/>line 202"])
-    n_random_salt(["random_salt<br/>line 215"])
+    n_default["KdfParams::default<br/>line 77"]
+    n_weak_for_tests(["KdfParams::weak_for_tests<br/>line 90"])
+    n_within(["KdfParams::within<br/>line 148"])
+    n_checked["KdfParams::checked<br/>line 177"]
+    n_build["KdfParams::build<br/>line 197"]
+    n_derive_key(["derive_key<br/>line 214"])
+    n_random_salt(["random_salt<br/>line 227"])
     n_build --> n_checked
     n_within --> n_checked
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L65" "open the source"
-    click n_weak_for_tests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L78" "open the source"
-    click n_within href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L136" "open the source"
-    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L165" "open the source"
-    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L185" "open the source"
-    click n_derive_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L202" "open the source"
-    click n_random_salt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L215" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L77" "open the source"
+    click n_weak_for_tests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L90" "open the source"
+    click n_within href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L148" "open the source"
+    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L177" "open the source"
+    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L197" "open the source"
+    click n_derive_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L214" "open the source"
+    click n_random_salt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L227" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_weak_for_tests,n_within,n_derive_key,n_random_salt entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -116,16 +129,16 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `KdfParams` <sub>pub struct</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L51) | Argon2id cost parameters. |
-| `KdfParams::default` <sub>fn</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L65) | RFC 9106's "first recommended" profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock — strong against offline cracking while still opening a file in well under a second on ordinary hardware. |
-| `KdfParams::weak_for_tests` <sub>pub fn</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L78) | A deliberately cheap profile for tests and low-memory devices. |
-| `KdfParams::MAX_P_COST` <sub>const</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L87) | Argon2's own documented ceiling on parallelism: 2^24 - 1. |
-| `KdfParams::MAX_M_COST` <sub>pub const</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L108) | The largest memory cost this build will attempt, in KiB — 4 GiB. |
-| `KdfParams::UNATTENDED_MAX_M_COST` <sub>pub const</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L124) | A ceiling for a caller with nobody watching. |
-| `KdfParams::within` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L136) | Check the costs against a caller-chosen memory ceiling as well as the built-in one. |
-| `KdfParams::checked` <sub>pub fn</sub> | [165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L165) | Check the costs are ones Argon2 can accept, before handing them to it. |
-| `KdfParams::build` <sub>fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L185) | Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF. |
-| `SALT_LEN` <sub>pub const</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L194) | Length of the salt stored in an encrypted container. |
-| `KEY_LEN` <sub>pub const</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L196) | Length of a derived symmetric key. |
-| `derive_key` <sub>pub fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L202) | Derive a 32-byte key from password and salt. |
-| `random_salt` <sub>pub fn</sub> | [215](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L215) | Draw a fresh random salt from the OS CSPRNG. |
+| `KdfParams` <sub>pub struct</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L63) | Argon2id cost parameters. |
+| `KdfParams::default` <sub>fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L77) | RFC 9106's "first recommended" profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock — strong against offline cracking while still opening a file in well under a second on ordinary hardware. |
+| `KdfParams::weak_for_tests` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L90) | A deliberately cheap profile for tests and low-memory devices. |
+| `KdfParams::MAX_P_COST` <sub>const</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L99) | Argon2's own documented ceiling on parallelism: 2^24 - 1. |
+| `KdfParams::MAX_M_COST` <sub>pub const</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L120) | The largest memory cost this build will attempt, in KiB — 4 GiB. |
+| `KdfParams::UNATTENDED_MAX_M_COST` <sub>pub const</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L136) | A ceiling for a caller with nobody watching. |
+| `KdfParams::within` <sub>pub fn</sub> | [148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L148) | Check the costs against a caller-chosen memory ceiling as well as the built-in one. |
+| `KdfParams::checked` <sub>pub fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L177) | Check the costs are ones Argon2 can accept, before handing them to it. |
+| `KdfParams::build` <sub>fn</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L197) | Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF. |
+| `SALT_LEN` <sub>pub const</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L206) | Length of the salt stored in an encrypted container. |
+| `KEY_LEN` <sub>pub const</sub> | [208](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L208) | Length of a derived symmetric key. |
+| `derive_key` <sub>pub fn</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L214) | Derive a 32-byte key from password and salt. |
+| `random_salt` <sub>pub fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L227) | Draw a fresh random salt from the OS CSPRNG. |

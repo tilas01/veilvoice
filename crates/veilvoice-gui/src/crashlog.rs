@@ -43,6 +43,18 @@
 //! **It records no user content.** A panic message, a source location, the
 //! version and a timestamp. Not the file being processed, not a path the user
 //! chose, not a passphrase -- nothing that is theirs.
+//!
+//! # In plain words
+//!
+//! Makes sure that if VeilVoice falls over, it leaves something behind saying so.
+//!
+//! A windowed program on Windows has nowhere to print to. Without this, a failure
+//! at startup produces a window that never appears and no message anywhere, and
+//! the only thing anybody can report is "it crashed", which is exactly the report
+//! that arrived once.
+//!
+//! So the reason is written to a file, and the file is shown to you next time the
+//! application opens. It stays on your machine and is never sent anywhere.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};

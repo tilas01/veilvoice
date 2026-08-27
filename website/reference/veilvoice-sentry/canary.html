@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-sentry/canary.svg" alt="canary.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-sentry/src/canary.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-sentry.html">veilvoice-sentry</a> &middot; 750 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-sentry.html">veilvoice-sentry</a> &middot; 761 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-idea-in-one-paragraph">The idea, in one paragraph</a>
@@ -47,6 +47,7 @@
   <a href="#the-name-is-a-deliberate-trade-and-the-default-takes-the-honest-side">The name is a deliberate trade, and the default takes the honest side</a>
   <a href="#a-deletion-and-an-encryption-look-the-same">A deletion and an encryption look the same</a>
   <a href="#format">Format</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -69,44 +70,48 @@
 <p>One record per line, text, for the same reason the tamper manifest is text: the point of the file is to be checkable without this crate.</p>
 <pre><code>VEILSENTRY-NEST1
 &lt;sha256 hex&gt;  &lt;size&gt;  &lt;planted unix seconds&gt;  &lt;path&gt;</code></pre>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Files VeilVoice puts in a folder and never touches again.</p>
+<p>Nothing should ever read or change them. If one does change, something has walked through that folder writing to everything in it, which is what ransomware does, and you have found out early.</p>
+<p>It does not stop anything. It is a tripwire, and its whole value is being noticed quickly.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>750 lines defining <strong>20 functions</strong> (16 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>761 lines defining <strong>20 functions</strong> (16 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Canary</code> <span style="color:var(--muted)">line 83</span> &mdash; One planted decoy, and what it was when it was planted.</li>
-<li><code>enum State</code> <span style="color:var(--muted)">line 96</span> &mdash; What a canary looks like now.</li>
-<li><code>struct Sighting</code> <span style="color:var(--muted)">line 166</span> &mdash; One canary and what became of it.</li>
-<li><code>struct Nest</code> <span style="color:var(--muted)">line 175</span> &mdash; The set of planted canaries.</li>
+<li><code>struct Canary</code> <span style="color:var(--muted)">line 94</span> &mdash; One planted decoy, and what it was when it was planted.</li>
+<li><code>enum State</code> <span style="color:var(--muted)">line 107</span> &mdash; What a canary looks like now.</li>
+<li><code>struct Sighting</code> <span style="color:var(--muted)">line 177</span> &mdash; One canary and what became of it.</li>
+<li><code>struct Nest</code> <span style="color:var(--muted)">line 186</span> &mdash; The set of planted canaries.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>State::is_trip</code> <span style="color:var(--muted)">line 123</span> &mdash; Whether this is anything other than State::Intact.
+<li><code>State::is_trip</code> <span style="color:var(--muted)">line 134</span> &mdash; Whether this is anything other than State::Intact.
 </li>
-<li><code>State::stopped_being_text</code> <span style="color:var(--muted)">line 132</span> &mdash; Whether the contents stopped looking like the text that was planted.
+<li><code>State::stopped_being_text</code> <span style="color:var(--muted)">line 143</span> &mdash; Whether the contents stopped looking like the text that was planted.
 </li>
-<li><code>State::describe</code> <span style="color:var(--muted)">line 140</span> &mdash; A single line for a terminal or a log.
+<li><code>State::describe</code> <span style="color:var(--muted)">line 151</span> &mdash; A single line for a terminal or a log.
 </li>
-<li><code>Nest::new</code> <span style="color:var(--muted)">line 254</span> &mdash; An empty nest.
+<li><code>Nest::new</code> <span style="color:var(--muted)">line 265</span> &mdash; An empty nest.
 </li>
-<li><code>Nest::len</code> <span style="color:var(--muted)">line 259</span> &mdash; How many canaries are planted.
+<li><code>Nest::len</code> <span style="color:var(--muted)">line 270</span> &mdash; How many canaries are planted.
 </li>
-<li><code>Nest::is_empty</code> <span style="color:var(--muted)">line 264</span> &mdash; Whether nothing is planted.
+<li><code>Nest::is_empty</code> <span style="color:var(--muted)">line 275</span> &mdash; Whether nothing is planted.
 </li>
-<li><code>Nest::canaries</code> <span style="color:var(--muted)">line 269</span> &mdash; The planted canaries, in a stable order.
+<li><code>Nest::canaries</code> <span style="color:var(--muted)">line 280</span> &mdash; The planted canaries, in a stable order.
 </li>
-<li><code>Nest::plant</code> <span style="color:var(--muted)">line 281</span> &mdash; Write a canary into dir and record it.
+<li><code>Nest::plant</code> <span style="color:var(--muted)">line 292</span> &mdash; Write a canary into dir and record it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>contents</code>, <code>digest_of</code>, <code>normalise</code>, <code>now_seconds</code></span>
 </li>
-<li><code>Nest::pull_up</code> <span style="color:var(--muted)">line 329</span> &mdash; Stop watching a canary, and delete it.
+<li><code>Nest::pull_up</code> <span style="color:var(--muted)">line 340</span> &mdash; Stop watching a canary, and delete it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>normalise</code></span>
 </li>
-<li><code>Nest::trips</code> <span style="color:var(--muted)">line 355</span> &mdash; Only the canaries that are not intact.
+<li><code>Nest::trips</code> <span style="color:var(--muted)">line 366</span> &mdash; Only the canaries that are not intact.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>check</code>, <code>state_of</code>, <code>digest_of</code></span>
 </li>
-<li><code>Nest::save</code> <span style="color:var(--muted)">line 435</span> &mdash; Write the nest to path.
+<li><code>Nest::save</code> <span style="color:var(--muted)">line 446</span> &mdash; Write the nest to path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Nest::load</code> <span style="color:var(--muted)">line 446</span> &mdash; Read a nest written by Nest::save.
+<li><code>Nest::load</code> <span style="color:var(--muted)">line 457</span> &mdash; Read a nest written by Nest::save.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code></span>
 </li>
 </ul>
@@ -128,105 +133,105 @@
 <path d="M372.6 447.0 C 616.2 447.0, 616.2 347.0, 597.2 347.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M361.2 547.0 C 383.2 547.0, 383.2 147.0, 241.8 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M441.4 347.0 C 463.4 347.0, 463.4 347.0, 306.8 347.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L123" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L134" target="_blank" rel="noopener noreferrer">
 <rect x="43.6" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="110.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">State::is_trip</text>
-<text x="110.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 123</text>
+<text x="110.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L132" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L143" target="_blank" rel="noopener noreferrer">
 <rect x="204.0" y="20.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="313.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">State::stopped_being_text</text>
-<text x="313.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
+<text x="313.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L140" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L151" target="_blank" rel="noopener noreferrer">
 <rect x="448.0" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="519.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">State::describe</text>
-<text x="519.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
+<text x="519.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 151</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L184" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L195" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="68.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">normalise</text>
-<text x="68.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 184</text>
+<text x="68.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 195</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L188" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L199" target="_blank" rel="noopener noreferrer">
 <rect x="142.4" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="190.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">digest_of</text>
-<text x="190.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 188</text>
+<text x="190.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 199</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L198" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L209" target="_blank" rel="noopener noreferrer">
 <rect x="264.8" y="120.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="320.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">now_seconds</text>
-<text x="320.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 198</text>
+<text x="320.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L215" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L226" target="_blank" rel="noopener noreferrer">
 <rect x="402.4" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="446.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">contents</text>
-<text x="446.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 215</text>
+<text x="446.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 226</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L254" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L265" target="_blank" rel="noopener noreferrer">
 <rect x="517.2" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="565.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::new</text>
-<text x="565.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 254</text>
+<text x="565.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 265</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L259" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L270" target="_blank" rel="noopener noreferrer">
 <rect x="39.4" y="220.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="87.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::len</text>
-<text x="87.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 259</text>
+<text x="87.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L264" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L275" target="_blank" rel="noopener noreferrer">
 <rect x="161.8" y="220.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="229.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::is_empty</text>
-<text x="229.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 264</text>
+<text x="229.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 275</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L269" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L280" target="_blank" rel="noopener noreferrer">
 <rect x="322.2" y="220.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="389.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::canaries</text>
-<text x="389.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 269</text>
+<text x="389.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 280</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L281" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L292" target="_blank" rel="noopener noreferrer">
 <rect x="482.6" y="220.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="538.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::plant</text>
-<text x="538.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 281</text>
+<text x="538.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 292</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L329" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L340" target="_blank" rel="noopener noreferrer">
 <rect x="39.4" y="320.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="102.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::pull_up</text>
-<text x="102.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 329</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L344" target="_blank" rel="noopener noreferrer">
-<rect x="192.2" y="320.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="248.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::check</text>
-<text x="248.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 344</text>
+<text x="102.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 340</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L355" target="_blank" rel="noopener noreferrer">
+<rect x="192.2" y="320.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="248.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::check</text>
+<text x="248.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 355</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L366" target="_blank" rel="noopener noreferrer">
 <rect x="329.8" y="320.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="385.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::trips</text>
-<text x="385.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 355</text>
+<text x="385.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 366</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L363" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L374" target="_blank" rel="noopener noreferrer">
 <rect x="467.4" y="320.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="530.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::to_text</text>
-<text x="530.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 363</text>
+<text x="530.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 374</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L376" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L387" target="_blank" rel="noopener noreferrer">
 <rect x="131.0" y="420.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="186.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::parse</text>
-<text x="186.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 376</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L435" target="_blank" rel="noopener noreferrer">
-<rect x="268.6" y="420.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="320.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::save</text>
-<text x="320.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 435</text>
+<text x="186.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 387</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L446" target="_blank" rel="noopener noreferrer">
+<rect x="268.6" y="420.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="320.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::save</text>
+<text x="320.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 446</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L457" target="_blank" rel="noopener noreferrer">
 <rect x="398.6" y="420.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="450.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Nest::load</text>
-<text x="450.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 446</text>
+<text x="450.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 457</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L451" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L462" target="_blank" rel="noopener noreferrer">
 <rect x="272.4" y="520.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="316.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">state_of</text>
-<text x="316.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 451</text>
+<text x="316.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 462</text>
 </a>
 </svg>
 </div>
@@ -234,26 +239,26 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_is_trip([&quot;State::is_trip&lt;br/&gt;line 123&quot;])
-    n_stopped_being_text([&quot;State::stopped_being_text&lt;br/&gt;line 132&quot;])
-    n_describe([&quot;State::describe&lt;br/&gt;line 140&quot;])
-    n_normalise[&quot;normalise&lt;br/&gt;line 184&quot;]
-    n_digest_of[&quot;digest_of&lt;br/&gt;line 188&quot;]
-    n_now_seconds[&quot;now_seconds&lt;br/&gt;line 198&quot;]
-    n_contents[&quot;contents&lt;br/&gt;line 215&quot;]
-    n_new([&quot;Nest::new&lt;br/&gt;line 254&quot;])
-    n_len([&quot;Nest::len&lt;br/&gt;line 259&quot;])
-    n_is_empty([&quot;Nest::is_empty&lt;br/&gt;line 264&quot;])
-    n_canaries([&quot;Nest::canaries&lt;br/&gt;line 269&quot;])
-    n_plant([&quot;Nest::plant&lt;br/&gt;line 281&quot;])
-    n_pull_up([&quot;Nest::pull_up&lt;br/&gt;line 329&quot;])
-    n_check[&quot;Nest::check&lt;br/&gt;line 344&quot;]
-    n_trips([&quot;Nest::trips&lt;br/&gt;line 355&quot;])
-    n_to_text[&quot;Nest::to_text&lt;br/&gt;line 363&quot;]
-    n_parse[&quot;Nest::parse&lt;br/&gt;line 376&quot;]
-    n_save([&quot;Nest::save&lt;br/&gt;line 435&quot;])
-    n_load([&quot;Nest::load&lt;br/&gt;line 446&quot;])
-    n_state_of[&quot;state_of&lt;br/&gt;line 451&quot;]
+    n_is_trip([&quot;State::is_trip&lt;br/&gt;line 134&quot;])
+    n_stopped_being_text([&quot;State::stopped_being_text&lt;br/&gt;line 143&quot;])
+    n_describe([&quot;State::describe&lt;br/&gt;line 151&quot;])
+    n_normalise[&quot;normalise&lt;br/&gt;line 195&quot;]
+    n_digest_of[&quot;digest_of&lt;br/&gt;line 199&quot;]
+    n_now_seconds[&quot;now_seconds&lt;br/&gt;line 209&quot;]
+    n_contents[&quot;contents&lt;br/&gt;line 226&quot;]
+    n_new([&quot;Nest::new&lt;br/&gt;line 265&quot;])
+    n_len([&quot;Nest::len&lt;br/&gt;line 270&quot;])
+    n_is_empty([&quot;Nest::is_empty&lt;br/&gt;line 275&quot;])
+    n_canaries([&quot;Nest::canaries&lt;br/&gt;line 280&quot;])
+    n_plant([&quot;Nest::plant&lt;br/&gt;line 292&quot;])
+    n_pull_up([&quot;Nest::pull_up&lt;br/&gt;line 340&quot;])
+    n_check[&quot;Nest::check&lt;br/&gt;line 355&quot;]
+    n_trips([&quot;Nest::trips&lt;br/&gt;line 366&quot;])
+    n_to_text[&quot;Nest::to_text&lt;br/&gt;line 374&quot;]
+    n_parse[&quot;Nest::parse&lt;br/&gt;line 387&quot;]
+    n_save([&quot;Nest::save&lt;br/&gt;line 446&quot;])
+    n_load([&quot;Nest::load&lt;br/&gt;line 457&quot;])
+    n_state_of[&quot;state_of&lt;br/&gt;line 462&quot;]
     n_check --&gt; n_state_of
     n_load --&gt; n_parse
     n_plant --&gt; n_contents
@@ -264,26 +269,26 @@ flowchart TD
     n_save --&gt; n_to_text
     n_state_of --&gt; n_digest_of
     n_trips --&gt; n_check
-    click n_is_trip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L123&quot; &quot;open the source&quot;
-    click n_stopped_being_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L132&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L140&quot; &quot;open the source&quot;
-    click n_normalise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L184&quot; &quot;open the source&quot;
-    click n_digest_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L188&quot; &quot;open the source&quot;
-    click n_now_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L198&quot; &quot;open the source&quot;
-    click n_contents href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L215&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L254&quot; &quot;open the source&quot;
-    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L259&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L264&quot; &quot;open the source&quot;
-    click n_canaries href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L269&quot; &quot;open the source&quot;
-    click n_plant href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L281&quot; &quot;open the source&quot;
-    click n_pull_up href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L329&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L344&quot; &quot;open the source&quot;
-    click n_trips href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L355&quot; &quot;open the source&quot;
-    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L363&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L376&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L435&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L446&quot; &quot;open the source&quot;
-    click n_state_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L451&quot; &quot;open the source&quot;
+    click n_is_trip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L134&quot; &quot;open the source&quot;
+    click n_stopped_being_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L143&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L151&quot; &quot;open the source&quot;
+    click n_normalise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L195&quot; &quot;open the source&quot;
+    click n_digest_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L199&quot; &quot;open the source&quot;
+    click n_now_seconds href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L209&quot; &quot;open the source&quot;
+    click n_contents href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L226&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L265&quot; &quot;open the source&quot;
+    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L270&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L275&quot; &quot;open the source&quot;
+    click n_canaries href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L280&quot; &quot;open the source&quot;
+    click n_plant href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L292&quot; &quot;open the source&quot;
+    click n_pull_up href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L340&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L355&quot; &quot;open the source&quot;
+    click n_trips href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L366&quot; &quot;open the source&quot;
+    click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L374&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L387&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L446&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L457&quot; &quot;open the source&quot;
+    click n_state_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L462&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_trip,n_stopped_being_text,n_describe,n_new,n_len,n_is_empty,n_canaries,n_plant,n_pull_up,n_trips,n_save,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -296,34 +301,34 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>MAGIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L65" rel="noopener noreferrer">65</a></td><td>Magic first line.</td></tr>
-<tr><td><code>DEFAULT_NAME</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L71" rel="noopener noreferrer">71</a></td><td>The default filename for a canary.</td></tr>
-<tr><td><code>PROSE_CEILING</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L79" rel="noopener noreferrer">79</a></td><td>Below this, a canary that was prose has stopped being prose.</td></tr>
-<tr><td><code>Canary</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L83" rel="noopener noreferrer">83</a></td><td>One planted decoy, and what it was when it was planted.</td></tr>
-<tr><td><code>State</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L96" rel="noopener noreferrer">96</a></td><td>What a canary looks like now.</td></tr>
-<tr><td><code>State::is_trip</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L123" rel="noopener noreferrer">123</a></td><td>Whether this is anything other than State::Intact.</td></tr>
-<tr><td><code>State::stopped_being_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L132" rel="noopener noreferrer">132</a></td><td>Whether the contents stopped looking like the text that was planted.</td></tr>
-<tr><td><code>State::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L140" rel="noopener noreferrer">140</a></td><td>A single line for a terminal or a log.</td></tr>
-<tr><td><code>Sighting</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L166" rel="noopener noreferrer">166</a></td><td>One canary and what became of it.</td></tr>
-<tr><td><code>Nest</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L175" rel="noopener noreferrer">175</a></td><td>The set of planted canaries.</td></tr>
-<tr><td><code>normalise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L184" rel="noopener noreferrer">184</a></td><td>Normalise a path for storage: forward slashes, as the tamper manifest does, so a nest written on Windows still reads on Linux.</td></tr>
-<tr><td><code>digest_of</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L188" rel="noopener noreferrer">188</a></td><td></td></tr>
-<tr><td><code>now_seconds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L198" rel="noopener noreferrer">198</a></td><td></td></tr>
-<tr><td><code>contents</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L215" rel="noopener noreferrer">215</a></td><td>The text a canary is filled with.</td></tr>
-<tr><td><code>FILLER</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L244" rel="noopener noreferrer">244</a></td><td>Plain sentences, in the project&#x27;s own register, repeated to make a body.</td></tr>
-<tr><td><code>Nest::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L254" rel="noopener noreferrer">254</a></td><td>An empty nest.</td></tr>
-<tr><td><code>Nest::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L259" rel="noopener noreferrer">259</a></td><td>How many canaries are planted.</td></tr>
-<tr><td><code>Nest::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L264" rel="noopener noreferrer">264</a></td><td>Whether nothing is planted.</td></tr>
-<tr><td><code>Nest::canaries</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L269" rel="noopener noreferrer">269</a></td><td>The planted canaries, in a stable order.</td></tr>
-<tr><td><code>Nest::plant</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L281" rel="noopener noreferrer">281</a></td><td>Write a canary into dir and record it.</td></tr>
-<tr><td><code>Nest::pull_up</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L329" rel="noopener noreferrer">329</a></td><td>Stop watching a canary, and delete it.</td></tr>
-<tr><td><code>Nest::check</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L344" rel="noopener noreferrer">344</a></td><td>Look at every canary.</td></tr>
-<tr><td><code>Nest::trips</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L355" rel="noopener noreferrer">355</a></td><td>Only the canaries that are not intact.</td></tr>
-<tr><td><code>Nest::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L363" rel="noopener noreferrer">363</a></td><td>Serialise to the text format described at the top of this module.</td></tr>
-<tr><td><code>Nest::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L376" rel="noopener noreferrer">376</a></td><td>Parse the text format.</td></tr>
-<tr><td><code>Nest::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L435" rel="noopener noreferrer">435</a></td><td>Write the nest to path.</td></tr>
-<tr><td><code>Nest::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L446" rel="noopener noreferrer">446</a></td><td>Read a nest written by Nest::save.</td></tr>
-<tr><td><code>state_of</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L451" rel="noopener noreferrer">451</a></td><td></td></tr>
+<tr><td><code>MAGIC</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L76" rel="noopener noreferrer">76</a></td><td>Magic first line.</td></tr>
+<tr><td><code>DEFAULT_NAME</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L82" rel="noopener noreferrer">82</a></td><td>The default filename for a canary.</td></tr>
+<tr><td><code>PROSE_CEILING</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L90" rel="noopener noreferrer">90</a></td><td>Below this, a canary that was prose has stopped being prose.</td></tr>
+<tr><td><code>Canary</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L94" rel="noopener noreferrer">94</a></td><td>One planted decoy, and what it was when it was planted.</td></tr>
+<tr><td><code>State</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L107" rel="noopener noreferrer">107</a></td><td>What a canary looks like now.</td></tr>
+<tr><td><code>State::is_trip</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L134" rel="noopener noreferrer">134</a></td><td>Whether this is anything other than State::Intact.</td></tr>
+<tr><td><code>State::stopped_being_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L143" rel="noopener noreferrer">143</a></td><td>Whether the contents stopped looking like the text that was planted.</td></tr>
+<tr><td><code>State::describe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L151" rel="noopener noreferrer">151</a></td><td>A single line for a terminal or a log.</td></tr>
+<tr><td><code>Sighting</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L177" rel="noopener noreferrer">177</a></td><td>One canary and what became of it.</td></tr>
+<tr><td><code>Nest</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L186" rel="noopener noreferrer">186</a></td><td>The set of planted canaries.</td></tr>
+<tr><td><code>normalise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L195" rel="noopener noreferrer">195</a></td><td>Normalise a path for storage: forward slashes, as the tamper manifest does, so a nest written on Windows still reads on Linux.</td></tr>
+<tr><td><code>digest_of</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L199" rel="noopener noreferrer">199</a></td><td></td></tr>
+<tr><td><code>now_seconds</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L209" rel="noopener noreferrer">209</a></td><td></td></tr>
+<tr><td><code>contents</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L226" rel="noopener noreferrer">226</a></td><td>The text a canary is filled with.</td></tr>
+<tr><td><code>FILLER</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L255" rel="noopener noreferrer">255</a></td><td>Plain sentences, in the project&#x27;s own register, repeated to make a body.</td></tr>
+<tr><td><code>Nest::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L265" rel="noopener noreferrer">265</a></td><td>An empty nest.</td></tr>
+<tr><td><code>Nest::len</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L270" rel="noopener noreferrer">270</a></td><td>How many canaries are planted.</td></tr>
+<tr><td><code>Nest::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L275" rel="noopener noreferrer">275</a></td><td>Whether nothing is planted.</td></tr>
+<tr><td><code>Nest::canaries</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L280" rel="noopener noreferrer">280</a></td><td>The planted canaries, in a stable order.</td></tr>
+<tr><td><code>Nest::plant</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L292" rel="noopener noreferrer">292</a></td><td>Write a canary into dir and record it.</td></tr>
+<tr><td><code>Nest::pull_up</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L340" rel="noopener noreferrer">340</a></td><td>Stop watching a canary, and delete it.</td></tr>
+<tr><td><code>Nest::check</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L355" rel="noopener noreferrer">355</a></td><td>Look at every canary.</td></tr>
+<tr><td><code>Nest::trips</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L366" rel="noopener noreferrer">366</a></td><td>Only the canaries that are not intact.</td></tr>
+<tr><td><code>Nest::to_text</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L374" rel="noopener noreferrer">374</a></td><td>Serialise to the text format described at the top of this module.</td></tr>
+<tr><td><code>Nest::parse</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L387" rel="noopener noreferrer">387</a></td><td>Parse the text format.</td></tr>
+<tr><td><code>Nest::save</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L446" rel="noopener noreferrer">446</a></td><td>Write the nest to path.</td></tr>
+<tr><td><code>Nest::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L457" rel="noopener noreferrer">457</a></td><td>Read a nest written by Nest::save.</td></tr>
+<tr><td><code>state_of</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/canary.rs#L462" rel="noopener noreferrer">462</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>
