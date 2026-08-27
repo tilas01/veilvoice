@@ -657,6 +657,45 @@ mod tests {
         assert!(drawn.notes.is_empty());
     }
 
+    /// **The engine's settings are for the person operating it, not for the
+    /// recording.**
+    ///
+    /// The desktop application shows each destination voice as "low register,
+    /// narrow tract (94 Hz, 620 Hz)", which is exactly what somebody choosing
+    /// between them needs. None of it belongs in the file that gets shared: it
+    /// describes the *destination* rather than the speaker, so it leaks nothing
+    /// about who was recorded, but it is noise to a viewer and it invites a
+    /// reader to think the numbers say something about the people.
+    ///
+    /// What a viewer needs is who is talking, which is the name and the lit
+    /// circle. This checks the picture carries the first and not the second.
+    #[test]
+    fn a_rendered_page_carries_names_and_no_engine_detail() {
+        let drawn = still(&plan(), &envelope(), &Look::default(), 1.0).unwrap();
+        let markup = drawn.markup.to_lowercase();
+
+        // Who is talking: present.
+        assert!(drawn.markup.contains(">Alex<"));
+        assert!(drawn.markup.contains(">Sam<"));
+
+        // The engine's own vocabulary: absent.
+        for detail in [
+            " hz",
+            "register",
+            "tract",
+            "formant",
+            "centroid",
+            "intensity",
+            "reseed",
+            "ratchet",
+        ] {
+            assert!(
+                !markup.contains(detail),
+                "{detail:?} describes the engine and does not belong in a file                  somebody shares"
+            );
+        }
+    }
+
     /// The circle that is lit must be the one whose turn it is.
     #[test]
     fn the_speaker_who_is_talking_is_the_one_that_is_lit() {

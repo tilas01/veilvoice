@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-video/src/page.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 977 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs)
+[[veilvoice-video|Crate-veilvoice-video]] &middot; 1016 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs)
 
 ## Contents
 
@@ -55,7 +55,7 @@ drawn and the circles simply stay dim.
 
 ## What this file contains
 
-977 lines defining **13 functions** (8 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1016 lines defining **13 functions** (8 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
