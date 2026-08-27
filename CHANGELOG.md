@@ -6,7 +6,27 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
-## Unreleased
+## v0.1.14
+
+The safety catch, an interface that reads like English, and a window that does
+not stop when you open a file.
+
+**Failsafe is the headline, and it is on by default.** It watches for the one
+accident this whole project is powerless against once it has happened: you are
+talking through VeilVoice with your voice veiled, you plug in a headset, and
+your computer quietly switches the call to the real microphone. Your own voice
+goes out and nothing on screen looks any different. Failsafe notices within
+about a second and closes the program that took it. It says plainly that it
+notices rather than prevents, because the gap is short and it is not zero.
+
+**Seven file pickers used to freeze the entire window** until you chose a file.
+That is the answer to "it lags when I select things", and it was an accurate
+report.
+
+**Nothing the application says has a dash in it any more**, headings are
+sentences rather than shouting, and every tab scrolls so nothing can be shrunk
+out of reach.
+
 
 ### The interface reads like English, and the screenshots are real
 
