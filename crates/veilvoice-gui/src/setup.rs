@@ -145,19 +145,19 @@ impl Setup {
         // and the inner width is pinned to the tab's. This screen is mostly
         // long sentences stating limits, and a limit that wraps off the edge
         // of the window is a limit nobody read.
+        // The application scrolls every tab in one place now; a second
+        // scroller here would trap the wheel in whichever the pointer was over.
+        // The width pin stays, because it is what stops the long sentences
+        // wrapping off the edge.
         let width = ui.available_width();
-        egui::ScrollArea::vertical()
-            .auto_shrink([false, false])
-            .show(ui, |ui| {
-                ui.set_max_width(width);
-                self.where_this_copy_lives(ui);
-                ui.add_space(14.0);
-                self.install_controls(ui, motion);
-                ui.add_space(18.0);
-                ui.separator();
-                ui.add_space(12.0);
-                self.companion_rows(ui);
-            });
+        ui.set_max_width(width);
+        self.where_this_copy_lives(ui);
+        ui.add_space(14.0);
+        self.install_controls(ui, motion);
+        ui.add_space(18.0);
+        ui.separator();
+        ui.add_space(12.0);
+        self.companion_rows(ui);
     }
 
     /// Why this tab is here, and how to make it not be.
@@ -185,7 +185,7 @@ impl Setup {
     // --- the state of this copy --------------------------------------------
 
     fn where_this_copy_lives(&mut self, ui: &mut Ui) {
-        ui.label(RichText::new("THIS COPY").color(p::blue()).small());
+        ui.label(RichText::new("This copy").color(p::blue()).small());
         ui.add_space(6.0);
 
         // Portable first, and stated as a working arrangement rather than as
@@ -198,7 +198,7 @@ impl Setup {
                 p::yellow(),
             ),
             (false, false) => (
-                "you are running a portable copy — nothing is installed, and nothing needs to be",
+                "you are running a portable copy. Nothing is installed, and nothing needs to be",
                 p::fg(),
             ),
         };
@@ -253,7 +253,7 @@ impl Setup {
 
     fn install_controls(&mut self, ui: &mut Ui, motion: crate::prefs::Motion) {
         ui.label(
-            RichText::new("INSTALL FOR THIS USER")
+            RichText::new("Install for this user")
                 .color(p::blue())
                 .small(),
         );
@@ -345,7 +345,7 @@ impl Setup {
                 ui.label(
                     RichText::new(
                         "Open a new terminal for a PATH change to take effect. VeilVoice \
-                         never checks for updates and cannot tell you when one exists — \
+                         never checks for updates and cannot tell you when one exists. \
                          it has no network code at all.",
                     )
                     .small()
@@ -421,7 +421,7 @@ impl Setup {
     // --- the companions ----------------------------------------------------
 
     fn companion_rows(&mut self, ui: &mut Ui) {
-        ui.label(RichText::new("COMPANION SOFTWARE").color(p::blue()).small());
+        ui.label(RichText::new("Companion software").color(p::blue()).small());
         ui.add_space(6.0);
         ui.label(
             RichText::new(
@@ -466,7 +466,7 @@ impl Setup {
                     Presence::Present(_) => (row.presence.describe(), p::green()),
                     Presence::NotDetected => (
                         format!(
-                            "{} — that is where VeilVoice looked, not a claim about your machine",
+                            "{}. That is where VeilVoice looked, not a claim about your machine",
                             row.presence.describe()
                         ),
                         p::muted(),
@@ -519,7 +519,7 @@ impl Setup {
                             ui.label(
                                 RichText::new(
                                     "This needs root. VeilVoice does not ask for a password \
-                                     and will not run it — run that command in a terminal, \
+                                     and will not run it. Run that command in a terminal, \
                                      where you can see what you are approving.",
                                 )
                                 .small()

@@ -146,7 +146,7 @@ impl InForce {
 
     /// The summary panel, for the about tab.
     pub fn panel(&self, ui: &mut Ui) {
-        ui.label(RichText::new("POLICY").color(p::blue()).small());
+        ui.label(RichText::new("Policy").color(p::blue()).small());
 
         if let Some(problem) = &self.problem {
             ui.label(

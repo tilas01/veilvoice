@@ -107,7 +107,7 @@ impl Style {
         match self {
             Self::Overlay => {
                 "A rounded card in the corner of this window that fades on its own. \
-                 It will not take focus or interrupt what you are typing -- which \
+                 It will not take focus or interrupt what you are typing, which \
                  also means it can be missed."
             }
             Self::Alert => {

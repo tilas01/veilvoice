@@ -8,6 +8,65 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The interface reads like English, and the screenshots are real
+
+Headings were shouted in capitals: `SETTINGS`, `WHAT A PASS PROVES`, `APP
+LOCK`. They are sentences now, capitalised the way a sentence is, and the tab
+labels with them. **No dashes anywhere the application speaks**, either: every
+one has been rewritten into the punctuation that carries the same pause, and a
+test reads the whole crate and fails the build if one comes back.
+
+**Every tab is inside one scroll area.** The lock tab had none at all, so on a
+short window its controls could not be reached by any means: not scrolled to,
+not tabbed to, not resized into view without making the window taller than the
+screen. One scroller rather than one per tab, so a tab added later gets it
+without anybody remembering, and so the wheel is never trapped in whichever of
+two nested scrollers the pointer happens to be over.
+
+The window opens at 1100 by 720 instead of 720 by 620, which is large enough to
+read without resizing and still fits a 1366 by 768 laptop with its taskbar. The
+floor is 720 by 520, and it is now about **width**: anything taller than the
+window can be scrolled to, but the layout is monospace and column-based and
+below roughly 720 across the columns overlap rather than reflow.
+
+### `--tab`, and screenshots that cannot show the wrong thing
+
+```
+veilvoice-gui --tab verify
+```
+
+A deep link into a tab, and the thing that finally made `tools/shots/gui.ps1`
+honest. Three earlier versions of that script drove the interface by clicking
+and each failed differently: hard-coded coordinates that went stale when a tab
+was inserted; a pixel scan that merged two labels once capitalising them closed
+the gap; and, underneath both, the fact that synthetic mouse input needs the
+window in the foreground and Windows refuses to give the foreground to a
+background process. `SetForegroundWindow` reports that refusal by returning
+false, which nothing was reading, so the click went nowhere and whichever tab
+was already open got photographed under nine names.
+
+It no longer clicks. The application is started once per tab, maximised, and
+photographed with `PrintWindow`, which asks the window to draw itself and needs
+neither focus nor visibility. A fingerprint of each capture is compared against
+the others, so two tabs coming out identical is caught rather than published.
+
+The README's pictures are retaken at the full resolution of the screen, and the
+page now says plainly that **Windows 11 is confirmed and Windows 10 is
+supported but not yet confirmed**, which are different sentences.
+
+### Measured: the window does not flicker
+
+Reported, investigated, and not reproduced. Twenty-four consecutive captures of
+an idle window differ in **fourteen sample points**, all inside `x 36..88,
+y 68..84`, which is exactly where the animated soundbar is drawn. Everything
+else is pixel-identical. Twenty frames taken while the window was resized were
+all drawn, none blank or stale.
+
+An earlier attempt to blame the renderer was reverted: a `wgpu` swap was
+written, and the instrument built to justify it turned out to measure nothing
+three times over. What *was* found and fixed is in the entry below, and it is a
+better match for the report: seven file dialogs that stopped the window dead.
+
 ### `veilvoice gui` finds the application in three places, not one
 
 ```
