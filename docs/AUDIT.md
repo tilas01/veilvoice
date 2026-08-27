@@ -40,6 +40,75 @@ longer offered as the explanation for anything.
 
 ## This round
 
+**Two defects found and fixed (F-74 and F-75.)** Both are in the security
+crates written since the eighth round, and neither has shipped: `main` carries
+them and they are not in v0.1.14.
+
+This round covers what was added after it: Failsafe, the application baseline,
+the privilege report, the hardware detection, the decoy passphrase, and the
+desktop application's file dialogs and notifications.
+
+**Both are the same failure in different clothes: trusting an answer that was
+never given.** F-74 trusted a process id to still mean what it meant a moment
+ago, and then trusted an exit code that is returned unconditionally. F-75
+trusted a file's default permissions to be appropriate for a security setting.
+Neither would have been found by reading the code, and F-74 was found by
+writing a test that killed a real process and watching what it actually did.
+
+### F-74 -- Failsafe could close the wrong program, and say so either way
+
+`veilvoice-failsafe/src/act.rs`. Two defects in one path, and the second is the
+worse of them.
+
+**A process id is not a durable handle to a program.** Between the scan that
+finds a program holding a microphone and the line that closes it, that program
+can exit and the operating system can hand its id to something else. Closing by
+number alone would terminate whatever inherited it. The window is small and it
+is not theoretical: this feature exists to fire while somebody is plugging
+things in and programs are starting and stopping, which is exactly when ids are
+being recycled.
+
+**And `taskkill` exits 0 whether or not it killed anything.** Measured: given a
+filter that matches nothing it prints `INFO: No tasks running with the
+specified criteria` and returns success, indistinguishable from a real
+termination. The code checked `status.success()`, so Failsafe would have
+recorded *"closed Discord (process 4812)"* in its log while Discord carried on
+sending audio. **That is the worst sentence a safety catch can produce**: it is
+not a failure to act, it is a false report of having acted, and the whole
+feature exists for the case where nobody is watching the window.
+
+The name now travels with the kill. On Windows `taskkill` is given
+`/FI "IMAGENAME eq ..."` as well as the id, so the check and the act are one
+operation rather than two with a gap; measured, a mismatched name leaves the
+process running. Elsewhere the name is checked immediately before, which
+narrows the window rather than closing it, and that is said rather than
+implied. Where the check cannot be answered at all, the answer is *no*: not
+closing something is recoverable and closing the wrong thing is not.
+
+Afterwards the process is looked for again, with a short backoff, and a kill
+that did not kill reports so. The test that found this closes a real process it
+started; the version of it that passed a made-up name now correctly fails to
+close anything, which is how the fix was confirmed.
+
+### F-75 -- the application baseline was written world-readable
+
+`veilvoice-cli/src/appctl.rs`. `veilvoice appctl` records what normally runs on
+this machine and writes it with `std::fs::write`, which takes the default
+permissions.
+
+That file decides what counts as ordinary, which makes it a security setting
+rather than a convenience. Another local account could add a line and have a
+program of their choosing treated as unremarkable for ever, or simply read it
+to learn exactly what runs on this machine and when.
+
+This project already has one place that gets file permissions right, and the
+part that matters is that it sets them **as the file is created** rather than
+afterwards: a file that exists for even a moment with the wrong permissions is
+a file somebody else's program may have read in that moment. The baseline now
+goes through it.
+
+## The eighth round
+
 **Eight defects found and fixed (F-66 to F-73.)** Seven had not shipped.
 **F-73 had**: the randomised ratchet interval was implemented, documented as
 being used, and called by nothing, so every released copy rolled on the same
@@ -561,7 +630,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 994 tests across 26 crates, plus doctests and 11 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). |
+| Test suite | 996 tests across 26 crates, plus doctests and 11 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -2013,7 +2082,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Seventy-three defects found and fixed across eight audit rounds (F-1 to F-73):**
+**Seventy-five defects found and fixed across nine audit rounds (F-1 to F-75):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

@@ -27,6 +27,78 @@
 
 use std::process::Command;
 
+/// A program's own name, without the path it was found at.
+fn file_name(app: &str) -> String {
+    app.trim()
+        .rsplit(['/', '\\'])
+        .next()
+        .unwrap_or(app)
+        .to_string()
+}
+
+/// Whether this process id still belongs to this program.
+///
+/// Windows asks `tasklist`, filtered by the id, and looks for the name in what
+/// comes back.
+///
+/// This has to exist even though `taskkill` is also given the name as a filter,
+/// because **`taskkill` exits 0 whether or not it killed anything.** Measured:
+/// with a filter that matches nothing it prints "INFO: No tasks running with
+/// the specified criteria" and returns success, exactly as it does after a real
+/// termination. Trusting the exit code meant reporting "closed Discord" while
+/// Discord carried on running, which is the worst thing a safety catch can say.
+#[cfg(windows)]
+fn still_named(app: &str, pid: u32) -> bool {
+    let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".to_string());
+    let mut command = Command::new(format!(r"{root}\System32\tasklist.exe"));
+    command.args(["/FI", &format!("PID eq {pid}"), "/FO", "CSV", "/NH"]);
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        command.creation_flags(CREATE_NO_WINDOW);
+    }
+    let Ok(output) = command.output() else {
+        // Could not tell. Refusing is the safe direction: not closing something
+        // is recoverable and closing the wrong thing is not.
+        return false;
+    };
+    let text = String::from_utf8_lossy(&output.stdout).to_ascii_lowercase();
+    text.contains(&file_name(app).to_ascii_lowercase())
+}
+
+/// Whether this process id still belongs to this program.
+///
+/// See F-74. Asked immediately before the kill, which narrows the window rather
+/// than removing it: that is the best a caller outside the kernel can do, and
+/// saying so is better than pretending the problem is gone.
+#[cfg(not(windows))]
+fn still_named(app: &str, pid: u32) -> bool {
+    let wanted = file_name(app).to_ascii_lowercase();
+
+    // Linux publishes it, so nothing has to be run.
+    if let Ok(comm) = std::fs::read_to_string(format!("/proc/{pid}/comm")) {
+        return comm.trim().to_ascii_lowercase() == wanted;
+    }
+    match Command::new("/bin/ps")
+        .args(["-p", &pid.to_string(), "-o", "comm="])
+        .output()
+    {
+        Ok(output) if output.status.success() => {
+            let text = String::from_utf8_lossy(&output.stdout);
+            let name = text
+                .trim()
+                .rsplit('/')
+                .next()
+                .unwrap_or("")
+                .to_ascii_lowercase();
+            name == wanted
+        }
+        // Could not tell. Refusing is the safe direction: not closing something
+        // is recoverable and closing the wrong thing is not.
+        _ => false,
+    }
+}
+
 /// Close a program, having decided it should be closed.
 ///
 /// Refuses anything on [`crate::PROTECTED`] whatever the caller believed, and
@@ -49,6 +121,18 @@ pub fn close(app: &str, pid: Option<u32>) -> Result<String, String> {
         ));
     };
 
+    // F-74. Before anything is run, and on every platform: a process id is not
+    // a durable handle to a program. Between the scan that found this and this
+    // line, the program can exit and the operating system can hand its id to
+    // something else, and closing by number alone would terminate whatever
+    // inherited it while reporting the one it meant.
+    if !still_named(app, pid) {
+        return Err(format!(
+            "{app} is no longer process {pid}. Nothing was closed: that id now \
+             belongs to something else, or to nothing."
+        ));
+    }
+
     let (program, args) = if cfg!(windows) {
         // Absolute path, never a bare name: Windows searches the current
         // directory before most of PATH, and this is a security feature
@@ -56,7 +140,28 @@ pub fn close(app: &str, pid: Option<u32>) -> Result<String, String> {
         let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".to_string());
         (
             format!(r"{root}\System32\taskkill.exe"),
-            vec!["/PID".to_string(), pid.to_string(), "/F".to_string()],
+            vec![
+                "/PID".to_string(),
+                pid.to_string(),
+                // F-74. The name as well as the number.
+                //
+                // Between the scan that found this and this line, the program
+                // can exit and the operating system can hand its id to
+                // something else. Closing by number alone would then terminate
+                // whatever inherited it and report having closed the one it
+                // meant. That window is small and it is not theoretical: this
+                // feature fires precisely while somebody is plugging things in
+                // and programs are starting and stopping.
+                //
+                // `taskkill` refuses when the filter does not match the id, so
+                // the check and the kill are one operation rather than two
+                // with a gap. Measured: with the wrong name it reports "no
+                // tasks running with the specified criteria" and the process
+                // survives; with the right one it terminates it.
+                "/FI".to_string(),
+                format!("IMAGENAME eq {}", file_name(app)),
+                "/F".to_string(),
+            ],
         )
     } else {
         // TERM, not KILL. A program given the chance to close its audio device
@@ -79,14 +184,31 @@ pub fn close(app: &str, pid: Option<u32>) -> Result<String, String> {
     let output = command
         .output()
         .map_err(|error| format!("could not run {program}: {error}"))?;
-    if output.status.success() {
-        Ok(format!("closed {app} (process {pid})"))
-    } else {
-        Err(format!(
+    if !output.status.success() {
+        return Err(format!(
             "could not close {app} (process {pid}): {}",
             String::from_utf8_lossy(&output.stderr).trim()
-        ))
+        ));
     }
+
+    // The exit code is not the answer. `taskkill` returns success whether or
+    // not it killed anything, and `kill -TERM` returns as soon as the signal is
+    // delivered rather than when the program acts on it. So the process is
+    // looked for again.
+    //
+    // A short wait, because ending is not instant and reporting a failure that
+    // resolves itself a hundred milliseconds later would send somebody chasing
+    // a program that is already gone.
+    for attempt in 0..10 {
+        if !still_named(app, pid) {
+            return Ok(format!("closed {app} (process {pid})"));
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50 * (attempt + 1)));
+    }
+    Err(format!(
+        "{app} (process {pid}) was asked to close and is still running. Close it \
+         yourself, or stop veiling."
+    ))
 }
 
 #[cfg(test)]
@@ -131,6 +253,72 @@ mod tests {
         assert!(body.contains("-TERM"), "and elsewhere it asks first");
     }
 
+    /// A name that does not match the process is refused, which is F-74's
+    /// whole purpose: the id alone is not enough to know what will be closed.
+    #[test]
+    fn a_process_whose_name_does_not_match_is_left_alone() {
+        let mut child = if cfg!(windows) {
+            let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".to_string());
+            Command::new(format!(r"{root}\System32\ping.exe"))
+                .args(["-n", "20", "127.0.0.1"])
+                .stdin(std::process::Stdio::null())
+                .stdout(std::process::Stdio::null())
+                .spawn()
+        } else {
+            Command::new("/bin/sleep").arg("20").spawn()
+        };
+        let Ok(child) = child.as_mut() else {
+            return;
+        };
+        let pid = child.id();
+
+        // Somebody else's program, wearing this one's number.
+        let refused = close("not-what-is-running.exe", Some(pid));
+        assert!(refused.is_err(), "{refused:?}");
+
+        // And it really is still running.
+        let name = if cfg!(windows) { "ping.exe" } else { "sleep" };
+        close(name, Some(pid)).expect("the right name still closes it");
+        let _ = child.wait();
+    }
+
+    /// **F-74.** A process id is not a durable handle to a program.
+    ///
+    /// Between the scan that found something and the line that closes it, the
+    /// program can exit and the operating system can hand its id to a new
+    /// process. Closing by number alone would then terminate whatever inherited
+    /// it, and report having closed the one it meant.
+    ///
+    /// On Windows the name travels with the kill as a filter, so the check and
+    /// the act are one operation. Elsewhere the name is checked immediately
+    /// before, which narrows the window rather than removing it.
+    #[test]
+    fn a_process_is_never_closed_by_number_alone() {
+        let source = include_str!("act.rs").replace(
+            "
+", "
+",
+        );
+        let body = source.split("#[cfg(test)]").next().unwrap();
+        assert!(
+            body.contains("IMAGENAME eq"),
+            "the Windows kill must carry the name as well as the id"
+        );
+        assert!(
+            body.contains("still_named"),
+            "and elsewhere the name must be checked first"
+        );
+        // And the fallback when it cannot tell is to refuse.
+        let start = body.find("fn still_named").unwrap_or(0);
+        if start > 0 {
+            let tail = &body[start..];
+            assert!(
+                tail.contains("_ => false"),
+                "not being able to tell must mean not closing it"
+            );
+        }
+    }
+
     /// A real process, closed for real. Started here so nothing else is at
     /// risk, and it is a program that does nothing but wait.
     #[test]
@@ -155,7 +343,13 @@ mod tests {
             return;
         };
         let pid = child.id();
-        let told = close("a-test-process", Some(pid));
+        // The real name, because F-74 made the name part of the kill. Passing a
+        // made-up one here used to work and now correctly does not, which is
+        // the whole point: the first run of this after that change sat for the
+        // full thirty seconds while taskkill refused and the process outlived
+        // it.
+        let name = if cfg!(windows) { "ping.exe" } else { "sleep" };
+        let told = close(name, Some(pid));
         assert!(told.is_ok(), "{told:?}");
         assert!(told.unwrap().contains(&pid.to_string()));
 
