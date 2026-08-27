@@ -99,7 +99,7 @@ thousand times.
 flowchart TD
     n_main(["main.rs<br/>2231 lines"])
     n_accel["accel.rs<br/>90 lines"]
-    n_appctl["appctl.rs<br/>272 lines"]
+    n_appctl["appctl.rs<br/>286 lines"]
     n_atrest["atrest.rs<br/>286 lines"]
     n_capture["capture.rs<br/>330 lines"]
     n_conversation["conversation.rs<br/>797 lines"]
@@ -169,7 +169,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`accel.rs`|File-veilvoice-cli-accel]] | 90 | veilvoice accel — the graphics hardware here, and what it is good for. |
-| [[`appctl.rs`|File-veilvoice-cli-appctl]] | 272 | veilvoice appctl — learn what normally runs, then notice what does not. |
+| [[`appctl.rs`|File-veilvoice-cli-appctl]] | 286 | veilvoice appctl — learn what normally runs, then notice what does not. |
 | [[`atrest.rs`|File-veilvoice-cli-atrest]] | 286 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [[`capture.rs`|File-veilvoice-cli-capture]] | 330 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [[`conversation.rs`|File-veilvoice-cli-conversation]] | 797 | veilvoice conversation -- several speakers, a voice each, and subtitles. |

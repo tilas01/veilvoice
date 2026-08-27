@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/appctl.svg" alt="appctl.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/appctl.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 272 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 286 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#in-plain-words">In plain words</a>
@@ -57,21 +57,21 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>272 lines defining <strong>10 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>286 lines defining <strong>10 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>learn</code> <span style="color:var(--muted)">line 67</span> &mdash; Record what is running as ordinary.
+<li><code>learn</code> <span style="color:var(--muted)">line 81</span> &mdash; Record what is running as ordinary.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>running</code>, <code>save</code>, <code>scope</code></span>
 </li>
-<li><code>check</code> <span style="color:var(--muted)">line 120</span> &mdash; Compare what is running against the baseline.
+<li><code>check</code> <span style="color:var(--muted)">line 134</span> &mdash; Compare what is running against the baseline.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>running</code>, <code>save</code>, <code>scope</code></span>
 </li>
-<li><code>allow</code> <span style="color:var(--muted)">line 195</span> &mdash; Allow a program, for a while or for good.
+<li><code>allow</code> <span style="color:var(--muted)">line 209</span> &mdash; Allow a program, for a while or for good.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>save</code>, <code>scope</code></span>
 </li>
-<li><code>revoke</code> <span style="color:var(--muted)">line 228</span> &mdash; Withdraw a grant.
+<li><code>revoke</code> <span style="color:var(--muted)">line 242</span> &mdash; Withdraw a grant.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>save</code>, <code>scope</code></span>
 </li>
-<li><code>log</code> <span style="color:var(--muted)">line 240</span> &mdash; Show the decision log.
+<li><code>log</code> <span style="color:var(--muted)">line 254</span> &mdash; Show the decision log.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>scope</code></span>
 </li>
 </ul>
@@ -119,40 +119,40 @@
 <text x="328.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">save</text>
 <text x="328.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 45</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L53" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67" target="_blank" rel="noopener noreferrer">
 <rect x="395.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="435.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">scope</text>
-<text x="435.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 53</text>
+<text x="435.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L62" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L76" target="_blank" rel="noopener noreferrer">
 <rect x="502.4" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="543.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">running</text>
-<text x="543.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 62</text>
+<text x="543.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 76</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L81" target="_blank" rel="noopener noreferrer">
 <rect x="35.6" y="120.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="76.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">learn</text>
-<text x="76.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
+<text x="76.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 81</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L120" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L134" target="_blank" rel="noopener noreferrer">
 <rect x="142.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="187.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check</text>
-<text x="187.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 120</text>
+<text x="187.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L195" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L209" target="_blank" rel="noopener noreferrer">
 <rect x="257.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="302.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">allow</text>
-<text x="302.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 195</text>
+<text x="302.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L228" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L242" target="_blank" rel="noopener noreferrer">
 <rect x="372.4" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="416.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">revoke</text>
-<text x="416.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
+<text x="416.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 242</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L240" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L254" target="_blank" rel="noopener noreferrer">
 <rect x="487.2" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="531.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">log</text>
-<text x="531.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 240</text>
+<text x="531.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 254</text>
 </a>
 </svg>
 </div>
@@ -163,13 +163,13 @@ flowchart TD
     n_baseline_path[&quot;baseline_path&lt;br/&gt;line 23&quot;]
     n_load[&quot;load&lt;br/&gt;line 37&quot;]
     n_save[&quot;save&lt;br/&gt;line 45&quot;]
-    n_scope[&quot;scope&lt;br/&gt;line 53&quot;]
-    n_running[&quot;running&lt;br/&gt;line 62&quot;]
-    n_learn([&quot;learn&lt;br/&gt;line 67&quot;])
-    n_check([&quot;check&lt;br/&gt;line 120&quot;])
-    n_allow([&quot;allow&lt;br/&gt;line 195&quot;])
-    n_revoke([&quot;revoke&lt;br/&gt;line 228&quot;])
-    n_log([&quot;log&lt;br/&gt;line 240&quot;])
+    n_scope[&quot;scope&lt;br/&gt;line 67&quot;]
+    n_running[&quot;running&lt;br/&gt;line 76&quot;]
+    n_learn([&quot;learn&lt;br/&gt;line 81&quot;])
+    n_check([&quot;check&lt;br/&gt;line 134&quot;])
+    n_allow([&quot;allow&lt;br/&gt;line 209&quot;])
+    n_revoke([&quot;revoke&lt;br/&gt;line 242&quot;])
+    n_log([&quot;log&lt;br/&gt;line 254&quot;])
     n_allow --&gt; n_baseline_path
     n_allow --&gt; n_load
     n_allow --&gt; n_save
@@ -194,13 +194,13 @@ flowchart TD
     click n_baseline_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L23&quot; &quot;open the source&quot;
     click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L37&quot; &quot;open the source&quot;
     click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L45&quot; &quot;open the source&quot;
-    click n_scope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L53&quot; &quot;open the source&quot;
-    click n_running href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L62&quot; &quot;open the source&quot;
-    click n_learn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L120&quot; &quot;open the source&quot;
-    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L195&quot; &quot;open the source&quot;
-    click n_revoke href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L228&quot; &quot;open the source&quot;
-    click n_log href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L240&quot; &quot;open the source&quot;
+    click n_scope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67&quot; &quot;open the source&quot;
+    click n_running href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L76&quot; &quot;open the source&quot;
+    click n_learn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L81&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L134&quot; &quot;open the source&quot;
+    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L209&quot; &quot;open the source&quot;
+    click n_revoke href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L242&quot; &quot;open the source&quot;
+    click n_log href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L254&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_learn,n_check,n_allow,n_revoke,n_log entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -216,13 +216,13 @@ flowchart TD
 <tr><td><code>baseline_path</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L23" rel="noopener noreferrer">23</a></td><td>Where the baseline is kept.</td></tr>
 <tr><td><code>load</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L37" rel="noopener noreferrer">37</a></td><td></td></tr>
 <tr><td><code>save</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L45" rel="noopener noreferrer">45</a></td><td></td></tr>
-<tr><td><code>scope</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L53" rel="noopener noreferrer">53</a></td><td>The note that goes with every answer.</td></tr>
-<tr><td><code>running</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L62" rel="noopener noreferrer">62</a></td><td>What is running now, through the shared listing.</td></tr>
-<tr><td><code>learn</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67" rel="noopener noreferrer">67</a></td><td>Record what is running as ordinary.</td></tr>
-<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L120" rel="noopener noreferrer">120</a></td><td>Compare what is running against the baseline.</td></tr>
-<tr><td><code>allow</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L195" rel="noopener noreferrer">195</a></td><td>Allow a program, for a while or for good.</td></tr>
-<tr><td><code>revoke</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L228" rel="noopener noreferrer">228</a></td><td>Withdraw a grant.</td></tr>
-<tr><td><code>log</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L240" rel="noopener noreferrer">240</a></td><td>Show the decision log.</td></tr>
+<tr><td><code>scope</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67" rel="noopener noreferrer">67</a></td><td>The note that goes with every answer.</td></tr>
+<tr><td><code>running</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L76" rel="noopener noreferrer">76</a></td><td>What is running now, through the shared listing.</td></tr>
+<tr><td><code>learn</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L81" rel="noopener noreferrer">81</a></td><td>Record what is running as ordinary.</td></tr>
+<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L134" rel="noopener noreferrer">134</a></td><td>Compare what is running against the baseline.</td></tr>
+<tr><td><code>allow</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L209" rel="noopener noreferrer">209</a></td><td>Allow a program, for a while or for good.</td></tr>
+<tr><td><code>revoke</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L242" rel="noopener noreferrer">242</a></td><td>Withdraw a grant.</td></tr>
+<tr><td><code>log</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L254" rel="noopener noreferrer">254</a></td><td>Show the decision log.</td></tr>
 </tbody></table>
 </section>
 </div></div>
