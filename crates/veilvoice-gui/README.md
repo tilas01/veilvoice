@@ -96,9 +96,9 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>81 lines"])
     n_main(["main.rs<br/>111 lines"])
-    n_app["app.rs<br/>1845 lines"]
+    n_app["app.rs<br/>1877 lines"]
     n_crashlog["crashlog.rs<br/>266 lines"]
-    n_dialog["dialog.rs<br/>364 lines"]
+    n_dialog["dialog.rs<br/>369 lines"]
     n_group["group.rs<br/>1668 lines"]
     n_notify["notify.rs<br/>460 lines"]
     n_palettes["palettes.rs<br/>700 lines"]
@@ -181,9 +181,9 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1845 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 1877 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 266 | Make a failure that produces no output produce some. |
-| [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 364 | Asking for a file without stopping the window. |
+| [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 369 | Asking for a file without stopping the window. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1668 | Group mode: several people in one recording, each with a name and a colour. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 81 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 111 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |

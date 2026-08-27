@@ -11,7 +11,7 @@
 
 # `website/css/main.css`
 
-[the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css) &middot; 1891 lines
+[the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css) &middot; 1975 lines
 
 ## What it does
 

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/dialog.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 364 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 369 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs)
 
 ## Contents
 
@@ -61,7 +61,7 @@ which actually works.
 
 ## What this file contains
 
-364 lines defining **10 functions** (9 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+369 lines defining **10 functions** (9 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

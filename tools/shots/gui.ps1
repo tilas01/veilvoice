@@ -32,8 +32,7 @@
 # in front of it matters -- which is the other half of the same problem, and
 # the reason the earlier versions quietly photographed the desktop wallpaper.
 #
-# The window is maximised first, so every picture is at the resolution somebody
-# actually uses rather than at a small default nobody would choose.
+# The window is sized rather than maximised: see the note beside SetWindowPos.
 
 param(
   [string]$Exe = "$env:CARGO_TARGET_DIR\release\veilvoice-gui.exe",
@@ -54,6 +53,7 @@ public class Shot {
   [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
   [DllImport("user32.dll")] public static extern bool PrintWindow(IntPtr h, IntPtr dc, uint flags);
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int cmd);
+  [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int w, int t, uint flags);
   [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr h, int a, out RECT r, int size);
   [DllImport("shcore.dll")] public static extern int SetProcessDpiAwareness(int v);
   [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
@@ -116,7 +116,6 @@ $forced = if ($saved) {
 New-Item -ItemType Directory -Force (Split-Path $settings) | Out-Null
 Set-Content -Path $settings -Value $forced -Encoding utf8
 
-$SW_MAXIMIZE = 3
 $PW_RENDERFULLCONTENT = 2
 $problems = @()
 $prints = @{}
@@ -141,8 +140,16 @@ foreach ($tab in $tabs) {
     continue
   }
 
-  # Full screen, so every picture is at a resolution somebody actually uses.
-  [void][Shot]::ShowWindow($h, $SW_MAXIMIZE)
+  # A fitted size rather than full screen.
+  #
+  # Maximising on a 4K display gave 3840x2088 captures whose text was
+  # unreadable at any size a page shows them, with wide empty margins down
+  # either side where the layout had nothing to put. This is the size the
+  # window opens at, widened so all nine tab labels fit and made taller so that
+  # every control on the longest tab is visible without scrolling. The picture
+  # should show somebody the whole of a panel, which is the only reason to take
+  # one.
+  [void][Shot]::SetWindowPos($h, [IntPtr]::Zero, 40, 40, 1400, 1000, 0x0004)
   # Long enough for the layout to settle and the first frames to be drawn.
   Start-Sleep -Milliseconds 2500
 
