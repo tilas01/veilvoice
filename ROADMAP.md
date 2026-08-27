@@ -93,6 +93,7 @@ it cannot do as plainly as what it can.
 | 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | — |
 | 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **done** | — |
 | 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | — |
+| 65 | **Failsafe** — on by default: notice the moment another program picks up a *real* microphone while you are being veiled, warn, and close it | **done** | — |
 | 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **done** | — |
 | 42 | Duress and decoy passwords | **planned** | 7–10 d |
 | 43 | Transcription through your own API key, given **veiled audio only** | **blocked** | — |
@@ -421,6 +422,32 @@ start, which is the same overstatement in the other direction. What could be
 built without diarisation — a wave per speaker in a *rendered* conversation,
 where the plan already says who speaks when — exists, and is what the video
 output and the HTML player draw.
+
+**Marker 65, Failsafe, is the one feature here that is on by default**, and
+the reason is the shape of the accident it guards against. You are talking
+through VeilVoice, veiled. You plug in a headset. The operating system offers
+the new microphone, the calling program takes it, and from that moment your
+**real voice** is going out — with the veiled window still open in front of
+you, meters still moving, looking exactly as it did a second earlier. Nobody
+notices that, because there is nothing to notice. It is not carelessness; it
+is a decision the operating system makes on somebody's behalf.
+
+So the default is on, and the default also **closes** the offending program,
+because a warning nobody has read yet does not stop a voice going out.
+
+**It notices; it does not prevent, and the difference is printed every time.**
+Stopping the operating system handing over a microphone needs exclusive-mode
+capture of every input device or a driver, and this project ships neither.
+What Failsafe does is see it within about a second and act. That moment is
+short and it is not zero, and `CANNOT_PREVENT` says so wherever the feature
+appears.
+
+Closing somebody's program is bounded rather than general: never VeilVoice
+itself, never a system process, never by name — only the specific process
+the watch feed named, and the check is made twice, once when deciding and
+again in the only function that acts. Every close is written down, because a
+program that vanishes with nothing to explain it is indistinguishable from a
+crash.
 
 **Marker 37 is a baseline, and it is named honestly everywhere but its own
 title.** `veilvoice-appctl` learns what normally runs here, then tells you when

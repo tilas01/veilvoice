@@ -50,6 +50,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`atrest.rs`|File-veilvoice-cli-atrest]] &mdash; Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.
 - [[`capture.rs`|File-veilvoice-cli-capture]] &mdash; veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.
 - [[`conversation.rs`|File-veilvoice-cli-conversation]] &mdash; veilvoice conversation -- several speakers, a voice each, and subtitles.
+- [[`failsafe.rs`|File-veilvoice-cli-failsafe]] &mdash; veilvoice failsafe — the safety catch, and what it can and cannot do.
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
 - [[`input.rs`|File-veilvoice-cli-input]] &mdash; veilvoice input — what running programs can see your keyboard and mouse.
 - [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
@@ -113,6 +114,13 @@ Notice when a kernel driver or module appears, with a cross-view check and an ho
 - [[`linux.rs`|File-veilvoice-drivers-linux]] &mdash; Linux: /proc/modules, cross-checked against /sys/module.
 - [[`macos.rs`|File-veilvoice-drivers-macos]] &mdash; macOS: kmutil showloaded, falling back to kextstat.
 - [[`windows.rs`|File-veilvoice-drivers-windows]] &mdash; Windows: driverquery.exe, which the system already ships.
+
+## [[veilvoice-failsafe|Crate-veilvoice-failsafe]]
+
+The safety catch: notice the moment another program takes a real microphone while you are being veiled, and act -- without ever claiming to have prevented it.
+
+- [[`act.rs`|File-veilvoice-failsafe-act]] &mdash; Actually closing a program, kept apart from deciding to.
+- [[`lib.rs`|File-veilvoice-failsafe-lib]] &mdash; Failsafe: nothing leaves this machine in your own voice by accident.
 
 ## [[veilvoice-guard|Crate-veilvoice-guard]]
 

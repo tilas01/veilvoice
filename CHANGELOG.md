@@ -8,6 +8,50 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Failsafe — on by default, because this accident is silent
+
+```
+veilvoice failsafe
+```
+
+The accident: you are talking through VeilVoice with your voice veiled, you
+plug in a headset, and your computer quietly switches the call to the **real**
+microphone. Your own voice goes out. The veiled window is still open in front
+of you, meters still moving, looking exactly as it did a second earlier.
+
+Nobody notices that, because there is nothing to notice. It is not
+carelessness; it is a decision the operating system makes on your behalf. So
+Failsafe is **on by default**, and by default it also **closes** the program
+that took the microphone — a warning you have not read yet does not stop
+your voice going out.
+
+**It notices. It does not prevent, and that difference is printed every time:**
+
+> Failsafe cannot stop your computer handing a microphone to another program.
+> [...] What it does is notice, within about a second, and act — so there
+> is a moment between another program taking a real microphone and Failsafe
+> reacting to it. That moment is short and it is not zero, and anything that
+> told you otherwise would be lying to you about how safe you are.
+
+Closing a program is bounded rather than general. Never VeilVoice itself,
+never a system process, and never by name — only the specific process the
+watch feed named, with the protection checked **twice**: once when deciding
+and again inside the only function that acts, because the cost of being wrong
+is ending somebody's desktop session. Every close is written down.
+
+Three distinctions the crate refuses to blur:
+
+- **"Nothing is wrong" and "nothing is being protected" are different.** With
+  live veiling stopped it says so, rather than showing an all-clear.
+- **A platform that cannot see is never reported as clear.** An empty list from
+  a system that cannot answer is not good news.
+- **An unreadable setting reads back as ON.** A settings file this build cannot
+  parse must never be the reason the safety catch is off.
+
+A program using VeilVoice's own cable is the arrangement working, not the
+accident, and is not reported — otherwise the alarm fires constantly and
+gets ignored.
+
 ### The window no longer freezes while you pick a file
 
 Every file picker in the application was opened with the **blocking** API,

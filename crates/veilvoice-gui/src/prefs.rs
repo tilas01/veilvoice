@@ -70,6 +70,12 @@ pub struct Prefs {
     /// choice -- which for the value `off` would mean turning their warnings
     /// back on, or worse, off.
     pub notify_style: String,
+    /// The Failsafe posture: `close`, `warn` or `off`.
+    ///
+    /// Stored as its key. An unreadable value reads back as the **default**,
+    /// which is on -- a settings file this build cannot parse must never be
+    /// the reason the safety catch is off.
+    pub failsafe: String,
     /// Set when the file on disk could not be understood, so the settings
     /// panel can say the defaults are in force and why. Never persisted.
     pub recovered_from_corrupt_file: bool,
@@ -87,6 +93,7 @@ impl Default for Prefs {
             hide_install_tab: false,
             always_group: false,
             notify_style: crate::notify::Style::default().key().to_string(),
+            failsafe: veilvoice_failsafe::Posture::default().key().to_string(),
             recovered_from_corrupt_file: false,
         }
     }
@@ -169,6 +176,14 @@ impl Prefs {
                         understood += 1;
                     }
                 }
+                "failsafe" => {
+                    // Through `from_key`, so an unrecognised value lands on the
+                    // default rather than being stored and acted on. The
+                    // default is on.
+                    prefs.failsafe = veilvoice_failsafe::Posture::from_key(value)
+                        .key()
+                        .to_string();
+                }
                 "notify_style" => {
                     // Anything unrecognised becomes the default rather than an
                     // error, and the default shows something. A file this build
@@ -203,6 +218,7 @@ impl Prefs {
         out.push_str(&format!("hide_install_tab = {}\n", self.hide_install_tab));
         out.push_str(&format!("always_group = {}\n", self.always_group));
         out.push_str(&format!("notify_style = {}\n", self.notify_style));
+        out.push_str(&format!("failsafe = {}\n", self.failsafe));
         out
     }
 
@@ -304,6 +320,7 @@ mod tests {
             hide_install_tab: true,
             always_group: true,
             notify_style: "alert".to_string(),
+            failsafe: "warn".to_string(),
             recovered_from_corrupt_file: false,
         };
         let back = Prefs::parse(&prefs.to_text());
@@ -387,6 +404,7 @@ mod tests {
             animated_icon: true,
             configured: true,
             notify_style: "overlay".into(),
+            failsafe: "close".into(),
             hide_install_tab: false,
             always_group: false,
             recovered_from_corrupt_file: false,
