@@ -110,12 +110,13 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>2216 lines"])
+    n_main(["main.rs<br/>2231 lines"])
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>272 lines"]
     n_atrest["atrest.rs<br/>275 lines"]
     n_capture["capture.rs<br/>321 lines"]
     n_conversation["conversation.rs<br/>789 lines"]
+    n_decoy["decoy.rs<br/>58 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
     n_guard["guard.rs<br/>338 lines"]
     n_gui["gui.rs<br/>247 lines"]
@@ -136,6 +137,8 @@ flowchart TD
     n_capture --> n_theme
     n_conversation --> n_sentry
     n_conversation --> n_theme
+    n_decoy --> n_sentry
+    n_decoy --> n_theme
     n_failsafe --> n_sentry
     n_failsafe --> n_theme
     n_guard --> n_atrest
@@ -159,6 +162,7 @@ flowchart TD
     click n_atrest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" "open the source"
     click n_capture href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs" "open the source"
     click n_conversation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs" "open the source"
+    click n_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs" "open the source"
     click n_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/failsafe.rs" "open the source"
     click n_guard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" "open the source"
     click n_gui href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs" "open the source"
@@ -182,12 +186,13 @@ flowchart TD
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 275 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | 321 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 789 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
+| [`decoy.rs`](../../docs/files/veilvoice-cli/decoy.md) | 58 | veilvoice decoy — what a second passphrase is worth, and what it is not. |
 | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | 112 | veilvoice failsafe — the safety catch, and what it can and cannot do. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 338 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | 247 | veilvoice gui — open the desktop application from the command line. |
 | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 117 | veilvoice input — what running programs can see your keyboard and mouse. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 239 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2216 | veilvoice — the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2231 | veilvoice — the command-line interface. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 250 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 236 | veilvoice policy -- settings that can only be tightened. |
 | [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | 46 | veilvoice privilege — what VeilVoice is running with, and what it can see. |
@@ -222,6 +227,7 @@ flowchart TD
 | `fn inspect` | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | Show a plan without rendering anything. |
 | `fn run` | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | Render a recording according to a plan. |
 | `fn preview` | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | A still of what the page will look like, and the command that would make a video of it. |
+| `fn explain` | [`decoy.rs`](../../docs/files/veilvoice-cli/decoy.md) | Explain the feature and its limits. |
 | `fn show` | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | Show what Failsafe would make of this machine right now. |
 | `fn describe` | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | A named finding, for the tests to reach without a machine. |
 | `enum Action` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |

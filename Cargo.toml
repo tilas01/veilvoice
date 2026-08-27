@@ -23,6 +23,7 @@ members = [
     "crates/veilvoice-cli",
     "crates/veilvoice-video",
     "crates/veilvoice-watch",
+    "crates/veilvoice-decoy",
     "crates/veilvoice-drivers",
     "crates/veilvoice-failsafe",
     "crates/veilvoice-guard",

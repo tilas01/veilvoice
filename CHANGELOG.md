@@ -8,6 +8,55 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### A second passphrase, and the one that does not exist
+
+```
+veilvoice decoy
+```
+
+Marker 42, which this roadmap called the most dangerous thing on its list. It
+set three conditions before anything shipped: what happens when it is typed by
+mistake, what "securely erased" is really worth on flash storage, and what an
+attacker who learns the trigger can do. Working through those decided the shape.
+
+**The decoy is shipped.** A second passphrase opens VeilVoice with nothing in
+it: a way to comply with somebody standing over you without handing over your
+recordings.
+
+A decoy too close to the real passphrase is **refused**, because somebody
+watching a keyboard would learn both at once and somebody typing under pressure
+would give away the wrong one. Length counts as difference, so `hunter2` and
+`hunter2222` is not two passphrases.
+
+Both are derived with the same Argon2id cost and compared in constant time, and
+**both are always derived** even when the first matches. An early return would
+make the real passphrase measurably faster and tell an observer with a stopwatch
+which one had just been typed. A copy with no decoy set does the second
+derivation anyway, so having one is not itself detectable.
+
+**The destructive duress passphrase is not shipped, and will not be.** On flash
+storage a write does not overwrite: the controller puts the new data in a fresh
+physical page and leaves the old one holding the original until it is collected,
+which may be never, and no program running as a user can reach it. VeilVoice
+already refuses to overstate that about its own secure-erase feature.
+
+So a destructive passphrase would be believed at exactly the moment being wrong
+costs the most: somebody types it, assumes the recordings are gone, and behaves
+accordingly while the ciphertext is still on the disk. **A control people rely
+on and that does not work is worse than no control at all.** It also answers the
+first condition: because nothing is destroyed, typing the decoy by mistake costs
+a relaunch and nothing else.
+
+**And it does not give you deniability.** VeilVoice is open source and this
+feature is documented, so anybody who recognises the program knows it exists and
+can ask for the other passphrase. A decoy buys you something to hand over; it
+does not buy you an argument that there is nothing more. That sentence is the
+first thing the feature prints, because somebody who mistakes it for deniability
+is worse off than somebody who never had it.
+
+A test reads the crate's own source and fails the build if anything in it grows
+the ability to delete a file.
+
 ### `veilvoice accel`: your graphics hardware, and the one place it helps
 
 ```

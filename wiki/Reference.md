@@ -57,6 +57,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`atrest.rs`|File-veilvoice-cli-atrest]] &mdash; Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.
 - [[`capture.rs`|File-veilvoice-cli-capture]] &mdash; veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.
 - [[`conversation.rs`|File-veilvoice-cli-conversation]] &mdash; veilvoice conversation -- several speakers, a voice each, and subtitles.
+- [[`decoy.rs`|File-veilvoice-cli-decoy]] &mdash; veilvoice decoy — what a second passphrase is worth, and what it is not.
 - [[`failsafe.rs`|File-veilvoice-cli-failsafe]] &mdash; veilvoice failsafe — the safety catch, and what it can and cannot do.
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
 - [[`gui.rs`|File-veilvoice-cli-gui]] &mdash; veilvoice gui — open the desktop application from the command line.
@@ -113,6 +114,12 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`seal_and_open.rs`|File-veilvoice-crypto-examples-seal_and_open]] &mdash; no module documentation yet
 - [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] &mdash; Randomised robustness testing for the two parsers that read untrusted input.
 - [[`timing.rs`|File-veilvoice-crypto-tests-timing]] &mdash; Timing measurement of the password paths.
+
+## [[veilvoice-decoy|Crate-veilvoice-decoy]]
+
+A second passphrase that opens an empty VeilVoice, with the deniability it does not provide stated plainly, and no passphrase that destroys anything.
+
+- [[`lib.rs`|File-veilvoice-decoy-lib]] &mdash; A second passphrase that opens a different, empty VeilVoice.
 
 ## [[veilvoice-drivers|Crate-veilvoice-drivers]]
 
