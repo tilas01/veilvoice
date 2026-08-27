@@ -8,6 +8,46 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### F-74 — Failsafe could close the wrong program, and said so either way
+
+Two defects in one path, and the second is the worse of them.
+
+**A process id is not a durable handle to a program.** Between the scan that
+finds something holding a microphone and the line that closes it, that program
+can exit and the operating system can hand its id to another. Closing by number
+alone would terminate whatever inherited it. The window is small and it is not
+theoretical: Failsafe exists to fire while somebody is plugging things in and
+programs are starting and stopping, which is exactly when ids get recycled.
+
+**And `taskkill` exits 0 whether or not it killed anything.** Measured: with a
+filter that matches nothing it prints `INFO: No tasks running with the
+specified criteria` and returns success, indistinguishable from a real
+termination. The code checked the exit status, so Failsafe would have written
+*"closed Discord (process 4812)"* into its log while Discord carried on sending
+audio.
+
+That is the worst sentence a safety catch can produce. It is not a failure to
+act; it is a false report of having acted, and the whole feature exists for the
+case where nobody is watching the window.
+
+The name now travels with the kill: on Windows as a `taskkill` filter, so the
+check and the act are one operation, and elsewhere as a check immediately
+before, which narrows the window rather than closing it and says so. Where the
+question cannot be answered, the answer is **no**: not closing something is
+recoverable and closing the wrong thing is not. Afterwards the process is
+looked for again, and a kill that did not kill now reports so.
+
+### F-75 — the application baseline was written world-readable
+
+`veilvoice appctl` records what normally runs on this machine, with
+`std::fs::write` and its default permissions.
+
+That file decides what counts as ordinary, which makes it a security setting.
+Another local account could add a line and have a program of their choosing
+treated as unremarkable for ever, or read it to learn exactly what runs here
+and when. It now goes through the same helper the key material uses, which sets
+the permissions **as the file is created** rather than afterwards.
+
 ### Every file in the tree now explains itself twice
 
 Marker 52. Every crate already carried a technical note and a plain-words one.
