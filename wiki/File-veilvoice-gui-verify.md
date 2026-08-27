@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/verify.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 505 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 655 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs)
 
 ## Contents
 
@@ -47,7 +47,7 @@ checked before it is run.
 
 ## What this file contains
 
-505 lines defining **12 functions** (6 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+655 lines defining **14 functions** (7 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -58,10 +58,10 @@ checked before it is run.
 
 - `Verify::wants_repaint` (line 105) -- Whether the window has to keep drawing for this panel's sake.
 - `Verify::drain` (line 110) -- Take the worker's answer if it has one.
-- `Verify::take_dropped` (line 144) -- Read what the window was given this frame.
-  - reaches: `accept`, `slot_for`
-- `Verify::tab` (line 162) -- The whole tab.
-  - reaches: `body`, `drop_target`, `is_busy`, `slot_row`, `start`, `verdict`
+- `Verify::take_dropped` (line 199) -- Read what the window was given this frame.
+  - reaches: `accept`, `fill_from_beside`, `slot_for`
+- `Verify::tab` (line 217) -- The whole tab.
+  - reaches: `body`, `drop_target`, `found_beside`, `is_busy`, `slot_row`, `start`, `verdict`
 
 ## What calls what
 
@@ -82,15 +82,19 @@ flowchart TD
     n_wants_repaint(["Verify::wants_repaint<br/>line 105"])
     n_drain(["Verify::drain<br/>line 110"])
     n_accept["Verify::accept<br/>line 128"]
-    n_take_dropped(["Verify::take_dropped<br/>line 144"])
-    n_tab(["Verify::tab<br/>line 162"])
-    n_body["Verify::body<br/>line 168"]
-    n_drop_target["Verify::drop_target<br/>line 246"]
-    n_slot_row["Verify::slot_row<br/>line 268"]
-    n_verdict["Verify::verdict<br/>line 323"]
-    n_start["Verify::start<br/>line 382"]
+    n_fill_from_beside["Verify::fill_from_beside<br/>line 158"]
+    n_found_beside["Verify::found_beside<br/>line 180"]
+    n_take_dropped(["Verify::take_dropped<br/>line 199"])
+    n_tab(["Verify::tab<br/>line 217"])
+    n_body["Verify::body<br/>line 223"]
+    n_drop_target["Verify::drop_target<br/>line 321"]
+    n_slot_row["Verify::slot_row<br/>line 343"]
+    n_verdict["Verify::verdict<br/>line 398"]
+    n_start["Verify::start<br/>line 457"]
+    n_accept --> n_fill_from_beside
     n_accept --> n_slot_for
     n_body --> n_drop_target
+    n_body --> n_found_beside
     n_body --> n_is_busy
     n_body --> n_slot_row
     n_body --> n_start
@@ -102,19 +106,21 @@ flowchart TD
     click n_wants_repaint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L105" "open the source"
     click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L110" "open the source"
     click n_accept href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L128" "open the source"
-    click n_take_dropped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L144" "open the source"
-    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L162" "open the source"
-    click n_body href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L168" "open the source"
-    click n_drop_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L246" "open the source"
-    click n_slot_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L268" "open the source"
-    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L323" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L382" "open the source"
+    click n_fill_from_beside href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L158" "open the source"
+    click n_found_beside href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L180" "open the source"
+    click n_take_dropped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L199" "open the source"
+    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L217" "open the source"
+    click n_body href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L223" "open the source"
+    click n_drop_target href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L321" "open the source"
+    click n_slot_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L343" "open the source"
+    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L398" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L457" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_wants_repaint,n_drain,n_take_dropped,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_is_busy,n_accept api
+    class n_is_busy,n_accept,n_found_beside api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_slot_for,n_body,n_drop_target,n_slot_row,n_verdict,n_start helper
+    class n_slot_for,n_fill_from_beside,n_body,n_drop_target,n_slot_row,n_verdict,n_start helper
 ```
 
 </details>
@@ -130,10 +136,12 @@ flowchart TD
 | `Verify::wants_repaint` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L105) | Whether the window has to keep drawing for this panel's sake. |
 | `Verify::drain` <sub>pub fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L110) | Take the worker's answer if it has one. |
 | `Verify::accept` <sub>pub fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L128) | Put a dropped or chosen file into the slot its name says it belongs in. |
-| `Verify::take_dropped` <sub>pub fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L144) | Read what the window was given this frame. |
-| `Verify::tab` <sub>pub fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L162) | The whole tab. |
-| `Verify::body` <sub>fn</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L168) |  |
-| `Verify::drop_target` <sub>fn</sub> | [246](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L246) | The rectangle that lights up while files are over the window. |
-| `Verify::slot_row` <sub>fn</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L268) | One file slot: what it is, what is in it, and a way to change it. |
-| `Verify::verdict` <sub>fn</sub> | [323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L323) | The answer, in the colour it deserves. |
-| `Verify::start` <sub>fn</sub> | [382](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L382) | Run the check on a thread of its own. |
+| `Verify::fill_from_beside` <sub>fn</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L158) | Fill the empty slots from the folder this file came from. |
+| `Verify::found_beside` <sub>pub fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L180) | Which slots were filled in by looking rather than by being chosen. |
+| `Verify::take_dropped` <sub>pub fn</sub> | [199](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L199) | Read what the window was given this frame. |
+| `Verify::tab` <sub>pub fn</sub> | [217](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L217) | The whole tab. |
+| `Verify::body` <sub>fn</sub> | [223](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L223) |  |
+| `Verify::drop_target` <sub>fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L321) | The rectangle that lights up while files are over the window. |
+| `Verify::slot_row` <sub>fn</sub> | [343](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L343) | One file slot: what it is, what is in it, and a way to change it. |
+| `Verify::verdict` <sub>fn</sub> | [398](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L398) | The answer, in the colour it deserves. |
+| `Verify::start` <sub>fn</sub> | [457](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L457) | Run the check on a thread of its own. |

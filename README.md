@@ -111,16 +111,38 @@ are different kinds of thing.
 
 | | |
 |---|---|
-| **Anonymise a file** — one recording, veiled, encrypted at rest by default | **Live scramble** — a microphone in, a voice that is not yours out |
+| **Anonymise a file.** One recording, veiled, encrypted at rest by default. | **Live scramble.** A microphone in, a voice that is not yours out. |
 | ![anonymise a file](assets/screenshots/gui-file.png) | ![live scramble](assets/screenshots/gui-live.png) |
-| **Group mode** — several people, a name and a colour each | **Monitor** — who is using the microphone and camera |
+| **Group mode.** Several people, a name and a colour each. | **Monitor.** Who is using the microphone and camera. |
 | ![group mode](assets/screenshots/gui-group.png) | ![monitor](assets/screenshots/gui-monitor.png) |
-| **Lock** — the app lock, and what it is and is not worth | **Verify** — drop a download on the window and be told what it is |
+| **Lock.** The app lock, and what it is and is not worth. | **Verify.** Drop a download on the window and be told what it is. |
 | ![the app lock](assets/screenshots/gui-lock.png) | ![verify a download](assets/screenshots/gui-verify.png) |
-| **Settings** — nine palettes, motion, and which tabs are shown | **Install** — offered only to a portable copy |
+| **Settings.** Nine palettes, motion, Failsafe, and which tabs are shown. | **Install.** Offered only to a portable copy. |
 | ![settings](assets/screenshots/gui-settings.png) | ![install](assets/screenshots/gui-install.png) |
-| **About** — versions, scope, and the update check you press | |
+| **About.** Versions, scope, and the update check you press. | |
 | ![about](assets/screenshots/gui-about.png) | |
+
+Every one of these is taken by `tools/shots/gui.ps1`, which starts the
+application once per tab with `--tab <name>`, maximises the window and
+photographs it with `PrintWindow`. There is no clicking and there are no
+coordinates, so a picture cannot quietly end up showing the wrong tab. They are
+captured at the full resolution of the screen they were taken on.
+
+**Confirmed on Windows 11.** That is the one this application has actually been
+run and photographed on, and these pictures come from it.
+
+**Windows 10 is supported and not yet confirmed**, which is a different
+sentence and is meant to be. Nothing in the desktop application needs anything
+newer than Windows 10: the oldest interfaces it uses are `DwmGetWindowAttribute`
+(Windows Vista), `SetProcessDpiAwareness` and `PrintWindow` with
+`PW_RENDERFULLCONTENT` (Windows 8.1), and the two are only used by the
+screenshot tool in any case. The application itself asks for nothing beyond
+`whoami`, `tasklist`, `taskkill` and `reg`, all of which predate Windows 10 by
+years. So it should run, and saying "it does" is not something this page will
+claim until somebody has sat in front of one.
+
+macOS and Linux build and their tests pass in CI, which is weaker still: a
+green test run is not a person using the window.
 
 ### The command line
 

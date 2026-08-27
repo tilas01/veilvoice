@@ -23,10 +23,17 @@
 //! mismatch means the window simply opens without an icon rather than panicking
 //! at startup.
 //!
-//! **The window has a minimum size.** The layout is monospace and column-based,
-//! and below roughly 560 by 480 the columns start overlapping rather than
-//! reflowing -- so the floor is enforced here instead of being left to produce
-//! an unreadable window on somebody else's machine.
+//! **The window has a minimum size, and it is about width.** Every tab is
+//! inside one scroll area, so anything taller than the window can be reached by
+//! scrolling to it and a short window loses nothing. Width is different: the
+//! layout is monospace and column-based, and below roughly 720 across, columns
+//! start overlapping rather than reflowing. So the floor is enforced here
+//! rather than left to produce an unreadable window on somebody else's machine.
+//!
+//! It opens at 1100 by 720, which is large enough to read without resizing and
+//! still fits a 1366 by 768 laptop with its taskbar. Anything bigger opens
+//! partly off the bottom of a common screen, which looks like a broken
+//! application rather than a generous one.
 // No console window on Windows for a release build; a debug build keeps it so
 // panics and `eprintln!` stay visible while developing.
 #![cfg_attr(
@@ -53,8 +60,16 @@ fn main() -> eframe::Result<()> {
     veilvoice_gui::crashlog::install();
 
     let mut viewport = egui::ViewportBuilder::default()
-        .with_inner_size([720.0, 620.0])
-        .with_min_inner_size([560.0, 480.0])
+        // Opens large enough to read without resizing, and still fits a
+        // 1366x768 laptop with its taskbar. Bigger than this and the window
+        // would open partly off the bottom of a common screen, which looks
+        // like a broken application rather than a generous one.
+        .with_inner_size([1100.0, 720.0])
+        // The floor. Everything below it is reachable by scrolling -- every
+        // tab is inside one scroller now -- so the only thing this has to
+        // protect is the horizontal layout, which is monospace and
+        // column-based and starts overlapping rather than reflowing.
+        .with_min_inner_size([720.0, 520.0])
         .with_title("VeilVoice");
 
     if ICON_RGBA.len() == (ICON_SIZE * ICON_SIZE * 4) as usize {

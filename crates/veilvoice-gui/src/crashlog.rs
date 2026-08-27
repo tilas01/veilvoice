@@ -101,7 +101,7 @@ pub fn write(path: &Path, kind: &str, detail: &str) {
          This file was written on your machine and sent nowhere. VeilVoice has\n\
          no network code at all. Delete it whenever you like.\n\n\
          If the window never appeared, the most likely cause is that this\n\
-         computer could not give the application an OpenGL context -- common\n\
+         computer could not give the application an OpenGL context. This is common\n\
          in a virtual machine, over a remote desktop session, or with hybrid\n\
          graphics. The command-line tool `veilvoice` does the same work and\n\
          needs no graphics at all.\n",
