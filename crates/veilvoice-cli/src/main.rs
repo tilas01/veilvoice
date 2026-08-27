@@ -68,6 +68,7 @@
 //! thousand times.
 #![forbid(unsafe_code)]
 
+mod accel;
 mod appctl;
 mod atrest;
 mod capture;
@@ -283,6 +284,14 @@ enum Command {
     },
     /// Show version and build information.
     Info,
+
+    /// The graphics hardware here, and what it is good for.
+    ///
+    /// Lists the devices, says which can encode video, and suggests one. It
+    /// also says, with the measurement behind it, why veiling a voice does not
+    /// use a graphics card: it is already about a hundred times faster than
+    /// real time, and moving that work onto a card would slow it down.
+    Accel,
 
     /// Open the desktop application.
     ///
@@ -910,6 +919,8 @@ fn run(command: Command) -> Result<(), String> {
         // The search lives in `gui`, which looks in three places rather than
         // only beside this binary, and never starts anything by a bare name --
         // Windows resolves those through the current directory first.
+        Command::Accel => accel::show(),
+
         Command::Gui { quiet } => gui::open(quiet),
 
         Command::Install { status } => {

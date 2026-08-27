@@ -12,6 +12,12 @@ Every crate and every source file, generated from the doc comments in the code b
 - [[`wav_chunks.rs`|File-fuzz-fuzz_targets-wav_chunks]] &mdash; The RIFF chunk walker in veilvoice-meta, coverage-guided.
 - [[`wav_preflight.rs`|File-fuzz-fuzz_targets-wav_preflight]] &mdash; The WAV pre-flight in veilvoice-audio, coverage-guided.
 
+## [[veilvoice-accel|Crate-veilvoice-accel]]
+
+What graphics hardware this machine has, which of it can encode video, and the measured reason the audio engine does not use any of it.
+
+- [[`lib.rs`|File-veilvoice-accel-lib]] &mdash; What hardware this machine has, and the one place VeilVoice can use it.
+
 ## [[veilvoice-appctl|Crate-veilvoice-appctl]]
 
 Learn what normally runs here, then notice what does not -- with time-limited grants and a log, and no claim to block anything.
@@ -46,6 +52,7 @@ Check a VeilVoice release: the SHA-256 of a file, its line in a signed SHA256SUM
 
 Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings.
 
+- [[`accel.rs`|File-veilvoice-cli-accel]] &mdash; veilvoice accel — the graphics hardware here, and what it is good for.
 - [[`appctl.rs`|File-veilvoice-cli-appctl]] &mdash; veilvoice appctl — learn what normally runs, then notice what does not.
 - [[`atrest.rs`|File-veilvoice-cli-atrest]] &mdash; Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.
 - [[`capture.rs`|File-veilvoice-cli-capture]] &mdash; veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.
