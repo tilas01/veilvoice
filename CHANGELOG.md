@@ -8,6 +8,34 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### `veilvoice gui` finds the application in three places, not one
+
+```
+veilvoice gui      # or: veilvoice g
+```
+
+The command existed and looked in exactly one place: beside the binary. A
+reader who had **installed** VeilVoice and typed `veilvoice gui` from
+anywhere else was told the application was not there, which was untrue.
+
+It now looks beside this program first (a portable folder holds all three
+together, and somebody who unpacked a release means the one they unpacked),
+then where an install puts it, then on `PATH` — and if it finds nothing it
+lists every place it looked rather than saying "not found".
+
+**It never starts anything by a bare name.** `PATH` on Windows searches the
+current directory first, so `veilvoice gui` run inside a downloads folder
+holding something called `veilvoice-gui.exe` would have started that. This is
+the one command whose entire job is launching another program, which makes it
+a poor place to be relaxed about which. A test reads the module's own code —
+not its comments — and fails the build if a bare name appears.
+
+`veilvoice g` is the same command, and `--quiet` opens the window without
+printing anything.
+
+`veilvoice install` already copied all three programs and added them to
+`PATH`; that has not changed.
+
 ### Failsafe — on by default, because this accident is silent
 
 ```
