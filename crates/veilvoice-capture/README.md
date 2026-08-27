@@ -108,7 +108,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>575 lines"])
     n_comms["comms.rs<br/>321 lines"]
-    n_programs["programs.rs<br/>372 lines"]
+    n_programs["programs.rs<br/>385 lines"]
     n_comms --> n_programs
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/lib.rs" "open the source"
     click n_comms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-capture/src/comms.rs" "open the source"
@@ -123,7 +123,7 @@ flowchart TD
 |---|---:|---|
 | [`comms.rs`](../../docs/files/veilvoice-capture/comms.md) | 321 | Communication programs, and how to put VeilVoice between you and them. |
 | [`lib.rs`](../../docs/files/veilvoice-capture/lib.md) | 575 | Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do. |
-| [`programs.rs`](../../docs/files/veilvoice-capture/programs.md) | 372 | The programs this build knows can capture a screen. |
+| [`programs.rs`](../../docs/files/veilvoice-capture/programs.md) | 385 | The programs this build knows can capture a screen. |
 
 ## Public items
 

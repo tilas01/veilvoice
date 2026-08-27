@@ -33,6 +33,15 @@
 //! commit, on every platform, by everybody.
 //!
 //! Set `VEILVOICE_FUZZ_ROUNDS` to run it longer than the default.
+//!
+//! # In plain words
+//!
+//! Throws malformed and deliberately hostile encrypted files at the code that
+//! reads them, in bulk.
+//!
+//! Reading a file somebody else made is where most security problems live. Every
+//! one of these has to be refused with a reason: never accepted, and never able to
+//! bring the program down.
 
 use veilvoice_crypto::{container, kdf, lock};
 

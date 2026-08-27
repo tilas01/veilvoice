@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/discover.svg" alt="discover.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/discover.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 344 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 353 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-exists">Why this exists</a>
   <a href="#where-it-looks-and-why-in-that-order">Where it looks, and why in that order</a>
   <a href="#what-counts-as-a-release-archive">What counts as a release archive</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -60,21 +61,24 @@
 <p>Each is searched one level deep only. A recursive walk of a home directory is slow, surprising, and would let a verifier wander into places nobody asked it to look at.</p>
 <h2 id="what-counts-as-a-release-archive">What counts as a release archive</h2>
 <p>A file whose name starts <code>veilvoice-</code> and ends in one of the archive extensions this project publishes. That is a <strong>filename</strong> test and it proves nothing at all &#8212; it is how candidates are found, never how they are judged. Every candidate still has to survive the signature and the hash, and a file that merely looks the part fails exactly as loudly as one that does not.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Looks for a downloaded release to check, so you can double-click the verifier and have it work.</p>
+<p>It looks in the folder it is in, the current folder, and your Downloads and Desktop. If it finds nothing it says exactly where it looked, rather than reporting a failure that leaves you guessing.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>344 lines defining <strong>7 functions</strong> (7 public), <strong>1 type</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>353 lines defining <strong>7 functions</strong> (7 public), <strong>1 type</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Found</code> <span style="color:var(--muted)">line 50</span> &mdash; What was found in one directory.</li>
+<li><code>struct Found</code> <span style="color:var(--muted)">line 59</span> &mdash; What was found in one directory.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Found::is_complete</code> <span style="color:var(--muted)">line 63</span> &mdash; Whether this directory holds everything needed to verify offline.
+<li><code>Found::is_complete</code> <span style="color:var(--muted)">line 72</span> &mdash; Whether this directory holds everything needed to verify offline.
 </li>
-<li><code>Found::is_empty</code> <span style="color:var(--muted)">line 68</span> &mdash; Whether anything at all turned up.
+<li><code>Found::is_empty</code> <span style="color:var(--muted)">line 77</span> &mdash; Whether anything at all turned up.
 </li>
-<li><code>Found::missing</code> <span style="color:var(--muted)">line 73</span> &mdash; What is missing, in words, for a message to the user.
+<li><code>Found::missing</code> <span style="color:var(--muted)">line 82</span> &mdash; What is missing, in words, for a message to the user.
 </li>
-<li><code>search</code> <span style="color:var(--muted)">line 171</span> &mdash; Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.
+<li><code>search</code> <span style="color:var(--muted)">line 180</span> &mdash; Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>look_in</code>, <code>places</code>, <code>looks_like_archive</code></span>
 </li>
 </ul>
@@ -82,47 +86,47 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 558 194" width="558" height="194" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 565 194" width="565" height="194" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
-<rect x="0" y="0" width="558" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M300.0 147.0 C 322.0 147.0, 322.0 147.0, 195.8 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M529.6 147.0 C 551.6 147.0, 551.6 147.0, 303.0 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<path d="M529.6 147.0 C 551.6 147.0, 551.6 147.0, 417.8 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L63" target="_blank" rel="noopener noreferrer">
-<rect x="32.2" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="114.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Found::is_complete</text>
-<text x="114.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 63</text>
+<rect x="0" y="0" width="565" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M307.6 147.0 C 329.6 147.0, 329.6 147.0, 195.8 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M537.2 147.0 C 559.2 147.0, 559.2 147.0, 310.6 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<path d="M537.2 147.0 C 559.2 147.0, 559.2 147.0, 425.4 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L72" target="_blank" rel="noopener noreferrer">
+<rect x="36.0" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="118.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Found::is_complete</text>
+<text x="118.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 72</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L68" target="_blank" rel="noopener noreferrer">
-<rect x="223.0" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="294.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Found::is_empty</text>
-<text x="294.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 68</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L77" target="_blank" rel="noopener noreferrer">
+<rect x="226.8" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="297.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Found::is_empty</text>
+<text x="297.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 77</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L73" target="_blank" rel="noopener noreferrer">
-<rect x="391.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="458.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Found::missing</text>
-<text x="458.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 73</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L82" target="_blank" rel="noopener noreferrer">
+<rect x="394.8" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="462.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Found::missing</text>
+<text x="462.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 82</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L91" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L100" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="120.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="110.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">looks_like_archive</text>
-<text x="110.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 91</text>
+<text x="110.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 100</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L97" target="_blank" rel="noopener noreferrer">
-<rect x="218.8" y="120.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="259.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look_in</text>
-<text x="259.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 97</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L106" target="_blank" rel="noopener noreferrer">
+<rect x="218.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="263.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look_in</text>
+<text x="263.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 106</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L130" target="_blank" rel="noopener noreferrer">
-<rect x="326.0" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="370.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">places</text>
-<text x="370.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L139" target="_blank" rel="noopener noreferrer">
+<rect x="333.6" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="378.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">places</text>
+<text x="378.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 139</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L171" target="_blank" rel="noopener noreferrer">
-<rect x="440.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="485.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">search</text>
-<text x="485.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 171</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L180" target="_blank" rel="noopener noreferrer">
+<rect x="448.4" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="492.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">search</text>
+<text x="492.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 180</text>
 </a>
 </svg>
 </div>
@@ -130,23 +134,23 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_is_complete([&quot;Found::is_complete&lt;br/&gt;line 63&quot;])
-    n_is_empty([&quot;Found::is_empty&lt;br/&gt;line 68&quot;])
-    n_missing([&quot;Found::missing&lt;br/&gt;line 73&quot;])
-    n_looks_like_archive[&quot;looks_like_archive&lt;br/&gt;line 91&quot;]
-    n_look_in[&quot;look_in&lt;br/&gt;line 97&quot;]
-    n_places[&quot;places&lt;br/&gt;line 130&quot;]
-    n_search([&quot;search&lt;br/&gt;line 171&quot;])
+    n_is_complete([&quot;Found::is_complete&lt;br/&gt;line 72&quot;])
+    n_is_empty([&quot;Found::is_empty&lt;br/&gt;line 77&quot;])
+    n_missing([&quot;Found::missing&lt;br/&gt;line 82&quot;])
+    n_looks_like_archive[&quot;looks_like_archive&lt;br/&gt;line 100&quot;]
+    n_look_in[&quot;look_in&lt;br/&gt;line 106&quot;]
+    n_places[&quot;places&lt;br/&gt;line 139&quot;]
+    n_search([&quot;search&lt;br/&gt;line 180&quot;])
     n_look_in --&gt; n_looks_like_archive
     n_search --&gt; n_look_in
     n_search --&gt; n_places
-    click n_is_complete href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L63&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L68&quot; &quot;open the source&quot;
-    click n_missing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L73&quot; &quot;open the source&quot;
-    click n_looks_like_archive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L91&quot; &quot;open the source&quot;
-    click n_look_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L97&quot; &quot;open the source&quot;
-    click n_places href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L130&quot; &quot;open the source&quot;
-    click n_search href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L171&quot; &quot;open the source&quot;
+    click n_is_complete href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L72&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L77&quot; &quot;open the source&quot;
+    click n_missing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L82&quot; &quot;open the source&quot;
+    click n_looks_like_archive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L100&quot; &quot;open the source&quot;
+    click n_look_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L106&quot; &quot;open the source&quot;
+    click n_places href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L139&quot; &quot;open the source&quot;
+    click n_search href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L180&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_complete,n_is_empty,n_missing,n_search entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -157,17 +161,17 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>ARCHIVES</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L41" rel="noopener noreferrer">41</a></td><td>The extensions this project publishes releases as.</td></tr>
-<tr><td><code>SUMS</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L44" rel="noopener noreferrer">44</a></td><td>The names of the two files a signed release carries beside its archives.</td></tr>
-<tr><td><code>SUMS_SIG</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L46" rel="noopener noreferrer">46</a></td><td>The detached signature over SUMS.</td></tr>
-<tr><td><code>Found</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L50" rel="noopener noreferrer">50</a></td><td>What was found in one directory.</td></tr>
-<tr><td><code>Found::is_complete</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L63" rel="noopener noreferrer">63</a></td><td>Whether this directory holds everything needed to verify offline.</td></tr>
-<tr><td><code>Found::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L68" rel="noopener noreferrer">68</a></td><td>Whether anything at all turned up.</td></tr>
-<tr><td><code>Found::missing</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L73" rel="noopener noreferrer">73</a></td><td>What is missing, in words, for a message to the user.</td></tr>
-<tr><td><code>looks_like_archive</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L91" rel="noopener noreferrer">91</a></td><td>Whether a filename looks like one of this project&#x27;s release archives.</td></tr>
-<tr><td><code>look_in</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L97" rel="noopener noreferrer">97</a></td><td>Look in one directory, one level deep.</td></tr>
-<tr><td><code>places</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L130" rel="noopener noreferrer">130</a></td><td>Every place worth looking, in order, without duplicates.</td></tr>
-<tr><td><code>search</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L171" rel="noopener noreferrer">171</a></td><td>Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.</td></tr>
+<tr><td><code>ARCHIVES</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L50" rel="noopener noreferrer">50</a></td><td>The extensions this project publishes releases as.</td></tr>
+<tr><td><code>SUMS</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L53" rel="noopener noreferrer">53</a></td><td>The names of the two files a signed release carries beside its archives.</td></tr>
+<tr><td><code>SUMS_SIG</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L55" rel="noopener noreferrer">55</a></td><td>The detached signature over SUMS.</td></tr>
+<tr><td><code>Found</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L59" rel="noopener noreferrer">59</a></td><td>What was found in one directory.</td></tr>
+<tr><td><code>Found::is_complete</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L72" rel="noopener noreferrer">72</a></td><td>Whether this directory holds everything needed to verify offline.</td></tr>
+<tr><td><code>Found::is_empty</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L77" rel="noopener noreferrer">77</a></td><td>Whether anything at all turned up.</td></tr>
+<tr><td><code>Found::missing</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L82" rel="noopener noreferrer">82</a></td><td>What is missing, in words, for a message to the user.</td></tr>
+<tr><td><code>looks_like_archive</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L100" rel="noopener noreferrer">100</a></td><td>Whether a filename looks like one of this project&#x27;s release archives.</td></tr>
+<tr><td><code>look_in</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L106" rel="noopener noreferrer">106</a></td><td>Look in one directory, one level deep.</td></tr>
+<tr><td><code>places</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L139" rel="noopener noreferrer">139</a></td><td>Every place worth looking, in order, without duplicates.</td></tr>
+<tr><td><code>search</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L180" rel="noopener noreferrer">180</a></td><td>Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.</td></tr>
 </tbody></table>
 </section>
 </div></div>

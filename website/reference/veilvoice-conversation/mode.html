@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-conversation/mode.svg" alt="mode.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-conversation/src/mode.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 271 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 286 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-limit-is-measured-not-chosen">The limit is measured, not chosen</a>
   <a href="#two-ways-to-be-told-apart-and-the-second-one-is-safer">Two ways to be told apart, and the second one is safer</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -62,24 +63,28 @@
 <li><strong>It is harder to follow by ear alone.</strong> A listener with no subtitles and no picture cannot tell who is speaking. That is the price, and it is why this is not the default.</li>
 </ul>
 <p>Uniform mode has <strong>no speaker limit</strong> from voices, because there is no second voice to collide with. The plan&#x27;s own ten-speaker limit still applies, because ten names is already a great deal to follow.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>How many people can be in one recording, and the choice between two ways of handling them.</p>
+<p>Give everybody a different voice and a listener can follow the conversation by ear, but only so many of the available voices are far enough apart to actually be told apart. That number was measured rather than picked, and the limit is real: past it, two people would sound like one person and you would only find out by listening to the finished recording.</p>
+<p>Give everybody the <em>same</em> voice and there is no limit, and it is more private, because the result no longer carries even the fact of who was speaker three. The price is that names and pictures become the only way to tell who is talking.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>271 lines defining <strong>6 functions</strong> (5 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>286 lines defining <strong>6 functions</strong> (5 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum VoiceMode</code> <span style="color:var(--muted)">line 48</span> &mdash; Whether speakers get different voices or one voice between them.</li>
-<li><code>enum TooMany</code> <span style="color:var(--muted)">line 113</span> &mdash; Why a group cannot be rendered as asked.</li>
+<li><code>enum VoiceMode</code> <span style="color:var(--muted)">line 63</span> &mdash; Whether speakers get different voices or one voice between them.</li>
+<li><code>enum TooMany</code> <span style="color:var(--muted)">line 128</span> &mdash; Why a group cannot be rendered as asked.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>VoiceMode::label</code> <span style="color:var(--muted)">line 59</span> &mdash; A short name, for a picker.
+<li><code>VoiceMode::label</code> <span style="color:var(--muted)">line 74</span> &mdash; A short name, for a picker.
 </li>
-<li><code>VoiceMode::speaker_limit</code> <span style="color:var(--muted)">line 71</span> &mdash; The most speakers this mode can carry under config.
+<li><code>VoiceMode::speaker_limit</code> <span style="color:var(--muted)">line 86</span> &mdash; The most speakers this mode can carry under config.
 </li>
-<li><code>VoiceMode::voice_for</code> <span style="color:var(--muted)">line 84</span> &mdash; The voice a slot gets in this mode.
+<li><code>VoiceMode::voice_for</code> <span style="color:var(--muted)">line 99</span> &mdash; The voice a slot gets in this mode.
 </li>
-<li><code>VoiceMode::note</code> <span style="color:var(--muted)">line 92</span> &mdash; What this mode costs and buys, in the words a front end should show.
+<li><code>VoiceMode::note</code> <span style="color:var(--muted)">line 107</span> &mdash; What this mode costs and buys, in the words a front end should show.
 </li>
-<li><code>check</code> <span style="color:var(--muted)">line 153</span> &mdash; Whether this many speakers can be rendered in this mode.
+<li><code>check</code> <span style="color:var(--muted)">line 168</span> &mdash; Whether this many speakers can be rendered in this mode.
 </li>
 </ul>
 </section>
@@ -90,35 +95,35 @@
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="632" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L59" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L74" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="94.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VoiceMode::label</text>
-<text x="94.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 59</text>
+<text x="94.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 74</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L71" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L86" target="_blank" rel="noopener noreferrer">
 <rect x="195.6" y="20.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="300.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VoiceMode::speaker_limit</text>
-<text x="300.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 71</text>
+<text x="300.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 86</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L84" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L99" target="_blank" rel="noopener noreferrer">
 <rect x="432.0" y="20.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="522.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VoiceMode::voice_for</text>
-<text x="522.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 84</text>
+<text x="522.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 99</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L92" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L107" target="_blank" rel="noopener noreferrer">
 <rect x="115.0" y="120.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="186.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VoiceMode::note</text>
-<text x="186.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<text x="186.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 107</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L131" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L146" target="_blank" rel="noopener noreferrer">
 <rect x="283.0" y="120.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="342.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">TooMany::fmt</text>
-<text x="342.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 131</text>
+<text x="342.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 146</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L153" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L168" target="_blank" rel="noopener noreferrer">
 <rect x="428.2" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="472.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check</text>
-<text x="472.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 153</text>
+<text x="472.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
 </a>
 </svg>
 </div>
@@ -126,18 +131,18 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_label([&quot;VoiceMode::label&lt;br/&gt;line 59&quot;])
-    n_speaker_limit([&quot;VoiceMode::speaker_limit&lt;br/&gt;line 71&quot;])
-    n_voice_for([&quot;VoiceMode::voice_for&lt;br/&gt;line 84&quot;])
-    n_note([&quot;VoiceMode::note&lt;br/&gt;line 92&quot;])
-    n_fmt[&quot;TooMany::fmt&lt;br/&gt;line 131&quot;]
-    n_check([&quot;check&lt;br/&gt;line 153&quot;])
-    click n_label href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L59&quot; &quot;open the source&quot;
-    click n_speaker_limit href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L71&quot; &quot;open the source&quot;
-    click n_voice_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L84&quot; &quot;open the source&quot;
-    click n_note href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L92&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L131&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L153&quot; &quot;open the source&quot;
+    n_label([&quot;VoiceMode::label&lt;br/&gt;line 74&quot;])
+    n_speaker_limit([&quot;VoiceMode::speaker_limit&lt;br/&gt;line 86&quot;])
+    n_voice_for([&quot;VoiceMode::voice_for&lt;br/&gt;line 99&quot;])
+    n_note([&quot;VoiceMode::note&lt;br/&gt;line 107&quot;])
+    n_fmt[&quot;TooMany::fmt&lt;br/&gt;line 146&quot;]
+    n_check([&quot;check&lt;br/&gt;line 168&quot;])
+    click n_label href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L74&quot; &quot;open the source&quot;
+    click n_speaker_limit href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L86&quot; &quot;open the source&quot;
+    click n_voice_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L99&quot; &quot;open the source&quot;
+    click n_note href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L107&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L146&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L168&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_speaker_limit,n_voice_for,n_note,n_check entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -148,14 +153,14 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>VoiceMode</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L48" rel="noopener noreferrer">48</a></td><td>Whether speakers get different voices or one voice between them.</td></tr>
-<tr><td><code>VoiceMode::label</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L59" rel="noopener noreferrer">59</a></td><td>A short name, for a picker.</td></tr>
-<tr><td><code>VoiceMode::speaker_limit</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L71" rel="noopener noreferrer">71</a></td><td>The most speakers this mode can carry under config.</td></tr>
-<tr><td><code>VoiceMode::voice_for</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L84" rel="noopener noreferrer">84</a></td><td>The voice a slot gets in this mode.</td></tr>
-<tr><td><code>VoiceMode::note</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L92" rel="noopener noreferrer">92</a></td><td>What this mode costs and buys, in the words a front end should show.</td></tr>
-<tr><td><code>TooMany</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L113" rel="noopener noreferrer">113</a></td><td>Why a group cannot be rendered as asked.</td></tr>
-<tr><td><code>TooMany::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L131" rel="noopener noreferrer">131</a></td><td></td></tr>
-<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L153" rel="noopener noreferrer">153</a></td><td>Whether this many speakers can be rendered in this mode.</td></tr>
+<tr><td><code>VoiceMode</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L63" rel="noopener noreferrer">63</a></td><td>Whether speakers get different voices or one voice between them.</td></tr>
+<tr><td><code>VoiceMode::label</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L74" rel="noopener noreferrer">74</a></td><td>A short name, for a picker.</td></tr>
+<tr><td><code>VoiceMode::speaker_limit</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L86" rel="noopener noreferrer">86</a></td><td>The most speakers this mode can carry under config.</td></tr>
+<tr><td><code>VoiceMode::voice_for</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L99" rel="noopener noreferrer">99</a></td><td>The voice a slot gets in this mode.</td></tr>
+<tr><td><code>VoiceMode::note</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L107" rel="noopener noreferrer">107</a></td><td>What this mode costs and buys, in the words a front end should show.</td></tr>
+<tr><td><code>TooMany</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L128" rel="noopener noreferrer">128</a></td><td>Why a group cannot be rendered as asked.</td></tr>
+<tr><td><code>TooMany::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L146" rel="noopener noreferrer">146</a></td><td></td></tr>
+<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/mode.rs#L168" rel="noopener noreferrer">168</a></td><td>Whether this many speakers can be rendered in this mode.</td></tr>
 </tbody></table>
 </section>
 </div></div>

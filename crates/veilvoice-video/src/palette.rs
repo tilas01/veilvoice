@@ -43,6 +43,18 @@
 //! Somebody who cannot separate two of these needs the name, and the name is
 //! always drawn beside the circle and always in the subtitles. A player that
 //! showed only colours would be one about eight per cent of men could not use.
+//!
+//! # In plain words
+//!
+//! The colours, and which one each speaker gets.
+//!
+//! They are the same colours the website uses, taken from one place so the
+//! application, the website and anything VeilVoice draws cannot drift apart. A
+//! test compares them against the site's own stylesheet and fails the build if
+//! they do.
+//!
+//! Speaker colours are handed out to be as distinct from each other as the number
+//! of people allows, so that a glance at the picture tells you who is talking.
 
 /// The page background.
 pub const BG: &str = "#1a1b26";

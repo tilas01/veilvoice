@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-drivers/linux.svg" alt="linux.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-drivers/src/linux.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-drivers.html">veilvoice-drivers</a> &middot; 230 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-drivers.html">veilvoice-drivers</a> &middot; 239 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-files-no-subprocess">Two files, no subprocess</a>
   <a href="#the-format">The format</a>
   <a href="#the-cross-view-check">The cross-view check</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -61,10 +62,13 @@
 <p><code>/sys/module</code> has a directory per module, and the two lists should agree. A name in one and not the other is worth reporting: unlinking from <code>/proc/modules</code> and forgetting <code>/sys/module</code> is a mistake real rootkits have made.</p>
 <p>It catches carelessness only. Both lists come from the same kernel, so anything with the privilege to edit one has the privilege to edit both.</p>
 <p>One honest wrinkle: <code>/sys/module</code> also lists built-in modules and boot parameters, which were never in <code>/proc/modules</code> and never will be. Those have no <code>initstate</code> file, so only directories that have one are compared &#8212; otherwise the check would produce dozens of discrepancies on every machine and be switched off within a day.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Asks Linux which kernel modules are loaded, by reading two files the system keeps.</p>
+<p>Nothing is run at all: the answer is already written down. Both files are read and compared, because a module that appears in one and not the other is itself worth reporting.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>230 lines defining <strong>3 functions</strong> (0 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>239 lines defining <strong>3 functions</strong> (0 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -75,20 +79,20 @@
 <rect x="0" y="0" width="328" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M300.0 47.0 C 322.0 47.0, 322.0 47.0, 195.8 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M259.4 74.0 C 259.4 94.0, 164.0 100.0, 164.0 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L48" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L57" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="110.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_proc_modules</text>
-<text x="110.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 48</text>
+<text x="110.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 57</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L78" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L87" target="_blank" rel="noopener noreferrer">
 <rect x="218.8" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="259.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read</text>
-<text x="259.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 78</text>
+<text x="259.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L121" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L130" target="_blank" rel="noopener noreferrer">
 <rect x="89.2" y="120.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="164.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sys_module_names</text>
-<text x="164.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 121</text>
+<text x="164.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
 </a>
 </svg>
 </div>
@@ -96,14 +100,14 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_parse_proc_modules[&quot;parse_proc_modules&lt;br/&gt;line 48&quot;]
-    n_read[&quot;read&lt;br/&gt;line 78&quot;]
-    n_sys_module_names[&quot;sys_module_names&lt;br/&gt;line 121&quot;]
+    n_parse_proc_modules[&quot;parse_proc_modules&lt;br/&gt;line 57&quot;]
+    n_read[&quot;read&lt;br/&gt;line 87&quot;]
+    n_sys_module_names[&quot;sys_module_names&lt;br/&gt;line 130&quot;]
     n_read --&gt; n_parse_proc_modules
     n_read --&gt; n_sys_module_names
-    click n_parse_proc_modules href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L48&quot; &quot;open the source&quot;
-    click n_read href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L78&quot; &quot;open the source&quot;
-    click n_sys_module_names href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L121&quot; &quot;open the source&quot;
+    click n_parse_proc_modules href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L57&quot; &quot;open the source&quot;
+    click n_read href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L87&quot; &quot;open the source&quot;
+    click n_sys_module_names href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L130&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_parse_proc_modules,n_read,n_sys_module_names helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -112,9 +116,9 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>parse_proc_modules</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L48" rel="noopener noreferrer">48</a></td><td>Parse the contents of /proc/modules.</td></tr>
-<tr><td><code>read</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L78" rel="noopener noreferrer">78</a></td><td>Read both views and compare them.</td></tr>
-<tr><td><code>sys_module_names</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L121" rel="noopener noreferrer">121</a></td><td>The names under /sys/module that correspond to loadable modules.</td></tr>
+<tr><td><code>parse_proc_modules</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L57" rel="noopener noreferrer">57</a></td><td>Parse the contents of /proc/modules.</td></tr>
+<tr><td><code>read</code> <sub>pub(crate) fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L87" rel="noopener noreferrer">87</a></td><td>Read both views and compare them.</td></tr>
+<tr><td><code>sys_module_names</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-drivers/src/linux.rs#L130" rel="noopener noreferrer">130</a></td><td>The names under /sys/module that correspond to loadable modules.</td></tr>
 </tbody></table>
 </section>
 </div></div>

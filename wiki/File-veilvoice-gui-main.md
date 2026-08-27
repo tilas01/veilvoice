@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-gui/src/main.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 102 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 111 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
 
 ## Contents
 
-- [What calls what](#what-calls-what)
-- [Items](#items)
+- [In plain words](#in-plain-words)
+  - [What calls what](#what-calls-what)
+  - [Items](#items)
 
 Entry point for the desktop application: open a window, hand it to
 `veilvoice_gui::VeilVoiceApp`, and get out of the way.
@@ -46,9 +47,18 @@ still fits a 1366 by 768 laptop with its taskbar. Anything bigger opens
 partly off the bottom of a common screen, which looks like a broken
 application rather than a generous one.
 
+# In plain words
+
+Opens the window and hands over to the rest of the application.
+
+Almost nothing happens here. Everything of substance lives beside it in code
+that can be tested without a screen, and this file holds only the few things
+that genuinely need a window to exist: its size, its icon, and making sure a
+failure to open leaves a message behind.
+
 ## What this file contains
 
-102 lines defining **1 function** (0 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+111 lines defining **1 function** (0 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -64,8 +74,8 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main["main<br/>line 52"]
-    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L52" "open the source"
+    n_main["main<br/>line 61"]
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L61" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_main helper
 ```
@@ -76,6 +86,6 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `ICON_RGBA` <sub>const</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L49) | The window icon, as raw 32x32 RGBA produced by assets/generate.py. |
-| `ICON_SIZE` <sub>const</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L50) |  |
-| `main` <sub>fn</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L52) |  |
+| `ICON_RGBA` <sub>const</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L58) | The window icon, as raw 32x32 RGBA produced by assets/generate.py. |
+| `ICON_SIZE` <sub>const</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L59) |  |
+| `main` <sub>fn</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L61) |  |

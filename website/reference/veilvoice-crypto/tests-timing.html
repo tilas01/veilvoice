@@ -39,10 +39,11 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/tests-timing.svg" alt="timing.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/tests/timing.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 240 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 249 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#these-are-ignored-by-default-and-that-is-deliberate">These are ignored by default, and that is deliberate</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -55,12 +56,15 @@
 <p>A timing test on a shared CI runner measures the neighbours, not the code. Run them on a quiet machine and read the numbers:</p>
 <pre><code>cargo test -p veilvoice-crypto --release --test timing -- --ignored --nocapture</code></pre>
 <p>The thresholds below are loose on purpose. They are there to catch a <em>catastrophic</em> regression &#8212; someone replacing a constant-time comparison with <code>==</code>, which shows up as a difference of orders of magnitude &#8212; not to certify a bound in nanoseconds, which this method cannot honestly do.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Measures whether checking a password takes a different amount of time depending on how wrong it is.</p>
+<p>If it did, somebody could work out a password one character at a time by watching the clock rather than by guessing. This runs the comparison many times and checks that the timing says nothing.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>240 lines defining <strong>9 functions</strong> (0 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>249 lines defining <strong>9 functions</strong> (0 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Stats</code> <span style="color:var(--muted)">line 49</span> &mdash; What a run of samples looked like.</li>
+<li><code>struct Stats</code> <span style="color:var(--muted)">line 58</span> &mdash; What a run of samples looked like.</li>
 </ul>
 </section>
 <section id="s-calls">
@@ -84,50 +88,50 @@
 <path d="M285.2 247.0 C 590.4 247.0, 590.4 47.0, 571.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M568.4 47.0 C 590.4 47.0, 590.4 47.0, 234.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M446.0 47.0 C 468.0 47.0, 468.0 47.0, 234.6 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L31" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L40" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="68.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">params</text>
-<text x="68.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 31</text>
+<text x="68.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 40</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L55" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L64" target="_blank" rel="noopener noreferrer">
 <rect x="135.2" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="183.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">summarise</text>
-<text x="183.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 55</text>
+<text x="183.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 64</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L65" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L74" target="_blank" rel="noopener noreferrer">
 <rect x="257.6" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="298.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">show</text>
-<text x="298.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 65</text>
+<text x="298.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 74</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L72" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L81" target="_blank" rel="noopener noreferrer">
 <rect x="364.8" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="405.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">time_it</text>
-<text x="405.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 72</text>
+<text x="405.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 81</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L96" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L105" target="_blank" rel="noopener noreferrer">
 <rect x="472.0" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="520.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">time_each</text>
-<text x="520.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 96</text>
+<text x="520.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L109" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L118" target="_blank" rel="noopener noreferrer">
 <rect x="112.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="157.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ratio</text>
-<text x="157.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 109</text>
+<text x="157.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 118</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L115" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L124" target="_blank" rel="noopener noreferrer">
 <rect x="227.6" y="120.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="355.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">opening_a_container_does_not_&#8230;</text>
-<text x="355.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 115</text>
+<text x="355.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L159" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L168" target="_blank" rel="noopener noreferrer">
 <rect x="29.2" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="157.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">the_app_lock_takes_the_same_t&#8230;</text>
-<text x="157.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 159</text>
+<text x="157.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L211" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L220" target="_blank" rel="noopener noreferrer">
 <rect x="311.2" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="439.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_rate_limited_attempt_is_vis&#8230;</text>
-<text x="439.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 211</text>
+<text x="439.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 220</text>
 </a>
 </svg>
 </div>
@@ -135,15 +139,15 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_params[&quot;params&lt;br/&gt;line 31&quot;]
-    n_summarise[&quot;summarise&lt;br/&gt;line 55&quot;]
-    n_show[&quot;show&lt;br/&gt;line 65&quot;]
-    n_time_it[&quot;time_it&lt;br/&gt;line 72&quot;]
-    n_time_each[&quot;time_each&lt;br/&gt;line 96&quot;]
-    n_ratio[&quot;ratio&lt;br/&gt;line 109&quot;]
-    n_opening_a_container_does_not_leak_how_much_of_the_password_was_right[&quot;opening_a_container_does_not_&#8230;&lt;br/&gt;line 115&quot;]
-    n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right[&quot;the_app_lock_takes_the_same_t&#8230;&lt;br/&gt;line 159&quot;]
-    n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended[&quot;a_rate_limited_attempt_is_vis&#8230;&lt;br/&gt;line 211&quot;]
+    n_params[&quot;params&lt;br/&gt;line 40&quot;]
+    n_summarise[&quot;summarise&lt;br/&gt;line 64&quot;]
+    n_show[&quot;show&lt;br/&gt;line 74&quot;]
+    n_time_it[&quot;time_it&lt;br/&gt;line 81&quot;]
+    n_time_each[&quot;time_each&lt;br/&gt;line 105&quot;]
+    n_ratio[&quot;ratio&lt;br/&gt;line 118&quot;]
+    n_opening_a_container_does_not_leak_how_much_of_the_password_was_right[&quot;opening_a_container_does_not_&#8230;&lt;br/&gt;line 124&quot;]
+    n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right[&quot;the_app_lock_takes_the_same_t&#8230;&lt;br/&gt;line 168&quot;]
+    n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended[&quot;a_rate_limited_attempt_is_vis&#8230;&lt;br/&gt;line 220&quot;]
     n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended --&gt; n_params
     n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended --&gt; n_show
     n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended --&gt; n_time_each
@@ -158,15 +162,15 @@ flowchart TD
     n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right --&gt; n_time_each
     n_time_each --&gt; n_summarise
     n_time_it --&gt; n_summarise
-    click n_params href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L31&quot; &quot;open the source&quot;
-    click n_summarise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L55&quot; &quot;open the source&quot;
-    click n_show href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L65&quot; &quot;open the source&quot;
-    click n_time_it href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L72&quot; &quot;open the source&quot;
-    click n_time_each href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L96&quot; &quot;open the source&quot;
-    click n_ratio href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L109&quot; &quot;open the source&quot;
-    click n_opening_a_container_does_not_leak_how_much_of_the_password_was_right href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L115&quot; &quot;open the source&quot;
-    click n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L159&quot; &quot;open the source&quot;
-    click n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L211&quot; &quot;open the source&quot;
+    click n_params href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L40&quot; &quot;open the source&quot;
+    click n_summarise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L64&quot; &quot;open the source&quot;
+    click n_show href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L74&quot; &quot;open the source&quot;
+    click n_time_it href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L81&quot; &quot;open the source&quot;
+    click n_time_each href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L105&quot; &quot;open the source&quot;
+    click n_ratio href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L118&quot; &quot;open the source&quot;
+    click n_opening_a_container_does_not_leak_how_much_of_the_password_was_right href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L124&quot; &quot;open the source&quot;
+    click n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L168&quot; &quot;open the source&quot;
+    click n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L220&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_params,n_summarise,n_show,n_time_it,n_time_each,n_ratio,n_opening_a_container_does_not_leak_how_much_of_the_password_was_right,n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right,n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -175,17 +179,17 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>params</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L31" rel="noopener noreferrer">31</a></td><td>Cheap parameters on purpose: a fast KDF makes the <em>comparison</em> a larger share of the total, so a non-constant-time one is easier to see.</td></tr>
-<tr><td><code>SAMPLES</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L39" rel="noopener noreferrer">39</a></td><td></td></tr>
-<tr><td><code>Stats</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L49" rel="noopener noreferrer">49</a></td><td>What a run of samples looked like.</td></tr>
-<tr><td><code>summarise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L55" rel="noopener noreferrer">55</a></td><td></td></tr>
-<tr><td><code>show</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L65" rel="noopener noreferrer">65</a></td><td></td></tr>
-<tr><td><code>time_it</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L72" rel="noopener noreferrer">72</a></td><td></td></tr>
-<tr><td><code>time_each</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L96" rel="noopener noreferrer">96</a></td><td>Time one call each against a batch of values prepared <em>outside</em> the clock.</td></tr>
-<tr><td><code>ratio</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L109" rel="noopener noreferrer">109</a></td><td></td></tr>
-<tr><td><code>opening_a_container_does_not_leak_how_much_of_the_password_was_right</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L115" rel="noopener noreferrer">115</a></td><td></td></tr>
-<tr><td><code>the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L159" rel="noopener noreferrer">159</a></td><td></td></tr>
-<tr><td><code>a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L211" rel="noopener noreferrer">211</a></td><td>The rate limiter returns before touching the KDF, so a locked-out attempt is obviously faster than a real one.</td></tr>
+<tr><td><code>params</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L40" rel="noopener noreferrer">40</a></td><td>Cheap parameters on purpose: a fast KDF makes the <em>comparison</em> a larger share of the total, so a non-constant-time one is easier to see.</td></tr>
+<tr><td><code>SAMPLES</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L48" rel="noopener noreferrer">48</a></td><td></td></tr>
+<tr><td><code>Stats</code> <sub>struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L58" rel="noopener noreferrer">58</a></td><td>What a run of samples looked like.</td></tr>
+<tr><td><code>summarise</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L64" rel="noopener noreferrer">64</a></td><td></td></tr>
+<tr><td><code>show</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L74" rel="noopener noreferrer">74</a></td><td></td></tr>
+<tr><td><code>time_it</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L81" rel="noopener noreferrer">81</a></td><td></td></tr>
+<tr><td><code>time_each</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L105" rel="noopener noreferrer">105</a></td><td>Time one call each against a batch of values prepared <em>outside</em> the clock.</td></tr>
+<tr><td><code>ratio</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L118" rel="noopener noreferrer">118</a></td><td></td></tr>
+<tr><td><code>opening_a_container_does_not_leak_how_much_of_the_password_was_right</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L124" rel="noopener noreferrer">124</a></td><td></td></tr>
+<tr><td><code>the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L168" rel="noopener noreferrer">168</a></td><td></td></tr>
+<tr><td><code>a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L220" rel="noopener noreferrer">220</a></td><td>The rate limiter returns before touching the KDF, so a locked-out attempt is obviously faster than a real one.</td></tr>
 </tbody></table>
 </section>
 </div></div>

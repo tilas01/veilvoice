@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-verify/src/fetch.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 320 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 329 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs)
 
 ## Contents
 
 - [The constraint this is written around](#the-constraint-this-is-written-around)
 - [What is deliberately not done here](#what-is-deliberately-not-done-here)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -72,22 +73,31 @@ and no "just in case" request.
 supplied on the command line, so this cannot be turned into a general
 downloader by an argument.
 
+# In plain words
+
+Downloads a release, without VeilVoice containing any networking code.
+
+It asks the tool your system already has to do the fetching. That is what keeps
+a real promise the rest of the project makes: there is no HTTP client anywhere
+in what VeilVoice is built from, which you can check yourself, and this is the
+one command that touches the network at all.
+
 ## What this file contains
 
-320 lines defining **6 functions** (5 public), **2 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+329 lines defining **6 functions** (5 public), **2 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Downloader` (line 76) -- Where a downloader was found, and what to call it.
-- `enum Style` (line 82)
+- `struct Downloader` (line 85) -- Where a downloader was found, and what to call it.
+- `enum Style` (line 91)
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `download` (line 155) -- Fetch one URL into into.
+- `download` (line 164) -- Fetch one URL into into.
   - reaches: `find_downloader`, `no_downloader_message`
-- `asset_url` (line 221) -- The URL of one file in one release.
-- `valid_tag` (line 238) -- A release tag, rejected unless it looks like one.
-- `valid_asset` (line 247) -- An asset filename, rejected unless it looks like one.
+- `asset_url` (line 230) -- The URL of one file in one release.
+- `valid_tag` (line 247) -- A release tag, rejected unless it looks like one.
+- `valid_asset` (line 256) -- An asset filename, rejected unless it looks like one.
 
 ## What calls what
 
@@ -109,20 +119,20 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_find_downloader["find_downloader<br/>line 97"]
-    n_no_downloader_message["no_downloader_message<br/>line 138"]
-    n_download(["download<br/>line 155"])
-    n_asset_url(["asset_url<br/>line 221"])
-    n_valid_tag(["valid_tag<br/>line 238"])
-    n_valid_asset(["valid_asset<br/>line 247"])
+    n_find_downloader["find_downloader<br/>line 106"]
+    n_no_downloader_message["no_downloader_message<br/>line 147"]
+    n_download(["download<br/>line 164"])
+    n_asset_url(["asset_url<br/>line 230"])
+    n_valid_tag(["valid_tag<br/>line 247"])
+    n_valid_asset(["valid_asset<br/>line 256"])
     n_download --> n_find_downloader
     n_download --> n_no_downloader_message
-    click n_find_downloader href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L97" "open the source"
-    click n_no_downloader_message href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L138" "open the source"
-    click n_download href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L155" "open the source"
-    click n_asset_url href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L221" "open the source"
-    click n_valid_tag href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L238" "open the source"
-    click n_valid_asset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L247" "open the source"
+    click n_find_downloader href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L106" "open the source"
+    click n_no_downloader_message href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L147" "open the source"
+    click n_download href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L164" "open the source"
+    click n_asset_url href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L230" "open the source"
+    click n_valid_tag href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L247" "open the source"
+    click n_valid_asset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L256" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_download,n_asset_url,n_valid_tag,n_valid_asset entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -137,19 +147,19 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `HOST` <sub>pub const</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L62) | The only host this will ever talk to. |
-| `REPO` <sub>pub const</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L65) | The repository releases are fetched from. |
-| `MAX_BYTES` <sub>pub const</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L73) | The largest file this will accept. |
-| `Downloader` <sub>struct</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L76) | Where a downloader was found, and what to call it. |
-| `Style` <sub>enum</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L82) |  |
-| `find_downloader` <sub>fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L97) | Absolute paths first, and a bare name only where that is safe. |
-| `no_downloader_message` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L138) | Say what could not be found, and what to do instead. |
-| `download` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L155) | Fetch one URL into into. |
-| `asset_url` <sub>pub fn</sub> | [221](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L221) | The URL of one file in one release. |
-| `SUMS` <sub>pub const</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L226) | The three files every release publishes for checking itself. |
-| `SIGNATURE` <sub>pub const</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L227) |  |
-| `valid_tag` <sub>pub fn</sub> | [238](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L238) | A release tag, rejected unless it looks like one. |
-| `valid_asset` <sub>pub fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L247) | An asset filename, rejected unless it looks like one. |
+| `HOST` <sub>pub const</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L71) | The only host this will ever talk to. |
+| `REPO` <sub>pub const</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L74) | The repository releases are fetched from. |
+| `MAX_BYTES` <sub>pub const</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L82) | The largest file this will accept. |
+| `Downloader` <sub>struct</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L85) | Where a downloader was found, and what to call it. |
+| `Style` <sub>enum</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L91) |  |
+| `find_downloader` <sub>fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L106) | Absolute paths first, and a bare name only where that is safe. |
+| `no_downloader_message` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L147) | Say what could not be found, and what to do instead. |
+| `download` <sub>pub fn</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L164) | Fetch one URL into into. |
+| `asset_url` <sub>pub fn</sub> | [230](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L230) | The URL of one file in one release. |
+| `SUMS` <sub>pub const</sub> | [235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L235) | The three files every release publishes for checking itself. |
+| `SIGNATURE` <sub>pub const</sub> | [236](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L236) |  |
+| `valid_tag` <sub>pub fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L247) | A release tag, rejected unless it looks like one. |
+| `valid_asset` <sub>pub fn</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L256) | An asset filename, rejected unless it looks like one. |
 
 ---
 

@@ -51,6 +51,19 @@
 //! rather than merely conventional, the verifier is derived over a domain-
 //! separated input, so the same passphrase used in both places still produces
 //! unrelated values.
+//!
+//! # In plain words
+//!
+//! The lock on the application window.
+//!
+//! It asks for a passphrase before VeilVoice will open, and it slows down after
+//! repeated wrong answers so that guessing is not worth trying.
+//!
+//! **It is not protection against somebody who has your disk.** It stops the
+//! person who picks up your unlocked laptop, and that is genuinely worth having,
+//! but anybody who can read the files directly is not stopped by a program
+//! deciding whether to show you a window. Encrypting your recordings is what
+//! protects them; this protects the session.
 
 use crate::{kdf, Error, Secret};
 use std::path::{Path, PathBuf};

@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/shred.svg" alt="shred.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/shred.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 401 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 415 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#read-this-before-relying-on-it">Read this before relying on it</a>
   <a href="#why-not-35-passes">Why not 35 passes</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -58,16 +59,20 @@
 <p><strong>The answer that does work is full-disk encryption.</strong> If the volume is encrypted, destroying the key destroys everything on it at once, wherever the controller chose to put the blocks. LUKS, BitLocker and FileVault all do this. Use it, and treat this module as a second line rather than a first.</p>
 <h2 id="why-not-35-passes">Why not 35 passes</h2>
 <p>Because passes stopped being the interesting variable decades ago. Against a drive that honours writes, one pass is enough; against one that does not, no number of passes reaches the retained cells. The default here is three &#8212; random, complement, random &#8212; which satisfies the common three-pass expectation without pretending that thirty-five would be stronger. Time is better spent enabling disk encryption than on passes 4 through 35.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>This is meant to destroy a file, and the first thing it does is tell you how much that is worth.</p>
+<p>On the drives most computers now have, overwriting a file does not reliably remove it. The drive puts the new data somewhere else and leaves the original sitting in a place no ordinary program can reach, until it is cleaned up later, which may be never.</p>
+<p>So this does what it can and refuses to promise more. If you need something to be genuinely unrecoverable, encrypt it from the start and never write it unencrypted anywhere.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>401 lines defining <strong>3 functions</strong> (1 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>415 lines defining <strong>3 functions</strong> (1 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Passes</code> <span style="color:var(--muted)">line 50</span> &mdash; How thoroughly to overwrite before unlinking.</li>
-<li><code>struct ShredReport</code> <span style="color:var(--muted)">line 72</span> &mdash; What actually happened, so the caller can tell the user the truth.</li>
+<li><code>enum Passes</code> <span style="color:var(--muted)">line 64</span> &mdash; How thoroughly to overwrite before unlinking.</li>
+<li><code>struct ShredReport</code> <span style="color:var(--muted)">line 86</span> &mdash; What actually happened, so the caller can tell the user the truth.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>shred_file</code> <span style="color:var(--muted)">line 91</span> &mdash; Overwrite a file&#x27;s contents, then delete it.
+<li><code>shred_file</code> <span style="color:var(--muted)">line 105</span> &mdash; Overwrite a file&#x27;s contents, then delete it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>caveats</code></span>
 </li>
 </ul>
@@ -80,20 +85,20 @@
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="297" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M224.8 74.0 C 224.8 94.0, 148.4 100.0, 148.4 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L61" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L75" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="83.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Passes::count</text>
-<text x="83.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 61</text>
+<text x="83.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 75</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L91" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L105" target="_blank" rel="noopener noreferrer">
 <rect x="172.8" y="20.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="224.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">shred_file</text>
-<text x="224.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 91</text>
+<text x="224.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L176" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L190" target="_blank" rel="noopener noreferrer">
 <rect x="104.0" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="148.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">caveats</text>
-<text x="148.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 176</text>
+<text x="148.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 190</text>
 </a>
 </svg>
 </div>
@@ -101,13 +106,13 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_count[&quot;Passes::count&lt;br/&gt;line 61&quot;]
-    n_shred_file([&quot;shred_file&lt;br/&gt;line 91&quot;])
-    n_caveats[&quot;caveats&lt;br/&gt;line 176&quot;]
+    n_count[&quot;Passes::count&lt;br/&gt;line 75&quot;]
+    n_shred_file([&quot;shred_file&lt;br/&gt;line 105&quot;])
+    n_caveats[&quot;caveats&lt;br/&gt;line 190&quot;]
     n_shred_file --&gt; n_caveats
-    click n_count href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L61&quot; &quot;open the source&quot;
-    click n_shred_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L91&quot; &quot;open the source&quot;
-    click n_caveats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L176&quot; &quot;open the source&quot;
+    click n_count href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L75&quot; &quot;open the source&quot;
+    click n_shred_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L105&quot; &quot;open the source&quot;
+    click n_caveats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L190&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_shred_file entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -118,12 +123,12 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>CHUNK</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L46" rel="noopener noreferrer">46</a></td><td>Bytes written per chunk.</td></tr>
-<tr><td><code>Passes</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L50" rel="noopener noreferrer">50</a></td><td>How thoroughly to overwrite before unlinking.</td></tr>
-<tr><td><code>Passes::count</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L61" rel="noopener noreferrer">61</a></td><td></td></tr>
-<tr><td><code>ShredReport</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L72" rel="noopener noreferrer">72</a></td><td>What actually happened, so the caller can tell the user the truth.</td></tr>
-<tr><td><code>shred_file</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L91" rel="noopener noreferrer">91</a></td><td>Overwrite a file&#x27;s contents, then delete it.</td></tr>
-<tr><td><code>caveats</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L176" rel="noopener noreferrer">176</a></td><td>The honest limits, phrased for a user rather than a security engineer.</td></tr>
+<tr><td><code>CHUNK</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L60" rel="noopener noreferrer">60</a></td><td>Bytes written per chunk.</td></tr>
+<tr><td><code>Passes</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L64" rel="noopener noreferrer">64</a></td><td>How thoroughly to overwrite before unlinking.</td></tr>
+<tr><td><code>Passes::count</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L75" rel="noopener noreferrer">75</a></td><td></td></tr>
+<tr><td><code>ShredReport</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L86" rel="noopener noreferrer">86</a></td><td>What actually happened, so the caller can tell the user the truth.</td></tr>
+<tr><td><code>shred_file</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L105" rel="noopener noreferrer">105</a></td><td>Overwrite a file&#x27;s contents, then delete it.</td></tr>
+<tr><td><code>caveats</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs#L190" rel="noopener noreferrer">190</a></td><td>The honest limits, phrased for a user rather than a security engineer.</td></tr>
 </tbody></table>
 </section>
 </div></div>

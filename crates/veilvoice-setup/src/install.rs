@@ -54,6 +54,19 @@
 //! subprocess on an operation that runs once. `reg.exe` is resolved by absolute
 //! path -- resolving it by name would search the working directory first, which
 //! is finding F-13.
+//!
+//! # In plain words
+//!
+//! Copies VeilVoice somewhere your system can find it, and adds that place to your
+//! path so typing `veilvoice` works.
+//!
+//! It installs for you alone and needs no administrator rights. It also registers
+//! with the system's own list of installed programs, so removing it works the way
+//! removing anything else does.
+//!
+//! Running VeilVoice straight out of a folder is a perfectly good way to use it,
+//! and the setup screen says so rather than treating portable as something
+//! missing.
 
 use std::path::{Path, PathBuf};
 

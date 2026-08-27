@@ -39,9 +39,10 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/tests-hostile_audio.svg" alt="hostile_audio.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/tests/hostile_audio.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 353 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 363 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -51,10 +52,13 @@
 <p>The engine against input that is not well-behaved audio.</p>
 <p>A realistic use of VeilVoice is &quot;someone sent me a recording and I want to veil it before passing it on&quot;, so the input file is not necessarily friendly. A 32-bit-float WAV can legally contain NaN and infinity, and <code>symphonia</code> decodes those faithfully rather than sanitising them.</p>
 <p>That matters more than it might sound, because the engine keeps <em>persistent</em> state: the accent neutraliser&#x27;s long-term spectrum is an exponential moving average, so a single non-finite sample folded into it never washes out. The audit found exactly that &#8212; one NaN, and every output sample for the rest of the session was NaN, silently.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Feeds the engine audio designed to break it: silence, deafening noise, values that are not numbers, files that lie about their own length.</p>
+<p>The question is not whether it sounds good. It is whether anything can make the engine stop, hang, or quietly produce silence while reporting success. A de-identifier that fails by outputting nothing is one somebody might not notice had failed.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>353 lines defining <strong>13 functions</strong> (0 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>363 lines defining <strong>13 functions</strong> (0 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -74,70 +78,70 @@
 <path d="M284.0 147.0 C 306.0 147.0, 306.0 47.0, 146.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M284.0 347.0 C 306.0 347.0, 306.0 47.0, 146.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M566.0 247.0 C 588.0 247.0, 588.0 47.0, 253.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L17" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L27" target="_blank" rel="noopener noreferrer">
 <rect x="61.8" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="102.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">speech</text>
-<text x="102.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 17</text>
+<text x="102.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 27</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L30" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L40" target="_blank" rel="noopener noreferrer">
 <rect x="169.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="209.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">engine</text>
-<text x="209.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 30</text>
+<text x="209.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 40</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L36" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L46" target="_blank" rel="noopener noreferrer">
 <rect x="276.2" y="20.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="404.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_single_nan_does_not_poison_&#8230;</text>
-<text x="404.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 36</text>
+<text x="404.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 46</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L63" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L73" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="120.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="156.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">every_flavour_of_non_finite_i&#8230;</text>
-<text x="156.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 63</text>
+<text x="156.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 73</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L93" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L103" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="120.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="438.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">an_entirely_non_finite_buffer&#8230;</text>
-<text x="438.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 93</text>
+<text x="438.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 103</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L105" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L115" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="156.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">digital_silence_stays_silent_&#8230;</text>
-<text x="156.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
+<text x="156.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 115</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L123" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L133" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="220.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="438.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">pathological_but_legal_audio_&#8230;</text>
-<text x="438.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 123</text>
+<text x="438.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L162" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L172" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="320.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="156.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hostile_input_is_survived_wit&#8230;</text>
-<text x="156.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
+<text x="156.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 172</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L200" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L210" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="320.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="438.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">a_non_finite_sample_rate_is_r&#8230;</text>
-<text x="438.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
+<text x="438.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 210</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L221" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L231" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="420.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="156.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">an_absurd_sample_rate_is_refu&#8230;</text>
-<text x="156.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 221</text>
+<text x="156.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 231</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L260" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L270" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="420.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="438.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">an_absurd_frame_size_is_refus&#8230;</text>
-<text x="438.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
+<text x="438.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L288" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L298" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="520.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="156.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">non_finite_parameters_are_ref&#8230;</text>
-<text x="156.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 288</text>
+<text x="156.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 298</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L339" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L349" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="520.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="438.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">every_configuration_that_buil&#8230;</text>
-<text x="438.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 339</text>
+<text x="438.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 349</text>
 </a>
 </svg>
 </div>
@@ -145,19 +149,19 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_speech[&quot;speech&lt;br/&gt;line 17&quot;]
-    n_engine[&quot;engine&lt;br/&gt;line 30&quot;]
-    n_a_single_nan_does_not_poison_the_engine_for_ever[&quot;a_single_nan_does_not_poison_&#8230;&lt;br/&gt;line 36&quot;]
-    n_every_flavour_of_non_finite_is_survived[&quot;every_flavour_of_non_finite_i&#8230;&lt;br/&gt;line 63&quot;]
-    n_an_entirely_non_finite_buffer_is_handled[&quot;an_entirely_non_finite_buffer&#8230;&lt;br/&gt;line 93&quot;]
-    n_digital_silence_stays_silent_and_leaves_the_state_usable[&quot;digital_silence_stays_silent_&#8230;&lt;br/&gt;line 105&quot;]
-    n_pathological_but_legal_audio_is_handled[&quot;pathological_but_legal_audio_&#8230;&lt;br/&gt;line 123&quot;]
-    n_hostile_input_is_survived_with_accent_neutralisation_off[&quot;hostile_input_is_survived_wit&#8230;&lt;br/&gt;line 162&quot;]
-    n_a_non_finite_sample_rate_is_refused_rather_than_built[&quot;a_non_finite_sample_rate_is_r&#8230;&lt;br/&gt;line 200&quot;]
-    n_an_absurd_sample_rate_is_refused_rather_than_allocated[&quot;an_absurd_sample_rate_is_refu&#8230;&lt;br/&gt;line 221&quot;]
-    n_an_absurd_frame_size_is_refused[&quot;an_absurd_frame_size_is_refus&#8230;&lt;br/&gt;line 260&quot;]
-    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped[&quot;non_finite_parameters_are_ref&#8230;&lt;br/&gt;line 288&quot;]
-    n_every_configuration_that_builds_produces_finite_audio[&quot;every_configuration_that_buil&#8230;&lt;br/&gt;line 339&quot;]
+    n_speech[&quot;speech&lt;br/&gt;line 27&quot;]
+    n_engine[&quot;engine&lt;br/&gt;line 40&quot;]
+    n_a_single_nan_does_not_poison_the_engine_for_ever[&quot;a_single_nan_does_not_poison_&#8230;&lt;br/&gt;line 46&quot;]
+    n_every_flavour_of_non_finite_is_survived[&quot;every_flavour_of_non_finite_i&#8230;&lt;br/&gt;line 73&quot;]
+    n_an_entirely_non_finite_buffer_is_handled[&quot;an_entirely_non_finite_buffer&#8230;&lt;br/&gt;line 103&quot;]
+    n_digital_silence_stays_silent_and_leaves_the_state_usable[&quot;digital_silence_stays_silent_&#8230;&lt;br/&gt;line 115&quot;]
+    n_pathological_but_legal_audio_is_handled[&quot;pathological_but_legal_audio_&#8230;&lt;br/&gt;line 133&quot;]
+    n_hostile_input_is_survived_with_accent_neutralisation_off[&quot;hostile_input_is_survived_wit&#8230;&lt;br/&gt;line 172&quot;]
+    n_a_non_finite_sample_rate_is_refused_rather_than_built[&quot;a_non_finite_sample_rate_is_r&#8230;&lt;br/&gt;line 210&quot;]
+    n_an_absurd_sample_rate_is_refused_rather_than_allocated[&quot;an_absurd_sample_rate_is_refu&#8230;&lt;br/&gt;line 231&quot;]
+    n_an_absurd_frame_size_is_refused[&quot;an_absurd_frame_size_is_refus&#8230;&lt;br/&gt;line 270&quot;]
+    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped[&quot;non_finite_parameters_are_ref&#8230;&lt;br/&gt;line 298&quot;]
+    n_every_configuration_that_builds_produces_finite_audio[&quot;every_configuration_that_buil&#8230;&lt;br/&gt;line 349&quot;]
     n_a_single_nan_does_not_poison_the_engine_for_ever --&gt; n_engine
     n_a_single_nan_does_not_poison_the_engine_for_ever --&gt; n_speech
     n_an_entirely_non_finite_buffer_is_handled --&gt; n_engine
@@ -169,19 +173,19 @@ flowchart TD
     n_every_flavour_of_non_finite_is_survived --&gt; n_speech
     n_hostile_input_is_survived_with_accent_neutralisation_off --&gt; n_speech
     n_pathological_but_legal_audio_is_handled --&gt; n_engine
-    click n_speech href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L17&quot; &quot;open the source&quot;
-    click n_engine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L30&quot; &quot;open the source&quot;
-    click n_a_single_nan_does_not_poison_the_engine_for_ever href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L36&quot; &quot;open the source&quot;
-    click n_every_flavour_of_non_finite_is_survived href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L63&quot; &quot;open the source&quot;
-    click n_an_entirely_non_finite_buffer_is_handled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L93&quot; &quot;open the source&quot;
-    click n_digital_silence_stays_silent_and_leaves_the_state_usable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L105&quot; &quot;open the source&quot;
-    click n_pathological_but_legal_audio_is_handled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L123&quot; &quot;open the source&quot;
-    click n_hostile_input_is_survived_with_accent_neutralisation_off href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L162&quot; &quot;open the source&quot;
-    click n_a_non_finite_sample_rate_is_refused_rather_than_built href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L200&quot; &quot;open the source&quot;
-    click n_an_absurd_sample_rate_is_refused_rather_than_allocated href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L221&quot; &quot;open the source&quot;
-    click n_an_absurd_frame_size_is_refused href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L260&quot; &quot;open the source&quot;
-    click n_non_finite_parameters_are_refused_and_wild_ones_are_clamped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L288&quot; &quot;open the source&quot;
-    click n_every_configuration_that_builds_produces_finite_audio href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L339&quot; &quot;open the source&quot;
+    click n_speech href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L27&quot; &quot;open the source&quot;
+    click n_engine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L40&quot; &quot;open the source&quot;
+    click n_a_single_nan_does_not_poison_the_engine_for_ever href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L46&quot; &quot;open the source&quot;
+    click n_every_flavour_of_non_finite_is_survived href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L73&quot; &quot;open the source&quot;
+    click n_an_entirely_non_finite_buffer_is_handled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L103&quot; &quot;open the source&quot;
+    click n_digital_silence_stays_silent_and_leaves_the_state_usable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L115&quot; &quot;open the source&quot;
+    click n_pathological_but_legal_audio_is_handled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L133&quot; &quot;open the source&quot;
+    click n_hostile_input_is_survived_with_accent_neutralisation_off href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L172&quot; &quot;open the source&quot;
+    click n_a_non_finite_sample_rate_is_refused_rather_than_built href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L210&quot; &quot;open the source&quot;
+    click n_an_absurd_sample_rate_is_refused_rather_than_allocated href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L231&quot; &quot;open the source&quot;
+    click n_an_absurd_frame_size_is_refused href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L270&quot; &quot;open the source&quot;
+    click n_non_finite_parameters_are_refused_and_wild_ones_are_clamped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L298&quot; &quot;open the source&quot;
+    click n_every_configuration_that_builds_produces_finite_audio href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L349&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_speech,n_engine,n_a_single_nan_does_not_poison_the_engine_for_ever,n_every_flavour_of_non_finite_is_survived,n_an_entirely_non_finite_buffer_is_handled,n_digital_silence_stays_silent_and_leaves_the_state_usable,n_pathological_but_legal_audio_is_handled,n_hostile_input_is_survived_with_accent_neutralisation_off,n_a_non_finite_sample_rate_is_refused_rather_than_built,n_an_absurd_sample_rate_is_refused_rather_than_allocated,n_an_absurd_frame_size_is_refused,n_non_finite_parameters_are_refused_and_wild_ones_are_clamped,n_every_configuration_that_builds_produces_finite_audio helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -190,19 +194,19 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>speech</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L17" rel="noopener noreferrer">17</a></td><td></td></tr>
-<tr><td><code>engine</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L30" rel="noopener noreferrer">30</a></td><td></td></tr>
-<tr><td><code>a_single_nan_does_not_poison_the_engine_for_ever</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L36" rel="noopener noreferrer">36</a></td><td>The regression.</td></tr>
-<tr><td><code>every_flavour_of_non_finite_is_survived</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L63" rel="noopener noreferrer">63</a></td><td></td></tr>
-<tr><td><code>an_entirely_non_finite_buffer_is_handled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L93" rel="noopener noreferrer">93</a></td><td>An input made entirely of poison must not panic, hang, or emit garbage.</td></tr>
-<tr><td><code>digital_silence_stays_silent_and_leaves_the_state_usable</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L105" rel="noopener noreferrer">105</a></td><td>Silence must not drive the long-term averages anywhere strange, and must not come out as anything but silence.</td></tr>
-<tr><td><code>pathological_but_legal_audio_is_handled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L123" rel="noopener noreferrer">123</a></td><td>Full-scale square waves and DC are legal audio and unlike anything the engine was tuned on.</td></tr>
-<tr><td><code>hostile_input_is_survived_with_accent_neutralisation_off</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L162" rel="noopener noreferrer">162</a></td><td>The same, with accent neutralisation off, since that changes which paths in spectral.rs run.</td></tr>
-<tr><td><code>a_non_finite_sample_rate_is_refused_rather_than_built</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L200" rel="noopener noreferrer">200</a></td><td>A non-finite sample rate must be refused, not built.</td></tr>
-<tr><td><code>an_absurd_sample_rate_is_refused_rather_than_allocated</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L221" rel="noopener noreferrer">221</a></td><td>A sample rate a file can legally declare, but no hardware produces, sizes the reverb and chorus delay lines.</td></tr>
-<tr><td><code>an_absurd_frame_size_is_refused</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L260" rel="noopener noreferrer">260</a></td><td>frame_size had no upper bound at all, and it sizes every internal buffer and the FFT plan.</td></tr>
-<tr><td><code>non_finite_parameters_are_refused_and_wild_ones_are_clamped</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L288" rel="noopener noreferrer">288</a></td><td>Every other float is either clamped to something meaningful or refused for being NaN.</td></tr>
-<tr><td><code>every_configuration_that_builds_produces_finite_audio</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L339" rel="noopener noreferrer">339</a></td><td>The whole point, checked end to end: a configuration that survives validation must produce finite audio from finite audio.</td></tr>
+<tr><td><code>speech</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L27" rel="noopener noreferrer">27</a></td><td></td></tr>
+<tr><td><code>engine</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L40" rel="noopener noreferrer">40</a></td><td></td></tr>
+<tr><td><code>a_single_nan_does_not_poison_the_engine_for_ever</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L46" rel="noopener noreferrer">46</a></td><td>The regression.</td></tr>
+<tr><td><code>every_flavour_of_non_finite_is_survived</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L73" rel="noopener noreferrer">73</a></td><td></td></tr>
+<tr><td><code>an_entirely_non_finite_buffer_is_handled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L103" rel="noopener noreferrer">103</a></td><td>An input made entirely of poison must not panic, hang, or emit garbage.</td></tr>
+<tr><td><code>digital_silence_stays_silent_and_leaves_the_state_usable</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L115" rel="noopener noreferrer">115</a></td><td>Silence must not drive the long-term averages anywhere strange, and must not come out as anything but silence.</td></tr>
+<tr><td><code>pathological_but_legal_audio_is_handled</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L133" rel="noopener noreferrer">133</a></td><td>Full-scale square waves and DC are legal audio and unlike anything the engine was tuned on.</td></tr>
+<tr><td><code>hostile_input_is_survived_with_accent_neutralisation_off</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L172" rel="noopener noreferrer">172</a></td><td>The same, with accent neutralisation off, since that changes which paths in spectral.rs run.</td></tr>
+<tr><td><code>a_non_finite_sample_rate_is_refused_rather_than_built</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L210" rel="noopener noreferrer">210</a></td><td>A non-finite sample rate must be refused, not built.</td></tr>
+<tr><td><code>an_absurd_sample_rate_is_refused_rather_than_allocated</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L231" rel="noopener noreferrer">231</a></td><td>A sample rate a file can legally declare, but no hardware produces, sizes the reverb and chorus delay lines.</td></tr>
+<tr><td><code>an_absurd_frame_size_is_refused</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L270" rel="noopener noreferrer">270</a></td><td>frame_size had no upper bound at all, and it sizes every internal buffer and the FFT plan.</td></tr>
+<tr><td><code>non_finite_parameters_are_refused_and_wild_ones_are_clamped</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L298" rel="noopener noreferrer">298</a></td><td>Every other float is either clamped to something meaningful or refused for being NaN.</td></tr>
+<tr><td><code>every_configuration_that_builds_produces_finite_audio</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs#L349" rel="noopener noreferrer">349</a></td><td>The whole point, checked end to end: a configuration that survives validation must produce finite audio from finite audio.</td></tr>
 </tbody></table>
 </section>
 </div></div>

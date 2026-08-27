@@ -106,6 +106,21 @@
 //! only where it clipped, because a limiter changes the relative loudness of
 //! the speakers and this crate has just spent considerable effort making them
 //! distinguishable.
+//!
+//! # In plain words
+//!
+//! This takes a recording and a plan of who speaks when, and produces the veiled
+//! version with each person in a different voice.
+//!
+//! Each speaker gets their own separate copy of the engine, with its own settings
+//! and its own stream of randomness. That is not just tidiness: it means nothing
+//! carries across from one person to another, so there is nothing shared that
+//! could be used to line two speakers up or work out that they came from the same
+//! recording.
+//!
+//! Any moment the plan does not account for comes out silent, rather than being
+//! passed through as it was. A missing line in the plan should cost you a gap, not
+//! somebody's real voice.
 
 use crate::{Conversation, Error};
 use veilvoice_core::{DeidConfig, Deidentifier};

@@ -12,6 +12,17 @@
 //! whether to trust `veilvoice-verify` should be able to see what it was tested
 //! *against* without cloning the repository, because the whole purpose of that
 //! binary is to be the thing you check a download with.
+//!
+//! # In plain words
+//!
+//! The verifier's own tests, and most of them are about failure rather than
+//! success.
+//!
+//! That is deliberate. A verifier that accepted everything would pass every
+//! happy-path test ever written and would ship looking perfect while doing the
+//! opposite of its job. So most of what is here is corrupted signatures, wrong
+//! keys, truncated files and mismatched hashes, and the question each time is
+//! whether it says no.
 
 use super::*;
 

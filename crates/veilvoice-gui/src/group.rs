@@ -41,6 +41,18 @@
 //! Somebody who cannot separate two of these colours has the name, everywhere.
 //! A panel that distinguished speakers by colour alone would be one about eight
 //! per cent of men could not use.
+//!
+//! # In plain words
+//!
+//! The panel for a recording with several people in it.
+//!
+//! Each person gets a name and a colour, so you can see at a glance who is who.
+//! The colours are chosen to be as different from each other as possible, and you
+//! can pick your own from any of the palettes the website offers.
+//!
+//! Group mode is off when the application opens unless you have said otherwise,
+//! and turning it on lasts only for that run. A mode that quietly survived a
+//! restart is a mode somebody eventually forgets is on.
 
 use crate::theme::palette as p;
 use eframe::egui::{self, Color32, RichText, Ui};

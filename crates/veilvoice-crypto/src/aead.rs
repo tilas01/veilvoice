@@ -11,6 +11,16 @@
 //! which is how the container header in [`crate::container`] is bound to its
 //! ciphertext: flipping a bit in the stored KDF parameters produces a
 //! decryption failure rather than a silently different key.
+//!
+//! # In plain words
+//!
+//! This is the encryption itself: it turns a recording into something unreadable,
+//! and it can tell whether the result was tampered with afterwards.
+//!
+//! Those two jobs go together on purpose. Encryption on its own hides what a file
+//! says but does not stop somebody changing it, and a changed file that still
+//! decrypts into something is a worse outcome than one that refuses to open. Here,
+//! any alteration at all means it will not open, and says so.
 
 use crate::{Error, Secret};
 use chacha20poly1305::aead::{Aead, Payload};

@@ -11,6 +11,16 @@
 //! average, so a single non-finite sample folded into it never washes out. The
 //! audit found exactly that — one NaN, and every output sample for the rest of
 //! the session was NaN, silently.
+//!
+//! # In plain words
+//!
+//! Feeds the engine audio designed to break it: silence, deafening noise, values
+//! that are not numbers, files that lie about their own length.
+//!
+//! The question is not whether it sounds good. It is whether anything can make the
+//! engine stop, hang, or quietly produce silence while reporting success. A
+//! de-identifier that fails by outputting nothing is one somebody might not notice
+//! had failed.
 
 use veilvoice_core::{AccentConfig, DeidConfig, Deidentifier};
 

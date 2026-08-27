@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-policy/src/policy.rs`
 
-[[veilvoice-policy|Crate-veilvoice-policy]] &middot; 892 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs)
+[[veilvoice-policy|Crate-veilvoice-policy]] &middot; 905 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs)
 
 ## Contents
 
 - [Every requirement tightens, and there is nowhere to write one that does not](#every-requirement-tightens-and-there-is-nowhere-to-write-one-that-does-not)
 - [Format](#format)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -48,36 +49,49 @@ written by a newer build says something this one cannot honour, and quietly
 honouring the rest would leave the machine less restricted than the person
 who wrote it believes. Refusing says so.
 
+# In plain words
+
+A way to say "these settings must always be on", so that they cannot be turned
+off later by accident.
+
+Everything here only ever tightens. There is deliberately no way to write a
+rule that makes VeilVoice do less, because a settings file that could weaken
+the program would be the first thing worth attacking.
+
+If a rule and a control disagree, the rule wins and the window shows you the
+value that will actually be used, rather than one that quietly changes when you
+press the button.
+
 ## What this file contains
 
-892 lines defining **25 functions** (23 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+905 lines defining **25 functions** (23 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Requirement` (line 56) -- One thing a policy can insist on.
-- `struct Posture` (line 124) -- The settings a policy can reach, as a front end holds them.
-- `struct Policy` (line 181) -- A set of requirements, and an optional note from whoever wrote them.
-- `enum Verification` (line 443) -- What is known about the seal on a policy.
+- `enum Requirement` (line 69) -- One thing a policy can insist on.
+- `struct Posture` (line 137) -- The settings a policy can reach, as a front end holds them.
+- `struct Policy` (line 194) -- A set of requirements, and an optional note from whoever wrote them.
+- `enum Verification` (line 456) -- What is known about the seal on a policy.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Requirement::keyword` (line 75) -- The keyword this is written as.
-- `Requirement::describe` (line 90) -- What this means, in the words a front end should show beside the control it has taken away.
-- `Posture::most_permissive` (line 156) -- The most permissive arrangement the controls can reach.
-- `Posture::is_at_least_as_strict_as` (line 170) -- Whether self is at least as strict as other in every dimension.
-- `Policy::require` (line 196) -- Add a requirement.
-- `Policy::with_note` (line 213) -- Set the note shown beside every control the policy has fixed.
-- `Policy::note` (line 230) -- The note, if there is one.
-- `Policy::is_empty` (line 235) -- Whether anything at all is required.
-- `Policy::len` (line 240) -- How many requirements there are.
-- `Policy::requirements` (line 245) -- The requirements, in a stable order.
-- `Policy::constrain` (line 270) -- Apply the policy to a posture.
+- `Requirement::keyword` (line 88) -- The keyword this is written as.
+- `Requirement::describe` (line 103) -- What this means, in the words a front end should show beside the control it has taken away.
+- `Posture::most_permissive` (line 169) -- The most permissive arrangement the controls can reach.
+- `Posture::is_at_least_as_strict_as` (line 183) -- Whether self is at least as strict as other in every dimension.
+- `Policy::require` (line 209) -- Add a requirement.
+- `Policy::with_note` (line 226) -- Set the note shown beside every control the policy has fixed.
+- `Policy::note` (line 243) -- The note, if there is one.
+- `Policy::is_empty` (line 248) -- Whether anything at all is required.
+- `Policy::len` (line 253) -- How many requirements there are.
+- `Policy::requirements` (line 258) -- The requirements, in a stable order.
+- `Policy::constrain` (line 283) -- Apply the policy to a posture.
   - reaches: `minimum_intensity`, `requires`
-- `Policy::save` (line 385) -- Write the plain policy into dir, and the sealed copy beside it.
+- `Policy::save` (line 398) -- Write the plain policy into dir, and the sealed copy beside it.
   - reaches: `seal`, `to_text`
-- `Verification::describe` (line 463) -- One line for a front end.
-- `Verification::wants_attention` (line 488) -- Whether this is a state somebody should look at.
-- `verify` (line 500) -- Check the plain policy in dir against its sealed copy.
+- `Verification::describe` (line 476) -- One line for a front end.
+- `Verification::wants_attention` (line 501) -- Whether this is a state somebody should look at.
+- `verify` (line 513) -- Check the plain policy in dir against its sealed copy.
   - reaches: `load`, `open_sealed`, `parse`, `new`, `requirement_from`, `default`
 
 ## What calls what
@@ -96,28 +110,28 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_keyword(["Requirement::keyword<br/>line 75"])
-    n_describe(["Requirement::describe<br/>line 90"])
-    n_default["Posture::default<br/>line 139"]
-    n_most_permissive(["Posture::most_permissive<br/>line 156"])
-    n_is_at_least_as_strict_as(["Posture::is_at_least_as_stric…<br/>line 170"])
-    n_new["Policy::new<br/>line 191"]
-    n_require(["Policy::require<br/>line 196"])
-    n_with_note(["Policy::with_note<br/>line 213"])
-    n_note(["Policy::note<br/>line 230"])
-    n_is_empty(["Policy::is_empty<br/>line 235"])
-    n_len(["Policy::len<br/>line 240"])
-    n_requires["Policy::requires<br/>line 250"]
-    n_minimum_intensity["Policy::minimum_intensity<br/>line 255"]
-    n_constrain(["Policy::constrain<br/>line 270"])
-    n_to_text["Policy::to_text<br/>line 291"]
-    n_parse["Policy::parse<br/>line 317"]
-    n_seal["Policy::seal<br/>line 363"]
-    n_open_sealed["Policy::open_sealed<br/>line 372"]
-    n_save(["Policy::save<br/>line 385"])
-    n_load["Policy::load<br/>line 402"]
-    n_requirement_from["requirement_from<br/>line 411"]
-    n_verify(["verify<br/>line 500"])
+    n_keyword(["Requirement::keyword<br/>line 88"])
+    n_describe(["Requirement::describe<br/>line 103"])
+    n_default["Posture::default<br/>line 152"]
+    n_most_permissive(["Posture::most_permissive<br/>line 169"])
+    n_is_at_least_as_strict_as(["Posture::is_at_least_as_stric…<br/>line 183"])
+    n_new["Policy::new<br/>line 204"]
+    n_require(["Policy::require<br/>line 209"])
+    n_with_note(["Policy::with_note<br/>line 226"])
+    n_note(["Policy::note<br/>line 243"])
+    n_is_empty(["Policy::is_empty<br/>line 248"])
+    n_len(["Policy::len<br/>line 253"])
+    n_requires["Policy::requires<br/>line 263"]
+    n_minimum_intensity["Policy::minimum_intensity<br/>line 268"]
+    n_constrain(["Policy::constrain<br/>line 283"])
+    n_to_text["Policy::to_text<br/>line 304"]
+    n_parse["Policy::parse<br/>line 330"]
+    n_seal["Policy::seal<br/>line 376"]
+    n_open_sealed["Policy::open_sealed<br/>line 385"]
+    n_save(["Policy::save<br/>line 398"])
+    n_load["Policy::load<br/>line 415"]
+    n_requirement_from["requirement_from<br/>line 424"]
+    n_verify(["verify<br/>line 513"])
     n_constrain --> n_minimum_intensity
     n_constrain --> n_requires
     n_load --> n_parse
@@ -130,28 +144,28 @@ flowchart TD
     n_seal --> n_to_text
     n_verify --> n_load
     n_verify --> n_open_sealed
-    click n_keyword href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L75" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L90" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L139" "open the source"
-    click n_most_permissive href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L156" "open the source"
-    click n_is_at_least_as_strict_as href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L170" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L191" "open the source"
-    click n_require href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L196" "open the source"
-    click n_with_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L213" "open the source"
-    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L230" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L235" "open the source"
-    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L240" "open the source"
-    click n_requires href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L250" "open the source"
-    click n_minimum_intensity href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L255" "open the source"
-    click n_constrain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L270" "open the source"
-    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L291" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L317" "open the source"
-    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L363" "open the source"
-    click n_open_sealed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L372" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L385" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L402" "open the source"
-    click n_requirement_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L411" "open the source"
-    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L500" "open the source"
+    click n_keyword href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L88" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L103" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L152" "open the source"
+    click n_most_permissive href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L169" "open the source"
+    click n_is_at_least_as_strict_as href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L183" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L204" "open the source"
+    click n_require href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L209" "open the source"
+    click n_with_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L226" "open the source"
+    click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L243" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L248" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L253" "open the source"
+    click n_requires href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L263" "open the source"
+    click n_minimum_intensity href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L268" "open the source"
+    click n_constrain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L283" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L304" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L330" "open the source"
+    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L376" "open the source"
+    click n_open_sealed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L385" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L398" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L415" "open the source"
+    click n_requirement_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L424" "open the source"
+    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L513" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_keyword,n_describe,n_most_permissive,n_is_at_least_as_strict_as,n_require,n_with_note,n_note,n_is_empty,n_len,n_constrain,n_save,n_verify entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -166,35 +180,35 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `MAGIC` <sub>const</sub> | [43](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L43) | Magic first line. |
-| `PLAIN_FILE` <sub>pub const</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L46) | The plain policy, read at every launch and needing no passphrase. |
-| `SEALED_FILE` <sub>pub const</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L50) | The same policy sealed under a passphrase, for proving the plain one is what was written. |
-| `Requirement` <sub>pub enum</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L56) | One thing a policy can insist on. |
-| `Requirement::keyword` <sub>pub fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L75) | The keyword this is written as. |
-| `Requirement::describe` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L90) | What this means, in the words a front end should show beside the control it has taken away. |
-| `Posture` <sub>pub struct</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L124) | The settings a policy can reach, as a front end holds them. |
-| `Posture::default` <sub>fn</sub> | [139](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L139) | VeilVoice's own defaults, which are the strict ones. |
-| `Posture::most_permissive` <sub>pub fn</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L156) | The most permissive arrangement the controls can reach. |
-| `Posture::is_at_least_as_strict_as` <sub>pub fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L170) | Whether self is at least as strict as other in every dimension. |
-| `Policy` <sub>pub struct</sub> | [181](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L181) | A set of requirements, and an optional note from whoever wrote them. |
-| `Policy::new` <sub>pub fn</sub> | [191](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L191) | A policy that requires nothing. |
-| `Policy::require` <sub>pub fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L196) | Add a requirement. |
-| `Policy::with_note` <sub>pub fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L213) | Set the note shown beside every control the policy has fixed. |
-| `Policy::note` <sub>pub fn</sub> | [230](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L230) | The note, if there is one. |
-| `Policy::is_empty` <sub>pub fn</sub> | [235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L235) | Whether anything at all is required. |
-| `Policy::len` <sub>pub fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L240) | How many requirements there are. |
-| `Policy::requirements` <sub>pub fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L245) | The requirements, in a stable order. |
-| `Policy::requires` <sub>pub fn</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L250) | Whether a particular requirement is in force. |
-| `Policy::minimum_intensity` <sub>pub fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L255) | The intensity floor, or 0.0 when none is set. |
-| `Policy::constrain` <sub>pub fn</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L270) | Apply the policy to a posture. |
-| `Policy::to_text` <sub>pub fn</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L291) | Serialise to the text format described at the top of this module. |
-| `Policy::parse` <sub>pub fn</sub> | [317](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L317) | Parse the text format. |
-| `Policy::seal` <sub>pub fn</sub> | [363](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L363) | Seal the policy under a passphrase. |
-| `Policy::open_sealed` <sub>pub fn</sub> | [372](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L372) | Open a policy sealed by Policy::seal. |
-| `Policy::save` <sub>pub fn</sub> | [385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L385) | Write the plain policy into dir, and the sealed copy beside it. |
-| `Policy::load` <sub>pub fn</sub> | [402](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L402) | Read the plain policy from dir. |
-| `requirement_from` <sub>fn</sub> | [411](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L411) |  |
-| `Verification` <sub>pub enum</sub> | [443](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L443) | What is known about the seal on a policy. |
-| `Verification::describe` <sub>pub fn</sub> | [463](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L463) | One line for a front end. |
-| `Verification::wants_attention` <sub>pub fn</sub> | [488](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L488) | Whether this is a state somebody should look at. |
-| `verify` <sub>pub fn</sub> | [500](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L500) | Check the plain policy in dir against its sealed copy. |
+| `MAGIC` <sub>const</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L56) | Magic first line. |
+| `PLAIN_FILE` <sub>pub const</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L59) | The plain policy, read at every launch and needing no passphrase. |
+| `SEALED_FILE` <sub>pub const</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L63) | The same policy sealed under a passphrase, for proving the plain one is what was written. |
+| `Requirement` <sub>pub enum</sub> | [69](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L69) | One thing a policy can insist on. |
+| `Requirement::keyword` <sub>pub fn</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L88) | The keyword this is written as. |
+| `Requirement::describe` <sub>pub fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L103) | What this means, in the words a front end should show beside the control it has taken away. |
+| `Posture` <sub>pub struct</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L137) | The settings a policy can reach, as a front end holds them. |
+| `Posture::default` <sub>fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L152) | VeilVoice's own defaults, which are the strict ones. |
+| `Posture::most_permissive` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L169) | The most permissive arrangement the controls can reach. |
+| `Posture::is_at_least_as_strict_as` <sub>pub fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L183) | Whether self is at least as strict as other in every dimension. |
+| `Policy` <sub>pub struct</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L194) | A set of requirements, and an optional note from whoever wrote them. |
+| `Policy::new` <sub>pub fn</sub> | [204](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L204) | A policy that requires nothing. |
+| `Policy::require` <sub>pub fn</sub> | [209](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L209) | Add a requirement. |
+| `Policy::with_note` <sub>pub fn</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L226) | Set the note shown beside every control the policy has fixed. |
+| `Policy::note` <sub>pub fn</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L243) | The note, if there is one. |
+| `Policy::is_empty` <sub>pub fn</sub> | [248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L248) | Whether anything at all is required. |
+| `Policy::len` <sub>pub fn</sub> | [253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L253) | How many requirements there are. |
+| `Policy::requirements` <sub>pub fn</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L258) | The requirements, in a stable order. |
+| `Policy::requires` <sub>pub fn</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L263) | Whether a particular requirement is in force. |
+| `Policy::minimum_intensity` <sub>pub fn</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L268) | The intensity floor, or 0.0 when none is set. |
+| `Policy::constrain` <sub>pub fn</sub> | [283](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L283) | Apply the policy to a posture. |
+| `Policy::to_text` <sub>pub fn</sub> | [304](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L304) | Serialise to the text format described at the top of this module. |
+| `Policy::parse` <sub>pub fn</sub> | [330](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L330) | Parse the text format. |
+| `Policy::seal` <sub>pub fn</sub> | [376](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L376) | Seal the policy under a passphrase. |
+| `Policy::open_sealed` <sub>pub fn</sub> | [385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L385) | Open a policy sealed by Policy::seal. |
+| `Policy::save` <sub>pub fn</sub> | [398](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L398) | Write the plain policy into dir, and the sealed copy beside it. |
+| `Policy::load` <sub>pub fn</sub> | [415](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L415) | Read the plain policy from dir. |
+| `requirement_from` <sub>fn</sub> | [424](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L424) |  |
+| `Verification` <sub>pub enum</sub> | [456](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L456) | What is known about the seal on a policy. |
+| `Verification::describe` <sub>pub fn</sub> | [476](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L476) | One line for a front end. |
+| `Verification::wants_attention` <sub>pub fn</sub> | [501](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L501) | Whether this is a state somebody should look at. |
+| `verify` <sub>pub fn</sub> | [513](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L513) | Check the plain policy in dir against its sealed copy. |

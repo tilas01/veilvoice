@@ -16,6 +16,14 @@
 //! 3. **It never invents audio.** Output length is bounded by input length.
 //!
 //! Set `VEILVOICE_FUZZ_ROUNDS` to run it longer than the default.
+//!
+//! # In plain words
+//!
+//! Throws damaged and hostile WAV files at the metadata stripper.
+//!
+//! A WAV file is a series of labelled sections, and a section that lies about its
+//! own size is the classic way to make a program read past the end of what it was
+//! given. Every malformed file here has to be refused rather than trusted.
 
 use veilvoice_meta::{clean_wav_bytes, is_wav, Policy};
 

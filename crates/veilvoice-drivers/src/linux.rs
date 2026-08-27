@@ -35,6 +35,15 @@
 //! have no `initstate` file, so only directories that have one are compared —
 //! otherwise the check would produce dozens of discrepancies on every machine
 //! and be switched off within a day.
+//!
+//! # In plain words
+//!
+//! Asks Linux which kernel modules are loaded, by reading two files the system
+//! keeps.
+//!
+//! Nothing is run at all: the answer is already written down. Both files are read
+//! and compared, because a module that appears in one and not the other is itself
+//! worth reporting.
 
 #[cfg(any(target_os = "linux", test))]
 use crate::Module;

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-sentry/src/rate.rs`
 
-[[veilvoice-sentry|Crate-veilvoice-sentry]] &middot; 942 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs)
+[[veilvoice-sentry|Crate-veilvoice-sentry]] &middot; 953 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs)
 
 ## Contents
 
@@ -11,6 +11,7 @@
 - [Modification times can be set by whatever did the modifying](#modification-times-can-be-set-by-whatever-did-the-modifying)
 - [Walking a tree costs real time, so the walk is bounded](#walking-a-tree-costs-real-time-so-the-walk-is-bounded)
 - [Format](#format)
+- [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
@@ -79,40 +80,51 @@ A modification time the platform did not report is written as `-`, which is
 not the same as zero: zero is a real instant in 1970 and files claiming it
 do exist.
 
+# In plain words
+
+Watches how much of a folder is changing and how quickly.
+
+A few files changing is somebody working. Hundreds changing in a minute is
+something else, and worth being told about.
+
+It measures how much and how fast, and nothing more. It does not know which
+program is responsible and does not guess, because a monitor that names the
+wrong program is worse than one that names none.
+
 ## What this file contains
 
-942 lines defining **22 functions** (17 public), **6 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+953 lines defining **22 functions** (17 public), **6 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Facts` (line 77) -- What is recorded about one file.
-- `struct Limits` (line 91) -- How far a walk is allowed to go.
-- `struct Snapshot` (line 109) -- What a tree looked like at one moment.
-- `struct Churn` (line 126) -- The difference between two snapshots.
-- `struct Threshold` (line 201) -- When to raise the level, set by the user rather than guessed at here.
-- `enum Concern` (line 228) -- How much of the threshold a Churn met.
+- `struct Facts` (line 88) -- What is recorded about one file.
+- `struct Limits` (line 102) -- How far a walk is allowed to go.
+- `struct Snapshot` (line 120) -- What a tree looked like at one moment.
+- `struct Churn` (line 137) -- The difference between two snapshots.
+- `struct Threshold` (line 212) -- When to raise the level, set by the user rather than guessed at here.
+- `enum Concern` (line 239) -- How much of the threshold a Churn met.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Churn::share` (line 164) -- The proportion of the earlier snapshot that was touched, from 0.0 to 1.0.
-- `Churn::describe` (line 173) -- One line for a terminal or a log.
+- `Churn::share` (line 175) -- The proportion of the earlier snapshot that was touched, from 0.0 to 1.0.
+- `Churn::describe` (line 184) -- One line for a terminal or a log.
   - reaches: `per_minute`, `touched`
-- `Concern::describe` (line 239) -- A line for a front end, phrased as the question it actually is.
+- `Concern::describe` (line 250) -- A line for a front end, phrased as the question it actually is.
   - reaches: `per_minute`, `touched`
-- `concern` (line 261) -- Judge a Churn against a Threshold.
-- `Snapshot::take` (line 298) -- Walk root and record what is there.
+- `concern` (line 272) -- Judge a Churn against a Threshold.
+- `Snapshot::take` (line 309) -- Walk root and record what is there.
   - reaches: `normalise`, `now_seconds`, `seconds`
-- `Snapshot::len` (line 357) -- How many files were recorded.
-- `Snapshot::is_empty` (line 362) -- Whether nothing was recorded.
-- `Snapshot::files` (line 367) -- The recorded paths and facts, in a stable order.
-- `Snapshot::with_taken` (line 375) -- Replace the recorded time.
-- `Snapshot::save` (line 494) -- Write the snapshot to path.
+- `Snapshot::len` (line 368) -- How many files were recorded.
+- `Snapshot::is_empty` (line 373) -- Whether nothing was recorded.
+- `Snapshot::files` (line 378) -- The recorded paths and facts, in a stable order.
+- `Snapshot::with_taken` (line 386) -- Replace the recorded time.
+- `Snapshot::save` (line 505) -- Write the snapshot to path.
   - reaches: `to_text`
-- `Snapshot::load` (line 505) -- Read a snapshot written by Snapshot::save.
+- `Snapshot::load` (line 516) -- Read a snapshot written by Snapshot::save.
   - reaches: `parse`
-- `baseline_name` (line 521) -- A stable filename for the saved snapshot of root.
+- `baseline_name` (line 532) -- A stable filename for the saved snapshot of root.
   - reaches: `normalise`
-- `compare` (line 540) -- Compare two snapshots of the same tree.
+- `compare` (line 551) -- Compare two snapshots of the same tree.
 
 ## What calls what
 
@@ -128,28 +140,28 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["Limits::default<br/>line 99"]
-    n_touched["Churn::touched<br/>line 143"]
-    n_per_minute["Churn::per_minute<br/>line 152"]
-    n_share(["Churn::share<br/>line 164"])
-    n_describe(["Churn::describe<br/>line 173"])
-    n_default["Threshold::default<br/>line 209"]
-    n_describe(["Concern::describe<br/>line 239"])
-    n_concern(["concern<br/>line 261"])
-    n_normalise["normalise<br/>line 278"]
-    n_seconds["seconds<br/>line 282"]
-    n_now_seconds["now_seconds<br/>line 286"]
-    n_take(["Snapshot::take<br/>line 298"])
-    n_len(["Snapshot::len<br/>line 357"])
-    n_is_empty(["Snapshot::is_empty<br/>line 362"])
-    n_files(["Snapshot::files<br/>line 367"])
-    n_with_taken(["Snapshot::with_taken<br/>line 375"])
-    n_to_text["Snapshot::to_text<br/>line 381"]
-    n_parse["Snapshot::parse<br/>line 406"]
-    n_save(["Snapshot::save<br/>line 494"])
-    n_load(["Snapshot::load<br/>line 505"])
-    n_baseline_name(["baseline_name<br/>line 521"])
-    n_compare(["compare<br/>line 540"])
+    n_default["Limits::default<br/>line 110"]
+    n_touched["Churn::touched<br/>line 154"]
+    n_per_minute["Churn::per_minute<br/>line 163"]
+    n_share(["Churn::share<br/>line 175"])
+    n_describe(["Churn::describe<br/>line 184"])
+    n_default["Threshold::default<br/>line 220"]
+    n_describe(["Concern::describe<br/>line 250"])
+    n_concern(["concern<br/>line 272"])
+    n_normalise["normalise<br/>line 289"]
+    n_seconds["seconds<br/>line 293"]
+    n_now_seconds["now_seconds<br/>line 297"]
+    n_take(["Snapshot::take<br/>line 309"])
+    n_len(["Snapshot::len<br/>line 368"])
+    n_is_empty(["Snapshot::is_empty<br/>line 373"])
+    n_files(["Snapshot::files<br/>line 378"])
+    n_with_taken(["Snapshot::with_taken<br/>line 386"])
+    n_to_text["Snapshot::to_text<br/>line 392"]
+    n_parse["Snapshot::parse<br/>line 417"]
+    n_save(["Snapshot::save<br/>line 505"])
+    n_load(["Snapshot::load<br/>line 516"])
+    n_baseline_name(["baseline_name<br/>line 532"])
+    n_compare(["compare<br/>line 551"])
     n_baseline_name --> n_normalise
     n_describe --> n_per_minute
     n_describe --> n_touched
@@ -159,28 +171,28 @@ flowchart TD
     n_save --> n_to_text
     n_take --> n_normalise
     n_take --> n_now_seconds
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L99" "open the source"
-    click n_touched href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L143" "open the source"
-    click n_per_minute href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L152" "open the source"
-    click n_share href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L164" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L173" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L209" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L239" "open the source"
-    click n_concern href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L261" "open the source"
-    click n_normalise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L278" "open the source"
-    click n_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L282" "open the source"
-    click n_now_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L286" "open the source"
-    click n_take href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L298" "open the source"
-    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L357" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L362" "open the source"
-    click n_files href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L367" "open the source"
-    click n_with_taken href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L375" "open the source"
-    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L381" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L406" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L494" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L505" "open the source"
-    click n_baseline_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L521" "open the source"
-    click n_compare href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L540" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L110" "open the source"
+    click n_touched href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L154" "open the source"
+    click n_per_minute href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L163" "open the source"
+    click n_share href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L175" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L184" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L220" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L250" "open the source"
+    click n_concern href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L272" "open the source"
+    click n_normalise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L289" "open the source"
+    click n_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L293" "open the source"
+    click n_now_seconds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L297" "open the source"
+    click n_take href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L309" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L368" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L373" "open the source"
+    click n_files href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L378" "open the source"
+    click n_with_taken href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L386" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L392" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L417" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L505" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L516" "open the source"
+    click n_baseline_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L532" "open the source"
+    click n_compare href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L551" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_share,n_describe,n_describe,n_concern,n_take,n_len,n_is_empty,n_files,n_with_taken,n_save,n_load,n_baseline_name,n_compare entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -195,32 +207,32 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `MAGIC` <sub>const</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L73) | Magic first line of a saved snapshot. |
-| `Facts` <sub>pub struct</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L77) | What is recorded about one file. |
-| `Limits` <sub>pub struct</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L91) | How far a walk is allowed to go. |
-| `Limits::default` <sub>fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L99) |  |
-| `Snapshot` <sub>pub struct</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L109) | What a tree looked like at one moment. |
-| `Churn` <sub>pub struct</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L126) | The difference between two snapshots. |
-| `Churn::touched` <sub>pub fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L143) | Added plus removed plus modified: everything that is not unchanged. |
-| `Churn::per_minute` <sub>pub fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L152) | Files touched per minute. |
-| `Churn::share` <sub>pub fn</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L164) | The proportion of the earlier snapshot that was touched, from 0.0 to 1.0. |
-| `Churn::describe` <sub>pub fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L173) | One line for a terminal or a log. |
-| `Threshold` <sub>pub struct</sub> | [201](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L201) | When to raise the level, set by the user rather than guessed at here. |
-| `Threshold::default` <sub>fn</sub> | [209](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L209) |  |
-| `Concern` <sub>pub enum</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L228) | How much of the threshold a Churn met. |
-| `Concern::describe` <sub>pub fn</sub> | [239](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L239) | A line for a front end, phrased as the question it actually is. |
-| `concern` <sub>pub fn</sub> | [261](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L261) | Judge a Churn against a Threshold. |
-| `normalise` <sub>fn</sub> | [278](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L278) | Normalise a path for storage: forward slashes, as everywhere else here. |
-| `seconds` <sub>fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L282) |  |
-| `now_seconds` <sub>fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L286) |  |
-| `Snapshot::take` <sub>pub fn</sub> | [298](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L298) | Walk root and record what is there. |
-| `Snapshot::len` <sub>pub fn</sub> | [357](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L357) | How many files were recorded. |
-| `Snapshot::is_empty` <sub>pub fn</sub> | [362](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L362) | Whether nothing was recorded. |
-| `Snapshot::files` <sub>pub fn</sub> | [367](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L367) | The recorded paths and facts, in a stable order. |
-| `Snapshot::with_taken` <sub>pub fn</sub> | [375](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L375) | Replace the recorded time. |
-| `Snapshot::to_text` <sub>pub fn</sub> | [381](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L381) | Serialise to the text format described at the top of this module. |
-| `Snapshot::parse` <sub>pub fn</sub> | [406](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L406) | Parse the text format. |
-| `Snapshot::save` <sub>pub fn</sub> | [494](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L494) | Write the snapshot to path. |
-| `Snapshot::load` <sub>pub fn</sub> | [505](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L505) | Read a snapshot written by Snapshot::save. |
-| `baseline_name` <sub>pub fn</sub> | [521](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L521) | A stable filename for the saved snapshot of root. |
-| `compare` <sub>pub fn</sub> | [540](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L540) | Compare two snapshots of the same tree. |
+| `MAGIC` <sub>const</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L84) | Magic first line of a saved snapshot. |
+| `Facts` <sub>pub struct</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L88) | What is recorded about one file. |
+| `Limits` <sub>pub struct</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L102) | How far a walk is allowed to go. |
+| `Limits::default` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L110) |  |
+| `Snapshot` <sub>pub struct</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L120) | What a tree looked like at one moment. |
+| `Churn` <sub>pub struct</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L137) | The difference between two snapshots. |
+| `Churn::touched` <sub>pub fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L154) | Added plus removed plus modified: everything that is not unchanged. |
+| `Churn::per_minute` <sub>pub fn</sub> | [163](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L163) | Files touched per minute. |
+| `Churn::share` <sub>pub fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L175) | The proportion of the earlier snapshot that was touched, from 0.0 to 1.0. |
+| `Churn::describe` <sub>pub fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L184) | One line for a terminal or a log. |
+| `Threshold` <sub>pub struct</sub> | [212](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L212) | When to raise the level, set by the user rather than guessed at here. |
+| `Threshold::default` <sub>fn</sub> | [220](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L220) |  |
+| `Concern` <sub>pub enum</sub> | [239](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L239) | How much of the threshold a Churn met. |
+| `Concern::describe` <sub>pub fn</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L250) | A line for a front end, phrased as the question it actually is. |
+| `concern` <sub>pub fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L272) | Judge a Churn against a Threshold. |
+| `normalise` <sub>fn</sub> | [289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L289) | Normalise a path for storage: forward slashes, as everywhere else here. |
+| `seconds` <sub>fn</sub> | [293](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L293) |  |
+| `now_seconds` <sub>fn</sub> | [297](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L297) |  |
+| `Snapshot::take` <sub>pub fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L309) | Walk root and record what is there. |
+| `Snapshot::len` <sub>pub fn</sub> | [368](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L368) | How many files were recorded. |
+| `Snapshot::is_empty` <sub>pub fn</sub> | [373](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L373) | Whether nothing was recorded. |
+| `Snapshot::files` <sub>pub fn</sub> | [378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L378) | The recorded paths and facts, in a stable order. |
+| `Snapshot::with_taken` <sub>pub fn</sub> | [386](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L386) | Replace the recorded time. |
+| `Snapshot::to_text` <sub>pub fn</sub> | [392](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L392) | Serialise to the text format described at the top of this module. |
+| `Snapshot::parse` <sub>pub fn</sub> | [417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L417) | Parse the text format. |
+| `Snapshot::save` <sub>pub fn</sub> | [505](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L505) | Write the snapshot to path. |
+| `Snapshot::load` <sub>pub fn</sub> | [516](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L516) | Read a snapshot written by Snapshot::save. |
+| `baseline_name` <sub>pub fn</sub> | [532](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L532) | A stable filename for the saved snapshot of root. |
+| `compare` <sub>pub fn</sub> | [551](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-sentry/src/rate.rs#L551) | Compare two snapshots of the same tree. |

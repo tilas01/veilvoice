@@ -37,6 +37,16 @@
 //! degenerate `sum(w^2) == 0` returns unity rather than infinity: this is a
 //! gain that gets multiplied into every output sample, and one non-finite value
 //! entering an engine with persistent state is permanent.
+//!
+//! # In plain words
+//!
+//! Two small pieces of arithmetic that decide how the overlapping slices of sound
+//! are faded in and out.
+//!
+//! They are short and they are easy to get subtly wrong in a way that does not
+//! look wrong: the sound still comes out, and it quietly has a faint hum through
+//! it, or the volume ripples. So both are written here once, with the reason, and
+//! checked.
 
 use std::f32::consts::TAU;
 

@@ -95,12 +95,12 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" target="_blank" rel="noopener noreferrer">
 <rect x="280.0" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="335.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">discover.rs</text>
-<text x="335.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">344 lines</text>
+<text x="335.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">353 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" target="_blank" rel="noopener noreferrer">
 <rect x="417.6" y="20.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="465.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fetch.rs</text>
-<text x="465.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">320 lines</text>
+<text x="465.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">329 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/report.rs" target="_blank" rel="noopener noreferrer">
 <rect x="280.0" y="220.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -110,7 +110,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" target="_blank" rel="noopener noreferrer">
 <rect x="218.8" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="267.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tests.rs</text>
-<text x="267.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">346 lines</text>
+<text x="267.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">357 lines</text>
 </a>
 </svg>
 </div>
@@ -121,10 +121,10 @@ flowchart TD
     n_main([&quot;main.rs&lt;br/&gt;1396 lines&quot;])
     n_builder[&quot;builder.rs&lt;br/&gt;1148 lines&quot;]
     n_deps[&quot;deps.rs&lt;br/&gt;650 lines&quot;]
-    n_discover[&quot;discover.rs&lt;br/&gt;344 lines&quot;]
-    n_fetch[&quot;fetch.rs&lt;br/&gt;320 lines&quot;]
+    n_discover[&quot;discover.rs&lt;br/&gt;353 lines&quot;]
+    n_fetch[&quot;fetch.rs&lt;br/&gt;329 lines&quot;]
     n_report[&quot;report.rs&lt;br/&gt;385 lines&quot;]
-    n_tests[&quot;tests.rs&lt;br/&gt;346 lines&quot;]
+    n_tests[&quot;tests.rs&lt;br/&gt;357 lines&quot;]
     n_builder --&gt; n_deps
     n_builder --&gt; n_report
     n_main --&gt; n_report
@@ -143,11 +143,11 @@ flowchart TD
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-verify/builder.html"><code>builder.rs</code></a></td><td>1148</td><td>Build VeilVoice here, and compare what came out against what was published.</td></tr>
 <tr><td><a href="veilvoice-verify/deps.html"><code>deps.rs</code></a></td><td>650</td><td>What this machine needs before it can build VeilVoice, and who ships it.</td></tr>
-<tr><td><a href="veilvoice-verify/discover.html"><code>discover.rs</code></a></td><td>344</td><td>Finding a release to check, without being told where it is.</td></tr>
-<tr><td><a href="veilvoice-verify/fetch.html"><code>fetch.rs</code></a></td><td>320</td><td>Download a release, without putting an HTTP client in the dependency graph.</td></tr>
+<tr><td><a href="veilvoice-verify/discover.html"><code>discover.rs</code></a></td><td>353</td><td>Finding a release to check, without being told where it is.</td></tr>
+<tr><td><a href="veilvoice-verify/fetch.html"><code>fetch.rs</code></a></td><td>329</td><td>Download a release, without putting an HTTP client in the dependency graph.</td></tr>
 <tr><td><a href="veilvoice-verify/main.html"><code>main.rs</code></a></td><td>1396</td><td>The portable verifier: check a VeilVoice release without GnuPG installed.</td></tr>
 <tr><td><a href="veilvoice-verify/report.html"><code>report.rs</code></a></td><td>385</td><td>How much this program says, and what it returns when it says nothing.</td></tr>
-<tr><td><a href="veilvoice-verify/tests.html"><code>tests.rs</code></a></td><td>346</td><td>The verifier&#x27;s own tests.</td></tr>
+<tr><td><a href="veilvoice-verify/tests.html"><code>tests.rs</code></a></td><td>357</td><td>The verifier&#x27;s own tests.</td></tr>
 </tbody></table>
 </section>
 </div></div>

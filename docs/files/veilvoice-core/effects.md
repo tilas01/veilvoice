@@ -11,13 +11,14 @@
 
 # `crates/veilvoice-core/src/effects.rs`
 
-[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 214 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs)
+[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 226 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs)
 
 ## Contents
 
 - [How little these contribute, said plainly](#how-little-these-contribute-said-plainly)
 - [Why every mix defaults low](#why-every-mix-defaults-low)
 - [Real-time constraints](#real-time-constraints)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -67,25 +68,37 @@ construction: `process` allocates nothing, takes no lock and reads no clock.
 arithmetic, so changing sample rate means building a new one rather than
 resizing a live one.
 
+# In plain words
+
+A few small finishing touches applied to the sound after the main work is done.
+
+They do two things. They loosen what remains of the connection between the
+result and the original recording, and they fill in the picture a spectrogram
+would show, so it looks like a dense, ordinary voice rather than something
+obviously processed.
+
+Every one of them is set gently by default, because all of them can hurt how
+clear the words are if pushed, and clear words are the point.
+
 ## What this file contains
 
-214 lines defining **8 functions** (6 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+226 lines defining **8 functions** (6 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct SoftClip` (line 51) -- Symmetric soft-clip (tanh) waveshaper.
-- `struct DelayVoice` (line 75) -- A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices.
-- `struct Chorus` (line 116) -- Detuned chorus ensemble.
-- `struct Reverb` (line 147) -- Minimal Schroeder-style reverb: one feedback comb + one all-pass.
+- `struct SoftClip` (line 63) -- Symmetric soft-clip (tanh) waveshaper.
+- `struct DelayVoice` (line 87) -- A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices.
+- `struct Chorus` (line 128) -- Detuned chorus ensemble.
+- `struct Reverb` (line 159) -- Minimal Schroeder-style reverb: one feedback comb + one all-pass.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `SoftClip::new` (line 58)
-- `SoftClip::process` (line 67)
-- `Chorus::new` (line 122)
-- `Chorus::process` (line 135)
-- `Reverb::new` (line 158)
-- `Reverb::process` (line 172)
+- `SoftClip::new` (line 70)
+- `SoftClip::process` (line 79)
+- `Chorus::new` (line 134)
+- `Chorus::process` (line 147)
+- `Reverb::new` (line 170)
+- `Reverb::process` (line 184)
 
 ## What calls what
 
@@ -107,22 +120,22 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new(["SoftClip::new<br/>line 58"])
-    n_process(["SoftClip::process<br/>line 67"])
-    n_new["DelayVoice::new<br/>line 85"]
-    n_process["DelayVoice::process<br/>line 99"]
-    n_new(["Chorus::new<br/>line 122"])
-    n_process(["Chorus::process<br/>line 135"])
-    n_new(["Reverb::new<br/>line 158"])
-    n_process(["Reverb::process<br/>line 172"])
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L58" "open the source"
-    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L67" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L85" "open the source"
-    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L99" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L122" "open the source"
-    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L135" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L158" "open the source"
-    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L172" "open the source"
+    n_new(["SoftClip::new<br/>line 70"])
+    n_process(["SoftClip::process<br/>line 79"])
+    n_new["DelayVoice::new<br/>line 97"]
+    n_process["DelayVoice::process<br/>line 111"]
+    n_new(["Chorus::new<br/>line 134"])
+    n_process(["Chorus::process<br/>line 147"])
+    n_new(["Reverb::new<br/>line 170"])
+    n_process(["Reverb::process<br/>line 184"])
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L70" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L79" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L97" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L111" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L134" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L147" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L170" "open the source"
+    click n_process href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L184" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_process,n_new,n_process,n_new,n_process entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -135,18 +148,18 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `SoftClip` <sub>pub struct</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L51) | Symmetric soft-clip (tanh) waveshaper. |
-| `SoftClip::new` <sub>pub fn</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L58) |  |
-| `SoftClip::process` <sub>pub fn</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L67) |  |
-| `DelayVoice` <sub>struct</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L75) | A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices. |
-| `DelayVoice::new` <sub>fn</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L85) |  |
-| `DelayVoice::process` <sub>fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L99) |  |
-| `Chorus` <sub>pub struct</sub> | [116](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L116) | Detuned chorus ensemble. |
-| `Chorus::new` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L122) |  |
-| `Chorus::process` <sub>pub fn</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L135) |  |
-| `Reverb` <sub>pub struct</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L147) | Minimal Schroeder-style reverb: one feedback comb + one all-pass. |
-| `Reverb::new` <sub>pub fn</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L158) |  |
-| `Reverb::process` <sub>pub fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L172) |  |
+| `SoftClip` <sub>pub struct</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L63) | Symmetric soft-clip (tanh) waveshaper. |
+| `SoftClip::new` <sub>pub fn</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L70) |  |
+| `SoftClip::process` <sub>pub fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L79) |  |
+| `DelayVoice` <sub>struct</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L87) | A single modulated delay line, summed into a small ensemble to create the impression of several slightly different voices. |
+| `DelayVoice::new` <sub>fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L97) |  |
+| `DelayVoice::process` <sub>fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L111) |  |
+| `Chorus` <sub>pub struct</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L128) | Detuned chorus ensemble. |
+| `Chorus::new` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L134) |  |
+| `Chorus::process` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L147) |  |
+| `Reverb` <sub>pub struct</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L159) | Minimal Schroeder-style reverb: one feedback comb + one all-pass. |
+| `Reverb::new` <sub>pub fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L170) |  |
+| `Reverb::process` <sub>pub fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/effects.rs#L184) |  |
 
 ---
 

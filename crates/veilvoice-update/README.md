@@ -118,7 +118,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`lib.rs`](../../docs/files/veilvoice-update/lib.md) | 536 | Ask, only when told to, whether a newer VeilVoice release exists. |
-| [`ask.rs`](../../docs/files/veilvoice-update/examples-ask.md) | 19 | Run the real check once, by hand. |
+| [`ask.rs`](../../docs/files/veilvoice-update/examples-ask.md) | 26 | Run the real check once, by hand. |
 
 ## Public items
 

@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/security.svg" alt="security.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/security.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1098 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1111 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-passwords-and-why">Two passwords, and why</a>
   <a href="#what-the-lock-is-worth">What the lock is worth</a>
   <a href="#a-limitation-of-typing-a-password-into-a-window">A limitation of typing a password into a window</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -70,42 +71,46 @@
 </ul>
 <p>It used to be kept as a plain <code>String</code> for the whole session, which was a much larger window for no benefit.</p>
 <p>None of this defends against someone who can read this process&#x27;s memory. If they can, they have already won, and <code>docs/WHITEPAPER.md</code> &#167;7 says so rather than implying otherwise. What it does is stop a passphrase lingering in a heap allocation long after it was needed, where a core dump or a swapped page could pick it up.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>The lock on the window, and the encryption of the files VeilVoice writes.</p>
+<p>There are two passphrases and they do different jobs. One opens the application. The other encrypts a recording, and it is asked for separately because they protect different things and losing one should not mean losing the other.</p>
+<p>The panel says what the lock is worth and what it is not: it stops somebody who picks up your unlocked computer, and it does not stop somebody who has the disk. Encrypting the recording is what protects the recording.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1098 lines defining <strong>25 functions</strong> (13 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1111 lines defining <strong>25 functions</strong> (13 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Sealing</code> <span style="color:var(--muted)">line 67</span> &mdash; How the recording that comes out of a job is protected.</li>
-<li><code>enum Op</code> <span style="color:var(--muted)">line 76</span> &mdash; What a background lock operation was trying to do.</li>
-<li><code>struct Security</code> <span style="color:var(--muted)">line 87</span> &mdash; Everything about locking the app and sealing its output.</li>
-<li><code>enum Plan</code> <span style="color:var(--muted)">line 799</span> &mdash; What a finished job should do with its bytes.</li>
+<li><code>enum Sealing</code> <span style="color:var(--muted)">line 80</span> &mdash; How the recording that comes out of a job is protected.</li>
+<li><code>enum Op</code> <span style="color:var(--muted)">line 89</span> &mdash; What a background lock operation was trying to do.</li>
+<li><code>struct Security</code> <span style="color:var(--muted)">line 100</span> &mdash; Everything about locking the app and sealing its output.</li>
+<li><code>enum Plan</code> <span style="color:var(--muted)">line 812</span> &mdash; What a finished job should do with its bytes.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Security::load</code> <span style="color:var(--muted)">line 186</span> &mdash; Read the lock file for this machine and start locked if one is set.
+<li><code>Security::load</code> <span style="color:var(--muted)">line 199</span> &mdash; Read the lock file for this machine and start locked if one is set.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default</code></span>
 </li>
-<li><code>Security::is_locked</code> <span style="color:var(--muted)">line 214</span> &mdash; Whether the unlock screen should be shown instead of the app.
+<li><code>Security::is_locked</code> <span style="color:var(--muted)">line 227</span> &mdash; Whether the unlock screen should be shown instead of the app.
 </li>
-<li><code>Security::blocked_reason</code> <span style="color:var(--muted)">line 260</span> &mdash; Why a job cannot start yet, for the button&#x27;s tooltip.
+<li><code>Security::blocked_reason</code> <span style="color:var(--muted)">line 273</span> &mdash; Why a job cannot start yet, for the button&#x27;s tooltip.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>ready_to_write</code></span>
 </li>
-<li><code>Security::plan</code> <span style="color:var(--muted)">line 274</span> &mdash; How the next job should protect its output.
+<li><code>Security::plan</code> <span style="color:var(--muted)">line 287</span> &mdash; How the next job should protect its output.
 </li>
-<li><code>Security::is_busy</code> <span style="color:var(--muted)">line 362</span> &mdash; Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.
+<li><code>Security::is_busy</code> <span style="color:var(--muted)">line 375</span> &mdash; Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code></span>
 </li>
-<li><code>Security::unlock_screen</code> <span style="color:var(--muted)">line 367</span> &mdash; The full-window unlock screen.
+<li><code>Security::unlock_screen</code> <span style="color:var(--muted)">line 380</span> &mdash; The full-window unlock screen.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>poll</code>, <code>spawn</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
 </li>
-<li><code>Security::tab</code> <span style="color:var(--muted)">line 466</span> &mdash; The security tab: manage the lock, and see what it is worth.
+<li><code>Security::tab</code> <span style="color:var(--muted)">line 479</span> &mdash; The security tab: manage the lock, and see what it is worth.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>has_lock</code>, <code>lock_now</code>, <code>password_row</code>, <code>poll</code>, <code>spawn</code>, <code>wipe_secrets</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
 </li>
-<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 622</span> &mdash; The at-rest controls that sit inside the file tab.
+<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 635</span> &mdash; The at-rest controls that sit inside the file tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>into_secret</code>, <code>password_row</code></span>
 </li>
-<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 747</span> &mdash; The dialogue shown when the user turns at-rest encryption off.
+<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 760</span> &mdash; The dialogue shown when the user turns at-rest encryption off.
 </li>
-<li><code>Plan::write</code> <span style="color:var(--muted)">line 824</span> &mdash; Seal wav if the plan says to, and write it.
+<li><code>Plan::write</code> <span style="color:var(--muted)">line 837</span> &mdash; Seal wav if the plan says to, and write it.
 </li>
 </ul>
 </section>
@@ -135,115 +140,115 @@
 <path d="M322.4 547.0 C 375.2 547.0, 375.2 447.0, 356.2 447.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M322.4 547.0 C 344.4 547.0, 344.4 447.0, 195.8 447.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M322.4 547.0 C 588.8 547.0, 588.8 347.0, 569.8 347.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L58" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L71" target="_blank" rel="noopener noreferrer">
 <rect x="69.8" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="125.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">into_secret</text>
-<text x="125.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 58</text>
+<text x="125.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 71</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L151" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L164" target="_blank" rel="noopener noreferrer">
 <rect x="207.4" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="286.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::default</text>
-<text x="286.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 151</text>
+<text x="286.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 164</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L179" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L192" target="_blank" rel="noopener noreferrer">
 <rect x="390.6" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="457.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::drop</text>
-<text x="457.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
+<text x="457.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L186" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L199" target="_blank" rel="noopener noreferrer">
 <rect x="35.6" y="120.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="102.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::load</text>
-<text x="102.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 186</text>
+<text x="102.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 199</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L214" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L227" target="_blank" rel="noopener noreferrer">
 <rect x="196.0" y="120.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="282.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::is_locked</text>
-<text x="282.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 214</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L219" target="_blank" rel="noopener noreferrer">
-<rect x="394.4" y="120.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="476.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::has_lock</text>
-<text x="476.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 219</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L224" target="_blank" rel="noopener noreferrer">
-<rect x="96.8" y="220.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="179.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::lock_now</text>
-<text x="179.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 224</text>
+<text x="282.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L232" target="_blank" rel="noopener noreferrer">
+<rect x="394.4" y="120.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="476.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::has_lock</text>
+<text x="476.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 232</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L237" target="_blank" rel="noopener noreferrer">
+<rect x="96.8" y="220.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="179.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::lock_now</text>
+<text x="179.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 237</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L245" target="_blank" rel="noopener noreferrer">
 <rect x="43.2" y="720.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="140.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::wipe_secrets</text>
-<text x="140.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 232</text>
+<text x="140.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L249" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L262" target="_blank" rel="noopener noreferrer">
 <rect x="287.6" y="220.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="392.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::ready_to_write</text>
-<text x="392.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 249</text>
+<text x="392.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 262</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L260" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L273" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="320.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="133.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::blocked_reason</text>
-<text x="133.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
+<text x="133.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 273</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L274" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L287" target="_blank" rel="noopener noreferrer">
 <rect x="264.4" y="320.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="331.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::plan</text>
-<text x="331.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 274</text>
+<text x="331.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L293" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L306" target="_blank" rel="noopener noreferrer">
 <rect x="424.8" y="320.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="495.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::spawn</text>
-<text x="495.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 293</text>
+<text x="495.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 306</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L308" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L321" target="_blank" rel="noopener noreferrer">
 <rect x="58.4" y="420.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="125.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::poll</text>
-<text x="125.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
+<text x="125.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L350" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L363" target="_blank" rel="noopener noreferrer">
 <rect x="264.4" y="720.0" width="172.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="350.6" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::wipe_form</text>
-<text x="350.6" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 350</text>
+<text x="350.6" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 363</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L356" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L369" target="_blank" rel="noopener noreferrer">
 <rect x="218.8" y="420.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="286.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::busy</text>
-<text x="286.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 356</text>
+<text x="286.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 369</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L362" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L375" target="_blank" rel="noopener noreferrer">
 <rect x="379.2" y="420.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="457.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::is_busy</text>
-<text x="457.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 362</text>
+<text x="457.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 375</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L367" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L380" target="_blank" rel="noopener noreferrer">
 <rect x="119.6" y="520.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="221.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::unlock_screen</text>
-<text x="221.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 367</text>
+<text x="221.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 380</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L466" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L479" target="_blank" rel="noopener noreferrer">
 <rect x="348.4" y="520.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="411.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::tab</text>
-<text x="411.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 466</text>
+<text x="411.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 479</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L622" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L635" target="_blank" rel="noopener noreferrer">
 <rect x="177.0" y="620.0" width="240.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="297.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::recording_controls</text>
-<text x="297.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 622</text>
+<text x="297.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 635</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L870" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L883" target="_blank" rel="noopener noreferrer">
 <rect x="462.8" y="720.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="507.2" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run_op</text>
-<text x="507.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 870</text>
+<text x="507.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 883</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L918" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L931" target="_blank" rel="noopener noreferrer">
 <rect x="253.0" y="920.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="297.4" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reopen</text>
-<text x="297.4" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 918</text>
+<text x="297.4" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 931</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L922" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L935" target="_blank" rel="noopener noreferrer">
 <rect x="237.8" y="820.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="297.4" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">password_row</text>
-<text x="297.4" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 922</text>
+<text x="297.4" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 935</text>
 </a>
 </svg>
 </div>
@@ -251,28 +256,28 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_into_secret[&quot;into_secret&lt;br/&gt;line 58&quot;]
-    n_default[&quot;Security::default&lt;br/&gt;line 151&quot;]
-    n_drop[&quot;Security::drop&lt;br/&gt;line 179&quot;]
-    n_load([&quot;Security::load&lt;br/&gt;line 186&quot;])
-    n_is_locked([&quot;Security::is_locked&lt;br/&gt;line 214&quot;])
-    n_has_lock[&quot;Security::has_lock&lt;br/&gt;line 219&quot;]
-    n_lock_now[&quot;Security::lock_now&lt;br/&gt;line 224&quot;]
-    n_wipe_secrets[&quot;Security::wipe_secrets&lt;br/&gt;line 232&quot;]
-    n_ready_to_write[&quot;Security::ready_to_write&lt;br/&gt;line 249&quot;]
-    n_blocked_reason([&quot;Security::blocked_reason&lt;br/&gt;line 260&quot;])
-    n_plan([&quot;Security::plan&lt;br/&gt;line 274&quot;])
-    n_spawn[&quot;Security::spawn&lt;br/&gt;line 293&quot;]
-    n_poll[&quot;Security::poll&lt;br/&gt;line 308&quot;]
-    n_wipe_form[&quot;Security::wipe_form&lt;br/&gt;line 350&quot;]
-    n_busy[&quot;Security::busy&lt;br/&gt;line 356&quot;]
-    n_is_busy([&quot;Security::is_busy&lt;br/&gt;line 362&quot;])
-    n_unlock_screen([&quot;Security::unlock_screen&lt;br/&gt;line 367&quot;])
-    n_tab([&quot;Security::tab&lt;br/&gt;line 466&quot;])
-    n_recording_controls([&quot;Security::recording_controls&lt;br/&gt;line 622&quot;])
-    n_run_op[&quot;run_op&lt;br/&gt;line 870&quot;]
-    n_reopen[&quot;reopen&lt;br/&gt;line 918&quot;]
-    n_password_row[&quot;password_row&lt;br/&gt;line 922&quot;]
+    n_into_secret[&quot;into_secret&lt;br/&gt;line 71&quot;]
+    n_default[&quot;Security::default&lt;br/&gt;line 164&quot;]
+    n_drop[&quot;Security::drop&lt;br/&gt;line 192&quot;]
+    n_load([&quot;Security::load&lt;br/&gt;line 199&quot;])
+    n_is_locked([&quot;Security::is_locked&lt;br/&gt;line 227&quot;])
+    n_has_lock[&quot;Security::has_lock&lt;br/&gt;line 232&quot;]
+    n_lock_now[&quot;Security::lock_now&lt;br/&gt;line 237&quot;]
+    n_wipe_secrets[&quot;Security::wipe_secrets&lt;br/&gt;line 245&quot;]
+    n_ready_to_write[&quot;Security::ready_to_write&lt;br/&gt;line 262&quot;]
+    n_blocked_reason([&quot;Security::blocked_reason&lt;br/&gt;line 273&quot;])
+    n_plan([&quot;Security::plan&lt;br/&gt;line 287&quot;])
+    n_spawn[&quot;Security::spawn&lt;br/&gt;line 306&quot;]
+    n_poll[&quot;Security::poll&lt;br/&gt;line 321&quot;]
+    n_wipe_form[&quot;Security::wipe_form&lt;br/&gt;line 363&quot;]
+    n_busy[&quot;Security::busy&lt;br/&gt;line 369&quot;]
+    n_is_busy([&quot;Security::is_busy&lt;br/&gt;line 375&quot;])
+    n_unlock_screen([&quot;Security::unlock_screen&lt;br/&gt;line 380&quot;])
+    n_tab([&quot;Security::tab&lt;br/&gt;line 479&quot;])
+    n_recording_controls([&quot;Security::recording_controls&lt;br/&gt;line 635&quot;])
+    n_run_op[&quot;run_op&lt;br/&gt;line 883&quot;]
+    n_reopen[&quot;reopen&lt;br/&gt;line 931&quot;]
+    n_password_row[&quot;password_row&lt;br/&gt;line 935&quot;]
     n_blocked_reason --&gt; n_ready_to_write
     n_drop --&gt; n_wipe_secrets
     n_is_busy --&gt; n_busy
@@ -292,28 +297,28 @@ flowchart TD
     n_unlock_screen --&gt; n_busy
     n_unlock_screen --&gt; n_poll
     n_unlock_screen --&gt; n_spawn
-    click n_into_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L58&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L151&quot; &quot;open the source&quot;
-    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L179&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L186&quot; &quot;open the source&quot;
-    click n_is_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L214&quot; &quot;open the source&quot;
-    click n_has_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L219&quot; &quot;open the source&quot;
-    click n_lock_now href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L224&quot; &quot;open the source&quot;
-    click n_wipe_secrets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L232&quot; &quot;open the source&quot;
-    click n_ready_to_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L249&quot; &quot;open the source&quot;
-    click n_blocked_reason href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L260&quot; &quot;open the source&quot;
-    click n_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L274&quot; &quot;open the source&quot;
-    click n_spawn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L293&quot; &quot;open the source&quot;
-    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L308&quot; &quot;open the source&quot;
-    click n_wipe_form href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L350&quot; &quot;open the source&quot;
-    click n_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L356&quot; &quot;open the source&quot;
-    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L362&quot; &quot;open the source&quot;
-    click n_unlock_screen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L367&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L466&quot; &quot;open the source&quot;
-    click n_recording_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L622&quot; &quot;open the source&quot;
-    click n_run_op href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L870&quot; &quot;open the source&quot;
-    click n_reopen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L918&quot; &quot;open the source&quot;
-    click n_password_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L922&quot; &quot;open the source&quot;
+    click n_into_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L71&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L164&quot; &quot;open the source&quot;
+    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L192&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L199&quot; &quot;open the source&quot;
+    click n_is_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L227&quot; &quot;open the source&quot;
+    click n_has_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L232&quot; &quot;open the source&quot;
+    click n_lock_now href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L237&quot; &quot;open the source&quot;
+    click n_wipe_secrets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L245&quot; &quot;open the source&quot;
+    click n_ready_to_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L262&quot; &quot;open the source&quot;
+    click n_blocked_reason href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L273&quot; &quot;open the source&quot;
+    click n_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L287&quot; &quot;open the source&quot;
+    click n_spawn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L306&quot; &quot;open the source&quot;
+    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L321&quot; &quot;open the source&quot;
+    click n_wipe_form href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L363&quot; &quot;open the source&quot;
+    click n_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L369&quot; &quot;open the source&quot;
+    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L375&quot; &quot;open the source&quot;
+    click n_unlock_screen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L380&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L479&quot; &quot;open the source&quot;
+    click n_recording_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L635&quot; &quot;open the source&quot;
+    click n_run_op href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L883&quot; &quot;open the source&quot;
+    click n_reopen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L931&quot; &quot;open the source&quot;
+    click n_password_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L935&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load,n_is_locked,n_blocked_reason,n_plan,n_is_busy,n_unlock_screen,n_tab,n_recording_controls entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -326,37 +331,37 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>into_secret</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L58" rel="noopener noreferrer">58</a></td><td>Move a typed passphrase out of its String and into page-locked storage, wiping the buffer it came from.</td></tr>
-<tr><td><code>Sealing</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L67" rel="noopener noreferrer">67</a></td><td>How the recording that comes out of a job is protected.</td></tr>
-<tr><td><code>Op</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L76" rel="noopener noreferrer">76</a></td><td>What a background lock operation was trying to do.</td></tr>
-<tr><td><code>OpResult</code> <sub>type</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L84" rel="noopener noreferrer">84</a></td><td>A finished lock operation: the store as it now stands, and how it went.</td></tr>
-<tr><td><code>Security</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L87" rel="noopener noreferrer">87</a></td><td>Everything about locking the app and sealing its output.</td></tr>
-<tr><td><code>Security::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L151" rel="noopener noreferrer">151</a></td><td>The safe state, and deliberately free of I/O so tests and VeilVoiceApp::default() never touch the real lock file.</td></tr>
-<tr><td><code>Security::drop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L179" rel="noopener noreferrer">179</a></td><td></td></tr>
-<tr><td><code>Security::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L186" rel="noopener noreferrer">186</a></td><td>Read the lock file for this machine and start locked if one is set.</td></tr>
-<tr><td><code>Security::is_locked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L214" rel="noopener noreferrer">214</a></td><td>Whether the unlock screen should be shown instead of the app.</td></tr>
-<tr><td><code>Security::has_lock</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L219" rel="noopener noreferrer">219</a></td><td>Whether a lock is configured at all.</td></tr>
-<tr><td><code>Security::lock_now</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L224" rel="noopener noreferrer">224</a></td><td>Lock the app now, wiping the session passphrase with it.</td></tr>
-<tr><td><code>Security::wipe_secrets</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L232" rel="noopener noreferrer">232</a></td><td>Wipe every plaintext secret this struct is holding.</td></tr>
-<tr><td><code>Security::ready_to_write</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L249" rel="noopener noreferrer">249</a></td><td>Whether a job may start: either encryption is off, or there is something to encrypt with.</td></tr>
-<tr><td><code>Security::blocked_reason</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L260" rel="noopener noreferrer">260</a></td><td>Why a job cannot start yet, for the button&#x27;s tooltip.</td></tr>
-<tr><td><code>Security::plan</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L274" rel="noopener noreferrer">274</a></td><td>How the next job should protect its output.</td></tr>
-<tr><td><code>Security::spawn</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L293" rel="noopener noreferrer">293</a></td><td></td></tr>
-<tr><td><code>Security::poll</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L308" rel="noopener noreferrer">308</a></td><td>Collect a finished lock operation.</td></tr>
-<tr><td><code>Security::wipe_form</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L350" rel="noopener noreferrer">350</a></td><td></td></tr>
-<tr><td><code>Security::busy</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L356" rel="noopener noreferrer">356</a></td><td></td></tr>
-<tr><td><code>Security::is_busy</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L362" rel="noopener noreferrer">362</a></td><td>Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.</td></tr>
-<tr><td><code>Security::unlock_screen</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L367" rel="noopener noreferrer">367</a></td><td>The full-window unlock screen.</td></tr>
-<tr><td><code>Security::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L466" rel="noopener noreferrer">466</a></td><td>The security tab: manage the lock, and see what it is worth.</td></tr>
-<tr><td><code>Security::recording_controls</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L622" rel="noopener noreferrer">622</a></td><td>The at-rest controls that sit inside the file tab.</td></tr>
-<tr><td><code>Security::disable_dialogue</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L747" rel="noopener noreferrer">747</a></td><td>The dialogue shown when the user turns at-rest encryption off.</td></tr>
-<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L786" rel="noopener noreferrer">786</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
-<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L799" rel="noopener noreferrer">799</a></td><td>What a finished job should do with its bytes.</td></tr>
-<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L824" rel="noopener noreferrer">824</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
-<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L859" rel="noopener noreferrer">859</a></td><td></td></tr>
-<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L870" rel="noopener noreferrer">870</a></td><td>Run one lock operation, off the UI thread.</td></tr>
-<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L918" rel="noopener noreferrer">918</a></td><td></td></tr>
-<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L922" rel="noopener noreferrer">922</a></td><td></td></tr>
+<tr><td><code>into_secret</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L71" rel="noopener noreferrer">71</a></td><td>Move a typed passphrase out of its String and into page-locked storage, wiping the buffer it came from.</td></tr>
+<tr><td><code>Sealing</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L80" rel="noopener noreferrer">80</a></td><td>How the recording that comes out of a job is protected.</td></tr>
+<tr><td><code>Op</code> <sub>enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L89" rel="noopener noreferrer">89</a></td><td>What a background lock operation was trying to do.</td></tr>
+<tr><td><code>OpResult</code> <sub>type</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L97" rel="noopener noreferrer">97</a></td><td>A finished lock operation: the store as it now stands, and how it went.</td></tr>
+<tr><td><code>Security</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L100" rel="noopener noreferrer">100</a></td><td>Everything about locking the app and sealing its output.</td></tr>
+<tr><td><code>Security::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L164" rel="noopener noreferrer">164</a></td><td>The safe state, and deliberately free of I/O so tests and VeilVoiceApp::default() never touch the real lock file.</td></tr>
+<tr><td><code>Security::drop</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L192" rel="noopener noreferrer">192</a></td><td></td></tr>
+<tr><td><code>Security::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L199" rel="noopener noreferrer">199</a></td><td>Read the lock file for this machine and start locked if one is set.</td></tr>
+<tr><td><code>Security::is_locked</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L227" rel="noopener noreferrer">227</a></td><td>Whether the unlock screen should be shown instead of the app.</td></tr>
+<tr><td><code>Security::has_lock</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L232" rel="noopener noreferrer">232</a></td><td>Whether a lock is configured at all.</td></tr>
+<tr><td><code>Security::lock_now</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L237" rel="noopener noreferrer">237</a></td><td>Lock the app now, wiping the session passphrase with it.</td></tr>
+<tr><td><code>Security::wipe_secrets</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L245" rel="noopener noreferrer">245</a></td><td>Wipe every plaintext secret this struct is holding.</td></tr>
+<tr><td><code>Security::ready_to_write</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L262" rel="noopener noreferrer">262</a></td><td>Whether a job may start: either encryption is off, or there is something to encrypt with.</td></tr>
+<tr><td><code>Security::blocked_reason</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L273" rel="noopener noreferrer">273</a></td><td>Why a job cannot start yet, for the button&#x27;s tooltip.</td></tr>
+<tr><td><code>Security::plan</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L287" rel="noopener noreferrer">287</a></td><td>How the next job should protect its output.</td></tr>
+<tr><td><code>Security::spawn</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L306" rel="noopener noreferrer">306</a></td><td></td></tr>
+<tr><td><code>Security::poll</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L321" rel="noopener noreferrer">321</a></td><td>Collect a finished lock operation.</td></tr>
+<tr><td><code>Security::wipe_form</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L363" rel="noopener noreferrer">363</a></td><td></td></tr>
+<tr><td><code>Security::busy</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L369" rel="noopener noreferrer">369</a></td><td></td></tr>
+<tr><td><code>Security::is_busy</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L375" rel="noopener noreferrer">375</a></td><td>Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.</td></tr>
+<tr><td><code>Security::unlock_screen</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L380" rel="noopener noreferrer">380</a></td><td>The full-window unlock screen.</td></tr>
+<tr><td><code>Security::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L479" rel="noopener noreferrer">479</a></td><td>The security tab: manage the lock, and see what it is worth.</td></tr>
+<tr><td><code>Security::recording_controls</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L635" rel="noopener noreferrer">635</a></td><td>The at-rest controls that sit inside the file tab.</td></tr>
+<tr><td><code>Security::disable_dialogue</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L760" rel="noopener noreferrer">760</a></td><td>The dialogue shown when the user turns at-rest encryption off.</td></tr>
+<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L799" rel="noopener noreferrer">799</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
+<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L812" rel="noopener noreferrer">812</a></td><td>What a finished job should do with its bytes.</td></tr>
+<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L837" rel="noopener noreferrer">837</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
+<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L872" rel="noopener noreferrer">872</a></td><td></td></tr>
+<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L883" rel="noopener noreferrer">883</a></td><td>Run one lock operation, off the UI thread.</td></tr>
+<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L931" rel="noopener noreferrer">931</a></td><td></td></tr>
+<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L935" rel="noopener noreferrer">935</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

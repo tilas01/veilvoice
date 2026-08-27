@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/examples/seal_and_open.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 70 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/examples/seal_and_open.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 80 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/examples/seal_and_open.rs)
 
 ## Contents
 
@@ -25,7 +25,7 @@
 
 ## What this file contains
 
-70 lines defining **1 function** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+80 lines defining **1 function** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -47,8 +47,8 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main["main<br/>line 14"]
-    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/examples/seal_and_open.rs#L14" "open the source"
+    n_main["main<br/>line 24"]
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/examples/seal_and_open.rs#L24" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_main helper
 ```
@@ -59,7 +59,7 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `main` <sub>fn</sub> | [14](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/examples/seal_and_open.rs#L14) |  |
+| `main` <sub>fn</sub> | [24](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/examples/seal_and_open.rs#L24) |  |
 
 ---
 

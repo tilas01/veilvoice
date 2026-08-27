@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/settings.svg" alt="settings.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/settings.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 964 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 975 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-menu-rather-than-one-long-list">Why a menu rather than one long list</a>
   <a href="#every-change-applies-immediately-and-is-saved-immediately">Every change applies immediately, and is saved immediately</a>
   <a href="#what-is-deliberately-not-in-here">What is deliberately not in here</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -58,34 +59,38 @@
 <p>There is no &quot;apply&quot; button and no &quot;unsaved changes&quot; state. Both are ways to lose a choice silently. If saving fails the choice still applies for this session and the panel says, in the panel, that it could not be remembered and why -- rather than failing quietly and letting the setting reappear wrong on the next launch.</p>
 <h2 id="what-is-deliberately-not-in-here">What is deliberately not in here</h2>
 <p>The app lock and the at-rest passphrase have their own tab and stay there. A password field sitting between &quot;animations&quot; and &quot;colour scheme&quot; invites being treated with the same weight, and it is not the same weight.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>The settings, arranged as a short menu rather than one long list.</p>
+<p>There are enough of them now that a single column meant scrolling past things you were not looking for, and finding a setting is most of what anybody does in a settings screen.</p>
+<p>Each page is a titled group with a sentence saying what it covers, and every choice applies as you make it and is remembered.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>964 lines defining <strong>24 functions</strong> (15 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>975 lines defining <strong>24 functions</strong> (15 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Page</code> <span style="color:var(--muted)">line 35</span> &mdash; Which page of the settings menu is showing.</li>
-<li><code>struct Settings</code> <span style="color:var(--muted)">line 57</span> &mdash; The settings tab&#x27;s own state.</li>
+<li><code>enum Page</code> <span style="color:var(--muted)">line 46</span> &mdash; Which page of the settings menu is showing.</li>
+<li><code>struct Settings</code> <span style="color:var(--muted)">line 68</span> &mdash; The settings tab&#x27;s own state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Settings::load</code> <span style="color:var(--muted)">line 101</span> &mdash; Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.
+<li><code>Settings::load</code> <span style="color:var(--muted)">line 112</span> &mdash; Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.
 </li>
-<li><code>Settings::needs_first_run</code> <span style="color:var(--muted)">line 132</span> &mdash; Whether the first-run choice has still to be made.
+<li><code>Settings::needs_first_run</code> <span style="color:var(--muted)">line 143</span> &mdash; Whether the first-run choice has still to be made.
 </li>
-<li><code>Settings::save_error</code> <span style="color:var(--muted)">line 157</span> &mdash; Whether the app should open in group mode, and a way to change it.
+<li><code>Settings::save_error</code> <span style="color:var(--muted)">line 168</span> &mdash; Whether the app should open in group mode, and a way to change it.
 </li>
-<li><code>Settings::show_install_tab</code> <span style="color:var(--muted)">line 168</span> &mdash; Whether the install tab should be offered at all.
+<li><code>Settings::show_install_tab</code> <span style="color:var(--muted)">line 179</span> &mdash; Whether the install tab should be offered at all.
 </li>
-<li><code>Settings::hide_install_tab</code> <span style="color:var(--muted)">line 173</span> &mdash; Whether the install tab is hidden by preference.
+<li><code>Settings::hide_install_tab</code> <span style="color:var(--muted)">line 184</span> &mdash; Whether the install tab is hidden by preference.
 </li>
-<li><code>Settings::always_group</code> <span style="color:var(--muted)">line 187</span> &mdash; Whether the app should open in group mode.
+<li><code>Settings::always_group</code> <span style="color:var(--muted)">line 198</span> &mdash; Whether the app should open in group mode.
 </li>
-<li><code>Settings::set_always_group</code> <span style="color:var(--muted)">line 220</span> &mdash; Record whether the app should open in group mode.
+<li><code>Settings::set_always_group</code> <span style="color:var(--muted)">line 231</span> &mdash; Record whether the app should open in group mode.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::first_run_panel</code> <span style="color:var(--muted)">line 360</span> &mdash; The first-run panel: offered once, with animation already on.
+<li><code>Settings::first_run_panel</code> <span style="color:var(--muted)">line 371</span> &mdash; The first-run panel: offered once, with animation already on.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::tab</code> <span style="color:var(--muted)">line 420</span> &mdash; The settings tab.
+<li><code>Settings::tab</code> <span style="color:var(--muted)">line 431</span> &mdash; The settings tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>appearance_page</code>, <code>interface_page</code>, <code>motion_page</code>, <code>storage_page</code>, <code>custom_palette_help</code>, <code>persist</code>, <code>section</code>, <code>swatches</code>, <code>failsafe</code>, <code>notify_style</code>, <code>set_failsafe</code>, <code>set_hide_install_tab</code></span>
 </li>
 </ul>
@@ -123,115 +128,115 @@
 <path d="M223.2 747.0 C 302.2 747.0, 302.2 647.0, 283.2 647.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M159.8 774.0 C 159.8 794.0, 419.0 800.0, 419.0 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M159.8 774.0 C 159.8 794.0, 297.0 900.0, 297.0 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L101" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L112" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="134.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="87.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::load</text>
-<text x="87.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
+<text x="87.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 112</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L127" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L138" target="_blank" rel="noopener noreferrer">
 <rect x="180.4" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="255.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::motion</text>
-<text x="255.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 127</text>
+<text x="255.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 138</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L132" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L143" target="_blank" rel="noopener noreferrer">
 <rect x="356.0" y="20.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="465.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::needs_first_run</text>
-<text x="465.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
+<text x="465.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L136" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L147" target="_blank" rel="noopener noreferrer">
 <rect x="115.4" y="120.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="194.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::persist</text>
-<text x="194.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L157" target="_blank" rel="noopener noreferrer">
-<rect x="298.6" y="120.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="388.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::save_error</text>
-<text x="388.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 157</text>
+<text x="194.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L168" target="_blank" rel="noopener noreferrer">
+<rect x="298.6" y="120.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="388.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::save_error</text>
+<text x="388.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L179" target="_blank" rel="noopener noreferrer">
 <rect x="58.4" y="220.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="171.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::show_install_tab</text>
-<text x="171.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
+<text x="171.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L173" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L184" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="220.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="422.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::hide_install_tab</text>
-<text x="422.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 173</text>
+<text x="422.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 184</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L178" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L189" target="_blank" rel="noopener noreferrer">
 <rect x="73.6" y="320.0" width="256.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="201.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_hide_install_tab</text>
-<text x="201.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 178</text>
+<text x="201.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 189</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L192" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L203" target="_blank" rel="noopener noreferrer">
 <rect x="355.6" y="320.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="438.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::failsafe</text>
-<text x="438.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
+<text x="438.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 203</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L197" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L208" target="_blank" rel="noopener noreferrer">
 <rect x="88.8" y="420.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="186.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_failsafe</text>
-<text x="186.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
+<text x="186.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 208</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L206" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L217" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="420.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="407.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::notify_style</text>
-<text x="407.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 206</text>
+<text x="407.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 217</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L211" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L222" target="_blank" rel="noopener noreferrer">
 <rect x="58.4" y="520.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="171.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_notify_style</text>
-<text x="171.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 211</text>
+<text x="171.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 222</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L220" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L231" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="520.0" width="225.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="422.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_always_group</text>
-<text x="422.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 220</text>
+<text x="422.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 231</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L229" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L240" target="_blank" rel="noopener noreferrer">
 <rect x="69.8" y="620.0" width="210.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="175.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::interface_page</text>
-<text x="175.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 229</text>
+<text x="175.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 240</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L360" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L371" target="_blank" rel="noopener noreferrer">
 <rect x="306.2" y="620.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="415.2" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::first_run_panel</text>
-<text x="415.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 360</text>
+<text x="415.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 371</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L420" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L431" target="_blank" rel="noopener noreferrer">
 <rect x="96.4" y="720.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="159.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::tab</text>
-<text x="159.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 420</text>
+<text x="159.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 431</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L474" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L485" target="_blank" rel="noopener noreferrer">
 <rect x="249.2" y="720.0" width="248.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="373.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::custom_palette_help</text>
-<text x="373.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 474</text>
+<text x="373.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 485</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L537" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L548" target="_blank" rel="noopener noreferrer">
 <rect x="81.2" y="820.0" width="218.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="190.2" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::appearance_page</text>
-<text x="190.2" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 537</text>
+<text x="190.2" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 548</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L574" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L585" target="_blank" rel="noopener noreferrer">
 <rect x="325.2" y="820.0" width="187.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="419.0" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::motion_page</text>
-<text x="419.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 574</text>
+<text x="419.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 585</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L649" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L660" target="_blank" rel="noopener noreferrer">
 <rect x="199.4" y="920.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="297.0" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::storage_page</text>
-<text x="297.0" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 649</text>
+<text x="297.0" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 660</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L710" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L721" target="_blank" rel="noopener noreferrer">
 <rect x="195.2" y="1020.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="239.6" y="1042.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">section</text>
-<text x="239.6" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 710</text>
+<text x="239.6" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 721</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L718" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L729" target="_blank" rel="noopener noreferrer">
 <rect x="310.0" y="1020.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="354.4" y="1042.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">swatches</text>
-<text x="354.4" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 718</text>
+<text x="354.4" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 729</text>
 </a>
 </svg>
 </div>
@@ -239,28 +244,28 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_load([&quot;Settings::load&lt;br/&gt;line 101&quot;])
-    n_motion[&quot;Settings::motion&lt;br/&gt;line 127&quot;]
-    n_needs_first_run([&quot;Settings::needs_first_run&lt;br/&gt;line 132&quot;])
-    n_persist[&quot;Settings::persist&lt;br/&gt;line 136&quot;]
-    n_save_error([&quot;Settings::save_error&lt;br/&gt;line 157&quot;])
-    n_show_install_tab([&quot;Settings::show_install_tab&lt;br/&gt;line 168&quot;])
-    n_hide_install_tab([&quot;Settings::hide_install_tab&lt;br/&gt;line 173&quot;])
-    n_set_hide_install_tab[&quot;Settings::set_hide_install_tab&lt;br/&gt;line 178&quot;]
-    n_failsafe[&quot;Settings::failsafe&lt;br/&gt;line 192&quot;]
-    n_set_failsafe[&quot;Settings::set_failsafe&lt;br/&gt;line 197&quot;]
-    n_notify_style[&quot;Settings::notify_style&lt;br/&gt;line 206&quot;]
-    n_set_notify_style[&quot;Settings::set_notify_style&lt;br/&gt;line 211&quot;]
-    n_set_always_group([&quot;Settings::set_always_group&lt;br/&gt;line 220&quot;])
-    n_interface_page[&quot;Settings::interface_page&lt;br/&gt;line 229&quot;]
-    n_first_run_panel([&quot;Settings::first_run_panel&lt;br/&gt;line 360&quot;])
-    n_tab([&quot;Settings::tab&lt;br/&gt;line 420&quot;])
-    n_custom_palette_help[&quot;Settings::custom_palette_help&lt;br/&gt;line 474&quot;]
-    n_appearance_page[&quot;Settings::appearance_page&lt;br/&gt;line 537&quot;]
-    n_motion_page[&quot;Settings::motion_page&lt;br/&gt;line 574&quot;]
-    n_storage_page[&quot;Settings::storage_page&lt;br/&gt;line 649&quot;]
-    n_section[&quot;section&lt;br/&gt;line 710&quot;]
-    n_swatches[&quot;swatches&lt;br/&gt;line 718&quot;]
+    n_load([&quot;Settings::load&lt;br/&gt;line 112&quot;])
+    n_motion[&quot;Settings::motion&lt;br/&gt;line 138&quot;]
+    n_needs_first_run([&quot;Settings::needs_first_run&lt;br/&gt;line 143&quot;])
+    n_persist[&quot;Settings::persist&lt;br/&gt;line 147&quot;]
+    n_save_error([&quot;Settings::save_error&lt;br/&gt;line 168&quot;])
+    n_show_install_tab([&quot;Settings::show_install_tab&lt;br/&gt;line 179&quot;])
+    n_hide_install_tab([&quot;Settings::hide_install_tab&lt;br/&gt;line 184&quot;])
+    n_set_hide_install_tab[&quot;Settings::set_hide_install_tab&lt;br/&gt;line 189&quot;]
+    n_failsafe[&quot;Settings::failsafe&lt;br/&gt;line 203&quot;]
+    n_set_failsafe[&quot;Settings::set_failsafe&lt;br/&gt;line 208&quot;]
+    n_notify_style[&quot;Settings::notify_style&lt;br/&gt;line 217&quot;]
+    n_set_notify_style[&quot;Settings::set_notify_style&lt;br/&gt;line 222&quot;]
+    n_set_always_group([&quot;Settings::set_always_group&lt;br/&gt;line 231&quot;])
+    n_interface_page[&quot;Settings::interface_page&lt;br/&gt;line 240&quot;]
+    n_first_run_panel([&quot;Settings::first_run_panel&lt;br/&gt;line 371&quot;])
+    n_tab([&quot;Settings::tab&lt;br/&gt;line 431&quot;])
+    n_custom_palette_help[&quot;Settings::custom_palette_help&lt;br/&gt;line 485&quot;]
+    n_appearance_page[&quot;Settings::appearance_page&lt;br/&gt;line 548&quot;]
+    n_motion_page[&quot;Settings::motion_page&lt;br/&gt;line 585&quot;]
+    n_storage_page[&quot;Settings::storage_page&lt;br/&gt;line 660&quot;]
+    n_section[&quot;section&lt;br/&gt;line 721&quot;]
+    n_swatches[&quot;swatches&lt;br/&gt;line 729&quot;]
     n_appearance_page --&gt; n_custom_palette_help
     n_appearance_page --&gt; n_persist
     n_appearance_page --&gt; n_section
@@ -287,28 +292,28 @@ flowchart TD
     n_tab --&gt; n_interface_page
     n_tab --&gt; n_motion_page
     n_tab --&gt; n_storage_page
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L101&quot; &quot;open the source&quot;
-    click n_motion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L127&quot; &quot;open the source&quot;
-    click n_needs_first_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L132&quot; &quot;open the source&quot;
-    click n_persist href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L136&quot; &quot;open the source&quot;
-    click n_save_error href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L157&quot; &quot;open the source&quot;
-    click n_show_install_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L168&quot; &quot;open the source&quot;
-    click n_hide_install_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L173&quot; &quot;open the source&quot;
-    click n_set_hide_install_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L178&quot; &quot;open the source&quot;
-    click n_failsafe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L192&quot; &quot;open the source&quot;
-    click n_set_failsafe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L197&quot; &quot;open the source&quot;
-    click n_notify_style href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L206&quot; &quot;open the source&quot;
-    click n_set_notify_style href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L211&quot; &quot;open the source&quot;
-    click n_set_always_group href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L220&quot; &quot;open the source&quot;
-    click n_interface_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L229&quot; &quot;open the source&quot;
-    click n_first_run_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L360&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L420&quot; &quot;open the source&quot;
-    click n_custom_palette_help href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L474&quot; &quot;open the source&quot;
-    click n_appearance_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L537&quot; &quot;open the source&quot;
-    click n_motion_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L574&quot; &quot;open the source&quot;
-    click n_storage_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L649&quot; &quot;open the source&quot;
-    click n_section href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L710&quot; &quot;open the source&quot;
-    click n_swatches href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L718&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L112&quot; &quot;open the source&quot;
+    click n_motion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L138&quot; &quot;open the source&quot;
+    click n_needs_first_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L143&quot; &quot;open the source&quot;
+    click n_persist href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L147&quot; &quot;open the source&quot;
+    click n_save_error href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L168&quot; &quot;open the source&quot;
+    click n_show_install_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L179&quot; &quot;open the source&quot;
+    click n_hide_install_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L184&quot; &quot;open the source&quot;
+    click n_set_hide_install_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L189&quot; &quot;open the source&quot;
+    click n_failsafe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L203&quot; &quot;open the source&quot;
+    click n_set_failsafe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L208&quot; &quot;open the source&quot;
+    click n_notify_style href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L217&quot; &quot;open the source&quot;
+    click n_set_notify_style href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L222&quot; &quot;open the source&quot;
+    click n_set_always_group href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L231&quot; &quot;open the source&quot;
+    click n_interface_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L240&quot; &quot;open the source&quot;
+    click n_first_run_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L371&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L431&quot; &quot;open the source&quot;
+    click n_custom_palette_help href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L485&quot; &quot;open the source&quot;
+    click n_appearance_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L548&quot; &quot;open the source&quot;
+    click n_motion_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L585&quot; &quot;open the source&quot;
+    click n_storage_page href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L660&quot; &quot;open the source&quot;
+    click n_section href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L721&quot; &quot;open the source&quot;
+    click n_swatches href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L729&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load,n_needs_first_run,n_save_error,n_show_install_tab,n_hide_install_tab,n_set_always_group,n_first_run_panel,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -321,33 +326,33 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Page</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L35" rel="noopener noreferrer">35</a></td><td>Which page of the settings menu is showing.</td></tr>
-<tr><td><code>Page::ALL</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L48" rel="noopener noreferrer">48</a></td><td>Every page, in menu order, with its label and one-line summary.</td></tr>
-<tr><td><code>Settings</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L57" rel="noopener noreferrer">57</a></td><td>The settings tab&#x27;s own state.</td></tr>
-<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L82" rel="noopener noreferrer">82</a></td><td></td></tr>
-<tr><td><code>Settings::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L101" rel="noopener noreferrer">101</a></td><td>Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.</td></tr>
-<tr><td><code>Settings::motion</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L127" rel="noopener noreferrer">127</a></td><td>How much movement is allowed this frame.</td></tr>
-<tr><td><code>Settings::needs_first_run</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L132" rel="noopener noreferrer">132</a></td><td>Whether the first-run choice has still to be made.</td></tr>
-<tr><td><code>Settings::persist</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L136" rel="noopener noreferrer">136</a></td><td></td></tr>
-<tr><td><code>Settings::save_error</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L157" rel="noopener noreferrer">157</a></td><td>Whether the app should open in group mode, and a way to change it.</td></tr>
-<tr><td><code>Settings::show_install_tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L168" rel="noopener noreferrer">168</a></td><td>Whether the install tab should be offered at all.</td></tr>
-<tr><td><code>Settings::hide_install_tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L173" rel="noopener noreferrer">173</a></td><td>Whether the install tab is hidden by preference.</td></tr>
-<tr><td><code>Settings::set_hide_install_tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L178" rel="noopener noreferrer">178</a></td><td>Record whether to hide the install tab on a portable copy.</td></tr>
-<tr><td><code>Settings::always_group</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L187" rel="noopener noreferrer">187</a></td><td>Whether the app should open in group mode.</td></tr>
-<tr><td><code>Settings::failsafe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L192" rel="noopener noreferrer">192</a></td><td>The Failsafe posture in force.</td></tr>
-<tr><td><code>Settings::set_failsafe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L197" rel="noopener noreferrer">197</a></td><td>Record the Failsafe posture.</td></tr>
-<tr><td><code>Settings::notify_style</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L206" rel="noopener noreferrer">206</a></td><td>How notifications should be shown.</td></tr>
-<tr><td><code>Settings::set_notify_style</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L211" rel="noopener noreferrer">211</a></td><td>Record how notifications should be shown.</td></tr>
-<tr><td><code>Settings::set_always_group</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L220" rel="noopener noreferrer">220</a></td><td>Record whether the app should open in group mode.</td></tr>
-<tr><td><code>Settings::interface_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L229" rel="noopener noreferrer">229</a></td><td>Which tabs the window offers.</td></tr>
-<tr><td><code>Settings::first_run_panel</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L360" rel="noopener noreferrer">360</a></td><td>The first-run panel: offered once, with animation already on.</td></tr>
-<tr><td><code>Settings::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L420" rel="noopener noreferrer">420</a></td><td>The settings tab.</td></tr>
-<tr><td><code>Settings::custom_palette_help</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L474" rel="noopener noreferrer">474</a></td><td>Explain where custom palettes go, and say what was refused and why.</td></tr>
-<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L537" rel="noopener noreferrer">537</a></td><td></td></tr>
-<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L574" rel="noopener noreferrer">574</a></td><td></td></tr>
-<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L649" rel="noopener noreferrer">649</a></td><td></td></tr>
-<tr><td><code>section</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L710" rel="noopener noreferrer">710</a></td><td>A titled group with a one-line explanation under it.</td></tr>
-<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L718" rel="noopener noreferrer">718</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
+<tr><td><code>Page</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L46" rel="noopener noreferrer">46</a></td><td>Which page of the settings menu is showing.</td></tr>
+<tr><td><code>Page::ALL</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L59" rel="noopener noreferrer">59</a></td><td>Every page, in menu order, with its label and one-line summary.</td></tr>
+<tr><td><code>Settings</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L68" rel="noopener noreferrer">68</a></td><td>The settings tab&#x27;s own state.</td></tr>
+<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L93" rel="noopener noreferrer">93</a></td><td></td></tr>
+<tr><td><code>Settings::load</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L112" rel="noopener noreferrer">112</a></td><td>Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.</td></tr>
+<tr><td><code>Settings::motion</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L138" rel="noopener noreferrer">138</a></td><td>How much movement is allowed this frame.</td></tr>
+<tr><td><code>Settings::needs_first_run</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L143" rel="noopener noreferrer">143</a></td><td>Whether the first-run choice has still to be made.</td></tr>
+<tr><td><code>Settings::persist</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L147" rel="noopener noreferrer">147</a></td><td></td></tr>
+<tr><td><code>Settings::save_error</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L168" rel="noopener noreferrer">168</a></td><td>Whether the app should open in group mode, and a way to change it.</td></tr>
+<tr><td><code>Settings::show_install_tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L179" rel="noopener noreferrer">179</a></td><td>Whether the install tab should be offered at all.</td></tr>
+<tr><td><code>Settings::hide_install_tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L184" rel="noopener noreferrer">184</a></td><td>Whether the install tab is hidden by preference.</td></tr>
+<tr><td><code>Settings::set_hide_install_tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L189" rel="noopener noreferrer">189</a></td><td>Record whether to hide the install tab on a portable copy.</td></tr>
+<tr><td><code>Settings::always_group</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L198" rel="noopener noreferrer">198</a></td><td>Whether the app should open in group mode.</td></tr>
+<tr><td><code>Settings::failsafe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L203" rel="noopener noreferrer">203</a></td><td>The Failsafe posture in force.</td></tr>
+<tr><td><code>Settings::set_failsafe</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L208" rel="noopener noreferrer">208</a></td><td>Record the Failsafe posture.</td></tr>
+<tr><td><code>Settings::notify_style</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L217" rel="noopener noreferrer">217</a></td><td>How notifications should be shown.</td></tr>
+<tr><td><code>Settings::set_notify_style</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L222" rel="noopener noreferrer">222</a></td><td>Record how notifications should be shown.</td></tr>
+<tr><td><code>Settings::set_always_group</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L231" rel="noopener noreferrer">231</a></td><td>Record whether the app should open in group mode.</td></tr>
+<tr><td><code>Settings::interface_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L240" rel="noopener noreferrer">240</a></td><td>Which tabs the window offers.</td></tr>
+<tr><td><code>Settings::first_run_panel</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L371" rel="noopener noreferrer">371</a></td><td>The first-run panel: offered once, with animation already on.</td></tr>
+<tr><td><code>Settings::tab</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L431" rel="noopener noreferrer">431</a></td><td>The settings tab.</td></tr>
+<tr><td><code>Settings::custom_palette_help</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L485" rel="noopener noreferrer">485</a></td><td>Explain where custom palettes go, and say what was refused and why.</td></tr>
+<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L548" rel="noopener noreferrer">548</a></td><td></td></tr>
+<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L585" rel="noopener noreferrer">585</a></td><td></td></tr>
+<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L660" rel="noopener noreferrer">660</a></td><td></td></tr>
+<tr><td><code>section</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L721" rel="noopener noreferrer">721</a></td><td>A titled group with a one-line explanation under it.</td></tr>
+<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L729" rel="noopener noreferrer">729</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
 </tbody></table>
 </section>
 </div></div>

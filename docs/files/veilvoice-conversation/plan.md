@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-conversation/src/plan.rs`
 
-[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 934 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs)
+[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 947 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs)
 
 ## Contents
 
 - [VeilVoice does not work out who is talking, and will not guess](#veilvoice-does-not-work-out-who-is-talking-and-will-not-guess)
 - [Format](#format)
+- [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -68,37 +69,50 @@ have all been replaced.
 Overlapping turns are allowed, because people talk over each other, and
 `crate::render` mixes them rather than picking a winner.
 
+# In plain words
+
+A list of who is in a recording and when each of them speaks.
+
+VeilVoice does not work this out for itself. Deciding who is talking at any
+moment is a hard problem that needs a trained model, and this project does not
+ship one, so it asks instead. You either write the times down, or you record
+each person on their own microphone.
+
+That is less convenient and it is honest. A program that guessed would
+sometimes put one person's words in another person's voice, and you would not
+find out by listening, because the result would sound perfectly fine.
+
 ## What this file contains
 
-934 lines defining **21 functions** (21 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+947 lines defining **21 functions** (21 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Speaker` (line 58) -- One person in the recording.
-- `struct Turn` (line 84) -- A span of the recording belonging to one speaker.
-- `struct Conversation` (line 108) -- The whole plan: who is in the recording, and when each of them speaks.
+- `struct Speaker` (line 71) -- One person in the recording.
+- `struct Turn` (line 97) -- A span of the recording belonging to one speaker.
+- `struct Conversation` (line 121) -- The whole plan: who is in the recording, and when each of them speaks.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Turn::duration` (line 101) -- How long this turn lasts, in seconds.
-- `Conversation::add_speaker` (line 134) -- Add a speaker, and return the index they were given.
-- `Conversation::add_turn` (line 156) -- Add a turn.
-- `Conversation::rename_speakers` (line 222) -- Rename everybody, in slot order, keeping every turn where it is.
-- `Conversation::speakers` (line 252) -- The speakers, in the order they were added.
-- `Conversation::turns` (line 257) -- The turns, in time order.
-- `Conversation::len` (line 262) -- How many speakers there are.
-- `Conversation::is_empty` (line 267) -- Whether there is nobody in the plan.
-- `Conversation::voice` (line 272) -- The destination voice for a speaker.
-- `Conversation::mode` (line 283) -- Whether every speaker gets their own voice, or one between them.
-- `Conversation::set_mode` (line 292) -- Render every speaker as the same voice, or as their own.
-- `Conversation::duration` (line 303) -- When the last turn ends, in seconds.
-- `Conversation::overlaps` (line 312) -- Turns where two people are speaking at once.
-- `Conversation::self_overlaps` (line 333) -- Spans where a speaker's turns overlap their own other turns.
-- `Conversation::from_channels` (line 355) -- A plan for a recording with one microphone per person.
+- `Turn::duration` (line 114) -- How long this turn lasts, in seconds.
+- `Conversation::add_speaker` (line 147) -- Add a speaker, and return the index they were given.
+- `Conversation::add_turn` (line 169) -- Add a turn.
+- `Conversation::rename_speakers` (line 235) -- Rename everybody, in slot order, keeping every turn where it is.
+- `Conversation::speakers` (line 265) -- The speakers, in the order they were added.
+- `Conversation::turns` (line 270) -- The turns, in time order.
+- `Conversation::len` (line 275) -- How many speakers there are.
+- `Conversation::is_empty` (line 280) -- Whether there is nobody in the plan.
+- `Conversation::voice` (line 285) -- The destination voice for a speaker.
+- `Conversation::mode` (line 296) -- Whether every speaker gets their own voice, or one between them.
+- `Conversation::set_mode` (line 305) -- Render every speaker as the same voice, or as their own.
+- `Conversation::duration` (line 316) -- When the last turn ends, in seconds.
+- `Conversation::overlaps` (line 325) -- Turns where two people are speaking at once.
+- `Conversation::self_overlaps` (line 346) -- Spans where a speaker's turns overlap their own other turns.
+- `Conversation::from_channels` (line 368) -- A plan for a recording with one microphone per person.
   - reaches: `named`, `new`
-- `Conversation::save` (line 512) -- Write the plan to path.
+- `Conversation::save` (line 525) -- Write the plan to path.
   - reaches: `to_text`
-- `Conversation::load` (line 523) -- Read a plan written by Conversation::save.
+- `Conversation::load` (line 536) -- Read a plan written by Conversation::save.
   - reaches: `parse`, `new`
 
 ## What calls what
@@ -121,53 +135,53 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_named["Speaker::named<br/>line 74"]
-    n_duration(["Turn::duration<br/>line 101"])
-    n_new["Conversation::new<br/>line 124"]
-    n_add_speaker(["Conversation::add_speaker<br/>line 134"])
-    n_add_turn(["Conversation::add_turn<br/>line 156"])
-    n_rename_speakers(["Conversation::rename_speakers<br/>line 222"])
-    n_speakers(["Conversation::speakers<br/>line 252"])
-    n_turns(["Conversation::turns<br/>line 257"])
-    n_len(["Conversation::len<br/>line 262"])
-    n_is_empty(["Conversation::is_empty<br/>line 267"])
-    n_voice(["Conversation::voice<br/>line 272"])
-    n_mode(["Conversation::mode<br/>line 283"])
-    n_set_mode(["Conversation::set_mode<br/>line 292"])
-    n_duration(["Conversation::duration<br/>line 303"])
-    n_overlaps(["Conversation::overlaps<br/>line 312"])
-    n_self_overlaps(["Conversation::self_overlaps<br/>line 333"])
-    n_from_channels(["Conversation::from_channels<br/>line 355"])
-    n_to_text["Conversation::to_text<br/>line 380"]
-    n_parse["Conversation::parse<br/>line 417"]
-    n_save(["Conversation::save<br/>line 512"])
-    n_load(["Conversation::load<br/>line 523"])
+    n_named["Speaker::named<br/>line 87"]
+    n_duration(["Turn::duration<br/>line 114"])
+    n_new["Conversation::new<br/>line 137"]
+    n_add_speaker(["Conversation::add_speaker<br/>line 147"])
+    n_add_turn(["Conversation::add_turn<br/>line 169"])
+    n_rename_speakers(["Conversation::rename_speakers<br/>line 235"])
+    n_speakers(["Conversation::speakers<br/>line 265"])
+    n_turns(["Conversation::turns<br/>line 270"])
+    n_len(["Conversation::len<br/>line 275"])
+    n_is_empty(["Conversation::is_empty<br/>line 280"])
+    n_voice(["Conversation::voice<br/>line 285"])
+    n_mode(["Conversation::mode<br/>line 296"])
+    n_set_mode(["Conversation::set_mode<br/>line 305"])
+    n_duration(["Conversation::duration<br/>line 316"])
+    n_overlaps(["Conversation::overlaps<br/>line 325"])
+    n_self_overlaps(["Conversation::self_overlaps<br/>line 346"])
+    n_from_channels(["Conversation::from_channels<br/>line 368"])
+    n_to_text["Conversation::to_text<br/>line 393"]
+    n_parse["Conversation::parse<br/>line 430"]
+    n_save(["Conversation::save<br/>line 525"])
+    n_load(["Conversation::load<br/>line 536"])
     n_from_channels --> n_named
     n_from_channels --> n_new
     n_load --> n_parse
     n_parse --> n_new
     n_save --> n_to_text
-    click n_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L74" "open the source"
-    click n_duration href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L101" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L124" "open the source"
-    click n_add_speaker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L134" "open the source"
-    click n_add_turn href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L156" "open the source"
-    click n_rename_speakers href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L222" "open the source"
-    click n_speakers href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L252" "open the source"
-    click n_turns href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L257" "open the source"
-    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L262" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L267" "open the source"
-    click n_voice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L272" "open the source"
-    click n_mode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L283" "open the source"
-    click n_set_mode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L292" "open the source"
-    click n_duration href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L303" "open the source"
-    click n_overlaps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L312" "open the source"
-    click n_self_overlaps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L333" "open the source"
-    click n_from_channels href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L355" "open the source"
-    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L380" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L417" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L512" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L523" "open the source"
+    click n_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L87" "open the source"
+    click n_duration href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L114" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L137" "open the source"
+    click n_add_speaker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L147" "open the source"
+    click n_add_turn href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L169" "open the source"
+    click n_rename_speakers href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L235" "open the source"
+    click n_speakers href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L265" "open the source"
+    click n_turns href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L270" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L275" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L280" "open the source"
+    click n_voice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L285" "open the source"
+    click n_mode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L296" "open the source"
+    click n_set_mode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L305" "open the source"
+    click n_duration href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L316" "open the source"
+    click n_overlaps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L325" "open the source"
+    click n_self_overlaps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L346" "open the source"
+    click n_from_channels href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L368" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L393" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L430" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L525" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L536" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_duration,n_add_speaker,n_add_turn,n_rename_speakers,n_speakers,n_turns,n_len,n_is_empty,n_voice,n_mode,n_set_mode,n_duration,n_overlaps,n_self_overlaps,n_from_channels,n_save,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -180,31 +194,31 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `MAGIC` <sub>const</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L54) | Magic first line. |
-| `Speaker` <sub>pub struct</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L58) | One person in the recording. |
-| `Speaker::named` <sub>pub fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L74) | A speaker with a name and no picture. |
-| `Turn` <sub>pub struct</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L84) | A span of the recording belonging to one speaker. |
-| `Turn::duration` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L101) | How long this turn lasts, in seconds. |
-| `Conversation` <sub>pub struct</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L108) | The whole plan: who is in the recording, and when each of them speaks. |
-| `Conversation::new` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L124) | An empty plan. |
-| `Conversation::add_speaker` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L134) | Add a speaker, and return the index they were given. |
-| `Conversation::add_turn` <sub>pub fn</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L156) | Add a turn. |
-| `Conversation::rename_speakers` <sub>pub fn</sub> | [222](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L222) | Rename everybody, in slot order, keeping every turn where it is. |
-| `Conversation::speakers` <sub>pub fn</sub> | [252](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L252) | The speakers, in the order they were added. |
-| `Conversation::turns` <sub>pub fn</sub> | [257](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L257) | The turns, in time order. |
-| `Conversation::len` <sub>pub fn</sub> | [262](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L262) | How many speakers there are. |
-| `Conversation::is_empty` <sub>pub fn</sub> | [267](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L267) | Whether there is nobody in the plan. |
-| `Conversation::voice` <sub>pub fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L272) | The destination voice for a speaker. |
-| `Conversation::mode` <sub>pub fn</sub> | [283](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L283) | Whether every speaker gets their own voice, or one between them. |
-| `Conversation::set_mode` <sub>pub fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L292) | Render every speaker as the same voice, or as their own. |
-| `Conversation::duration` <sub>pub fn</sub> | [303](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L303) | When the last turn ends, in seconds. |
-| `Conversation::overlaps` <sub>pub fn</sub> | [312](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L312) | Turns where two people are speaking at once. |
-| `Conversation::self_overlaps` <sub>pub fn</sub> | [333](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L333) | Spans where a speaker's turns overlap their own other turns. |
-| `Conversation::from_channels` <sub>pub fn</sub> | [355](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L355) | A plan for a recording with one microphone per person. |
-| `Conversation::to_text` <sub>pub fn</sub> | [380](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L380) | Serialise to the text format described at the top of this module. |
-| `Conversation::parse` <sub>pub fn</sub> | [417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L417) | Parse the text format. |
-| `Conversation::save` <sub>pub fn</sub> | [512](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L512) | Write the plan to path. |
-| `Conversation::load` <sub>pub fn</sub> | [523](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L523) | Read a plan written by Conversation::save. |
+| `MAGIC` <sub>const</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L67) | Magic first line. |
+| `Speaker` <sub>pub struct</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L71) | One person in the recording. |
+| `Speaker::named` <sub>pub fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L87) | A speaker with a name and no picture. |
+| `Turn` <sub>pub struct</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L97) | A span of the recording belonging to one speaker. |
+| `Turn::duration` <sub>pub fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L114) | How long this turn lasts, in seconds. |
+| `Conversation` <sub>pub struct</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L121) | The whole plan: who is in the recording, and when each of them speaks. |
+| `Conversation::new` <sub>pub fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L137) | An empty plan. |
+| `Conversation::add_speaker` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L147) | Add a speaker, and return the index they were given. |
+| `Conversation::add_turn` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L169) | Add a turn. |
+| `Conversation::rename_speakers` <sub>pub fn</sub> | [235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L235) | Rename everybody, in slot order, keeping every turn where it is. |
+| `Conversation::speakers` <sub>pub fn</sub> | [265](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L265) | The speakers, in the order they were added. |
+| `Conversation::turns` <sub>pub fn</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L270) | The turns, in time order. |
+| `Conversation::len` <sub>pub fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L275) | How many speakers there are. |
+| `Conversation::is_empty` <sub>pub fn</sub> | [280](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L280) | Whether there is nobody in the plan. |
+| `Conversation::voice` <sub>pub fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L285) | The destination voice for a speaker. |
+| `Conversation::mode` <sub>pub fn</sub> | [296](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L296) | Whether every speaker gets their own voice, or one between them. |
+| `Conversation::set_mode` <sub>pub fn</sub> | [305](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L305) | Render every speaker as the same voice, or as their own. |
+| `Conversation::duration` <sub>pub fn</sub> | [316](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L316) | When the last turn ends, in seconds. |
+| `Conversation::overlaps` <sub>pub fn</sub> | [325](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L325) | Turns where two people are speaking at once. |
+| `Conversation::self_overlaps` <sub>pub fn</sub> | [346](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L346) | Spans where a speaker's turns overlap their own other turns. |
+| `Conversation::from_channels` <sub>pub fn</sub> | [368](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L368) | A plan for a recording with one microphone per person. |
+| `Conversation::to_text` <sub>pub fn</sub> | [393](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L393) | Serialise to the text format described at the top of this module. |
+| `Conversation::parse` <sub>pub fn</sub> | [430](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L430) | Parse the text format. |
+| `Conversation::save` <sub>pub fn</sub> | [525](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L525) | Write the plan to path. |
+| `Conversation::load` <sub>pub fn</sub> | [536](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L536) | Read a plan written by Conversation::save. |
 
 ---
 

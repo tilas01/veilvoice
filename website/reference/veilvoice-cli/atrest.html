@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/atrest.svg" alt="atrest.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/atrest.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 275 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 286 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-the-default">Why this is the default</a>
   <a href="#never-through-a-plaintext-file">Never through a plaintext file</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -56,20 +57,24 @@
 <p>So the result is sealed into a <code>container</code> &#8212; Argon2id or the X25519 + ML-KEM-768 hybrid &#8212; unless the user asks for plaintext, and asking for plaintext prints <code>PLAINTEXT_WARNING</code> and, on a terminal, waits for an answer.</p>
 <h2 id="never-through-a-plaintext-file">Never through a plaintext file</h2>
 <p>The WAV is encoded in memory and sealed there. It is never written to disk and then encrypted, because a plaintext file that is created and deleted is precisely what <code>veilvoice_crypto::shred</code> explains cannot be reliably taken back on flash storage.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>Asks for a passphrase and encrypts the recording VeilVoice has just written.</p>
+<p>It is on by default, and the reason is worth stating: the words survive de-identification on purpose, so an unencrypted result is still a recording of everything that was said. Veiling the voice and leaving the file open protects the speaker and not the conversation.</p>
+<p>Writing one unencrypted is allowed, and asks first.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>275 lines defining <strong>5 functions</strong> (4 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>286 lines defining <strong>5 functions</strong> (4 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Recipient</code> <span style="color:var(--muted)">line 52</span> &mdash; How a recording is to be sealed.</li>
+<li><code>enum Recipient</code> <span style="color:var(--muted)">line 63</span> &mdash; How a recording is to be sealed.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>seal_to_disk</code> <span style="color:var(--muted)">line 60</span> &mdash; Seal plaintext and write it to &lt;path&gt;.veil, returning where it landed.
+<li><code>seal_to_disk</code> <span style="color:var(--muted)">line 71</span> &mdash; Seal plaintext and write it to &lt;path&gt;.veil, returning where it landed.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>read_new_password</code>, <code>into_secret</code></span>
 </li>
-<li><code>confirm_plaintext</code> <span style="color:var(--muted)">line 111</span> &mdash; Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.
+<li><code>confirm_plaintext</code> <span style="color:var(--muted)">line 122</span> &mdash; Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.
 </li>
-<li><code>prompt_secret</code> <span style="color:var(--muted)">line 162</span> &mdash; Prompt once, without echoing, and keep the answer in a Secret.
+<li><code>prompt_secret</code> <span style="color:var(--muted)">line 173</span> &mdash; Prompt once, without echoing, and keep the answer in a Secret.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>into_secret</code></span>
 </li>
 </ul>
@@ -84,30 +89,30 @@
 <path d="M620.8 47.0 C 642.8 47.0, 642.8 47.0, 471.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M403.0 147.0 C 490.0 147.0, 490.0 47.0, 471.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M87.6 74.0 C 87.6 94.0, 324.4 100.0, 324.4 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L60" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L71" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="87.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seal_to_disk</text>
-<text x="87.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 60</text>
+<text x="87.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 71</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L111" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L122" target="_blank" rel="noopener noreferrer">
 <rect x="173.2" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="251.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">confirm_plaintext</text>
-<text x="251.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
+<text x="251.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L154" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L165" target="_blank" rel="noopener noreferrer">
 <rect x="356.4" y="20.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="412.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">into_secret</text>
-<text x="412.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+<text x="412.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 165</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L162" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L173" target="_blank" rel="noopener noreferrer">
 <rect x="494.0" y="20.0" width="126.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="557.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">prompt_secret</text>
-<text x="557.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
+<text x="557.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 173</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L168" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L179" target="_blank" rel="noopener noreferrer">
 <rect x="245.8" y="120.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="324.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_new_password</text>
-<text x="324.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
+<text x="324.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
 </svg>
 </div>
@@ -115,19 +120,19 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_seal_to_disk([&quot;seal_to_disk&lt;br/&gt;line 60&quot;])
-    n_confirm_plaintext([&quot;confirm_plaintext&lt;br/&gt;line 111&quot;])
-    n_into_secret[&quot;into_secret&lt;br/&gt;line 154&quot;]
-    n_prompt_secret([&quot;prompt_secret&lt;br/&gt;line 162&quot;])
-    n_read_new_password[&quot;read_new_password&lt;br/&gt;line 168&quot;]
+    n_seal_to_disk([&quot;seal_to_disk&lt;br/&gt;line 71&quot;])
+    n_confirm_plaintext([&quot;confirm_plaintext&lt;br/&gt;line 122&quot;])
+    n_into_secret[&quot;into_secret&lt;br/&gt;line 165&quot;]
+    n_prompt_secret([&quot;prompt_secret&lt;br/&gt;line 173&quot;])
+    n_read_new_password[&quot;read_new_password&lt;br/&gt;line 179&quot;]
     n_prompt_secret --&gt; n_into_secret
     n_read_new_password --&gt; n_into_secret
     n_seal_to_disk --&gt; n_read_new_password
-    click n_seal_to_disk href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L60&quot; &quot;open the source&quot;
-    click n_confirm_plaintext href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L111&quot; &quot;open the source&quot;
-    click n_into_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L154&quot; &quot;open the source&quot;
-    click n_prompt_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L162&quot; &quot;open the source&quot;
-    click n_read_new_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L168&quot; &quot;open the source&quot;
+    click n_seal_to_disk href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L71&quot; &quot;open the source&quot;
+    click n_confirm_plaintext href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L122&quot; &quot;open the source&quot;
+    click n_into_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L165&quot; &quot;open the source&quot;
+    click n_prompt_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L173&quot; &quot;open the source&quot;
+    click n_read_new_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L179&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_seal_to_disk,n_confirm_plaintext,n_prompt_secret entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -140,13 +145,13 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>PLAINTEXT_WARNING</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L35" rel="noopener noreferrer">35</a></td><td>What the user is told before a recording is written in the clear.</td></tr>
-<tr><td><code>Recipient</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L52" rel="noopener noreferrer">52</a></td><td>How a recording is to be sealed.</td></tr>
-<tr><td><code>seal_to_disk</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L60" rel="noopener noreferrer">60</a></td><td>Seal plaintext and write it to &lt;path&gt;.veil, returning where it landed.</td></tr>
-<tr><td><code>confirm_plaintext</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L111" rel="noopener noreferrer">111</a></td><td>Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.</td></tr>
-<tr><td><code>into_secret</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L154" rel="noopener noreferrer">154</a></td><td>Move a typed password into page-locked, zeroizing storage, wiping the String it arrived in.</td></tr>
-<tr><td><code>prompt_secret</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L162" rel="noopener noreferrer">162</a></td><td>Prompt once, without echoing, and keep the answer in a Secret.</td></tr>
-<tr><td><code>read_new_password</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L168" rel="noopener noreferrer">168</a></td><td>Read a password twice, without echoing it, and check the two agree.</td></tr>
+<tr><td><code>PLAINTEXT_WARNING</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L46" rel="noopener noreferrer">46</a></td><td>What the user is told before a recording is written in the clear.</td></tr>
+<tr><td><code>Recipient</code> <sub>pub enum</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L63" rel="noopener noreferrer">63</a></td><td>How a recording is to be sealed.</td></tr>
+<tr><td><code>seal_to_disk</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L71" rel="noopener noreferrer">71</a></td><td>Seal plaintext and write it to &lt;path&gt;.veil, returning where it landed.</td></tr>
+<tr><td><code>confirm_plaintext</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L122" rel="noopener noreferrer">122</a></td><td>Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.</td></tr>
+<tr><td><code>into_secret</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L165" rel="noopener noreferrer">165</a></td><td>Move a typed password into page-locked, zeroizing storage, wiping the String it arrived in.</td></tr>
+<tr><td><code>prompt_secret</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L173" rel="noopener noreferrer">173</a></td><td>Prompt once, without echoing, and keep the answer in a Secret.</td></tr>
+<tr><td><code>read_new_password</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L179" rel="noopener noreferrer">179</a></td><td>Read a password twice, without echoing it, and check the two agree.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -39,12 +39,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/palette.svg" alt="palette.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/palette.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 735 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 747 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs" rel="noopener noreferrer">read the source</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#one-source-of-colour-cross-checked-by-a-test">One source of colour, cross-checked by a test</a>
   <a href="#ten-speaker-colours-ordered-by-measurement-rather-than-by-eye">Ten speaker colours, ordered by measurement rather than by eye</a>
   <a href="#colour-is-never-the-only-signal">Colour is never the only signal</a>
+  <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
   <a href="#items">Items</a>
@@ -62,26 +63,30 @@
 <p>One colour is deliberately not a hue at all: the near-white foreground token, separated from every saturated colour by <strong>lightness</strong> &#8212; the axis that is still free once the wheel is full.</p>
 <h2 id="colour-is-never-the-only-signal">Colour is never the only signal</h2>
 <p>Somebody who cannot separate two of these needs the name, and the name is always drawn beside the circle and always in the subtitles. A player that showed only colours would be one about eight per cent of men could not use.</p>
+<h2 id="in-plain-words">In plain words</h2>
+<p>The colours, and which one each speaker gets.</p>
+<p>They are the same colours the website uses, taken from one place so the application, the website and anything VeilVoice draws cannot drift apart. A test compares them against the site&#x27;s own stylesheet and fails the build if they do.</p>
+<p>Speaker colours are handed out to be as distinct from each other as the number of people allows, so that a glance at the picture tells you who is talking.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>735 lines defining <strong>9 functions</strong> (9 public), <strong>1 type</strong> and <strong>8 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>747 lines defining <strong>9 functions</strong> (9 public), <strong>1 type</strong> and <strong>8 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Palette</code> <span style="color:var(--muted)">line 66</span> &mdash; One complete colour scheme, matching one data-theme block in website/css/themes.css and one entry in veilvoice-gui&#x27;s theme table.</li>
+<li><code>struct Palette</code> <span style="color:var(--muted)">line 78</span> &mdash; One complete colour scheme, matching one data-theme block in website/css/themes.css and one entry in veilvoice-gui&#x27;s theme table.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>by_id</code> <span style="color:var(--muted)">line 267</span> &mdash; The palette with this identifier.
+<li><code>by_id</code> <span style="color:var(--muted)">line 279</span> &mdash; The palette with this identifier.
 </li>
-<li><code>default_palette</code> <span style="color:var(--muted)">line 273</span> &mdash; The default palette.
+<li><code>default_palette</code> <span style="color:var(--muted)">line 285</span> &mdash; The default palette.
 </li>
-<li><code>ids</code> <span style="color:var(--muted)">line 278</span> &mdash; Every identifier, for an error message or a picker.
+<li><code>ids</code> <span style="color:var(--muted)">line 290</span> &mdash; Every identifier, for an error message or a picker.
 </li>
-<li><code>speaker</code> <span style="color:var(--muted)">line 321</span> &mdash; The colour for a speaker slot.
+<li><code>speaker</code> <span style="color:var(--muted)">line 333</span> &mdash; The colour for a speaker slot.
 </li>
-<li><code>distance</code> <span style="color:var(--muted)">line 334</span> &mdash; How far apart two colours look, by the &quot;redmean&quot; approximation.
+<li><code>distance</code> <span style="color:var(--muted)">line 346</span> &mdash; How far apart two colours look, by the &quot;redmean&quot; approximation.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>rgb</code></span>
 </li>
-<li><code>ink_on</code> <span style="color:var(--muted)">line 396</span> &mdash; Black or white, whichever is readable on background.
+<li><code>ink_on</code> <span style="color:var(--muted)">line 408</span> &mdash; Black or white, whichever is readable on background.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>contrast</code>, <code>luminance</code>, <code>rgb</code></span>
 </li>
 </ul>
@@ -97,50 +102,50 @@
 <path d="M87.2 174.0 C 87.2 194.0, 263.2 200.0, 263.2 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M483.6 147.0 C 505.6 147.0, 505.6 147.0, 371.8 147.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M205.8 174.0 C 205.8 194.0, 263.2 200.0, 263.2 217.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L267" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L279" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="64.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">by_id</text>
-<text x="64.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 267</text>
+<text x="64.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L273" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L285" target="_blank" rel="noopener noreferrer">
 <rect x="134.8" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="205.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_palette</text>
-<text x="205.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 273</text>
+<text x="205.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 285</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L278" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L290" target="_blank" rel="noopener noreferrer">
 <rect x="302.8" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="347.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ids</text>
-<text x="347.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 278</text>
+<text x="347.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 290</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L321" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L333" target="_blank" rel="noopener noreferrer">
 <rect x="417.6" y="20.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="462.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">speaker</text>
-<text x="462.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
+<text x="462.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 333</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L334" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L346" target="_blank" rel="noopener noreferrer">
 <rect x="42.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="87.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">distance</text>
-<text x="87.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 334</text>
+<text x="87.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 346</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L351" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L363" target="_blank" rel="noopener noreferrer">
 <rect x="218.8" y="220.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="263.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">rgb</text>
-<text x="263.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 351</text>
+<text x="263.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 363</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L369" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L381" target="_blank" rel="noopener noreferrer">
 <rect x="157.6" y="120.0" width="96.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="205.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">luminance</text>
-<text x="205.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 369</text>
+<text x="205.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 381</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L385" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L397" target="_blank" rel="noopener noreferrer">
 <rect x="280.0" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="324.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">contrast</text>
-<text x="324.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 385</text>
+<text x="324.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 397</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L396" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L408" target="_blank" rel="noopener noreferrer">
 <rect x="394.8" y="120.0" width="88.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="439.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">ink_on</text>
-<text x="439.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 396</text>
+<text x="439.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 408</text>
 </a>
 </svg>
 </div>
@@ -148,28 +153,28 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_by_id([&quot;by_id&lt;br/&gt;line 267&quot;])
-    n_default_palette([&quot;default_palette&lt;br/&gt;line 273&quot;])
-    n_ids([&quot;ids&lt;br/&gt;line 278&quot;])
-    n_speaker([&quot;speaker&lt;br/&gt;line 321&quot;])
-    n_distance([&quot;distance&lt;br/&gt;line 334&quot;])
-    n_rgb[&quot;rgb&lt;br/&gt;line 351&quot;]
-    n_luminance[&quot;luminance&lt;br/&gt;line 369&quot;]
-    n_contrast[&quot;contrast&lt;br/&gt;line 385&quot;]
-    n_ink_on([&quot;ink_on&lt;br/&gt;line 396&quot;])
+    n_by_id([&quot;by_id&lt;br/&gt;line 279&quot;])
+    n_default_palette([&quot;default_palette&lt;br/&gt;line 285&quot;])
+    n_ids([&quot;ids&lt;br/&gt;line 290&quot;])
+    n_speaker([&quot;speaker&lt;br/&gt;line 333&quot;])
+    n_distance([&quot;distance&lt;br/&gt;line 346&quot;])
+    n_rgb[&quot;rgb&lt;br/&gt;line 363&quot;]
+    n_luminance[&quot;luminance&lt;br/&gt;line 381&quot;]
+    n_contrast[&quot;contrast&lt;br/&gt;line 397&quot;]
+    n_ink_on([&quot;ink_on&lt;br/&gt;line 408&quot;])
     n_contrast --&gt; n_luminance
     n_distance --&gt; n_rgb
     n_ink_on --&gt; n_contrast
     n_luminance --&gt; n_rgb
-    click n_by_id href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L267&quot; &quot;open the source&quot;
-    click n_default_palette href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L273&quot; &quot;open the source&quot;
-    click n_ids href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L278&quot; &quot;open the source&quot;
-    click n_speaker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L321&quot; &quot;open the source&quot;
-    click n_distance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L334&quot; &quot;open the source&quot;
-    click n_rgb href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L351&quot; &quot;open the source&quot;
-    click n_luminance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L369&quot; &quot;open the source&quot;
-    click n_contrast href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L385&quot; &quot;open the source&quot;
-    click n_ink_on href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L396&quot; &quot;open the source&quot;
+    click n_by_id href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L279&quot; &quot;open the source&quot;
+    click n_default_palette href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L285&quot; &quot;open the source&quot;
+    click n_ids href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L290&quot; &quot;open the source&quot;
+    click n_speaker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L333&quot; &quot;open the source&quot;
+    click n_distance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L346&quot; &quot;open the source&quot;
+    click n_rgb href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L363&quot; &quot;open the source&quot;
+    click n_luminance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L381&quot; &quot;open the source&quot;
+    click n_contrast href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L397&quot; &quot;open the source&quot;
+    click n_ink_on href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L408&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_by_id,n_default_palette,n_ids,n_speaker,n_distance,n_ink_on entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -180,24 +185,24 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>BG</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L48" rel="noopener noreferrer">48</a></td><td>The page background.</td></tr>
-<tr><td><code>BG_INSET</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L50" rel="noopener noreferrer">50</a></td><td>A panel or inset behind the waveform.</td></tr>
-<tr><td><code>BORDER</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L52" rel="noopener noreferrer">52</a></td><td>Hairlines and dividers.</td></tr>
-<tr><td><code>FG</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L54" rel="noopener noreferrer">54</a></td><td>Body text.</td></tr>
-<tr><td><code>MUTED</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L56" rel="noopener noreferrer">56</a></td><td>Secondary text.</td></tr>
-<tr><td><code>Palette</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L66" rel="noopener noreferrer">66</a></td><td>One complete colour scheme, matching one data-theme block in website/css/themes.css and one entry in veilvoice-gui&#x27;s theme table.</td></tr>
-<tr><td><code>PALETTES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L103" rel="noopener noreferrer">103</a></td><td>Every palette, in the order the pickers show them.</td></tr>
-<tr><td><code>DEFAULT_ID</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L260" rel="noopener noreferrer">260</a></td><td>The palette a render uses unless one is named.</td></tr>
-<tr><td><code>by_id</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L267" rel="noopener noreferrer">267</a></td><td>The palette with this identifier.</td></tr>
-<tr><td><code>default_palette</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L273" rel="noopener noreferrer">273</a></td><td>The default palette.</td></tr>
-<tr><td><code>ids</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L278" rel="noopener noreferrer">278</a></td><td>Every identifier, for an error message or a picker.</td></tr>
-<tr><td><code>SPEAKERS</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L302" rel="noopener noreferrer">302</a></td><td>The ten speaker colours, in the order slots are handed out.</td></tr>
-<tr><td><code>speaker</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L321" rel="noopener noreferrer">321</a></td><td>The colour for a speaker slot.</td></tr>
-<tr><td><code>distance</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L334" rel="noopener noreferrer">334</a></td><td>How far apart two colours look, by the &quot;redmean&quot; approximation.</td></tr>
-<tr><td><code>rgb</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L351" rel="noopener noreferrer">351</a></td><td>Parse #rrggbb into its three channels.</td></tr>
-<tr><td><code>luminance</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L369" rel="noopener noreferrer">369</a></td><td>Relative luminance, as WCAG defines it, from 0.0 to 1.0.</td></tr>
-<tr><td><code>contrast</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L385" rel="noopener noreferrer">385</a></td><td>The contrast ratio between two colours, from 1.0 to 21.0.</td></tr>
-<tr><td><code>ink_on</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L396" rel="noopener noreferrer">396</a></td><td>Black or white, whichever is readable on background.</td></tr>
+<tr><td><code>BG</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L60" rel="noopener noreferrer">60</a></td><td>The page background.</td></tr>
+<tr><td><code>BG_INSET</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L62" rel="noopener noreferrer">62</a></td><td>A panel or inset behind the waveform.</td></tr>
+<tr><td><code>BORDER</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L64" rel="noopener noreferrer">64</a></td><td>Hairlines and dividers.</td></tr>
+<tr><td><code>FG</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L66" rel="noopener noreferrer">66</a></td><td>Body text.</td></tr>
+<tr><td><code>MUTED</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L68" rel="noopener noreferrer">68</a></td><td>Secondary text.</td></tr>
+<tr><td><code>Palette</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L78" rel="noopener noreferrer">78</a></td><td>One complete colour scheme, matching one data-theme block in website/css/themes.css and one entry in veilvoice-gui&#x27;s theme table.</td></tr>
+<tr><td><code>PALETTES</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L115" rel="noopener noreferrer">115</a></td><td>Every palette, in the order the pickers show them.</td></tr>
+<tr><td><code>DEFAULT_ID</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L272" rel="noopener noreferrer">272</a></td><td>The palette a render uses unless one is named.</td></tr>
+<tr><td><code>by_id</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L279" rel="noopener noreferrer">279</a></td><td>The palette with this identifier.</td></tr>
+<tr><td><code>default_palette</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L285" rel="noopener noreferrer">285</a></td><td>The default palette.</td></tr>
+<tr><td><code>ids</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L290" rel="noopener noreferrer">290</a></td><td>Every identifier, for an error message or a picker.</td></tr>
+<tr><td><code>SPEAKERS</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L314" rel="noopener noreferrer">314</a></td><td>The ten speaker colours, in the order slots are handed out.</td></tr>
+<tr><td><code>speaker</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L333" rel="noopener noreferrer">333</a></td><td>The colour for a speaker slot.</td></tr>
+<tr><td><code>distance</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L346" rel="noopener noreferrer">346</a></td><td>How far apart two colours look, by the &quot;redmean&quot; approximation.</td></tr>
+<tr><td><code>rgb</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L363" rel="noopener noreferrer">363</a></td><td>Parse #rrggbb into its three channels.</td></tr>
+<tr><td><code>luminance</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L381" rel="noopener noreferrer">381</a></td><td>Relative luminance, as WCAG defines it, from 0.0 to 1.0.</td></tr>
+<tr><td><code>contrast</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L397" rel="noopener noreferrer">397</a></td><td>The contrast ratio between two colours, from 1.0 to 21.0.</td></tr>
+<tr><td><code>ink_on</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs#L408" rel="noopener noreferrer">408</a></td><td>Black or white, whichever is readable on background.</td></tr>
 </tbody></table>
 </section>
 </div></div>

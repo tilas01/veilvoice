@@ -12,6 +12,14 @@
 //!   (140.6 Hz and its multiples), whatever pitch went in.
 //!
 //! Run with `cargo run -p veilvoice-core --example diag_spectrum`.
+//!
+//! # In plain words
+//!
+//! A small program that runs the engine over a recording and prints what changed
+//! about its frequencies.
+//!
+//! It is here so that the claims about what VeilVoice does to a voice can be
+//! checked by anybody, rather than taken on trust from a paragraph of prose.
 
 use realfft::RealFftPlanner;
 use veilvoice_core::{AccentConfig, DeidConfig, Deidentifier};
