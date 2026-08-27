@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/prefs.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 439 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 457 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs)
 
 ## Contents
 
@@ -59,22 +59,22 @@ yes -- would be ignoring them.
 
 ## What this file contains
 
-439 lines defining **9 functions** (7 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+457 lines defining **9 functions** (7 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct Prefs` (line 41) -- Everything the user can choose about presentation.
-- `struct Motion` (line 242) -- Whether movement is allowed, and how much.
+- `struct Motion` (line 258) -- Whether movement is allowed, and how much.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `default_path` (line 98) -- Where preferences live: beside the app lock, in this platform's config directory.
-- `Prefs::load` (line 109) -- Read preferences from path.
+- `default_path` (line 105) -- Where preferences live: beside the app lock, in this platform's config directory.
+- `Prefs::load` (line 116) -- Read preferences from path.
   - reaches: `default`, `parse`, `parse_bool`
-- `Prefs::save` (line 214) -- Write preferences to path, creating the directory if needed.
+- `Prefs::save` (line 230) -- Write preferences to path, creating the directory if needed.
   - reaches: `to_text`
-- `Motion::resolve` (line 254) -- Resolve for this frame.
-- `Motion::secs` (line 272) -- A duration scaled by whether motion is allowed.
+- `Motion::resolve` (line 270) -- Resolve for this frame.
+- `Motion::secs` (line 288) -- A duration scaled by whether motion is allowed.
 
 ## What calls what
 
@@ -96,29 +96,29 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["Prefs::default<br/>line 79"]
-    n_default_path(["default_path<br/>line 98"])
-    n_load(["Prefs::load<br/>line 109"])
-    n_parse["Prefs::parse<br/>line 122"]
-    n_to_text["Prefs::to_text<br/>line 195"]
-    n_save(["Prefs::save<br/>line 214"])
-    n_parse_bool["parse_bool<br/>line 224"]
-    n_resolve(["Motion::resolve<br/>line 254"])
-    n_secs(["Motion::secs<br/>line 272"])
+    n_default["Prefs::default<br/>line 85"]
+    n_default_path(["default_path<br/>line 105"])
+    n_load(["Prefs::load<br/>line 116"])
+    n_parse["Prefs::parse<br/>line 129"]
+    n_to_text["Prefs::to_text<br/>line 210"]
+    n_save(["Prefs::save<br/>line 230"])
+    n_parse_bool["parse_bool<br/>line 240"]
+    n_resolve(["Motion::resolve<br/>line 270"])
+    n_secs(["Motion::secs<br/>line 288"])
     n_load --> n_default
     n_load --> n_parse
     n_parse --> n_default
     n_parse --> n_parse_bool
     n_save --> n_to_text
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L79" "open the source"
-    click n_default_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L98" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L109" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L122" "open the source"
-    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L195" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L214" "open the source"
-    click n_parse_bool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L224" "open the source"
-    click n_resolve href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L254" "open the source"
-    click n_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L272" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L85" "open the source"
+    click n_default_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L105" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L116" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L129" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L210" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L230" "open the source"
+    click n_parse_bool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L240" "open the source"
+    click n_resolve href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L270" "open the source"
+    click n_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L288" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_default_path,n_load,n_save,n_resolve,n_secs entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -134,16 +134,16 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `Prefs` <sub>pub struct</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L41) | Everything the user can choose about presentation. |
-| `Prefs::default` <sub>fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L79) |  |
-| `default_path` <sub>pub fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L98) | Where preferences live: beside the app lock, in this platform's config directory. |
-| `Prefs::load` <sub>pub fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L109) | Read preferences from path. |
-| `Prefs::parse` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L122) | Parse the key = value format. |
-| `Prefs::to_text` <sub>pub fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L195) | Serialise to the text format. |
-| `Prefs::save` <sub>pub fn</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L214) | Write preferences to path, creating the directory if needed. |
-| `parse_bool` <sub>fn</sub> | [224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L224) |  |
-| `Motion` <sub>pub struct</sub> | [242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L242) | Whether movement is allowed, and how much. |
-| `Motion::resolve` <sub>pub fn</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L254) | Resolve for this frame. |
-| `Motion::secs` <sub>pub fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L272) | A duration scaled by whether motion is allowed. |
+| `Prefs::default` <sub>fn</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L85) |  |
+| `default_path` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L105) | Where preferences live: beside the app lock, in this platform's config directory. |
+| `Prefs::load` <sub>pub fn</sub> | [116](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L116) | Read preferences from path. |
+| `Prefs::parse` <sub>pub fn</sub> | [129](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L129) | Parse the key = value format. |
+| `Prefs::to_text` <sub>pub fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L210) | Serialise to the text format. |
+| `Prefs::save` <sub>pub fn</sub> | [230](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L230) | Write preferences to path, creating the directory if needed. |
+| `parse_bool` <sub>fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L240) |  |
+| `Motion` <sub>pub struct</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L258) | Whether movement is allowed, and how much. |
+| `Motion::resolve` <sub>pub fn</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L270) | Resolve for this frame. |
+| `Motion::secs` <sub>pub fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs#L288) | A duration scaled by whether motion is allowed. |
 
 ---
 
