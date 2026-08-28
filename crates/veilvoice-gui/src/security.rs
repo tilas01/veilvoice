@@ -759,6 +759,19 @@ impl Security {
             ui.label(RichText::new(text).color(*colour));
         }
 
+        if self.store.as_ref().is_some_and(|s| !s.every_copy_current()) {
+            ui.add_space(8.0);
+            ui.label(
+                RichText::new(
+                    "The second copy of this lock is kept where only an administrator \
+                     can write it, and could not be updated from here. It still holds \
+                     the previous password. Run VeilVoice once as an administrator to \
+                     finish the change.",
+                )
+                .color(p::yellow()),
+            );
+        }
+
         ui.add_space(16.0);
         ui.separator();
         ui.label(

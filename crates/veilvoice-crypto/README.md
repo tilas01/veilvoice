@@ -108,16 +108,16 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>192 lines"])
+    n_lib(["lib.rs<br/>200 lines"])
     n_aead["aead.rs<br/>178 lines"]
     n_amnesia["amnesia.rs<br/>326 lines"]
     n_container["container.rs<br/>491 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
-    n_lock["lock.rs<br/>1276 lines"]
-    n_privatefile["privatefile.rs<br/>169 lines"]
+    n_lock["lock.rs<br/>1379 lines"]
+    n_privatefile["privatefile.rs<br/>251 lines"]
     n_shred["shred.rs<br/>415 lines"]
-    n_vault["vault.rs<br/>459 lines"]
+    n_vault["vault.rs<br/>615 lines"]
     n_lock --> n_aead
     n_lock --> n_privatefile
     n_lock --> n_vault
@@ -146,11 +146,11 @@ flowchart TD
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 491 | The .veil encrypted container format. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
-| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 192 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1276 | The application lock: an Argon2id password verifier with a rate limit. |
-| [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 169 | Writing a file that only its owner can read. |
+| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 200 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1379 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 251 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure — the self-destruct. |
-| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 459 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
+| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
@@ -208,6 +208,7 @@ flowchart TD
 | `fn default_path` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Where the lock file lives on this platform, if the environment says. |
 | `fn write_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Create path containing bytes, readable only by the current user. |
 | `fn write_owner_only_new` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | As write_owner_only, but fail if anything is already at path. |
+| `fn replace_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Replace path with bytes in one step, or leave what was there. |
 | `enum Passes` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | How thoroughly to overwrite before unlinking. |
 | `struct ShredReport` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | What actually happened, so the caller can tell the user the truth. |
 | `fn shred_file` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | Overwrite a file's contents, then delete it. |

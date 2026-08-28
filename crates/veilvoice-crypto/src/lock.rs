@@ -256,6 +256,23 @@ impl AppLock {
         Ok(())
     }
 
+    /// Whether two records hold the same stored password.
+    ///
+    /// Compares the salt as well as the verifier, because two locks made from
+    /// the same passphrase have different salts and therefore different
+    /// verifiers: the question being asked is "are these the same lock", not
+    /// "would the same passphrase open both".
+    ///
+    /// Constant time, although the values being compared are both already on
+    /// disk. It costs nothing and keeps one habit for this kind of material
+    /// rather than two.
+    pub fn same_secret_as(&self, other: &Self) -> bool {
+        use subtle::ConstantTimeEq;
+        let salts = self.salt.ct_eq(&other.salt);
+        let verifiers = self.verifier.expose().ct_eq(other.verifier.expose());
+        bool::from(salts & verifiers)
+    }
+
     /// Whether a record has been found edited by somebody without the
     /// passphrase, at any point since this was last cleared.
     ///
@@ -559,6 +576,9 @@ fn derive_pair(
 pub struct LockStore {
     backing: Backing,
     lock: AppLock,
+    /// Whether the last write reached the spare as well as the first copy. See
+    /// [`LockStore::every_copy_current`].
+    every_copy_current: bool,
 }
 
 /// Where a [`LockStore`] keeps its record.
@@ -598,6 +618,7 @@ impl LockStore {
         Ok(Some(Self {
             backing: Backing::File(path.to_path_buf()),
             lock: AppLock::parse(&bytes)?,
+            every_copy_current: true,
         }))
     }
 
@@ -614,6 +635,7 @@ impl LockStore {
         let store = Self {
             backing: Backing::File(path.to_path_buf()),
             lock: AppLock::create(password, params)?,
+            every_copy_current: true,
         };
         if let Some(parent) = path.parent() {
             if !parent.as_os_str().is_empty() {
@@ -641,7 +663,9 @@ impl LockStore {
         }
         // Nothing to persist if we never got as far as an attempt.
         if !matches!(result, Err(Error::AppLockCooldown(_))) {
-            let _ = self.save();
+            if let Ok(current) = self.save() {
+                self.every_copy_current = current;
+            }
         }
         result
     }
@@ -653,10 +677,19 @@ impl LockStore {
     }
 
     /// Clear the tamper report, after proving the passphrase, and persist that.
+    ///
+    /// One key derivation, not three. The first version called `unlock` and
+    /// then `AppLock::acknowledge`, which verifies again, and each of those is
+    /// a full Argon2id run at 256 MiB. Three of them is the better part of a
+    /// minute on a slow machine to dismiss a message, and a control nobody will
+    /// wait for is a control nobody uses. `unlock` has already proved the
+    /// passphrase by the time the flag is cleared.
     pub fn acknowledge(&mut self, password: &[u8]) -> Result<(), Error> {
         self.unlock(password)?;
-        self.lock.acknowledge(password)?;
-        self.save()
+        self.lock.tampered = false;
+        self.lock.retag(password)?;
+        self.every_copy_current = self.save()?;
+        Ok(())
     }
 
     /// Raise the tamper report from outside, and persist it if the passphrase
@@ -680,7 +713,15 @@ impl LockStore {
         // flag is carried across and the record re-tagged under the new key.
         self.lock.tampered = carried;
         self.lock.retag(new)?;
-        self.save()
+        self.every_copy_current = self.save()?;
+        // A change that did not reach the spare has left the previous password
+        // sitting in a file this process cannot rewrite. Anybody who deletes
+        // the first copy gets the old password back, so the change is reported
+        // as incomplete rather than as done.
+        if !self.every_copy_current {
+            return Err(Error::AppLockSpareStale);
+        }
+        Ok(())
     }
 
     /// Remove the lock, after proving the password.
@@ -711,7 +752,11 @@ impl LockStore {
         self.backing.primary()
     }
 
-    fn save(&self) -> Result<(), Error> {
+    /// Write the record, and say whether every copy of it is now current.
+    ///
+    /// `Ok(false)` only ever comes from a vault whose administrator-owned spare
+    /// could not be written. A single file is either written or an error.
+    fn save(&self) -> Result<bool, Error> {
         match &self.backing {
             Backing::Vault(v) => v.store(&self.lock),
             Backing::File(path) => {
@@ -720,9 +765,18 @@ impl LockStore {
                         std::fs::create_dir_all(parent).map_err(|_| Error::AppLockStore)?;
                     }
                 }
-                write_private(path, &self.lock.to_bytes(), false)
+                write_private(path, &self.lock.to_bytes(), false).map(|()| true)
             }
         }
+    }
+
+    /// Whether the last write reached every copy.
+    ///
+    /// False when the administrator-owned spare could not be updated, which
+    /// leaves it holding an older record. Callers show this; a spare carrying
+    /// the previous password is a way back in for anybody who knew it.
+    pub fn every_copy_current(&self) -> bool {
+        self.every_copy_current
     }
 }
 
@@ -733,19 +787,26 @@ impl LockStore {
 /// that cannot find one should say so rather than scatter a lock file into the
 /// working directory.
 ///
-/// The second element is true when one of the two copies had gone and was
-/// rebuilt from the other. A copy does not vanish on its own, so the caller
-/// should treat it as a tamper report and show it; [`LockStore::report_tamper`]
-/// is how to make it stick.
+/// The second element is true when the two copies did not agree: one had gone
+/// and was rebuilt from the other, or both were there and held different stored
+/// passwords. Neither happens on its own, so the caller should treat it as a
+/// tamper report and show it; [`LockStore::report_tamper`] is how to make it
+/// stick.
 pub fn open_default() -> Result<(Option<LockStore>, bool), Error> {
     let base = default_dir().ok_or(Error::AppLockStore)?;
     let vault = crate::vault::Vault::at(&base, crate::vault::admin_dir().as_deref())?;
     let (record, found) = vault.load()?;
-    let restored = found == crate::vault::Found::Restored;
+    // Both outcomes are evidence somebody has been at the files: a copy that
+    // went, or two copies that no longer hold the same password.
+    let restored = matches!(
+        found,
+        crate::vault::Found::Restored | crate::vault::Found::Disagreed
+    );
     Ok((
         record.map(|lock| LockStore {
             backing: Backing::Vault(vault),
             lock,
+            every_copy_current: true,
         }),
         restored,
     ))
@@ -759,11 +820,12 @@ pub fn create_default(password: &[u8], params: kdf::KdfParams) -> Result<LockSto
     if vault.load()?.0.is_some() {
         return Err(Error::AppLockStore);
     }
-    let store = LockStore {
+    let mut store = LockStore {
         backing: Backing::Vault(vault),
         lock: AppLock::create(password, params)?,
+        every_copy_current: true,
     };
-    store.save()?;
+    store.every_copy_current = store.save()?;
     Ok(store)
 }
 
@@ -1244,6 +1306,47 @@ mod tests {
         store.unlock(b"pw").unwrap();
         let second = std::fs::read(&path).unwrap()[73..97].to_vec();
         assert_ne!(first, second, "the tag nonce repeated across two writes");
+    }
+
+    /// F-88. Acknowledging a report must cost one key derivation, not three.
+    /// Counted in the source rather than timed, because a timing test on a
+    /// deliberately slow function is a flaky test.
+    #[test]
+    fn acknowledging_a_report_derives_the_key_once() {
+        let source = include_str!("lock.rs").replace("\r\n", "\n");
+        let start = source
+            .find("pub fn acknowledge(&mut self, password: &[u8]) -> Result<(), Error> {\n        self.unlock")
+            .expect("the store's acknowledge has to exist");
+        let body = &source[start..];
+        let end = body.find("\n    }").unwrap_or(body.len());
+        let body = &body[..end];
+        assert!(
+            !body.contains("self.lock.acknowledge"),
+            "the store verifies once through `unlock`; calling the record's own \
+             acknowledge verifies a second and a third time"
+        );
+        assert_eq!(
+            body.matches("self.unlock").count(),
+            1,
+            "one proof of the passphrase is enough to clear a report"
+        );
+    }
+
+    /// F-86. A password change that could not reach the spare has left the
+    /// previous password in a file this process cannot rewrite, so it is not a
+    /// finished change and must not be reported as one.
+    #[test]
+    fn a_change_that_did_not_reach_the_spare_is_not_reported_as_done() {
+        let source = include_str!("lock.rs").replace("\r\n", "\n");
+        let start = source
+            .find("pub fn change_password")
+            .expect("change_password exists");
+        let body = &source[start..];
+        let end = body.find("\n    /// Remove the lock").unwrap_or(body.len());
+        assert!(
+            body[..end].contains("Error::AppLockSpareStale"),
+            "a change that left the spare behind reported success"
+        );
     }
 
     /// The user-facing claim must keep stating the limit. If someone edits this
