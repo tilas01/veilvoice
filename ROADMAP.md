@@ -530,11 +530,31 @@ following a voice: at that rate it steps rather than sweeps, and a window whose
 only moving part is stepping reads as one that is struggling. A live session
 asks for 16 ms now and everything else keeps 50.
 
+*Compilation was asked about and was already at the ceiling.* The release
+profile builds at `opt-level = 3` with fat link-time optimisation, one codegen
+unit, `panic = "abort"` and the symbols stripped, which is every setting that
+makes a difference. The one thing deliberately not set is `target-cpu=native`,
+and `.cargo/config.toml` says why: it would produce a binary that runs on the
+machine that built it and crashes on an older one, and it would break the
+reproducible builds this project publishes. So there was nothing to change here
+and the honest report is that there was nothing to change, not a commit that
+moved a number.
+
+*The draw path was read for per-frame filesystem calls and has none.* An
+`exists()` or an `is_file()` in a frame is a stat syscall sixty times a second
+for an answer that changed when a file was dropped, and it is the shape of
+stutter that only appears on a network share or a drive that has spun down.
+There were none to remove. The guard test now refuses them along with the calls
+it already refused, so this stays true rather than being true today.
+
 What is *not* claimed is that this fixes anything anybody has reported. The
 machine this was written on has no display and cannot measure a frame. So the
 About tab shows the frame time, smoothed, because a number from the person with
 the problem is worth more than a change made blind, and 16 ms and 120 ms are
-different problems with different causes.
+different problems with different causes. Flicker in particular has causes this
+machine cannot reach: a compositor, a driver, a scaling factor. The window
+clear colour was checked against the panel fill, which is the one flicker cause
+that lives in this code, and they already match.
 
 **Markers 74 to 79, and the two places they meet a rule this project already
 has.**

@@ -1907,6 +1907,19 @@ mod tests {
             "join()",
             "thread::sleep",
             "devices::list",
+            // Each of these is a stat syscall, which is cheap on a warm local
+            // disk and is not cheap on a network share or a sleeping drive.
+            // One per frame at 60 Hz is sixty of them a second for an answer
+            // that changed when a file was dropped, which is where the check
+            // that needs them lives. Added after reading the draw path for
+            // marker 79 and finding none, so this keeps it that way rather
+            // than fixing something.
+            ".exists()",
+            ".is_file()",
+            ".is_dir()",
+            "fs::metadata",
+            "read_dir(",
+            "canonicalize(",
         ] {
             assert!(
                 !drawing.contains(waits),
