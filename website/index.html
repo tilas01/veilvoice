@@ -633,6 +633,14 @@
 
       <div class="demo-core">
         <img class="demo-mark" src="assets/icon-32.png" alt="">
+        <ol class="demo-stages">
+          <li style="--s:0"><i class="demo-dot"></i>framed, 1024 samples</li>
+          <li style="--s:1"><i class="demo-dot"></i>phase measured</li>
+          <li style="--s:2"><i class="demo-dot"></i>phase discarded</li>
+          <li style="--s:3"><i class="demo-dot"></i>pitch and formants moved</li>
+          <li style="--s:4"><i class="demo-dot"></i>modulation seed rolled</li>
+          <li style="--s:5"><i class="demo-dot"></i>words left alone</li>
+        </ol>
       </div>
 
       <div class="demo-side">
@@ -652,10 +660,37 @@
 
       <p><strong>The bars marked &ldquo;anonymised voice&rdquo; carry the same
       energy and none of the
-      relationship.</strong> The measured phase of every frame is discarded and
-      never stored, and every speaker is mapped onto one canonical pitch
-      register and vocal-tract scale — many voices in, one set of
-      characteristics out. There is no inverse to compute.</p>
+      relationship.</strong> The list between them is what actually happens, in
+      order, and it is six steps rather than one:</p>
+
+      <ol class="demo-steps">
+        <li><strong>Framed.</strong> The audio is cut into overlapping frames of
+        1024 samples and each one is turned into frequencies. Everything below
+        happens per frame, which at 48 kHz is about 187 times a second.</li>
+
+        <li><strong>Phase measured.</strong> A frame has a magnitude, which is
+        how much of each frequency there is, and a phase, which is how those
+        frequencies line up in time. The second one is a great deal of what
+        makes a voice recognisably yours.</li>
+
+        <li><strong>Phase discarded.</strong> Not scrambled, not encrypted, not
+        hidden: thrown away and replaced, and never written anywhere. That is
+        the step with no inverse. Nothing is left from which the original
+        timing could be recovered, by us or by anybody else.</li>
+
+        <li><strong>Pitch and formants moved.</strong> Every speaker is mapped
+        onto one canonical register and one vocal-tract scale. Many voices in,
+        one set of characteristics out, which is the other reason there is
+        nothing to undo: several different people arrive at the same place.</li>
+
+        <li><strong>Modulation seed rolled.</strong> How far things move is
+        drawn from a cryptographic random stream, and that stream rolls forward
+        at an interval drawn fresh at every launch. Audio from before a roll is
+        sealed off behind it, so there is no fixed period to observe.</li>
+
+        <li><strong>Words left alone.</strong> None of it touches which words
+        were said.</li>
+      </ol>
 
       <p><strong>The words survive all of it.</strong> The output is meant to be
       listened to, shared, understood and transcribed. That is the whole
