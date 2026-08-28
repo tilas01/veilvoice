@@ -327,16 +327,19 @@ USE_CRATE = re.compile(r"\b(?:crate|super)::([a-z_][a-z0-9_]*)")
 MOD_DECL = re.compile(r"^\s*(?:pub(?:\s*\([^)]*\))?\s+)?mod\s+([a-z_][a-z0-9_]*)\s*;")
 
 
-def strip_code_noise(text):
-    """A copy of the source with comments and literals replaced by spaces.
+def literal_runs(text):
+    """Where the comments and the literals are, as `(start, end, kind)`.
 
-    Offsets are preserved -- spaces in, not deletions -- so anything found in
-    the stripped copy is at the same position in the original. Brace counting
-    and call detection both run against this, so a `{` inside a string or a
-    doc comment cannot throw the structure off. That is not hypothetical in
-    this tree: `lock.rs` and `shred.rs` both contain braces inside prose.
+    `kind` is `"com"` for a comment and `"str"` for a string or character
+    literal. Two things read this. `strip_code_noise` below blanks the runs, so
+    that a brace inside prose cannot throw the structure off. The source pages
+    colour them.
+
+    One scanner rather than two. Two would eventually disagree, and the
+    disagreement would show up as a page that painted a comment as code, or a
+    call graph with an edge in it that the compiler does not see.
     """
-    out = []
+    runs = []
     index = 0
     length = len(text)
     while index < length:
@@ -345,7 +348,7 @@ def strip_code_noise(text):
         if pair == "//":
             end = text.find("\n", index)
             end = length if end == -1 else end
-            out.append(" " * (end - index))
+            runs.append((index, end, "com"))
             index = end
         elif pair == "/*":
             depth = 1
@@ -359,16 +362,14 @@ def strip_code_noise(text):
                     scan += 2
                 else:
                     scan += 1
-            out.append("".join(" " if c != "\n" else "\n"
-                               for c in text[index:scan]))
+            runs.append((index, min(scan, length), "com"))
             index = scan
         elif char == 'r' and re.match(r'r#*"', text[index:index + 8] or ""):
             hashes = re.match(r'r(#*)"', text[index:]).group(1)
             close = '"' + hashes
             end = text.find(close, index + len(hashes) + 2)
             end = length if end == -1 else end + len(close)
-            out.append("".join(" " if c != "\n" else "\n"
-                               for c in text[index:end]))
+            runs.append((index, min(end, length), "str"))
             index = end
         elif char in ('"', "'"):
             # A lifetime (`'a`) is not a character literal. Telling them apart
@@ -397,15 +398,29 @@ def strip_code_noise(text):
                         break
                     scan += 1
             if not closed and quote == "'":
-                out.append(char)
                 index += 1
                 continue
-            out.append("".join(" " if c != "\n" else "\n"
-                               for c in text[index:scan]))
+            runs.append((index, min(scan, length), "str"))
             index = scan
         else:
-            out.append(char)
             index += 1
+    return runs
+
+
+def strip_code_noise(text):
+    """A copy of the source with comments and literals replaced by spaces.
+
+    Offsets are preserved -- spaces in, not deletions -- so anything found in
+    the stripped copy is at the same position in the original. Brace counting
+    and call detection both run against this, so a `{` inside a string or a
+    doc comment cannot throw the structure off. That is not hypothetical in
+    this tree: `lock.rs` and `shred.rs` both contain braces inside prose.
+    """
+    out = list(text)
+    for start, end, _ in literal_runs(text):
+        for position in range(start, end):
+            if out[position] != "\n":
+                out[position] = " "
     return "".join(out)
 
 
@@ -893,6 +908,17 @@ def build(root, crate):
         text = read(path)
         doc = module_doc(text)
         parsed = parse_file(text)
+        # Where each item begins and ends, and what to call the anchor that
+        # marks it. Worked out here rather than in the renderer because three
+        # of them need it: the source page wraps the lines, the diagram links
+        # to them, and the item table numbers them.
+        clean_lines = strip_code_noise(text).splitlines()
+        raw_lines = text.splitlines()
+        anchors = source_anchors(parsed["items"])
+        for item in parsed["items"]:
+            first, last = item_span(clean_lines, item["line"])
+            item["span"] = (item_lead(raw_lines, first), last)
+            item["anchor"] = anchors[id(item)]
         # Page names have to be unique within a crate, and `src/lib.rs` and a
         # test called `lib.rs` would otherwise collide. Only `src` keeps the
         # bare stem, so existing page addresses do not move.
@@ -909,6 +935,7 @@ def build(root, crate):
             "summary": first_sentence(doc),
             "items": parsed["items"],
             "calls": parsed["calls"],
+            "text": text,
         })
     return {
         "crate": crate,
@@ -958,6 +985,9 @@ def crate_graph(model):
             "label": [entry["name"], "%d lines" % entry["lines"]],
             "url": "https://github.com/%s/blob/%s/%s"
                    % (REPO, REF, entry["rel"]),
+            # Where the same box goes on this site. A crate page sits beside
+            # its files' pages, so this is a bare filename.
+            "site_url": "%s/%s.src.html" % (model["crate"], entry["stem"]),
             "root": stem in ("lib", "main"),
         })
     return nodes, list(model["edges"])
@@ -1018,6 +1048,9 @@ def file_graph(entry):
             "line": item["line"],
             "url": "https://github.com/%s/blob/%s/%s#L%d"
                    % (REPO, REF, entry["rel"], item["line"]),
+            # The same function on this site, with the whole of it marked
+            # rather than the one line its name is on.
+            "site_url": "%s.src.html#%s" % (entry["stem"], item["anchor"]),
             "role": role,
             "root": role == "entry",
         })
@@ -1376,7 +1409,7 @@ def diagram_markdown(source, alt, note, mermaid_source, extra=None):
     return out
 
 
-def diagram_svg(colours, nodes, edges, width=640):
+def diagram_svg(colours, nodes, edges, width=640, on_site=False):
     """Lay the same graph out as SVG, for readers with no JavaScript.
 
     A simple layered drawing: rank by longest path, order within a rank by
@@ -1526,13 +1559,29 @@ def diagram_svg(colours, nodes, edges, width=640):
     for node in nodes:
         x, y, w, h = placed[node["id"]]
         # Wrapped in an anchor so the whole box is the target rather than just
-        # the words. `_blank` because the reader is in the middle of a diagram
-        # and taking the page away to show one function is the wrong trade;
-        # `noopener noreferrer` because a new tab should not get a handle back.
-        linked = bool(node.get("url"))
+        # the words.
+        #
+        # Two addresses, because this drawing is rendered twice. In a README or
+        # the wiki it is an image on GitHub, where the only useful destination
+        # is the blob -- and where a link inside an `<img>` does not work at
+        # all, so it is the standalone SVG that carries it. On this site it is
+        # inline, the link works, and the destination is the source page one
+        # directory along: same origin, the reader's own theme, and the
+        # function marked rather than one line of it.
+        #
+        # An off-site link opens in a new tab, because taking the page away to
+        # show one function is the wrong trade and `noopener noreferrer` is
+        # what a new tab should get. A link that stays on this site does not:
+        # the back button is right there, and a tab per box is a mess.
+        url = node.get("site_url") if on_site else None
+        url = url or node.get("url")
+        linked = bool(url)
         if linked:
-            add('<a href="%s" target="_blank" rel="noopener noreferrer">'
-                % esc(node["url"]))
+            if on_site and node.get("site_url"):
+                add('<a href="%s">' % esc(url))
+            else:
+                add('<a href="%s" target="_blank" rel="noopener noreferrer">'
+                    % esc(url))
         token = role_token.get(node.get("role"), "border")
         stroke = "var(--%s, %s)" % (token, colours.get(token, colours["border"]))
         add('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="7" '
@@ -1548,6 +1597,229 @@ def diagram_svg(colours, nodes, edges, width=640):
             add('</a>')
     add('</svg>')
     return "\n".join(out) + "\n"
+
+
+# --- the source, on this site ------------------------------------------------
+#
+# Every diagram box has always carried a link, and every one of them left the
+# site: a GitHub blob URL, in a new tab, drawn in somebody else's colours. That
+# is a reasonable thing for a README to do, because a README is read on GitHub.
+# It is the wrong thing for the reference pages, where the reader has chosen a
+# theme, is halfway through a call graph, and wants to see what one box does.
+#
+# So the source is served here as well, one page per file, coloured with the
+# same six classes `website/js/markdown.js` uses for code blocks, so a reader
+# who changes theme changes this too. Clicking a box opens that file at that
+# function, with the whole function marked rather than one line, and the mark
+# is `:target` in the stylesheet rather than script: it survives a reader with
+# JavaScript off, and it survives a page opened from a bookmark.
+
+# Which characters get which class. Escaping happens per piece, after the match,
+# because `esc` turns a non-ASCII character into `&#8212;` and a number pattern
+# run over that output would colour the 8212 and break the entity.
+CODE_TOKENS = re.compile(
+    r"(?P<attr>#!?\[[A-Za-z_][A-Za-z0-9_:]*)"
+    r"|(?P<kw>\b(?:fn|let|mut|pub|use|mod|struct|enum|impl|trait|for|in|if|else"
+    r"|match|return|const|static|crate|self|super|where|as|dyn|move|async|await"
+    r"|ref|type|unsafe)\b)"
+    r"|(?P<fun>\b[A-Za-z_][A-Za-z0-9_]*(?=\s*\())"
+    r"|(?P<num>\b\d[\d_]*(?:\.\d+)?\b)")
+
+TOKEN_CLASS = {"attr": "tok-attr", "kw": "tok-kw", "fun": "tok-fn", "num": "tok-num"}
+
+
+def code_html(chunk):
+    """One run of ordinary code, escaped and coloured."""
+    out = []
+    at = 0
+    for match in CODE_TOKENS.finditer(chunk):
+        out.append(esc(chunk[at:match.start()]))
+        kind = match.lastgroup
+        out.append('<span class="%s">%s</span>'
+                   % (TOKEN_CLASS[kind], esc(match.group())))
+        at = match.end()
+    out.append(esc(chunk[at:]))
+    return "".join(out)
+
+
+def highlight_source(text):
+    """Every line of a file, escaped and coloured, one string per line.
+
+    Comments and literals come from `literal_runs`, which is the same scanner
+    the call graph counts braces with, so a keyword inside a comment and a
+    brace inside a comment are the same fact read twice rather than two
+    guesses. Everything outside a run is ordinary code and gets the pattern
+    above.
+
+    A run may cross a line -- a block comment, a raw string -- and the split
+    below cuts it at the newline and reopens the span on the next line, so the
+    markup stays balanced line by line. That matters here beyond tidiness: the
+    page is one element per line and an unclosed span would swallow the rest of
+    the file.
+    """
+    kinds = [None] * len(text)
+    for start, end, kind in literal_runs(text):
+        for position in range(start, end):
+            kinds[position] = kind
+
+    lines = text.split("\n")
+    if text.endswith("\n"):
+        lines.pop()
+
+    out = []
+    offset = 0
+    for line in lines:
+        row = []
+        at = 0
+        while at < len(line):
+            kind = kinds[offset + at]
+            run = at + 1
+            while run < len(line) and kinds[offset + run] == kind:
+                run += 1
+            piece = line[at:run]
+            if kind is None:
+                row.append(code_html(piece))
+            else:
+                row.append('<span class="tok-%s">%s</span>'
+                           % ("com" if kind == "com" else "str", esc(piece)))
+            at = run
+        out.append("".join(row))
+        offset += len(line) + 1
+    return out
+
+
+def item_span(clean_lines, start):
+    """The first and last line of the item declared at `start`.
+
+    Braces are counted in the noise-stripped copy, so one inside a comment or a
+    string cannot end an item early -- which is not hypothetical here, because
+    `strip_code_noise` exists for exactly that in this tree. An item with no
+    body, a `use` or a type alias, ends at its own semicolon.
+
+    A declaration this cannot make sense of runs to the end of the file rather
+    than to a guess. That is visible as a mark that is obviously too long,
+    which is the failure worth having: the other direction marks the wrong
+    lines and looks right.
+    """
+    depth = 0
+    opened = False
+    for number in range(start, len(clean_lines) + 1):
+        line = clean_lines[number - 1]
+        for char in line:
+            if char == "{":
+                depth += 1
+                opened = True
+            elif char == "}":
+                depth -= 1
+        if opened:
+            if depth <= 0:
+                return start, number
+        elif ";" in line:
+            return start, number
+    return start, len(clean_lines)
+
+
+def item_lead(lines, start):
+    """The first line of what a reader would call this item.
+
+    An item's declaration is not where it begins on the page. Above it sit its
+    `///` documentation and its attributes, and somebody who clicked a box
+    labelled `still_named` wants those: they are where the reason is written,
+    and this project puts a great deal of the reason there.
+
+    Walks back over documentation and attribute lines only, so a blank line or
+    a line of code stops it and the mark can never reach into whatever is
+    above.
+    """
+    number = start
+    while number > 1:
+        above = lines[number - 2].strip()
+        if above.startswith("///") or above.startswith("#["):
+            number -= 1
+            continue
+        break
+    return number
+
+
+ANCHOR_UNSAFE = re.compile(r"[^A-Za-z0-9_]+")
+
+
+def source_anchors(items):
+    """One page-unique anchor per item, in declaration order.
+
+    Two `impl` blocks in one file may each define `fmt`, and a page with two
+    `id="fn-fmt"` is a page where one of the two links goes to the wrong
+    function. The type owns the name where there is one, and a collision after
+    that is numbered rather than silently dropped.
+    """
+    anchors = {}
+    used = {}
+    for item in items:
+        base = item["name"]
+        if item["owner"]:
+            base = "%s-%s" % (item["owner"], item["name"])
+        base = ANCHOR_UNSAFE.sub("-", base).strip("-").lower() or "item"
+        used[base] = used.get(base, 0) + 1
+        anchors[id(item)] = ("fn-%s" % base if used[base] == 1
+                             else "fn-%s-%d" % (base, used[base]))
+    return anchors
+
+
+def html_source(colours, model, entry, fingerprint):
+    """One file, as it is in the tree, on a page of this site."""
+    crate = model["crate"]
+    rows = highlight_source(entry["text"])
+
+    # Where each item begins and ends, so its lines can be wrapped and marked
+    # as one. Every item gets a wrapper, because every one of them is something
+    # the diagram or the item table may link to and an anchor that is not on
+    # the page is a link that goes nowhere.
+    #
+    # A span is cut short at the next item's first line. `parse_file` collects
+    # items at the top level and inside an `impl` and nowhere else, so two of
+    # them overlapping means the brace counting lost its place rather than that
+    # one contains the other. Cutting there keeps the markup closing in the
+    # order it opened, and keeps a confused span from marking lines that
+    # visibly belong to something else.
+    opens = {}
+    closes = {}
+    items = entry["items"]
+    for index, item in enumerate(items):
+        start, end = item["span"]
+        start = min(max(start, 1), len(rows))
+        if index + 1 < len(items):
+            end = min(end, items[index + 1]["span"][0] - 1)
+        end = max(start, min(end, len(rows)))
+        opens.setdefault(start, []).append(item["anchor"])
+        closes[end] = closes.get(end, 0) + 1
+
+    body = []
+    body.append("<h1><code>%s</code></h1>" % esc(entry["rel"]))
+    body.append('<p style="color:var(--muted)">'
+                '<a href="%s.html">what this file is for</a> &middot; '
+                '<a href="../%s.html">%s</a> &middot; %d lines &middot; '
+                '<a href="https://github.com/%s/blob/%s/%s" '
+                'rel="noopener noreferrer">the same file on GitHub</a></p>'
+                % (esc(entry["stem"]), esc(crate), esc(crate), entry["lines"],
+                   REPO, REF, entry["rel"]))
+    body.append('<p style="color:var(--muted)">The file as it is in the tree, '
+                'in the colours you chose. A line number is a link, and so is '
+                'every box in this file&#8217;s diagram: it opens here with the '
+                'function it names marked.</p>')
+
+    body.append('<pre class="src"><code>')
+    for number, row in enumerate(rows, start=1):
+        for anchor in opens.get(number, ()):
+            body.append('<span class="src-item" id="%s">' % anchor)
+        body.append('<span class="ln" id="L%d">%s</span>' % (number, row))
+        for _ in range(closes.get(number, 0)):
+            body.append('</span>')
+    body.append('</code></pre>')
+
+    return html_page(colours, 2,
+                     "%s source — VeilVoice reference" % entry["rel"],
+                     "The source of %s, on this site." % entry["rel"],
+                     body, fingerprint)
 
 
 # --- Markdown ---------------------------------------------------------------
@@ -1943,7 +2215,7 @@ def doc_html(lines, anchors=None):
 def diagram_block(colours, nodes, edges, note, mermaid_source):
     """The inline SVG, the explanation, and the Mermaid source beside it."""
     out = ['<div class="diagram">']
-    out.append(diagram_svg(colours, nodes, edges).rstrip("\n"))
+    out.append(diagram_svg(colours, nodes, edges, on_site=True).rstrip("\n"))
     out.append('</div>')
     out.append('<p class="muted" style="color:var(--muted);font-size:13px">%s</p>'
                % note)
@@ -2080,9 +2352,11 @@ def html_file(colours, model, entry, fingerprint, links):
     body.append("<h1><code>%s</code></h1>" % esc(entry["rel"]))
     body.append('<p style="color:var(--muted)"><a href="../%s.html">%s</a> '
                 '&middot; %d lines &middot; '
+                '<a href="%s.src.html">read the source here</a> &middot; '
                 '<a href="https://github.com/%s/blob/%s/%s" rel="noopener noreferrer">'
-                'read the source</a></p>'
-                % (crate, esc(crate), entry["lines"], REPO, REF, entry["rel"]))
+                'or on GitHub</a></p>'
+                % (crate, esc(crate), entry["lines"], esc(entry["stem"]),
+                   REPO, REF, entry["rel"]))
 
     fixed = []
     has_contains = bool(contains_html(entry, "x"))
@@ -2138,11 +2412,11 @@ def html_file(colours, model, entry, fingerprint, links):
             vis = (item["vis"] + " ") if item["vis"] else ""
             what = first_sentence(item["doc"])
             body.append('<tr><td><code>%s</code> <sub>%s%s</sub></td>'
-                        '<td><a href="https://github.com/%s/blob/%s/%s#L%d" '
-                        'rel="noopener noreferrer">%d</a></td><td>%s</td></tr>'
-                        % (esc(name), esc(vis), esc(item["kind"]), REPO, REF,
-                           entry["rel"], item["line"], item["line"],
-                           inline_html(what) if what else ""))
+                        '<td><a href="%s.src.html#%s">%d</a></td>'
+                        '<td>%s</td></tr>'
+                        % (esc(name), esc(vis), esc(item["kind"]),
+                           esc(entry["stem"]), esc(item["anchor"]),
+                           item["line"], inline_html(what) if what else ""))
         body.append('</tbody></table>')
         body.append('</section>')
 
@@ -2432,6 +2706,8 @@ def outputs(root):
             ).replace(FINGERPRINT_PLACEHOLDER, fingerprint)
             files["website/reference/%s/%s.html" % (crate, entry["stem"])] = html_file(
                 colours, model, entry, fingerprint, (known, spellings["site_file"]))
+            files["website/reference/%s/%s.src.html" % (crate, entry["stem"])] = html_source(
+                colours, model, entry, fingerprint)
             files["wiki/%s.md" % wiki_file_page(crate, entry["stem"])] = wiki_file(
                 colours, model, entry, (known, spellings["wiki"]))
 

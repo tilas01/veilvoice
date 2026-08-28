@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/pitch.svg" alt="pitch.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/pitch.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 286 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 286 lines &middot; <a href="pitch.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#in-plain-words">In plain words</a>
@@ -87,22 +87,22 @@
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="609" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M491.6 74.0 C 491.6 94.0, 304.6 100.0, 304.6 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L81" target="_blank" rel="noopener noreferrer">
+<a href="pitch.src.html#fn-pitchtracker-new">
 <rect x="20.0" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="98.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PitchTracker::new</text>
 <text x="98.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 81</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L103" target="_blank" rel="noopener noreferrer">
+<a href="pitch.src.html#fn-pitchtracker-push">
 <rect x="203.2" y="20.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="285.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PitchTracker::push</text>
 <text x="285.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 103</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L123" target="_blank" rel="noopener noreferrer">
+<a href="pitch.src.html#fn-pitchtracker-estimate">
 <rect x="394.0" y="20.0" width="195.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="491.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PitchTracker::estimate</text>
 <text x="491.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 123</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L185" target="_blank" rel="noopener noreferrer">
+<a href="pitch.src.html#fn-pitchtracker-parabolic">
 <rect x="203.2" y="120.0" width="202.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="304.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">PitchTracker::parabolic</text>
 <text x="304.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 185</text>
@@ -132,18 +132,18 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>F0_MIN_HZ</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L38" rel="noopener noreferrer">38</a></td><td>Lowest fundamental the tracker will report, in hertz.</td></tr>
-<tr><td><code>F0_MAX_HZ</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L40" rel="noopener noreferrer">40</a></td><td>Highest fundamental the tracker will report, in hertz.</td></tr>
-<tr><td><code>DECIMATED_HZ</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L42" rel="noopener noreferrer">42</a></td><td>Target sample rate after decimation, in hertz.</td></tr>
-<tr><td><code>WINDOW</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L45" rel="noopener noreferrer">45</a></td><td>Analysis window length in decimated samples (~40 ms at 8 kHz &#8212; at least two periods of the lowest supported f0).</td></tr>
-<tr><td><code>YIN_THRESHOLD</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L47" rel="noopener noreferrer">47</a></td><td>d&#x27;(tau) below this counts as a confident voiced period.</td></tr>
-<tr><td><code>SILENCE_RMS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L49" rel="noopener noreferrer">49</a></td><td>Frames quieter than this (RMS) are treated as unvoiced regardless.</td></tr>
-<tr><td><code>PitchEstimate</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L53" rel="noopener noreferrer">53</a></td><td>One f0 measurement.</td></tr>
-<tr><td><code>PitchTracker</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L63" rel="noopener noreferrer">63</a></td><td>Rolling, allocation-free f0 tracker.</td></tr>
-<tr><td><code>PitchTracker::new</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L81" rel="noopener noreferrer">81</a></td><td>Build a tracker for input at sample_rate hertz.</td></tr>
-<tr><td><code>PitchTracker::push</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L103" rel="noopener noreferrer">103</a></td><td>Feed new input samples (anti-aliased and decimated internally).</td></tr>
-<tr><td><code>PitchTracker::estimate</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L123" rel="noopener noreferrer">123</a></td><td>Estimate f0 over the newest history.</td></tr>
-<tr><td><code>PitchTracker::parabolic</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/pitch.rs#L185" rel="noopener noreferrer">185</a></td><td>Sub-sample refinement of the minimum at tau by fitting a parabola through its two neighbours.</td></tr>
+<tr><td><code>F0_MIN_HZ</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-f0_min_hz">38</a></td><td>Lowest fundamental the tracker will report, in hertz.</td></tr>
+<tr><td><code>F0_MAX_HZ</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-f0_max_hz">40</a></td><td>Highest fundamental the tracker will report, in hertz.</td></tr>
+<tr><td><code>DECIMATED_HZ</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-decimated_hz">42</a></td><td>Target sample rate after decimation, in hertz.</td></tr>
+<tr><td><code>WINDOW</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-window">45</a></td><td>Analysis window length in decimated samples (~40 ms at 8 kHz &#8212; at least two periods of the lowest supported f0).</td></tr>
+<tr><td><code>YIN_THRESHOLD</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-yin_threshold">47</a></td><td>d&#x27;(tau) below this counts as a confident voiced period.</td></tr>
+<tr><td><code>SILENCE_RMS</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-silence_rms">49</a></td><td>Frames quieter than this (RMS) are treated as unvoiced regardless.</td></tr>
+<tr><td><code>PitchEstimate</code> <sub>pub struct</sub></td><td><a href="pitch.src.html#fn-pitchestimate">53</a></td><td>One f0 measurement.</td></tr>
+<tr><td><code>PitchTracker</code> <sub>pub struct</sub></td><td><a href="pitch.src.html#fn-pitchtracker">63</a></td><td>Rolling, allocation-free f0 tracker.</td></tr>
+<tr><td><code>PitchTracker::new</code> <sub>pub fn</sub></td><td><a href="pitch.src.html#fn-pitchtracker-new">81</a></td><td>Build a tracker for input at sample_rate hertz.</td></tr>
+<tr><td><code>PitchTracker::push</code> <sub>pub fn</sub></td><td><a href="pitch.src.html#fn-pitchtracker-push">103</a></td><td>Feed new input samples (anti-aliased and decimated internally).</td></tr>
+<tr><td><code>PitchTracker::estimate</code> <sub>pub fn</sub></td><td><a href="pitch.src.html#fn-pitchtracker-estimate">123</a></td><td>Estimate f0 over the newest history.</td></tr>
+<tr><td><code>PitchTracker::parabolic</code> <sub>fn</sub></td><td><a href="pitch.src.html#fn-pitchtracker-parabolic">185</a></td><td>Sub-sample refinement of the minimum at tau by fitting a parabola through its two neighbours.</td></tr>
 </tbody></table>
 </section>
 </div></div>
