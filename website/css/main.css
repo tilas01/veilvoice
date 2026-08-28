@@ -891,6 +891,268 @@ html:not(.js) .bn { display: none; }
   .demo-mark { animation: none; }
 }
 
+/* ---------- the interactive model ---------- */
+/*
+ * `website/js/demo.js` draws a working model of the application and of the
+ * command line, over whichever page the reader is on. Everything here is the
+ * frame around it: the overlay, the card, the picker and the pieces the panels
+ * are built from.
+ *
+ * Two rules run through the lot. It uses the palette tokens and nothing else,
+ * so the model follows the reader's theme exactly as the real application
+ * follows it. And nothing here animates a property that causes layout: the
+ * open is `opacity` and `transform`, both of which the compositor handles
+ * without laying the page out again, and the global reduced-motion rule at the
+ * top of this file neutralises even those.
+ */
+
+/* The buttons that open it exist only when scripts are running. A button that
+ * does nothing is worse than no button, and the scripts-off edition has the
+ * photographs instead. `theme.js` sets `js` on <html> from a blocking head
+ * script, which is the same mechanism the reveal animation uses. */
+.demo-open-row { display: none; }
+html.js .demo-open-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0 0;
+}
+
+/* Scrolling the page behind an open overlay leaves the reader somewhere else
+ * when they close it. */
+html.demo-locked, html.demo-locked body { overflow: hidden; }
+
+.demo-overlay {
+  position: fixed;
+  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;  /* longhand first, for older engines */
+  z-index: 60;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.demo-overlay.demo-open { display: flex; }
+
+.demo-card {
+  width: 100%;
+  max-width: 1040px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  opacity: 0;
+  transform: translateY(10px) scale(0.99);
+  animation: demo-in 0.22s ease-out forwards;
+}
+
+@keyframes demo-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.demo-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.demo-modes { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.demo-mode, .demo-close, .demo-tab, .demo-btn {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--muted);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 6px 11px;
+  cursor: pointer;
+}
+.demo-mode:hover, .demo-close:hover, .demo-tab:hover, .demo-btn:hover {
+  color: var(--fg);
+  border-color: var(--accent);
+}
+.demo-mode-on, .demo-tab-on, .demo-btn-on {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.demo-btn-strong { color: var(--fg); }
+.demo-close { color: var(--fg); }
+
+.demo-disclaimer {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.demo-stage { display: block; }
+.demo-stage-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.demo-stage-split > * { min-width: 0; }
+
+.demo-app, .demo-term {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.demo-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.demo-title { color: var(--fg); }
+.demo-offline { color: var(--ok); font-size: 11.5px; }
+
+/* The tab strip scrolls rather than wrapping, for the same reason the site's
+ * own navigation does: nine labels on a narrow screen either wrap into three
+ * ragged rows or push the card sideways, and neither is a tab strip. */
+.demo-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 9px 10px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.demo-tab { flex: 0 0 auto; }
+
+.demo-body { padding: 12px 14px; min-height: 210px; }
+.demo-panel { display: flex; flex-direction: column; gap: 8px; }
+/* A button in a column of flex children stretches to the column's width by
+ * default, which turned "choose file…" into a bar the width of the window. */
+.demo-panel > .demo-btn, .demo-panel > .demo-check, .demo-panel > .demo-input {
+  align-self: flex-start;
+}
+
+.demo-h { margin: 4px 0 0; color: var(--accent); font-size: 12px; }
+.demo-note { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+.demo-ok { color: var(--ok); }
+.demo-warn { color: var(--warn); }
+
+.demo-field {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  color: var(--fg);
+}
+
+.demo-drop {
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.demo-check { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.demo-input {
+  font: inherit;
+  font-size: 13px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  color: var(--fg);
+  width: 220px;
+}
+
+.demo-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+
+.demo-meters { display: flex; flex-direction: column; gap: 6px; }
+.demo-meter { display: flex; align-items: center; gap: 8px; }
+.demo-meter-label { width: 26px; color: var(--muted); font-size: 12px; }
+.demo-meter-track {
+  flex: 1 1 auto;
+  height: 10px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.demo-meter-track i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--ok);
+  transition: width 0.12s linear;
+}
+
+.demo-speaker { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.demo-speaker-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+.demo-steps-list { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.6; }
+
+.demo-help {
+  margin: 10px 0 0;
+  min-height: 2.6em;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.demo-term-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.demo-term-dot { width: 9px; height: 9px; border-radius: 50%; }
+.demo-term-name { color: var(--muted); font-size: 12px; margin-left: 6px; }
+
+.demo-term-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* The output scrolls in its own box. A help screen is forty lines and the card
+ * must not grow to whatever the longest one happens to be. */
+.demo-term-out {
+  margin: 0;
+  padding: 12px 14px;
+  max-height: 340px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg-inset);
+  border: 0;
+  border-radius: 0;
+  white-space: pre;
+}
+
+@media (max-width: 820px) {
+  .demo-stage-split { grid-template-columns: 1fr; }
+  .demo-card { padding: 12px; }
+}
+
 /* ---------- tooltips ---------- */
 /*
  * `data-tip` on any element, shown on hover and on keyboard focus. No
