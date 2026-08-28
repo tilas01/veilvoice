@@ -8,6 +8,49 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### F-79 - a security step that printed somebody else's error above its own "ok"
+
+The installer fetches the signing key from the website, and from the repository
+if the website does not answer. A failure of the first is not a failure at all,
+which is why there are two addresses. But `curl -fsS` prints its own message
+even in silent mode, so on a machine where the first address does not answer,
+this is what a reader saw:
+
+```
+==> Checking the signing key's fingerprint
+curl: (22) The requested URL returned error: 403
+  ok   fingerprint matches 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A
+```
+
+An error from another program, in the step that anchors every other check in
+the script, immediately above the word `ok`. The check had passed. Knowing that
+from those three lines requires knowing how the script is written.
+
+The first attempt is now quiet and a line in the script's own voice says which
+copy of the key it fell back to. The final failure stays loud and still names
+both addresses. `install.ps1` never printed the raw error, because its fetch
+swallows the exception, but it never said it had fallen back either, and now it
+does.
+
+**This one shipped**, in v0.1.14 and in every release with an installer before
+it. No check was skipped and nothing unverified was installed: what failed was
+the script's account of itself, in the one place a reader is being asked to
+trust a chain of checks they cannot see.
+
+### The installer has now been run on Linux
+
+`docs/AUDIT.md` has listed "nobody has run `install.sh` on a real Linux or
+macOS machine" as open since the fourth round. Half of that is now closed. On
+x86-64 Linux, against the published v0.1.14 release: the latest tag was found,
+the archive downloaded, the key's fingerprint compared against the constant in
+the script, the signature over `SHA256SUMS` verified, the archive's hash
+matched against the signed list, both binaries installed, and the installed
+`veilvoice info` ran and reported 0.1.14. Its refusals were exercised on the
+same machine, an unknown option and a version that is not published, and both
+exited 1.
+
+That run is what found F-79. macOS is still unrun, and its `sh` is not Linux's.
+
 ### Every box in a flowchart now opens the source, here, in your colours
 
 Marker 27. The reference pages have drawn a call graph per crate and per file

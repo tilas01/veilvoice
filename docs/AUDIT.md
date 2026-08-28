@@ -40,11 +40,12 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Five defects found and fixed (F-74 to F-78.)** Three are in the security
+**Six defects found and fixed (F-74 to F-79.)** Three are in the security
 crates written since the eighth round and none of those has shipped: `main`
 carries them and they are not in v0.1.14. One is on the published front page
 and has been there for as long as the count has. One is in the test suite
-itself, where it had been passing four runs in five.
+itself, where it had been passing four runs in five. One is in the installer,
+and it shipped: it is in v0.1.14 and in every release before it.
 
 This round covers what was added after it: Failsafe, the application baseline,
 the privilege report, the hardware detection, the decoy passphrase, and the
@@ -56,11 +57,53 @@ moment ago, and then trusted an exit code that is returned unconditionally.
 F-75 trusted a file's default permissions to be appropriate for a security
 setting. F-76 trusted a name in the process table to mean the program is
 running. F-77 trusted one machine's measurement to be a fact about the tree.
-F-78 trusted a test that passes to mean a test that holds. None would have been
-found by reading the code. F-74 was found by writing a test that killed a real
-process and watching what it actually did; F-76, F-77 and F-78 by running that
-same suite on a second operating system, where one test failed, one number came
-out different, and one test failed only sometimes.
+F-78 trusted a test that passes to mean a test that holds. F-79 trusted another
+program's error message to be readable in the middle of this one's output. None
+would have been found by reading the code. F-74 was found by writing a test
+that killed a real process and watching what it actually did; F-76, F-77 and
+F-78 by running that same suite on a second operating system, where one test
+failed, one number came out different, and one test failed only sometimes; and
+F-79 by running the installer on that machine, which is a thing this document
+had listed as never done.
+
+### F-79 -- a security step that printed somebody else's error above its own "ok"
+
+`install/install.sh`, and the same place in `install/install.ps1`. The signing
+key is fetched from the website, and from the repository if the website does
+not answer. A failure of the first is not a failure at all, which is the whole
+reason there are two addresses.
+
+But `fetch` is `curl -fsSL`, and `-S` prints curl's own message on stderr even
+in silent mode. So on a machine where the first address does not answer, what a
+reader saw was:
+
+```
+==> Checking the signing key's fingerprint
+curl: (22) The requested URL returned error: 403
+  ok   fingerprint matches 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A
+```
+
+An error from another program, inside the step that anchors every other check
+in the script, immediately above the word `ok`, with nothing to say those two
+lines are about different things. The check had in fact passed. Somebody
+reading that output has to know how the script is written to know that.
+
+Measured on a machine whose network refuses `tilas01.github.io` and allows
+`raw.githubusercontent.com`, which is an ordinary situation rather than a
+contrived one: a filtering proxy, a restricted network, or GitHub Pages being
+down for a few minutes.
+
+The first attempt's own output is now suppressed and replaced with a line in
+the script's voice saying which copy it is falling back to. The final failure
+stays loud and still names both addresses. The PowerShell installer never
+printed the raw error, because its fetch swallows the exception, but it also
+never said it had fallen back; it says so now.
+
+**This one shipped.** It is in v0.1.14 and in every release with an installer
+before it. It is not a verification failure, and that distinction is worth
+keeping: no check was skipped and nothing unverified was installed. What
+failed was the script's account of itself, in the one place where a reader is
+being asked to trust a chain of checks they cannot see.
 
 ### F-78 -- four tests shared one global and could undo each other
 
@@ -2163,12 +2206,17 @@ the top of this document now says.
    logic is done; privilege and setup are not, and the obvious version of it is
    worse than nothing.
 
-6. **Nobody but the author has run the install scripts or the verifier.** They
-   are tested end to end on Windows against the real published v0.1.8 release,
-   and the verifier checks that release's actual OpenPGP signature with no
-   GnuPG installed. `install.sh` has had its syntax and refusal paths exercised
-   but has never run on a real Linux or macOS machine, because the host this
-   was developed on is Windows. `docs/INSTALL.md` says so in its own words.
+6. **`install.sh` has now been run on Linux; macOS is still unrun, and nobody
+   outside this project has run any of it.** On x86-64 Linux it was run end to
+   end against the published v0.1.14 release: latest tag found, archive
+   downloaded, key fingerprint compared, signature over `SHA256SUMS` verified,
+   archive hash matched against the signed list, both binaries installed, and
+   the installed `veilvoice info` ran. Its refusals were exercised on the same
+   machine and both exited 1. That run found F-79.
+
+   What is still open is macOS, whose `sh` is not Linux's, and the larger
+   point: every one of these runs is the project checking its own work.
+   `docs/INSTALL.md` says so in its own words.
 
 7. **None of the package definitions has been built.** WiX, `.deb`, `.rpm`,
    Flatpak, Homebrew and the Gentoo ebuild parse, and that is the whole of what
@@ -2190,7 +2238,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Seventy-eight defects found and fixed across nine audit rounds (F-1 to F-78):**
+**Seventy-nine defects found and fixed across nine audit rounds (F-1 to F-79):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
