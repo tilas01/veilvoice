@@ -162,6 +162,23 @@ about the signal, which is already done.
 | 63 | **Live levels and a wave per speaker**, in the app and in the terminal, while a recording is running | **blocked** | — |
 | 64 | **Speaker detection through software you already have** — detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **blocked** | — |
 
+## Seeing it before you install it
+
+Asked for after v0.1.14. Everything here is about the same problem from two
+sides: somebody deciding whether to trust this, and somebody using it and not
+being sure it is working. Neither is answered by more features.
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 66 | **The live monitor** — what is going in and what is coming out, on every tab, on by default, and a preview that lets you hear yourself veiled before anybody else does | **done** | — |
+| 67 | **An interactive demonstration on the website** — the inside of the application and of the command line, laid out in the site's own colours, that a reader can click through before downloading anything | **next** | 3–4 d |
+| 68 | **A frequently asked questions page**, answering what gets asked rather than what is convenient to answer | **planned** | 1 d |
+| 69 | **A drawn graphic for every workflow chart** — coloured arrows, an explanation inside the picture, and every word wrapped rather than running off the edge | **planned** | 2 d |
+| 70 | **This roadmap, published as a page**, with a picture of what is done and what is not, generated from this file so the two cannot disagree | **next** | 1 d |
+| 71 | **A video of the roadmap**, scrolling what is finished, with a short pause and a countdown before it repeats | **planned** | 1 d |
+| 72 | **The front page animation, in more depth** — the same picture, saying what the engine actually does to the signal rather than one word | **planned** | 1 d |
+| 73 | **A full security and functionality audit, and an optimisation pass, before the next deploy** — the whole tree, both halves, and the last thing that happens | **planned** | 4–6 d |
+
 ## Finally
 
 | # | Marker | Status | Estimate |
@@ -459,6 +476,33 @@ flash a console every time, and a windowed one would send its output nowhere
 when run from a terminal. Switching at run time is FFI, and every crate here
 carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
 maintainer's call and not something to slip in, so it waits for one.
+
+**Markers 67 to 73 are one request in seven parts, and the order matters.**
+The demonstration and the questions page come first because they are what
+somebody meets before they have installed anything, and the roadmap page and
+its video come next because "what is finished" is a question this project keeps
+being asked and keeps answering in a file only a developer reads. The pictures
+and the animation follow, because they are polish on something that already
+works rather than a claim about what it does.
+
+**Marker 73 is deliberately last, and it is last for a reason rather than by
+accident.** An audit run before the code stops moving is an audit of code that
+no longer exists. Nine rounds have each found real defects in code a previous
+round called clean, and the two most recent found them in code that three
+rounds had read: the fuzzing campaign turned up an unbounded Argon2 time cost
+and a tamper report that could be made to lie. So the audit goes at the end,
+after the last feature and before the deploy, and the estimate is the widest on
+this page because the audit's estimate is the number that has historically been
+wrong.
+
+**Marker 66 is shipped, and the honest part is what it does not tell you.** The
+monitor shows the level going in and the level coming out, on every tab, so the
+question "is it still hearing me" is answered without navigating anywhere. What
+a level cannot answer is whether the voice has been changed: a working meter and
+a bypassed engine draw exactly the same bar. That sentence is printed beside the
+meters in both front ends rather than left to be worked out, and the answer to
+the question it raises is the preview, which sends the veiled voice to your own
+headphones and to nothing else so you can hear that it is not your voice.
 
 **Marker 27 opens the source here rather than sending the reader away, and
 what it does not do is guess.** Every box in every flowchart was a link to a
