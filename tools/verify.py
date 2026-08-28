@@ -104,6 +104,9 @@ GENERATORS = [
     # Derived from website/index.html, so it must run after anything that could
     # edit that file and before the index walks the result.
     ("section pages", [sys.executable, "tools/site/split.py"]),
+    # After the split, because it borrows that tool's header, navigation and
+    # footer from index.html, and before the index, which walks the result.
+    ("roadmap page", [sys.executable, "tools/site/roadmap.py"]),
     ("search index", [sys.executable, "tools/search-index/generate.py"]),
 ]
 
@@ -117,6 +120,8 @@ CHECKS = [
     ("website source pages match their files",
      [sys.executable, "tools/docs/sources.py", "--check"]),
     ("section pages match index.html", [sys.executable, "tools/site/split.py", "--check"]),
+    ("the roadmap page matches ROADMAP.md",
+     [sys.executable, "tools/site/roadmap.py", "--check"]),
     ("search index matches the tree", [sys.executable, "tools/search-index/generate.py", "--check"]),
     ("measured numbers match the tree",
      [sys.executable, "tools/measured/generate.py", "--check"]),
