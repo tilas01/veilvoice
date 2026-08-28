@@ -175,9 +175,9 @@ being sure it is working. Neither is answered by more features.
 | 68 | **A frequently asked questions page**, answering what gets asked rather than what is convenient to answer | **done** | — |
 | 69 | **A drawn graphic for every workflow chart** — coloured arrows, an explanation inside the picture, and every word wrapped rather than running off the edge | **done** | — |
 | 70 | **This roadmap, published as a page**, with a picture of what is done and what is not, generated from this file so the two cannot disagree | **done** | — |
-| 71 | **A video of the roadmap**, scrolling what is finished, with a short pause and a countdown before it repeats | **next** | 1 d |
+| 71 | **A video of the roadmap**, scrolling what is finished, with a short pause and a countdown before it repeats | **done** | — |
 | 72 | **The front page animation, in more depth** — the same picture, saying what the engine actually does to the signal rather than one word | **done** | — |
-| 73 | **A full security and functionality audit, and an optimisation pass, before the next deploy** — the whole tree, both halves, and the last thing that happens | **planned** | 4–6 d |
+| 73 | **A full security and functionality audit, and an optimisation pass, before the next deploy** — the whole tree, both halves, and the last thing that happens | **next** | 4–6 d |
 
 ## Finally
 
@@ -476,6 +476,20 @@ flash a console every time, and a windowed one would send its output nowhere
 when run from a terminal. Switching at run time is FFI, and every crate here
 carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
 maintainer's call and not something to slip in, so it waits for one.
+
+**Marker 71 is an animation rather than an encoded file, and that is a
+decision.** A video was asked for and a video is the right shape for it:
+something to watch rather than a picture with a long dead pause in it. What it
+is not is a reason to put an H.264 file in this repository. This project ships
+no codec and does not bundle `ffmpeg`, and the rule already settled for video
+output applies here too: render here, and always produce something that needs
+nothing else installed. An encoded file would also be a committed binary whose
+bytes depend on which build of which encoder made it, so it could not be
+regenerated and compared the way every other picture here is. The result plays
+in any browser with no plugin and no download, weighs a few kilobytes, takes
+the reader's colour scheme, and is generated from this file so it cannot show a
+marker as finished that is not. The command to turn it into a file is printed
+under it for anybody who wants one.
 
 **Markers 67 to 73 are one request in seven parts, and the order matters.**
 The demonstration and the questions page come first because they are what
