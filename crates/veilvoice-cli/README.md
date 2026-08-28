@@ -121,7 +121,7 @@ flowchart TD
     n_guard["guard.rs<br/>346 lines"]
     n_gui["gui.rs<br/>247 lines"]
     n_input["input.rs<br/>117 lines"]
-    n_lock["lock.rs<br/>248 lines"]
+    n_lock["lock.rs<br/>319 lines"]
     n_meter["meter.rs<br/>259 lines"]
     n_policy["policy.rs<br/>243 lines"]
     n_priv_mode["priv_mode.rs<br/>46 lines"]
@@ -191,7 +191,7 @@ flowchart TD
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 346 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | 247 | veilvoice gui — open the desktop application from the command line. |
 | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 117 | veilvoice input — what running programs can see your keyboard and mouse. |
-| [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 248 | veilvoice lock — manage the application lock from the command line. |
+| [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 319 | veilvoice lock — manage the application lock from the command line. |
 | [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2365 | veilvoice — the command-line interface. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 259 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 243 | veilvoice policy -- settings that can only be tightened. |

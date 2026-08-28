@@ -23,7 +23,7 @@
 use crate::atrest::{prompt_secret, read_new_password};
 use crate::theme::{colour, field, heading, ok, paint, warn};
 use clap::Subcommand;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use veilvoice_crypto::{kdf, lock, LockStore};
 
 #[derive(Subcommand)]
@@ -38,15 +38,64 @@ pub enum Action {
     Remove,
 }
 
-/// Resolve the lock file, preferring an explicit `--path`.
-fn resolve(explicit: Option<PathBuf>) -> Result<PathBuf, String> {
-    match explicit {
-        Some(p) => Ok(p),
-        None => lock::default_path().ok_or_else(|| {
-            "cannot work out where this platform keeps configuration \
-             (no APPDATA, XDG_CONFIG_HOME or HOME) — pass --path"
-                .to_string()
-        }),
+/// Where the lock is kept for this invocation.
+///
+/// Without `--path` the lock lives in the vault: two copies under names derived
+/// from a per-installation value, one of them administrator-owned where the
+/// platform allows it. With `--path` it is one plain file at the path given,
+/// which is what a script or a test wants and what this command has always
+/// done. The two are kept apart rather than blended, because a command that
+/// silently wrote somewhere other than the path it was handed would be worse
+/// than either.
+enum Site {
+    Default,
+    Explicit(PathBuf),
+}
+
+impl Site {
+    fn resolve(explicit: Option<PathBuf>) -> Result<Self, String> {
+        match explicit {
+            Some(p) => Ok(Self::Explicit(p)),
+            None => {
+                lock::default_dir().ok_or_else(|| {
+                    "cannot work out where this platform keeps configuration \
+                     (no APPDATA, XDG_CONFIG_HOME or HOME) — pass --path"
+                        .to_string()
+                })?;
+                Ok(Self::Default)
+            }
+        }
+    }
+
+    /// What to print as the location. The vault's own file names are derived
+    /// and would mean nothing to a reader, so the directory is what is shown.
+    fn describe(&self) -> String {
+        match self {
+            Self::Explicit(p) => p.display().to_string(),
+            Self::Default => match lock::default_dir() {
+                Some(d) => format!("{} (two copies, derived names)", d.display()),
+                None => "unknown".to_string(),
+            },
+        }
+    }
+
+    /// Open the lock, and say whether a missing copy had to be rebuilt.
+    fn open(&self) -> Result<(Option<LockStore>, bool), String> {
+        match self {
+            Self::Explicit(p) => LockStore::open(p)
+                .map(|s| (s, false))
+                .map_err(|e| e.to_string()),
+            Self::Default => lock::open_default().map_err(|e| e.to_string()),
+        }
+    }
+
+    fn create(&self, password: &[u8]) -> Result<(), String> {
+        let params = kdf::KdfParams::default();
+        match self {
+            Self::Explicit(p) => LockStore::create(p, password, params).map(|_| ()),
+            Self::Default => lock::create_default(password, params).map(|_| ()),
+        }
+        .map_err(|e| e.to_string())
     }
 }
 
@@ -79,20 +128,20 @@ pub fn wrap(text: &str, width: usize) -> Vec<String> {
 }
 
 pub fn run(action: Action, path: Option<PathBuf>) -> Result<(), String> {
-    let path = resolve(path)?;
+    let site = Site::resolve(path)?;
     println!("{}", heading("App lock"));
-    println!("{}", field("File", &path.display().to_string()));
+    println!("{}", field("File", &site.describe()));
 
     match action {
-        Action::Status => status(&path),
-        Action::Set => set(&path),
-        Action::Change => change(&path),
-        Action::Remove => remove(&path),
+        Action::Status => status(&site),
+        Action::Set => set(&site),
+        Action::Change => change(&site),
+        Action::Remove => remove(&site),
     }
 }
 
-fn status(path: &Path) -> Result<(), String> {
-    let store = LockStore::open(path).map_err(|e| e.to_string())?;
+fn status(site: &Site) -> Result<(), String> {
+    let (store, restored) = site.open()?;
     match store {
         None => {
             println!("{}", field("State", "not set"));
@@ -118,6 +167,13 @@ fn status(path: &Path) -> Result<(), String> {
                 ),
                 None => println!("{}", field("Rate limit", "not currently in force")),
             }
+            if store.tampered() || restored {
+                println!();
+                println!(
+                    "{}",
+                    warn("this lock reports interference; open the app to read it")
+                );
+            }
         }
     }
     println!();
@@ -125,8 +181,8 @@ fn status(path: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn set(path: &Path) -> Result<(), String> {
-    if LockStore::open(path).map_err(|e| e.to_string())?.is_some() {
+fn set(site: &Site) -> Result<(), String> {
+    if site.open()?.0.is_some() {
         return Err("a lock is already set here — use `veilvoice lock change`".into());
     }
     println!();
@@ -162,14 +218,13 @@ fn set(path: &Path) -> Result<(), String> {
             "  Deriving verifier (Argon2id, deliberately slow)..."
         )
     );
-    LockStore::create(path, password.expose(), kdf::KdfParams::default())
-        .map_err(|e| e.to_string())?;
+    site.create(password.expose())?;
     println!("{}", ok("app lock set"));
     Ok(())
 }
 
-fn change(path: &Path) -> Result<(), String> {
-    let mut store = open_or_explain(path)?;
+fn change(site: &Site) -> Result<(), String> {
+    let mut store = open_or_explain(site)?;
     let current = prompt_secret("Current password: ")?;
     println!("{}", paint(colour::MUTED, "  Now the new one."));
     let new = read_new_password()?;
@@ -180,8 +235,8 @@ fn change(path: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn remove(path: &Path) -> Result<(), String> {
-    let store = open_or_explain(path)?;
+fn remove(site: &Site) -> Result<(), String> {
+    let store = open_or_explain(site)?;
     let current = prompt_secret("Current password: ")?;
     store.remove(current.expose()).map_err(|e| e.to_string())?;
     println!(
@@ -191,9 +246,9 @@ fn remove(path: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn open_or_explain(path: &Path) -> Result<LockStore, String> {
-    LockStore::open(path)
-        .map_err(|e| e.to_string())?
+fn open_or_explain(site: &Site) -> Result<LockStore, String> {
+    site.open()?
+        .0
         .ok_or_else(|| "no lock is set here — use `veilvoice lock set`".to_string())
 }
 
@@ -219,7 +274,22 @@ mod tests {
     #[test]
     fn an_explicit_path_wins_over_the_platform_default() {
         let chosen = PathBuf::from("somewhere/else.bin");
-        assert_eq!(resolve(Some(chosen.clone())).unwrap(), chosen);
+        let site = Site::resolve(Some(chosen.clone())).unwrap();
+        assert!(matches!(&site, Site::Explicit(p) if p == &chosen));
+        assert_eq!(site.describe(), chosen.display().to_string());
+    }
+
+    /// Without `--path` the command must go to the vault, not to the single
+    /// file the vault replaced. Getting this wrong would leave the CLI and the
+    /// window looking at two different locks.
+    #[test]
+    fn no_path_means_the_vault_rather_than_one_named_file() {
+        if lock::default_dir().is_none() {
+            return;
+        }
+        let site = Site::resolve(None).unwrap();
+        assert!(matches!(site, Site::Default));
+        assert!(site.describe().contains("two copies"));
     }
 
     /// The lock lifecycle through the same store the subcommands drive. The
@@ -230,9 +300,10 @@ mod tests {
         let path = dir.path().join("applock.bin");
         let weak = kdf::KdfParams::weak_for_tests();
 
+        let site = Site::Explicit(path.clone());
         assert!(LockStore::open(&path).unwrap().is_none());
         LockStore::create(&path, b"app password", weak).unwrap();
-        assert!(status(&path).is_ok());
+        assert!(status(&site).is_ok());
 
         let mut store = LockStore::open(&path).unwrap().unwrap();
         assert!(store.unlock(b"recording password").is_err());

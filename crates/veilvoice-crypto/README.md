@@ -108,16 +108,21 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>190 lines"])
+    n_lib(["lib.rs<br/>192 lines"])
     n_aead["aead.rs<br/>178 lines"]
     n_amnesia["amnesia.rs<br/>326 lines"]
     n_container["container.rs<br/>491 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
-    n_lock["lock.rs<br/>745 lines"]
+    n_lock["lock.rs<br/>1276 lines"]
     n_privatefile["privatefile.rs<br/>169 lines"]
     n_shred["shred.rs<br/>415 lines"]
+    n_vault["vault.rs<br/>459 lines"]
+    n_lock --> n_aead
     n_lock --> n_privatefile
+    n_lock --> n_vault
+    n_vault --> n_kdf
+    n_vault --> n_privatefile
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" "open the source"
     click n_aead href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" "open the source"
     click n_amnesia href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" "open the source"
@@ -127,6 +132,7 @@ flowchart TD
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" "open the source"
     click n_privatefile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" "open the source"
     click n_shred href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs" "open the source"
+    click n_vault href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" "open the source"
 ```
 
 </details>
@@ -140,10 +146,11 @@ flowchart TD
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 491 | The .veil encrypted container format. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
-| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 190 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 745 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 192 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1276 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 169 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure — the self-destruct. |
+| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 459 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
@@ -190,16 +197,23 @@ flowchart TD
 | `const SCOPE` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | What the app lock protects against, and what it does not, in the words a front-end should show the user. |
 | `const MAGIC` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Magic bytes at the start of a lock file. |
 | `const FORMAT_VERSION` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Format version this build writes. |
-| `const LOCK_LEN` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Exact size of a lock file, in bytes. |
+| `const LOCK_LEN` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Exact size of a version 2 lock file, in bytes. |
+| `const LOCK_LEN_V1` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Exact size of a version 1 lock file, which this build still reads. |
 | `fn delay_secs` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | How long to refuse the next attempt after failures consecutive failures. |
 | `struct AppLock` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | A password verifier plus its attempt history. |
 | `struct LockStore` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | An AppLock bound to a file, which is persisted after every attempt. |
+| `fn open_default` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Open the lock at the default location, wherever this platform keeps it. |
+| `fn create_default` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Create a lock at the default location, refusing to replace one already there. |
+| `fn default_dir` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | The configuration directory the vault keeps its files in, if the environment says where one is. |
 | `fn default_path` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Where the lock file lives on this platform, if the environment says. |
 | `fn write_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Create path containing bytes, readable only by the current user. |
 | `fn write_owner_only_new` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | As write_owner_only, but fail if anything is already at path. |
 | `enum Passes` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | How thoroughly to overwrite before unlinking. |
 | `struct ShredReport` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | What actually happened, so the caller can tell the user the truth. |
 | `fn shred_file` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | Overwrite a file's contents, then delete it. |
+| `enum Found` | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | What Vault::load found when it went looking. |
+| `struct Vault` | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | The two files a lock lives in, and the index that names them. |
+| `fn admin_dir` | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | A directory only an administrator can write to, if this process can make one there. |
 
 ## Reading it elsewhere
 

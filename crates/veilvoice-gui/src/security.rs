@@ -91,6 +91,9 @@ enum Op {
     Set,
     Change,
     Remove,
+    /// Clear an outstanding interference report. Needs the passphrase, which is
+    /// the whole reason it is an operation and not a button.
+    Acknowledge,
 }
 
 /// A finished lock operation: the store as it now stands, and how it went.
@@ -106,6 +109,10 @@ pub struct Security {
     load_error: Option<String>,
     /// Whether the app is currently locked. Only ever true with a `store`.
     locked: bool,
+    /// Whether the lock reported interference. Shown once the app is open, not
+    /// on the lock screen: telling a stranger at the lock screen that their
+    /// last attempt was noticed is telling them something they can use.
+    tampered: bool,
 
     // --- unlock screen ---
     entry: String,
@@ -167,6 +174,7 @@ impl Default for Security {
             store: None,
             load_error: None,
             locked: false,
+            tampered: false,
             entry: String::new(),
             message: None,
             pending: None,
@@ -203,17 +211,26 @@ impl Security {
         // to move fields out of a value that owns one.
         let mut security = Self::default();
         security.path = path.clone();
-        let Some(path) = path else {
+        let Some(_path) = path else {
             security.load_error =
                 Some("cannot find a configuration directory on this platform".into());
             return security;
         };
-        match LockStore::open(&path) {
-            Ok(Some(store)) => {
+        match lock::open_default() {
+            Ok((Some(mut store), restored)) => {
+                if restored {
+                    // A copy of the lock had gone and was rebuilt from the
+                    // other. Files do not delete themselves, so this is a
+                    // report, and it is made to stick: `report_tamper` holds it
+                    // in memory now and the next successful unlock writes it
+                    // where a restart cannot lose it.
+                    store.report_tamper();
+                }
+                security.tampered = restored || store.tampered();
                 security.store = Some(store);
                 security.locked = true;
             }
-            Ok(None) => {}
+            Ok((None, _)) => {}
             // A lock that will not parse must never read as an absent lock.
             Err(e) => {
                 security.load_error = Some(format!("the app lock could not be read: {e}"));
@@ -221,6 +238,14 @@ impl Security {
             }
         }
         security
+    }
+
+    /// Whether the lock reported having been interfered with.
+    ///
+    /// Stays true until an unlock acknowledges it, which needs the passphrase,
+    /// so nobody can dismiss the banner except the person who can open the app.
+    pub fn tampered(&self) -> bool {
+        self.tampered
     }
 
     /// Whether the unlock screen should be shown instead of the app.
@@ -333,11 +358,21 @@ impl Security {
         self.pending = None;
         self.store = store;
 
+        // Whatever the operation was, the store is the authority on whether a
+        // report is outstanding. Reading it back here means one place decides,
+        // rather than each arm remembering to.
+        self.tampered = self.store.as_ref().is_some_and(LockStore::tampered) || self.tampered;
+
         match outcome {
             Ok(Op::Unlock) => {
                 self.locked = false;
                 self.entry.zeroize();
                 self.message = None;
+            }
+            Ok(Op::Acknowledge) => {
+                self.tampered = false;
+                self.wipe_form();
+                self.message = Some(("interference report cleared".into(), p::green()));
             }
             Ok(Op::Set) => {
                 self.wipe_form();
@@ -482,6 +517,73 @@ impl Security {
         // where the person reading it has already proved who they are.
     }
 
+    /// The standing report that the lock file was interfered with.
+    ///
+    /// **Marker 76.** It is drawn here rather than on the lock screen, and the
+    /// distinction matters. The lock screen is read by whoever is holding the
+    /// machine, and telling them their edit was noticed tells them to try
+    /// something else. This side of the lock is read only by somebody who has
+    /// already produced the passphrase.
+    ///
+    /// It will not go away on its own. Clearing it runs
+    /// [`veilvoice_crypto::LockStore::acknowledge`], which asks for the
+    /// passphrase again, so the only person who can dismiss the report is the
+    /// one who could have opened the lock anyway.
+    fn interference_banner(&mut self, ui: &mut egui::Ui) {
+        if !self.tampered {
+            return;
+        }
+        let busy = self.busy();
+        egui::Frame::none()
+            .fill(p::bg_dark())
+            .stroke(egui::Stroke::new(1.0, p::red()))
+            .rounding(8.0)
+            .inner_margin(egui::Margin::symmetric(14.0, 12.0))
+            .show(ui, |ui| {
+                ui.label(
+                    RichText::new("The app lock was interfered with")
+                        .color(p::red())
+                        .strong(),
+                );
+                ui.add_space(4.0);
+                ui.label(
+                    RichText::new(
+                        "Either the stored lock was edited by somebody who did not know \
+                         your passphrase, or one of its two copies was deleted and had to \
+                         be rebuilt from the other. Your passphrase still works and the \
+                         lock is still in force. Nothing here says anything about your \
+                         recordings, which have their own password.",
+                    )
+                    .color(p::fg()),
+                );
+                ui.add_space(4.0);
+                ui.label(
+                    RichText::new(
+                        "If this was you, moving files about or restoring a backup, clear \
+                         it. If it was not, treat the machine as one somebody else has had \
+                         their hands on.",
+                    )
+                    .color(p::muted())
+                    .small(),
+                );
+                ui.add_space(8.0);
+                ui.add_enabled_ui(!busy, |ui| {
+                    password_row(ui, "passphrase", &mut self.current);
+                });
+                if ui
+                    .add_enabled(
+                        !busy && !self.current.is_empty(),
+                        egui::Button::new("clear this report"),
+                    )
+                    .clicked()
+                {
+                    let current = std::mem::take(&mut self.current);
+                    self.spawn(Op::Acknowledge, current, String::new());
+                }
+            });
+        ui.add_space(12.0);
+    }
+
     /// The security tab: manage the lock, and see what it is worth.
     pub fn tab(&mut self, ui: &mut egui::Ui) {
         self.poll();
@@ -492,6 +594,8 @@ impl Security {
         if let Some(path) = self.choosing_key.taken() {
             self.public_key = Some(path);
         }
+
+        self.interference_banner(ui);
 
         ui.add_space(4.0);
         ui.label(RichText::new("App lock").color(p::blue()).small());
@@ -901,6 +1005,10 @@ fn run_op(
             Ok(()) => (Some(store), Ok(Op::Unlock)),
             Err(e) => (Some(store), Err(e.to_string())),
         },
+        (Op::Acknowledge, Some(mut store)) => match store.acknowledge(password.as_bytes()) {
+            Ok(()) => (Some(store), Ok(Op::Acknowledge)),
+            Err(e) => (Some(store), Err(e.to_string())),
+        },
         (Op::Set, None) => match path {
             None => (None, Err("no configuration directory".into())),
             Some(path) => {
@@ -966,6 +1074,43 @@ mod tests {
     /// because what is being held is that certain sentences are not reachable
     /// from that function at all. A rendering test would only prove they were
     /// absent from one frame.
+    /// Marker 76. The report has to be reachable from the tab and only from
+    /// the tab, and clearing it has to go through the passphrase rather than
+    /// through a flag the drawing code can set.
+    #[test]
+    fn the_interference_report_is_behind_the_lock_and_behind_the_passphrase() {
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        let tab = source
+            .find("    /// The security tab")
+            .map(|at| &source[at..])
+            .expect("the tab has to exist");
+        assert!(
+            tab.contains("self.interference_banner(ui)"),
+            "the report has to be drawn somewhere its owner will see it"
+        );
+
+        let banner = source
+            .find("fn interference_banner")
+            .map(|at| &source[at..])
+            .expect("the banner has to exist");
+        assert!(
+            banner.contains("Op::Acknowledge"),
+            "clearing the report has to run the acknowledgement, which asks for \
+             the passphrase, not just clear a flag"
+        );
+        let clears: usize = banner
+            .split("fn tab")
+            .next()
+            .unwrap_or("")
+            .matches("self.tampered = false")
+            .count();
+        assert_eq!(
+            clears, 0,
+            "the banner must not clear the report itself; only the finished \
+             acknowledgement may, and that has already proved the passphrase"
+        );
+    }
+
     #[test]
     fn the_locked_window_tells_a_stranger_nothing() {
         let source = include_str!("security.rs").replace("\r\n", "\n");
@@ -973,7 +1118,7 @@ mod tests {
             .find("pub fn unlock_screen")
             .expect("the unlock screen has to exist");
         let end = source[start..]
-            .find("\n    /// The security tab")
+            .find("\n    /// The standing report")
             .map(|at| start + at)
             .unwrap_or(source.len());
         // Comments stripped first. The first version of this flagged its own
@@ -991,6 +1136,10 @@ mod tests {
             "path.display()",
             "Delete the lock file",
             "failed attempt",
+            // Marker 76. The interference report is the same mistake in a new
+            // shape: telling whoever is holding the machine that their last
+            // edit was noticed tells them to try a different one.
+            "interference_banner",
         ] {
             assert!(
                 !body.contains(forbidden),
