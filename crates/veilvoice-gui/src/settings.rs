@@ -594,6 +594,37 @@ impl Settings {
         }
     }
 
+    /// The colour scheme, as a compact control for the window header.
+    ///
+    /// The same list the appearance page offers and the same effect; what it
+    /// does not carry is the swatches and the custom-palette help, which need
+    /// room and belong on the page. Two controls for one setting is worth it
+    /// here: the header is where the website puts this, and a reader who has
+    /// used the site looks in the same place.
+    pub fn theme_picker(&mut self, ui: &mut Ui, ctx: &egui::Context) {
+        let current = crate::theme::active();
+        let mut chosen = None;
+        egui::ComboBox::from_id_salt("header-theme")
+            .selected_text(RichText::new(current.name).small())
+            .width(132.0)
+            .show_ui(ui, |ui| {
+                for theme in themes() {
+                    if ui
+                        .selectable_label(theme.id == current.id, theme.name)
+                        .clicked()
+                    {
+                        chosen = Some(theme.id);
+                    }
+                }
+            });
+        if let Some(id) = chosen {
+            if crate::theme::set_by_id(ctx, id) {
+                self.prefs.theme = id.to_string();
+                self.persist();
+            }
+        }
+    }
+
     fn appearance_page(&mut self, ui: &mut Ui, ctx: &egui::Context) {
         section(
             ui,
