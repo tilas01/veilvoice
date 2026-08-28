@@ -4,31 +4,51 @@
 
 Package definitions for the platforms that have one, in [`packaging/`](../packaging/).
 
-## Status: written, not built
+## Status: one of them has been built
 
-**None of the package definitions in this directory has been built or
-installed.** They are written against each format's documentation and validated
-as far as parsing goes — the WiX source and the AppStream metadata are
-well-formed XML, the Flatpak manifest is valid YAML — and that is all that can
-honestly be claimed today.
+**One of these has produced a package, and five have not.** The rest are
+written against each format's documentation and validated as far as parsing
+goes: the WiX source and the AppStream metadata are well-formed XML, the
+Flatpak manifest is valid YAML. That is all that can honestly be claimed about
+them.
 
-That is a real limitation and it is written here rather than discovered by
-somebody running `rpmbuild`. A spec file that has never produced an RPM is a
-draft, and this table says which is which:
+A spec file that has never produced an RPM is a draft, and this table says
+which is which:
 
 | Format | File | Built? | Installed and run? |
 |---|---|---|---|
 | Windows MSI | `packaging/wix/veilvoice.wxs` | no | no |
-| Debian/Ubuntu | `packaging/debian/` | no | no |
+| Debian/Ubuntu | `packaging/debian/` | **yes**, on Ubuntu 24.04, x86-64 | **yes** |
 | Fedora/RHEL/SUSE | `packaging/rpm/veilvoice.spec` | no | no |
 | Flatpak | `packaging/flatpak/` | no | no |
 | Homebrew | `packaging/homebrew/veilvoice.rb` | no | no |
 | Gentoo | `packaging/gentoo/` | no | no |
 
-The install scripts and the portable verifier *are* tested — see
-[INSTALL.md](INSTALL.md) — and they are the supported route until the above
-changes. If you build one of these and it works, or does not, saying so in an
-issue is the most useful thing you could contribute.
+### What the Debian build actually proved, and what it did not
+
+`dpkg-buildpackage -us -uc -b` produced `veilvoice_0.1.14-1_amd64.deb` and
+`veilvoice-gui_0.1.14-1_amd64.deb`. Both installed with `dpkg -i`, the
+installed `veilvoice --version` reported 0.1.14, `veilvoice info` and
+`veilvoice-verify --help` ran, and both packages removed cleanly. The release
+build and `cargo test --release --workspace` both ran as part of it, because
+that is what `debian/rules` does.
+
+What it did not prove: this was one machine, on x86-64, with the toolchain from
+rustup rather than from Debian's own `cargo` and `rustc` packages, which is why
+the build needed `-d` to get past `dpkg-checkbuilddeps`. On a real Debian build
+machine those packages are what `Build-Depends` names and the flag is not
+wanted. `lintian` has not been run. Nothing has been uploaded anywhere.
+
+Doing it found two defects, F-80 and F-81, both recorded in
+[`AUDIT.md`](AUDIT.md). The first was that the recipe below could not run at
+all. The second was that every definition here still named v0.1.9 while the
+workspace was at v0.1.14, and nothing was watching:
+`tools/site-tests/packaging.test.js` is watching now.
+
+The install scripts and the portable verifier are tested — see
+[INSTALL.md](INSTALL.md) — and they are the supported route until the rest of
+this table changes. If you build one of these and it works, or does not, saying
+so in an issue is the most useful thing you could contribute.
 
 ---
 
@@ -109,8 +129,8 @@ install it.**
 ```bash
 # Windows MSI (needs: dotnet tool install -g wix)
 wix build packaging/wix/veilvoice.wxs -arch x64 \
-    -d Version=0.1.9 -d BinDir=dist/veilvoice-v0.1.9-windows-x86_64 \
-    -o dist/VeilVoice-0.1.9-x64.msi
+    -d Version=0.1.14 -d BinDir=dist/veilvoice-v0.1.14-windows-x86_64 \
+    -o dist/VeilVoice-0.1.14-x64.msi
 ```
 
 The WiX source refers to `packaging/wix/LICENSE.rtf` for the licence dialog,
@@ -120,14 +140,22 @@ the unmodified GPL-3.0.
 
 ```bash
 # Debian / Ubuntu  (copy packaging/debian to ./debian first)
+#
+# `debian/source/format` is a file in a directory, and this repository keeps it
+# as `source-format` so that `packaging/debian/` stays a flat directory of
+# files. The move below is what turns one into the other.
+#
+# Add `-d` if your Rust came from rustup rather than from Debian's `cargo` and
+# `rustc` packages: `dpkg-checkbuilddeps` looks for the packages named in
+# Build-Depends and cannot see a rustup toolchain. On a real Debian build
+# machine, leave it off.
 cp -r packaging/debian debian
-mv debian/source-format debian/source/format 2>/dev/null || \
-  { mkdir -p debian/source && mv debian/source-format debian/source/format; }
+mkdir -p debian/source && mv debian/source-format debian/source/format
 dpkg-buildpackage -us -uc -b
 
 # Fedora / RHEL / openSUSE
 rpmbuild -ba packaging/rpm/veilvoice.spec \
-    --define "_sourcedir $PWD/dist" --define "vv_version 0.1.9"
+    --define "_sourcedir $PWD/dist" --define "vv_version 0.1.14"
 
 # Flatpak  (regenerate cargo-sources.json from Cargo.lock first)
 python flatpak-cargo-generator.py Cargo.lock -o packaging/flatpak/cargo-sources.json
