@@ -96,9 +96,22 @@ COMMANDS = [
     ("clean", ["clean", "--help"], "metadata, EXIF and GPS"),
 ]
 
-# A line longer than this is cut, with the cut marked. A help screen wraps
-# itself; anything past this is a path or a URL, and a picture two thousand
-# pixels wide to show the end of one is a worse picture.
+# The widest a line may be drawn. A line longer than this is **wrapped**, not
+# cut.
+#
+# It used to be cut, with an ellipsis marking the cut, and the reasoning was
+# that a picture two thousand pixels wide to show the end of one path is a
+# worse picture. That part is still true and it is why the width is bounded at
+# all. What was wrong was the other half: a help screen that says
+#
+#     -o, --output <OUTPUT>   Output device name. Defaults to a virtual cable if one is fo…
+#
+# has not shown the reader what the flag does. It has shown them that there is
+# more and they cannot have it, in a picture whose entire job is explaining the
+# flag. Three of the committed drawings ended a sentence mid-word that way.
+#
+# So the picture gets taller instead of wider, which is the axis a page can
+# afford, and the text is all there.
 MAX_COLUMNS = 96
 # A capture longer than this is cut too. These are illustrations, not manuals.
 MAX_LINES = 44
@@ -183,6 +196,81 @@ def colour_of(line):
     return FG
 
 
+# A help screen's second column: leading space, the flag group, a run of two or
+# more spaces, then the description.
+#
+# The flag group is `\S(?:.*?\S)?` rather than one token, and that is the whole
+# difficulty. `-o, --output <OUTPUT>` is four tokens separated by single spaces,
+# so a pattern that matched one token found `-o,` and then looked for the column
+# gap immediately after it, failed, and fell through to the prose branch, which
+# collapsed the column and left `-o, --output <OUTPUT> Output device name`. The
+# non-greedy form takes everything up to the *first* run of two spaces, which is
+# what the column gap actually is.
+OPTION_LINE = re.compile(r"^(\s*)(\S(?:.*?\S)?)(\s{2,})(\S.*)$")
+
+
+def wrap_line(line, width):
+    """One captured line as one or more drawn lines, wrapped on words.
+
+    Three things this has to get right, each of which it got wrong first:
+
+    * **The second column stays a column.** A wrapped option indents to where
+      its description started, so the flag column is still readable down the
+      page. Wrapping to zero turns a tidy help screen into a paragraph.
+    * **Nothing comes out wider than `width`.** Including a word that is on its
+      own longer than the line, which for these captures means a path or a URL:
+      it is broken at the width, because a line that overflows the picture is
+      the thing being fixed.
+    * **A word is never broken otherwise**, and no line is left blank in the
+      middle of a help screen.
+
+    The joining rule is worth stating because it is where the column lives: the
+    prefix already ends in the column's spaces, so a word is appended to it
+    directly, and a space is added only when the line so far ends in something
+    other than a space.
+    """
+    if len(line) <= width:
+        return [line]
+
+    match = OPTION_LINE.match(line)
+    if match:
+        head = match.group(1) + match.group(2) + match.group(3)
+        rest = match.group(4)
+    else:
+        lead = len(line) - len(line.lstrip(" "))
+        head = " " * lead
+        rest = line.strip()
+    indent = " " * len(head)
+    # A column gap wider than the line leaves nothing to wrap into.
+    if len(indent) > width // 2:
+        indent = " " * min(len(indent), max(2, width // 4))
+
+    out = []
+    current = head
+    for word in rest.split():
+        if len(indent) + len(word) > width:
+            # Longer than a line of its own: break it at the width.
+            if current.strip():
+                out.append(current.rstrip())
+                current = indent
+            while len(current) + len(word) > width:
+                room = width - len(current)
+                out.append(current + word[:room])
+                word = word[room:]
+                current = indent
+            current += word
+            continue
+        joiner = "" if current.endswith(" ") or not current else " "
+        if len(current) + len(joiner) + len(word) > width:
+            out.append(current.rstrip())
+            current = indent + word
+        else:
+            current = current + joiner + word
+    if current.strip():
+        out.append(current.rstrip())
+    return out or [line[:width]]
+
+
 def draw(name, title, note, text):
     """One terminal window, as SVG."""
     lines = text.replace("\r\n", "\n").rstrip("\n").split("\n")
@@ -191,10 +279,7 @@ def draw(name, title, note, text):
         lines = lines[:MAX_LINES]
     body = []
     for line in lines:
-        line = line.rstrip()
-        if len(line) > MAX_COLUMNS:
-            line = line[: MAX_COLUMNS - 1] + "…"
-        body.append(line)
+        body.extend(wrap_line(line.rstrip(), MAX_COLUMNS))
     if cut_lines:
         body.append("…")
 

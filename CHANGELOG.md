@@ -8,6 +8,46 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The pictures: no black margin, and no sentence cut off mid-word
+
+Two things, both visible in the committed images and neither visible in any
+test until one was written for them.
+
+**Every window capture had a black border.** Eleven columns down each side, one
+row along the top and two along the bottom, measured. `gui.ps1` asks Windows
+for the DWM frame rather than `GetWindowRect`, which is the right rectangle and
+is still not exact. Eleven pixels of nothing is the difference between a
+picture that sits in a page and one with a ragged margin somebody has to look
+past, and on a rounded container it is what stops the rounding meeting the
+content.
+
+`tools/shots/crop.py` takes it off, and `tools/verify.py` checks it stays off.
+Nothing is redrawn or resampled: rows and columns are removed, and only ones
+that are entirely a single opaque near-black colour matching the corner. The
+near-black part is load-bearing and was found by running the tool without it,
+whereupon it cheerfully ate nine rows of the **title bar**, which is also
+uniform and is not desktop.
+
+**And the terminal drawings cut their lines off with an ellipsis.** Three of
+them ended a sentence mid-word:
+
+```
+-o, --output <OUTPUT>   Output device name. Defaults to a virtual cable if one is fo…
+```
+
+A picture whose entire job is explaining a flag, showing the reader that there
+is more and they cannot have it. Long lines now **wrap** rather than truncate,
+so the picture gets taller instead of wider, which is the axis a page can
+afford. The wrap keeps the help screen's second column a column: a continuation
+indents to where its description started rather than to zero.
+
+That last part took two attempts and both failures are worth recording. The
+column pattern first matched a single token, so `-o, --output <OUTPUT>` was read
+as the flag `-o,` followed by no column gap, and the line fell through to the
+prose branch which collapsed the alignment entirely. And a word longer than the
+line, a path or a URL, could still be broken past the width. Both are fixed and
+the longest line in any drawing now measures exactly the cap.
+
 ### The coverage-guided campaign has been run, and it found two things
 
 `fuzz/` has held six libFuzzer targets since the fifth round, and
