@@ -287,7 +287,14 @@ try {
     }
 
     Write-Step "Checking the signing key's fingerprint"
+    # F-79, the other half. `Get-File` swallows the exception, so this script
+    # never printed somebody else's error here the way `install.sh` did. What
+    # it also never did was say that the first address failed and the second
+    # one answered, which is worth a line: on a network that refuses the
+    # website and allows the repository, the reader should know which copy of
+    # the key was checked.
     if (-not (Get-File $KEY_URL "$WORK\key.asc")) {
+        Write-Say "  the website copy could not be fetched; trying the repository copy"
         if (-not (Get-File $KEY_URL_FALLBACK "$WORK\key.asc")) {
             Deny "could not download the public key" @(
                 "Tried: $KEY_URL",

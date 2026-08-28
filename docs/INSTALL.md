@@ -404,10 +404,16 @@ Recorded here rather than left for you to discover:
   on the same release. That is not the same as having been run on a machine
   that did not build them, and until it has been, treat "it works" as a claim
   with one source.
-- **`install.sh` has not been run on a real Linux or macOS machine.** Its
-  syntax is checked and its refusal paths are exercised, but the host this was
-  developed on is Windows. The verification chain it performs is identical to
-  the by-hand one above, which *has* been checked against the real release.
+- **`install.sh` has now been run on Linux, and not on macOS.** On
+  x86-64 Linux it was run end to end against the published v0.1.14 release: it
+  found the latest tag, downloaded the archive, checked the key's fingerprint,
+  verified the signature over `SHA256SUMS`, matched the archive's hash against
+  the signed list, installed both binaries, and the installed `veilvoice info`
+  ran. Its refusals were exercised on the same machine: an unknown option, and
+  a version that is not published, both refusing with a status of 1.
+
+  Running it found one defect, F-79, in what it says rather than in what it
+  checks. macOS is still unrun, and its `sh` is not Linux's.
 - **The packaged installers (WiX, `.deb`, `.rpm`, Flatpak, Homebrew), the
   OpenBSD and NetBSD builds and the Gentoo ebuild are not built yet.** They are
   specified in [`ROADMAP.md`](../ROADMAP.md). macOS Intel and Apple Silicon are already
