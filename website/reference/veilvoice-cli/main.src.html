@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-cli/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 2334 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 2365 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1760,685 +1760,716 @@
 <span class="ln" id="L1672">            <span class="tok-str">&quot;Live scramble&quot;</span></span>
 <span class="ln" id="L1673">        })</span>
 <span class="ln" id="L1674">    );</span>
-<span class="ln" id="L1675">    <span class="tok-kw">if</span> preview {</span>
-<span class="ln" id="L1676">        println!(</span>
-<span class="ln" id="L1677">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1678">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1679">                colour::YELLOW,</span>
-<span class="ln" id="L1680">                <span class="tok-str">&quot;  Preview. The veiled voice goes to this machine&#x27;s output and nowhere else.&quot;</span></span>
-<span class="ln" id="L1681">            )</span>
-<span class="ln" id="L1682">        );</span>
-<span class="ln" id="L1683">        println!(</span>
-<span class="ln" id="L1684">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1685">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1686">                colour::MUTED,</span>
-<span class="ln" id="L1687">                <span class="tok-str">&quot;  Use headphones: speakers plus a microphone is a feedback loop.&quot;</span></span>
-<span class="ln" id="L1688">            )</span>
-<span class="ln" id="L1689">        );</span>
-<span class="ln" id="L1690">        println!(</span>
-<span class="ln" id="L1691">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1692">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1693">                colour::MUTED,</span>
-<span class="ln" id="L1694">                <span class="tok-str">&quot;  Listen for a voice that is not yours. That is the check the meters cannot make.&quot;</span></span>
-<span class="ln" id="L1695">            )</span>
-<span class="ln" id="L1696">        );</span>
-<span class="ln" id="L1697">        println!();</span>
-<span class="ln" id="L1698">    }</span>
-<span class="ln" id="L1699">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Input&quot;</span>, &amp;devices::<span class="tok-fn">name_of</span>(&amp;in_device)));</span>
-<span class="ln" id="L1700">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Output&quot;</span>, &amp;devices::<span class="tok-fn">name_of</span>(&amp;out_device)));</span>
-<span class="ln" id="L1701">    println!(</span>
-<span class="ln" id="L1702">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1703">        <span class="tok-fn">field</span>(</span>
-<span class="ln" id="L1704">            <span class="tok-str">&quot;Accent&quot;</span>,</span>
-<span class="ln" id="L1705">            <span class="tok-kw">if</span> tuning.keep_accent {</span>
-<span class="ln" id="L1706">                <span class="tok-str">&quot;kept&quot;</span></span>
-<span class="ln" id="L1707">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1708">                <span class="tok-str">&quot;neutralised&quot;</span></span>
-<span class="ln" id="L1709">            }</span>
-<span class="ln" id="L1710">        )</span>
-<span class="ln" id="L1711">    );</span>
-<span class="ln" id="L1712">    println!(</span>
-<span class="ln" id="L1713">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1714">        <span class="tok-fn">field</span>(<span class="tok-str">&quot;Seed rolls&quot;</span>, &amp;<span class="tok-fn">describe_reseed_range</span>(&amp;<span class="tok-fn">config</span>(tuning)))</span>
-<span class="ln" id="L1715">    );</span>
-<span class="ln" id="L1716">    <span class="tok-kw">if</span> out_name.<span class="tok-fn">is_none</span>() &amp;&amp; !preview {</span>
-<span class="ln" id="L1717">        println!(</span>
-<span class="ln" id="L1718">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1719">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;no virtual audio cable found &#8212; routing to the default output&quot;</span>)</span>
-<span class="ln" id="L1720">        );</span>
-<span class="ln" id="L1721">        println!(</span>
-<span class="ln" id="L1722">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1723">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1724">                colour::MUTED,</span>
-<span class="ln" id="L1725">                <span class="tok-str">&quot;  Install VB-CABLE (Windows) or BlackHole (macOS) so other&quot;</span></span>
-<span class="ln" id="L1726">            ),</span>
-<span class="ln" id="L1727">        );</span>
-<span class="ln" id="L1728">        println!(</span>
-<span class="ln" id="L1729">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1730">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1731">                colour::MUTED,</span>
-<span class="ln" id="L1732">                <span class="tok-str">&quot;  applications can receive the veiled voice.&quot;</span></span>
-<span class="ln" id="L1733">            )</span>
-<span class="ln" id="L1734">        );</span>
-<span class="ln" id="L1735">    }</span>
-<span class="ln" id="L1736"></span>
-<span class="ln" id="L1737">    <span class="tok-kw">let</span> session = veilvoice_audio::LiveSession::<span class="tok-fn">start</span>(&amp;in_device, &amp;out_device, <span class="tok-fn">config</span>(tuning))</span>
-<span class="ln" id="L1738">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1739"></span>
-<span class="ln" id="L1740">    println!();</span>
-<span class="ln" id="L1741">    <span class="tok-kw">if</span> !monitor {</span>
-<span class="ln" id="L1742">        <span class="tok-com">// Asked for silence, so say once that it is running and then be quiet.</span></span>
-<span class="ln" id="L1743">        <span class="tok-com">// A quiet mode that still prints a bar sixty times a minute is not one.</span></span>
-<span class="ln" id="L1744">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;running. Ctrl-C to stop.&quot;</span>));</span>
-<span class="ln" id="L1745">        println!(</span>
-<span class="ln" id="L1746">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1747">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1748">                colour::MUTED,</span>
-<span class="ln" id="L1749">                <span class="tok-str">&quot;  Meters are off. Run without --no-monitor to see the levels.&quot;</span></span>
-<span class="ln" id="L1750">            )</span>
+<span class="ln" id="L1675">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Input&quot;</span>, &amp;devices::<span class="tok-fn">name_of</span>(&amp;in_device)));</span>
+<span class="ln" id="L1676">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Output&quot;</span>, &amp;devices::<span class="tok-fn">name_of</span>(&amp;out_device)));</span>
+<span class="ln" id="L1677">    <span class="tok-kw">if</span> preview {</span>
+<span class="ln" id="L1678">        <span class="tok-com">// **F-84.** Printed after the device, and it names the device rather</span></span>
+<span class="ln" id="L1679">        <span class="tok-com">// than claiming something about it.</span></span>
+<span class="ln" id="L1680">        <span class="tok-com">//</span></span>
+<span class="ln" id="L1681">        <span class="tok-com">// The first version said &quot;goes to this machine&#x27;s output and nowhere</span></span>
+<span class="ln" id="L1682">        <span class="tok-com">// else&quot; before the output was even named, and that is not always true:</span></span>
+<span class="ln" id="L1683">        <span class="tok-com">// `--preview --output &lt;a cable&gt;` keeps the cable, and a machine whose</span></span>
+<span class="ln" id="L1684">        <span class="tok-com">// *default* output is a cable does the same thing without being asked.</span></span>
+<span class="ln" id="L1685">        <span class="tok-com">// Whatever is listening on that cable then hears the preview.</span></span>
+<span class="ln" id="L1686">        <span class="tok-com">//</span></span>
+<span class="ln" id="L1687">        <span class="tok-com">// A false reassurance in the one place somebody is checking their</span></span>
+<span class="ln" id="L1688">        <span class="tok-com">// setup is worse than no reassurance, because checking is what they</span></span>
+<span class="ln" id="L1689">        <span class="tok-com">// came here to do. So the claim is scoped to the named device, and</span></span>
+<span class="ln" id="L1690">        <span class="tok-com">// when that device is a cable it is said outright.</span></span>
+<span class="ln" id="L1691">        <span class="tok-kw">let</span> cable = devices::<span class="tok-fn">find_virtual_cable</span>().<span class="tok-fn">map</span>(|d| d.name);</span>
+<span class="ln" id="L1692">        <span class="tok-kw">let</span> chosen = devices::<span class="tok-fn">name_of</span>(&amp;out_device);</span>
+<span class="ln" id="L1693">        <span class="tok-kw">let</span> into_cable = cable.<span class="tok-fn">as_deref</span>() == <span class="tok-fn">Some</span>(chosen.<span class="tok-fn">as_str</span>());</span>
+<span class="ln" id="L1694">        println!();</span>
+<span class="ln" id="L1695">        <span class="tok-kw">if</span> into_cable {</span>
+<span class="ln" id="L1696">            println!(</span>
+<span class="ln" id="L1697">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1698">                <span class="tok-fn">warn</span>(<span class="tok-str">&quot;that output is a virtual cable, so whatever is listening on it hears this&quot;</span>)</span>
+<span class="ln" id="L1699">            );</span>
+<span class="ln" id="L1700">            println!(</span>
+<span class="ln" id="L1701">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1702">                <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1703">                    colour::MUTED,</span>
+<span class="ln" id="L1704">                    <span class="tok-str">&quot;  For a preview only you can hear, run --preview with no --output.&quot;</span></span>
+<span class="ln" id="L1705">                )</span>
+<span class="ln" id="L1706">            );</span>
+<span class="ln" id="L1707">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1708">            println!(</span>
+<span class="ln" id="L1709">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1710">                <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1711">                    colour::YELLOW,</span>
+<span class="ln" id="L1712">                    <span class="tok-str">&quot;  Preview. The veiled voice goes to the output named above and nowhere else.&quot;</span></span>
+<span class="ln" id="L1713">                )</span>
+<span class="ln" id="L1714">            );</span>
+<span class="ln" id="L1715">        }</span>
+<span class="ln" id="L1716">        println!(</span>
+<span class="ln" id="L1717">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1718">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1719">                colour::MUTED,</span>
+<span class="ln" id="L1720">                <span class="tok-str">&quot;  Use headphones: speakers plus a microphone is a feedback loop.&quot;</span></span>
+<span class="ln" id="L1721">            )</span>
+<span class="ln" id="L1722">        );</span>
+<span class="ln" id="L1723">        println!(</span>
+<span class="ln" id="L1724">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1725">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1726">                colour::MUTED,</span>
+<span class="ln" id="L1727">                <span class="tok-str">&quot;  Listen for a voice that is not yours. That is the check the meters cannot make.&quot;</span></span>
+<span class="ln" id="L1728">            )</span>
+<span class="ln" id="L1729">        );</span>
+<span class="ln" id="L1730">        println!();</span>
+<span class="ln" id="L1731">    }</span>
+<span class="ln" id="L1732">    println!(</span>
+<span class="ln" id="L1733">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1734">        <span class="tok-fn">field</span>(</span>
+<span class="ln" id="L1735">            <span class="tok-str">&quot;Accent&quot;</span>,</span>
+<span class="ln" id="L1736">            <span class="tok-kw">if</span> tuning.keep_accent {</span>
+<span class="ln" id="L1737">                <span class="tok-str">&quot;kept&quot;</span></span>
+<span class="ln" id="L1738">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1739">                <span class="tok-str">&quot;neutralised&quot;</span></span>
+<span class="ln" id="L1740">            }</span>
+<span class="ln" id="L1741">        )</span>
+<span class="ln" id="L1742">    );</span>
+<span class="ln" id="L1743">    println!(</span>
+<span class="ln" id="L1744">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1745">        <span class="tok-fn">field</span>(<span class="tok-str">&quot;Seed rolls&quot;</span>, &amp;<span class="tok-fn">describe_reseed_range</span>(&amp;<span class="tok-fn">config</span>(tuning)))</span>
+<span class="ln" id="L1746">    );</span>
+<span class="ln" id="L1747">    <span class="tok-kw">if</span> out_name.<span class="tok-fn">is_none</span>() &amp;&amp; !preview {</span>
+<span class="ln" id="L1748">        println!(</span>
+<span class="ln" id="L1749">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1750">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;no virtual audio cable found &#8212; routing to the default output&quot;</span>)</span>
 <span class="ln" id="L1751">        );</span>
-<span class="ln" id="L1752">        loop {</span>
-<span class="ln" id="L1753">            std::thread::<span class="tok-fn">sleep</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">500</span>));</span>
-<span class="ln" id="L1754">        }</span>
-<span class="ln" id="L1755">    }</span>
-<span class="ln" id="L1756">    println!(</span>
-<span class="ln" id="L1757">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1758">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1759">            colour::MUTED,</span>
-<span class="ln" id="L1760">            <span class="tok-str">&quot;  dBFS, peak. 0 is full scale; speech usually sits near -12.&quot;</span></span>
-<span class="ln" id="L1761">        )</span>
-<span class="ln" id="L1762">    );</span>
-<span class="ln" id="L1763">    <span class="tok-com">// The limit, printed where the meters are rather than left to be inferred.</span></span>
-<span class="ln" id="L1764">    <span class="tok-com">// A level says sound arrived and sound left. It cannot say the voice was</span></span>
-<span class="ln" id="L1765">    <span class="tok-com">// changed: a working meter and a bypassed engine draw the same bar.</span></span>
-<span class="ln" id="L1766">    println!(</span>
-<span class="ln" id="L1767">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1768">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1769">            colour::MUTED,</span>
-<span class="ln" id="L1770">            <span class="tok-str">&quot;  These show sound arriving and leaving, not that the voice has changed.&quot;</span></span>
-<span class="ln" id="L1771">        )</span>
-<span class="ln" id="L1772">    );</span>
-<span class="ln" id="L1773">    <span class="tok-kw">if</span> !preview {</span>
-<span class="ln" id="L1774">        println!(</span>
-<span class="ln" id="L1775">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1776">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1777">                colour::MUTED,</span>
-<span class="ln" id="L1778">                <span class="tok-str">&quot;  To hear what you sound like first, stop and run with --preview.&quot;</span></span>
-<span class="ln" id="L1779">            )</span>
-<span class="ln" id="L1780">        );</span>
-<span class="ln" id="L1781">    }</span>
-<span class="ln" id="L1782">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  Ctrl-C to stop.&quot;</span>));</span>
-<span class="ln" id="L1783">    println!();</span>
-<span class="ln" id="L1784"></span>
-<span class="ln" id="L1785">    <span class="tok-kw">const</span> WIDTH: usize = <span class="tok-num">20</span>;</span>
-<span class="ln" id="L1786">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> in_meter = meter::Channel::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1787">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out_meter = meter::Channel::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1788"></span>
-<span class="ln" id="L1789">    <span class="tok-com">// Sixty times a second would be smoother and would also be sixty terminal</span></span>
-<span class="ln" id="L1790">    <span class="tok-com">// writes a second for a bar twenty characters wide. Twenty is fast enough</span></span>
-<span class="ln" id="L1791">    <span class="tok-com">// that a syllable moves the bar, and the peak hold is what catches what</span></span>
-<span class="ln" id="L1792">    <span class="tok-com">// falls between two frames -- nothing is missed, because the audio thread</span></span>
-<span class="ln" id="L1793">    <span class="tok-com">// keeps the maximum and resets it on read.</span></span>
-<span class="ln" id="L1794">    loop {</span>
-<span class="ln" id="L1795">        std::thread::<span class="tok-fn">sleep</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">50</span>));</span>
-<span class="ln" id="L1796">        <span class="tok-kw">let</span> s = session.<span class="tok-fn">stats</span>();</span>
-<span class="ln" id="L1797">        <span class="tok-kw">let</span> glitches = <span class="tok-kw">if</span> s.dropped &gt; <span class="tok-num">0</span> || s.starved &gt; <span class="tok-num">0</span> {</span>
-<span class="ln" id="L1798">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1799">                colour::YELLOW,</span>
-<span class="ln" id="L1800">                &amp;format!(<span class="tok-str">&quot;  drops {} / starves {}&quot;</span>, s.dropped, s.starved),</span>
-<span class="ln" id="L1801">            )</span>
-<span class="ln" id="L1802">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1803">            String::<span class="tok-fn">new</span>()</span>
-<span class="ln" id="L1804">        };</span>
-<span class="ln" id="L1805">        <span class="tok-com">// Sticky, because clipping is destructive and is over in a</span></span>
-<span class="ln" id="L1806">        <span class="tok-com">// millisecond: a warning that has gone before the person looks up was</span></span>
-<span class="ln" id="L1807">        <span class="tok-com">// never given.</span></span>
-<span class="ln" id="L1808">        <span class="tok-kw">let</span> clipped = <span class="tok-kw">if</span> in_meter.<span class="tok-fn">has_clipped</span>() || out_meter.<span class="tok-fn">has_clipped</span>() {</span>
-<span class="ln" id="L1809">            <span class="tok-fn">paint</span>(colour::RED, <span class="tok-str">&quot;  CLIPPED&quot;</span>)</span>
-<span class="ln" id="L1810">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1811">            String::<span class="tok-fn">new</span>()</span>
-<span class="ln" id="L1812">        };</span>
-<span class="ln" id="L1813">        print!(</span>
-<span class="ln" id="L1814">            <span class="tok-str">&quot;\r  {} {}   {} {}   {} {:.1} ms{}{}   &quot;</span>,</span>
-<span class="ln" id="L1815">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot; in&quot;</span>),</span>
-<span class="ln" id="L1816">            in_meter.<span class="tok-fn">update</span>(s.input_peak, WIDTH),</span>
-<span class="ln" id="L1817">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;out&quot;</span>),</span>
-<span class="ln" id="L1818">            out_meter.<span class="tok-fn">update</span>(s.output_peak, WIDTH),</span>
-<span class="ln" id="L1819">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;cpu&quot;</span>),</span>
-<span class="ln" id="L1820">            s.process.<span class="tok-fn">ema_block_ms</span>(),</span>
-<span class="ln" id="L1821">            glitches,</span>
-<span class="ln" id="L1822">            clipped</span>
-<span class="ln" id="L1823">        );</span>
-<span class="ln" id="L1824">        <span class="tok-kw">use</span> std::io::Write;</span>
-<span class="ln" id="L1825">        <span class="tok-kw">let</span> _ = std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>();</span>
-<span class="ln" id="L1826">    }</span>
-<span class="ln" id="L1827">}</span>
+<span class="ln" id="L1752">        println!(</span>
+<span class="ln" id="L1753">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1754">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1755">                colour::MUTED,</span>
+<span class="ln" id="L1756">                <span class="tok-str">&quot;  Install VB-CABLE (Windows) or BlackHole (macOS) so other&quot;</span></span>
+<span class="ln" id="L1757">            ),</span>
+<span class="ln" id="L1758">        );</span>
+<span class="ln" id="L1759">        println!(</span>
+<span class="ln" id="L1760">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1761">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1762">                colour::MUTED,</span>
+<span class="ln" id="L1763">                <span class="tok-str">&quot;  applications can receive the veiled voice.&quot;</span></span>
+<span class="ln" id="L1764">            )</span>
+<span class="ln" id="L1765">        );</span>
+<span class="ln" id="L1766">    }</span>
+<span class="ln" id="L1767"></span>
+<span class="ln" id="L1768">    <span class="tok-kw">let</span> session = veilvoice_audio::LiveSession::<span class="tok-fn">start</span>(&amp;in_device, &amp;out_device, <span class="tok-fn">config</span>(tuning))</span>
+<span class="ln" id="L1769">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1770"></span>
+<span class="ln" id="L1771">    println!();</span>
+<span class="ln" id="L1772">    <span class="tok-kw">if</span> !monitor {</span>
+<span class="ln" id="L1773">        <span class="tok-com">// Asked for silence, so say once that it is running and then be quiet.</span></span>
+<span class="ln" id="L1774">        <span class="tok-com">// A quiet mode that still prints a bar sixty times a minute is not one.</span></span>
+<span class="ln" id="L1775">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;running. Ctrl-C to stop.&quot;</span>));</span>
+<span class="ln" id="L1776">        println!(</span>
+<span class="ln" id="L1777">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1778">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1779">                colour::MUTED,</span>
+<span class="ln" id="L1780">                <span class="tok-str">&quot;  Meters are off. Run without --no-monitor to see the levels.&quot;</span></span>
+<span class="ln" id="L1781">            )</span>
+<span class="ln" id="L1782">        );</span>
+<span class="ln" id="L1783">        loop {</span>
+<span class="ln" id="L1784">            std::thread::<span class="tok-fn">sleep</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">500</span>));</span>
+<span class="ln" id="L1785">        }</span>
+<span class="ln" id="L1786">    }</span>
+<span class="ln" id="L1787">    println!(</span>
+<span class="ln" id="L1788">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1789">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1790">            colour::MUTED,</span>
+<span class="ln" id="L1791">            <span class="tok-str">&quot;  dBFS, peak. 0 is full scale; speech usually sits near -12.&quot;</span></span>
+<span class="ln" id="L1792">        )</span>
+<span class="ln" id="L1793">    );</span>
+<span class="ln" id="L1794">    <span class="tok-com">// The limit, printed where the meters are rather than left to be inferred.</span></span>
+<span class="ln" id="L1795">    <span class="tok-com">// A level says sound arrived and sound left. It cannot say the voice was</span></span>
+<span class="ln" id="L1796">    <span class="tok-com">// changed: a working meter and a bypassed engine draw the same bar.</span></span>
+<span class="ln" id="L1797">    println!(</span>
+<span class="ln" id="L1798">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1799">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1800">            colour::MUTED,</span>
+<span class="ln" id="L1801">            <span class="tok-str">&quot;  These show sound arriving and leaving, not that the voice has changed.&quot;</span></span>
+<span class="ln" id="L1802">        )</span>
+<span class="ln" id="L1803">    );</span>
+<span class="ln" id="L1804">    <span class="tok-kw">if</span> !preview {</span>
+<span class="ln" id="L1805">        println!(</span>
+<span class="ln" id="L1806">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1807">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1808">                colour::MUTED,</span>
+<span class="ln" id="L1809">                <span class="tok-str">&quot;  To hear what you sound like first, stop and run with --preview.&quot;</span></span>
+<span class="ln" id="L1810">            )</span>
+<span class="ln" id="L1811">        );</span>
+<span class="ln" id="L1812">    }</span>
+<span class="ln" id="L1813">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  Ctrl-C to stop.&quot;</span>));</span>
+<span class="ln" id="L1814">    println!();</span>
+<span class="ln" id="L1815"></span>
+<span class="ln" id="L1816">    <span class="tok-kw">const</span> WIDTH: usize = <span class="tok-num">20</span>;</span>
+<span class="ln" id="L1817">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> in_meter = meter::Channel::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1818">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out_meter = meter::Channel::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1819"></span>
+<span class="ln" id="L1820">    <span class="tok-com">// Sixty times a second would be smoother and would also be sixty terminal</span></span>
+<span class="ln" id="L1821">    <span class="tok-com">// writes a second for a bar twenty characters wide. Twenty is fast enough</span></span>
+<span class="ln" id="L1822">    <span class="tok-com">// that a syllable moves the bar, and the peak hold is what catches what</span></span>
+<span class="ln" id="L1823">    <span class="tok-com">// falls between two frames -- nothing is missed, because the audio thread</span></span>
+<span class="ln" id="L1824">    <span class="tok-com">// keeps the maximum and resets it on read.</span></span>
+<span class="ln" id="L1825">    loop {</span>
+<span class="ln" id="L1826">        std::thread::<span class="tok-fn">sleep</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">50</span>));</span>
+<span class="ln" id="L1827">        <span class="tok-kw">let</span> s = session.<span class="tok-fn">stats</span>();</span>
+<span class="ln" id="L1828">        <span class="tok-kw">let</span> glitches = <span class="tok-kw">if</span> s.dropped &gt; <span class="tok-num">0</span> || s.starved &gt; <span class="tok-num">0</span> {</span>
+<span class="ln" id="L1829">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1830">                colour::YELLOW,</span>
+<span class="ln" id="L1831">                &amp;format!(<span class="tok-str">&quot;  drops {} / starves {}&quot;</span>, s.dropped, s.starved),</span>
+<span class="ln" id="L1832">            )</span>
+<span class="ln" id="L1833">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1834">            String::<span class="tok-fn">new</span>()</span>
+<span class="ln" id="L1835">        };</span>
+<span class="ln" id="L1836">        <span class="tok-com">// Sticky, because clipping is destructive and is over in a</span></span>
+<span class="ln" id="L1837">        <span class="tok-com">// millisecond: a warning that has gone before the person looks up was</span></span>
+<span class="ln" id="L1838">        <span class="tok-com">// never given.</span></span>
+<span class="ln" id="L1839">        <span class="tok-kw">let</span> clipped = <span class="tok-kw">if</span> in_meter.<span class="tok-fn">has_clipped</span>() || out_meter.<span class="tok-fn">has_clipped</span>() {</span>
+<span class="ln" id="L1840">            <span class="tok-fn">paint</span>(colour::RED, <span class="tok-str">&quot;  CLIPPED&quot;</span>)</span>
+<span class="ln" id="L1841">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1842">            String::<span class="tok-fn">new</span>()</span>
+<span class="ln" id="L1843">        };</span>
+<span class="ln" id="L1844">        print!(</span>
+<span class="ln" id="L1845">            <span class="tok-str">&quot;\r  {} {}   {} {}   {} {:.1} ms{}{}   &quot;</span>,</span>
+<span class="ln" id="L1846">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot; in&quot;</span>),</span>
+<span class="ln" id="L1847">            in_meter.<span class="tok-fn">update</span>(s.input_peak, WIDTH),</span>
+<span class="ln" id="L1848">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;out&quot;</span>),</span>
+<span class="ln" id="L1849">            out_meter.<span class="tok-fn">update</span>(s.output_peak, WIDTH),</span>
+<span class="ln" id="L1850">            <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;cpu&quot;</span>),</span>
+<span class="ln" id="L1851">            s.process.<span class="tok-fn">ema_block_ms</span>(),</span>
+<span class="ln" id="L1852">            glitches,</span>
+<span class="ln" id="L1853">            clipped</span>
+<span class="ln" id="L1854">        );</span>
+<span class="ln" id="L1855">        <span class="tok-kw">use</span> std::io::Write;</span>
+<span class="ln" id="L1856">        <span class="tok-kw">let</span> _ = std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>();</span>
+<span class="ln" id="L1857">    }</span>
+<span class="ln" id="L1858">}</span>
 </span>
-<span class="ln" id="L1828"></span>
+<span class="ln" id="L1859"></span>
 <span class="src-item" id="fn-list_devices">
-<span class="ln" id="L1829"><span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
-<span class="ln" id="L1830"><span class="tok-kw">fn</span> <span class="tok-fn">list_devices</span>() -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L1831">    <span class="tok-kw">for</span> (label, direction) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1832">        (<span class="tok-str">&quot;Inputs&quot;</span>, devices::Direction::Input),</span>
-<span class="ln" id="L1833">        (<span class="tok-str">&quot;Outputs&quot;</span>, devices::Direction::Output),</span>
-<span class="ln" id="L1834">    ] {</span>
-<span class="ln" id="L1835">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(label));</span>
-<span class="ln" id="L1836">        <span class="tok-kw">match</span> devices::<span class="tok-fn">list</span>(direction) {</span>
-<span class="ln" id="L1837">            <span class="tok-fn">Ok</span>(list) <span class="tok-kw">if</span> list.<span class="tok-fn">is_empty</span>() =&gt; println!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;none found&quot;</span>)),</span>
-<span class="ln" id="L1838">            <span class="tok-fn">Ok</span>(list) =&gt; {</span>
-<span class="ln" id="L1839">                <span class="tok-kw">for</span> d <span class="tok-kw">in</span> list {</span>
-<span class="ln" id="L1840">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> marks = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1841">                    <span class="tok-kw">if</span> d.is_default {</span>
-<span class="ln" id="L1842">                        marks.<span class="tok-fn">push</span>(<span class="tok-fn">paint</span>(colour::GREEN, <span class="tok-str">&quot;default&quot;</span>));</span>
-<span class="ln" id="L1843">                    }</span>
-<span class="ln" id="L1844">                    <span class="tok-kw">if</span> d.is_virtual_cable {</span>
-<span class="ln" id="L1845">                        marks.<span class="tok-fn">push</span>(<span class="tok-fn">paint</span>(colour::PURPLE, <span class="tok-str">&quot;virtual cable&quot;</span>));</span>
-<span class="ln" id="L1846">                    }</span>
-<span class="ln" id="L1847">                    <span class="tok-kw">let</span> suffix = <span class="tok-kw">if</span> marks.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L1848">                        String::<span class="tok-fn">new</span>()</span>
-<span class="ln" id="L1849">                    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1850">                        format!(<span class="tok-str">&quot;  ({})&quot;</span>, marks.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>))</span>
-<span class="ln" id="L1851">                    };</span>
-<span class="ln" id="L1852">                    println!(<span class="tok-str">&quot;  {}{}&quot;</span>, d.name, suffix);</span>
-<span class="ln" id="L1853">                }</span>
-<span class="ln" id="L1854">            }</span>
-<span class="ln" id="L1855">            <span class="tok-fn">Err</span>(e) =&gt; println!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-fn">warn</span>(&amp;e.<span class="tok-fn">to_string</span>())),</span>
-<span class="ln" id="L1856">        }</span>
-<span class="ln" id="L1857">        println!();</span>
-<span class="ln" id="L1858">    }</span>
-<span class="ln" id="L1859">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L1860">}</span>
+<span class="ln" id="L1860"><span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
+<span class="ln" id="L1861"><span class="tok-kw">fn</span> <span class="tok-fn">list_devices</span>() -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L1862">    <span class="tok-kw">for</span> (label, direction) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1863">        (<span class="tok-str">&quot;Inputs&quot;</span>, devices::Direction::Input),</span>
+<span class="ln" id="L1864">        (<span class="tok-str">&quot;Outputs&quot;</span>, devices::Direction::Output),</span>
+<span class="ln" id="L1865">    ] {</span>
+<span class="ln" id="L1866">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(label));</span>
+<span class="ln" id="L1867">        <span class="tok-kw">match</span> devices::<span class="tok-fn">list</span>(direction) {</span>
+<span class="ln" id="L1868">            <span class="tok-fn">Ok</span>(list) <span class="tok-kw">if</span> list.<span class="tok-fn">is_empty</span>() =&gt; println!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;none found&quot;</span>)),</span>
+<span class="ln" id="L1869">            <span class="tok-fn">Ok</span>(list) =&gt; {</span>
+<span class="ln" id="L1870">                <span class="tok-kw">for</span> d <span class="tok-kw">in</span> list {</span>
+<span class="ln" id="L1871">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> marks = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1872">                    <span class="tok-kw">if</span> d.is_default {</span>
+<span class="ln" id="L1873">                        marks.<span class="tok-fn">push</span>(<span class="tok-fn">paint</span>(colour::GREEN, <span class="tok-str">&quot;default&quot;</span>));</span>
+<span class="ln" id="L1874">                    }</span>
+<span class="ln" id="L1875">                    <span class="tok-kw">if</span> d.is_virtual_cable {</span>
+<span class="ln" id="L1876">                        marks.<span class="tok-fn">push</span>(<span class="tok-fn">paint</span>(colour::PURPLE, <span class="tok-str">&quot;virtual cable&quot;</span>));</span>
+<span class="ln" id="L1877">                    }</span>
+<span class="ln" id="L1878">                    <span class="tok-kw">let</span> suffix = <span class="tok-kw">if</span> marks.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L1879">                        String::<span class="tok-fn">new</span>()</span>
+<span class="ln" id="L1880">                    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1881">                        format!(<span class="tok-str">&quot;  ({})&quot;</span>, marks.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>))</span>
+<span class="ln" id="L1882">                    };</span>
+<span class="ln" id="L1883">                    println!(<span class="tok-str">&quot;  {}{}&quot;</span>, d.name, suffix);</span>
+<span class="ln" id="L1884">                }</span>
+<span class="ln" id="L1885">            }</span>
+<span class="ln" id="L1886">            <span class="tok-fn">Err</span>(e) =&gt; println!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-fn">warn</span>(&amp;e.<span class="tok-fn">to_string</span>())),</span>
+<span class="ln" id="L1887">        }</span>
+<span class="ln" id="L1888">        println!();</span>
+<span class="ln" id="L1889">    }</span>
+<span class="ln" id="L1890">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L1891">}</span>
 </span>
-<span class="ln" id="L1861"></span>
+<span class="ln" id="L1892"></span>
 <span class="src-item" id="fn-clean">
-<span class="ln" id="L1862"><span class="tok-kw">fn</span> <span class="tok-fn">clean</span>(file: PathBuf, policy: Policy) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L1863">    <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(&amp;file).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1864">    <span class="tok-kw">let</span> report = <span class="tok-kw">if</span> veilvoice_meta::ImageKind::<span class="tok-fn">sniff</span>(&amp;bytes).<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L1865">        veilvoice_meta::<span class="tok-fn">clean_image_file</span>(&amp;file, policy).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
-<span class="ln" id="L1866">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1867">        veilvoice_meta::<span class="tok-fn">clean_audio_file</span>(&amp;file, policy).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
-<span class="ln" id="L1868">    };</span>
-<span class="ln" id="L1869"></span>
-<span class="ln" id="L1870">    <span class="tok-kw">if</span> report.changed {</span>
-<span class="ln" id="L1871">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;cleaned {}&quot;</span>, file.<span class="tok-fn">display</span>())));</span>
-<span class="ln" id="L1872">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Removed&quot;</span>, &amp;report.removed.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>)));</span>
-<span class="ln" id="L1873">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1874">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;{} was already clean&quot;</span>, file.<span class="tok-fn">display</span>())));</span>
-<span class="ln" id="L1875">    }</span>
-<span class="ln" id="L1876">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L1877">}</span>
+<span class="ln" id="L1893"><span class="tok-kw">fn</span> <span class="tok-fn">clean</span>(file: PathBuf, policy: Policy) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L1894">    <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(&amp;file).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1895">    <span class="tok-kw">let</span> report = <span class="tok-kw">if</span> veilvoice_meta::ImageKind::<span class="tok-fn">sniff</span>(&amp;bytes).<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L1896">        veilvoice_meta::<span class="tok-fn">clean_image_file</span>(&amp;file, policy).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
+<span class="ln" id="L1897">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1898">        veilvoice_meta::<span class="tok-fn">clean_audio_file</span>(&amp;file, policy).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
+<span class="ln" id="L1899">    };</span>
+<span class="ln" id="L1900"></span>
+<span class="ln" id="L1901">    <span class="tok-kw">if</span> report.changed {</span>
+<span class="ln" id="L1902">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;cleaned {}&quot;</span>, file.<span class="tok-fn">display</span>())));</span>
+<span class="ln" id="L1903">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Removed&quot;</span>, &amp;report.removed.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>)));</span>
+<span class="ln" id="L1904">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1905">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;{} was already clean&quot;</span>, file.<span class="tok-fn">display</span>())));</span>
+<span class="ln" id="L1906">    }</span>
+<span class="ln" id="L1907">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L1908">}</span>
 </span>
-<span class="ln" id="L1878"></span>
+<span class="ln" id="L1909"></span>
 <span class="src-item" id="fn-encrypt">
-<span class="ln" id="L1879"><span class="tok-kw">fn</span> <span class="tok-fn">encrypt</span>(input: PathBuf, output: Option&lt;PathBuf&gt;, to: Option&lt;PathBuf&gt;) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L1880">    <span class="tok-kw">let</span> out_path = output.<span class="tok-fn">unwrap_or_else</span>(|| container::<span class="tok-fn">veil_path</span>(&amp;input));</span>
-<span class="ln" id="L1881">    <span class="tok-kw">let</span> plaintext = std::fs::<span class="tok-fn">read</span>(&amp;input).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1882"></span>
-<span class="ln" id="L1883">    <span class="tok-kw">let</span> sealed = <span class="tok-kw">match</span> to {</span>
-<span class="ln" id="L1884">        <span class="tok-fn">Some</span>(key_path) =&gt; {</span>
-<span class="ln" id="L1885">            <span class="tok-kw">let</span> encoded = std::fs::<span class="tok-fn">read</span>(&amp;key_path).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1886">            <span class="tok-kw">let</span> pk = hybrid::PublicKey::<span class="tok-fn">from_bytes</span>(&amp;encoded).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1887">            container::<span class="tok-fn">seal_to_public_key</span>(&amp;pk, &amp;plaintext).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
-<span class="ln" id="L1888">        }</span>
-<span class="ln" id="L1889">        None =&gt; {</span>
-<span class="ln" id="L1890">            <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
-<span class="ln" id="L1891">            println!(</span>
-<span class="ln" id="L1892">                <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1893">                <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1894">                    colour::MUTED,</span>
-<span class="ln" id="L1895">                    <span class="tok-str">&quot;  Deriving key (Argon2id, this is meant to be slow)...&quot;</span></span>
-<span class="ln" id="L1896">                )</span>
-<span class="ln" id="L1897">            );</span>
-<span class="ln" id="L1898">            container::<span class="tok-fn">seal_with_password</span>(password.<span class="tok-fn">expose</span>(), &amp;plaintext, kdf::KdfParams::<span class="tok-fn">default</span>())</span>
-<span class="ln" id="L1899">                .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
-<span class="ln" id="L1900">        }</span>
-<span class="ln" id="L1901">    };</span>
-<span class="ln" id="L1902"></span>
-<span class="ln" id="L1903">    std::fs::<span class="tok-fn">write</span>(&amp;out_path, &amp;sealed).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1904">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;encrypted to {}&quot;</span>, out_path.<span class="tok-fn">display</span>())));</span>
-<span class="ln" id="L1905">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L1906">}</span>
-</span>
-<span class="ln" id="L1907"></span>
-<span class="src-item" id="fn-decrypt">
-<span class="ln" id="L1908"><span class="tok-kw">fn</span> <span class="tok-fn">decrypt</span>(input: PathBuf, output: PathBuf, key: Option&lt;PathBuf&gt;) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L1909">    <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(&amp;input).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1910"></span>
-<span class="ln" id="L1911">    <span class="tok-kw">let</span> plaintext = <span class="tok-kw">match</span> key {</span>
-<span class="ln" id="L1912">        <span class="tok-fn">Some</span>(key_path) =&gt; {</span>
-<span class="ln" id="L1913">            <span class="tok-kw">let</span> sk = <span class="tok-fn">load_secret_key</span>(&amp;key_path)?;</span>
-<span class="ln" id="L1914">            container::<span class="tok-fn">open_with_secret_key</span>(&amp;sk, &amp;sealed).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
-<span class="ln" id="L1915">        }</span>
-<span class="ln" id="L1916">        None =&gt; {</span>
-<span class="ln" id="L1917">            <span class="tok-kw">let</span> password = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Passphrase: &quot;</span>)?;</span>
-<span class="ln" id="L1918">            container::<span class="tok-fn">open_with_password</span>(password.<span class="tok-fn">expose</span>(), &amp;sealed).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
+<span class="ln" id="L1910"><span class="tok-kw">fn</span> <span class="tok-fn">encrypt</span>(input: PathBuf, output: Option&lt;PathBuf&gt;, to: Option&lt;PathBuf&gt;) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L1911">    <span class="tok-kw">let</span> out_path = output.<span class="tok-fn">unwrap_or_else</span>(|| container::<span class="tok-fn">veil_path</span>(&amp;input));</span>
+<span class="ln" id="L1912">    <span class="tok-kw">let</span> plaintext = std::fs::<span class="tok-fn">read</span>(&amp;input).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1913"></span>
+<span class="ln" id="L1914">    <span class="tok-kw">let</span> sealed = <span class="tok-kw">match</span> to {</span>
+<span class="ln" id="L1915">        <span class="tok-fn">Some</span>(key_path) =&gt; {</span>
+<span class="ln" id="L1916">            <span class="tok-kw">let</span> encoded = std::fs::<span class="tok-fn">read</span>(&amp;key_path).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1917">            <span class="tok-kw">let</span> pk = hybrid::PublicKey::<span class="tok-fn">from_bytes</span>(&amp;encoded).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1918">            container::<span class="tok-fn">seal_to_public_key</span>(&amp;pk, &amp;plaintext).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
 <span class="ln" id="L1919">        }</span>
-<span class="ln" id="L1920">    };</span>
-<span class="ln" id="L1921"></span>
-<span class="ln" id="L1922">    <span class="tok-com">// Owner-only from the moment it exists. This is the *decrypted* contents of</span></span>
-<span class="ln" id="L1923">    <span class="tok-com">// something the user chose to encrypt; writing it out world-readable, even</span></span>
-<span class="ln" id="L1924">    <span class="tok-com">// for the instant before a chmod, would undo the point of having sealed it.</span></span>
-<span class="ln" id="L1925">    veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(&amp;output, &amp;plaintext)</span>
-<span class="ln" id="L1926">        .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, output.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L1927">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;decrypted to {}&quot;</span>, output.<span class="tok-fn">display</span>())));</span>
-<span class="ln" id="L1928">    println!(</span>
-<span class="ln" id="L1929">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1930">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1931">            colour::MUTED,</span>
-<span class="ln" id="L1932">            <span class="tok-str">&quot;  Written so only your account can read it. That is a file permission, \</span></span>
-<span class="ln" id="L1933"><span class="tok-str">             not disk encryption.&quot;</span></span>
-<span class="ln" id="L1934">        )</span>
-<span class="ln" id="L1935">    );</span>
+<span class="ln" id="L1920">        None =&gt; {</span>
+<span class="ln" id="L1921">            <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
+<span class="ln" id="L1922">            println!(</span>
+<span class="ln" id="L1923">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1924">                <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1925">                    colour::MUTED,</span>
+<span class="ln" id="L1926">                    <span class="tok-str">&quot;  Deriving key (Argon2id, this is meant to be slow)...&quot;</span></span>
+<span class="ln" id="L1927">                )</span>
+<span class="ln" id="L1928">            );</span>
+<span class="ln" id="L1929">            container::<span class="tok-fn">seal_with_password</span>(password.<span class="tok-fn">expose</span>(), &amp;plaintext, kdf::KdfParams::<span class="tok-fn">default</span>())</span>
+<span class="ln" id="L1930">                .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
+<span class="ln" id="L1931">        }</span>
+<span class="ln" id="L1932">    };</span>
+<span class="ln" id="L1933"></span>
+<span class="ln" id="L1934">    std::fs::<span class="tok-fn">write</span>(&amp;out_path, &amp;sealed).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1935">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;encrypted to {}&quot;</span>, out_path.<span class="tok-fn">display</span>())));</span>
 <span class="ln" id="L1936">    <span class="tok-fn">Ok</span>(())</span>
 <span class="ln" id="L1937">}</span>
 </span>
 <span class="ln" id="L1938"></span>
+<span class="src-item" id="fn-decrypt">
+<span class="ln" id="L1939"><span class="tok-kw">fn</span> <span class="tok-fn">decrypt</span>(input: PathBuf, output: PathBuf, key: Option&lt;PathBuf&gt;) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L1940">    <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(&amp;input).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1941"></span>
+<span class="ln" id="L1942">    <span class="tok-kw">let</span> plaintext = <span class="tok-kw">match</span> key {</span>
+<span class="ln" id="L1943">        <span class="tok-fn">Some</span>(key_path) =&gt; {</span>
+<span class="ln" id="L1944">            <span class="tok-kw">let</span> sk = <span class="tok-fn">load_secret_key</span>(&amp;key_path)?;</span>
+<span class="ln" id="L1945">            container::<span class="tok-fn">open_with_secret_key</span>(&amp;sk, &amp;sealed).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
+<span class="ln" id="L1946">        }</span>
+<span class="ln" id="L1947">        None =&gt; {</span>
+<span class="ln" id="L1948">            <span class="tok-kw">let</span> password = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Passphrase: &quot;</span>)?;</span>
+<span class="ln" id="L1949">            container::<span class="tok-fn">open_with_password</span>(password.<span class="tok-fn">expose</span>(), &amp;sealed).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?</span>
+<span class="ln" id="L1950">        }</span>
+<span class="ln" id="L1951">    };</span>
+<span class="ln" id="L1952"></span>
+<span class="ln" id="L1953">    <span class="tok-com">// Owner-only from the moment it exists. This is the *decrypted* contents of</span></span>
+<span class="ln" id="L1954">    <span class="tok-com">// something the user chose to encrypt; writing it out world-readable, even</span></span>
+<span class="ln" id="L1955">    <span class="tok-com">// for the instant before a chmod, would undo the point of having sealed it.</span></span>
+<span class="ln" id="L1956">    veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(&amp;output, &amp;plaintext)</span>
+<span class="ln" id="L1957">        .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, output.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L1958">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;decrypted to {}&quot;</span>, output.<span class="tok-fn">display</span>())));</span>
+<span class="ln" id="L1959">    println!(</span>
+<span class="ln" id="L1960">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L1961">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L1962">            colour::MUTED,</span>
+<span class="ln" id="L1963">            <span class="tok-str">&quot;  Written so only your account can read it. That is a file permission, \</span></span>
+<span class="ln" id="L1964"><span class="tok-str">             not disk encryption.&quot;</span></span>
+<span class="ln" id="L1965">        )</span>
+<span class="ln" id="L1966">    );</span>
+<span class="ln" id="L1967">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L1968">}</span>
+</span>
+<span class="ln" id="L1969"></span>
 <span class="src-item" id="fn-load_secret_key">
-<span class="ln" id="L1939"><span class="tok-com">/// Load a private key file, which is itself a password-locked container.</span></span>
-<span class="ln" id="L1940"><span class="tok-kw">fn</span> <span class="tok-fn">load_secret_key</span>(path: &amp;std::path::Path) -&gt; Result&lt;hybrid::SecretKey, String&gt; {</span>
-<span class="ln" id="L1941">    <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(path).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1942">    <span class="tok-kw">let</span> password = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Key passphrase: &quot;</span>)?;</span>
-<span class="ln" id="L1943">    <span class="tok-kw">let</span> encoded =</span>
-<span class="ln" id="L1944">        container::<span class="tok-fn">open_with_password</span>(password.<span class="tok-fn">expose</span>(), &amp;sealed).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1945">    hybrid::SecretKey::<span class="tok-fn">from_bytes</span>(&amp;encoded).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L1946">}</span>
+<span class="ln" id="L1970"><span class="tok-com">/// Load a private key file, which is itself a password-locked container.</span></span>
+<span class="ln" id="L1971"><span class="tok-kw">fn</span> <span class="tok-fn">load_secret_key</span>(path: &amp;std::path::Path) -&gt; Result&lt;hybrid::SecretKey, String&gt; {</span>
+<span class="ln" id="L1972">    <span class="tok-kw">let</span> sealed = std::fs::<span class="tok-fn">read</span>(path).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1973">    <span class="tok-kw">let</span> password = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Key passphrase: &quot;</span>)?;</span>
+<span class="ln" id="L1974">    <span class="tok-kw">let</span> encoded =</span>
+<span class="ln" id="L1975">        container::<span class="tok-fn">open_with_password</span>(password.<span class="tok-fn">expose</span>(), &amp;sealed).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1976">    hybrid::SecretKey::<span class="tok-fn">from_bytes</span>(&amp;encoded).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L1977">}</span>
 </span>
-<span class="ln" id="L1947"></span>
+<span class="ln" id="L1978"></span>
 <span class="src-item" id="fn-keygen">
-<span class="ln" id="L1948"><span class="tok-kw">fn</span> <span class="tok-fn">keygen</span>(public: PathBuf, secret: PathBuf) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L1949">    <span class="tok-com">// Reported early so the user is not asked for a passphrase before being</span></span>
-<span class="ln" id="L1950">    <span class="tok-com">// told the file is in the way. The *refusal* that matters is not this one</span></span>
-<span class="ln" id="L1951">    <span class="tok-com">// though &#8212; it is `write_owner_only_new` below, which asks the kernel to</span></span>
-<span class="ln" id="L1952">    <span class="tok-com">// fail if anything is already there. Checking `exists()` and then writing</span></span>
-<span class="ln" id="L1953">    <span class="tok-com">// is a race, and it follows a symbolic link planted at the path.</span></span>
-<span class="ln" id="L1954">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> [&amp;public, &amp;secret] {</span>
-<span class="ln" id="L1955">        <span class="tok-kw">if</span> path.<span class="tok-fn">exists</span>() {</span>
-<span class="ln" id="L1956">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L1957">                <span class="tok-str">&quot;{} already exists &#8212; refusing to overwrite a key file&quot;</span>,</span>
-<span class="ln" id="L1958">                path.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L1959">            ));</span>
-<span class="ln" id="L1960">        }</span>
-<span class="ln" id="L1961">    }</span>
-<span class="ln" id="L1962"></span>
-<span class="ln" id="L1963">    <span class="tok-kw">let</span> (sk, pk) = hybrid::SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1964"></span>
-<span class="ln" id="L1965">    <span class="tok-com">// The private key is never written in the clear: it is sealed with the same</span></span>
-<span class="ln" id="L1966">    <span class="tok-com">// container format everything else uses, so a stolen key file is worth</span></span>
-<span class="ln" id="L1967">    <span class="tok-com">// nothing without the passphrase.</span></span>
-<span class="ln" id="L1968">    println!(</span>
-<span class="ln" id="L1969">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1970">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1971">            colour::MUTED,</span>
-<span class="ln" id="L1972">            <span class="tok-str">&quot;  Choose a passphrase to protect the private key.&quot;</span></span>
-<span class="ln" id="L1973">        )</span>
-<span class="ln" id="L1974">    );</span>
-<span class="ln" id="L1975">    <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
-<span class="ln" id="L1976">    println!(</span>
-<span class="ln" id="L1977">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1978">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L1979">            colour::MUTED,</span>
-<span class="ln" id="L1980">            <span class="tok-str">&quot;  Deriving key (Argon2id, deliberately slow)...&quot;</span></span>
-<span class="ln" id="L1981">        )</span>
-<span class="ln" id="L1982">    );</span>
-<span class="ln" id="L1983">    <span class="tok-kw">let</span> encoded = sk.<span class="tok-fn">to_bytes</span>();</span>
-<span class="ln" id="L1984">    <span class="tok-kw">let</span> sealed = container::<span class="tok-fn">seal_with_password</span>(</span>
-<span class="ln" id="L1985">        password.<span class="tok-fn">expose</span>(),</span>
-<span class="ln" id="L1986">        encoded.<span class="tok-fn">expose</span>(),</span>
-<span class="ln" id="L1987">        kdf::KdfParams::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1988">    )</span>
-<span class="ln" id="L1989">    .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1990"></span>
-<span class="ln" id="L1991">    <span class="tok-com">// The public key is meant to be shared, so it is written normally. The</span></span>
-<span class="ln" id="L1992">    <span class="tok-com">// private key is created owner-only and *exclusively*: the permission is</span></span>
-<span class="ln" id="L1993">    <span class="tok-com">// applied by the creation rather than by a chmod afterwards, and the</span></span>
-<span class="ln" id="L1994">    <span class="tok-com">// creation fails rather than overwriting anything already at the path.</span></span>
-<span class="ln" id="L1995">    std::fs::<span class="tok-fn">write</span>(&amp;public, pk.<span class="tok-fn">to_bytes</span>()).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, public.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L1996">    veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only_new</span>(&amp;secret, &amp;sealed)</span>
-<span class="ln" id="L1997">        .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, secret.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L1998"></span>
-<span class="ln" id="L1999">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;public key  {}&quot;</span>, public.<span class="tok-fn">display</span>())));</span>
-<span class="ln" id="L2000">    println!(</span>
-<span class="ln" id="L2001">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2002">        <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;private key {} (encrypted)&quot;</span>, secret.<span class="tok-fn">display</span>()))</span>
-<span class="ln" id="L2003">    );</span>
-<span class="ln" id="L2004">    println!();</span>
-<span class="ln" id="L2005">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Algorithm&quot;</span>, <span class="tok-str">&quot;X25519 + ML-KEM-768 hybrid&quot;</span>));</span>
-<span class="ln" id="L2006">    println!(</span>
-<span class="ln" id="L2007">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2008">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L2009">            colour::MUTED,</span>
-<span class="ln" id="L2010">            <span class="tok-str">&quot;  Share the public key freely. Anyone holding it can&quot;</span></span>
-<span class="ln" id="L2011">        )</span>
-<span class="ln" id="L2012">    );</span>
-<span class="ln" id="L2013">    println!(</span>
-<span class="ln" id="L2014">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2015">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L2016">            colour::MUTED,</span>
-<span class="ln" id="L2017">            <span class="tok-str">&quot;  encrypt to you; only the private key can open it.&quot;</span></span>
-<span class="ln" id="L2018">        )</span>
-<span class="ln" id="L2019">    );</span>
-<span class="ln" id="L2020">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L2021">}</span>
+<span class="ln" id="L1979"><span class="tok-kw">fn</span> <span class="tok-fn">keygen</span>(public: PathBuf, secret: PathBuf) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L1980">    <span class="tok-com">// Reported early so the user is not asked for a passphrase before being</span></span>
+<span class="ln" id="L1981">    <span class="tok-com">// told the file is in the way. The *refusal* that matters is not this one</span></span>
+<span class="ln" id="L1982">    <span class="tok-com">// though &#8212; it is `write_owner_only_new` below, which asks the kernel to</span></span>
+<span class="ln" id="L1983">    <span class="tok-com">// fail if anything is already there. Checking `exists()` and then writing</span></span>
+<span class="ln" id="L1984">    <span class="tok-com">// is a race, and it follows a symbolic link planted at the path.</span></span>
+<span class="ln" id="L1985">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> [&amp;public, &amp;secret] {</span>
+<span class="ln" id="L1986">        <span class="tok-kw">if</span> path.<span class="tok-fn">exists</span>() {</span>
+<span class="ln" id="L1987">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L1988">                <span class="tok-str">&quot;{} already exists &#8212; refusing to overwrite a key file&quot;</span>,</span>
+<span class="ln" id="L1989">                path.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L1990">            ));</span>
+<span class="ln" id="L1991">        }</span>
+<span class="ln" id="L1992">    }</span>
+<span class="ln" id="L1993"></span>
+<span class="ln" id="L1994">    <span class="tok-kw">let</span> (sk, pk) = hybrid::SecretKey::<span class="tok-fn">generate</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L1995"></span>
+<span class="ln" id="L1996">    <span class="tok-com">// The private key is never written in the clear: it is sealed with the same</span></span>
+<span class="ln" id="L1997">    <span class="tok-com">// container format everything else uses, so a stolen key file is worth</span></span>
+<span class="ln" id="L1998">    <span class="tok-com">// nothing without the passphrase.</span></span>
+<span class="ln" id="L1999">    println!(</span>
+<span class="ln" id="L2000">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2001">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L2002">            colour::MUTED,</span>
+<span class="ln" id="L2003">            <span class="tok-str">&quot;  Choose a passphrase to protect the private key.&quot;</span></span>
+<span class="ln" id="L2004">        )</span>
+<span class="ln" id="L2005">    );</span>
+<span class="ln" id="L2006">    <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
+<span class="ln" id="L2007">    println!(</span>
+<span class="ln" id="L2008">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2009">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L2010">            colour::MUTED,</span>
+<span class="ln" id="L2011">            <span class="tok-str">&quot;  Deriving key (Argon2id, deliberately slow)...&quot;</span></span>
+<span class="ln" id="L2012">        )</span>
+<span class="ln" id="L2013">    );</span>
+<span class="ln" id="L2014">    <span class="tok-kw">let</span> encoded = sk.<span class="tok-fn">to_bytes</span>();</span>
+<span class="ln" id="L2015">    <span class="tok-kw">let</span> sealed = container::<span class="tok-fn">seal_with_password</span>(</span>
+<span class="ln" id="L2016">        password.<span class="tok-fn">expose</span>(),</span>
+<span class="ln" id="L2017">        encoded.<span class="tok-fn">expose</span>(),</span>
+<span class="ln" id="L2018">        kdf::KdfParams::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L2019">    )</span>
+<span class="ln" id="L2020">    .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L2021"></span>
+<span class="ln" id="L2022">    <span class="tok-com">// The public key is meant to be shared, so it is written normally. The</span></span>
+<span class="ln" id="L2023">    <span class="tok-com">// private key is created owner-only and *exclusively*: the permission is</span></span>
+<span class="ln" id="L2024">    <span class="tok-com">// applied by the creation rather than by a chmod afterwards, and the</span></span>
+<span class="ln" id="L2025">    <span class="tok-com">// creation fails rather than overwriting anything already at the path.</span></span>
+<span class="ln" id="L2026">    std::fs::<span class="tok-fn">write</span>(&amp;public, pk.<span class="tok-fn">to_bytes</span>()).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, public.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L2027">    veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only_new</span>(&amp;secret, &amp;sealed)</span>
+<span class="ln" id="L2028">        .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, secret.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L2029"></span>
+<span class="ln" id="L2030">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;public key  {}&quot;</span>, public.<span class="tok-fn">display</span>())));</span>
+<span class="ln" id="L2031">    println!(</span>
+<span class="ln" id="L2032">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2033">        <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;private key {} (encrypted)&quot;</span>, secret.<span class="tok-fn">display</span>()))</span>
+<span class="ln" id="L2034">    );</span>
+<span class="ln" id="L2035">    println!();</span>
+<span class="ln" id="L2036">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Algorithm&quot;</span>, <span class="tok-str">&quot;X25519 + ML-KEM-768 hybrid&quot;</span>));</span>
+<span class="ln" id="L2037">    println!(</span>
+<span class="ln" id="L2038">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2039">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L2040">            colour::MUTED,</span>
+<span class="ln" id="L2041">            <span class="tok-str">&quot;  Share the public key freely. Anyone holding it can&quot;</span></span>
+<span class="ln" id="L2042">        )</span>
+<span class="ln" id="L2043">    );</span>
+<span class="ln" id="L2044">    println!(</span>
+<span class="ln" id="L2045">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2046">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L2047">            colour::MUTED,</span>
+<span class="ln" id="L2048">            <span class="tok-str">&quot;  encrypt to you; only the private key can open it.&quot;</span></span>
+<span class="ln" id="L2049">        )</span>
+<span class="ln" id="L2050">    );</span>
+<span class="ln" id="L2051">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L2052">}</span>
 </span>
-<span class="ln" id="L2022"></span>
+<span class="ln" id="L2053"></span>
 <span class="src-item" id="fn-watch">
-<span class="ln" id="L2023"><span class="tok-com">/// Report, and keep reporting, what is using the microphone and camera.</span></span>
-<span class="ln" id="L2024"><span class="tok-kw">fn</span> <span class="tok-fn">watch</span>(once: bool, interval: f32) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L2025">    <span class="tok-kw">use</span> veilvoice_watch::{Change, DeviceKind, Monitor};</span>
-<span class="ln" id="L2026"></span>
-<span class="ln" id="L2027">    <span class="tok-kw">let</span> support = veilvoice_watch::<span class="tok-fn">support</span>();</span>
-<span class="ln" id="L2028">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Microphone and camera monitor&quot;</span>));</span>
-<span class="ln" id="L2029">    println!(</span>
-<span class="ln" id="L2030">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2031">        <span class="tok-fn">field</span>(</span>
-<span class="ln" id="L2032">            <span class="tok-str">&quot;Detection&quot;</span>,</span>
-<span class="ln" id="L2033">            <span class="tok-kw">if</span> support.microphone &amp;&amp; support.camera {</span>
-<span class="ln" id="L2034">                <span class="tok-str">&quot;microphone and camera&quot;</span></span>
-<span class="ln" id="L2035">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> support.microphone {</span>
-<span class="ln" id="L2036">                <span class="tok-str">&quot;microphone only&quot;</span></span>
-<span class="ln" id="L2037">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L2038">                <span class="tok-str">&quot;unavailable on this platform&quot;</span></span>
-<span class="ln" id="L2039">            }</span>
-<span class="ln" id="L2040">        )</span>
-<span class="ln" id="L2041">    );</span>
-<span class="ln" id="L2042">    println!(</span>
-<span class="ln" id="L2043">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2044">        <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;  {}&quot;</span>, support.explanation))</span>
-<span class="ln" id="L2045">    );</span>
-<span class="ln" id="L2046"></span>
-<span class="ln" id="L2047">    <span class="tok-com">// An empty list from a platform that cannot see is not good news, and must</span></span>
-<span class="ln" id="L2048">    <span class="tok-com">// never be presented as though it were.</span></span>
-<span class="ln" id="L2049">    <span class="tok-kw">if</span> !support.microphone &amp;&amp; !support.camera {</span>
-<span class="ln" id="L2050">        println!();</span>
-<span class="ln" id="L2051">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;nothing can be detected here, so nothing is reported&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L2052">    }</span>
-<span class="ln" id="L2053">    println!();</span>
-<span class="ln" id="L2054"></span>
-<span class="ln" id="L2055">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> monitor = Monitor::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L2056">    <span class="tok-kw">let</span> sleep = std::time::Duration::<span class="tok-fn">from_secs_f32</span>(interval.<span class="tok-fn">clamp</span>(<span class="tok-num">0.2</span>, <span class="tok-num">60.0</span>));</span>
+<span class="ln" id="L2054"><span class="tok-com">/// Report, and keep reporting, what is using the microphone and camera.</span></span>
+<span class="ln" id="L2055"><span class="tok-kw">fn</span> <span class="tok-fn">watch</span>(once: bool, interval: f32) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L2056">    <span class="tok-kw">use</span> veilvoice_watch::{Change, DeviceKind, Monitor};</span>
 <span class="ln" id="L2057"></span>
-<span class="ln" id="L2058">    loop {</span>
-<span class="ln" id="L2059">        <span class="tok-kw">let</span> changes = monitor.<span class="tok-fn">poll</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L2060">        <span class="tok-kw">for</span> change <span class="tok-kw">in</span> &amp;changes {</span>
-<span class="ln" id="L2061">            <span class="tok-kw">let</span> (mark, shade) = <span class="tok-kw">match</span> change {</span>
-<span class="ln" id="L2062">                Change::<span class="tok-fn">Started</span>(u) <span class="tok-kw">if</span> u.kind == DeviceKind::Camera =&gt; (<span class="tok-str">&quot;&#9679;&quot;</span>, colour::RED),</span>
-<span class="ln" id="L2063">                Change::<span class="tok-fn">Started</span>(_) =&gt; (<span class="tok-str">&quot;&#9679;&quot;</span>, colour::YELLOW),</span>
-<span class="ln" id="L2064">                Change::<span class="tok-fn">Stopped</span>(_) =&gt; (<span class="tok-str">&quot;&#9675;&quot;</span>, colour::GREEN),</span>
-<span class="ln" id="L2065">            };</span>
-<span class="ln" id="L2066">            println!(<span class="tok-str">&quot;  {} {}&quot;</span>, <span class="tok-fn">paint</span>(shade, mark), change.<span class="tok-fn">alert</span>());</span>
-<span class="ln" id="L2067">        }</span>
-<span class="ln" id="L2068"></span>
-<span class="ln" id="L2069">        <span class="tok-kw">if</span> once {</span>
-<span class="ln" id="L2070">            <span class="tok-kw">let</span> active = monitor.<span class="tok-fn">current</span>();</span>
-<span class="ln" id="L2071">            <span class="tok-kw">if</span> active.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L2072">                println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;nothing is using the microphone or camera&quot;</span>));</span>
-<span class="ln" id="L2073">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L2074">                <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> active {</span>
-<span class="ln" id="L2075">                    println!(</span>
-<span class="ln" id="L2076">                        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2077">                        <span class="tok-fn">field</span>(</span>
-<span class="ln" id="L2078">                            &amp;entry.kind.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L2079">                            &amp;format!(</span>
-<span class="ln" id="L2080">                                <span class="tok-str">&quot;{}{}&quot;</span>,</span>
-<span class="ln" id="L2081">                                entry.<span class="tok-fn">describe</span>(),</span>
-<span class="ln" id="L2082">                                entry</span>
-<span class="ln" id="L2083">                                    .device</span>
-<span class="ln" id="L2084">                                    .<span class="tok-fn">as_deref</span>()</span>
-<span class="ln" id="L2085">                                    .<span class="tok-fn">map</span>(|d| format!(<span class="tok-str">&quot;  [{d}]&quot;</span>))</span>
-<span class="ln" id="L2086">                                    .<span class="tok-fn">unwrap_or_default</span>()</span>
-<span class="ln" id="L2087">                            )</span>
-<span class="ln" id="L2088">                        )</span>
-<span class="ln" id="L2089">                    );</span>
-<span class="ln" id="L2090">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = &amp;entry.path {</span>
-<span class="ln" id="L2091">                        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;      {path}&quot;</span>)));</span>
-<span class="ln" id="L2092">                    }</span>
-<span class="ln" id="L2093">                }</span>
-<span class="ln" id="L2094">            }</span>
-<span class="ln" id="L2095">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
-<span class="ln" id="L2096">        }</span>
-<span class="ln" id="L2097"></span>
-<span class="ln" id="L2098">        <span class="tok-kw">if</span> changes.<span class="tok-fn">is_empty</span>() &amp;&amp; monitor.<span class="tok-fn">current</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L2099">            print!(</span>
-<span class="ln" id="L2100">                <span class="tok-str">&quot;\r  {}   &quot;</span>,</span>
-<span class="ln" id="L2101">                <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;watching - nothing active&quot;</span>)</span>
-<span class="ln" id="L2102">            );</span>
-<span class="ln" id="L2103">            <span class="tok-kw">use</span> std::io::Write;</span>
-<span class="ln" id="L2104">            <span class="tok-kw">let</span> _ = std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>();</span>
-<span class="ln" id="L2105">        }</span>
-<span class="ln" id="L2106">        std::thread::<span class="tok-fn">sleep</span>(sleep);</span>
-<span class="ln" id="L2107">    }</span>
-<span class="ln" id="L2108">}</span>
+<span class="ln" id="L2058">    <span class="tok-kw">let</span> support = veilvoice_watch::<span class="tok-fn">support</span>();</span>
+<span class="ln" id="L2059">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Microphone and camera monitor&quot;</span>));</span>
+<span class="ln" id="L2060">    println!(</span>
+<span class="ln" id="L2061">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2062">        <span class="tok-fn">field</span>(</span>
+<span class="ln" id="L2063">            <span class="tok-str">&quot;Detection&quot;</span>,</span>
+<span class="ln" id="L2064">            <span class="tok-kw">if</span> support.microphone &amp;&amp; support.camera {</span>
+<span class="ln" id="L2065">                <span class="tok-str">&quot;microphone and camera&quot;</span></span>
+<span class="ln" id="L2066">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> support.microphone {</span>
+<span class="ln" id="L2067">                <span class="tok-str">&quot;microphone only&quot;</span></span>
+<span class="ln" id="L2068">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L2069">                <span class="tok-str">&quot;unavailable on this platform&quot;</span></span>
+<span class="ln" id="L2070">            }</span>
+<span class="ln" id="L2071">        )</span>
+<span class="ln" id="L2072">    );</span>
+<span class="ln" id="L2073">    println!(</span>
+<span class="ln" id="L2074">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2075">        <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;  {}&quot;</span>, support.explanation))</span>
+<span class="ln" id="L2076">    );</span>
+<span class="ln" id="L2077"></span>
+<span class="ln" id="L2078">    <span class="tok-com">// An empty list from a platform that cannot see is not good news, and must</span></span>
+<span class="ln" id="L2079">    <span class="tok-com">// never be presented as though it were.</span></span>
+<span class="ln" id="L2080">    <span class="tok-kw">if</span> !support.microphone &amp;&amp; !support.camera {</span>
+<span class="ln" id="L2081">        println!();</span>
+<span class="ln" id="L2082">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;nothing can be detected here, so nothing is reported&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L2083">    }</span>
+<span class="ln" id="L2084">    println!();</span>
+<span class="ln" id="L2085"></span>
+<span class="ln" id="L2086">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> monitor = Monitor::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L2087">    <span class="tok-kw">let</span> sleep = std::time::Duration::<span class="tok-fn">from_secs_f32</span>(interval.<span class="tok-fn">clamp</span>(<span class="tok-num">0.2</span>, <span class="tok-num">60.0</span>));</span>
+<span class="ln" id="L2088"></span>
+<span class="ln" id="L2089">    loop {</span>
+<span class="ln" id="L2090">        <span class="tok-kw">let</span> changes = monitor.<span class="tok-fn">poll</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L2091">        <span class="tok-kw">for</span> change <span class="tok-kw">in</span> &amp;changes {</span>
+<span class="ln" id="L2092">            <span class="tok-kw">let</span> (mark, shade) = <span class="tok-kw">match</span> change {</span>
+<span class="ln" id="L2093">                Change::<span class="tok-fn">Started</span>(u) <span class="tok-kw">if</span> u.kind == DeviceKind::Camera =&gt; (<span class="tok-str">&quot;&#9679;&quot;</span>, colour::RED),</span>
+<span class="ln" id="L2094">                Change::<span class="tok-fn">Started</span>(_) =&gt; (<span class="tok-str">&quot;&#9679;&quot;</span>, colour::YELLOW),</span>
+<span class="ln" id="L2095">                Change::<span class="tok-fn">Stopped</span>(_) =&gt; (<span class="tok-str">&quot;&#9675;&quot;</span>, colour::GREEN),</span>
+<span class="ln" id="L2096">            };</span>
+<span class="ln" id="L2097">            println!(<span class="tok-str">&quot;  {} {}&quot;</span>, <span class="tok-fn">paint</span>(shade, mark), change.<span class="tok-fn">alert</span>());</span>
+<span class="ln" id="L2098">        }</span>
+<span class="ln" id="L2099"></span>
+<span class="ln" id="L2100">        <span class="tok-kw">if</span> once {</span>
+<span class="ln" id="L2101">            <span class="tok-kw">let</span> active = monitor.<span class="tok-fn">current</span>();</span>
+<span class="ln" id="L2102">            <span class="tok-kw">if</span> active.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L2103">                println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;nothing is using the microphone or camera&quot;</span>));</span>
+<span class="ln" id="L2104">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L2105">                <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> active {</span>
+<span class="ln" id="L2106">                    println!(</span>
+<span class="ln" id="L2107">                        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2108">                        <span class="tok-fn">field</span>(</span>
+<span class="ln" id="L2109">                            &amp;entry.kind.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L2110">                            &amp;format!(</span>
+<span class="ln" id="L2111">                                <span class="tok-str">&quot;{}{}&quot;</span>,</span>
+<span class="ln" id="L2112">                                entry.<span class="tok-fn">describe</span>(),</span>
+<span class="ln" id="L2113">                                entry</span>
+<span class="ln" id="L2114">                                    .device</span>
+<span class="ln" id="L2115">                                    .<span class="tok-fn">as_deref</span>()</span>
+<span class="ln" id="L2116">                                    .<span class="tok-fn">map</span>(|d| format!(<span class="tok-str">&quot;  [{d}]&quot;</span>))</span>
+<span class="ln" id="L2117">                                    .<span class="tok-fn">unwrap_or_default</span>()</span>
+<span class="ln" id="L2118">                            )</span>
+<span class="ln" id="L2119">                        )</span>
+<span class="ln" id="L2120">                    );</span>
+<span class="ln" id="L2121">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = &amp;entry.path {</span>
+<span class="ln" id="L2122">                        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;      {path}&quot;</span>)));</span>
+<span class="ln" id="L2123">                    }</span>
+<span class="ln" id="L2124">                }</span>
+<span class="ln" id="L2125">            }</span>
+<span class="ln" id="L2126">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L2127">        }</span>
+<span class="ln" id="L2128"></span>
+<span class="ln" id="L2129">        <span class="tok-kw">if</span> changes.<span class="tok-fn">is_empty</span>() &amp;&amp; monitor.<span class="tok-fn">current</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L2130">            print!(</span>
+<span class="ln" id="L2131">                <span class="tok-str">&quot;\r  {}   &quot;</span>,</span>
+<span class="ln" id="L2132">                <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;watching - nothing active&quot;</span>)</span>
+<span class="ln" id="L2133">            );</span>
+<span class="ln" id="L2134">            <span class="tok-kw">use</span> std::io::Write;</span>
+<span class="ln" id="L2135">            <span class="tok-kw">let</span> _ = std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>();</span>
+<span class="ln" id="L2136">        }</span>
+<span class="ln" id="L2137">        std::thread::<span class="tok-fn">sleep</span>(sleep);</span>
+<span class="ln" id="L2138">    }</span>
+<span class="ln" id="L2139">}</span>
 </span>
-<span class="ln" id="L2109"></span>
+<span class="ln" id="L2140"></span>
 <span class="src-item" id="fn-shred">
-<span class="ln" id="L2110"><span class="tok-com">/// Destroy a file&#x27;s contents, then delete it.</span></span>
-<span class="ln" id="L2111"><span class="tok-com">///</span></span>
-<span class="ln" id="L2112"><span class="tok-com">/// Gated behind a typed confirmation rather than a y/n prompt. There is no</span></span>
-<span class="ln" id="L2113"><span class="tok-com">/// undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></span>
-<span class="ln" id="L2114"><span class="tok-kw">fn</span> <span class="tok-fn">shred</span>(file: PathBuf, passes: u8, yes: bool) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L2115">    <span class="tok-kw">let</span> metadata = std::fs::<span class="tok-fn">metadata</span>(&amp;file).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, file.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L2116">    <span class="tok-kw">if</span> !metadata.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L2117">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;{} is not a file&quot;</span>, file.<span class="tok-fn">display</span>()));</span>
-<span class="ln" id="L2118">    }</span>
-<span class="ln" id="L2119"></span>
-<span class="ln" id="L2120">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Self-destruct&quot;</span>));</span>
-<span class="ln" id="L2121">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;File&quot;</span>, &amp;file.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L2122">    println!(</span>
-<span class="ln" id="L2123">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2124">        <span class="tok-fn">field</span>(</span>
-<span class="ln" id="L2125">            <span class="tok-str">&quot;Size&quot;</span>,</span>
-<span class="ln" id="L2126">            &amp;format!(<span class="tok-str">&quot;{:.1} KiB&quot;</span>, metadata.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f64 / <span class="tok-num">1024.0</span>)</span>
-<span class="ln" id="L2127">        )</span>
-<span class="ln" id="L2128">    );</span>
-<span class="ln" id="L2129">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Passes&quot;</span>, &amp;passes.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L2130">    println!();</span>
-<span class="ln" id="L2131">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">err</span>(<span class="tok-str">&quot;THIS CANNOT BE UNDONE.&quot;</span>));</span>
-<span class="ln" id="L2132">    println!(</span>
-<span class="ln" id="L2133">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2134">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L2135">            colour::MUTED,</span>
-<span class="ln" id="L2136">            <span class="tok-str">&quot;  On an SSD, SD card or USB stick, wear levelling may leave the</span></span>
-<span class="ln" id="L2137"><span class="tok-str">               original blocks in flash where no software can reach them.</span></span>
-<span class="ln" id="L2138"><span class="tok-str">               Full-disk encryption is the reliable answer &#8212; destroy the key</span></span>
-<span class="ln" id="L2139"><span class="tok-str">               and the data goes with it, wherever the drive put it.&quot;</span></span>
-<span class="ln" id="L2140">        )</span>
-<span class="ln" id="L2141">    );</span>
-<span class="ln" id="L2142">    println!();</span>
-<span class="ln" id="L2143"></span>
-<span class="ln" id="L2144">    <span class="tok-kw">if</span> !yes {</span>
-<span class="ln" id="L2145">        print!(<span class="tok-str">&quot;  Type DESTROY to continue: &quot;</span>);</span>
-<span class="ln" id="L2146">        <span class="tok-kw">use</span> std::io::Write;</span>
-<span class="ln" id="L2147">        std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>().<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L2148">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L2149">        std::io::<span class="tok-fn">stdin</span>()</span>
-<span class="ln" id="L2150">            .<span class="tok-fn">read_line</span>(&amp;<span class="tok-kw">mut</span> answer)</span>
-<span class="ln" id="L2151">            .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L2152">        <span class="tok-kw">if</span> answer.<span class="tok-fn">trim</span>() != <span class="tok-str">&quot;DESTROY&quot;</span> {</span>
-<span class="ln" id="L2153">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;cancelled &#8212; nothing was touched&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L2154">        }</span>
-<span class="ln" id="L2155">    }</span>
-<span class="ln" id="L2156"></span>
-<span class="ln" id="L2157">    <span class="tok-kw">let</span> report = veilvoice_crypto::<span class="tok-fn">shred_file</span>(&amp;file, veilvoice_crypto::Passes::<span class="tok-fn">Custom</span>(passes))</span>
-<span class="ln" id="L2158">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L2159"></span>
-<span class="ln" id="L2160">    println!();</span>
-<span class="ln" id="L2161">    println!(</span>
-<span class="ln" id="L2162">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2163">        <span class="tok-fn">ok</span>(&amp;format!(</span>
-<span class="ln" id="L2164">            <span class="tok-str">&quot;overwrote {} bytes in {} passes, then deleted it&quot;</span>,</span>
-<span class="ln" id="L2165">            report.bytes, report.passes</span>
-<span class="ln" id="L2166">        ))</span>
-<span class="ln" id="L2167">    );</span>
-<span class="ln" id="L2168">    <span class="tok-kw">if</span> !report.synced {</span>
-<span class="ln" id="L2169">        println!(</span>
-<span class="ln" id="L2170">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2171">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;the OS did not confirm the overwrite reached the device&quot;</span>)</span>
-<span class="ln" id="L2172">        );</span>
-<span class="ln" id="L2173">    }</span>
-<span class="ln" id="L2174">    println!();</span>
-<span class="ln" id="L2175">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  What this does not cover:&quot;</span>));</span>
-<span class="ln" id="L2176">    <span class="tok-kw">for</span> note <span class="tok-kw">in</span> &amp;report.caveats {</span>
-<span class="ln" id="L2177">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;   - {note}&quot;</span>)));</span>
-<span class="ln" id="L2178">    }</span>
-<span class="ln" id="L2179">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L2180">}</span>
+<span class="ln" id="L2141"><span class="tok-com">/// Destroy a file&#x27;s contents, then delete it.</span></span>
+<span class="ln" id="L2142"><span class="tok-com">///</span></span>
+<span class="ln" id="L2143"><span class="tok-com">/// Gated behind a typed confirmation rather than a y/n prompt. There is no</span></span>
+<span class="ln" id="L2144"><span class="tok-com">/// undo, and a reflexive &quot;y&quot; is exactly the mistake this is guarding against.</span></span>
+<span class="ln" id="L2145"><span class="tok-kw">fn</span> <span class="tok-fn">shred</span>(file: PathBuf, passes: u8, yes: bool) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L2146">    <span class="tok-kw">let</span> metadata = std::fs::<span class="tok-fn">metadata</span>(&amp;file).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, file.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L2147">    <span class="tok-kw">if</span> !metadata.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L2148">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;{} is not a file&quot;</span>, file.<span class="tok-fn">display</span>()));</span>
+<span class="ln" id="L2149">    }</span>
+<span class="ln" id="L2150"></span>
+<span class="ln" id="L2151">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Self-destruct&quot;</span>));</span>
+<span class="ln" id="L2152">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;File&quot;</span>, &amp;file.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L2153">    println!(</span>
+<span class="ln" id="L2154">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2155">        <span class="tok-fn">field</span>(</span>
+<span class="ln" id="L2156">            <span class="tok-str">&quot;Size&quot;</span>,</span>
+<span class="ln" id="L2157">            &amp;format!(<span class="tok-str">&quot;{:.1} KiB&quot;</span>, metadata.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f64 / <span class="tok-num">1024.0</span>)</span>
+<span class="ln" id="L2158">        )</span>
+<span class="ln" id="L2159">    );</span>
+<span class="ln" id="L2160">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Passes&quot;</span>, &amp;passes.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L2161">    println!();</span>
+<span class="ln" id="L2162">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">err</span>(<span class="tok-str">&quot;THIS CANNOT BE UNDONE.&quot;</span>));</span>
+<span class="ln" id="L2163">    println!(</span>
+<span class="ln" id="L2164">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2165">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L2166">            colour::MUTED,</span>
+<span class="ln" id="L2167">            <span class="tok-str">&quot;  On an SSD, SD card or USB stick, wear levelling may leave the</span></span>
+<span class="ln" id="L2168"><span class="tok-str">               original blocks in flash where no software can reach them.</span></span>
+<span class="ln" id="L2169"><span class="tok-str">               Full-disk encryption is the reliable answer &#8212; destroy the key</span></span>
+<span class="ln" id="L2170"><span class="tok-str">               and the data goes with it, wherever the drive put it.&quot;</span></span>
+<span class="ln" id="L2171">        )</span>
+<span class="ln" id="L2172">    );</span>
+<span class="ln" id="L2173">    println!();</span>
+<span class="ln" id="L2174"></span>
+<span class="ln" id="L2175">    <span class="tok-kw">if</span> !yes {</span>
+<span class="ln" id="L2176">        print!(<span class="tok-str">&quot;  Type DESTROY to continue: &quot;</span>);</span>
+<span class="ln" id="L2177">        <span class="tok-kw">use</span> std::io::Write;</span>
+<span class="ln" id="L2178">        std::io::<span class="tok-fn">stdout</span>().<span class="tok-fn">flush</span>().<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L2179">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L2180">        std::io::<span class="tok-fn">stdin</span>()</span>
+<span class="ln" id="L2181">            .<span class="tok-fn">read_line</span>(&amp;<span class="tok-kw">mut</span> answer)</span>
+<span class="ln" id="L2182">            .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L2183">        <span class="tok-kw">if</span> answer.<span class="tok-fn">trim</span>() != <span class="tok-str">&quot;DESTROY&quot;</span> {</span>
+<span class="ln" id="L2184">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;cancelled &#8212; nothing was touched&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L2185">        }</span>
+<span class="ln" id="L2186">    }</span>
+<span class="ln" id="L2187"></span>
+<span class="ln" id="L2188">    <span class="tok-kw">let</span> report = veilvoice_crypto::<span class="tok-fn">shred_file</span>(&amp;file, veilvoice_crypto::Passes::<span class="tok-fn">Custom</span>(passes))</span>
+<span class="ln" id="L2189">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L2190"></span>
+<span class="ln" id="L2191">    println!();</span>
+<span class="ln" id="L2192">    println!(</span>
+<span class="ln" id="L2193">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2194">        <span class="tok-fn">ok</span>(&amp;format!(</span>
+<span class="ln" id="L2195">            <span class="tok-str">&quot;overwrote {} bytes in {} passes, then deleted it&quot;</span>,</span>
+<span class="ln" id="L2196">            report.bytes, report.passes</span>
+<span class="ln" id="L2197">        ))</span>
+<span class="ln" id="L2198">    );</span>
+<span class="ln" id="L2199">    <span class="tok-kw">if</span> !report.synced {</span>
+<span class="ln" id="L2200">        println!(</span>
+<span class="ln" id="L2201">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2202">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;the OS did not confirm the overwrite reached the device&quot;</span>)</span>
+<span class="ln" id="L2203">        );</span>
+<span class="ln" id="L2204">    }</span>
+<span class="ln" id="L2205">    println!();</span>
+<span class="ln" id="L2206">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  What this does not cover:&quot;</span>));</span>
+<span class="ln" id="L2207">    <span class="tok-kw">for</span> note <span class="tok-kw">in</span> &amp;report.caveats {</span>
+<span class="ln" id="L2208">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, &amp;format!(<span class="tok-str">&quot;   - {note}&quot;</span>)));</span>
+<span class="ln" id="L2209">    }</span>
+<span class="ln" id="L2210">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L2211">}</span>
 </span>
-<span class="ln" id="L2181"></span>
+<span class="ln" id="L2212"></span>
 <span class="src-item" id="fn-info">
-<span class="ln" id="L2182"><span class="tok-kw">fn</span> <span class="tok-fn">info</span>() {</span>
-<span class="ln" id="L2183">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;VeilVoice&quot;</span>));</span>
-<span class="ln" id="L2184">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Version&quot;</span>, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>)));</span>
-<span class="ln" id="L2185">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Engine&quot;</span>, veilvoice_core::VERSION));</span>
-<span class="ln" id="L2186">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Crypto&quot;</span>, veilvoice_crypto::VERSION));</span>
-<span class="ln" id="L2187">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Audio&quot;</span>, veilvoice_audio::VERSION));</span>
-<span class="ln" id="L2188">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Metadata&quot;</span>, veilvoice_meta::VERSION));</span>
-<span class="ln" id="L2189">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Monitor&quot;</span>, veilvoice_watch::VERSION));</span>
-<span class="ln" id="L2190">    <span class="tok-com">// &quot;Licence&quot; the noun, to match the desktop app and the website. &quot;License&quot;</span></span>
-<span class="ln" id="L2191">    <span class="tok-com">// stays only where it is part of the proper name &quot;GNU General Public</span></span>
-<span class="ln" id="L2192">    <span class="tok-com">// License&quot; or an SPDX identifier.</span></span>
-<span class="ln" id="L2193">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Licence&quot;</span>, <span class="tok-str">&quot;GPL-3.0-or-later&quot;</span>));</span>
-<span class="ln" id="L2194">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Network access&quot;</span>, <span class="tok-str">&quot;none, by construction&quot;</span>));</span>
-<span class="ln" id="L2195">    println!(</span>
-<span class="ln" id="L2196">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2197">        <span class="tok-fn">field</span>(</span>
-<span class="ln" id="L2198">            <span class="tok-str">&quot;Live audio&quot;</span>,</span>
-<span class="ln" id="L2199">            <span class="tok-kw">if</span> cfg!(feature = <span class="tok-str">&quot;live&quot;</span>) {</span>
-<span class="ln" id="L2200">                <span class="tok-str">&quot;available&quot;</span></span>
-<span class="ln" id="L2201">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L2202">                <span class="tok-str">&quot;not built in (no device backend for this platform)&quot;</span></span>
-<span class="ln" id="L2203">            }</span>
-<span class="ln" id="L2204">        )</span>
-<span class="ln" id="L2205">    );</span>
-<span class="ln" id="L2206">    println!();</span>
-<span class="ln" id="L2207">    println!(</span>
-<span class="ln" id="L2208">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2209">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L2210">            colour::MUTED,</span>
-<span class="ln" id="L2211">            <span class="tok-str">&quot;  VeilVoice destroys the voiceprint, not the words.&quot;</span></span>
-<span class="ln" id="L2212">        )</span>
-<span class="ln" id="L2213">    );</span>
-<span class="ln" id="L2214">    println!(</span>
-<span class="ln" id="L2215">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L2216">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L2217">            colour::MUTED,</span>
-<span class="ln" id="L2218">            <span class="tok-str">&quot;  See docs/WHITEPAPER.md for what that does and does not&quot;</span></span>
-<span class="ln" id="L2219">        )</span>
-<span class="ln" id="L2220">    );</span>
-<span class="ln" id="L2221">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  protect against.&quot;</span>));</span>
-<span class="ln" id="L2222">}</span>
+<span class="ln" id="L2213"><span class="tok-kw">fn</span> <span class="tok-fn">info</span>() {</span>
+<span class="ln" id="L2214">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;VeilVoice&quot;</span>));</span>
+<span class="ln" id="L2215">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Version&quot;</span>, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>)));</span>
+<span class="ln" id="L2216">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Engine&quot;</span>, veilvoice_core::VERSION));</span>
+<span class="ln" id="L2217">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Crypto&quot;</span>, veilvoice_crypto::VERSION));</span>
+<span class="ln" id="L2218">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Audio&quot;</span>, veilvoice_audio::VERSION));</span>
+<span class="ln" id="L2219">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Metadata&quot;</span>, veilvoice_meta::VERSION));</span>
+<span class="ln" id="L2220">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Monitor&quot;</span>, veilvoice_watch::VERSION));</span>
+<span class="ln" id="L2221">    <span class="tok-com">// &quot;Licence&quot; the noun, to match the desktop app and the website. &quot;License&quot;</span></span>
+<span class="ln" id="L2222">    <span class="tok-com">// stays only where it is part of the proper name &quot;GNU General Public</span></span>
+<span class="ln" id="L2223">    <span class="tok-com">// License&quot; or an SPDX identifier.</span></span>
+<span class="ln" id="L2224">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Licence&quot;</span>, <span class="tok-str">&quot;GPL-3.0-or-later&quot;</span>));</span>
+<span class="ln" id="L2225">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Network access&quot;</span>, <span class="tok-str">&quot;none, by construction&quot;</span>));</span>
+<span class="ln" id="L2226">    println!(</span>
+<span class="ln" id="L2227">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2228">        <span class="tok-fn">field</span>(</span>
+<span class="ln" id="L2229">            <span class="tok-str">&quot;Live audio&quot;</span>,</span>
+<span class="ln" id="L2230">            <span class="tok-kw">if</span> cfg!(feature = <span class="tok-str">&quot;live&quot;</span>) {</span>
+<span class="ln" id="L2231">                <span class="tok-str">&quot;available&quot;</span></span>
+<span class="ln" id="L2232">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L2233">                <span class="tok-str">&quot;not built in (no device backend for this platform)&quot;</span></span>
+<span class="ln" id="L2234">            }</span>
+<span class="ln" id="L2235">        )</span>
+<span class="ln" id="L2236">    );</span>
+<span class="ln" id="L2237">    println!();</span>
+<span class="ln" id="L2238">    println!(</span>
+<span class="ln" id="L2239">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2240">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L2241">            colour::MUTED,</span>
+<span class="ln" id="L2242">            <span class="tok-str">&quot;  VeilVoice destroys the voiceprint, not the words.&quot;</span></span>
+<span class="ln" id="L2243">        )</span>
+<span class="ln" id="L2244">    );</span>
+<span class="ln" id="L2245">    println!(</span>
+<span class="ln" id="L2246">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L2247">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L2248">            colour::MUTED,</span>
+<span class="ln" id="L2249">            <span class="tok-str">&quot;  See docs/WHITEPAPER.md for what that does and does not&quot;</span></span>
+<span class="ln" id="L2250">        )</span>
+<span class="ln" id="L2251">    );</span>
+<span class="ln" id="L2252">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  protect against.&quot;</span>));</span>
+<span class="ln" id="L2253">}</span>
 </span>
-<span class="ln" id="L2223"></span>
-<span class="ln" id="L2224"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L2225"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L2226">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L2227">    <span class="tok-kw">use</span> clap::CommandFactory;</span>
-<span class="ln" id="L2228"></span>
-<span class="ln" id="L2229">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2230">    <span class="tok-kw">fn</span> <span class="tok-fn">cli_definition_is_valid</span>() {</span>
-<span class="ln" id="L2231">        Cli::<span class="tok-fn">command</span>().<span class="tok-fn">debug_assert</span>();</span>
-<span class="ln" id="L2232">    }</span>
-<span class="ln" id="L2233"></span>
-<span class="ln" id="L2234">    <span class="tok-kw">fn</span> <span class="tok-fn">tuning</span>(intensity: f32, keep_accent: bool, reseed_secs: f32) -&gt; Tuning {</span>
-<span class="ln" id="L2235">        Tuning {</span>
-<span class="ln" id="L2236">            intensity,</span>
-<span class="ln" id="L2237">            keep_accent,</span>
-<span class="ln" id="L2238">            reseed_secs,</span>
-<span class="ln" id="L2239">            <span class="tok-com">// The fixed interval, so these tests stay deterministic. The</span></span>
-<span class="ln" id="L2240">            <span class="tok-com">// randomised range has its own tests in veilvoice-core.</span></span>
-<span class="ln" id="L2241">            reseed_range: None,</span>
-<span class="ln" id="L2242">        }</span>
-<span class="ln" id="L2243">    }</span>
-<span class="ln" id="L2244"></span>
-<span class="ln" id="L2245">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2246">    <span class="tok-kw">fn</span> <span class="tok-fn">intensity_is_clamped_into_range</span>() {</span>
-<span class="ln" id="L2247">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">5.0</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L2248">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(-<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L2249">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">0.5</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">0.5</span>);</span>
-<span class="ln" id="L2250">    }</span>
-<span class="ln" id="L2251"></span>
-<span class="ln" id="L2252">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2253">    <span class="tok-kw">fn</span> <span class="tok-fn">keep_accent_disables_neutralisation</span>() {</span>
-<span class="ln" id="L2254">        assert!(!<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, true, <span class="tok-num">2.0</span>)).accent.enabled);</span>
-<span class="ln" id="L2255">        assert!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>)).accent.enabled);</span>
-<span class="ln" id="L2256">    }</span>
-<span class="ln" id="L2257"></span>
-<span class="ln" id="L2258">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2259">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_interval_reaches_the_engine_and_cannot_go_negative</span>() {</span>
-<span class="ln" id="L2260">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">0.5</span>)).reseed_secs, <span class="tok-num">0.5</span>);</span>
-<span class="ln" id="L2261">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">0.0</span>)).reseed_secs, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L2262">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, -<span class="tok-num">3.0</span>)).reseed_secs, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L2254"></span>
+<span class="ln" id="L2255"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L2256"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L2257">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L2258">    <span class="tok-kw">use</span> clap::CommandFactory;</span>
+<span class="ln" id="L2259"></span>
+<span class="ln" id="L2260">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2261">    <span class="tok-kw">fn</span> <span class="tok-fn">cli_definition_is_valid</span>() {</span>
+<span class="ln" id="L2262">        Cli::<span class="tok-fn">command</span>().<span class="tok-fn">debug_assert</span>();</span>
 <span class="ln" id="L2263">    }</span>
 <span class="ln" id="L2264"></span>
-<span class="ln" id="L2265">    <span class="tok-com">/// Encryption at rest is a *default*, not a flag the careful user has to</span></span>
-<span class="ln" id="L2266">    <span class="tok-com">/// find. If someone ever flips this, this test is what stops it shipping.</span></span>
-<span class="ln" id="L2267">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2268">    <span class="tok-kw">fn</span> <span class="tok-fn">recordings_are_encrypted_at_rest_by_default</span>() {</span>
-<span class="ln" id="L2269">        <span class="tok-kw">let</span> cli = Cli::<span class="tok-fn">try_parse_from</span>([<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;anonymise&quot;</span>, <span class="tok-str">&quot;in.wav&quot;</span>]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2270">        <span class="tok-kw">let</span> Command::Anonymise {</span>
-<span class="ln" id="L2271">            encrypt,</span>
-<span class="ln" id="L2272">            encrypt_to,</span>
-<span class="ln" id="L2273">            yes,</span>
-<span class="ln" id="L2274">            ..</span>
-<span class="ln" id="L2275">        } = cli.command</span>
-<span class="ln" id="L2276">        <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L2277">            panic!(<span class="tok-str">&quot;expected anonymise&quot;</span>);</span>
-<span class="ln" id="L2278">        };</span>
-<span class="ln" id="L2279">        assert!(encrypt, <span class="tok-str">&quot;at-rest encryption must default on&quot;</span>);</span>
-<span class="ln" id="L2280">        assert!(encrypt_to.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L2281">        assert!(!yes, <span class="tok-str">&quot;the confirmation must not be pre-answered&quot;</span>);</span>
+<span class="ln" id="L2265">    <span class="tok-kw">fn</span> <span class="tok-fn">tuning</span>(intensity: f32, keep_accent: bool, reseed_secs: f32) -&gt; Tuning {</span>
+<span class="ln" id="L2266">        Tuning {</span>
+<span class="ln" id="L2267">            intensity,</span>
+<span class="ln" id="L2268">            keep_accent,</span>
+<span class="ln" id="L2269">            reseed_secs,</span>
+<span class="ln" id="L2270">            <span class="tok-com">// The fixed interval, so these tests stay deterministic. The</span></span>
+<span class="ln" id="L2271">            <span class="tok-com">// randomised range has its own tests in veilvoice-core.</span></span>
+<span class="ln" id="L2272">            reseed_range: None,</span>
+<span class="ln" id="L2273">        }</span>
+<span class="ln" id="L2274">    }</span>
+<span class="ln" id="L2275"></span>
+<span class="ln" id="L2276">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2277">    <span class="tok-kw">fn</span> <span class="tok-fn">intensity_is_clamped_into_range</span>() {</span>
+<span class="ln" id="L2278">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">5.0</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L2279">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(-<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L2280">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">0.5</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">0.5</span>);</span>
+<span class="ln" id="L2281">    }</span>
 <span class="ln" id="L2282"></span>
-<span class="ln" id="L2283">        <span class="tok-kw">let</span> off = Cli::<span class="tok-fn">try_parse_from</span>([<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;anonymise&quot;</span>, <span class="tok-str">&quot;in.wav&quot;</span>, <span class="tok-str">&quot;--encrypt&quot;</span>, <span class="tok-str">&quot;false&quot;</span>])</span>
-<span class="ln" id="L2284">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L2285">        <span class="tok-kw">let</span> Command::Anonymise { encrypt, .. } = off.command <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L2286">            panic!(<span class="tok-str">&quot;expected anonymise&quot;</span>);</span>
-<span class="ln" id="L2287">        };</span>
-<span class="ln" id="L2288">        assert!(!encrypt, <span class="tok-str">&quot;it must still be possible to opt out&quot;</span>);</span>
-<span class="ln" id="L2289">    }</span>
-<span class="ln" id="L2290"></span>
-<span class="ln" id="L2291">    <span class="tok-com">/// Refused before anything is read or written, so a contradictory command</span></span>
-<span class="ln" id="L2292">    <span class="tok-com">/// line cannot half-happen.</span></span>
-<span class="ln" id="L2293">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2294">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span>() {</span>
-<span class="ln" id="L2295">        <span class="tok-kw">let</span> result = <span class="tok-fn">anonymise</span>(</span>
-<span class="ln" id="L2296">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;does-not-need-to-exist.wav&quot;</span>),</span>
-<span class="ln" id="L2297">            None,</span>
-<span class="ln" id="L2298">            <span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>),</span>
-<span class="ln" id="L2299">            true,</span>
-<span class="ln" id="L2300">            AtRest {</span>
-<span class="ln" id="L2301">                encrypt: false,</span>
-<span class="ln" id="L2302">                to: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;someone.pub&quot;</span>)),</span>
-<span class="ln" id="L2303">                yes: true,</span>
-<span class="ln" id="L2304">            },</span>
-<span class="ln" id="L2305">        );</span>
-<span class="ln" id="L2306">        assert!(result.<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L2307">    }</span>
-<span class="ln" id="L2308"></span>
-<span class="ln" id="L2309">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2310">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_setting_reads_clearly</span>() {</span>
-<span class="ln" id="L2311">        assert!(<span class="tok-fn">describe_reseed</span>(<span class="tok-num">0.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;off&quot;</span>));</span>
-<span class="ln" id="L2312">        assert!(<span class="tok-fn">describe_reseed</span>(<span class="tok-num">2.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;2&quot;</span>));</span>
-<span class="ln" id="L2313">    }</span>
-<span class="ln" id="L2314"></span>
-<span class="ln" id="L2315">    <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
-<span class="ln" id="L2316">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L2317">    <span class="tok-kw">fn</span> <span class="tok-fn">meter_scales_and_never_panics</span>() {</span>
-<span class="ln" id="L2318">        <span class="tok-com">// The meter itself, its scale and its edge cases, are tested in</span></span>
-<span class="ln" id="L2319">        <span class="tok-com">// `meter.rs` beside the code. What is worth checking from here is that</span></span>
-<span class="ln" id="L2320">        <span class="tok-com">// the two are still connected: a level a person would call loud must</span></span>
-<span class="ln" id="L2321">        <span class="tok-com">// not draw as an empty bar, which is what the linear meter this</span></span>
-<span class="ln" id="L2322">        <span class="tok-com">// replaced did to ordinary speech.</span></span>
-<span class="ln" id="L2323">        <span class="tok-kw">for</span> peak <span class="tok-kw">in</span> [-<span class="tok-num">1</span>.0f32, <span class="tok-num">0.0</span>, <span class="tok-num">0.25</span>, <span class="tok-num">0.5</span>, <span class="tok-num">1.0</span>, <span class="tok-num">4.0</span>] {</span>
-<span class="ln" id="L2324">            <span class="tok-kw">let</span> bar = meter::<span class="tok-fn">render</span>(peak, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>);</span>
-<span class="ln" id="L2325">            assert!(bar.<span class="tok-fn">chars</span>().<span class="tok-fn">count</span>() &gt;= <span class="tok-num">12</span>);</span>
-<span class="ln" id="L2326">        }</span>
-<span class="ln" id="L2327">        assert!(meter::<span class="tok-fn">render</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&#183;&#x27;</span>));</span>
-<span class="ln" id="L2328">        assert!(meter::<span class="tok-fn">render</span>(<span class="tok-num">1.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&#9608;&#x27;</span>));</span>
-<span class="ln" id="L2329">        assert!(</span>
-<span class="ln" id="L2330">            meter::<span class="tok-fn">render</span>(<span class="tok-num">0.251</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&#9608;&#x27;</span>).<span class="tok-fn">count</span>() &gt;= <span class="tok-num">8</span>,</span>
-<span class="ln" id="L2331">            <span class="tok-str">&quot;speech at -12 dBFS must fill most of the bar&quot;</span></span>
-<span class="ln" id="L2332">        );</span>
-<span class="ln" id="L2333">    }</span>
-<span class="ln" id="L2334">}</span>
+<span class="ln" id="L2283">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2284">    <span class="tok-kw">fn</span> <span class="tok-fn">keep_accent_disables_neutralisation</span>() {</span>
+<span class="ln" id="L2285">        assert!(!<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, true, <span class="tok-num">2.0</span>)).accent.enabled);</span>
+<span class="ln" id="L2286">        assert!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>)).accent.enabled);</span>
+<span class="ln" id="L2287">    }</span>
+<span class="ln" id="L2288"></span>
+<span class="ln" id="L2289">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2290">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_interval_reaches_the_engine_and_cannot_go_negative</span>() {</span>
+<span class="ln" id="L2291">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">0.5</span>)).reseed_secs, <span class="tok-num">0.5</span>);</span>
+<span class="ln" id="L2292">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">0.0</span>)).reseed_secs, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L2293">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, -<span class="tok-num">3.0</span>)).reseed_secs, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L2294">    }</span>
+<span class="ln" id="L2295"></span>
+<span class="ln" id="L2296">    <span class="tok-com">/// Encryption at rest is a *default*, not a flag the careful user has to</span></span>
+<span class="ln" id="L2297">    <span class="tok-com">/// find. If someone ever flips this, this test is what stops it shipping.</span></span>
+<span class="ln" id="L2298">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2299">    <span class="tok-kw">fn</span> <span class="tok-fn">recordings_are_encrypted_at_rest_by_default</span>() {</span>
+<span class="ln" id="L2300">        <span class="tok-kw">let</span> cli = Cli::<span class="tok-fn">try_parse_from</span>([<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;anonymise&quot;</span>, <span class="tok-str">&quot;in.wav&quot;</span>]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2301">        <span class="tok-kw">let</span> Command::Anonymise {</span>
+<span class="ln" id="L2302">            encrypt,</span>
+<span class="ln" id="L2303">            encrypt_to,</span>
+<span class="ln" id="L2304">            yes,</span>
+<span class="ln" id="L2305">            ..</span>
+<span class="ln" id="L2306">        } = cli.command</span>
+<span class="ln" id="L2307">        <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L2308">            panic!(<span class="tok-str">&quot;expected anonymise&quot;</span>);</span>
+<span class="ln" id="L2309">        };</span>
+<span class="ln" id="L2310">        assert!(encrypt, <span class="tok-str">&quot;at-rest encryption must default on&quot;</span>);</span>
+<span class="ln" id="L2311">        assert!(encrypt_to.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L2312">        assert!(!yes, <span class="tok-str">&quot;the confirmation must not be pre-answered&quot;</span>);</span>
+<span class="ln" id="L2313"></span>
+<span class="ln" id="L2314">        <span class="tok-kw">let</span> off = Cli::<span class="tok-fn">try_parse_from</span>([<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;anonymise&quot;</span>, <span class="tok-str">&quot;in.wav&quot;</span>, <span class="tok-str">&quot;--encrypt&quot;</span>, <span class="tok-str">&quot;false&quot;</span>])</span>
+<span class="ln" id="L2315">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L2316">        <span class="tok-kw">let</span> Command::Anonymise { encrypt, .. } = off.command <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L2317">            panic!(<span class="tok-str">&quot;expected anonymise&quot;</span>);</span>
+<span class="ln" id="L2318">        };</span>
+<span class="ln" id="L2319">        assert!(!encrypt, <span class="tok-str">&quot;it must still be possible to opt out&quot;</span>);</span>
+<span class="ln" id="L2320">    }</span>
+<span class="ln" id="L2321"></span>
+<span class="ln" id="L2322">    <span class="tok-com">/// Refused before anything is read or written, so a contradictory command</span></span>
+<span class="ln" id="L2323">    <span class="tok-com">/// line cannot half-happen.</span></span>
+<span class="ln" id="L2324">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2325">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span>() {</span>
+<span class="ln" id="L2326">        <span class="tok-kw">let</span> result = <span class="tok-fn">anonymise</span>(</span>
+<span class="ln" id="L2327">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;does-not-need-to-exist.wav&quot;</span>),</span>
+<span class="ln" id="L2328">            None,</span>
+<span class="ln" id="L2329">            <span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>),</span>
+<span class="ln" id="L2330">            true,</span>
+<span class="ln" id="L2331">            AtRest {</span>
+<span class="ln" id="L2332">                encrypt: false,</span>
+<span class="ln" id="L2333">                to: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;someone.pub&quot;</span>)),</span>
+<span class="ln" id="L2334">                yes: true,</span>
+<span class="ln" id="L2335">            },</span>
+<span class="ln" id="L2336">        );</span>
+<span class="ln" id="L2337">        assert!(result.<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L2338">    }</span>
+<span class="ln" id="L2339"></span>
+<span class="ln" id="L2340">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2341">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_setting_reads_clearly</span>() {</span>
+<span class="ln" id="L2342">        assert!(<span class="tok-fn">describe_reseed</span>(<span class="tok-num">0.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;off&quot;</span>));</span>
+<span class="ln" id="L2343">        assert!(<span class="tok-fn">describe_reseed</span>(<span class="tok-num">2.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;2&quot;</span>));</span>
+<span class="ln" id="L2344">    }</span>
+<span class="ln" id="L2345"></span>
+<span class="ln" id="L2346">    <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
+<span class="ln" id="L2347">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L2348">    <span class="tok-kw">fn</span> <span class="tok-fn">meter_scales_and_never_panics</span>() {</span>
+<span class="ln" id="L2349">        <span class="tok-com">// The meter itself, its scale and its edge cases, are tested in</span></span>
+<span class="ln" id="L2350">        <span class="tok-com">// `meter.rs` beside the code. What is worth checking from here is that</span></span>
+<span class="ln" id="L2351">        <span class="tok-com">// the two are still connected: a level a person would call loud must</span></span>
+<span class="ln" id="L2352">        <span class="tok-com">// not draw as an empty bar, which is what the linear meter this</span></span>
+<span class="ln" id="L2353">        <span class="tok-com">// replaced did to ordinary speech.</span></span>
+<span class="ln" id="L2354">        <span class="tok-kw">for</span> peak <span class="tok-kw">in</span> [-<span class="tok-num">1</span>.0f32, <span class="tok-num">0.0</span>, <span class="tok-num">0.25</span>, <span class="tok-num">0.5</span>, <span class="tok-num">1.0</span>, <span class="tok-num">4.0</span>] {</span>
+<span class="ln" id="L2355">            <span class="tok-kw">let</span> bar = meter::<span class="tok-fn">render</span>(peak, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>);</span>
+<span class="ln" id="L2356">            assert!(bar.<span class="tok-fn">chars</span>().<span class="tok-fn">count</span>() &gt;= <span class="tok-num">12</span>);</span>
+<span class="ln" id="L2357">        }</span>
+<span class="ln" id="L2358">        assert!(meter::<span class="tok-fn">render</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&#183;&#x27;</span>));</span>
+<span class="ln" id="L2359">        assert!(meter::<span class="tok-fn">render</span>(<span class="tok-num">1.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&#9608;&#x27;</span>));</span>
+<span class="ln" id="L2360">        assert!(</span>
+<span class="ln" id="L2361">            meter::<span class="tok-fn">render</span>(<span class="tok-num">0.251</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&#9608;&#x27;</span>).<span class="tok-fn">count</span>() &gt;= <span class="tok-num">8</span>,</span>
+<span class="ln" id="L2362">            <span class="tok-str">&quot;speech at -12 dBFS must fill most of the bar&quot;</span></span>
+<span class="ln" id="L2363">        );</span>
+<span class="ln" id="L2364">    }</span>
+<span class="ln" id="L2365">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

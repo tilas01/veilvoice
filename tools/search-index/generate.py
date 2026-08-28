@@ -81,6 +81,9 @@ MAX_HEADING = 120
 GENERATED = frozenset({
     "website/search-index.json",
     "website/nojs/search.html",
+    # Generated from the tab list in the desktop application's source and from
+    # the command captures, both of which are indexed where they are written.
+    "website/js/demo-data.js",
 })
 
 # `tools/docs/generate.py` renders the doc comments in the source into four
@@ -100,12 +103,35 @@ GENERATED_PREFIXES = (
     "wiki/",
     "assets/banners/",
     "website/assets/banners/",
+    # Every copy under here is a copy of something in `assets/`, which is
+    # already indexed. The website needs its own copy because it serves only
+    # what is under `website/`; the index does not need two.
+    "website/assets/",
 )
 CRATE_README = re.compile(r"^crates/[^/]+/README\.md$")
 
 
 def is_generated(rel):
+    """Is this file a rendering of something already indexed at its source?
+
+    **Every `.svg` in this repository is a drawing produced by a generator**,
+    and all 536 of them carry a `GENERATED` marker in their first lines. None
+    is hand-written prose. Indexing them put **1.7 MB of SVG markup into the
+    index, 43.6 per cent of it**, measured: `roadmap-film.svg` alone was 42 KB,
+    twice, because the website keeps its own copy.
+
+    Every byte of that is downloaded by every reader who uses the search, and
+    it buys them nothing: the words inside a drawing are the words of the
+    document it was drawn from, which is indexed at that document, and a search
+    result pointing at an SVG file is a result nobody can use.
+
+    That is not a new argument. It is the one written above about the crate
+    documentation, applied to the other kind of generated file. The banners
+    were excluded on it and the diagrams were not, which is how 43.6 per cent
+    accumulated without anybody deciding to.
+    """
     return (rel in GENERATED
+            or rel.endswith(".svg")
             or rel.startswith(GENERATED_PREFIXES)
             or bool(CRATE_README.match(rel)))
 
