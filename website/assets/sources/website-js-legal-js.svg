@@ -29,7 +29,8 @@
 <rect x="333.0" y="36.5" width="7.0" height="77.1" rx="3" fill="#bb9af7" opacity="0.93"/>
 <rect x="346.0" y="44.1" width="7.0" height="61.8" rx="3" fill="#bb9af7" opacity="0.85"/>
 <rect x="359.0" y="50.2" width="7.0" height="49.7" rx="3" fill="#bb9af7" opacity="0.79"/>
-<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">website/js/legal.js</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">The welcome dialog: licence terms, liability waiver, and the disclosure that this project was bu</text>
+<text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">website/js/legal.js</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">The welcome dialog: licence terms, liability waiver, and the disclosure that this</text>
+<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">project was bu</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">JS</text>
 </svg>

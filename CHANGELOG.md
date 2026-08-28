@@ -8,6 +8,47 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Every banner was cutting its own sentence in half
+
+Found by measuring rather than by looking, which is the point of it.
+
+The colour key and explanation added to the diagrams needed a canvas tall
+enough for them, and the height was worked out in one function and drawn in
+another. They disagreed by one row, so the last line of every note was clipped
+by the bottom edge of the picture it was explaining. That is the third time
+this repository has cut its own text off, after F-37's banner and the terminal
+drawings' ellipsis, and the two earlier ones were both found by somebody
+looking at a picture. Looking does not scale to three hundred of them.
+
+So `tools/site-tests/images.test.js` measures every piece of text in every
+generated drawing against the canvas it sits on. It found the clipped note it
+was written for, and then it found something considerably worse.
+
+**The banner subtitles ran off the right edge, on almost every banner in the
+repository.** `veilvoice-failsafe` overran by 665 pixels: its subtitle stopped
+after "while you are" and the rest was simply outside the picture. A banner is
+the first thing on a crate's page, in its README and in the wiki, and it was
+cutting its own sentence in half in all three. Nobody had noticed because
+nobody had read one to the end.
+
+That is F-37 again, in the same place, four rounds later. The lesson recorded
+then was that a picture has to be looked at; the lesson now is that a
+measurement is what scales.
+
+Subtitles wrap to two lines and mark the cut if a third would be needed. The
+narrow diagrams widen to fit their own key, because a key drawn off the edge of
+its picture is the same fault, and to fit their note, because a crate with one
+file drew a picture 141 pixels across and wrapped a paragraph into it one word
+at a time.
+
+And one number where there were three. The two generators laid text out at 0.60
+and 0.567 of the font size and the checker measured at 0.62, so drawings came
+out a few pixels wider than the suite would accept. All three are 0.62 now,
+which is also the safer figure: the font is whichever of the stack the reader
+has, and a layout that assumes the narrowest overflows on the others.
+
+**4,956 pieces of text in 490 drawings, all inside their canvas.**
+
 ### Every workflow chart now carries its own colour key and explanation
 
 Marker 69. There are 303 of these drawings, one per crate and one per file, and
