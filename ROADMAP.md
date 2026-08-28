@@ -188,12 +188,12 @@ it can honestly be made rather than to keep apologising for it.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 74 | **The lock screen tells an attacker nothing** — no explanation of what the lock is or is not worth while it is locked, the account of that moved to the documentation and to the unlocked application, and a small animation in its place | **next** | 1 d |
-| 75 | **`veilvoice-guard` inside the desktop application** — the integrity record taken at install and checked at every launch, sealed with the existing cryptography rather than left in the clear | **planned** | 2–3 d |
+| 74 | **The lock screen tells an attacker nothing** — no explanation of what the lock is or is not worth while it is locked, the account of that moved to the documentation and to the unlocked application, and a small animation in its place | **done** | — |
+| 75 | **`veilvoice-guard` inside the desktop application** — the integrity record taken at install and checked at every launch, sealed with the existing cryptography rather than left in the clear | **next** | 2–3 d |
 | 76 | **The app lock, hardened as far as it honestly goes** — the file stored where only an administrator can write it, its contents and its name randomised, a tamper check on every read, restoration from the sealed copy when it fails, and an alert that does not go away until the tamper passphrase is given | **planned** | 4–5 d |
 | 77 | **What the lock is worth, written down properly** — one account, in the documentation, covering what the hardening buys and what it does not | **planned** | 1 d |
-| 78 | **Every website palette in the application, chosen from the interface** | **planned** | 1 d |
-| 79 | **A window that does not stutter** — the interface measured rather than described, every task off the drawing thread, and the smallest amount of code that does it | **planned** | 3–4 d |
+| 78 | **Every website palette in the application, chosen from the interface** | **done** | — |
+| 79 | **A window that does not stutter** — the interface measured rather than described, every task off the drawing thread, and the smallest amount of code that does it | **next** | 2 d |
 
 ## Finally
 
@@ -492,6 +492,31 @@ flash a console every time, and a windowed one would send its output nowhere
 when run from a terminal. Switching at run time is FFI, and every crate here
 carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
 maintainer's call and not something to slip in, so it waits for one.
+
+**Marker 78 was already built and was not findable, which is a different
+fault.** Every one of the website's nine palettes has been in the application
+since marker 26, with the swatches and the contrast measured rather than
+assumed, and the picker was on a page inside Settings. Somebody looks there
+only if they already believe there is something to find. The website puts its
+picker in the header of every page; so does this now, and Settings keeps the
+fuller panel. Nothing was added to the engine and one control was moved into
+sight.
+
+**Marker 79 is half done and the half that is left needs a machine with a
+screen.** The draw path was read for the calls that wait, and there are none:
+everything that can block already runs on its own thread and reports back
+through a channel, which a test now holds rather than a comment. The repaint
+cadence was one number, 50 ms, for a live session and a download alike, and
+twenty frames a second is fine for a progress line and is not fine for a meter
+following a voice: at that rate it steps rather than sweeps, and a window whose
+only moving part is stepping reads as one that is struggling. A live session
+asks for 16 ms now and everything else keeps 50.
+
+What is *not* claimed is that this fixes anything anybody has reported. The
+machine this was written on has no display and cannot measure a frame. So the
+About tab shows the frame time, smoothed, because a number from the person with
+the problem is worth more than a change made blind, and 16 ms and 120 ms are
+different problems with different causes.
 
 **Markers 74 to 79, and the two places they meet a rule this project already
 has.**

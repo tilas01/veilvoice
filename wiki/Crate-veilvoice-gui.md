@@ -83,7 +83,7 @@ another thread, so the window keeps answering while it is busy.
 flowchart TD
     n_lib(["lib.rs<br/>82 lines"])
     n_main(["main.rs<br/>111 lines"])
-    n_app["app.rs<br/>1971 lines"]
+    n_app["app.rs<br/>2100 lines"]
     n_crashlog["crashlog.rs<br/>266 lines"]
     n_dialog["dialog.rs<br/>369 lines"]
     n_group["group.rs<br/>1668 lines"]
@@ -93,8 +93,8 @@ flowchart TD
     n_policy["policy.rs<br/>320 lines"]
     n_prefs["prefs.rs<br/>490 lines"]
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
-    n_security["security.rs<br/>1111 lines"]
-    n_settings["settings.rs<br/>1025 lines"]
+    n_security["security.rs<br/>1175 lines"]
+    n_settings["settings.rs<br/>1056 lines"]
     n_setup["setup.rs<br/>753 lines"]
     n_soundbar["soundbar.rs<br/>360 lines"]
     n_theme["theme.rs<br/>783 lines"]
@@ -130,6 +130,8 @@ flowchart TD
     n_prefs --> n_notify
     n_prefs --> n_theme
     n_security --> n_dialog
+    n_security --> n_prefs
+    n_security --> n_soundbar
     n_security --> n_theme
     n_settings --> n_monitor
     n_settings --> n_notify
@@ -174,7 +176,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`app.rs`|File-veilvoice-gui-app]] | 1971 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [[`app.rs`|File-veilvoice-gui-app]] | 2100 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [[`crashlog.rs`|File-veilvoice-gui-crashlog]] | 266 | Make a failure that produces no output produce some. |
 | [[`dialog.rs`|File-veilvoice-gui-dialog]] | 369 | Asking for a file without stopping the window. |
 | [[`group.rs`|File-veilvoice-gui-group]] | 1668 | Group mode: several people in one recording, each with a name and a colour. |
@@ -186,8 +188,8 @@ flowchart TD
 | [[`policy.rs`|File-veilvoice-gui-policy]] | 320 | The policy in force, and what the interface does about it. |
 | [[`prefs.rs`|File-veilvoice-gui-prefs]] | 490 | What the user has chosen about how the app looks and moves. |
 | [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] | 348 | Whether the operating system has been asked to reduce motion. |
-| [[`security.rs`|File-veilvoice-gui-security]] | 1111 | The application lock, and the at-rest encryption of what VeilVoice writes. |
-| [[`settings.rs`|File-veilvoice-gui-settings]] | 1025 | The settings panel: a menu of pages, each a titled group of choices. |
+| [[`security.rs`|File-veilvoice-gui-security]] | 1175 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [[`settings.rs`|File-veilvoice-gui-settings]] | 1056 | The settings panel: a menu of pages, each a titled group of choices. |
 | [[`setup.rs`|File-veilvoice-gui-setup]] | 753 | The setup tab: install this copy, undo that, and the optional companions. |
 | [[`soundbar.rs`|File-veilvoice-gui-soundbar]] | 360 | The animated mark: a row of bars that rise and fall. |
 | [[`theme.rs`|File-veilvoice-gui-theme]] | 783 | Colour schemes for the desktop app. |

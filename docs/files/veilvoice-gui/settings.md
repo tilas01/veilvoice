@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/settings.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1025 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1056 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
 
 ## Contents
 
@@ -61,7 +61,7 @@ choice applies as you make it and is remembered.
 
 ## What this file contains
 
-1025 lines defining **26 functions** (17 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+1056 lines defining **27 functions** (18 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -82,6 +82,8 @@ choice applies as you make it and is remembered.
   - reaches: `persist`
 - `Settings::tab` (line 480) -- The settings tab.
   - reaches: `appearance_page`, `interface_page`, `motion_page`, `storage_page`, `custom_palette_help`, `persist`, `section`, `swatches`, `failsafe`, `live_monitor`, `notify_style`, `set_failsafe`
+- `Settings::theme_picker` (line 604) -- The colour scheme, as a compact control for the window header.
+  - reaches: `persist`
 
 ## What calls what
 
@@ -91,7 +93,7 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
-_22 of 26 functions are drawn; the diagram is bounded at 22 so it
+_22 of 27 functions are drawn; the diagram is bounded at 22 so it
 stays readable. The full list is in the table below._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
@@ -110,7 +112,6 @@ flowchart TD
     n_motion["Settings::motion<br/>line 138"]
     n_needs_first_run(["Settings::needs_first_run<br/>line 143"])
     n_persist["Settings::persist<br/>line 147"]
-    n_save_error(["Settings::save_error<br/>line 168"])
     n_set_hide_install_tab["Settings::set_hide_install_tab<br/>line 189"]
     n_failsafe["Settings::failsafe<br/>line 203"]
     n_set_failsafe["Settings::set_failsafe<br/>line 208"]
@@ -123,11 +124,12 @@ flowchart TD
     n_first_run_panel(["Settings::first_run_panel<br/>line 420"])
     n_tab(["Settings::tab<br/>line 480"])
     n_custom_palette_help["Settings::custom_palette_help<br/>line 534"]
-    n_appearance_page["Settings::appearance_page<br/>line 597"]
-    n_motion_page["Settings::motion_page<br/>line 634"]
-    n_storage_page["Settings::storage_page<br/>line 709"]
-    n_section["section<br/>line 770"]
-    n_swatches["swatches<br/>line 778"]
+    n_theme_picker(["Settings::theme_picker<br/>line 604"])
+    n_appearance_page["Settings::appearance_page<br/>line 628"]
+    n_motion_page["Settings::motion_page<br/>line 665"]
+    n_storage_page["Settings::storage_page<br/>line 740"]
+    n_section["section<br/>line 801"]
+    n_swatches["swatches<br/>line 809"]
     n_appearance_page --> n_custom_palette_help
     n_appearance_page --> n_persist
     n_appearance_page --> n_section
@@ -158,11 +160,11 @@ flowchart TD
     n_tab --> n_interface_page
     n_tab --> n_motion_page
     n_tab --> n_storage_page
+    n_theme_picker --> n_persist
     click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L112" "open the source"
     click n_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L138" "open the source"
     click n_needs_first_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L143" "open the source"
     click n_persist href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L147" "open the source"
-    click n_save_error href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L168" "open the source"
     click n_set_hide_install_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L189" "open the source"
     click n_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L203" "open the source"
     click n_set_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L208" "open the source"
@@ -175,13 +177,14 @@ flowchart TD
     click n_first_run_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L420" "open the source"
     click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L480" "open the source"
     click n_custom_palette_help href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L534" "open the source"
-    click n_appearance_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L597" "open the source"
-    click n_motion_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L634" "open the source"
-    click n_storage_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L709" "open the source"
-    click n_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L770" "open the source"
-    click n_swatches href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L778" "open the source"
+    click n_theme_picker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L604" "open the source"
+    click n_appearance_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L628" "open the source"
+    click n_motion_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L665" "open the source"
+    click n_storage_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L740" "open the source"
+    click n_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L801" "open the source"
+    click n_swatches href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L809" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_load,n_needs_first_run,n_save_error,n_set_always_group,n_first_run_panel,n_tab entry
+    class n_load,n_needs_first_run,n_set_always_group,n_first_run_panel,n_tab,n_theme_picker entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_motion,n_set_hide_install_tab,n_failsafe,n_set_failsafe,n_notify_style,n_set_notify_style,n_live_monitor,n_set_live_monitor api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -218,11 +221,12 @@ flowchart TD
 | `Settings::first_run_panel` <sub>pub fn</sub> | [420](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L420) | The first-run panel: offered once, with animation already on. |
 | `Settings::tab` <sub>pub fn</sub> | [480](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L480) | The settings tab. |
 | `Settings::custom_palette_help` <sub>fn</sub> | [534](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L534) | Explain where custom palettes go, and say what was refused and why. |
-| `Settings::appearance_page` <sub>fn</sub> | [597](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L597) |  |
-| `Settings::motion_page` <sub>fn</sub> | [634](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L634) |  |
-| `Settings::storage_page` <sub>fn</sub> | [709](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L709) |  |
-| `section` <sub>fn</sub> | [770](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L770) | A titled group with a one-line explanation under it. |
-| `swatches` <sub>fn</sub> | [778](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L778) | The active palette, as a row of swatches, so the choice can be seen rather than only read. |
+| `Settings::theme_picker` <sub>pub fn</sub> | [604](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L604) | The colour scheme, as a compact control for the window header. |
+| `Settings::appearance_page` <sub>fn</sub> | [628](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L628) |  |
+| `Settings::motion_page` <sub>fn</sub> | [665](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L665) |  |
+| `Settings::storage_page` <sub>fn</sub> | [740](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L740) |  |
+| `section` <sub>fn</sub> | [801](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L801) | A titled group with a one-line explanation under it. |
+| `swatches` <sub>fn</sub> | [809](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L809) | The active palette, as a row of swatches, so the choice can be seen rather than only read. |
 
 ---
 

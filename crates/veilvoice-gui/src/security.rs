@@ -377,11 +377,26 @@ impl Security {
     }
 
     /// The full-window unlock screen. Nothing else is drawn while this is up.
-    pub fn unlock_screen(&mut self, ui: &mut egui::Ui) {
+    pub fn unlock_screen(&mut self, ui: &mut egui::Ui, motion: crate::prefs::Motion) {
         self.poll();
 
         ui.add_space(40.0);
         ui.vertical_centered(|ui| {
+            // The mark, moving, in the space the explanation used to take.
+            //
+            // It is the same soundbar the header draws and the website draws,
+            // and it obeys the same motion preference, so somebody who asked
+            // their system for less movement gets it at rest. A locked window
+            // is a window somebody is looking at while they remember a
+            // passphrase; something alive in it is worth more than a paragraph
+            // that helps whoever should not be reading it.
+            crate::soundbar::draw(
+                ui,
+                egui::vec2(120.0, 34.0),
+                motion,
+                ui.input(|i| i.time) as f32,
+            );
+            ui.add_space(10.0);
             ui.label(
                 RichText::new("VeilVoice")
                     .size(24.0)
@@ -392,23 +407,28 @@ impl Security {
         });
         ui.add_space(24.0);
 
-        if let Some(e) = &self.load_error {
-            ui.label(RichText::new(e).color(p::red()));
-            ui.label(
-                RichText::new(
-                    "Delete the lock file to start over. Doing so is not a bypass: \
-                     anyone who can reach the file could always have done it.",
-                )
-                .color(p::muted())
-                .small(),
-            );
-            if let Some(path) = &self.path {
+        // **Marker 74.** A locked window says it is locked and nothing else.
+        //
+        // It used to say a great deal: what the lock is and is not worth, where
+        // the file lives, and that deleting that file starts over and is not a
+        // bypass. Every one of those sentences is true, and every one of them
+        // is addressed to the wrong person. The reader of a locked window is
+        // either its owner, who does not need any of it right now, or somebody
+        // who picked the machine up, who should not be handed the location of
+        // the file and the news that removing it works.
+        //
+        // The account of what the lock is worth has not been dropped. It is in
+        // `docs/USER_GUIDE.md` and on the security tab of the *unlocked*
+        // application, which are the two places its owner reads it.
+        if self.load_error.is_some() {
+            ui.vertical_centered(|ui| {
+                ui.label(RichText::new("This copy cannot be unlocked here.").color(p::yellow()));
                 ui.label(
-                    RichText::new(path.display().to_string())
+                    RichText::new("See the user guide, under the app lock.")
                         .color(p::muted())
                         .small(),
                 );
-            }
+            });
             return;
         }
 
@@ -455,24 +475,11 @@ impl Security {
             ui.label(RichText::new(text).color(*colour));
         }
 
-        if let Some(store) = &self.store {
-            if store.failures() > 0 && cooldown.is_none() {
-                ui.label(
-                    RichText::new(format!("{} failed attempt(s) recorded", store.failures()))
-                        .color(p::muted())
-                        .small(),
-                );
-            }
-        }
-
-        ui.add_space(28.0);
-        ui.separator();
-        ui.label(
-            RichText::new("What this lock is worth")
-                .color(p::yellow())
-                .small(),
-        );
-        ui.label(RichText::new(lock::SCOPE).color(p::fg()));
+        // The count of failed attempts is not shown here either. It tells the
+        // owner nothing they did not just do, and it tells somebody else how
+        // many people have tried and how recently, which is information about
+        // the owner rather than about the lock. It is on the security tab,
+        // where the person reading it has already proved who they are.
     }
 
     /// The security tab: manage the lock, and see what it is worth.
@@ -946,6 +953,63 @@ fn password_row(ui: &mut egui::Ui, label: &str, value: &mut String) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **Marker 74.** The locked window explains nothing.
+    ///
+    /// It used to explain a great deal: what the lock is and is not worth,
+    /// where its file lives, and that deleting that file starts over. All true,
+    /// all addressed to the wrong person. The reader of a locked window is
+    /// either its owner, who does not need any of it at that moment, or
+    /// somebody who picked the machine up.
+    ///
+    /// This reads the source of `unlock_screen` rather than rendering it,
+    /// because what is being held is that certain sentences are not reachable
+    /// from that function at all. A rendering test would only prove they were
+    /// absent from one frame.
+    #[test]
+    fn the_locked_window_tells_a_stranger_nothing() {
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        let start = source
+            .find("pub fn unlock_screen")
+            .expect("the unlock screen has to exist");
+        let end = source[start..]
+            .find("\n    /// The security tab")
+            .map(|at| start + at)
+            .unwrap_or(source.len());
+        // Comments stripped first. The first version of this flagged its own
+        // explanation of why the count is not shown, which is the same honest
+        // failure `veilvoice-priv`'s subprocess guard records: what matters is
+        // what the function *draws*, so that is what is searched.
+        let body: String = source[start..end]
+            .lines()
+            .filter(|line| !line.trim_start().starts_with("//"))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        for forbidden in [
+            "lock::SCOPE",
+            "path.display()",
+            "Delete the lock file",
+            "failed attempt",
+        ] {
+            assert!(
+                !body.contains(forbidden),
+                "the locked window mentions {forbidden:?}, which is for its owner \
+                 and not for whoever is holding the machine"
+            );
+        }
+
+        // And the account itself has not simply been deleted: the tab, which
+        // only an unlocked application draws, still carries it.
+        let tab = source
+            .find("pub fn tab")
+            .map(|at| &source[at..])
+            .unwrap_or("");
+        assert!(
+            tab.contains("lock::SCOPE"),
+            "what the lock is worth has to be somewhere its owner reads it"
+        );
+    }
 
     /// Cheap on purpose: these tests exercise the plan, not Argon2.
     fn weak() -> kdf::KdfParams {
