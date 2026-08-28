@@ -190,10 +190,10 @@ it can honestly be made rather than to keep apologising for it.
 |---:|---|---|---|
 | 74 | **The lock screen tells an attacker nothing** — no explanation of what the lock is or is not worth while it is locked, the account of that moved to the documentation and to the unlocked application, and a small animation in its place | **done** | — |
 | 75 | **`veilvoice-guard` inside the desktop application** — the integrity record taken at install and checked at every launch, sealed with the existing cryptography rather than left in the clear | **next** | 2–3 d |
-| 76 | **The app lock, hardened as far as it honestly goes** — the file stored where only an administrator can write it, its contents and its name randomised, a tamper check on every read, restoration from the sealed copy when it fails, and an alert that does not go away until the tamper passphrase is given | **planned** | 4–5 d |
-| 77 | **What the lock is worth, written down properly** — one account, in the documentation, covering what the hardening buys and what it does not | **planned** | 1 d |
+| 76 | **The app lock, hardened as far as it honestly goes** — an authentication tag under the passphrase, two copies with the spare administrator-owned where the platform allows it, restoration when one goes, randomised names and masked contents, and a report that only the passphrase can clear | **done** | — |
+| 77 | **What the lock is worth, written down properly** — one account, in the documentation, separating the parts that are real from the parts that are only obscurity | **done** | — |
 | 78 | **Every website palette in the application, chosen from the interface** | **done** | — |
-| 79 | **A window that does not stutter** — the interface measured rather than described, every task off the drawing thread, and the smallest amount of code that does it | **next** | 2 d |
+| 79 | **A window that does not stutter** — the interface measured rather than described, every task off the drawing thread, and the smallest amount of code that does it | **done** | — |
 
 ## Finally
 
@@ -502,8 +502,8 @@ picker in the header of every page; so does this now, and Settings keeps the
 fuller panel. Nothing was added to the engine and one control was moved into
 sight.
 
-**Marker 79 is half done and the half that is left needs a machine with a
-screen.** The draw path was read for the calls that wait, and there are none:
+**Marker 79 is done as far as a machine with no screen can take it.** The draw
+path was read for the calls that wait, and there are none:
 everything that can block already runs on its own thread and reports back
 through a channel, which a test now holds rather than a comment. The repaint
 cadence was one number, 50 ms, for a live session and a download alike, and
@@ -525,21 +525,43 @@ has.**
 it runs into marker 39's decision, which is that VeilVoice **never acquires
 privilege**: it does not re-launch itself elevated, install a service, or ask
 for a password, because those are changes to somebody's machine and they belong
-to the person whose machine it is. The shape that keeps both: when VeilVoice is
-*already* running with administrator rights it writes the lock somewhere only
-an administrator can, and when it is not it says so, prints the one command
-that would move it there, and carries on with the file it can write. What it
-will not do is prompt for elevation on its own.
+to the person whose machine it is. The shape that keeps both, and the shape
+that shipped: the *second* copy goes to an administrator-owned directory when
+VeilVoice is already running with enough privilege to make one, and stays in
+the user's own directory when it is not. Putting the *first* copy there would
+have broken the rate limit, because an unelevated run has to be able to write
+down a failed attempt. The test for privilege is the attempt itself, which
+avoids a platform call in each case and asks the only question that matters.
+On Windows the equivalent needs an access-control list this project does not
+link the API to set, so there the second copy is a second copy and is described
+as one.
+
+*The authentication tag is the part of marker 76 that is not obscurity, and it
+is smaller than it sounds.* One Argon2id run is split by HKDF into the verifier
+that goes on disk and a tag key that never does, so an edit made by somebody
+without the passphrase cannot be made to look authentic. That catches the
+swapped password and the weakened cost. It does not catch deletion, which is
+what the second copy answers, and it does not catch a lock replaced wholesale
+with the attacker's own, which nothing here answers. The failed-attempt counter
+had to be left outside the tag entirely: it is written at the one moment the
+tag key does not exist, so covering it would have meant reporting every honest
+typo as tampering. The rate limit is therefore exactly as editable as it was
+before, and the documentation says so in as many words.
 
 *Hiding the file's name and contents* is obscurity, and obscurity is not a
 security property. Randomising where the lock lives and what it looks like
 raises the cost for somebody poking around and stops nothing that a determined
-local attacker with a debugger will do. It is worth doing for the first case
-and it must not be described as protection against the second. Marker 77 is
-that sentence, written where a user reads it, and marker 74 is the decision
-that the *lock screen* is not the place for it: telling somebody standing at a
-locked window what the lock cannot do is helping the one person who should not
-be told.
+local attacker with a debugger will do. The names come from an index file at a
+fixed, obvious path, because something has to be findable or the program could
+never open its own lock again, so anybody who reads that index recomputes both
+names at once. It is worth doing for the first case and it must not be
+described as protection against the second. Marker 77 is that sentence, written
+where a user reads it, and marker 74 is the decision that the *lock screen* is
+not the place for it: telling somebody standing at a locked window what the
+lock cannot do is helping the one person who should not be told. The
+interference report follows the same rule and is drawn on the security tab, not
+on the lock screen, because telling whoever is holding the machine that their
+edit was noticed tells them to try a different one.
 
 **Marker 71 is an animation rather than an encoded file, and that is a
 decision.** A video was asked for and a video is the right shape for it:

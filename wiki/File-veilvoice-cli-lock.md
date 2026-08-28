@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/lock.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 248 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 319 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs)
 
 ## Contents
 
@@ -34,15 +34,16 @@ up your unlocked computer, and it does not stop somebody holding your disk.
 
 ## What this file contains
 
-248 lines defining **9 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+319 lines defining **12 functions** (2 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Action` (line 30)
+- `enum Site` (line 50) -- Where the lock is kept for this invocation.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `run` (line 81)
+- `run` (line 130)
   - reaches: `change`, `remove`, `resolve`, `set`, `status`, `open_or_explain`, `print_scope`, `wrap`
 
 ## What calls what
@@ -59,15 +60,18 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_resolve["resolve<br/>line 42"]
-    n_print_scope["print_scope<br/>line 54"]
-    n_wrap["wrap<br/>line 63"]
-    n_run(["run<br/>line 81"])
-    n_status["status<br/>line 94"]
-    n_set["set<br/>line 128"]
-    n_change["change<br/>line 171"]
-    n_remove["remove<br/>line 183"]
-    n_open_or_explain["open_or_explain<br/>line 194"]
+    n_resolve["Site::resolve<br/>line 56"]
+    n_describe["Site::describe<br/>line 72"]
+    n_open["Site::open<br/>line 83"]
+    n_create["Site::create<br/>line 92"]
+    n_print_scope["print_scope<br/>line 103"]
+    n_wrap["wrap<br/>line 112"]
+    n_run(["run<br/>line 130"])
+    n_status["status<br/>line 143"]
+    n_set["set<br/>line 184"]
+    n_change["change<br/>line 226"]
+    n_remove["remove<br/>line 238"]
+    n_open_or_explain["open_or_explain<br/>line 249"]
     n_change --> n_open_or_explain
     n_print_scope --> n_wrap
     n_remove --> n_open_or_explain
@@ -78,21 +82,24 @@ flowchart TD
     n_run --> n_status
     n_set --> n_print_scope
     n_status --> n_print_scope
-    click n_resolve href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L42" "open the source"
-    click n_print_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L54" "open the source"
-    click n_wrap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L63" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L81" "open the source"
-    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L94" "open the source"
-    click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L128" "open the source"
-    click n_change href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L171" "open the source"
-    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L183" "open the source"
-    click n_open_or_explain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L194" "open the source"
+    click n_resolve href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L56" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L72" "open the source"
+    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L83" "open the source"
+    click n_create href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L92" "open the source"
+    click n_print_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L103" "open the source"
+    click n_wrap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L112" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L130" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L143" "open the source"
+    click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L184" "open the source"
+    click n_change href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L226" "open the source"
+    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L238" "open the source"
+    click n_open_or_explain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L249" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_wrap api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_resolve,n_print_scope,n_status,n_set,n_change,n_remove,n_open_or_explain helper
+    class n_resolve,n_describe,n_open,n_create,n_print_scope,n_status,n_set,n_change,n_remove,n_open_or_explain helper
 ```
 
 </details>
@@ -102,12 +109,16 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `Action` <sub>pub enum</sub> | [30](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L30) |  |
-| `resolve` <sub>fn</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L42) | Resolve the lock file, preferring an explicit --path. |
-| `print_scope` <sub>fn</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L54) | Print the honest scope note, wrapped for a terminal. |
-| `wrap` <sub>pub fn</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L63) | Greedy word wrap. |
-| `run` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L81) |  |
-| `status` <sub>fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L94) |  |
-| `set` <sub>fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L128) |  |
-| `change` <sub>fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L171) |  |
-| `remove` <sub>fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L183) |  |
-| `open_or_explain` <sub>fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L194) |  |
+| `Site` <sub>enum</sub> | [50](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L50) | Where the lock is kept for this invocation. |
+| `Site::resolve` <sub>fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L56) |  |
+| `Site::describe` <sub>fn</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L72) | What to print as the location. |
+| `Site::open` <sub>fn</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L83) | Open the lock, and say whether a missing copy had to be rebuilt. |
+| `Site::create` <sub>fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L92) |  |
+| `print_scope` <sub>fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L103) | Print the honest scope note, wrapped for a terminal. |
+| `wrap` <sub>pub fn</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L112) | Greedy word wrap. |
+| `run` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L130) |  |
+| `status` <sub>fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L143) |  |
+| `set` <sub>fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L184) |  |
+| `change` <sub>fn</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L226) |  |
+| `remove` <sub>fn</sub> | [238](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L238) |  |
+| `open_or_explain` <sub>fn</sub> | [249](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs#L249) |  |
