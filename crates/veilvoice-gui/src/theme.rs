@@ -518,6 +518,31 @@ pub fn install(ctx: &egui::Context) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Mutex;
+
+    /// **F-78.** Four tests here read and write the same process-global
+    /// `ACTIVE`, and `cargo test` runs them on parallel threads in one
+    /// process. Nothing kept them apart, so any two could interleave: one
+    /// switched the theme to `paper` and asked whether the palette had
+    /// changed, while another put the index back to zero in between and made
+    /// the answer no.
+    ///
+    /// Measured: one failure in forty runs of this module alone, and it fired
+    /// for real during a full-workspace run, where there are more threads
+    /// competing. A test that fails one run in forty is worse than one that
+    /// fails every time, because the answer people learn is "run it again".
+    ///
+    /// So the tests that touch the global take this in turn. Poisoning is
+    /// stepped over rather than propagated: a panic in one test has already
+    /// failed that test, and turning it into a failure in every other one
+    /// hides which was the real fault.
+    static ACTIVE_THEME: Mutex<()> = Mutex::new(());
+
+    fn alone() -> std::sync::MutexGuard<'static, ()> {
+        ACTIVE_THEME
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
 
     fn reset() {
         ACTIVE.store(0, Ordering::Relaxed);
@@ -525,6 +550,7 @@ mod tests {
 
     #[test]
     fn palette_matches_the_cli_escape_codes() {
+        let _alone = alone();
         reset();
         // Both front-ends must be the same program to look at. These values are
         // duplicated in veilvoice-cli's `theme::colour`.
@@ -674,6 +700,7 @@ mod tests {
 
     #[test]
     fn switching_theme_changes_the_palette_and_the_visuals() {
+        let _alone = alone();
         reset();
         let ctx = egui::Context::default();
         install(&ctx);
@@ -696,6 +723,7 @@ mod tests {
     /// inside the paint loop, which is the worst place for an index panic.
     #[test]
     fn an_impossible_index_saturates_instead_of_panicking() {
+        let _alone = alone();
         ACTIVE.store(usize::MAX, Ordering::Relaxed);
         let _ = active();
         assert_eq!(active().id, THEMES[THEMES.len() - 1].id);
@@ -736,6 +764,7 @@ mod tests {
 
     #[test]
     fn styling_applies_without_a_window() {
+        let _alone = alone();
         reset();
         let ctx = egui::Context::default();
         install(&ctx);
@@ -746,6 +775,7 @@ mod tests {
     /// Missing JetBrains Mono must degrade to the built-in face, never panic.
     #[test]
     fn missing_font_is_not_fatal() {
+        let _alone = alone();
         let ctx = egui::Context::default();
         let _found = install_fonts(&ctx);
         install(&ctx);

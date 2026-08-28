@@ -96,7 +96,7 @@ flowchart TD
     n_settings["settings.rs<br/>975 lines"]
     n_setup["setup.rs<br/>753 lines"]
     n_soundbar["soundbar.rs<br/>360 lines"]
-    n_theme["theme.rs<br/>753 lines"]
+    n_theme["theme.rs<br/>783 lines"]
     n_updates["updates.rs<br/>246 lines"]
     n_verify["verify.rs<br/>667 lines"]
     n_watchfeed["watchfeed.rs<br/>381 lines"]
@@ -183,7 +183,7 @@ flowchart TD
 | [[`settings.rs`|File-veilvoice-gui-settings]] | 975 | The settings panel: a menu of pages, each a titled group of choices. |
 | [[`setup.rs`|File-veilvoice-gui-setup]] | 753 | The setup tab: install this copy, undo that, and the optional companions. |
 | [[`soundbar.rs`|File-veilvoice-gui-soundbar]] | 360 | The animated mark: a row of bars that rise and fall. |
-| [[`theme.rs`|File-veilvoice-gui-theme]] | 753 | Colour schemes for the desktop app. |
+| [[`theme.rs`|File-veilvoice-gui-theme]] | 783 | Colour schemes for the desktop app. |
 | [[`updates.rs`|File-veilvoice-gui-updates]] | 246 | The manual update check, as the window shows it. |
 | [[`verify.rs`|File-veilvoice-gui-verify]] | 667 | The verify tab: drop a download on the window and be told what it is. |
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 381 | The device monitor, moved off the thread that paints. |
