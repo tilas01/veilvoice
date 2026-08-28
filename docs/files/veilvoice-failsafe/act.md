@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-failsafe/src/act.rs`
 
-[`veilvoice-failsafe`](../../../crates/veilvoice-failsafe/README.md) &middot; 365 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs)
+[`veilvoice-failsafe`](../../../crates/veilvoice-failsafe/README.md) &middot; 470 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs)
 
 ## Contents
 
@@ -50,11 +50,11 @@ it did either way.
 
 ## What this file contains
 
-365 lines defining **4 functions** (1 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+470 lines defining **5 functions** (1 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `close` (line 107) -- Close a program, having decided it should be closed.
+- `close` (line 169) -- Close a program, having decided it should be closed.
   - reaches: `file_name`, `still_named`
 
 ## What calls what
@@ -79,19 +79,21 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 flowchart TD
     n_file_name["file_name<br/>line 31"]
     n_still_named["still_named<br/>line 51"]
-    n_still_named["still_named<br/>line 75"]
-    n_close(["close<br/>line 107"])
+    n_run_state["run_state<br/>line 76"]
+    n_still_named["still_named<br/>line 106"]
+    n_close(["close<br/>line 169"])
     n_close --> n_file_name
     n_close --> n_still_named
     n_still_named --> n_file_name
     click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L31" "open the source"
     click n_still_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L51" "open the source"
-    click n_still_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L75" "open the source"
-    click n_close href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L107" "open the source"
+    click n_run_state href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L76" "open the source"
+    click n_still_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L106" "open the source"
+    click n_close href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L169" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_close entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_file_name,n_still_named,n_still_named helper
+    class n_file_name,n_still_named,n_run_state,n_still_named helper
 ```
 
 </details>
@@ -102,8 +104,9 @@ flowchart TD
 |---|---:|---|
 | `file_name` <sub>fn</sub> | [31](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L31) | A program's own name, without the path it was found at. |
 | `still_named` <sub>fn</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L51) | Whether this process id still belongs to this program. |
-| `still_named` <sub>fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L75) | Whether this process id still belongs to this program. |
-| `close` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L107) | Close a program, having decided it should be closed. |
+| `run_state` <sub>fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L76) | The one-letter run state in a line of /proc/<pid>/stat. |
+| `still_named` <sub>fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L106) | Whether this process id still belongs to this program and is running. |
+| `close` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs#L169) | Close a program, having decided it should be closed. |
 
 ---
 

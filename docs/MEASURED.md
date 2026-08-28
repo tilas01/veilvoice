@@ -8,8 +8,16 @@ memory. Regenerated and checked by `tools/verify.py`; the documents and the
 website that quote them are compared against this file, so a claim that drifts
 fails the build instead of ageing quietly.
 
+**The test count is a number about one machine.** Some tests are compiled only
+on one operating system, so running the same tree on another gives a different
+total: this tree measures 996 on Windows and 988 on Linux. The row below says
+which machine produced the number in it, because a count with no platform
+beside it reads as a fact about the tree and is a fact about a computer. See
+F-77 in `docs/AUDIT.md`.
+
 | What | Measured |
 |---|---:|
-| Tests, measured by running them | 996 |
+| Tests, measured by running them | 988 |
 | Crates in the workspace | 26 |
 | Website suites | 11 |
+| Measured on | `x86_64-unknown-linux-gnu` |
