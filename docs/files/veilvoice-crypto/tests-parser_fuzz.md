@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/tests/parser_fuzz.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 315 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 368 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs)
 
 ## Contents
 
@@ -68,7 +68,7 @@ bring the program down.
 
 ## What this file contains
 
-315 lines defining **12 functions** (0 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+368 lines defining **13 functions** (0 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -106,6 +106,7 @@ flowchart TD
     n_the_app_lock_parser_survives_hostile_input["the_app_lock_parser_survives_…<br/>line 234"]
     n_both_parsers_survive_pure_noise["both_parsers_survive_pure_noi…<br/>line 274"]
     n_every_length_around_a_boundary_is_handled["every_length_around_a_boundar…<br/>line 294"]
+    n_the_header_the_coverage_guided_campaign_found_is_refused["the_header_the_coverage_guide…<br/>line 335"]
     n_below --> n_next_u32
     n_both_parsers_survive_pure_noise --> n_cheap
     n_both_parsers_survive_pure_noise --> n_new
@@ -134,8 +135,9 @@ flowchart TD
     click n_the_app_lock_parser_survives_hostile_input href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L234" "open the source"
     click n_both_parsers_survive_pure_noise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L274" "open the source"
     click n_every_length_around_a_boundary_is_handled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L294" "open the source"
+    click n_the_header_the_coverage_guided_campaign_found_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L335" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_new,n_next_u32,n_below,n_byte,n_rounds,n_mutate,n_weak,n_cheap,n_the_container_header_parser_survives_hostile_input,n_the_app_lock_parser_survives_hostile_input,n_both_parsers_survive_pure_noise,n_every_length_around_a_boundary_is_handled helper
+    class n_new,n_next_u32,n_below,n_byte,n_rounds,n_mutate,n_weak,n_cheap,n_the_container_header_parser_survives_hostile_input,n_the_app_lock_parser_survives_hostile_input,n_both_parsers_survive_pure_noise,n_every_length_around_a_boundary_is_handled,n_the_header_the_coverage_guided_campaign_found_is_refused helper
 ```
 
 </details>
@@ -157,6 +159,7 @@ flowchart TD
 | `the_app_lock_parser_survives_hostile_input` <sub>fn</sub> | [234](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L234) |  |
 | `both_parsers_survive_pure_noise` <sub>fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L274) | Pure noise, with no valid seed to start from. |
 | `every_length_around_a_boundary_is_handled` <sub>fn</sub> | [294](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L294) | The lengths a parser gets wrong are the ones either side of a boundary, and a random campaign hits them only by luck. |
+| `the_header_the_coverage_guided_campaign_found_is_refused` <sub>fn</sub> | [335](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L335) | F-82. |
 
 ---
 

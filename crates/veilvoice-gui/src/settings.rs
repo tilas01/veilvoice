@@ -227,6 +227,20 @@ impl Settings {
         self.persist();
     }
 
+    /// Where the live monitor sits, or whether it is shown.
+    pub fn live_monitor(&self) -> crate::monitor::Style {
+        crate::monitor::Style::from_key(&self.prefs.live_monitor)
+    }
+
+    /// Record where the live monitor sits.
+    pub fn set_live_monitor(&mut self, style: crate::monitor::Style) {
+        if self.live_monitor() == style {
+            return;
+        }
+        self.prefs.live_monitor = style.key().to_string();
+        self.persist();
+    }
+
     /// Record whether the app should open in group mode.
     pub fn set_always_group(&mut self, always: bool) {
         if self.prefs.always_group == always {
@@ -270,6 +284,41 @@ impl Settings {
         ] {
             ui.label(RichText::new(format!("  {note}")).small().color(p::muted()));
         }
+        ui.add_space(12.0);
+
+        section(
+            ui,
+            "The live monitor",
+            "What is going in and what is coming out, while live scramble is running.",
+        );
+
+        let current_monitor = self.live_monitor();
+        ui.horizontal(|ui| {
+            for style in crate::monitor::Style::ALL {
+                if ui
+                    .selectable_label(current_monitor == *style, style.label())
+                    .clicked()
+                    && current_monitor != *style
+                {
+                    self.set_live_monitor(*style);
+                }
+            }
+        });
+        ui.label(
+            RichText::new(format!("  {}", self.live_monitor().note()))
+                .small()
+                .color(p::muted()),
+        );
+        // The limit, printed beside the setting rather than left to be
+        // discovered. A level is not proof that the voice is being changed: a
+        // working meter and a bypassed engine draw the same bar.
+        ui.label(
+            RichText::new(
+                "  It shows levels, which tells you sound is arriving and sound is                  leaving. It cannot tell you the disguise is working; listening to                  the preview on the live tab is what does that.",
+            )
+            .small()
+            .color(p::muted()),
+        );
         ui.add_space(12.0);
 
         section(
@@ -932,6 +981,7 @@ mod tests {
                 configured: true,
                 notify_style: "overlay".into(),
                 failsafe: "close".into(),
+                live_monitor: "toolbar".into(),
                 hide_install_tab: false,
                 always_group: false,
                 recovered_from_corrupt_file: false,

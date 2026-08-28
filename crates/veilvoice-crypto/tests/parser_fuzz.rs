@@ -313,3 +313,56 @@ fn every_length_around_a_boundary_is_handled() {
     long.push(0);
     assert!(lock::AppLock::parse(&long).is_err());
 }
+
+/// **F-82.** The one input the coverage-guided campaign found, kept here.
+///
+/// `fuzz/README.md` says these two campaigns are different things and both are
+/// kept, and this is what that means in practice: the nightly campaign found an
+/// input, and the input lives here, where it is checked on every commit on
+/// every platform by anybody who cloned the repository.
+///
+/// The bytes are a whole `.veil` header declaring `m_cost` 65535, `t_cost`
+/// 4521984 and `p_cost` 1280. Nothing about them overflows, nothing allocates
+/// beyond the memory ceiling, and `m_cost >= p_cost * 8` holds, so every check
+/// this file's other tests make passed. The only thing wrong with them is that
+/// the derivation would not finish: about 74 hours, measured in a release
+/// build before `MAX_T_COST` existed.
+///
+/// Written out as bytes rather than built from `KdfParams`, because the point
+/// is the file, and a test that constructs the parameters would keep passing if
+/// the header ever stopped putting them where it puts them.
+#[test]
+fn the_header_the_coverage_guided_campaign_found_is_refused() {
+    let mut header = vec![0u8; 69];
+    header[..8].copy_from_slice(b"VEILVOX1");
+    header[8] = 1; // format version
+    header[9] = 1; // password mode
+    header[12..16].copy_from_slice(&65_535u32.to_le_bytes()); // m_cost
+    header[16..20].copy_from_slice(&4_521_984u32.to_le_bytes()); // t_cost
+    header[20..24].copy_from_slice(&1280u32.to_le_bytes()); // p_cost
+
+    // The header still parses: the numbers are structurally fine, and pretending
+    // otherwise would be testing the wrong thing.
+    let parsed = container::Header::parse(&header);
+    assert!(
+        parsed.is_ok(),
+        "the header itself is well formed: {parsed:?}"
+    );
+
+    // What must not happen is that opening it runs. On a thread with a deadline,
+    // because the defect this guards against is a *hang*: timing the call after
+    // it returns cannot fail, it can only never finish, and a test that hangs
+    // says less than one that fails and says why.
+    let (done, answer) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let refused = container::open_with_password(b"not the password", &header).is_err();
+        let _ = done.send(refused);
+    });
+    match answer.recv_timeout(std::time::Duration::from_secs(5)) {
+        Ok(refused) => assert!(refused, "a header this expensive must be refused"),
+        Err(_) => panic!(
+            "open_with_password did not come back within five seconds, so it is \
+             deriving rather than refusing. That is F-82: t_cost is unbounded."
+        ),
+    }
+}

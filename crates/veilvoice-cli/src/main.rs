@@ -202,6 +202,27 @@ enum Command {
         /// never adjusted to fit.
         #[arg(long)]
         reseed_range: Option<String>,
+
+        /// Listen to yourself veiled, instead of sending it anywhere.
+        ///
+        /// Routes the veiled voice to this machine's **default output** rather
+        /// than to a virtual cable, so it goes to your headphones and to
+        /// nothing else. This is the way to find out what you sound like, and
+        /// that the microphone is the one you meant, before an interview
+        /// starts rather than during it.
+        ///
+        /// Use headphones. Speakers plus a microphone is a feedback loop.
+        #[arg(long)]
+        preview: bool,
+
+        /// Do not draw the level meters.
+        ///
+        /// The meters are on by default because the two questions in a live
+        /// session are "is it hearing me" and "is anything coming out", and a
+        /// bar answers both at a glance. This turns them off for a terminal
+        /// that is being logged or read by something other than a person.
+        #[arg(long)]
+        no_monitor: bool,
     },
     /// List the audio devices this machine offers.
     #[cfg(feature = "live")]
@@ -904,9 +925,13 @@ fn run(command: Command) -> Result<(), String> {
             keep_accent,
             reseed_secs,
             reseed_range,
+            preview,
+            no_monitor,
         } => live(
             input,
             output,
+            preview,
+            !no_monitor,
             Tuning {
                 intensity,
                 keep_accent,
@@ -1613,20 +1638,64 @@ fn anonymise(
 }
 
 #[cfg(feature = "live")]
-fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result<(), String> {
+fn live(
+    input: Option<String>,
+    output: Option<String>,
+    preview: bool,
+    monitor: bool,
+    tuning: Tuning,
+) -> Result<(), String> {
     let in_device =
         devices::open(devices::Direction::Input, input.as_deref()).map_err(|e| e.to_string())?;
 
     // With no explicit choice, prefer a virtual cable: routing into one is what
     // makes the veiled voice usable by other applications.
-    let out_name = match output {
-        Some(name) => Some(name),
-        None => devices::find_virtual_cable().map(|d| d.name),
+    //
+    // Except in preview, where the whole point is the opposite. `--preview` is
+    // for hearing yourself before anybody else does, so it goes to this
+    // machine's default output and to nothing else. Choosing the cable there
+    // would send the preview into whatever is listening on it, which is the
+    // one thing somebody checking their setup does not want.
+    let out_name = match (&output, preview) {
+        (Some(name), _) => Some(name.clone()),
+        (None, true) => None,
+        (None, false) => devices::find_virtual_cable().map(|d| d.name),
     };
     let out_device = devices::open(devices::Direction::Output, out_name.as_deref())
         .map_err(|e| e.to_string())?;
 
-    println!("{}", heading("Live scramble"));
+    println!(
+        "{}",
+        heading(if preview {
+            "Live scramble - preview"
+        } else {
+            "Live scramble"
+        })
+    );
+    if preview {
+        println!(
+            "{}",
+            paint(
+                colour::YELLOW,
+                "  Preview. The veiled voice goes to this machine's output and nowhere else."
+            )
+        );
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  Use headphones: speakers plus a microphone is a feedback loop."
+            )
+        );
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  Listen for a voice that is not yours. That is the check the meters cannot make."
+            )
+        );
+        println!();
+    }
     println!("{}", field("Input", &devices::name_of(&in_device)));
     println!("{}", field("Output", &devices::name_of(&out_device)));
     println!(
@@ -1644,7 +1713,7 @@ fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result
         "{}",
         field("Seed rolls", &describe_reseed_range(&config(tuning)))
     );
-    if out_name.is_none() {
+    if out_name.is_none() && !preview {
         println!(
             "{}",
             warn("no virtual audio cable found — routing to the default output")
@@ -1669,6 +1738,21 @@ fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result
         .map_err(|e| e.to_string())?;
 
     println!();
+    if !monitor {
+        // Asked for silence, so say once that it is running and then be quiet.
+        // A quiet mode that still prints a bar sixty times a minute is not one.
+        println!("{}", ok("running. Ctrl-C to stop."));
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  Meters are off. Run without --no-monitor to see the levels."
+            )
+        );
+        loop {
+            std::thread::sleep(std::time::Duration::from_millis(500));
+        }
+    }
     println!(
         "{}",
         paint(
@@ -1676,6 +1760,25 @@ fn live(input: Option<String>, output: Option<String>, tuning: Tuning) -> Result
             "  dBFS, peak. 0 is full scale; speech usually sits near -12."
         )
     );
+    // The limit, printed where the meters are rather than left to be inferred.
+    // A level says sound arrived and sound left. It cannot say the voice was
+    // changed: a working meter and a bypassed engine draw the same bar.
+    println!(
+        "{}",
+        paint(
+            colour::MUTED,
+            "  These show sound arriving and leaving, not that the voice has changed."
+        )
+    );
+    if !preview {
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  To hear what you sound like first, stop and run with --preview."
+            )
+        );
+    }
     println!("{}", paint(colour::MUTED, "  Ctrl-C to stop."));
     println!();
 

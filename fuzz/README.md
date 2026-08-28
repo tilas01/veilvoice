@@ -41,14 +41,15 @@ cargo +nightly fuzz run container_header
 One target for a fixed time, which is the useful form for a session:
 
 ```bash
-cargo +nightly fuzz run wav_chunks -- -max_total_time=600
+cargo +nightly fuzz run wav_chunks -- -max_total_time=600 -rss_limit_mb=6144
 ```
 
 All six in turn:
 
 ```bash
 for t in container_header lock_file wav_chunks wav_preflight guard_manifest hybrid_keys; do
-  cargo +nightly fuzz run "$t" -- -max_total_time=300 -max_len=65536 || exit 1
+  cargo +nightly fuzz run "$t" -- -max_total_time=300 -max_len=65536 \
+      -rss_limit_mb=6144 || exit 1
 done
 ```
 
@@ -60,18 +61,51 @@ cargo +nightly fuzz run <target> fuzz/artifacts/<target>/<file>
 
 ## Status, stated plainly
 
-**These targets have been written and type-checked against the real APIs. They
-have not been run to convergence by the maintainer.** libFuzzer needs a
-clang-based toolchain, which the `x86_64-pc-windows-msvc` host this was
-developed on does not provide, so the campaign is currently something a
-contributor on Linux or macOS can run and the maintainer cannot.
+**It has now been run, for five minutes per target, once.** That is a great
+deal more than never and a great deal less than convergence, and both halves of
+that sentence matter.
 
-That is recorded here rather than glossed, because "we have a fuzzing setup" and
-"we have fuzzed this" are different claims and only the first one is true. What
-*has* been run to exhaustion is the deterministic campaign described at the
-bottom of this file — a million rounds per target, on every commit, on three
-platforms. If you have a Linux box and ten minutes, running the loop above is
-the single most useful contribution available to this project right now.
+The run: all six targets, `-max_total_time=300 -max_len=65536
+-rss_limit_mb=6144`, on x86-64 Linux, against the tree at the time. What each
+target got through in its five minutes, from libFuzzer's own count:
+
+| Target | Runs in 300 s | Found |
+|---|---:|---|
+| `container_header` | 212,479 | **a timeout** (F-82) |
+| `lock_file` | 3,274 | **a timeout** (F-82, through the other door) |
+| `wav_chunks` | 11,465,356 | nothing |
+| `wav_preflight` | 110,515,319 | nothing |
+| `guard_manifest` | stopped early | **a crash** (F-83) |
+| `hybrid_keys` | 125,988,977 | nothing |
+
+The two low counts are not a fault. `container_header` and `lock_file` run
+Argon2 on every input, so a run there is a key derivation rather than a parse,
+and three thousand of them in five minutes is what that costs.
+`guard_manifest` has no count because it stopped the moment it found the crash;
+run again against the fix it completed 3,153,768 runs in its five minutes and
+found nothing.
+
+**What it found, in one line each.** F-82: `t_cost` had no ceiling, so a header
+could declare four billion passes and the derivation would not finish. Measured
+at 74 hours for the input the fuzzer produced, and the app-lock file carries the
+same field and is read before anyone has authenticated. F-83: the manifest
+parser accepted a path containing a carriage return, which rewrites the line
+when the tamper report is printed, while `Manifest::of` had always refused to
+*write* one. Both are written up in `docs/AUDIT.md` and both have a regression
+test in the deterministic campaign, where they are checked on every commit
+without nightly.
+
+**What is still not claimed.** Five minutes is not convergence, no corpus is
+kept between runs, and nobody has run this on Windows or macOS. Three of the six
+targets have never found anything, which is evidence about five minutes rather
+than about those three parsers.
+
+**`-rss_limit_mb` has to be raised above the memory ceiling.** With libFuzzer's
+default of 2048 MB, `container_header` reports an out-of-memory on the first
+input declaring an `m_cost` near `KdfParams::MAX_M_COST`, which is 4 GiB and is
+deliberate. That is the target doing what it is documented to do, so the limit
+in the commands above is 6144 rather than the artefact being treated as a
+finding.
 
 ## Overflow checks are on, deliberately
 

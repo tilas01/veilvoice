@@ -113,7 +113,7 @@ flowchart TD
     n_amnesia["amnesia.rs<br/>326 lines"]
     n_container["container.rs<br/>491 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
-    n_kdf["kdf.rs<br/>399 lines"]
+    n_kdf["kdf.rs<br/>525 lines"]
     n_lock["lock.rs<br/>745 lines"]
     n_privatefile["privatefile.rs<br/>169 lines"]
     n_shred["shred.rs<br/>415 lines"]
@@ -139,13 +139,13 @@ flowchart TD
 | [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 326 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 491 | The .veil encrypted container format. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
-| [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 399 | Password-based key derivation with Argon2id. |
+| [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 190 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 745 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 169 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure — the self-destruct. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
-| [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 315 | Randomised robustness testing for the two parsers that read untrusted input. |
+| [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
 ## Public items

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-guard/src/manifest.rs`
 
-[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 548 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs)
+[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 678 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs)
 
 ## Contents
 
@@ -45,7 +45,7 @@ which rather defeats the point of having it.
 
 ## What this file contains
 
-548 lines defining **17 functions** (15 public), **4 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+678 lines defining **18 functions** (15 public), **4 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -59,22 +59,22 @@ which rather defeats the point of having it.
 - `Change::path` (line 84) -- The path this change concerns.
 - `Change::describe` (line 94) -- A single line for a terminal or a log.
 - `Report::is_clean` (line 119) -- Whether anything at all differs.
-- `Manifest::of` (line 155) -- Record every readable file in paths.
+- `Manifest::of` (line 190) -- Record every readable file in paths.
+  - reaches: `digest_of`, `normalise`, `unrecordable`
+- `Manifest::len` (line 215) -- How many files are recorded.
+- `Manifest::is_empty` (line 220) -- Whether nothing is recorded.
+- `Manifest::paths` (line 225) -- The recorded paths, in order.
+- `Manifest::check` (line 234) -- Compare the record against what is on disk now.
   - reaches: `digest_of`, `normalise`
-- `Manifest::len` (line 180) -- How many files are recorded.
-- `Manifest::is_empty` (line 185) -- Whether nothing is recorded.
-- `Manifest::paths` (line 190) -- The recorded paths, in order.
-- `Manifest::check` (line 199) -- Compare the record against what is on disk now.
-  - reaches: `digest_of`, `normalise`
-- `Manifest::save` (line 306) -- Write the manifest to path in the clear.
+- `Manifest::save` (line 370) -- Write the manifest to path in the clear.
   - reaches: `to_text`
-- `Manifest::load` (line 317) -- Read a manifest written by Manifest::save.
-  - reaches: `parse`
-- `Manifest::seal` (line 331) -- Seal the manifest under a passphrase.
+- `Manifest::load` (line 381) -- Read a manifest written by Manifest::save.
+  - reaches: `parse`, `unrecordable`
+- `Manifest::seal` (line 395) -- Seal the manifest under a passphrase.
   - reaches: `to_text`
-- `Manifest::open_sealed` (line 340) -- Open a manifest sealed by Manifest::seal.
-  - reaches: `parse`
-- `files_in` (line 353) -- Every file directly inside dir, for use as check's extra argument.
+- `Manifest::open_sealed` (line 404) -- Open a manifest sealed by Manifest::seal.
+  - reaches: `parse`, `unrecordable`
+- `files_in` (line 417) -- Every file directly inside dir, for use as check's extra argument.
 
 ## What calls what
 
@@ -94,50 +94,54 @@ flowchart TD
     n_describe(["Change::describe<br/>line 94"])
     n_is_clean(["Report::is_clean<br/>line 119"])
     n_normalise["normalise<br/>line 134"]
-    n_digest_of["digest_of<br/>line 138"]
-    n_of(["Manifest::of<br/>line 155"])
-    n_len(["Manifest::len<br/>line 180"])
-    n_is_empty(["Manifest::is_empty<br/>line 185"])
-    n_paths(["Manifest::paths<br/>line 190"])
-    n_check(["Manifest::check<br/>line 199"])
-    n_to_text["Manifest::to_text<br/>line 240"]
-    n_parse["Manifest::parse<br/>line 250"]
-    n_save(["Manifest::save<br/>line 306"])
-    n_load(["Manifest::load<br/>line 317"])
-    n_seal(["Manifest::seal<br/>line 331"])
-    n_open_sealed(["Manifest::open_sealed<br/>line 340"])
-    n_files_in(["files_in<br/>line 353"])
+    n_unrecordable["unrecordable<br/>line 157"]
+    n_digest_of["digest_of<br/>line 173"]
+    n_of(["Manifest::of<br/>line 190"])
+    n_len(["Manifest::len<br/>line 215"])
+    n_is_empty(["Manifest::is_empty<br/>line 220"])
+    n_paths(["Manifest::paths<br/>line 225"])
+    n_check(["Manifest::check<br/>line 234"])
+    n_to_text["Manifest::to_text<br/>line 275"]
+    n_parse["Manifest::parse<br/>line 285"]
+    n_save(["Manifest::save<br/>line 370"])
+    n_load(["Manifest::load<br/>line 381"])
+    n_seal(["Manifest::seal<br/>line 395"])
+    n_open_sealed(["Manifest::open_sealed<br/>line 404"])
+    n_files_in(["files_in<br/>line 417"])
     n_check --> n_digest_of
     n_check --> n_normalise
     n_load --> n_parse
     n_of --> n_digest_of
     n_of --> n_normalise
+    n_of --> n_unrecordable
     n_open_sealed --> n_parse
+    n_parse --> n_unrecordable
     n_save --> n_to_text
     n_seal --> n_to_text
     click n_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L84" "open the source"
     click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L94" "open the source"
     click n_is_clean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L119" "open the source"
     click n_normalise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L134" "open the source"
-    click n_digest_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L138" "open the source"
-    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L155" "open the source"
-    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L180" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L185" "open the source"
-    click n_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L190" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L199" "open the source"
-    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L240" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L250" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L306" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L317" "open the source"
-    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L331" "open the source"
-    click n_open_sealed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L340" "open the source"
-    click n_files_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L353" "open the source"
+    click n_unrecordable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L157" "open the source"
+    click n_digest_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L173" "open the source"
+    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L190" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L215" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L220" "open the source"
+    click n_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L225" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L234" "open the source"
+    click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L275" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L285" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L370" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L381" "open the source"
+    click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L395" "open the source"
+    click n_open_sealed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L404" "open the source"
+    click n_files_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L417" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_path,n_describe,n_is_clean,n_of,n_len,n_is_empty,n_paths,n_check,n_save,n_load,n_seal,n_open_sealed,n_files_in entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_to_text,n_parse api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_normalise,n_digest_of helper
+    class n_normalise,n_unrecordable,n_digest_of helper
 ```
 
 </details>
@@ -155,16 +159,17 @@ flowchart TD
 | `Report::is_clean` <sub>pub fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L119) | Whether anything at all differs. |
 | `Manifest` <sub>pub struct</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L126) | A record of a set of files. |
 | `normalise` <sub>fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L134) | Normalise a path for storage: forward slashes, no leading ./. |
-| `digest_of` <sub>fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L138) |  |
-| `Manifest::of` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L155) | Record every readable file in paths. |
-| `Manifest::len` <sub>pub fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L180) | How many files are recorded. |
-| `Manifest::is_empty` <sub>pub fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L185) | Whether nothing is recorded. |
-| `Manifest::paths` <sub>pub fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L190) | The recorded paths, in order. |
-| `Manifest::check` <sub>pub fn</sub> | [199](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L199) | Compare the record against what is on disk now. |
-| `Manifest::to_text` <sub>pub fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L240) | Serialise to the text format described at the top of this module. |
-| `Manifest::parse` <sub>pub fn</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L250) | Parse the text format. |
-| `Manifest::save` <sub>pub fn</sub> | [306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L306) | Write the manifest to path in the clear. |
-| `Manifest::load` <sub>pub fn</sub> | [317](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L317) | Read a manifest written by Manifest::save. |
-| `Manifest::seal` <sub>pub fn</sub> | [331](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L331) | Seal the manifest under a passphrase. |
-| `Manifest::open_sealed` <sub>pub fn</sub> | [340](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L340) | Open a manifest sealed by Manifest::seal. |
-| `files_in` <sub>pub fn</sub> | [353](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L353) | Every file directly inside dir, for use as check's extra argument. |
+| `unrecordable` <sub>fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L157) | Why this path cannot go in a manifest, if it cannot. |
+| `digest_of` <sub>fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L173) |  |
+| `Manifest::of` <sub>pub fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L190) | Record every readable file in paths. |
+| `Manifest::len` <sub>pub fn</sub> | [215](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L215) | How many files are recorded. |
+| `Manifest::is_empty` <sub>pub fn</sub> | [220](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L220) | Whether nothing is recorded. |
+| `Manifest::paths` <sub>pub fn</sub> | [225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L225) | The recorded paths, in order. |
+| `Manifest::check` <sub>pub fn</sub> | [234](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L234) | Compare the record against what is on disk now. |
+| `Manifest::to_text` <sub>pub fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L275) | Serialise to the text format described at the top of this module. |
+| `Manifest::parse` <sub>pub fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L285) | Parse the text format. |
+| `Manifest::save` <sub>pub fn</sub> | [370](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L370) | Write the manifest to path in the clear. |
+| `Manifest::load` <sub>pub fn</sub> | [381](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L381) | Read a manifest written by Manifest::save. |
+| `Manifest::seal` <sub>pub fn</sub> | [395](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L395) | Seal the manifest under a passphrase. |
+| `Manifest::open_sealed` <sub>pub fn</sub> | [404](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L404) | Open a manifest sealed by Manifest::seal. |
+| `files_in` <sub>pub fn</sub> | [417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L417) | Every file directly inside dir, for use as check's extra argument. |
