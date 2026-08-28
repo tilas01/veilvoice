@@ -1299,7 +1299,19 @@ def mermaid(colours, nodes, edges, direction="TD"):
 # --- SVG: shared helpers ----------------------------------------------------
 
 MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
-CHAR_W = 7.6          # width of one monospace character at 13px, near enough
+CHAR_W = 8.06         # width of one monospace character at 13px: 13 * TEXT_RATIO
+
+# The same width as a fraction of the font size, for text set at other sizes.
+#
+# Deliberately above the 0.585 that `CHAR_W` implies at 13px. The font is
+# whichever of the stack the reader has, the widths differ a little between
+# them, and a layout that assumes the narrowest is a layout that overflows on
+# the others. `CHAR_RATIO` in `tools/site-tests/images.test.js` is this number
+# and has to stay this number: that suite measures what this lays out, so the
+# generator being the more optimistic of the two would fail the build on every
+# drawing.
+TEXT_RATIO = 0.62
+assert abs(CHAR_W - 13.0 * TEXT_RATIO) < 0.01, "CHAR_W and TEXT_RATIO disagree"
 LINE_H = 17.0
 
 
@@ -1388,10 +1400,46 @@ def banner_svg(colours, title, subtitle, kind):
     text_x = 34.0 + bars * step + 24.0
     add('<text x="%.1f" y="%.1f" font-family="%s" font-size="30" '
         'font-weight="700" fill="%s" letter-spacing="0.5">%s</text>'
-        % (text_x, mid - 6.0, MONO, colours["fg"], esc(title)))
-    add('<text x="%.1f" y="%.1f" font-family="%s" font-size="15" '
-        'fill="%s">%s</text>'
-        % (text_x, mid + 22.0, MONO, colours["muted"], esc(subtitle)))
+        % (text_x, mid - 12.0, MONO, colours["fg"], esc(title)))
+
+    # The subtitle wraps, and this is a fix rather than a nicety.
+    #
+    # It was one line, drawn at whatever length it happened to be, and it ran
+    # off the right edge of nearly every banner in this repository: measured at
+    # 665 pixels past the edge on `veilvoice-failsafe`, whose subtitle simply
+    # stopped after "while you are". A banner is the first thing on a crate's
+    # page, in its README and in the wiki, and it was cutting its own sentence
+    # in half in all three.
+    #
+    # **This is finding F-37 again.** That one deleted more than half the pixel
+    # rows of the project banner, carrying the licence and the authorship, on
+    # every viewport, for as long as the banner had existed, with every test
+    # passing. The lesson recorded then was that a picture has to be looked at.
+    # The lesson this time is that three hundred of them cannot be, so
+    # `tools/site-tests/images.test.js` measures every piece of text in every
+    # generated drawing against the canvas it is on, and that is what found
+    # this.
+    #
+    # Room to the right of the text, less a margin that keeps it clear of the
+    # `CRATE` label in the corner. A character in this stack is about 0.585 of
+    # the font size wide, which is where `CHAR_W` comes from at 13.
+    room = BANNER_W - text_x - 34.0
+    columns = max(20, int(room / (15.0 * TEXT_RATIO)))
+    # Two lines is what the banner is tall enough for. A subtitle longer than
+    # that is cut, and the cut is **marked**: an ellipsis says there is more,
+    # which is the difference between a summary and a sentence that stops.
+    wrapped = wrap_text(subtitle, columns)
+    lines = wrapped[:2]
+    if len(wrapped) > 2 and lines:
+        tail = lines[-1]
+        if len(tail) + 2 > columns:
+            tail = tail[:max(0, columns - 2)].rstrip()
+        lines[-1] = tail + " \u2026"
+    for index, line in enumerate(lines):
+        add('<text x="%.1f" y="%.1f" font-family="%s" font-size="15" '
+            'fill="%s">%s</text>'
+            % (text_x, mid + 14.0 + index * 19.0, MONO, colours["muted"],
+               esc(line)))
     add('<text x="%d" y="30" font-family="%s" font-size="12" fill="%s" '
         'text-anchor="end" letter-spacing="1.5">%s</text>'
         % (BANNER_W - 24, MONO, colours["border"], esc(kind.upper())))
@@ -1462,6 +1510,16 @@ def diagram_markdown(source, alt, note, mermaid_source, extra=None):
     out.append("```mermaid\n%s\n```\n" % mermaid_source)
     out.append("</details>\n")
     return out
+
+
+# What the dashed edges mean, said once so the width calculation and the
+# drawing use the same string.
+DASHED_KEY = "dashed: a call that goes back up, or across a wrapped rank"
+
+# The narrowest a drawing's note is allowed to be set. Below this a paragraph
+# stops being a paragraph: forty-eight characters is about eight words, which
+# is a line somebody reads rather than scans down.
+NOTE_MIN_COLUMNS = 48
 
 
 def footer_height(key, note_lines):
@@ -1603,7 +1661,6 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None):
         return placed, y - gap_y + margin
 
     canvas_w = max(line_widths) + margin * 2
-    placed, canvas_h = lay_out(canvas_w)
 
     # Room under the drawing for the colour key and the explanation.
     #
@@ -1614,7 +1671,36 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None):
     # caption it does not carry is a picture that arrives without its meaning.
     role_names = {node.get("role") for node in nodes}
     key = [(role, token, why) for role, token, why in ROLES if role in role_names]
-    note_lines = wrap_text(note, int((canvas_w - margin * 2) / CHAR_W)) if note else []
+
+    # The canvas has to be at least as wide as its own key.
+    #
+    # A file with one small function makes a drawing 121 pixels across, and the
+    # key is a fixed sentence about five times that. Widening for it is the
+    # only honest answer: the key cannot be wrapped without becoming a wall of
+    # text, and a key drawn off the edge of the picture is the fault this whole
+    # change is about.
+    if key:
+        widest = max([len("%s: %s" % (role, why)) for role, _, why in key]
+                     + [len(DASHED_KEY)])
+        canvas_w = max(canvas_w, widest * 11.0 * TEXT_RATIO + margin * 2 + 15.0)
+
+    # And at least wide enough for the note to be a paragraph rather than a
+    # column of one word.
+    #
+    # A crate with a single file draws a picture 141 pixels across, and the
+    # note wrapped into it came out as fifteen lines with `veilvoice-workspace,`
+    # sticking out of the side, because a word longer than the column cannot be
+    # wrapped, only broken, and breaking a name is worse than widening a
+    # picture that has room to spare.
+    if note:
+        longest_word = max(len(word) for word in note.split()) if note.split() else 0
+        columns = max(NOTE_MIN_COLUMNS, longest_word)
+        canvas_w = max(canvas_w, columns * 11.0 * TEXT_RATIO + margin * 2)
+
+    placed, canvas_h = lay_out(canvas_w)
+
+    note_lines = (wrap_text(note, int((canvas_w - margin * 2) / (11.0 * TEXT_RATIO)))
+                  if note else [])
     footer = footer_height(key, note_lines)
 
     # A back edge is drawn out to the side of both of its endpoints, so it can
@@ -1634,7 +1720,8 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None):
         if overflow > 0:
             canvas_w += overflow * 2.0
             placed, canvas_h = lay_out(canvas_w)
-            note_lines = (wrap_text(note, int((canvas_w - margin * 2) / CHAR_W))
+            note_lines = (wrap_text(note,
+                                    int((canvas_w - margin * 2) / (11.0 * TEXT_RATIO)))
                           if note else [])
             footer = footer_height(key, note_lines)
 
@@ -1769,8 +1856,7 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None):
             % (margin, y + 4.5, margin + 9, y + 4.5, colours["warn"]))
         add('<text x="%.1f" y="%.1f" font-family="%s" font-size="11" '
             'fill="var(--muted, %s)">%s</text>'
-            % (margin + 15, y + 9, MONO, colours["muted"],
-               esc("dashed: a call that goes back up, or across a wrapped rank")))
+            % (margin + 15, y + 9, MONO, colours["muted"], esc(DASHED_KEY)))
         y += 16.0
     if note_lines:
         y += 6.0
@@ -2887,10 +2973,12 @@ def outputs(root):
             colours, model, (known, spellings["wiki"]))
 
         for entry in model["files"]:
+            # No cut here any more: the banner wraps to two lines and marks
+            # its own cut if it has to. Cutting at 96 first meant a subtitle
+            # was truncated before anything had worked out how much room there
+            # actually was, and the answer is about 176 characters.
             subtitle = entry["summary"] or ("%s · %d lines"
                                             % (crate, entry["lines"]))
-            if len(subtitle) > 96:
-                subtitle = subtitle[:95] + "…"
             files["assets/banners/%s/%s.svg" % (crate, entry["stem"])] = banner_svg(
                 colours, entry["name"], subtitle, crate.replace("veilvoice-", ""))
             file_nodes, file_edges, drawn_short, drawn_total = file_graph(entry)
