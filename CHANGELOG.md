@@ -8,6 +8,91 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The app lock, hardened as far as it honestly goes
+
+Markers 74 to 79, and one round of audit on the result.
+
+**The locked window says it is locked and nothing else.** It used to name the
+lock file, its directory, how many attempts had failed, and that deleting the
+file starts over. All true, all addressed to the wrong person: the reader of a
+locked window is either its owner, who does not need any of it right now, or
+somebody who picked the machine up, who should not be handed the location of
+the file and the news that removing it works. What the lock is worth is now in
+`docs/USER_GUIDE.md` and on the security tab of the *unlocked* application.
+
+**Every record now carries an authentication tag keyed by the passphrase.** One
+Argon2id run is split by HKDF into the verifier that goes on disk and a tag key
+that never does. Somebody who swaps the stored password for one of their own,
+or drops the Argon2id cost so a guess becomes cheap, cannot make the edit look
+authentic, and the next successful unlock says so. The report is stored, so it
+survives a restart, and clearing it asks for the passphrase, so the person who
+caused it cannot dismiss it.
+
+The failed-attempt counter is deliberately **outside** the tag. It is written
+at the one moment the tag key does not exist, so covering it would mean
+reporting every honest typo as tampering. The rate limit is exactly as
+editable as it always was and the documentation says so.
+
+**The lock is kept twice.** Two copies, in two directories, under names derived
+from a per-installation index, with contents masked so a search for the magic
+bytes finds nothing. Deleting one does not remove the lock: the other puts it
+back and the loss is reported. The names and the mask are **obscurity**, they
+are labelled as obscurity everywhere they appear, and they are not counted as
+security anywhere.
+
+**The second copy goes somewhere only an administrator can write**, on Linux
+and macOS, when VeilVoice is already running with the privilege to put it
+there. It never asks for that privilege and never elevates itself. On Windows
+the equivalent needs an access-control list this project does not link the API
+to set, so there the second copy is a second copy and says so.
+
+**`veilvoice-guard` is in the window.** The integrity record is taken at the
+first launch that finds none and checked at every one after, on a worker
+thread. With an app lock set it is sealed under that passphrase and the check
+runs at the unlock, which is the one moment the passphrase exists. Without one
+it is written in the clear and the tab says so in those words, because a record
+sealed under a key kept beside it would look like the sealed case and be worth
+nothing.
+
+**The nine palettes are in the header**, where the website keeps its own. They
+have been in the application since marker 26; nobody found them on a page
+inside Settings.
+
+**A live session repaints at 16 ms and everything else at 50.** Twenty frames a
+second is fine for a progress line and is not fine for a meter following a
+voice. The About tab now shows the measured frame time, because this was
+written on a machine with no display and a number from the person with the
+problem is worth more than a change made blind.
+
+### The eleventh audit round: six defects in the code above
+
+New security code written after an audit is precisely the code an audit exists
+for, so markers 74 to 79 got their own round. Six defects, every one in code
+written this cycle, every one found by reading the diff.
+
+Two of them were **worse than the thing they hardened**, which is the pattern
+worth naming.
+
+- **F-85** Any read of the vault index that was not a clean sixteen bytes drew
+  a new index and wrote it, so one refused read, one sharing violation or one
+  exhausted descriptor table would have orphaned the lock under a name nothing
+  could ever compute again. The plain file this replaced could not be orphaned,
+  because its name was a constant. Only a genuinely absent index is created now.
+- **F-86** The administrator-owned spare silently kept the previous password
+  after a change made from an unelevated run, so deleting the copy anybody can
+  delete reverted the lock to a password somebody may still know. `store` now
+  reports whether the spare caught up, a change that did not reach it is not
+  called finished, and two copies holding different passwords are reported.
+- **F-87** A spare that could never be written was reported as a deleted one,
+  at every launch, which is how an alarm stops being read.
+- **F-88** Dismissing an interference report ran Argon2id three times. A
+  control nobody will wait for is a control nobody uses.
+- **F-89** A power cut mid-write left a short file, which does not parse, which
+  reads as tampering. Both copies now go through a write-and-rename.
+- **F-90** Setting an app lock never upgraded an existing plain integrity
+  record to a sealed one, so somebody who did the thing that earns the sealed
+  record kept the readable one.
+
 ### The tenth audit round: security, functionality, and what it costs to run
 
 Marker 73, run last on purpose, because an audit of code that is still moving
