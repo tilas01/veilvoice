@@ -129,7 +129,7 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_new(["SpectralState::new<br/>line 104"])
-    n_retarget_phase_offsets(["SpectralState::retarget_phase…<br/>line 145"])
+    n_retarget_phase_offsets(["SpectralState::<br/>retarget_phase_offsets<br/>line 145"])
     n_transform(["SpectralState::transform<br/>line 159"])
     n_resample_linear["resample_linear<br/>line 293"]
     n_box_smooth["box_smooth<br/>line 314"]

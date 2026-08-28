@@ -130,7 +130,7 @@ flowchart TD
     n_describe(["Requirement::describe<br/>line 103"])
     n_default["Posture::default<br/>line 152"]
     n_most_permissive(["Posture::most_permissive<br/>line 169"])
-    n_is_at_least_as_strict_as(["Posture::is_at_least_as_stric…<br/>line 183"])
+    n_is_at_least_as_strict_as(["Posture::<br/>is_at_least_as_strict_as<br/>line 183"])
     n_new["Policy::new<br/>line 204"]
     n_require(["Policy::require<br/>line 209"])
     n_with_note(["Policy::with_note<br/>line 226"])

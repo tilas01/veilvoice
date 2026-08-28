@@ -186,7 +186,7 @@ flowchart TD
     n_preferred_input["preferred_input<br/>line 314"]
     n_without_devices["VeilVoiceApp::without_devices<br/>line 328"]
     n_default["VeilVoiceApp::default<br/>line 378"]
-    n_tab_from_arguments["VeilVoiceApp::tab_from_argume…<br/>line 408"]
+    n_tab_from_arguments["VeilVoiceApp::<br/>tab_from_arguments<br/>line 408"]
     n_new(["VeilVoiceApp::new<br/>line 422"])
     n_apply_policy["VeilVoiceApp::apply_policy<br/>line 473"]
     n_posture["VeilVoiceApp::posture<br/>line 495"]
@@ -198,7 +198,7 @@ flowchart TD
     n_start_job["VeilVoiceApp::start_job<br/>line 1044"]
     n_live_tab["VeilVoiceApp::live_tab<br/>line 1100"]
     n_start_live["VeilVoiceApp::start_live<br/>line 1229"]
-    n_start_live_preview["VeilVoiceApp::start_live_prev…<br/>line 1249"]
+    n_start_live_preview["VeilVoiceApp::<br/>start_live_preview<br/>line 1249"]
     n_check_failsafe["VeilVoiceApp::check_failsafe<br/>line 1278"]
     n_watch_indicator["VeilVoiceApp::watch_indicator<br/>line 1354"]
     n_watch_tab["VeilVoiceApp::watch_tab<br/>line 1384"]

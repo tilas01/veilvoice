@@ -219,15 +219,15 @@ flowchart TD
     n_hop["DeidConfig::hop<br/>line 382"]
     n_frame_ms["DeidConfig::frame_ms<br/>line 390"]
     n_frames_for_ms["DeidConfig::frames_for_ms<br/>line 399"]
-    n_effective_reseed_range_ms(["DeidConfig::effective_reseed_…<br/>line 416"])
-    n_reseed_range_is_finer_than_a_frame(["DeidConfig::reseed_range_is_f…<br/>line 430"])
-    n_with_random_reseed_range(["DeidConfig::with_random_resee…<br/>line 451"])
+    n_effective_reseed_range_ms(["DeidConfig::<br/>effective_reseed_range_ms<br/>line 416"])
+    n_reseed_range_is_finer_than_a_frame(["DeidConfig::<br/>reseed_range_is_finer_than_a_frame<br/>line 430"])
+    n_with_random_reseed_range(["DeidConfig::<br/>with_random_reseed_range<br/>line 451"])
     n_checked(["DeidConfig::checked<br/>line 507"])
     n_clamp_ratio_bounds["clamp_ratio_bounds<br/>line 597"]
     n_last_block_ms(["ProcessStats::last_block_ms<br/>line 643"])
     n_worst_block_ms(["ProcessStats::worst_block_ms<br/>line 647"])
     n_ema_block_ms(["ProcessStats::ema_block_ms<br/>line 651"])
-    n_last_realtime_factor(["ProcessStats::last_realtime_f…<br/>line 656"])
+    n_last_realtime_factor(["ProcessStats::<br/>last_realtime_factor<br/>line 656"])
     n_new(["Deidentifier::new<br/>line 702"])
     n_from_seed["Deidentifier::from_seed<br/>line 709"]
     n_latency_samples(["Deidentifier::latency_samples<br/>line 777"])
