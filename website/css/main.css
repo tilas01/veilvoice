@@ -741,7 +741,86 @@ html:not(.js) .bn { display: none; }
   50%      { height: 88%; opacity: 1; }
 }
 
-.demo-core { flex: 0 0 auto; display: grid; place-items: center; }
+.demo-core {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* What happens between the two waveforms, in order, one step lighting at a
+ * time.
+ *
+ * The middle of this picture used to be the mark on its own, glowing, and the
+ * caption summarised the whole engine as the word "discarded". That is true
+ * and it is one word for six things, and the one it names is the third of
+ * them. A reader looking at the picture could not see that the audio is
+ * framed first, that the phase is measured before it is thrown away, that the
+ * pitch mapping is a separate step and is the *other* reason there is no
+ * inverse, or that the modulation is rolled on an interval.
+ *
+ * So the steps are drawn, in the same style as everything else here: no
+ * script, no image, one animation, and it follows the reader's theme.
+ *
+ * The cycle is six seconds and each step holds the light for one of them, so
+ * the sequence reads at about the pace somebody reads a short line. Faster
+ * looked like flickering; slower and the reader has moved on. */
+.demo-stages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  /* The longest label decides this, and it must not decide the whole row: the
+   * two waveforms are `flex: 1 1 0` and this is `flex: 0 0 auto`, so a wide
+   * core takes its width off both of them. */
+  max-width: 26ch;
+}
+
+.demo-stages li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  animation: demo-step 6s linear infinite backwards;
+  animation-delay: calc(var(--s) * 1s);
+}
+
+.demo-dot {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  animation: demo-step-dot 6s linear infinite backwards;
+  animation-delay: calc(var(--s) * 1s);
+}
+
+/* Colour and nothing else: a step that moved or grew would push the labels
+ * around, and six labels jostling for six seconds is a picture nobody reads. */
+@keyframes demo-step {
+  0%, 15%   { color: var(--fg); }
+  17%, 100% { color: var(--muted); }
+}
+
+@keyframes demo-step-dot {
+  0%, 15%   { background: var(--accent); box-shadow: 0 0 7px 1px var(--accent); }
+  17%, 100% { background: var(--border); box-shadow: none; }
+}
+
+/* The numbered account under the picture, which says the same six things at
+ * length. The picture names them; this one explains them. */
+.demo-steps {
+  margin: 0 0 10px;
+  padding-left: 20px;
+  max-width: 68ch;
+}
+.demo-steps li { margin: 0 0 8px; }
 
 .demo-mark {
   width: 44px;
@@ -784,7 +863,11 @@ html:not(.js) .bn { display: none; }
 @media (max-width: 640px) {
   .demo-flow { flex-direction: column; gap: 12px; }
   .demo-side { width: 100%; }
-  .demo-core { transform: rotate(90deg); }
+  /* The mark turns on its side so it still reads as "through here" rather than
+   * as a third panel. Only the mark: rotating the core would take the six
+   * labels with it, and sideways text is not a label. */
+  .demo-mark { transform: rotate(90deg); }
+  .demo-stages { max-width: none; }
 }
 
 /* Motion reduced: the bars hold a readable spread of heights and the mark
@@ -795,6 +878,11 @@ html:not(.js) .bn { display: none; }
  * state is a height, not `opacity: 0`. Stated because the two look alike and
  * the difference is exactly what made the other one need an exception. */
 @media (prefers-reduced-motion: reduce) {
+  /* Every step lit, rather than every step dark. The list is the content here
+   * and the sequence is the decoration, so with the movement gone the reader
+   * should still be able to read all six. */
+  .demo-stages li { animation: none; color: var(--fg); }
+  .demo-dot { animation: none; background: var(--accent); box-shadow: none; }
   .demo-wave span { animation: none; height: 60%; }
   .demo-clean span { height: 62%; }
   .demo-veiled span:nth-child(odd) { height: 34%; }
