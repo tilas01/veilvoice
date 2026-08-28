@@ -491,7 +491,26 @@ impl AppLock {
         // bounds them (see F-2 and F-3). Refusing at parse time means the
         // failure is reported as "this lock file is broken", which is true and
         // actionable, rather than as a password that never works.
-        params.checked()?;
+        //
+        // F-91. `within` rather than `checked`, and the difference matters more
+        // here than anywhere else this crate reads a cost from a file.
+        // `checked` alone permits four gigabytes of Argon2 memory, which is
+        // deliberate for a container: somebody chose to open that file, it is
+        // slow, and they can decide to stop waiting. Nobody chooses to open
+        // this one. It is read at launch, before anything has been
+        // authenticated, and a value of four gigabytes on a modest machine is
+        // not a wait, it is an allocation failure, and this build aborts on
+        // one. The window would then fail to start with no way in.
+        //
+        // Found by the coverage-guided campaign after the format changed: it
+        // produced a header declaring 1,664 MiB and libFuzzer flagged the unit
+        // as slow. That the recovery is now harder is this cycle's own doing:
+        // the vault's file names are derived rather than fixed, so "delete the
+        // lock file and start again" needs the index read first.
+        //
+        // The ceiling is `UNATTENDED_MAX_M_COST`, four times what this program
+        // has ever written into one of these files.
+        params.within(kdf::KdfParams::UNATTENDED_MAX_M_COST)?;
         let mut salt = [0u8; kdf::SALT_LEN];
         salt.copy_from_slice(&bytes[24..40]);
 
@@ -1306,6 +1325,33 @@ mod tests {
         store.unlock(b"pw").unwrap();
         let second = std::fs::read(&path).unwrap()[73..97].to_vec();
         assert_ne!(first, second, "the tag nonce repeated across two writes");
+    }
+
+    /// F-91. The one file this program reads before anybody has authenticated
+    /// must not be able to ask for more memory than the machine has. Nobody
+    /// chose to open it, so nobody can choose to stop waiting for it.
+    #[test]
+    fn a_lock_file_cannot_demand_more_memory_than_an_unattended_caller_allows() {
+        let lock = AppLock::create(b"pw", weak()).unwrap();
+        let mut bytes = lock.to_bytes();
+
+        // What the campaign produced: within `checked`, far outside anything
+        // this program has ever written.
+        bytes[12..16].copy_from_slice(&(1_703_936u32).to_le_bytes());
+        assert!(
+            AppLock::parse(&bytes).is_err(),
+            "a lock file declaring 1.6 GiB of Argon2 memory was accepted"
+        );
+
+        // And the ceiling itself is above anything legitimate, so a real lock
+        // is not caught by it.
+        bytes[12..16].copy_from_slice(&kdf::KdfParams::default().m_cost.to_le_bytes());
+        bytes[16..20].copy_from_slice(&kdf::KdfParams::default().t_cost.to_le_bytes());
+        bytes[20..24].copy_from_slice(&kdf::KdfParams::default().p_cost.to_le_bytes());
+        assert!(
+            AppLock::parse(&bytes).is_ok(),
+            "the default cost this program writes was refused by its own ceiling"
+        );
     }
 
     /// F-88. Acknowledging a report must cost one key derivation, not three.
