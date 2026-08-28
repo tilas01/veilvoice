@@ -78,10 +78,12 @@ pub mod kdf;
 pub mod lock;
 pub mod privatefile;
 pub mod shred;
+pub mod vault;
 
 pub use amnesia::Secret;
 pub use lock::{AppLock, LockStore};
 pub use shred::{shred_file, Passes, ShredReport};
+pub use vault::Vault;
 
 /// Crate version string, surfaced in the About panel.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

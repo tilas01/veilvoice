@@ -21,17 +21,42 @@
 //!
 //! # Why a verifier and not a key
 //!
-//! The lock stores `Argon2id(domain ‖ password, salt)` and compares it in
-//! constant time. It deliberately does **not** derive a key that encrypts
-//! anything, because there is nothing here it could usefully encrypt: the
-//! recordings have their own password (a *different* one — see
+//! The lock stores `Argon2id(domain ‖ password, salt)`, split by HKDF into a
+//! verifier and a tag key, and compares the verifier in constant time. It
+//! deliberately does **not** derive a key that encrypts your recordings,
+//! because those have their own password (a *different* one — see
 //! [`crate::container`]), and pretending the app lock protected them would be
 //! exactly the overclaim this project refuses to make.
 //!
-//! The stored verifier is therefore a password hash sitting on disk in the
-//! clear, and must be treated like one. Argon2id at the default cost (256 MiB,
-//! t=3, p=4) makes an offline attack expensive per guess, which matters for a
-//! decent passphrase and does not save a bad one.
+//! The stored verifier is a password hash sitting on disk in the clear, and
+//! must be treated like one. Argon2id at the default cost (256 MiB, t=3, p=4)
+//! makes an offline attack expensive per guess, which matters for a decent
+//! passphrase and does not save a bad one.
+//!
+//! # The tag, and the one tamper claim this file can honestly make
+//!
+//! Every record carries a 16-byte authentication tag over all the bytes before
+//! it, keyed by a value that exists only while a correct passphrase is in
+//! memory. The tag key is the second half of one Argon2id run, split from the
+//! verifier by HKDF, so publishing the verifier — which the file does, by
+//! sitting on disk — says nothing about the tag key.
+//!
+//! That buys exactly one thing, and it is worth naming precisely. Somebody who
+//! edits this file without knowing the passphrase cannot leave the edit
+//! looking authentic. Resetting the failure counter to zero, winding the
+//! last-failure timestamp back to escape a wait, or dropping the Argon2id cost
+//! so that a guess is cheap — all three are edits, and all three are caught at
+//! the next successful unlock, because that is the moment the tag key exists.
+//!
+//! It buys nothing at all against the two attacks people expect it to stop.
+//! Deleting the file still removes the lock. Replacing the file wholesale with
+//! a lock the attacker created still lets the attacker in, because their own
+//! record is authentic under *their* passphrase. [`crate::vault`] answers the
+//! first with a second copy and answers the second not at all.
+//!
+//! The tamper flag, once raised, is stored and is cleared only by an unlock
+//! that also proves the passphrase. So the report survives a restart, and the
+//! person who caused it cannot dismiss it.
 //!
 //! # Rate limiting
 //!
@@ -75,21 +100,33 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 /// Single-sourced so the CLI and the GUI cannot drift into two different
 /// promises, and asserted by the tests so it cannot quietly become a boast.
 pub const SCOPE: &str = "The app lock keeps someone who picks up your unlocked computer out of \
-     VeilVoice. It is not disk encryption and it is not tamper-proof: anyone who \
-     can write to this machine's files can delete the lock, and anyone holding \
-     the disk can attack the stored password hash offline. If that is the \
-     threat, encrypt the whole volume.";
+     VeilVoice. If the stored password is swapped or its cost weakened, the \
+     next unlock reports it, and a second copy is kept, so to delete the lock \
+     you have to find both. It is still not tamper-proof and it is not disk \
+     encryption: anyone holding the disk can attack the stored password hash \
+     offline. If that is the threat, encrypt the whole volume.";
 
 /// Magic bytes at the start of a lock file.
 pub const MAGIC: &[u8; 8] = b"VEILLOK1";
 /// Format version this build writes.
-pub const FORMAT_VERSION: u8 = 1;
-/// Exact size of a lock file, in bytes.
-pub const LOCK_LEN: usize = 84;
+pub const FORMAT_VERSION: u8 = 2;
+/// Exact size of a version 2 lock file, in bytes.
+pub const LOCK_LEN: usize = 125;
+/// Exact size of a version 1 lock file, which this build still reads.
+pub const LOCK_LEN_V1: usize = 84;
 
-/// Domain separator, so the app-lock verifier can never coincide with a key
+/// Domain separator, so the app-lock secret can never coincide with a key
 /// derived from the same passphrase anywhere else in this crate.
 const DOMAIN: &[u8] = b"veilvoice/app-lock/v1\0";
+/// HKDF label for the half of the derivation that is written to disk.
+const INFO_VERIFIER: &[u8] = b"veilvoice/app-lock/verifier";
+/// HKDF label for the half that is not, and that authenticates the record.
+const INFO_TAG: &[u8] = b"veilvoice/app-lock/tag";
+/// Length of the record tag. Sixteen bytes of Poly1305, as everywhere else.
+const TAG_LEN: usize = crate::aead::TAG_LEN;
+/// Length of the tagged part of a record, which is also the offset of the
+/// nonce that follows it.
+const BODY_LEN: usize = 73;
 
 /// Failed attempts allowed before the wait starts.
 const FREE_ATTEMPTS: u32 = 3;
@@ -139,20 +176,47 @@ pub struct AppLock {
     failures: u32,
     /// Unix seconds of the most recent failure, or 0 if there has not been one.
     last_failure: i64,
+    /// Raised when a record failed its tag, and kept raised across restarts
+    /// until an unlock clears it. See [`AppLock::tampered`].
+    tampered: bool,
+    /// Which format this record was read from, so that a version 1 file can be
+    /// rewritten as version 2 the first time the passphrase is available.
+    version: u8,
+    /// Nonce for the record tag, drawn fresh on every write.
+    ///
+    /// Fresh rather than fixed because Poly1305 authenticates each message
+    /// under a one-time key derived from the key *and the nonce*. Two records
+    /// tagged under one nonce would hand an observer of this file two
+    /// equations in the same two unknowns, which is enough to solve for the
+    /// one-time key and forge a third. The file is rewritten after every
+    /// failed attempt, so "two records" is an afternoon, not a corner case.
+    tag_nonce: [u8; crate::aead::NONCE_LEN],
+    /// The tag as read from disk. `None` for a version 1 record, which has no
+    /// tag, and for a freshly created one, which has not been written yet.
+    tag: Option<[u8; TAG_LEN]>,
 }
 
 impl AppLock {
     /// Create a lock for `password`.
     pub fn create(password: &[u8], params: kdf::KdfParams) -> Result<Self, Error> {
         let salt = kdf::random_salt()?;
-        let verifier = derive_verifier(password, &salt, params)?;
-        Ok(Self {
+        let (verifier, _) = derive_pair(password, &salt, params)?;
+        let mut lock = Self {
             params,
             salt,
             verifier,
             failures: 0,
             last_failure: 0,
-        })
+            tampered: false,
+            version: FORMAT_VERSION,
+            tag_nonce: [0u8; crate::aead::NONCE_LEN],
+            tag: None,
+        };
+        // Tag it here rather than leaving that to the caller. A record created
+        // and written without a tag would be indistinguishable on disk from a
+        // version 1 file, and would go one more unlock before it was covered.
+        lock.retag(password)?;
+        Ok(lock)
     }
 
     /// Check `password`, recording the outcome.
@@ -168,16 +232,80 @@ impl AppLock {
         if let Some(wait) = self.cooldown_at(now) {
             return Err(Error::AppLockCooldown(wait));
         }
-        let candidate = derive_verifier(password, &self.salt, self.params)?;
-        if candidate == self.verifier {
-            self.failures = 0;
-            self.last_failure = 0;
-            Ok(())
-        } else {
+        let (candidate, tag_key) = derive_pair(password, &self.salt, self.params)?;
+        if candidate != self.verifier {
             self.failures = self.failures.saturating_add(1);
             self.last_failure = now;
-            Err(Error::AppLockRejected)
+            return Err(Error::AppLockRejected);
         }
+
+        // The passphrase is right, so the tag key exists and the record can be
+        // checked against it. This is the only moment it can be: before now
+        // there was nothing to check with.
+        //
+        // A version 1 record has no tag and cannot be judged either way. It is
+        // upgraded rather than accused: `version` carries the answer out to
+        // `LockStore`, which rewrites the file as version 2 while it still has
+        // the passphrase.
+        if self.version >= 2 && !self.tag_matches(&tag_key) {
+            self.tampered = true;
+        }
+
+        self.failures = 0;
+        self.last_failure = 0;
+        Ok(())
+    }
+
+    /// Whether a record has been found edited by somebody without the
+    /// passphrase, at any point since this was last cleared.
+    ///
+    /// Sticky on purpose. A report that a restart clears is a report an
+    /// attacker clears.
+    pub fn tampered(&self) -> bool {
+        self.tampered
+    }
+
+    /// Clear the tamper report, after proving the passphrase.
+    ///
+    /// Takes the password rather than trusting an earlier unlock, so that
+    /// nothing can dismiss the report except the person who can open the lock.
+    pub fn acknowledge(&mut self, password: &[u8]) -> Result<(), Error> {
+        self.verify(password)?;
+        self.tampered = false;
+        Ok(())
+    }
+
+    /// True when this record predates the authentication tag and should be
+    /// rewritten once the passphrase is in hand.
+    pub fn needs_upgrade(&self) -> bool {
+        self.version < FORMAT_VERSION
+    }
+
+    fn tag_matches(&self, tag_key: &Secret) -> bool {
+        let Ok(want) = self.tag(tag_key) else {
+            // A failure to compute the tag is a broken build or an exhausted
+            // machine, not evidence about the file. Do not call it tampering.
+            return true;
+        };
+        match &self.tag {
+            Some(have) => bool::from(subtle::ConstantTimeEq::ct_eq(&want[..], &have[..])),
+            None => false,
+        }
+    }
+
+    /// The authentication tag over everything in the record before it.
+    ///
+    /// Poly1305 over an empty message with the record as associated data: a
+    /// keyed tag built from the AEAD already in this crate, rather than a
+    /// second MAC construction to review.
+    fn tag(&self, tag_key: &Secret) -> Result<[u8; TAG_LEN], Error> {
+        let sealed = crate::aead::seal(tag_key, &self.tag_nonce, &self.body(), &[])?;
+        let mut out = [0u8; TAG_LEN];
+        if sealed.len() != TAG_LEN {
+            return Err(Error::Encrypt);
+        }
+        out.copy_from_slice(&sealed);
+        Ok(out)
     }
 
     /// Seconds still to wait before another attempt is accepted.
@@ -207,55 +335,121 @@ impl AppLock {
         self.params
     }
 
+    /// The bytes the tag covers.
+    ///
+    /// Not the whole record. The failed-attempt counter and its timestamp are
+    /// deliberately outside, and the reason is worth stating rather than
+    /// leaving to be discovered: they are written at the one moment the tag
+    /// key does not exist. A wrong passphrase has to be counted, and counting
+    /// it means a write, and the write cannot be authenticated by a key that
+    /// only a right passphrase produces. Putting them inside would mean either
+    /// re-tagging with a stale tag -- so every honest typo would be reported
+    /// as tampering -- or not counting failures at all.
+    ///
+    /// So the rate limit is exactly as defeatable by an editor as it was
+    /// before, and [`SCOPE`] does not claim otherwise. What the tag does cover
+    /// is the part an attacker actually wants: the verifier, the Argon2id
+    /// cost, and the tamper flag itself.
+    fn body(&self) -> [u8; BODY_LEN] {
+        let mut out = [0u8; BODY_LEN];
+        out[..8].copy_from_slice(MAGIC);
+        out[8] = FORMAT_VERSION;
+        // 9..12 stay zero: reserved.
+        out[12..16].copy_from_slice(&self.params.m_cost.to_le_bytes());
+        out[16..20].copy_from_slice(&self.params.t_cost.to_le_bytes());
+        out[20..24].copy_from_slice(&self.params.p_cost.to_le_bytes());
+        out[24..40].copy_from_slice(&self.salt);
+        out[40..72].copy_from_slice(self.verifier.expose());
+        out[72] = u8::from(self.tampered);
+        out
+    }
+
+    /// Draw a fresh nonce and re-tag the record under `password`.
+    ///
+    /// Called when the passphrase is in hand: at creation, at a change, and
+    /// after a successful unlock. A version 1 record becomes version 2 here,
+    /// which is the whole of the upgrade path.
+    pub fn retag(&mut self, password: &[u8]) -> Result<(), Error> {
+        let (_, tag_key) = derive_pair(password, &self.salt, self.params)?;
+        self.tag_nonce = crate::aead::random_nonce()?;
+        self.version = FORMAT_VERSION;
+        self.tag = Some(self.tag(&tag_key)?);
+        Ok(())
+    }
+
     /// Serialise exactly as it appears on disk.
     ///
     /// ```text
-    ///  offset  size  field
-    ///       0     8  magic "VEILLOK1"
-    ///       8     1  format version (1)
-    ///       9     3  reserved, must be zero
-    ///      12     4  Argon2id m_cost (KiB, little-endian)
-    ///      16     4  Argon2id t_cost
-    ///      20     4  Argon2id p_cost
-    ///      24    16  salt
-    ///      40    32  verifier
-    ///      72     4  consecutive failed attempts
-    ///      76     8  Unix seconds of the most recent failure
+    ///  offset  size  field                                  covered by the tag
+    ///       0     8  magic "VEILLOK1"                        yes
+    ///       8     1  format version (2)                      yes
+    ///       9     3  reserved, must be zero                  yes
+    ///      12     4  Argon2id m_cost (KiB, little-endian)    yes
+    ///      16     4  Argon2id t_cost                         yes
+    ///      20     4  Argon2id p_cost                         yes
+    ///      24    16  salt                                    yes
+    ///      40    32  verifier                                yes
+    ///      72     1  tamper report: 1 raised, 0 acknowledged yes
+    ///      73    24  tag nonce, fresh on every re-tag        no
+    ///      97    16  tag over bytes 0..73                    no
+    ///     113     4  consecutive failed attempts             no
+    ///     117     8  Unix seconds of the most recent failure no
     /// ```
     ///
-    /// Nothing here is authenticated, and that is deliberate: any key we could
-    /// authenticate it with would have to sit beside it in the same file. A MAC
-    /// would look like tamper-proofing without being any, which is worse than
-    /// the honest absence of one.
+    /// A record that has never been tagged -- one read from a version 1 file
+    /// and not yet unlocked -- is written back as version 1, so that a failed
+    /// attempt against an old lock still records itself. [`AppLock::retag`]
+    /// is what moves it forward, and it needs the passphrase to do so.
     pub fn to_bytes(&self) -> Vec<u8> {
+        let Some(tag) = self.tag else {
+            let mut out = Vec::with_capacity(LOCK_LEN_V1);
+            out.extend_from_slice(MAGIC);
+            out.push(1);
+            out.extend_from_slice(&[0u8; 3]);
+            out.extend_from_slice(&self.params.m_cost.to_le_bytes());
+            out.extend_from_slice(&self.params.t_cost.to_le_bytes());
+            out.extend_from_slice(&self.params.p_cost.to_le_bytes());
+            out.extend_from_slice(&self.salt);
+            out.extend_from_slice(self.verifier.expose());
+            out.extend_from_slice(&self.failures.to_le_bytes());
+            out.extend_from_slice(&self.last_failure.to_le_bytes());
+            debug_assert_eq!(out.len(), LOCK_LEN_V1);
+            return out;
+        };
+
         let mut out = Vec::with_capacity(LOCK_LEN);
-        out.extend_from_slice(MAGIC);
-        out.push(FORMAT_VERSION);
-        out.extend_from_slice(&[0u8; 3]); // reserved
-        out.extend_from_slice(&self.params.m_cost.to_le_bytes());
-        out.extend_from_slice(&self.params.t_cost.to_le_bytes());
-        out.extend_from_slice(&self.params.p_cost.to_le_bytes());
-        out.extend_from_slice(&self.salt);
-        out.extend_from_slice(self.verifier.expose());
+        out.extend_from_slice(&self.body());
+        out.extend_from_slice(&self.tag_nonce);
+        out.extend_from_slice(&tag);
         out.extend_from_slice(&self.failures.to_le_bytes());
         out.extend_from_slice(&self.last_failure.to_le_bytes());
         debug_assert_eq!(out.len(), LOCK_LEN);
         out
     }
 
-    /// Parse a lock file.
+    /// Parse a lock file, version 1 or version 2.
+    ///
+    /// Nothing is authenticated here. Deciding whether the tag is right needs
+    /// the passphrase, which parsing does not have, so parsing answers only
+    /// "is this a lock file" and leaves the rest to [`AppLock::verify`].
     pub fn parse(bytes: &[u8]) -> Result<Self, Error> {
-        if bytes.len() < LOCK_LEN {
+        if bytes.len() < 9 {
             return Err(Error::Truncated);
-        }
-        if bytes.len() > LOCK_LEN {
-            return Err(Error::BadHeader);
         }
         if &bytes[..8] != MAGIC {
             return Err(Error::BadMagic);
         }
-        if bytes[8] != FORMAT_VERSION {
-            return Err(Error::UnsupportedVersion(bytes[8]));
+        let version = bytes[8];
+        let want = match version {
+            1 => LOCK_LEN_V1,
+            2 => LOCK_LEN,
+            other => return Err(Error::UnsupportedVersion(other)),
+        };
+        if bytes.len() < want {
+            return Err(Error::Truncated);
+        }
+        if bytes.len() > want {
+            return Err(Error::BadHeader);
         }
         // Refuse a future flag rather than ignore it, as the container does.
         if bytes[9..12] != [0u8; 3] {
@@ -264,14 +458,19 @@ impl AppLock {
 
         let u32_at =
             |o: usize| u32::from_le_bytes([bytes[o], bytes[o + 1], bytes[o + 2], bytes[o + 3]]);
+        let i64_at = |o: usize| {
+            let mut b = [0u8; 8];
+            b.copy_from_slice(&bytes[o..o + 8]);
+            i64::from_le_bytes(b)
+        };
         let params = kdf::KdfParams {
             m_cost: u32_at(12),
             t_cost: u32_at(16),
             p_cost: u32_at(20),
         };
         // Validate the costs here rather than only at the first verification.
-        // They are attacker-controlled — this file is read before anyone has
-        // authenticated — and `KdfParams::checked` is the single funnel that
+        // They are attacker-controlled -- this file is read before anyone has
+        // authenticated -- and `KdfParams::checked` is the single funnel that
         // bounds them (see F-2 and F-3). Refusing at parse time means the
         // failure is reported as "this lock file is broken", which is true and
         // actionable, rather than as a password that never works.
@@ -283,30 +482,74 @@ impl AppLock {
         verifier_bytes.copy_from_slice(&bytes[40..72]);
         let verifier = Secret::new(&mut verifier_bytes);
 
-        let mut last = [0u8; 8];
-        last.copy_from_slice(&bytes[76..84]);
+        let mut tag_nonce = [0u8; crate::aead::NONCE_LEN];
+        let mut tag = None;
+        let mut tampered = false;
+        let (failures, last_failure) = if version >= 2 {
+            // The flag is one bit written in one byte, so anything but 0 or 1
+            // is an edit. Refuse it rather than normalising it: normalising
+            // would make two different files parse to the same record, and a
+            // file read before anybody has authenticated is the last place to
+            // accept bytes it does not then write back. Refusing is also the
+            // safe direction, because a lock file that will not parse leaves
+            // the lock in force and sends `crate::vault` to the second copy.
+            tampered = match bytes[72] {
+                0 => false,
+                1 => true,
+                _ => return Err(Error::BadHeader),
+            };
+            tag_nonce.copy_from_slice(&bytes[73..97]);
+            let mut t = [0u8; TAG_LEN];
+            t.copy_from_slice(&bytes[97..113]);
+            tag = Some(t);
+            (u32_at(113), i64_at(117))
+        } else {
+            (u32_at(72), i64_at(76))
+        };
 
         Ok(Self {
             params,
             salt,
             verifier,
-            failures: u32_at(72),
-            last_failure: i64::from_le_bytes(last),
+            failures,
+            last_failure,
+            tampered,
+            version,
+            tag_nonce,
+            tag,
         })
     }
 }
 
-/// Derive the verifier for `password`.
+/// Derive the verifier and the tag key for `password`.
 ///
-/// The domain separator is prepended so that this value cannot collide with a
-/// container key derived from the same passphrase and salt. The joined buffer is
-/// wiped as soon as it has been consumed.
-fn derive_verifier(password: &[u8], salt: &[u8], params: kdf::KdfParams) -> Result<Secret, Error> {
+/// One Argon2id run, split in two by HKDF. Two runs would double the cost of
+/// every unlock for no gain: HKDF outputs under distinct labels are
+/// independent, so publishing the verifier -- which the file does, by existing
+/// -- reveals nothing about the tag key.
+///
+/// The domain separator is prepended before the Argon2id run so that neither
+/// half can collide with a container key derived from the same passphrase and
+/// salt. The joined buffer is wiped as soon as it has been consumed.
+fn derive_pair(
+    password: &[u8],
+    salt: &[u8],
+    params: kdf::KdfParams,
+) -> Result<(Secret, Secret), Error> {
     let mut bound = Vec::with_capacity(DOMAIN.len() + password.len());
     bound.extend_from_slice(DOMAIN);
     bound.extend_from_slice(password);
     let bound = Secret::new(&mut bound);
-    kdf::derive_key(bound.expose(), salt, params)
+    let root = kdf::derive_key(bound.expose(), salt, params)?;
+
+    let hk = hkdf::Hkdf::<sha2::Sha256>::from_prk(root.expose()).map_err(|_| Error::Kdf)?;
+    let mut verifier = Secret::zeroed(kdf::KEY_LEN);
+    let mut tag_key = Secret::zeroed(kdf::KEY_LEN);
+    hk.expand(INFO_VERIFIER, verifier.expose_mut())
+        .map_err(|_| Error::Kdf)?;
+    hk.expand(INFO_TAG, tag_key.expose_mut())
+        .map_err(|_| Error::Kdf)?;
+    Ok((verifier, tag_key))
 }
 
 /// An [`AppLock`] bound to a file, which is persisted after every attempt.
@@ -314,8 +557,30 @@ fn derive_verifier(password: &[u8], salt: &[u8], params: kdf::KdfParams) -> Resu
 /// Persisting on failure is the point: a rate limit that a process restart
 /// clears is not a rate limit.
 pub struct LockStore {
-    path: PathBuf,
+    backing: Backing,
     lock: AppLock,
+}
+
+/// Where a [`LockStore`] keeps its record.
+///
+/// Two, because the two are asked for by different callers. The default
+/// location is a [`crate::vault::Vault`]: two copies under unguessable names,
+/// one of them administrator-owned where the platform allows it. An explicit
+/// path is one plain file, which is what `veilvoice lock --path` is for and
+/// what a script pointing at a temporary directory expects.
+#[derive(Clone, Debug)]
+enum Backing {
+    File(PathBuf),
+    Vault(crate::vault::Vault),
+}
+
+impl Backing {
+    fn primary(&self) -> &Path {
+        match self {
+            Self::File(p) => p,
+            Self::Vault(v) => v.primary(),
+        }
+    }
 }
 
 impl LockStore {
@@ -331,7 +596,7 @@ impl LockStore {
             Err(_) => return Err(Error::AppLockStore),
         };
         Ok(Some(Self {
-            path: path.to_path_buf(),
+            backing: Backing::File(path.to_path_buf()),
             lock: AppLock::parse(&bytes)?,
         }))
     }
@@ -347,7 +612,7 @@ impl LockStore {
     /// which is one atomic answer to both.
     pub fn create(path: &Path, password: &[u8], params: kdf::KdfParams) -> Result<Self, Error> {
         let store = Self {
-            path: path.to_path_buf(),
+            backing: Backing::File(path.to_path_buf()),
             lock: AppLock::create(password, params)?,
         };
         if let Some(parent) = path.parent() {
@@ -367,6 +632,13 @@ impl LockStore {
     /// already true of anyone who can delete the file.
     pub fn unlock(&mut self, password: &[u8]) -> Result<(), Error> {
         let result = self.lock.verify(password);
+        if result.is_ok() {
+            // The passphrase is in hand, so this is the moment to draw a fresh
+            // nonce, re-tag, and move a version 1 record forward. It is also
+            // the only moment a raised tamper flag can be written with a tag
+            // that will stand up to the next check.
+            let _ = self.lock.retag(password);
+        }
         // Nothing to persist if we never got as far as an attempt.
         if !matches!(result, Err(Error::AppLockCooldown(_))) {
             let _ = self.save();
@@ -374,10 +646,40 @@ impl LockStore {
         result
     }
 
+    /// Whether the stored record has been found edited by somebody without the
+    /// passphrase. See [`AppLock::tampered`].
+    pub fn tampered(&self) -> bool {
+        self.lock.tampered()
+    }
+
+    /// Clear the tamper report, after proving the passphrase, and persist that.
+    pub fn acknowledge(&mut self, password: &[u8]) -> Result<(), Error> {
+        self.unlock(password)?;
+        self.lock.acknowledge(password)?;
+        self.save()
+    }
+
+    /// Raise the tamper report from outside, and persist it if the passphrase
+    /// allows.
+    ///
+    /// [`crate::vault`] calls this when it finds the two copies of a lock
+    /// disagreeing, which is evidence this module cannot see on its own. The
+    /// flag is held in memory either way; persisting it needs an unlock, so a
+    /// report raised now becomes durable at the next successful one.
+    pub fn report_tamper(&mut self) {
+        self.lock.tampered = true;
+    }
+
     /// Replace the password, after proving the current one.
     pub fn change_password(&mut self, current: &[u8], new: &[u8]) -> Result<(), Error> {
         self.unlock(current)?;
+        let carried = self.lock.tampered;
         self.lock = AppLock::create(new, self.lock.params)?;
+        // A new passphrase is not an acknowledgement. Somebody who changes the
+        // password without ever reading the report should still see it, so the
+        // flag is carried across and the record re-tagged under the new key.
+        self.lock.tampered = carried;
+        self.lock.retag(new)?;
         self.save()
     }
 
@@ -387,7 +689,10 @@ impl LockStore {
     /// simply be deleted by anyone who can reach it, which [`SCOPE`] says.
     pub fn remove(mut self, current: &[u8]) -> Result<(), Error> {
         self.unlock(current)?;
-        std::fs::remove_file(&self.path).map_err(|_| Error::AppLockStore)
+        match &self.backing {
+            Backing::Vault(v) => v.clear(),
+            Backing::File(path) => std::fs::remove_file(path).map_err(|_| Error::AppLockStore),
+        }
     }
 
     /// Seconds still to wait before another attempt is accepted.
@@ -400,19 +705,66 @@ impl LockStore {
         self.lock.failures()
     }
 
-    /// Where this lock is stored.
+    /// Where this lock is stored. The first of the two copies, when it is
+    /// vault-backed.
     pub fn path(&self) -> &Path {
-        &self.path
+        self.backing.primary()
     }
 
     fn save(&self) -> Result<(), Error> {
-        if let Some(parent) = self.path.parent() {
-            if !parent.as_os_str().is_empty() {
-                std::fs::create_dir_all(parent).map_err(|_| Error::AppLockStore)?;
+        match &self.backing {
+            Backing::Vault(v) => v.store(&self.lock),
+            Backing::File(path) => {
+                if let Some(parent) = path.parent() {
+                    if !parent.as_os_str().is_empty() {
+                        std::fs::create_dir_all(parent).map_err(|_| Error::AppLockStore)?;
+                    }
+                }
+                write_private(path, &self.lock.to_bytes(), false)
             }
         }
-        write_private(&self.path, &self.lock.to_bytes(), false)
     }
+}
+
+/// Open the lock at the default location, wherever this platform keeps it.
+///
+/// Returns `Ok(None)` when no lock is configured, and `Err` when the
+/// environment does not say where a configuration directory is -- a caller
+/// that cannot find one should say so rather than scatter a lock file into the
+/// working directory.
+///
+/// The second element is true when one of the two copies had gone and was
+/// rebuilt from the other. A copy does not vanish on its own, so the caller
+/// should treat it as a tamper report and show it; [`LockStore::report_tamper`]
+/// is how to make it stick.
+pub fn open_default() -> Result<(Option<LockStore>, bool), Error> {
+    let base = default_dir().ok_or(Error::AppLockStore)?;
+    let vault = crate::vault::Vault::at(&base, crate::vault::admin_dir().as_deref())?;
+    let (record, found) = vault.load()?;
+    let restored = found == crate::vault::Found::Restored;
+    Ok((
+        record.map(|lock| LockStore {
+            backing: Backing::Vault(vault),
+            lock,
+        }),
+        restored,
+    ))
+}
+
+/// Create a lock at the default location, refusing to replace one already
+/// there.
+pub fn create_default(password: &[u8], params: kdf::KdfParams) -> Result<LockStore, Error> {
+    let base = default_dir().ok_or(Error::AppLockStore)?;
+    let vault = crate::vault::Vault::at(&base, crate::vault::admin_dir().as_deref())?;
+    if vault.load()?.0.is_some() {
+        return Err(Error::AppLockStore);
+    }
+    let store = LockStore {
+        backing: Backing::Vault(vault),
+        lock: AppLock::create(password, params)?,
+    };
+    store.save()?;
+    Ok(store)
 }
 
 /// Write the lock file so it is owner-only from the moment it exists.
@@ -436,6 +788,12 @@ fn write_private(path: &Path, bytes: &[u8], exclusive: bool) -> Result<(), Error
     result.map_err(|_| Error::AppLockStore)
 }
 
+/// The configuration directory the vault keeps its files in, if the
+/// environment says where one is.
+pub fn default_dir() -> Option<PathBuf> {
+    default_path().and_then(|p| p.parent().map(Path::to_path_buf))
+}
+
 /// Where the lock file lives on this platform, if the environment says.
 ///
 /// Resolved from environment variables rather than a directories crate: it is
@@ -443,6 +801,12 @@ fn write_private(path: &Path, bytes: &[u8], exclusive: bool) -> Result<(), Error
 /// `None` instead of guessing when the environment does not say. A caller that
 /// gets `None` should tell the user it cannot find a config directory rather
 /// than scattering a lock file into the working directory.
+///
+/// This is the path a caller naming one gets, and the anchor a dozen other
+/// settings files are derived from -- policy, capture, sentry. It is no longer
+/// where the lock itself is kept by default: [`open_default`] goes through
+/// [`crate::vault`], whose files sit in the same directory under names derived
+/// from its index.
 pub fn default_path() -> Option<PathBuf> {
     let base = if cfg!(windows) {
         PathBuf::from(std::env::var_os("APPDATA")?)
@@ -642,8 +1006,18 @@ mod tests {
     fn the_verifier_is_domain_separated_from_container_keys() {
         let salt = [5u8; kdf::SALT_LEN];
         let plain = kdf::derive_key(b"same passphrase", &salt, weak()).unwrap();
-        let bound = derive_verifier(b"same passphrase", &salt, weak()).unwrap();
+        let (bound, _) = derive_pair(b"same passphrase", &salt, weak()).unwrap();
         assert_ne!(plain, bound, "app lock and container key must not coincide");
+    }
+
+    /// The half of the derivation that is written to disk must say nothing
+    /// about the half that authenticates the record, or the tag is worth
+    /// nothing to anybody holding the file.
+    #[test]
+    fn the_stored_verifier_and_the_tag_key_are_independent() {
+        let salt = [5u8; kdf::SALT_LEN];
+        let (verifier, tag_key) = derive_pair(b"same passphrase", &salt, weak()).unwrap();
+        assert_ne!(verifier, tag_key);
     }
 
     #[test]
@@ -719,13 +1093,170 @@ mod tests {
         assert!(!path.exists());
     }
 
+    /// The claim the tag exists to support, stated as a test so it cannot
+    /// quietly stop being true: an edit made without the passphrase is caught
+    /// at the next unlock.
+    #[test]
+    fn swapping_the_stored_verifier_is_reported_at_the_next_unlock() {
+        let honest = AppLock::create(b"the real one", weak()).unwrap();
+        let attacker = AppLock::create(b"the attacker's", weak()).unwrap();
+
+        // Splice the attacker's verifier into the owner's record, leaving
+        // everything else including the tag alone. This is the attack: a lock
+        // that opens to a password the owner never chose.
+        let mut bytes = honest.to_bytes();
+        let theirs = attacker.to_bytes();
+        bytes[24..72].copy_from_slice(&theirs[24..72]);
+
+        let mut edited = AppLock::parse(&bytes).unwrap();
+        assert!(!edited.tampered(), "nothing has been checked yet");
+        edited.verify(b"the attacker's").unwrap();
+        assert!(
+            edited.tampered(),
+            "the record was edited by somebody without the passphrase and \
+             nothing said so"
+        );
+    }
+
+    /// Weakening the stored cost is the other edit worth making, and it is
+    /// answered before the tag is even consulted: the cost is an input to the
+    /// derivation, so a changed cost produces a different verifier and the
+    /// owner's own passphrase stops matching. Refusal, not a warning, which is
+    /// the stronger of the two answers.
+    #[test]
+    fn weakening_the_argon_cost_stops_the_lock_opening_at_all() {
+        let lock = AppLock::create(b"pw", kdf::KdfParams::default()).unwrap();
+        let mut bytes = lock.to_bytes();
+        bytes[12..16].copy_from_slice(&weak().m_cost.to_le_bytes());
+        bytes[16..20].copy_from_slice(&weak().t_cost.to_le_bytes());
+        bytes[20..24].copy_from_slice(&weak().p_cost.to_le_bytes());
+
+        let mut edited = AppLock::parse(&bytes).unwrap();
+        assert!(matches!(edited.verify(b"pw"), Err(Error::AppLockRejected)));
+    }
+
+    #[test]
+    fn clearing_the_tamper_flag_by_hand_puts_it_straight_back() {
+        let honest = AppLock::create(b"pw", weak()).unwrap();
+        let attacker = AppLock::create(b"other", weak()).unwrap();
+        let mut bytes = honest.to_bytes();
+        bytes[24..72].copy_from_slice(&attacker.to_bytes()[24..72]);
+
+        let mut raised = AppLock::parse(&bytes).unwrap();
+        raised.verify(b"other").unwrap();
+        assert!(raised.tampered());
+        let mut stored = raised.to_bytes();
+        assert_eq!(stored[72], 1, "the report must reach the file");
+
+        // Now wipe the flag, as somebody hiding their tracks would.
+        stored[72] = 0;
+        let mut hidden = AppLock::parse(&stored).unwrap();
+        assert!(!hidden.tampered(), "the file no longer says so");
+        hidden.verify(b"other").unwrap();
+        assert!(
+            hidden.tampered(),
+            "the flag is inside the tag, so clearing it is itself an edit"
+        );
+    }
+
+    /// The report must not be dismissible by anything except the passphrase,
+    /// and it must survive the process dying.
+    #[test]
+    fn a_report_outlives_a_restart_and_needs_the_passphrase_to_clear() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("applock.bin");
+        LockStore::create(&path, b"pw", weak()).unwrap();
+
+        let attacker = AppLock::create(b"other", weak()).unwrap();
+        let mut bytes = std::fs::read(&path).unwrap();
+        bytes[24..72].copy_from_slice(&attacker.to_bytes()[24..72]);
+        std::fs::write(&path, &bytes).unwrap();
+
+        let mut store = LockStore::open(&path).unwrap().unwrap();
+        store.unlock(b"other").unwrap();
+        assert!(store.tampered());
+
+        // Reopened from disk, the report is still there.
+        let mut store = LockStore::open(&path).unwrap().unwrap();
+        assert!(store.tampered(), "the report did not survive a restart");
+        assert!(matches!(
+            store.acknowledge(b"wrong"),
+            Err(Error::AppLockRejected)
+        ));
+        assert!(store.tampered(), "a wrong password must not dismiss it");
+        store.acknowledge(b"other").unwrap();
+        assert!(!store.tampered());
+
+        let store = LockStore::open(&path).unwrap().unwrap();
+        assert!(!store.tampered(), "the acknowledgement must reach disk");
+    }
+
+    /// An honest typo is not tampering, and a test says so because getting
+    /// this wrong would train the user to ignore the warning.
+    #[test]
+    fn a_wrong_password_is_never_reported_as_tampering() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("applock.bin");
+        let mut store = LockStore::create(&path, b"pw", weak()).unwrap();
+        for _ in 0..3 {
+            assert!(matches!(store.unlock(b"typo"), Err(Error::AppLockRejected)));
+        }
+        store.unlock(b"pw").unwrap();
+        assert!(!store.tampered());
+    }
+
+    /// A lock written by an older build has no tag. It must keep working, and
+    /// it must gain one, and it must not be accused of anything on the way.
+    #[test]
+    fn a_version_one_lock_still_opens_and_is_upgraded_in_place() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("applock.bin");
+
+        let lock = AppLock::create(b"pw", weak()).unwrap();
+        let v2 = lock.to_bytes();
+        let mut v1 = Vec::with_capacity(LOCK_LEN_V1);
+        v1.extend_from_slice(&v2[..8]);
+        v1.push(1);
+        v1.extend_from_slice(&v2[9..72]);
+        v1.extend_from_slice(&2u32.to_le_bytes()); // failures
+        v1.extend_from_slice(&0i64.to_le_bytes()); // last failure
+        assert_eq!(v1.len(), LOCK_LEN_V1);
+        std::fs::write(&path, &v1).unwrap();
+
+        let mut store = LockStore::open(&path).unwrap().unwrap();
+        assert_eq!(store.failures(), 2, "the old counter must be read");
+        store.unlock(b"pw").unwrap();
+        assert!(!store.tampered(), "an untagged record is not an edited one");
+
+        let raw = std::fs::read(&path).unwrap();
+        assert_eq!(raw.len(), LOCK_LEN, "it should have been rewritten");
+        assert_eq!(raw[8], FORMAT_VERSION);
+    }
+
+    /// The nonce must move on every write, because Poly1305 under a repeated
+    /// nonce hands an observer of two records enough to forge a third.
+    #[test]
+    fn two_writes_never_share_a_tag_nonce() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("applock.bin");
+        let mut store = LockStore::create(&path, b"pw", weak()).unwrap();
+        let first = std::fs::read(&path).unwrap()[73..97].to_vec();
+        store.unlock(b"pw").unwrap();
+        let second = std::fs::read(&path).unwrap()[73..97].to_vec();
+        assert_ne!(first, second, "the tag nonce repeated across two writes");
+    }
+
     /// The user-facing claim must keep stating the limit. If someone edits this
     /// into a promise, this test is what stops it shipping.
     #[test]
     fn the_scope_note_states_the_limit_rather_than_a_guarantee() {
         let scope = SCOPE.to_lowercase();
         assert!(scope.contains("not disk encryption"));
-        assert!(scope.contains("not tamper-proof"));
+        assert!(
+            scope.contains("not tamper-proof"),
+            "the tag catches edits; it does not make the file tamper-proof, and \
+             the difference is the whole of what this note exists to say"
+        );
         assert!(scope.contains("delete"), "deletion must be admitted");
         assert!(scope.contains("offline"), "offline attack must be admitted");
         for boast in ["unbreakable", "impossible", "guarantee"] {
