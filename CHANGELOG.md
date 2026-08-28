@@ -8,6 +8,33 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The roadmap, as something you watch
+
+Marker 71. Everything that is finished, scrolling past in a little under half a
+minute, then four seconds with a ring filling in the corner before it starts
+again. The countdown is there because a loop with no warning restarts under the
+reader while they are still on the last line.
+
+**An animation rather than an encoded file, and that is a decision rather than
+a shortcut.** This project ships no codec and does not bundle `ffmpeg`, and the
+rule it already settled for video output applies here: render here, and always
+produce something that needs nothing else installed. An encoded file would also
+be a committed binary whose bytes depend on which build of which encoder made
+it, so it could not be regenerated and compared the way every other picture in
+this repository is. What is there plays in any browser with no plugin and no
+download, weighs a few kilobytes, takes the reader's colour scheme, and is
+generated from `ROADMAP.md`, so it cannot show a marker as finished that is
+not. The `ffmpeg` command to turn it into a file is printed under it.
+
+Somebody who has asked their system for less movement gets the list at the top
+and no countdown, rather than a picture that never settles.
+
+The picture checker needed to learn about clipping for this: text inside a
+`clip-path` is meant to be outside the frame, because that is what a scrolling
+list is, and measuring it against the canvas would have reported sixty rows as
+overflowing and been wrong about every one. Everything outside the clip is
+still measured.
+
 ### Every banner was cutting its own sentence in half
 
 Found by measuring rather than by looking, which is the point of it.
