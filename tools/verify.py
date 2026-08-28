@@ -91,6 +91,10 @@ GENERATORS = [
     # build, a machine and a person deciding the output is right. Everything
     # after that is a pure function of those text files, which is why this half
     # can be regenerated and checked here.
+    # Before the drawings, which mirror the window captures into the website
+    # and record their sizes: a crop after that copy would leave the two out of
+    # step, and the size check in `terminal.py --check` is what would notice.
+    ("screenshot borders", [sys.executable, "tools/shots/crop.py"]),
     ("terminal drawings", [sys.executable, "tools/shots/terminal.py"]),
     ("documentation", [sys.executable, "tools/docs/generate.py"]),
     # The website's own source, which `generate.py` does not cover: it reads
@@ -105,6 +109,8 @@ GENERATORS = [
 
 CHECKS = [
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
+    ("no screenshot has a capture border",
+     [sys.executable, "tools/shots/crop.py", "--check"]),
     ("terminal drawings match their output",
      [sys.executable, "tools/shots/terminal.py", "--check"]),
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),
