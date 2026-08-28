@@ -319,6 +319,9 @@ def build(root):
         "Roadmap",
         "What is built, what is coming, and roughly when. Generated from ROADMAP.md.",
         "\n".join(body(colours, groups, counts, note)),
+        # This page is written for itself, so its `#anchor` links point at
+        # its own headings rather than at sections of the front page.
+        relink_body=False,
     )
     # `split.page` says the section is also on the front page, which is true of
     # a section and not of this. Replaced rather than parameterised, because
