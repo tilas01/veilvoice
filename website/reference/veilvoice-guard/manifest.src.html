@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-guard/src/manifest.rs</code></h1>
-<p style="color:var(--muted)"><a href="manifest.html">what this file is for</a> &middot; <a href="../veilvoice-guard.html">veilvoice-guard</a> &middot; 548 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="manifest.html">what this file is for</a> &middot; <a href="../veilvoice-guard.html">veilvoice-guard</a> &middot; 678 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -196,443 +196,575 @@
 <span class="ln" id="L136">}</span>
 </span>
 <span class="ln" id="L137"></span>
+<span class="src-item" id="fn-unrecordable">
+<span class="ln" id="L138"><span class="tok-com">/// Why this path cannot go in a manifest, if it cannot. **F-83.**</span></span>
+<span class="ln" id="L139"><span class="tok-com">///</span></span>
+<span class="ln" id="L140"><span class="tok-com">/// The record is a line-oriented text file that gets printed to a terminal, and</span></span>
+<span class="ln" id="L141"><span class="tok-com">/// those two facts decide what a path may contain.</span></span>
+<span class="ln" id="L142"><span class="tok-com">///</span></span>
+<span class="ln" id="L143"><span class="tok-com">/// A line break would end the record early and let one entry forge a second.</span></span>
+<span class="ln" id="L144"><span class="tok-com">/// A carriage return returns the cursor to the start of the line, so a crafted</span></span>
+<span class="ln" id="L145"><span class="tok-com">/// path overwrites what the report has already printed and the report says</span></span>
+<span class="ln" id="L146"><span class="tok-com">/// something other than what is recorded. An escape character does more again:</span></span>
+<span class="ln" id="L147"><span class="tok-com">/// colour, cursor movement, clearing the screen. The product of this module is</span></span>
+<span class="ln" id="L148"><span class="tok-com">/// a report somebody reads to decide whether their files have been altered, so</span></span>
+<span class="ln" id="L149"><span class="tok-com">/// a report that can be made to lie is the whole thing failing.</span></span>
+<span class="ln" id="L150"><span class="tok-com">///</span></span>
+<span class="ln" id="L151"><span class="tok-com">/// The refusal covers the C0 and C1 control ranges rather than the two</span></span>
+<span class="ln" id="L152"><span class="tok-com">/// characters that were found, because listing the ones somebody thought of is</span></span>
+<span class="ln" id="L153"><span class="tok-com">/// how the next one gets in. Refusing rather than stripping is deliberate: a</span></span>
+<span class="ln" id="L154"><span class="tok-com">/// path this format cannot represent faithfully is one it must not claim to</span></span>
+<span class="ln" id="L155"><span class="tok-com">/// hold. Such a filename is legal on Unix and vanishingly rare, and being told</span></span>
+<span class="ln" id="L156"><span class="tok-com">/// so is better than a record that quietly describes a different file.</span></span>
+<span class="ln" id="L157"><span class="tok-kw">fn</span> <span class="tok-fn">unrecordable</span>(path: &amp;str) -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> str&gt; {</span>
+<span class="ln" id="L158">    <span class="tok-kw">if</span> path.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\n&#x27;</span>) {</span>
+<span class="ln" id="L159">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(<span class="tok-str">&quot;a line break&quot;</span>);</span>
+<span class="ln" id="L160">    }</span>
+<span class="ln" id="L161">    <span class="tok-kw">if</span> path.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\r&#x27;</span>) {</span>
+<span class="ln" id="L162">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(<span class="tok-str">&quot;a carriage return&quot;</span>);</span>
+<span class="ln" id="L163">    }</span>
+<span class="ln" id="L164">    <span class="tok-kw">if</span> path.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\u{1b}&#x27;</span>) {</span>
+<span class="ln" id="L165">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(<span class="tok-str">&quot;an escape character&quot;</span>);</span>
+<span class="ln" id="L166">    }</span>
+<span class="ln" id="L167">    <span class="tok-kw">if</span> path.<span class="tok-fn">chars</span>().<span class="tok-fn">any</span>(char::is_control) {</span>
+<span class="ln" id="L168">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(<span class="tok-str">&quot;a control character&quot;</span>);</span>
+<span class="ln" id="L169">    }</span>
+<span class="ln" id="L170">    None</span>
+<span class="ln" id="L171">}</span>
+</span>
+<span class="ln" id="L172"></span>
 <span class="src-item" id="fn-digest_of">
-<span class="ln" id="L138"><span class="tok-kw">fn</span> <span class="tok-fn">digest_of</span>(bytes: &amp;[u8]) -&gt; String {</span>
-<span class="ln" id="L139">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hasher = Sha256::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L140">    hasher.<span class="tok-fn">update</span>(bytes);</span>
-<span class="ln" id="L141">    hasher</span>
-<span class="ln" id="L142">        .<span class="tok-fn">finalize</span>()</span>
-<span class="ln" id="L143">        .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L144">        .<span class="tok-fn">map</span>(|b| format!(<span class="tok-str">&quot;{b:02x}&quot;</span>))</span>
-<span class="ln" id="L145">        .<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L146">}</span>
+<span class="ln" id="L173"><span class="tok-kw">fn</span> <span class="tok-fn">digest_of</span>(bytes: &amp;[u8]) -&gt; String {</span>
+<span class="ln" id="L174">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> hasher = Sha256::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L175">    hasher.<span class="tok-fn">update</span>(bytes);</span>
+<span class="ln" id="L176">    hasher</span>
+<span class="ln" id="L177">        .<span class="tok-fn">finalize</span>()</span>
+<span class="ln" id="L178">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L179">        .<span class="tok-fn">map</span>(|b| format!(<span class="tok-str">&quot;{b:02x}&quot;</span>))</span>
+<span class="ln" id="L180">        .<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L181">}</span>
 </span>
-<span class="ln" id="L147"></span>
-<span class="ln" id="L148"><span class="tok-kw">impl</span> Manifest {</span>
+<span class="ln" id="L182"></span>
+<span class="ln" id="L183"><span class="tok-kw">impl</span> Manifest {</span>
 <span class="src-item" id="fn-manifest-of">
-<span class="ln" id="L149">    <span class="tok-com">/// Record every readable file in `paths`.</span></span>
-<span class="ln" id="L150">    <span class="tok-com">///</span></span>
-<span class="ln" id="L151">    <span class="tok-com">/// A path that cannot be read is skipped rather than failing the whole</span></span>
-<span class="ln" id="L152">    <span class="tok-com">/// manifest: recording nine of ten files is more useful than recording</span></span>
-<span class="ln" id="L153">    <span class="tok-com">/// none, and the tenth shows up as `Removed` at check time, which is the</span></span>
-<span class="ln" id="L154">    <span class="tok-com">/// honest description of a file this build cannot see.</span></span>
-<span class="ln" id="L155">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> of&lt;P: AsRef&lt;Path&gt;&gt;(paths: &amp;[P]) -&gt; Result&lt;Self, Error&gt; {</span>
-<span class="ln" id="L156">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> entries = BTreeMap::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L157">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> paths {</span>
-<span class="ln" id="L158">            <span class="tok-kw">let</span> path = path.<span class="tok-fn">as_ref</span>();</span>
-<span class="ln" id="L159">            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(bytes) = std::fs::<span class="tok-fn">read</span>(path) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L160">                continue;</span>
-<span class="ln" id="L161">            };</span>
-<span class="ln" id="L162">            <span class="tok-kw">let</span> key = <span class="tok-fn">normalise</span>(path);</span>
-<span class="ln" id="L163">            <span class="tok-kw">if</span> key.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\n&#x27;</span>) || key.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\r&#x27;</span>) {</span>
-<span class="ln" id="L164">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
-<span class="ln" id="L165">                    <span class="tok-str">&quot;path contains a line break and cannot be recorded: {key:?}&quot;</span></span>
-<span class="ln" id="L166">                )));</span>
-<span class="ln" id="L167">            }</span>
-<span class="ln" id="L168">            entries.<span class="tok-fn">insert</span>(</span>
-<span class="ln" id="L169">                key,</span>
-<span class="ln" id="L170">                Entry {</span>
-<span class="ln" id="L171">                    size: bytes.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> u64,</span>
-<span class="ln" id="L172">                    digest: <span class="tok-fn">digest_of</span>(&amp;bytes),</span>
-<span class="ln" id="L173">                },</span>
-<span class="ln" id="L174">            );</span>
-<span class="ln" id="L175">        }</span>
-<span class="ln" id="L176">        <span class="tok-fn">Ok</span>(Self { entries })</span>
-<span class="ln" id="L177">    }</span>
+<span class="ln" id="L184">    <span class="tok-com">/// Record every readable file in `paths`.</span></span>
+<span class="ln" id="L185">    <span class="tok-com">///</span></span>
+<span class="ln" id="L186">    <span class="tok-com">/// A path that cannot be read is skipped rather than failing the whole</span></span>
+<span class="ln" id="L187">    <span class="tok-com">/// manifest: recording nine of ten files is more useful than recording</span></span>
+<span class="ln" id="L188">    <span class="tok-com">/// none, and the tenth shows up as `Removed` at check time, which is the</span></span>
+<span class="ln" id="L189">    <span class="tok-com">/// honest description of a file this build cannot see.</span></span>
+<span class="ln" id="L190">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> of&lt;P: AsRef&lt;Path&gt;&gt;(paths: &amp;[P]) -&gt; Result&lt;Self, Error&gt; {</span>
+<span class="ln" id="L191">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> entries = BTreeMap::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L192">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> paths {</span>
+<span class="ln" id="L193">            <span class="tok-kw">let</span> path = path.<span class="tok-fn">as_ref</span>();</span>
+<span class="ln" id="L194">            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(bytes) = std::fs::<span class="tok-fn">read</span>(path) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L195">                continue;</span>
+<span class="ln" id="L196">            };</span>
+<span class="ln" id="L197">            <span class="tok-kw">let</span> key = <span class="tok-fn">normalise</span>(path);</span>
+<span class="ln" id="L198">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(bad) = <span class="tok-fn">unrecordable</span>(&amp;key) {</span>
+<span class="ln" id="L199">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L200">                    <span class="tok-str">&quot;path contains {bad} and cannot be recorded: {key:?}&quot;</span></span>
+<span class="ln" id="L201">                )));</span>
+<span class="ln" id="L202">            }</span>
+<span class="ln" id="L203">            entries.<span class="tok-fn">insert</span>(</span>
+<span class="ln" id="L204">                key,</span>
+<span class="ln" id="L205">                Entry {</span>
+<span class="ln" id="L206">                    size: bytes.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> u64,</span>
+<span class="ln" id="L207">                    digest: <span class="tok-fn">digest_of</span>(&amp;bytes),</span>
+<span class="ln" id="L208">                },</span>
+<span class="ln" id="L209">            );</span>
+<span class="ln" id="L210">        }</span>
+<span class="ln" id="L211">        <span class="tok-fn">Ok</span>(Self { entries })</span>
+<span class="ln" id="L212">    }</span>
 </span>
-<span class="ln" id="L178"></span>
+<span class="ln" id="L213"></span>
 <span class="src-item" id="fn-manifest-len">
-<span class="ln" id="L179">    <span class="tok-com">/// How many files are recorded.</span></span>
-<span class="ln" id="L180">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">len</span>(&amp;<span class="tok-kw">self</span>) -&gt; usize {</span>
-<span class="ln" id="L181">        <span class="tok-kw">self</span>.entries.<span class="tok-fn">len</span>()</span>
-<span class="ln" id="L182">    }</span>
+<span class="ln" id="L214">    <span class="tok-com">/// How many files are recorded.</span></span>
+<span class="ln" id="L215">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">len</span>(&amp;<span class="tok-kw">self</span>) -&gt; usize {</span>
+<span class="ln" id="L216">        <span class="tok-kw">self</span>.entries.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L217">    }</span>
 </span>
-<span class="ln" id="L183"></span>
+<span class="ln" id="L218"></span>
 <span class="src-item" id="fn-manifest-is_empty">
-<span class="ln" id="L184">    <span class="tok-com">/// Whether nothing is recorded.</span></span>
-<span class="ln" id="L185">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_empty</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L186">        <span class="tok-kw">self</span>.entries.<span class="tok-fn">is_empty</span>()</span>
-<span class="ln" id="L187">    }</span>
+<span class="ln" id="L219">    <span class="tok-com">/// Whether nothing is recorded.</span></span>
+<span class="ln" id="L220">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_empty</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L221">        <span class="tok-kw">self</span>.entries.<span class="tok-fn">is_empty</span>()</span>
+<span class="ln" id="L222">    }</span>
 </span>
-<span class="ln" id="L188"></span>
+<span class="ln" id="L223"></span>
 <span class="src-item" id="fn-manifest-paths">
-<span class="ln" id="L189">    <span class="tok-com">/// The recorded paths, in order.</span></span>
-<span class="ln" id="L190">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">paths</span>(&amp;<span class="tok-kw">self</span>) -&gt; <span class="tok-kw">impl</span> Iterator&lt;Item = &amp;str&gt; {</span>
-<span class="ln" id="L191">        <span class="tok-kw">self</span>.entries.<span class="tok-fn">keys</span>().<span class="tok-fn">map</span>(String::as_str)</span>
-<span class="ln" id="L192">    }</span>
+<span class="ln" id="L224">    <span class="tok-com">/// The recorded paths, in order.</span></span>
+<span class="ln" id="L225">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">paths</span>(&amp;<span class="tok-kw">self</span>) -&gt; <span class="tok-kw">impl</span> Iterator&lt;Item = &amp;str&gt; {</span>
+<span class="ln" id="L226">        <span class="tok-kw">self</span>.entries.<span class="tok-fn">keys</span>().<span class="tok-fn">map</span>(String::as_str)</span>
+<span class="ln" id="L227">    }</span>
 </span>
-<span class="ln" id="L193"></span>
+<span class="ln" id="L228"></span>
 <span class="src-item" id="fn-manifest-check">
-<span class="ln" id="L194">    <span class="tok-com">/// Compare the record against what is on disk now.</span></span>
-<span class="ln" id="L195">    <span class="tok-com">///</span></span>
-<span class="ln" id="L196">    <span class="tok-com">/// `extra` is the set of paths currently in the watched location, so a file</span></span>
-<span class="ln" id="L197">    <span class="tok-com">/// that has *appeared* can be reported. Pass an empty slice to check only</span></span>
-<span class="ln" id="L198">    <span class="tok-com">/// what was recorded.</span></span>
-<span class="ln" id="L199">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> check&lt;P: AsRef&lt;Path&gt;&gt;(&amp;<span class="tok-kw">self</span>, extra: &amp;[P]) -&gt; Report {</span>
-<span class="ln" id="L200">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> report = Report::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L201"></span>
-<span class="ln" id="L202">        <span class="tok-kw">for</span> (path, entry) <span class="tok-kw">in</span> &amp;<span class="tok-kw">self</span>.entries {</span>
-<span class="ln" id="L203">            <span class="tok-kw">match</span> std::fs::<span class="tok-fn">read</span>(path) {</span>
-<span class="ln" id="L204">                <span class="tok-fn">Ok</span>(bytes) =&gt; {</span>
-<span class="ln" id="L205">                    <span class="tok-kw">let</span> now = <span class="tok-fn">digest_of</span>(&amp;bytes);</span>
-<span class="ln" id="L206">                    <span class="tok-kw">if</span> now == entry.digest {</span>
-<span class="ln" id="L207">                        report.unchanged += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L208">                    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L209">                        report.changes.<span class="tok-fn">push</span>(Change::Modified {</span>
-<span class="ln" id="L210">                            path: path.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L211">                            was: entry.digest.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L212">                            now,</span>
-<span class="ln" id="L213">                        });</span>
-<span class="ln" id="L214">                    }</span>
-<span class="ln" id="L215">                }</span>
-<span class="ln" id="L216">                <span class="tok-fn">Err</span>(e) <span class="tok-kw">if</span> e.<span class="tok-fn">kind</span>() == std::io::ErrorKind::NotFound =&gt; {</span>
-<span class="ln" id="L217">                    report.changes.<span class="tok-fn">push</span>(Change::Removed { path: path.<span class="tok-fn">clone</span>() });</span>
-<span class="ln" id="L218">                }</span>
-<span class="ln" id="L219">                <span class="tok-fn">Err</span>(e) =&gt; {</span>
-<span class="ln" id="L220">                    report.changes.<span class="tok-fn">push</span>(Change::Unreadable {</span>
-<span class="ln" id="L221">                        path: path.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L222">                        why: e.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L223">                    });</span>
-<span class="ln" id="L224">                }</span>
-<span class="ln" id="L225">            }</span>
-<span class="ln" id="L226">        }</span>
-<span class="ln" id="L227"></span>
-<span class="ln" id="L228">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> extra {</span>
-<span class="ln" id="L229">            <span class="tok-kw">let</span> key = <span class="tok-fn">normalise</span>(path.<span class="tok-fn">as_ref</span>());</span>
-<span class="ln" id="L230">            <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.entries.<span class="tok-fn">contains_key</span>(&amp;key) {</span>
-<span class="ln" id="L231">                report.changes.<span class="tok-fn">push</span>(Change::Added { path: key });</span>
-<span class="ln" id="L232">            }</span>
-<span class="ln" id="L233">        }</span>
-<span class="ln" id="L234"></span>
-<span class="ln" id="L235">        report.changes.<span class="tok-fn">sort_by</span>(|a, b| a.<span class="tok-fn">path</span>().<span class="tok-fn">cmp</span>(b.<span class="tok-fn">path</span>()));</span>
-<span class="ln" id="L236">        report</span>
-<span class="ln" id="L237">    }</span>
+<span class="ln" id="L229">    <span class="tok-com">/// Compare the record against what is on disk now.</span></span>
+<span class="ln" id="L230">    <span class="tok-com">///</span></span>
+<span class="ln" id="L231">    <span class="tok-com">/// `extra` is the set of paths currently in the watched location, so a file</span></span>
+<span class="ln" id="L232">    <span class="tok-com">/// that has *appeared* can be reported. Pass an empty slice to check only</span></span>
+<span class="ln" id="L233">    <span class="tok-com">/// what was recorded.</span></span>
+<span class="ln" id="L234">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> check&lt;P: AsRef&lt;Path&gt;&gt;(&amp;<span class="tok-kw">self</span>, extra: &amp;[P]) -&gt; Report {</span>
+<span class="ln" id="L235">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> report = Report::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L236"></span>
+<span class="ln" id="L237">        <span class="tok-kw">for</span> (path, entry) <span class="tok-kw">in</span> &amp;<span class="tok-kw">self</span>.entries {</span>
+<span class="ln" id="L238">            <span class="tok-kw">match</span> std::fs::<span class="tok-fn">read</span>(path) {</span>
+<span class="ln" id="L239">                <span class="tok-fn">Ok</span>(bytes) =&gt; {</span>
+<span class="ln" id="L240">                    <span class="tok-kw">let</span> now = <span class="tok-fn">digest_of</span>(&amp;bytes);</span>
+<span class="ln" id="L241">                    <span class="tok-kw">if</span> now == entry.digest {</span>
+<span class="ln" id="L242">                        report.unchanged += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L243">                    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L244">                        report.changes.<span class="tok-fn">push</span>(Change::Modified {</span>
+<span class="ln" id="L245">                            path: path.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L246">                            was: entry.digest.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L247">                            now,</span>
+<span class="ln" id="L248">                        });</span>
+<span class="ln" id="L249">                    }</span>
+<span class="ln" id="L250">                }</span>
+<span class="ln" id="L251">                <span class="tok-fn">Err</span>(e) <span class="tok-kw">if</span> e.<span class="tok-fn">kind</span>() == std::io::ErrorKind::NotFound =&gt; {</span>
+<span class="ln" id="L252">                    report.changes.<span class="tok-fn">push</span>(Change::Removed { path: path.<span class="tok-fn">clone</span>() });</span>
+<span class="ln" id="L253">                }</span>
+<span class="ln" id="L254">                <span class="tok-fn">Err</span>(e) =&gt; {</span>
+<span class="ln" id="L255">                    report.changes.<span class="tok-fn">push</span>(Change::Unreadable {</span>
+<span class="ln" id="L256">                        path: path.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L257">                        why: e.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L258">                    });</span>
+<span class="ln" id="L259">                }</span>
+<span class="ln" id="L260">            }</span>
+<span class="ln" id="L261">        }</span>
+<span class="ln" id="L262"></span>
+<span class="ln" id="L263">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> extra {</span>
+<span class="ln" id="L264">            <span class="tok-kw">let</span> key = <span class="tok-fn">normalise</span>(path.<span class="tok-fn">as_ref</span>());</span>
+<span class="ln" id="L265">            <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.entries.<span class="tok-fn">contains_key</span>(&amp;key) {</span>
+<span class="ln" id="L266">                report.changes.<span class="tok-fn">push</span>(Change::Added { path: key });</span>
+<span class="ln" id="L267">            }</span>
+<span class="ln" id="L268">        }</span>
+<span class="ln" id="L269"></span>
+<span class="ln" id="L270">        report.changes.<span class="tok-fn">sort_by</span>(|a, b| a.<span class="tok-fn">path</span>().<span class="tok-fn">cmp</span>(b.<span class="tok-fn">path</span>()));</span>
+<span class="ln" id="L271">        report</span>
+<span class="ln" id="L272">    }</span>
 </span>
-<span class="ln" id="L238"></span>
-<span class="src-item" id="fn-manifest-to_text">
-<span class="ln" id="L239">    <span class="tok-com">/// Serialise to the text format described at the top of this module.</span></span>
-<span class="ln" id="L240">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">to_text</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
-<span class="ln" id="L241">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">from</span>(MAGIC);</span>
-<span class="ln" id="L242">        out.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;\n&#x27;</span>);</span>
-<span class="ln" id="L243">        <span class="tok-kw">for</span> (path, entry) <span class="tok-kw">in</span> &amp;<span class="tok-kw">self</span>.entries {</span>
-<span class="ln" id="L244">            out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;{}  {}  {}\n&quot;</span>, entry.digest, entry.size, path));</span>
-<span class="ln" id="L245">        }</span>
-<span class="ln" id="L246">        out</span>
-<span class="ln" id="L247">    }</span>
-</span>
-<span class="ln" id="L248"></span>
-<span class="src-item" id="fn-manifest-parse">
-<span class="ln" id="L249">    <span class="tok-com">/// Parse the text format.</span></span>
-<span class="ln" id="L250">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(text: &amp;str) -&gt; Result&lt;Self, Error&gt; {</span>
-<span class="ln" id="L251">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = text.<span class="tok-fn">lines</span>();</span>
-<span class="ln" id="L252">        <span class="tok-kw">match</span> lines.<span class="tok-fn">next</span>() {</span>
-<span class="ln" id="L253">            <span class="tok-fn">Some</span>(first) <span class="tok-kw">if</span> first.<span class="tok-fn">trim</span>() == MAGIC =&gt; {}</span>
-<span class="ln" id="L254">            <span class="tok-fn">Some</span>(other) =&gt; {</span>
-<span class="ln" id="L255">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
-<span class="ln" id="L256">                    <span class="tok-str">&quot;expected {MAGIC} on the first line, found {other:?}&quot;</span></span>
-<span class="ln" id="L257">                )))</span>
-<span class="ln" id="L258">            }</span>
-<span class="ln" id="L259">            None =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(<span class="tok-str">&quot;the manifest is empty&quot;</span>.<span class="tok-fn">into</span>())),</span>
-<span class="ln" id="L260">        }</span>
-<span class="ln" id="L261"></span>
-<span class="ln" id="L262">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> entries = BTreeMap::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L263">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> lines.<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L264">            <span class="tok-kw">if</span> line.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L265">                continue;</span>
-<span class="ln" id="L266">            }</span>
-<span class="ln" id="L267">            <span class="tok-com">// Split on the double space, and only twice: a path may contain</span></span>
-<span class="ln" id="L268">            <span class="tok-com">// single spaces, and routinely does on Windows.</span></span>
-<span class="ln" id="L269">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> parts = line.<span class="tok-fn">splitn</span>(<span class="tok-num">3</span>, <span class="tok-str">&quot;  &quot;</span>);</span>
-<span class="ln" id="L270">            <span class="tok-kw">let</span> digest = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or_default</span>().<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L271">            <span class="tok-kw">let</span> size = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or_default</span>().<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L272">            <span class="tok-kw">let</span> path = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or_default</span>().<span class="tok-fn">trim</span>();</span>
 <span class="ln" id="L273"></span>
-<span class="ln" id="L274">            <span class="tok-kw">if</span> digest.<span class="tok-fn">len</span>() != <span class="tok-num">64</span> || !digest.<span class="tok-fn">bytes</span>().<span class="tok-fn">all</span>(|b| b.<span class="tok-fn">is_ascii_hexdigit</span>()) {</span>
-<span class="ln" id="L275">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
-<span class="ln" id="L276">                    <span class="tok-str">&quot;line {}: {digest:?} is not a SHA-256 digest&quot;</span>,</span>
-<span class="ln" id="L277">                    number + <span class="tok-num">2</span></span>
-<span class="ln" id="L278">                )));</span>
-<span class="ln" id="L279">            }</span>
-<span class="ln" id="L280">            <span class="tok-kw">let</span> size: u64 = size</span>
-<span class="ln" id="L281">                .<span class="tok-fn">parse</span>()</span>
-<span class="ln" id="L282">                .<span class="tok-fn">map_err</span>(|_| Error::<span class="tok-fn">Malformed</span>(format!(<span class="tok-str">&quot;line {}: bad size {size:?}&quot;</span>, number + <span class="tok-num">2</span>)))?;</span>
-<span class="ln" id="L283">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L284">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(<span class="tok-str">&quot;line {}: no path&quot;</span>, number + <span class="tok-num">2</span>)));</span>
-<span class="ln" id="L285">            }</span>
-<span class="ln" id="L286">            <span class="tok-com">// Normalised on the way in, exactly as `Manifest::of` normalises on</span></span>
-<span class="ln" id="L287">            <span class="tok-com">// the way out. Without this, a manifest written by hand (or by an</span></span>
-<span class="ln" id="L288">            <span class="tok-com">// older build) with backslashes produced entries keyed differently</span></span>
-<span class="ln" id="L289">            <span class="tok-com">// from the ones `check`&#x27;s `extra` argument is keyed by, so every</span></span>
-<span class="ln" id="L290">            <span class="tok-com">// recorded file was *also* reported as newly added. A tamper report</span></span>
-<span class="ln" id="L291">            <span class="tok-com">// full of false positives is one nobody reads, which defeats the</span></span>
-<span class="ln" id="L292">            <span class="tok-com">// only thing this module does.</span></span>
-<span class="ln" id="L293">            <span class="tok-kw">let</span> path = path.<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;\\&#x27;</span>, <span class="tok-str">&quot;/&quot;</span>);</span>
-<span class="ln" id="L294">            entries.<span class="tok-fn">insert</span>(</span>
-<span class="ln" id="L295">                path,</span>
-<span class="ln" id="L296">                Entry {</span>
-<span class="ln" id="L297">                    size,</span>
-<span class="ln" id="L298">                    digest: digest.<span class="tok-fn">to_ascii_lowercase</span>(),</span>
-<span class="ln" id="L299">                },</span>
-<span class="ln" id="L300">            );</span>
-<span class="ln" id="L301">        }</span>
-<span class="ln" id="L302">        <span class="tok-fn">Ok</span>(Self { entries })</span>
-<span class="ln" id="L303">    }</span>
+<span class="src-item" id="fn-manifest-to_text">
+<span class="ln" id="L274">    <span class="tok-com">/// Serialise to the text format described at the top of this module.</span></span>
+<span class="ln" id="L275">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">to_text</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L276">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">from</span>(MAGIC);</span>
+<span class="ln" id="L277">        out.<span class="tok-fn">push</span>(<span class="tok-str">&#x27;\n&#x27;</span>);</span>
+<span class="ln" id="L278">        <span class="tok-kw">for</span> (path, entry) <span class="tok-kw">in</span> &amp;<span class="tok-kw">self</span>.entries {</span>
+<span class="ln" id="L279">            out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;{}  {}  {}\n&quot;</span>, entry.digest, entry.size, path));</span>
+<span class="ln" id="L280">        }</span>
+<span class="ln" id="L281">        out</span>
+<span class="ln" id="L282">    }</span>
 </span>
-<span class="ln" id="L304"></span>
-<span class="src-item" id="fn-manifest-save">
-<span class="ln" id="L305">    <span class="tok-com">/// Write the manifest to `path` in the clear.</span></span>
-<span class="ln" id="L306">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">save</span>(&amp;<span class="tok-kw">self</span>, path: &amp;Path) -&gt; Result&lt;(), Error&gt; {</span>
-<span class="ln" id="L307">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
-<span class="ln" id="L308">            <span class="tok-kw">if</span> !parent.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L309">                std::fs::<span class="tok-fn">create_dir_all</span>(parent)?;</span>
-<span class="ln" id="L310">            }</span>
-<span class="ln" id="L311">        }</span>
-<span class="ln" id="L312">        std::fs::<span class="tok-fn">write</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>())?;</span>
-<span class="ln" id="L313">        <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L314">    }</span>
+<span class="ln" id="L283"></span>
+<span class="src-item" id="fn-manifest-parse">
+<span class="ln" id="L284">    <span class="tok-com">/// Parse the text format.</span></span>
+<span class="ln" id="L285">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(text: &amp;str) -&gt; Result&lt;Self, Error&gt; {</span>
+<span class="ln" id="L286">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = text.<span class="tok-fn">lines</span>();</span>
+<span class="ln" id="L287">        <span class="tok-kw">match</span> lines.<span class="tok-fn">next</span>() {</span>
+<span class="ln" id="L288">            <span class="tok-fn">Some</span>(first) <span class="tok-kw">if</span> first.<span class="tok-fn">trim</span>() == MAGIC =&gt; {}</span>
+<span class="ln" id="L289">            <span class="tok-fn">Some</span>(other) =&gt; {</span>
+<span class="ln" id="L290">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L291">                    <span class="tok-str">&quot;expected {MAGIC} on the first line, found {other:?}&quot;</span></span>
+<span class="ln" id="L292">                )))</span>
+<span class="ln" id="L293">            }</span>
+<span class="ln" id="L294">            None =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(<span class="tok-str">&quot;the manifest is empty&quot;</span>.<span class="tok-fn">into</span>())),</span>
+<span class="ln" id="L295">        }</span>
+<span class="ln" id="L296"></span>
+<span class="ln" id="L297">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> entries = BTreeMap::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L298">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> lines.<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L299">            <span class="tok-kw">if</span> line.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L300">                continue;</span>
+<span class="ln" id="L301">            }</span>
+<span class="ln" id="L302">            <span class="tok-com">// Split on the double space, and only twice: a path may contain</span></span>
+<span class="ln" id="L303">            <span class="tok-com">// single spaces, and routinely does on Windows.</span></span>
+<span class="ln" id="L304">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> parts = line.<span class="tok-fn">splitn</span>(<span class="tok-num">3</span>, <span class="tok-str">&quot;  &quot;</span>);</span>
+<span class="ln" id="L305">            <span class="tok-kw">let</span> digest = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or_default</span>().<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L306">            <span class="tok-kw">let</span> size = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or_default</span>().<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L307">            <span class="tok-kw">let</span> path = parts.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or_default</span>().<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L308"></span>
+<span class="ln" id="L309">            <span class="tok-kw">if</span> digest.<span class="tok-fn">len</span>() != <span class="tok-num">64</span> || !digest.<span class="tok-fn">bytes</span>().<span class="tok-fn">all</span>(|b| b.<span class="tok-fn">is_ascii_hexdigit</span>()) {</span>
+<span class="ln" id="L310">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L311">                    <span class="tok-str">&quot;line {}: {digest:?} is not a SHA-256 digest&quot;</span>,</span>
+<span class="ln" id="L312">                    number + <span class="tok-num">2</span></span>
+<span class="ln" id="L313">                )));</span>
+<span class="ln" id="L314">            }</span>
+<span class="ln" id="L315">            <span class="tok-kw">let</span> size: u64 = size</span>
+<span class="ln" id="L316">                .<span class="tok-fn">parse</span>()</span>
+<span class="ln" id="L317">                .<span class="tok-fn">map_err</span>(|_| Error::<span class="tok-fn">Malformed</span>(format!(<span class="tok-str">&quot;line {}: bad size {size:?}&quot;</span>, number + <span class="tok-num">2</span>)))?;</span>
+<span class="ln" id="L318">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L319">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(<span class="tok-str">&quot;line {}: no path&quot;</span>, number + <span class="tok-num">2</span>)));</span>
+<span class="ln" id="L320">            }</span>
+<span class="ln" id="L321">            <span class="tok-com">// **F-83.** The same refusal `Manifest::of` makes when it writes.</span></span>
+<span class="ln" id="L322">            <span class="tok-com">//</span></span>
+<span class="ln" id="L323">            <span class="tok-com">// Those two ends disagreed. `of` refused to record a path with a</span></span>
+<span class="ln" id="L324">            <span class="tok-com">// line break in it, and `parse` accepted one, so VeilVoice would</span></span>
+<span class="ln" id="L325">            <span class="tok-com">// not write a record it was perfectly happy to read from somebody</span></span>
+<span class="ln" id="L326">            <span class="tok-com">// else. `veilvoice guard check` reads whichever file is at the</span></span>
+<span class="ln" id="L327">            <span class="tok-com">// path it is given, and a record is exactly the kind of thing that</span></span>
+<span class="ln" id="L328">            <span class="tok-com">// gets handed to you.</span></span>
+<span class="ln" id="L329">            <span class="tok-com">//</span></span>
+<span class="ln" id="L330">            <span class="tok-com">// What it costs to accept one is not theoretical. The product of</span></span>
+<span class="ln" id="L331">            <span class="tok-com">// this whole module is a report somebody reads to decide whether</span></span>
+<span class="ln" id="L332">            <span class="tok-com">// their files have been altered, and that report is printed to a</span></span>
+<span class="ln" id="L333">            <span class="tok-com">// terminal. A carriage return in a path returns the cursor to the</span></span>
+<span class="ln" id="L334">            <span class="tok-com">// start of the line, so everything already printed is overwritten</span></span>
+<span class="ln" id="L335">            <span class="tok-com">// by whatever follows: a crafted path can make the report say</span></span>
+<span class="ln" id="L336">            <span class="tok-com">// something other than what is recorded. An escape character does</span></span>
+<span class="ln" id="L337">            <span class="tok-com">// more than that, and can colour, move the cursor or clear the</span></span>
+<span class="ln" id="L338">            <span class="tok-com">// screen.</span></span>
+<span class="ln" id="L339">            <span class="tok-com">//</span></span>
+<span class="ln" id="L340">            <span class="tok-com">// So the whole control range is refused rather than the two</span></span>
+<span class="ln" id="L341">            <span class="tok-com">// characters the fuzzer happened to find, and the line is named.</span></span>
+<span class="ln" id="L342">            <span class="tok-com">// Refusing is right rather than sanitising: a record this format</span></span>
+<span class="ln" id="L343">            <span class="tok-com">// cannot represent faithfully is one it should not claim to hold.</span></span>
+<span class="ln" id="L344">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(bad) = <span class="tok-fn">unrecordable</span>(path) {</span>
+<span class="ln" id="L345">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L346">                    <span class="tok-str">&quot;line {}: path contains {bad} and cannot be recorded: {path:?}&quot;</span>,</span>
+<span class="ln" id="L347">                    number + <span class="tok-num">2</span></span>
+<span class="ln" id="L348">                )));</span>
+<span class="ln" id="L349">            }</span>
+<span class="ln" id="L350">            <span class="tok-com">// Normalised on the way in, exactly as `Manifest::of` normalises on</span></span>
+<span class="ln" id="L351">            <span class="tok-com">// the way out. Without this, a manifest written by hand (or by an</span></span>
+<span class="ln" id="L352">            <span class="tok-com">// older build) with backslashes produced entries keyed differently</span></span>
+<span class="ln" id="L353">            <span class="tok-com">// from the ones `check`&#x27;s `extra` argument is keyed by, so every</span></span>
+<span class="ln" id="L354">            <span class="tok-com">// recorded file was *also* reported as newly added. A tamper report</span></span>
+<span class="ln" id="L355">            <span class="tok-com">// full of false positives is one nobody reads, which defeats the</span></span>
+<span class="ln" id="L356">            <span class="tok-com">// only thing this module does.</span></span>
+<span class="ln" id="L357">            <span class="tok-kw">let</span> path = path.<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;\\&#x27;</span>, <span class="tok-str">&quot;/&quot;</span>);</span>
+<span class="ln" id="L358">            entries.<span class="tok-fn">insert</span>(</span>
+<span class="ln" id="L359">                path,</span>
+<span class="ln" id="L360">                Entry {</span>
+<span class="ln" id="L361">                    size,</span>
+<span class="ln" id="L362">                    digest: digest.<span class="tok-fn">to_ascii_lowercase</span>(),</span>
+<span class="ln" id="L363">                },</span>
+<span class="ln" id="L364">            );</span>
+<span class="ln" id="L365">        }</span>
+<span class="ln" id="L366">        <span class="tok-fn">Ok</span>(Self { entries })</span>
+<span class="ln" id="L367">    }</span>
 </span>
-<span class="ln" id="L315"></span>
-<span class="src-item" id="fn-manifest-load">
-<span class="ln" id="L316">    <span class="tok-com">/// Read a manifest written by [`Manifest::save`].</span></span>
-<span class="ln" id="L317">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">load</span>(path: &amp;Path) -&gt; Result&lt;Self, Error&gt; {</span>
-<span class="ln" id="L318">        Self::<span class="tok-fn">parse</span>(&amp;std::fs::<span class="tok-fn">read_to_string</span>(path)?)</span>
-<span class="ln" id="L319">    }</span>
-</span>
-<span class="ln" id="L320"></span>
-<span class="src-item" id="fn-manifest-seal">
-<span class="ln" id="L321">    <span class="tok-com">/// Seal the manifest under a passphrase.</span></span>
-<span class="ln" id="L322">    <span class="tok-com">///</span></span>
-<span class="ln" id="L323">    <span class="tok-com">/// This is what makes the record worth more than a courtesy: rewriting it</span></span>
-<span class="ln" id="L324">    <span class="tok-com">/// undetectably then needs the passphrase as well as write access. Keep</span></span>
-<span class="ln" id="L325">    <span class="tok-com">/// that passphrase somewhere other than beside the manifest, or the</span></span>
-<span class="ln" id="L326">    <span class="tok-com">/// exercise is circular.</span></span>
-<span class="ln" id="L327">    <span class="tok-com">///</span></span>
-<span class="ln" id="L328">    <span class="tok-com">/// It is still not proof. An attacker present while you type the passphrase</span></span>
-<span class="ln" id="L329">    <span class="tok-com">/// has everything, which is the same caveat every password in this project</span></span>
-<span class="ln" id="L330">    <span class="tok-com">/// carries.</span></span>
-<span class="ln" id="L331">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">seal</span>(&amp;<span class="tok-kw">self</span>, password: &amp;[u8]) -&gt; Result&lt;Vec&lt;u8&gt;, Error&gt; {</span>
-<span class="ln" id="L332">        <span class="tok-fn">Ok</span>(veilvoice_crypto::container::<span class="tok-fn">seal_with_password</span>(</span>
-<span class="ln" id="L333">            password,</span>
-<span class="ln" id="L334">            <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>(),</span>
-<span class="ln" id="L335">            veilvoice_crypto::kdf::KdfParams::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L336">        )?)</span>
-<span class="ln" id="L337">    }</span>
-</span>
-<span class="ln" id="L338"></span>
-<span class="src-item" id="fn-manifest-open_sealed">
-<span class="ln" id="L339">    <span class="tok-com">/// Open a manifest sealed by [`Manifest::seal`].</span></span>
-<span class="ln" id="L340">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">open_sealed</span>(password: &amp;[u8], sealed: &amp;[u8]) -&gt; Result&lt;Self, Error&gt; {</span>
-<span class="ln" id="L341">        <span class="tok-kw">let</span> text = veilvoice_crypto::container::<span class="tok-fn">open_with_password</span>(password, sealed)?;</span>
-<span class="ln" id="L342">        <span class="tok-kw">let</span> text = String::<span class="tok-fn">from_utf8</span>(text)</span>
-<span class="ln" id="L343">            .<span class="tok-fn">map_err</span>(|_| Error::<span class="tok-fn">Malformed</span>(<span class="tok-str">&quot;sealed manifest is not text&quot;</span>.<span class="tok-fn">into</span>()))?;</span>
-<span class="ln" id="L344">        Self::<span class="tok-fn">parse</span>(&amp;text)</span>
-<span class="ln" id="L345">    }</span>
-</span>
-<span class="ln" id="L346">}</span>
-<span class="ln" id="L347"></span>
-<span class="src-item" id="fn-files_in">
-<span class="ln" id="L348"><span class="tok-com">/// Every file directly inside `dir`, for use as `check`&#x27;s `extra` argument.</span></span>
-<span class="ln" id="L349"><span class="tok-com">///</span></span>
-<span class="ln" id="L350"><span class="tok-com">/// Not recursive on purpose: the caller decides what is being watched, and a</span></span>
-<span class="ln" id="L351"><span class="tok-com">/// silent recursive walk of a directory somebody pointed this at is a good way</span></span>
-<span class="ln" id="L352"><span class="tok-com">/// to hash a home folder by accident.</span></span>
-<span class="ln" id="L353"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">files_in</span>(dir: &amp;Path) -&gt; Result&lt;Vec&lt;PathBuf&gt;, Error&gt; {</span>
-<span class="ln" id="L354">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L355">    <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(dir)? {</span>
-<span class="ln" id="L356">        <span class="tok-kw">let</span> entry = entry?;</span>
-<span class="ln" id="L357">        <span class="tok-kw">if</span> entry.<span class="tok-fn">file_type</span>()?.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L358">            found.<span class="tok-fn">push</span>(entry.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L359">        }</span>
-<span class="ln" id="L360">    }</span>
-<span class="ln" id="L361">    found.<span class="tok-fn">sort</span>();</span>
-<span class="ln" id="L362">    <span class="tok-fn">Ok</span>(found)</span>
-<span class="ln" id="L363">}</span>
-</span>
-<span class="ln" id="L364"></span>
-<span class="ln" id="L365"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L366"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L367">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L368"></span>
-<span class="ln" id="L369">    <span class="tok-kw">fn</span> <span class="tok-fn">write</span>(dir: &amp;Path, name: &amp;str, body: &amp;[u8]) -&gt; PathBuf {</span>
-<span class="ln" id="L370">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(name);</span>
-<span class="ln" id="L371">        std::fs::<span class="tok-fn">write</span>(&amp;path, body).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L372">        path</span>
-<span class="ln" id="L373">    }</span>
-<span class="ln" id="L374"></span>
-<span class="ln" id="L375">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L376">    <span class="tok-kw">fn</span> <span class="tok-fn">an_untouched_set_of_files_is_clean</span>() {</span>
-<span class="ln" id="L377">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L378">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;binary&quot;</span>);</span>
-<span class="ln" id="L379">        <span class="tok-kw">let</span> b = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;applock.bin&quot;</span>, b<span class="tok-str">&quot;lock&quot;</span>);</span>
-<span class="ln" id="L380"></span>
-<span class="ln" id="L381">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a, &amp;b]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L382">        assert_eq!(manifest.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L383"></span>
-<span class="ln" id="L384">        <span class="tok-kw">let</span> report = manifest.check::&lt;&amp;Path&gt;(&amp;[]);</span>
-<span class="ln" id="L385">        assert!(report.<span class="tok-fn">is_clean</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, report.changes);</span>
-<span class="ln" id="L386">        assert_eq!(report.unchanged, <span class="tok-num">2</span>);</span>
-<span class="ln" id="L387">    }</span>
-<span class="ln" id="L388"></span>
-<span class="ln" id="L389">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L390">    <span class="tok-kw">fn</span> <span class="tok-fn">a_modified_file_is_reported_with_both_digests</span>() {</span>
-<span class="ln" id="L391">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L392">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;binary&quot;</span>);</span>
-<span class="ln" id="L393">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L394"></span>
-<span class="ln" id="L395">        <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;binary, but not the same one&quot;</span>);</span>
-<span class="ln" id="L396">        <span class="tok-kw">let</span> report = manifest.check::&lt;&amp;Path&gt;(&amp;[]);</span>
-<span class="ln" id="L397"></span>
-<span class="ln" id="L398">        assert_eq!(report.changes.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L399">        <span class="tok-kw">match</span> &amp;report.changes[<span class="tok-num">0</span>] {</span>
-<span class="ln" id="L400">            Change::Modified { was, now, .. } =&gt; {</span>
-<span class="ln" id="L401">                assert_ne!(was, now);</span>
-<span class="ln" id="L402">                assert_eq!(was.<span class="tok-fn">len</span>(), <span class="tok-num">64</span>);</span>
-<span class="ln" id="L403">            }</span>
-<span class="ln" id="L404">            other =&gt; panic!(<span class="tok-str">&quot;expected a modification, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L405">        }</span>
-<span class="ln" id="L406">        assert!(report.changes[<span class="tok-num">0</span>].<span class="tok-fn">describe</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;modified:&quot;</span>));</span>
-<span class="ln" id="L407">    }</span>
-<span class="ln" id="L408"></span>
-<span class="ln" id="L409">    <span class="tok-com">/// A file of the same *length* with different contents is the case a</span></span>
-<span class="ln" id="L410">    <span class="tok-com">/// size-only check would miss, which is why the digest is the check.</span></span>
-<span class="ln" id="L411">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L412">    <span class="tok-kw">fn</span> <span class="tok-fn">a_same_length_substitution_is_still_caught</span>() {</span>
-<span class="ln" id="L413">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L414">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;aaaaaaaa&quot;</span>);</span>
-<span class="ln" id="L415">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L416">        <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;bbbbbbbb&quot;</span>);</span>
-<span class="ln" id="L417"></span>
-<span class="ln" id="L418">        <span class="tok-kw">let</span> report = manifest.check::&lt;&amp;Path&gt;(&amp;[]);</span>
-<span class="ln" id="L419">        assert!(matches!(report.changes[<span class="tok-num">0</span>], Change::Modified { .. }));</span>
-<span class="ln" id="L420">    }</span>
-<span class="ln" id="L421"></span>
-<span class="ln" id="L422">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L423">    <span class="tok-kw">fn</span> <span class="tok-fn">a_removed_file_is_reported</span>() {</span>
-<span class="ln" id="L424">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L425">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;gone.bin&quot;</span>, b<span class="tok-str">&quot;here for now&quot;</span>);</span>
-<span class="ln" id="L426">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L427">        std::fs::<span class="tok-fn">remove_file</span>(&amp;a).<span class="tok-fn">unwrap</span>();</span>
+<span class="src-item" id="fn-manifest-save">
+<span class="ln" id="L369">    <span class="tok-com">/// Write the manifest to `path` in the clear.</span></span>
+<span class="ln" id="L370">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">save</span>(&amp;<span class="tok-kw">self</span>, path: &amp;Path) -&gt; Result&lt;(), Error&gt; {</span>
+<span class="ln" id="L371">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
+<span class="ln" id="L372">            <span class="tok-kw">if</span> !parent.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L373">                std::fs::<span class="tok-fn">create_dir_all</span>(parent)?;</span>
+<span class="ln" id="L374">            }</span>
+<span class="ln" id="L375">        }</span>
+<span class="ln" id="L376">        std::fs::<span class="tok-fn">write</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>())?;</span>
+<span class="ln" id="L377">        <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L378">    }</span>
+</span>
+<span class="ln" id="L379"></span>
+<span class="src-item" id="fn-manifest-load">
+<span class="ln" id="L380">    <span class="tok-com">/// Read a manifest written by [`Manifest::save`].</span></span>
+<span class="ln" id="L381">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">load</span>(path: &amp;Path) -&gt; Result&lt;Self, Error&gt; {</span>
+<span class="ln" id="L382">        Self::<span class="tok-fn">parse</span>(&amp;std::fs::<span class="tok-fn">read_to_string</span>(path)?)</span>
+<span class="ln" id="L383">    }</span>
+</span>
+<span class="ln" id="L384"></span>
+<span class="src-item" id="fn-manifest-seal">
+<span class="ln" id="L385">    <span class="tok-com">/// Seal the manifest under a passphrase.</span></span>
+<span class="ln" id="L386">    <span class="tok-com">///</span></span>
+<span class="ln" id="L387">    <span class="tok-com">/// This is what makes the record worth more than a courtesy: rewriting it</span></span>
+<span class="ln" id="L388">    <span class="tok-com">/// undetectably then needs the passphrase as well as write access. Keep</span></span>
+<span class="ln" id="L389">    <span class="tok-com">/// that passphrase somewhere other than beside the manifest, or the</span></span>
+<span class="ln" id="L390">    <span class="tok-com">/// exercise is circular.</span></span>
+<span class="ln" id="L391">    <span class="tok-com">///</span></span>
+<span class="ln" id="L392">    <span class="tok-com">/// It is still not proof. An attacker present while you type the passphrase</span></span>
+<span class="ln" id="L393">    <span class="tok-com">/// has everything, which is the same caveat every password in this project</span></span>
+<span class="ln" id="L394">    <span class="tok-com">/// carries.</span></span>
+<span class="ln" id="L395">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">seal</span>(&amp;<span class="tok-kw">self</span>, password: &amp;[u8]) -&gt; Result&lt;Vec&lt;u8&gt;, Error&gt; {</span>
+<span class="ln" id="L396">        <span class="tok-fn">Ok</span>(veilvoice_crypto::container::<span class="tok-fn">seal_with_password</span>(</span>
+<span class="ln" id="L397">            password,</span>
+<span class="ln" id="L398">            <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>(),</span>
+<span class="ln" id="L399">            veilvoice_crypto::kdf::KdfParams::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L400">        )?)</span>
+<span class="ln" id="L401">    }</span>
+</span>
+<span class="ln" id="L402"></span>
+<span class="src-item" id="fn-manifest-open_sealed">
+<span class="ln" id="L403">    <span class="tok-com">/// Open a manifest sealed by [`Manifest::seal`].</span></span>
+<span class="ln" id="L404">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">open_sealed</span>(password: &amp;[u8], sealed: &amp;[u8]) -&gt; Result&lt;Self, Error&gt; {</span>
+<span class="ln" id="L405">        <span class="tok-kw">let</span> text = veilvoice_crypto::container::<span class="tok-fn">open_with_password</span>(password, sealed)?;</span>
+<span class="ln" id="L406">        <span class="tok-kw">let</span> text = String::<span class="tok-fn">from_utf8</span>(text)</span>
+<span class="ln" id="L407">            .<span class="tok-fn">map_err</span>(|_| Error::<span class="tok-fn">Malformed</span>(<span class="tok-str">&quot;sealed manifest is not text&quot;</span>.<span class="tok-fn">into</span>()))?;</span>
+<span class="ln" id="L408">        Self::<span class="tok-fn">parse</span>(&amp;text)</span>
+<span class="ln" id="L409">    }</span>
+</span>
+<span class="ln" id="L410">}</span>
+<span class="ln" id="L411"></span>
+<span class="src-item" id="fn-files_in">
+<span class="ln" id="L412"><span class="tok-com">/// Every file directly inside `dir`, for use as `check`&#x27;s `extra` argument.</span></span>
+<span class="ln" id="L413"><span class="tok-com">///</span></span>
+<span class="ln" id="L414"><span class="tok-com">/// Not recursive on purpose: the caller decides what is being watched, and a</span></span>
+<span class="ln" id="L415"><span class="tok-com">/// silent recursive walk of a directory somebody pointed this at is a good way</span></span>
+<span class="ln" id="L416"><span class="tok-com">/// to hash a home folder by accident.</span></span>
+<span class="ln" id="L417"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">files_in</span>(dir: &amp;Path) -&gt; Result&lt;Vec&lt;PathBuf&gt;, Error&gt; {</span>
+<span class="ln" id="L418">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L419">    <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(dir)? {</span>
+<span class="ln" id="L420">        <span class="tok-kw">let</span> entry = entry?;</span>
+<span class="ln" id="L421">        <span class="tok-kw">if</span> entry.<span class="tok-fn">file_type</span>()?.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L422">            found.<span class="tok-fn">push</span>(entry.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L423">        }</span>
+<span class="ln" id="L424">    }</span>
+<span class="ln" id="L425">    found.<span class="tok-fn">sort</span>();</span>
+<span class="ln" id="L426">    <span class="tok-fn">Ok</span>(found)</span>
+<span class="ln" id="L427">}</span>
+</span>
 <span class="ln" id="L428"></span>
-<span class="ln" id="L429">        <span class="tok-kw">let</span> report = manifest.check::&lt;&amp;Path&gt;(&amp;[]);</span>
-<span class="ln" id="L430">        assert!(matches!(report.changes[<span class="tok-num">0</span>], Change::Removed { .. }));</span>
-<span class="ln" id="L431">        assert_eq!(report.unchanged, <span class="tok-num">0</span>);</span>
-<span class="ln" id="L432">    }</span>
-<span class="ln" id="L433"></span>
-<span class="ln" id="L434">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L435">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_file_in_the_watched_set_is_reported</span>() {</span>
-<span class="ln" id="L436">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L437">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;known.bin&quot;</span>, b<span class="tok-str">&quot;recorded&quot;</span>);</span>
-<span class="ln" id="L438">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L439">        <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;surprise.dll&quot;</span>, b<span class="tok-str">&quot;not recorded&quot;</span>);</span>
-<span class="ln" id="L440"></span>
-<span class="ln" id="L441">        <span class="tok-kw">let</span> present = <span class="tok-fn">files_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L442">        <span class="tok-kw">let</span> report = manifest.<span class="tok-fn">check</span>(&amp;present);</span>
-<span class="ln" id="L443">        assert_eq!(report.changes.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L444">        assert!(report.changes[<span class="tok-num">0</span>].<span class="tok-fn">path</span>().<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;surprise.dll&quot;</span>));</span>
-<span class="ln" id="L445">        assert!(matches!(report.changes[<span class="tok-num">0</span>], Change::Added { .. }));</span>
-<span class="ln" id="L446">    }</span>
-<span class="ln" id="L447"></span>
-<span class="ln" id="L448">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L449">    <span class="tok-kw">fn</span> <span class="tok-fn">the_text_format_round_trips_exactly</span>() {</span>
-<span class="ln" id="L450">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L451">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;one.bin&quot;</span>, b<span class="tok-str">&quot;first&quot;</span>);</span>
-<span class="ln" id="L452">        <span class="tok-kw">let</span> b = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;two with spaces.bin&quot;</span>, b<span class="tok-str">&quot;second&quot;</span>);</span>
-<span class="ln" id="L453"></span>
-<span class="ln" id="L454">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a, &amp;b]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L455">        <span class="tok-kw">let</span> text = manifest.<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L456">        assert!(text.<span class="tok-fn">starts_with</span>(MAGIC));</span>
-<span class="ln" id="L457"></span>
-<span class="ln" id="L458">        <span class="tok-kw">let</span> back = Manifest::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L459">        assert_eq!(manifest, back);</span>
-<span class="ln" id="L460">        assert_eq!(back.<span class="tok-fn">to_text</span>(), text, <span class="tok-str">&quot;serialisation is not stable&quot;</span>);</span>
+<span class="ln" id="L429"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L430"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L431">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L432"></span>
+<span class="ln" id="L433">    <span class="tok-com">/// **F-83.** A record somebody hands you cannot contain a character that</span></span>
+<span class="ln" id="L434">    <span class="tok-com">/// rewrites the report.</span></span>
+<span class="ln" id="L435">    <span class="tok-com">///</span></span>
+<span class="ln" id="L436">    <span class="tok-com">/// `Manifest::of` refused a path with a line break in it and `parse`</span></span>
+<span class="ln" id="L437">    <span class="tok-com">/// accepted one, so VeilVoice would not write a record it was happy to</span></span>
+<span class="ln" id="L438">    <span class="tok-com">/// read from somebody else. `veilvoice guard check` reads whichever file</span></span>
+<span class="ln" id="L439">    <span class="tok-com">/// is at the path it is given.</span></span>
+<span class="ln" id="L440">    <span class="tok-com">///</span></span>
+<span class="ln" id="L441">    <span class="tok-com">/// The carriage return is the one the coverage-guided campaign found. The</span></span>
+<span class="ln" id="L442">    <span class="tok-com">/// rest are here because listing the characters somebody thought of is how</span></span>
+<span class="ln" id="L443">    <span class="tok-com">/// the next one gets in.</span></span>
+<span class="ln" id="L444">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L445">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_that_could_rewrite_the_report_is_refused_on_the_way_in</span>() {</span>
+<span class="ln" id="L446">        <span class="tok-kw">let</span> digest = <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>);</span>
+<span class="ln" id="L447">        <span class="tok-kw">for</span> (label, bad) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L448">            (<span class="tok-str">&quot;carriage return&quot;</span>, <span class="tok-str">&quot;some\rthing&quot;</span>),</span>
+<span class="ln" id="L449">            (<span class="tok-str">&quot;escape&quot;</span>, <span class="tok-str">&quot;some\u{1b}[2Kthing&quot;</span>),</span>
+<span class="ln" id="L450">            (<span class="tok-str">&quot;bell&quot;</span>, <span class="tok-str">&quot;some\u{7}thing&quot;</span>),</span>
+<span class="ln" id="L451">            (<span class="tok-str">&quot;nul&quot;</span>, <span class="tok-str">&quot;some\0thing&quot;</span>),</span>
+<span class="ln" id="L452">            (<span class="tok-str">&quot;backspace&quot;</span>, <span class="tok-str">&quot;some\u{8}thing&quot;</span>),</span>
+<span class="ln" id="L453">        ] {</span>
+<span class="ln" id="L454">            <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\n{digest}  12  {bad}\n&quot;</span>);</span>
+<span class="ln" id="L455">            <span class="tok-kw">let</span> parsed = Manifest::<span class="tok-fn">parse</span>(&amp;text);</span>
+<span class="ln" id="L456">            assert!(</span>
+<span class="ln" id="L457">                matches!(parsed, <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(_))),</span>
+<span class="ln" id="L458">                <span class="tok-str">&quot;{label} was accepted: {parsed:?}&quot;</span></span>
+<span class="ln" id="L459">            );</span>
+<span class="ln" id="L460">        }</span>
 <span class="ln" id="L461">    }</span>
 <span class="ln" id="L462"></span>
-<span class="ln" id="L463">    <span class="tok-com">/// Paths with spaces are ordinary on Windows, and splitting naively would</span></span>
-<span class="ln" id="L464">    <span class="tok-com">/// truncate them.</span></span>
-<span class="ln" id="L465">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L466">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_containing_spaces_survives</span>() {</span>
-<span class="ln" id="L467">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L468">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;Program Files thing.exe&quot;</span>, b<span class="tok-str">&quot;x&quot;</span>);</span>
-<span class="ln" id="L469">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L470">        <span class="tok-kw">let</span> back = Manifest::<span class="tok-fn">parse</span>(&amp;manifest.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L471">        assert!(back.<span class="tok-fn">paths</span>().<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;Program Files thing.exe&quot;</span>)));</span>
-<span class="ln" id="L472">        assert!(back.check::&lt;&amp;Path&gt;(&amp;[]).<span class="tok-fn">is_clean</span>());</span>
-<span class="ln" id="L473">    }</span>
-<span class="ln" id="L474"></span>
-<span class="ln" id="L475">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L476">    <span class="tok-kw">fn</span> <span class="tok-fn">a_malformed_manifest_is_rejected_rather_than_half_read</span>() {</span>
-<span class="ln" id="L477">        assert!(Manifest::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L478">        assert!(Manifest::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;NOT-THE-MAGIC\n&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L479">        assert!(Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\nnothex  12  a.bin\n&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L480">        assert!(Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n{}  x  a.bin\n&quot;</span>, <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>))).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L481">        assert!(Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n{}  12  \n&quot;</span>, <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>))).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L482">        <span class="tok-com">// A blank line in the middle is tolerated, not an error.</span></span>
-<span class="ln" id="L483">        assert!(Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n\n&quot;</span>)).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L484">    }</span>
-<span class="ln" id="L485"></span>
-<span class="ln" id="L486">    <span class="tok-com">/// A hand-written manifest using backslashes must key the same way one this</span></span>
-<span class="ln" id="L487">    <span class="tok-com">/// crate wrote does, or every recorded file also reports as newly added and</span></span>
-<span class="ln" id="L488">    <span class="tok-com">/// the report becomes noise.</span></span>
-<span class="ln" id="L489">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L490">    <span class="tok-kw">fn</span> <span class="tok-fn">a_manifest_written_with_backslashes_keys_the_same_way</span>() {</span>
-<span class="ln" id="L491">        <span class="tok-kw">let</span> digest = <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>);</span>
-<span class="ln" id="L492">        <span class="tok-kw">let</span> back = Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n{digest}  1  C:\\dir\\thing.exe\n&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L493">        <span class="tok-kw">let</span> forward =</span>
-<span class="ln" id="L494">            Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n{digest}  1  C:/dir/thing.exe\n&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L495">        assert_eq!(back, forward);</span>
-<span class="ln" id="L496">        assert_eq!(back.<span class="tok-fn">paths</span>().collect::&lt;Vec&lt;_&gt;&gt;(), [<span class="tok-str">&quot;C:/dir/thing.exe&quot;</span>]);</span>
-<span class="ln" id="L497">        <span class="tok-com">// And it survives a second round trip unchanged.</span></span>
-<span class="ln" id="L498">        assert_eq!(Manifest::<span class="tok-fn">parse</span>(&amp;back.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>(), back);</span>
-<span class="ln" id="L499">    }</span>
-<span class="ln" id="L500"></span>
-<span class="ln" id="L501">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L502">    <span class="tok-kw">fn</span> <span class="tok-fn">saving_and_loading_round_trips</span>() {</span>
-<span class="ln" id="L503">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L504">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;one.bin&quot;</span>, b<span class="tok-str">&quot;first&quot;</span>);</span>
-<span class="ln" id="L505">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L506"></span>
-<span class="ln" id="L507">        <span class="tok-kw">let</span> store = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;manifest.txt&quot;</span>);</span>
-<span class="ln" id="L508">        manifest.<span class="tok-fn">save</span>(&amp;store).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L509">        assert_eq!(Manifest::<span class="tok-fn">load</span>(&amp;store).<span class="tok-fn">unwrap</span>(), manifest);</span>
-<span class="ln" id="L510">    }</span>
-<span class="ln" id="L511"></span>
-<span class="ln" id="L512">    <span class="tok-com">/// The sealed form is what makes the record more than a courtesy: without</span></span>
-<span class="ln" id="L513">    <span class="tok-com">/// the passphrase it cannot be rewritten to match a tampered file.</span></span>
-<span class="ln" id="L514">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L515">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sealed_manifest_needs_its_passphrase</span>() {</span>
-<span class="ln" id="L516">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L517">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;one.bin&quot;</span>, b<span class="tok-str">&quot;first&quot;</span>);</span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L519"></span>
-<span class="ln" id="L520">        <span class="tok-kw">let</span> sealed = manifest.<span class="tok-fn">seal</span>(b<span class="tok-str">&quot;a passphrase kept elsewhere&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L521">        assert!(</span>
-<span class="ln" id="L522">            !sealed.<span class="tok-fn">windows</span>(MAGIC.<span class="tok-fn">len</span>()).<span class="tok-fn">any</span>(|w| w == MAGIC.<span class="tok-fn">as_bytes</span>()),</span>
-<span class="ln" id="L523">            <span class="tok-str">&quot;the manifest is readable inside its own container&quot;</span></span>
-<span class="ln" id="L524">        );</span>
-<span class="ln" id="L525">        assert_eq!(</span>
-<span class="ln" id="L526">            Manifest::<span class="tok-fn">open_sealed</span>(b<span class="tok-str">&quot;a passphrase kept elsewhere&quot;</span>, &amp;sealed).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L527">            manifest</span>
-<span class="ln" id="L528">        );</span>
-<span class="ln" id="L529">        assert!(Manifest::<span class="tok-fn">open_sealed</span>(b<span class="tok-str">&quot;the wrong one&quot;</span>, &amp;sealed).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L530">    }</span>
-<span class="ln" id="L531"></span>
-<span class="ln" id="L532">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L533">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unreadable_path_is_skipped_when_recording</span>() {</span>
-<span class="ln" id="L534">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L535">        <span class="tok-kw">let</span> real = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;real.bin&quot;</span>, b<span class="tok-str">&quot;x&quot;</span>);</span>
-<span class="ln" id="L536">        <span class="tok-kw">let</span> missing = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;never-existed.bin&quot;</span>);</span>
-<span class="ln" id="L537"></span>
-<span class="ln" id="L538">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;real, &amp;missing]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L539">        assert_eq!(manifest.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;the missing file must not be recorded&quot;</span>);</span>
-<span class="ln" id="L540">    }</span>
-<span class="ln" id="L541"></span>
-<span class="ln" id="L542">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L543">    <span class="tok-kw">fn</span> <span class="tok-fn">recording_nothing_is_allowed_and_checks_clean</span>() {</span>
-<span class="ln" id="L544">        <span class="tok-kw">let</span> manifest = Manifest::of::&lt;&amp;Path&gt;(&amp;[]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L545">        assert!(manifest.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L546">        assert!(manifest.check::&lt;&amp;Path&gt;(&amp;[]).<span class="tok-fn">is_clean</span>());</span>
-<span class="ln" id="L547">    }</span>
-<span class="ln" id="L548">}</span>
+<span class="ln" id="L463">    <span class="tok-com">/// And an ordinary path, including the awkward but legitimate ones, still</span></span>
+<span class="ln" id="L464">    <span class="tok-com">/// parses. A refusal that catches real filenames is a worse bug than the</span></span>
+<span class="ln" id="L465">    <span class="tok-com">/// one it fixes.</span></span>
+<span class="ln" id="L466">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L467">    <span class="tok-kw">fn</span> <span class="tok-fn">an_ordinary_path_is_still_recorded</span>() {</span>
+<span class="ln" id="L468">        <span class="tok-kw">let</span> digest = <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>);</span>
+<span class="ln" id="L469">        <span class="tok-kw">for</span> good <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L470">            <span class="tok-str">&quot;notes.wav&quot;</span>,</span>
+<span class="ln" id="L471">            <span class="tok-str">&quot;a folder/with spaces/recording.wav&quot;</span>,</span>
+<span class="ln" id="L472">            <span class="tok-str">&quot;C:/Users/somebody/My Documents/x.wav&quot;</span>,</span>
+<span class="ln" id="L473">            <span class="tok-str">&quot;unicode \u{e9}\u{fc}\u{4e2d}\u{6587}.wav&quot;</span>,</span>
+<span class="ln" id="L474">            <span class="tok-str">&quot;punctuation!@#$%^&amp;()_+-=[]{};&#x27;.wav&quot;</span>,</span>
+<span class="ln" id="L475">        ] {</span>
+<span class="ln" id="L476">            <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\n{digest}  12  {good}\n&quot;</span>);</span>
+<span class="ln" id="L477">            <span class="tok-kw">let</span> parsed = Manifest::<span class="tok-fn">parse</span>(&amp;text);</span>
+<span class="ln" id="L478">            assert!(parsed.<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{good:?} was refused: {parsed:?}&quot;</span>);</span>
+<span class="ln" id="L479">        }</span>
+<span class="ln" id="L480">    }</span>
+<span class="ln" id="L481"></span>
+<span class="ln" id="L482">    <span class="tok-com">/// The two ends agree: what `of` will not write, `parse` will not read.</span></span>
+<span class="ln" id="L483">    <span class="tok-com">///</span></span>
+<span class="ln" id="L484">    <span class="tok-com">/// That asymmetry *was* the finding, so it is the thing to hold rather</span></span>
+<span class="ln" id="L485">    <span class="tok-com">/// than the individual characters.</span></span>
+<span class="ln" id="L486">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L487">    <span class="tok-kw">fn</span> <span class="tok-fn">what_cannot_be_written_cannot_be_read</span>() {</span>
+<span class="ln" id="L488">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&quot;a\rb&quot;</span>, <span class="tok-str">&quot;a\nb&quot;</span>, <span class="tok-str">&quot;a\u{1b}b&quot;</span>, <span class="tok-str">&quot;a\0b&quot;</span>] {</span>
+<span class="ln" id="L489">            assert!(</span>
+<span class="ln" id="L490">                <span class="tok-fn">unrecordable</span>(bad).<span class="tok-fn">is_some</span>(),</span>
+<span class="ln" id="L491">                <span class="tok-str">&quot;{bad:?} would be written but not read, or the other way round&quot;</span></span>
+<span class="ln" id="L492">            );</span>
+<span class="ln" id="L493">        }</span>
+<span class="ln" id="L494">        <span class="tok-kw">for</span> good <span class="tok-kw">in</span> [<span class="tok-str">&quot;a/b&quot;</span>, <span class="tok-str">&quot;a b&quot;</span>, <span class="tok-str">&quot;\u{e9}&quot;</span>] {</span>
+<span class="ln" id="L495">            assert!(<span class="tok-fn">unrecordable</span>(good).<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;{good:?}&quot;</span>);</span>
+<span class="ln" id="L496">        }</span>
+<span class="ln" id="L497">    }</span>
+<span class="ln" id="L498"></span>
+<span class="ln" id="L499">    <span class="tok-kw">fn</span> <span class="tok-fn">write</span>(dir: &amp;Path, name: &amp;str, body: &amp;[u8]) -&gt; PathBuf {</span>
+<span class="ln" id="L500">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(name);</span>
+<span class="ln" id="L501">        std::fs::<span class="tok-fn">write</span>(&amp;path, body).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L502">        path</span>
+<span class="ln" id="L503">    }</span>
+<span class="ln" id="L504"></span>
+<span class="ln" id="L505">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L506">    <span class="tok-kw">fn</span> <span class="tok-fn">an_untouched_set_of_files_is_clean</span>() {</span>
+<span class="ln" id="L507">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L508">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;binary&quot;</span>);</span>
+<span class="ln" id="L509">        <span class="tok-kw">let</span> b = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;applock.bin&quot;</span>, b<span class="tok-str">&quot;lock&quot;</span>);</span>
+<span class="ln" id="L510"></span>
+<span class="ln" id="L511">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a, &amp;b]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L512">        assert_eq!(manifest.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L513"></span>
+<span class="ln" id="L514">        <span class="tok-kw">let</span> report = manifest.check::&lt;&amp;Path&gt;(&amp;[]);</span>
+<span class="ln" id="L515">        assert!(report.<span class="tok-fn">is_clean</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, report.changes);</span>
+<span class="ln" id="L516">        assert_eq!(report.unchanged, <span class="tok-num">2</span>);</span>
+<span class="ln" id="L517">    }</span>
+<span class="ln" id="L518"></span>
+<span class="ln" id="L519">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L520">    <span class="tok-kw">fn</span> <span class="tok-fn">a_modified_file_is_reported_with_both_digests</span>() {</span>
+<span class="ln" id="L521">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L522">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;binary&quot;</span>);</span>
+<span class="ln" id="L523">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L524"></span>
+<span class="ln" id="L525">        <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;binary, but not the same one&quot;</span>);</span>
+<span class="ln" id="L526">        <span class="tok-kw">let</span> report = manifest.check::&lt;&amp;Path&gt;(&amp;[]);</span>
+<span class="ln" id="L527"></span>
+<span class="ln" id="L528">        assert_eq!(report.changes.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L529">        <span class="tok-kw">match</span> &amp;report.changes[<span class="tok-num">0</span>] {</span>
+<span class="ln" id="L530">            Change::Modified { was, now, .. } =&gt; {</span>
+<span class="ln" id="L531">                assert_ne!(was, now);</span>
+<span class="ln" id="L532">                assert_eq!(was.<span class="tok-fn">len</span>(), <span class="tok-num">64</span>);</span>
+<span class="ln" id="L533">            }</span>
+<span class="ln" id="L534">            other =&gt; panic!(<span class="tok-str">&quot;expected a modification, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L535">        }</span>
+<span class="ln" id="L536">        assert!(report.changes[<span class="tok-num">0</span>].<span class="tok-fn">describe</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;modified:&quot;</span>));</span>
+<span class="ln" id="L537">    }</span>
+<span class="ln" id="L538"></span>
+<span class="ln" id="L539">    <span class="tok-com">/// A file of the same *length* with different contents is the case a</span></span>
+<span class="ln" id="L540">    <span class="tok-com">/// size-only check would miss, which is why the digest is the check.</span></span>
+<span class="ln" id="L541">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L542">    <span class="tok-kw">fn</span> <span class="tok-fn">a_same_length_substitution_is_still_caught</span>() {</span>
+<span class="ln" id="L543">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L544">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;aaaaaaaa&quot;</span>);</span>
+<span class="ln" id="L545">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L546">        <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice.exe&quot;</span>, b<span class="tok-str">&quot;bbbbbbbb&quot;</span>);</span>
+<span class="ln" id="L547"></span>
+<span class="ln" id="L548">        <span class="tok-kw">let</span> report = manifest.check::&lt;&amp;Path&gt;(&amp;[]);</span>
+<span class="ln" id="L549">        assert!(matches!(report.changes[<span class="tok-num">0</span>], Change::Modified { .. }));</span>
+<span class="ln" id="L550">    }</span>
+<span class="ln" id="L551"></span>
+<span class="ln" id="L552">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L553">    <span class="tok-kw">fn</span> <span class="tok-fn">a_removed_file_is_reported</span>() {</span>
+<span class="ln" id="L554">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L555">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;gone.bin&quot;</span>, b<span class="tok-str">&quot;here for now&quot;</span>);</span>
+<span class="ln" id="L556">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L557">        std::fs::<span class="tok-fn">remove_file</span>(&amp;a).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L558"></span>
+<span class="ln" id="L559">        <span class="tok-kw">let</span> report = manifest.check::&lt;&amp;Path&gt;(&amp;[]);</span>
+<span class="ln" id="L560">        assert!(matches!(report.changes[<span class="tok-num">0</span>], Change::Removed { .. }));</span>
+<span class="ln" id="L561">        assert_eq!(report.unchanged, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L562">    }</span>
+<span class="ln" id="L563"></span>
+<span class="ln" id="L564">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L565">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_file_in_the_watched_set_is_reported</span>() {</span>
+<span class="ln" id="L566">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L567">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;known.bin&quot;</span>, b<span class="tok-str">&quot;recorded&quot;</span>);</span>
+<span class="ln" id="L568">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L569">        <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;surprise.dll&quot;</span>, b<span class="tok-str">&quot;not recorded&quot;</span>);</span>
+<span class="ln" id="L570"></span>
+<span class="ln" id="L571">        <span class="tok-kw">let</span> present = <span class="tok-fn">files_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L572">        <span class="tok-kw">let</span> report = manifest.<span class="tok-fn">check</span>(&amp;present);</span>
+<span class="ln" id="L573">        assert_eq!(report.changes.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L574">        assert!(report.changes[<span class="tok-num">0</span>].<span class="tok-fn">path</span>().<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;surprise.dll&quot;</span>));</span>
+<span class="ln" id="L575">        assert!(matches!(report.changes[<span class="tok-num">0</span>], Change::Added { .. }));</span>
+<span class="ln" id="L576">    }</span>
+<span class="ln" id="L577"></span>
+<span class="ln" id="L578">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L579">    <span class="tok-kw">fn</span> <span class="tok-fn">the_text_format_round_trips_exactly</span>() {</span>
+<span class="ln" id="L580">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L581">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;one.bin&quot;</span>, b<span class="tok-str">&quot;first&quot;</span>);</span>
+<span class="ln" id="L582">        <span class="tok-kw">let</span> b = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;two with spaces.bin&quot;</span>, b<span class="tok-str">&quot;second&quot;</span>);</span>
+<span class="ln" id="L583"></span>
+<span class="ln" id="L584">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a, &amp;b]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L585">        <span class="tok-kw">let</span> text = manifest.<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L586">        assert!(text.<span class="tok-fn">starts_with</span>(MAGIC));</span>
+<span class="ln" id="L587"></span>
+<span class="ln" id="L588">        <span class="tok-kw">let</span> back = Manifest::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L589">        assert_eq!(manifest, back);</span>
+<span class="ln" id="L590">        assert_eq!(back.<span class="tok-fn">to_text</span>(), text, <span class="tok-str">&quot;serialisation is not stable&quot;</span>);</span>
+<span class="ln" id="L591">    }</span>
+<span class="ln" id="L592"></span>
+<span class="ln" id="L593">    <span class="tok-com">/// Paths with spaces are ordinary on Windows, and splitting naively would</span></span>
+<span class="ln" id="L594">    <span class="tok-com">/// truncate them.</span></span>
+<span class="ln" id="L595">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L596">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_containing_spaces_survives</span>() {</span>
+<span class="ln" id="L597">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L598">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;Program Files thing.exe&quot;</span>, b<span class="tok-str">&quot;x&quot;</span>);</span>
+<span class="ln" id="L599">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L600">        <span class="tok-kw">let</span> back = Manifest::<span class="tok-fn">parse</span>(&amp;manifest.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L601">        assert!(back.<span class="tok-fn">paths</span>().<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;Program Files thing.exe&quot;</span>)));</span>
+<span class="ln" id="L602">        assert!(back.check::&lt;&amp;Path&gt;(&amp;[]).<span class="tok-fn">is_clean</span>());</span>
+<span class="ln" id="L603">    }</span>
+<span class="ln" id="L604"></span>
+<span class="ln" id="L605">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L606">    <span class="tok-kw">fn</span> <span class="tok-fn">a_malformed_manifest_is_rejected_rather_than_half_read</span>() {</span>
+<span class="ln" id="L607">        assert!(Manifest::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L608">        assert!(Manifest::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;NOT-THE-MAGIC\n&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L609">        assert!(Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\nnothex  12  a.bin\n&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L610">        assert!(Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n{}  x  a.bin\n&quot;</span>, <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>))).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L611">        assert!(Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n{}  12  \n&quot;</span>, <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>))).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L612">        <span class="tok-com">// A blank line in the middle is tolerated, not an error.</span></span>
+<span class="ln" id="L613">        assert!(Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n\n&quot;</span>)).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L614">    }</span>
+<span class="ln" id="L615"></span>
+<span class="ln" id="L616">    <span class="tok-com">/// A hand-written manifest using backslashes must key the same way one this</span></span>
+<span class="ln" id="L617">    <span class="tok-com">/// crate wrote does, or every recorded file also reports as newly added and</span></span>
+<span class="ln" id="L618">    <span class="tok-com">/// the report becomes noise.</span></span>
+<span class="ln" id="L619">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L620">    <span class="tok-kw">fn</span> <span class="tok-fn">a_manifest_written_with_backslashes_keys_the_same_way</span>() {</span>
+<span class="ln" id="L621">        <span class="tok-kw">let</span> digest = <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>);</span>
+<span class="ln" id="L622">        <span class="tok-kw">let</span> back = Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n{digest}  1  C:\\dir\\thing.exe\n&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L623">        <span class="tok-kw">let</span> forward =</span>
+<span class="ln" id="L624">            Manifest::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;{MAGIC}\n{digest}  1  C:/dir/thing.exe\n&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L625">        assert_eq!(back, forward);</span>
+<span class="ln" id="L626">        assert_eq!(back.<span class="tok-fn">paths</span>().collect::&lt;Vec&lt;_&gt;&gt;(), [<span class="tok-str">&quot;C:/dir/thing.exe&quot;</span>]);</span>
+<span class="ln" id="L627">        <span class="tok-com">// And it survives a second round trip unchanged.</span></span>
+<span class="ln" id="L628">        assert_eq!(Manifest::<span class="tok-fn">parse</span>(&amp;back.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>(), back);</span>
+<span class="ln" id="L629">    }</span>
+<span class="ln" id="L630"></span>
+<span class="ln" id="L631">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L632">    <span class="tok-kw">fn</span> <span class="tok-fn">saving_and_loading_round_trips</span>() {</span>
+<span class="ln" id="L633">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L634">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;one.bin&quot;</span>, b<span class="tok-str">&quot;first&quot;</span>);</span>
+<span class="ln" id="L635">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L636"></span>
+<span class="ln" id="L637">        <span class="tok-kw">let</span> store = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;manifest.txt&quot;</span>);</span>
+<span class="ln" id="L638">        manifest.<span class="tok-fn">save</span>(&amp;store).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L639">        assert_eq!(Manifest::<span class="tok-fn">load</span>(&amp;store).<span class="tok-fn">unwrap</span>(), manifest);</span>
+<span class="ln" id="L640">    }</span>
+<span class="ln" id="L641"></span>
+<span class="ln" id="L642">    <span class="tok-com">/// The sealed form is what makes the record more than a courtesy: without</span></span>
+<span class="ln" id="L643">    <span class="tok-com">/// the passphrase it cannot be rewritten to match a tampered file.</span></span>
+<span class="ln" id="L644">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L645">    <span class="tok-kw">fn</span> <span class="tok-fn">a_sealed_manifest_needs_its_passphrase</span>() {</span>
+<span class="ln" id="L646">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L647">        <span class="tok-kw">let</span> a = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;one.bin&quot;</span>, b<span class="tok-str">&quot;first&quot;</span>);</span>
+<span class="ln" id="L648">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;a]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L649"></span>
+<span class="ln" id="L650">        <span class="tok-kw">let</span> sealed = manifest.<span class="tok-fn">seal</span>(b<span class="tok-str">&quot;a passphrase kept elsewhere&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L651">        assert!(</span>
+<span class="ln" id="L652">            !sealed.<span class="tok-fn">windows</span>(MAGIC.<span class="tok-fn">len</span>()).<span class="tok-fn">any</span>(|w| w == MAGIC.<span class="tok-fn">as_bytes</span>()),</span>
+<span class="ln" id="L653">            <span class="tok-str">&quot;the manifest is readable inside its own container&quot;</span></span>
+<span class="ln" id="L654">        );</span>
+<span class="ln" id="L655">        assert_eq!(</span>
+<span class="ln" id="L656">            Manifest::<span class="tok-fn">open_sealed</span>(b<span class="tok-str">&quot;a passphrase kept elsewhere&quot;</span>, &amp;sealed).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L657">            manifest</span>
+<span class="ln" id="L658">        );</span>
+<span class="ln" id="L659">        assert!(Manifest::<span class="tok-fn">open_sealed</span>(b<span class="tok-str">&quot;the wrong one&quot;</span>, &amp;sealed).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L660">    }</span>
+<span class="ln" id="L661"></span>
+<span class="ln" id="L662">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L663">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unreadable_path_is_skipped_when_recording</span>() {</span>
+<span class="ln" id="L664">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L665">        <span class="tok-kw">let</span> real = <span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;real.bin&quot;</span>, b<span class="tok-str">&quot;x&quot;</span>);</span>
+<span class="ln" id="L666">        <span class="tok-kw">let</span> missing = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;never-existed.bin&quot;</span>);</span>
+<span class="ln" id="L667"></span>
+<span class="ln" id="L668">        <span class="tok-kw">let</span> manifest = Manifest::<span class="tok-fn">of</span>(&amp;[&amp;real, &amp;missing]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L669">        assert_eq!(manifest.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;the missing file must not be recorded&quot;</span>);</span>
+<span class="ln" id="L670">    }</span>
+<span class="ln" id="L671"></span>
+<span class="ln" id="L672">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L673">    <span class="tok-kw">fn</span> <span class="tok-fn">recording_nothing_is_allowed_and_checks_clean</span>() {</span>
+<span class="ln" id="L674">        <span class="tok-kw">let</span> manifest = Manifest::of::&lt;&amp;Path&gt;(&amp;[]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L675">        assert!(manifest.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L676">        assert!(manifest.check::&lt;&amp;Path&gt;(&amp;[]).<span class="tok-fn">is_clean</span>());</span>
+<span class="ln" id="L677">    }</span>
+<span class="ln" id="L678">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

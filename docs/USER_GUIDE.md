@@ -86,6 +86,49 @@ lets other applications hear the veiled voice; if none is found you are warned
 rather than silently sent to the speakers. Levels, processing time per block,
 engine latency and a glitch counter are shown live.
 
+**Hear yourself first.** Beside **start** there is **preview to my headphones**.
+It runs the same engine and sends the result to this machine's own output rather
+than to the cable, so you hear the veiled voice and nobody else does. Use it
+before an interview begins rather than during one. Use headphones while you do:
+speakers plus a microphone is a feedback loop.
+
+While a preview is running the interface says **preview** in yellow rather than
+**live** in green, everywhere it says anything, because somebody who has those
+two the wrong way round is either speaking to a call in their own voice or
+speaking to nobody.
+
+**The monitor follows you.** While a session is running, a strip along the
+bottom of the window shows the level going in and the level coming out, on every
+tab. It is on by default, because the moment you want it is the moment you are
+setting up an interview on another tab and are not sure the microphone is still
+working. Settings, under *the live monitor*, moves it to a floating card in the
+corner or switches it off; the live tab keeps its full meters either way.
+
+**What the meters can and cannot tell you.** They say sound is arriving and
+sound is leaving, which is the thing that usually goes wrong: a muted
+microphone, the wrong device, a cable nothing is listening to. They cannot tell
+you the voice has been changed. A working meter and a bypassed engine draw the
+same bar. The check for that is listening to the preview and hearing a voice
+that is not yours.
+
+### recording an interview
+
+Group mode is about a recording that already exists, so the steps for an
+interview are:
+
+1. **Set up and check first.** Choose the microphone, press **preview to my
+   headphones**, and listen. This is where you find out that the wrong device
+   was selected, or that you are too close to the microphone and clipping.
+2. **Start live scramble** into the virtual cable, and point whatever is
+   recording or calling at that cable rather than at the microphone.
+3. **Watch the strip.** It stays on screen while you work on other tabs. `in`
+   moving and `out` flat means the engine has stopped or the cable has gone;
+   `CLIPPED` means the input is too loud and is being cut off, which cannot be
+   undone afterwards.
+4. **Afterwards**, if the recording has several people in it and you want each
+   one given a different voice, that is the **Group** tab and it works on the
+   file.
+
 ### monitor
 
 Which applications are holding your microphone and camera, with a log of starts
@@ -137,6 +180,8 @@ Every command takes `--help`.
 | `--intensity 0.0–1.0` | How far pitch and formants move. Default 1.0. |
 | `--keep-accent` | Leaves intonation, accent and vocal tract intact. Weaker; use only if you know why. |
 | `--reseed-secs N` | Seed roll interval. 0 keeps one stream for the session. |
+| `--preview` | On `live`: sends the veiled voice to this machine's own output rather than to a virtual cable, so you hear it and nothing else does. Use headphones. |
+| `--no-monitor` | On `live`: does not draw the level meters. For a terminal that is being logged or read by something other than a person. |
 | `--clean-metadata false` | Keeps tags on the written file. On by default. |
 | `--encrypt false` | Writes the recording in the clear. On by default; prints what you are giving up and waits for you to type `UNENCRYPTED`. |
 | `--encrypt-to key.pub` | Seals to a recipient's hybrid public key instead of a passphrase. |

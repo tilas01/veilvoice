@@ -8,6 +8,93 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The coverage-guided campaign has been run, and it found two things
+
+`fuzz/` has held six libFuzzer targets since the fifth round, and
+`docs/AUDIT.md` has recorded, every round since, that they had never been run:
+libFuzzer needs a clang toolchain and the machine this is developed on is
+Windows. "We have a fuzzing setup" and "we have fuzzed this" are different
+claims and only the first was true.
+
+All six have now been run, five minutes each, on x86-64 Linux. Between them
+they got through 250 million inputs and found **two defects, both shipped, both
+in code three audit rounds had read.** The run counts and the limits of what
+five minutes proves are in `fuzz/README.md`.
+
+### F-82 - a header could ask for four billion Argon2 passes, and get them
+
+The memory cost has had a ceiling since F-2, with a long note explaining that
+it arrives from the file and that a header claiming `u32::MAX` asks for four
+terabytes. The **time** cost had a test for zero and nothing else.
+
+Nothing overflows and nothing allocates, so every check passed. The derivation
+simply did not finish. The campaign produced a header declaring 4,521,984
+passes: **measured at about 74 hours** in a release build, and that is not the
+worst case, only the one it happened to reach. `u32::MAX` passes is roughly
+eight years.
+
+It matters in two places and the second is worse. A `.veil` file is something
+somebody sent you, so opening it hangs the program. The app-lock file carries
+the same numbers and is **read before anyone has authenticated**, so anything
+able to write it could stop VeilVoice from starting at all, with no error and
+nothing to see. The campaign found it through both doors, independently.
+
+The ceiling is 16 passes, chosen by measurement: RFC 9106's two profiles use
+one and three, libsodium's most expensive preset uses four, this crate's
+default is three. At the memory ceiling that is 75 seconds. The most expensive
+header this build will accept is now a wait somebody can sit through.
+
+The exact bytes are a regression test in the deterministic campaign, where they
+run on every commit on every platform with no nightly toolchain.
+
+### F-83 - the tamper record refused to write what it was happy to read
+
+`Manifest::of` refused to record a path containing a line break.
+`Manifest::parse` accepted one. So VeilVoice would not write a record it was
+perfectly willing to read from somebody else, and `veilvoice guard check` reads
+whichever file is at the path it is given.
+
+The campaign produced a manifest whose recorded path contained a **carriage
+return**. That is not a parsing problem. The product of this whole feature is a
+report somebody reads to decide whether their files have been altered, and that
+report is printed to a terminal, where a carriage return returns the cursor to
+the start of the line and everything already printed is overwritten by what
+follows. A crafted path makes the report say something other than what is
+recorded. An escape character can colour, move the cursor or clear the screen.
+
+Both ends refuse the same thing now, and they refuse the whole control range
+rather than the two characters that were found, because listing the ones
+somebody thought of is how the next one gets in.
+
+### The live monitor: what is going in, and what is coming out
+
+Live scramble has drawn input and output meters for some time, and they were
+inside one panel. Switch to Group to set up an interview, or to Settings, and
+the only picture of what the microphone was doing went off screen while the
+audio carried on.
+
+There is now a monitor that rides the window: **on by default, on every tab**,
+showing the level going in and the level coming out, plus a sticky `CLIPPED`
+warning because clipping is destructive and is over in a millisecond. Settings
+moves it to a floating card in the corner or switches it off, and the live tab
+keeps its full meters either way.
+
+**And a way to hear yourself before anybody else does.** `preview to my
+headphones` in the application, `--preview` on the command line: the same
+engine, with the veiled voice going to this machine's own output instead of to
+a virtual cable. It is the check the meters cannot make. A level says sound
+arrived and sound left; a working meter and a bypassed engine draw the same
+bar. Listening and hearing a voice that is not yours is what tells you the
+engine is running, and that sentence is printed beside the meters rather than
+left to be worked out.
+
+While a preview runs, everything that said `live` in green says `preview` in
+yellow, because somebody who has those two the wrong way round is either
+speaking to a call in their own voice or speaking to nobody.
+
+`--no-monitor` turns the terminal meters off for a log, and says once that it
+is running rather than drawing a bar into a file nobody will read.
+
 ### The Debian package has been built, installed and run
 
 `docs/AUDIT.md` has listed "none of the package definitions has been built" as

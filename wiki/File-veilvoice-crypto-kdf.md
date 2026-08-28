@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/kdf.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 399 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 525 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs)
 
 ## Contents
 
@@ -71,7 +71,7 @@ the defaults are made stronger.
 
 ## What this file contains
 
-399 lines defining **7 functions** (5 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+525 lines defining **7 functions** (5 public), **1 type** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -80,10 +80,10 @@ the defaults are made stronger.
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `KdfParams::weak_for_tests` (line 90) -- A deliberately cheap profile for tests and low-memory devices.
-- `KdfParams::within` (line 148) -- Check the costs against a caller-chosen memory ceiling as well as the built-in one.
+- `KdfParams::within` (line 196) -- Check the costs against a caller-chosen memory ceiling as well as the built-in one.
   - reaches: `checked`
-- `derive_key` (line 214) -- Derive a 32-byte key from password and salt.
-- `random_salt` (line 227) -- Draw a fresh random salt from the OS CSPRNG.
+- `derive_key` (line 265) -- Derive a 32-byte key from password and salt.
+- `random_salt` (line 278) -- Draw a fresh random salt from the OS CSPRNG.
 
 ## What calls what
 
@@ -101,20 +101,20 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 flowchart TD
     n_default["KdfParams::default<br/>line 77"]
     n_weak_for_tests(["KdfParams::weak_for_tests<br/>line 90"])
-    n_within(["KdfParams::within<br/>line 148"])
-    n_checked["KdfParams::checked<br/>line 177"]
-    n_build["KdfParams::build<br/>line 197"]
-    n_derive_key(["derive_key<br/>line 214"])
-    n_random_salt(["random_salt<br/>line 227"])
+    n_within(["KdfParams::within<br/>line 196"])
+    n_checked["KdfParams::checked<br/>line 225"]
+    n_build["KdfParams::build<br/>line 248"]
+    n_derive_key(["derive_key<br/>line 265"])
+    n_random_salt(["random_salt<br/>line 278"])
     n_build --> n_checked
     n_within --> n_checked
     click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L77" "open the source"
     click n_weak_for_tests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L90" "open the source"
-    click n_within href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L148" "open the source"
-    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L177" "open the source"
-    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L197" "open the source"
-    click n_derive_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L214" "open the source"
-    click n_random_salt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L227" "open the source"
+    click n_within href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L196" "open the source"
+    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L225" "open the source"
+    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L248" "open the source"
+    click n_derive_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L265" "open the source"
+    click n_random_salt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L278" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_weak_for_tests,n_within,n_derive_key,n_random_salt entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -134,11 +134,12 @@ flowchart TD
 | `KdfParams::weak_for_tests` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L90) | A deliberately cheap profile for tests and low-memory devices. |
 | `KdfParams::MAX_P_COST` <sub>const</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L99) | Argon2's own documented ceiling on parallelism: 2^24 - 1. |
 | `KdfParams::MAX_M_COST` <sub>pub const</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L120) | The largest memory cost this build will attempt, in KiB — 4 GiB. |
-| `KdfParams::UNATTENDED_MAX_M_COST` <sub>pub const</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L136) | A ceiling for a caller with nobody watching. |
-| `KdfParams::within` <sub>pub fn</sub> | [148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L148) | Check the costs against a caller-chosen memory ceiling as well as the built-in one. |
-| `KdfParams::checked` <sub>pub fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L177) | Check the costs are ones Argon2 can accept, before handing them to it. |
-| `KdfParams::build` <sub>fn</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L197) | Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF. |
-| `SALT_LEN` <sub>pub const</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L206) | Length of the salt stored in an encrypted container. |
-| `KEY_LEN` <sub>pub const</sub> | [208](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L208) | Length of a derived symmetric key. |
-| `derive_key` <sub>pub fn</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L214) | Derive a 32-byte key from password and salt. |
-| `random_salt` <sub>pub fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L227) | Draw a fresh random salt from the OS CSPRNG. |
+| `KdfParams::MAX_T_COST` <sub>pub const</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L160) | The largest number of passes this build will attempt. |
+| `KdfParams::UNATTENDED_MAX_M_COST` <sub>pub const</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L176) | A ceiling for a caller with nobody watching. |
+| `KdfParams::within` <sub>pub fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L196) | Check the costs against a caller-chosen memory ceiling as well as the built-in one. |
+| `KdfParams::checked` <sub>pub fn</sub> | [225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L225) | Check the costs are ones Argon2 can accept, before handing them to it. |
+| `KdfParams::build` <sub>fn</sub> | [248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L248) | Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF. |
+| `SALT_LEN` <sub>pub const</sub> | [257](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L257) | Length of the salt stored in an encrypted container. |
+| `KEY_LEN` <sub>pub const</sub> | [259](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L259) | Length of a derived symmetric key. |
+| `derive_key` <sub>pub fn</sub> | [265](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L265) | Derive a 32-byte key from password and salt. |
+| `random_salt` <sub>pub fn</sub> | [278](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L278) | Draw a fresh random salt from the OS CSPRNG. |

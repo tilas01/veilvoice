@@ -105,7 +105,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>150 lines"])
     n_blame["blame.rs<br/>421 lines"]
-    n_manifest["manifest.rs<br/>548 lines"]
+    n_manifest["manifest.rs<br/>678 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs" "open the source"
     click n_blame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" "open the source"
     click n_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs" "open the source"
@@ -119,7 +119,7 @@ flowchart TD
 |---|---:|---|
 | [`blame.rs`](../../docs/files/veilvoice-guard/blame.md) | 421 | Best-effort attribution: which program changed a file. |
 | [`lib.rs`](../../docs/files/veilvoice-guard/lib.md) | 150 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
-| [`manifest.rs`](../../docs/files/veilvoice-guard/manifest.md) | 548 | The integrity manifest: what the files were, and what they are now. |
+| [`manifest.rs`](../../docs/files/veilvoice-guard/manifest.md) | 678 | The integrity manifest: what the files were, and what they are now. |
 
 ## Public items
 
