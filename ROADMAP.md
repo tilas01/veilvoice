@@ -189,7 +189,7 @@ it can honestly be made rather than to keep apologising for it.
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
 | 74 | **The lock screen tells an attacker nothing** — no explanation of what the lock is or is not worth while it is locked, the account of that moved to the documentation and to the unlocked application, and a small animation in its place | **done** | — |
-| 75 | **`veilvoice-guard` inside the desktop application** — the integrity record taken at install and checked at every launch, sealed with the existing cryptography rather than left in the clear | **next** | 2–3 d |
+| 75 | **`veilvoice-guard` inside the desktop application** — the integrity record taken at the first launch and checked at every one after, sealed under the app-lock passphrase where there is one | **done** | — |
 | 76 | **The app lock, hardened as far as it honestly goes** — an authentication tag under the passphrase, two copies with the spare administrator-owned where the platform allows it, restoration when one goes, randomised names and masked contents, and a report that only the passphrase can clear | **done** | — |
 | 77 | **What the lock is worth, written down properly** — one account, in the documentation, separating the parts that are real from the parts that are only obscurity | **done** | — |
 | 78 | **Every website palette in the application, chosen from the interface** | **done** | — |
@@ -492,6 +492,24 @@ flash a console every time, and a windowed one would send its output nowhere
 when run from a terminal. Switching at run time is FFI, and every crate here
 carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
 maintainer's call and not something to slip in, so it waits for one.
+
+**Marker 75 seals the record with the only secret the program ever has, and
+that decides when it can run.** Sealing needs a passphrase, and a window that
+has just opened has none. The app-lock passphrase is the one secret this
+program is ever given, so that is what the record is sealed with, and the
+unlock is therefore when the check runs. With no app lock set there is nothing
+to seal with, so the record is written in the clear and the tab says so in
+those words. Sealing it under a key kept beside it would have looked like the
+sealed case and been worth nothing, which is the failure this project keeps
+refusing.
+
+*Taken at first launch rather than at install*, and that is a correction rather
+than a shortcut. Installing a package runs as an administrator; the record
+belongs to the user account that will run the program, and lives in that
+account's configuration directory. A postinstall hook would have written a
+record into the administrator's directory describing a check nobody performs.
+There is no per-user moment during a package install, so the first launch is
+that moment.
 
 **Marker 78 was already built and was not findable, which is a different
 fault.** Every one of the website's nine palettes has been in the application
