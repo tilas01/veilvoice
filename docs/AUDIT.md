@@ -57,6 +57,32 @@ the pattern worth naming: *hardening that fails open*. A lock that could be
 orphaned by one refused read, and a spare copy that silently kept the previous
 password, are both worse than the plain single file they replaced.
 
+### What was re-run, and what was not
+
+One target, `lock_file`, because one input format changed. The app-lock record
+went from version 1 to version 2 in this cycle: a different length, three new
+fields and a keyed tag. The other five targets parse formats this cycle did not
+touch, so re-running them would have cost twenty-five minutes to re-confirm the
+tenth round's result rather than to learn anything.
+
+Against the fixed parser: **5,493 inputs, 586 code paths, no crash and no
+hang.** One slow unit, at 518 MiB and sixteen passes, which is the accepted
+class described under F-91.
+
+That input count is not comparable with the tenth round's 445,714 for this
+target, and the reason is measurable rather than arguable. **Thirty-six of the
+53 corpus entries the campaign kept now parse successfully**, so most of what it
+runs reaches the Argon2id derivation instead of being turned away by the header
+checks, and a permitted derivation costs between one and nineteen seconds by
+design. A campaign that spends its time inside the key derivation does fewer
+runs and covers more, which is what the coverage number says: 586 paths against
+a target that used to bounce off the parser.
+
+The same pattern, in reverse, is what the tenth round recorded for F-82: fixing
+an unbounded time cost made this target 136 times more productive. Bounding the
+*memory* cost in F-91 moves it the other way, and both are the campaign
+reporting the truth about where the program spends its time.
+
 ### F-85 -- one refused read would have orphaned the lock for ever
 
 `veilvoice-crypto/src/vault.rs`.
