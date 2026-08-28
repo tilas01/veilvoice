@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/lock.svg" alt="lock.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/lock.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1276 lines &middot; <a href="lock.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1379 lines &middot; <a href="lock.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-worth-stated-before-anything-else">What this is worth, stated before anything else</a>
@@ -79,66 +79,70 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1276 lines defining <strong>37 functions</strong> (27 public), <strong>3 types</strong> and <strong>13 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1379 lines defining <strong>39 functions</strong> (29 public), <strong>3 types</strong> and <strong>13 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct AppLock</code> <span style="color:var(--muted)">line 169</span> &mdash; A password verifier plus its attempt history.</li>
-<li><code>struct LockStore</code> <span style="color:var(--muted)">line 559</span> &mdash; An AppLock bound to a file, which is persisted after every attempt.</li>
-<li><code>enum Backing</code> <span style="color:var(--muted)">line 572</span> &mdash; Where a LockStore keeps its record.</li>
+<li><code>struct LockStore</code> <span style="color:var(--muted)">line 576</span> &mdash; An AppLock bound to a file, which is persisted after every attempt.</li>
+<li><code>enum Backing</code> <span style="color:var(--muted)">line 592</span> &mdash; Where a LockStore keeps its record.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>AppLock::create</code> <span style="color:var(--muted)">line 201</span> &mdash; Create a lock for password.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>derive_pair</code></span>
 </li>
-<li><code>AppLock::tampered</code> <span style="color:var(--muted)">line 264</span> &mdash; Whether a record has been found edited by somebody without the passphrase, at any point since this was last cleared.
+<li><code>AppLock::same_secret_as</code> <span style="color:var(--muted)">line 269</span> &mdash; Whether two records hold the same stored password.
 </li>
-<li><code>AppLock::acknowledge</code> <span style="color:var(--muted)">line 272</span> &mdash; Clear the tamper report, after proving the passphrase.
+<li><code>AppLock::tampered</code> <span style="color:var(--muted)">line 281</span> &mdash; Whether a record has been found edited by somebody without the passphrase, at any point since this was last cleared.
+</li>
+<li><code>AppLock::acknowledge</code> <span style="color:var(--muted)">line 289</span> &mdash; Clear the tamper report, after proving the passphrase.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>verify</code>, <code>unix_now</code>, <code>verify_at</code>, <code>cooldown_at</code>, <code>derive_pair</code>, <code>tag_matches</code>, <code>delay_secs</code>, <code>tag</code>, <code>body</code></span>
 </li>
-<li><code>AppLock::needs_upgrade</code> <span style="color:var(--muted)">line 280</span> &mdash; True when this record predates the authentication tag and should be rewritten once the passphrase is in hand.
+<li><code>AppLock::needs_upgrade</code> <span style="color:var(--muted)">line 297</span> &mdash; True when this record predates the authentication tag and should be rewritten once the passphrase is in hand.
 </li>
-<li><code>AppLock::cooldown</code> <span style="color:var(--muted)">line 312</span> &mdash; Seconds still to wait before another attempt is accepted.
+<li><code>AppLock::cooldown</code> <span style="color:var(--muted)">line 329</span> &mdash; Seconds still to wait before another attempt is accepted.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>cooldown_at</code>, <code>unix_now</code>, <code>delay_secs</code></span>
 </li>
-<li><code>AppLock::failures</code> <span style="color:var(--muted)">line 329</span> &mdash; Consecutive failed attempts recorded so far.
+<li><code>AppLock::failures</code> <span style="color:var(--muted)">line 346</span> &mdash; Consecutive failed attempts recorded so far.
 </li>
-<li><code>AppLock::params</code> <span style="color:var(--muted)">line 334</span> &mdash; The Argon2id cost this lock was created with.
+<li><code>AppLock::params</code> <span style="color:var(--muted)">line 351</span> &mdash; The Argon2id cost this lock was created with.
 </li>
-<li><code>AppLock::retag</code> <span style="color:var(--muted)">line 372</span> &mdash; Draw a fresh nonce and re-tag the record under password.
+<li><code>AppLock::retag</code> <span style="color:var(--muted)">line 389</span> &mdash; Draw a fresh nonce and re-tag the record under password.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>derive_pair</code>, <code>tag</code>, <code>body</code></span>
 </li>
-<li><code>AppLock::to_bytes</code> <span style="color:var(--muted)">line 403</span> &mdash; Serialise exactly as it appears on disk.
+<li><code>AppLock::to_bytes</code> <span style="color:var(--muted)">line 420</span> &mdash; Serialise exactly as it appears on disk.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>body</code></span>
 </li>
-<li><code>LockStore::open</code> <span style="color:var(--muted)">line 592</span> &mdash; Load the lock at path, or Ok(None) if no lock is configured there.
+<li><code>LockStore::open</code> <span style="color:var(--muted)">line 612</span> &mdash; Load the lock at path, or Ok(None) if no lock is configured there.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code></span>
 </li>
-<li><code>LockStore::create</code> <span style="color:var(--muted)">line 613</span> &mdash; Create a lock at path, refusing to overwrite one already there.
+<li><code>LockStore::create</code> <span style="color:var(--muted)">line 634</span> &mdash; Create a lock at path, refusing to overwrite one already there.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>derive_pair</code></span>
 </li>
-<li><code>LockStore::tampered</code> <span style="color:var(--muted)">line 651</span> &mdash; Whether the stored record has been found edited by somebody without the passphrase.
+<li><code>LockStore::tampered</code> <span style="color:var(--muted)">line 675</span> &mdash; Whether the stored record has been found edited by somebody without the passphrase.
 </li>
-<li><code>LockStore::acknowledge</code> <span style="color:var(--muted)">line 656</span> &mdash; Clear the tamper report, after proving the passphrase, and persist that.
+<li><code>LockStore::acknowledge</code> <span style="color:var(--muted)">line 687</span> &mdash; Clear the tamper report, after proving the passphrase, and persist that.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>verify</code>, <code>unix_now</code>, <code>verify_at</code>, <code>cooldown_at</code>, <code>derive_pair</code>, <code>tag_matches</code>, <code>delay_secs</code>, <code>tag</code>, <code>body</code></span>
 </li>
-<li><code>LockStore::report_tamper</code> <span style="color:var(--muted)">line 669</span> &mdash; Raise the tamper report from outside, and persist it if the passphrase allows.
+<li><code>LockStore::report_tamper</code> <span style="color:var(--muted)">line 702</span> &mdash; Raise the tamper report from outside, and persist it if the passphrase allows.
 </li>
-<li><code>LockStore::change_password</code> <span style="color:var(--muted)">line 674</span> &mdash; Replace the password, after proving the current one.
+<li><code>LockStore::change_password</code> <span style="color:var(--muted)">line 707</span> &mdash; Replace the password, after proving the current one.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>save</code>, <code>unlock</code>, <code>write_private</code></span>
 </li>
-<li><code>LockStore::remove</code> <span style="color:var(--muted)">line 690</span> &mdash; Remove the lock, after proving the password.
+<li><code>LockStore::remove</code> <span style="color:var(--muted)">line 731</span> &mdash; Remove the lock, after proving the password.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>unlock</code>, <code>save</code>, <code>write_private</code></span>
 </li>
-<li><code>LockStore::cooldown</code> <span style="color:var(--muted)">line 699</span> &mdash; Seconds still to wait before another attempt is accepted.
+<li><code>LockStore::cooldown</code> <span style="color:var(--muted)">line 740</span> &mdash; Seconds still to wait before another attempt is accepted.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>cooldown_at</code>, <code>unix_now</code>, <code>delay_secs</code></span>
 </li>
-<li><code>LockStore::failures</code> <span style="color:var(--muted)">line 704</span> &mdash; Consecutive failed attempts recorded so far.
+<li><code>LockStore::failures</code> <span style="color:var(--muted)">line 745</span> &mdash; Consecutive failed attempts recorded so far.
 </li>
-<li><code>LockStore::path</code> <span style="color:var(--muted)">line 710</span> &mdash; Where this lock is stored.
+<li><code>LockStore::path</code> <span style="color:var(--muted)">line 751</span> &mdash; Where this lock is stored.
 </li>
-<li><code>open_default</code> <span style="color:var(--muted)">line 740</span> &mdash; Open the lock at the default location, wherever this platform keeps it.
+<li><code>LockStore::every_copy_current</code> <span style="color:var(--muted)">line 778</span> &mdash; Whether the last write reached every copy.
+</li>
+<li><code>open_default</code> <span style="color:var(--muted)">line 795</span> &mdash; Open the lock at the default location, wherever this platform keeps it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default_dir</code>, <code>default_path</code></span>
 </li>
-<li><code>create_default</code> <span style="color:var(--muted)">line 756</span> &mdash; Create a lock at the default location, refusing to replace one already there.
+<li><code>create_default</code> <span style="color:var(--muted)">line 817</span> &mdash; Create a lock at the default location, refusing to replace one already there.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default_dir</code>, <code>default_path</code></span>
 </li>
 </ul>
@@ -195,87 +199,87 @@
 <a href="lock.src.html#fn-applock-acknowledge">
 <rect x="412.9" y="320.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="515.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::acknowledge</text>
-<text x="515.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
+<text x="515.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
 </a>
 <a href="lock.src.html#fn-applock-tag_matches">
 <rect x="154.5" y="720.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="249.1" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::tag_matches</text>
-<text x="249.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 284</text>
+<text x="249.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 301</text>
 </a>
 <a href="lock.src.html#fn-applock-cooldown">
 <rect x="75.1" y="520.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="165.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::cooldown</text>
-<text x="165.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 312</text>
+<text x="165.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 329</text>
 </a>
 <a href="lock.src.html#fn-applock-retag">
 <rect x="473.3" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="543.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::retag</text>
-<text x="543.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 372</text>
+<text x="543.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 389</text>
 </a>
 <a href="lock.src.html#fn-applock-to_bytes">
 <rect x="71.1" y="220.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="153.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::to_bytes</text>
-<text x="153.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 403</text>
+<text x="153.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 420</text>
 </a>
 <a href="lock.src.html#fn-applock-parse">
 <rect x="262.1" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="332.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">AppLock::parse</text>
-<text x="332.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 435</text>
+<text x="332.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 452</text>
 </a>
 <a href="lock.src.html#fn-lockstore-open">
 <rect x="429.0" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="503.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::open</text>
-<text x="503.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 592</text>
+<text x="503.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 612</text>
 </a>
 <a href="lock.src.html#fn-lockstore-create">
 <rect x="30.8" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="113.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::create</text>
-<text x="113.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 613</text>
+<text x="113.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 634</text>
 </a>
 <a href="lock.src.html#fn-lockstore-unlock">
 <rect x="221.8" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="304.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::unlock</text>
-<text x="304.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 633</text>
+<text x="304.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 655</text>
 </a>
 <a href="lock.src.html#fn-lockstore-acknowledge">
 <rect x="412.9" y="320.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="515.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::acknowledge</text>
-<text x="515.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 656</text>
+<text x="515.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 687</text>
 </a>
 <a href="lock.src.html#fn-lockstore-change_password">
 <rect x="110.2" y="420.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="229.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::change_password</text>
-<text x="229.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 674</text>
+<text x="229.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 707</text>
 </a>
 <a href="lock.src.html#fn-lockstore-remove">
 <rect x="373.8" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="456.3" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::remove</text>
-<text x="456.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 690</text>
+<text x="456.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 731</text>
 </a>
 <a href="lock.src.html#fn-lockstore-cooldown">
 <rect x="75.1" y="520.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="165.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LockStore::cooldown</text>
-<text x="165.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 699</text>
+<text x="165.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 740</text>
 </a>
 <a href="lock.src.html#fn-open_default">
 <rect x="282.3" y="520.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="344.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open_default</text>
-<text x="344.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 740</text>
+<text x="344.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 795</text>
 </a>
 <a href="lock.src.html#fn-create_default">
 <rect x="433.0" y="520.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="503.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">create_default</text>
-<text x="503.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 756</text>
+<text x="503.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 817</text>
 </a>
 <a href="lock.src.html#fn-default_dir">
 <rect x="365.7" y="620.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="424.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_dir</text>
-<text x="424.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 793</text>
+<text x="424.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 855</text>
 </a>
 <a href="lock.src.html#fn-default_path">
 <rect x="369.7" y="720.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="432.1" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_path</text>
-<text x="432.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 810</text>
+<text x="432.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 872</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -287,10 +291,10 @@
 <text x="35.0" y="861.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="883.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
 <text x="20.0" y="898.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a type-resolved</text>
-<text x="20.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">one. 22 of 32 functions are drawn; the diagram is bounded at 22 so it stays readable.</text>
+<text x="20.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 32 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
@@ -299,23 +303,23 @@ flowchart TD
     n_create([&quot;AppLock::create&lt;br/&gt;line 201&quot;])
     n_verify[&quot;AppLock::verify&lt;br/&gt;line 227&quot;]
     n_verify_at[&quot;AppLock::verify_at&lt;br/&gt;line 231&quot;]
-    n_acknowledge([&quot;AppLock::acknowledge&lt;br/&gt;line 272&quot;])
-    n_tag_matches[&quot;AppLock::tag_matches&lt;br/&gt;line 284&quot;]
-    n_cooldown([&quot;AppLock::cooldown&lt;br/&gt;line 312&quot;])
-    n_retag([&quot;AppLock::retag&lt;br/&gt;line 372&quot;])
-    n_to_bytes([&quot;AppLock::to_bytes&lt;br/&gt;line 403&quot;])
-    n_parse[&quot;AppLock::parse&lt;br/&gt;line 435&quot;]
-    n_open([&quot;LockStore::open&lt;br/&gt;line 592&quot;])
-    n_create([&quot;LockStore::create&lt;br/&gt;line 613&quot;])
-    n_unlock[&quot;LockStore::unlock&lt;br/&gt;line 633&quot;]
-    n_acknowledge([&quot;LockStore::acknowledge&lt;br/&gt;line 656&quot;])
-    n_change_password([&quot;LockStore::change_password&lt;br/&gt;line 674&quot;])
-    n_remove([&quot;LockStore::remove&lt;br/&gt;line 690&quot;])
-    n_cooldown([&quot;LockStore::cooldown&lt;br/&gt;line 699&quot;])
-    n_open_default([&quot;open_default&lt;br/&gt;line 740&quot;])
-    n_create_default([&quot;create_default&lt;br/&gt;line 756&quot;])
-    n_default_dir[&quot;default_dir&lt;br/&gt;line 793&quot;]
-    n_default_path[&quot;default_path&lt;br/&gt;line 810&quot;]
+    n_acknowledge([&quot;AppLock::acknowledge&lt;br/&gt;line 289&quot;])
+    n_tag_matches[&quot;AppLock::tag_matches&lt;br/&gt;line 301&quot;]
+    n_cooldown([&quot;AppLock::cooldown&lt;br/&gt;line 329&quot;])
+    n_retag([&quot;AppLock::retag&lt;br/&gt;line 389&quot;])
+    n_to_bytes([&quot;AppLock::to_bytes&lt;br/&gt;line 420&quot;])
+    n_parse[&quot;AppLock::parse&lt;br/&gt;line 452&quot;]
+    n_open([&quot;LockStore::open&lt;br/&gt;line 612&quot;])
+    n_create([&quot;LockStore::create&lt;br/&gt;line 634&quot;])
+    n_unlock[&quot;LockStore::unlock&lt;br/&gt;line 655&quot;]
+    n_acknowledge([&quot;LockStore::acknowledge&lt;br/&gt;line 687&quot;])
+    n_change_password([&quot;LockStore::change_password&lt;br/&gt;line 707&quot;])
+    n_remove([&quot;LockStore::remove&lt;br/&gt;line 731&quot;])
+    n_cooldown([&quot;LockStore::cooldown&lt;br/&gt;line 740&quot;])
+    n_open_default([&quot;open_default&lt;br/&gt;line 795&quot;])
+    n_create_default([&quot;create_default&lt;br/&gt;line 817&quot;])
+    n_default_dir[&quot;default_dir&lt;br/&gt;line 855&quot;]
+    n_default_path[&quot;default_path&lt;br/&gt;line 872&quot;]
     n_acknowledge --&gt; n_verify
     n_change_password --&gt; n_unlock
     n_cooldown --&gt; n_unix_now
@@ -332,23 +336,23 @@ flowchart TD
     click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L201&quot; &quot;open the source&quot;
     click n_verify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L227&quot; &quot;open the source&quot;
     click n_verify_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L231&quot; &quot;open the source&quot;
-    click n_acknowledge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L272&quot; &quot;open the source&quot;
-    click n_tag_matches href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L284&quot; &quot;open the source&quot;
-    click n_cooldown href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L312&quot; &quot;open the source&quot;
-    click n_retag href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L372&quot; &quot;open the source&quot;
-    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L403&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L435&quot; &quot;open the source&quot;
-    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L592&quot; &quot;open the source&quot;
-    click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L613&quot; &quot;open the source&quot;
-    click n_unlock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L633&quot; &quot;open the source&quot;
-    click n_acknowledge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L656&quot; &quot;open the source&quot;
-    click n_change_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L674&quot; &quot;open the source&quot;
-    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L690&quot; &quot;open the source&quot;
-    click n_cooldown href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L699&quot; &quot;open the source&quot;
-    click n_open_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L740&quot; &quot;open the source&quot;
-    click n_create_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L756&quot; &quot;open the source&quot;
-    click n_default_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L793&quot; &quot;open the source&quot;
-    click n_default_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L810&quot; &quot;open the source&quot;
+    click n_acknowledge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L289&quot; &quot;open the source&quot;
+    click n_tag_matches href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L301&quot; &quot;open the source&quot;
+    click n_cooldown href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L329&quot; &quot;open the source&quot;
+    click n_retag href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L389&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L420&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L452&quot; &quot;open the source&quot;
+    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L612&quot; &quot;open the source&quot;
+    click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L634&quot; &quot;open the source&quot;
+    click n_unlock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L655&quot; &quot;open the source&quot;
+    click n_acknowledge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L687&quot; &quot;open the source&quot;
+    click n_change_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L707&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L731&quot; &quot;open the source&quot;
+    click n_cooldown href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L740&quot; &quot;open the source&quot;
+    click n_open_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L795&quot; &quot;open the source&quot;
+    click n_create_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L817&quot; &quot;open the source&quot;
+    click n_default_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L855&quot; &quot;open the source&quot;
+    click n_default_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L872&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_create,n_acknowledge,n_cooldown,n_retag,n_to_bytes,n_open,n_create,n_acknowledge,n_change_password,n_remove,n_cooldown,n_open_default,n_create_default entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -380,40 +384,42 @@ flowchart TD
 <tr><td><code>AppLock::create</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-create">201</a></td><td>Create a lock for password.</td></tr>
 <tr><td><code>AppLock::verify</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-verify">227</a></td><td>Check password, recording the outcome.</td></tr>
 <tr><td><code>AppLock::verify_at</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-applock-verify_at">231</a></td><td></td></tr>
-<tr><td><code>AppLock::tampered</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-tampered">264</a></td><td>Whether a record has been found edited by somebody without the passphrase, at any point since this was last cleared.</td></tr>
-<tr><td><code>AppLock::acknowledge</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-acknowledge">272</a></td><td>Clear the tamper report, after proving the passphrase.</td></tr>
-<tr><td><code>AppLock::needs_upgrade</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-needs_upgrade">280</a></td><td>True when this record predates the authentication tag and should be rewritten once the passphrase is in hand.</td></tr>
-<tr><td><code>AppLock::tag_matches</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-applock-tag_matches">284</a></td><td></td></tr>
-<tr><td><code>AppLock::tag</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-applock-tag">301</a></td><td>The authentication tag over everything in the record before it.</td></tr>
-<tr><td><code>AppLock::cooldown</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-cooldown">312</a></td><td>Seconds still to wait before another attempt is accepted.</td></tr>
-<tr><td><code>AppLock::cooldown_at</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-applock-cooldown_at">316</a></td><td></td></tr>
-<tr><td><code>AppLock::failures</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-failures">329</a></td><td>Consecutive failed attempts recorded so far.</td></tr>
-<tr><td><code>AppLock::params</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-params">334</a></td><td>The Argon2id cost this lock was created with.</td></tr>
-<tr><td><code>AppLock::body</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-applock-body">353</a></td><td>The bytes the tag covers.</td></tr>
-<tr><td><code>AppLock::retag</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-retag">372</a></td><td>Draw a fresh nonce and re-tag the record under password.</td></tr>
-<tr><td><code>AppLock::to_bytes</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-to_bytes">403</a></td><td>Serialise exactly as it appears on disk.</td></tr>
-<tr><td><code>AppLock::parse</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-parse">435</a></td><td>Parse a lock file, version 1 or version 2.</td></tr>
-<tr><td><code>derive_pair</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-derive_pair">534</a></td><td>Derive the verifier and the tag key for password.</td></tr>
-<tr><td><code>LockStore</code> <sub>pub struct</sub></td><td><a href="lock.src.html#fn-lockstore">559</a></td><td>An AppLock bound to a file, which is persisted after every attempt.</td></tr>
-<tr><td><code>Backing</code> <sub>enum</sub></td><td><a href="lock.src.html#fn-backing">572</a></td><td>Where a LockStore keeps its record.</td></tr>
-<tr><td><code>Backing::primary</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-backing-primary">578</a></td><td></td></tr>
-<tr><td><code>LockStore::open</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-open">592</a></td><td>Load the lock at path, or Ok(None) if no lock is configured there.</td></tr>
-<tr><td><code>LockStore::create</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-create">613</a></td><td>Create a lock at path, refusing to overwrite one already there.</td></tr>
-<tr><td><code>LockStore::unlock</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-unlock">633</a></td><td>Check password and persist the outcome.</td></tr>
-<tr><td><code>LockStore::tampered</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-tampered">651</a></td><td>Whether the stored record has been found edited by somebody without the passphrase.</td></tr>
-<tr><td><code>LockStore::acknowledge</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-acknowledge">656</a></td><td>Clear the tamper report, after proving the passphrase, and persist that.</td></tr>
-<tr><td><code>LockStore::report_tamper</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-report_tamper">669</a></td><td>Raise the tamper report from outside, and persist it if the passphrase allows.</td></tr>
-<tr><td><code>LockStore::change_password</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-change_password">674</a></td><td>Replace the password, after proving the current one.</td></tr>
-<tr><td><code>LockStore::remove</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-remove">690</a></td><td>Remove the lock, after proving the password.</td></tr>
-<tr><td><code>LockStore::cooldown</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-cooldown">699</a></td><td>Seconds still to wait before another attempt is accepted.</td></tr>
-<tr><td><code>LockStore::failures</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-failures">704</a></td><td>Consecutive failed attempts recorded so far.</td></tr>
-<tr><td><code>LockStore::path</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-path">710</a></td><td>Where this lock is stored.</td></tr>
-<tr><td><code>LockStore::save</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-lockstore-save">714</a></td><td></td></tr>
-<tr><td><code>open_default</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-open_default">740</a></td><td>Open the lock at the default location, wherever this platform keeps it.</td></tr>
-<tr><td><code>create_default</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-create_default">756</a></td><td>Create a lock at the default location, refusing to replace one already there.</td></tr>
-<tr><td><code>write_private</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-write_private">782</a></td><td>Write the lock file so it is owner-only from the moment it exists.</td></tr>
-<tr><td><code>default_dir</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-default_dir">793</a></td><td>The configuration directory the vault keeps its files in, if the environment says where one is.</td></tr>
-<tr><td><code>default_path</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-default_path">810</a></td><td>Where the lock file lives on this platform, if the environment says.</td></tr>
+<tr><td><code>AppLock::same_secret_as</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-same_secret_as">269</a></td><td>Whether two records hold the same stored password.</td></tr>
+<tr><td><code>AppLock::tampered</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-tampered">281</a></td><td>Whether a record has been found edited by somebody without the passphrase, at any point since this was last cleared.</td></tr>
+<tr><td><code>AppLock::acknowledge</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-acknowledge">289</a></td><td>Clear the tamper report, after proving the passphrase.</td></tr>
+<tr><td><code>AppLock::needs_upgrade</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-needs_upgrade">297</a></td><td>True when this record predates the authentication tag and should be rewritten once the passphrase is in hand.</td></tr>
+<tr><td><code>AppLock::tag_matches</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-applock-tag_matches">301</a></td><td></td></tr>
+<tr><td><code>AppLock::tag</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-applock-tag">318</a></td><td>The authentication tag over everything in the record before it.</td></tr>
+<tr><td><code>AppLock::cooldown</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-cooldown">329</a></td><td>Seconds still to wait before another attempt is accepted.</td></tr>
+<tr><td><code>AppLock::cooldown_at</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-applock-cooldown_at">333</a></td><td></td></tr>
+<tr><td><code>AppLock::failures</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-failures">346</a></td><td>Consecutive failed attempts recorded so far.</td></tr>
+<tr><td><code>AppLock::params</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-params">351</a></td><td>The Argon2id cost this lock was created with.</td></tr>
+<tr><td><code>AppLock::body</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-applock-body">370</a></td><td>The bytes the tag covers.</td></tr>
+<tr><td><code>AppLock::retag</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-retag">389</a></td><td>Draw a fresh nonce and re-tag the record under password.</td></tr>
+<tr><td><code>AppLock::to_bytes</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-to_bytes">420</a></td><td>Serialise exactly as it appears on disk.</td></tr>
+<tr><td><code>AppLock::parse</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-applock-parse">452</a></td><td>Parse a lock file, version 1 or version 2.</td></tr>
+<tr><td><code>derive_pair</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-derive_pair">551</a></td><td>Derive the verifier and the tag key for password.</td></tr>
+<tr><td><code>LockStore</code> <sub>pub struct</sub></td><td><a href="lock.src.html#fn-lockstore">576</a></td><td>An AppLock bound to a file, which is persisted after every attempt.</td></tr>
+<tr><td><code>Backing</code> <sub>enum</sub></td><td><a href="lock.src.html#fn-backing">592</a></td><td>Where a LockStore keeps its record.</td></tr>
+<tr><td><code>Backing::primary</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-backing-primary">598</a></td><td></td></tr>
+<tr><td><code>LockStore::open</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-open">612</a></td><td>Load the lock at path, or Ok(None) if no lock is configured there.</td></tr>
+<tr><td><code>LockStore::create</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-create">634</a></td><td>Create a lock at path, refusing to overwrite one already there.</td></tr>
+<tr><td><code>LockStore::unlock</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-unlock">655</a></td><td>Check password and persist the outcome.</td></tr>
+<tr><td><code>LockStore::tampered</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-tampered">675</a></td><td>Whether the stored record has been found edited by somebody without the passphrase.</td></tr>
+<tr><td><code>LockStore::acknowledge</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-acknowledge">687</a></td><td>Clear the tamper report, after proving the passphrase, and persist that.</td></tr>
+<tr><td><code>LockStore::report_tamper</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-report_tamper">702</a></td><td>Raise the tamper report from outside, and persist it if the passphrase allows.</td></tr>
+<tr><td><code>LockStore::change_password</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-change_password">707</a></td><td>Replace the password, after proving the current one.</td></tr>
+<tr><td><code>LockStore::remove</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-remove">731</a></td><td>Remove the lock, after proving the password.</td></tr>
+<tr><td><code>LockStore::cooldown</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-cooldown">740</a></td><td>Seconds still to wait before another attempt is accepted.</td></tr>
+<tr><td><code>LockStore::failures</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-failures">745</a></td><td>Consecutive failed attempts recorded so far.</td></tr>
+<tr><td><code>LockStore::path</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-path">751</a></td><td>Where this lock is stored.</td></tr>
+<tr><td><code>LockStore::save</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-lockstore-save">759</a></td><td>Write the record, and say whether every copy of it is now current.</td></tr>
+<tr><td><code>LockStore::every_copy_current</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-lockstore-every_copy_current">778</a></td><td>Whether the last write reached every copy.</td></tr>
+<tr><td><code>open_default</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-open_default">795</a></td><td>Open the lock at the default location, wherever this platform keeps it.</td></tr>
+<tr><td><code>create_default</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-create_default">817</a></td><td>Create a lock at the default location, refusing to replace one already there.</td></tr>
+<tr><td><code>write_private</code> <sub>fn</sub></td><td><a href="lock.src.html#fn-write_private">844</a></td><td>Write the lock file so it is owner-only from the moment it exists.</td></tr>
+<tr><td><code>default_dir</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-default_dir">855</a></td><td>The configuration directory the vault keeps its files in, if the environment says where one is.</td></tr>
+<tr><td><code>default_path</code> <sub>pub fn</sub></td><td><a href="lock.src.html#fn-default_path">872</a></td><td>Where the lock file lives on this platform, if the environment says.</td></tr>
 </tbody></table>
 </section>
 </div></div>

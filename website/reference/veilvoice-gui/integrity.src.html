@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/integrity.rs</code></h1>
-<p style="color:var(--muted)"><a href="integrity.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 361 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="integrity.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 386 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -272,162 +272,187 @@
 <span class="ln" id="L206">            .<span class="tok-fn">and_then</span>(|bytes| Manifest::<span class="tok-fn">open_sealed</span>(pw.<span class="tok-fn">as_bytes</span>(), &amp;bytes).<span class="tok-fn">ok</span>())</span>
 <span class="ln" id="L207">        {</span>
 <span class="ln" id="L208">            <span class="tok-fn">Some</span>(m) =&gt; <span class="tok-fn">Some</span>((m, true)),</span>
-<span class="ln" id="L209">            <span class="tok-com">// A sealed record that will not open is not an absent record. It</span></span>
-<span class="ln" id="L210">            <span class="tok-com">// may be a wrong passphrase, and it may be the tampering this is</span></span>
-<span class="ln" id="L211">            <span class="tok-com">// here to find; either way, treating it as absent would overwrite</span></span>
-<span class="ln" id="L212">            <span class="tok-com">// the evidence.</span></span>
-<span class="ln" id="L213">            None =&gt; {</span>
-<span class="ln" id="L214">                <span class="tok-kw">return</span> State::<span class="tok-fn">Failed</span>(</span>
-<span class="ln" id="L215">                    <span class="tok-str">&quot;the sealed integrity record could not be opened with this passphrase&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L216">                )</span>
-<span class="ln" id="L217">            }</span>
-<span class="ln" id="L218">        },</span>
-<span class="ln" id="L219">        _ =&gt; Manifest::<span class="tok-fn">load</span>(&amp;plain).<span class="tok-fn">ok</span>().<span class="tok-fn">map</span>(|m| (m, false)),</span>
-<span class="ln" id="L220">    };</span>
-<span class="ln" id="L221"></span>
-<span class="ln" id="L222">    <span class="tok-kw">match</span> existing {</span>
-<span class="ln" id="L223">        <span class="tok-fn">Some</span>((manifest, was_sealed)) =&gt; {</span>
-<span class="ln" id="L224">            <span class="tok-kw">let</span> report = manifest.check::&lt;PathBuf&gt;(&amp;[]);</span>
-<span class="ln" id="L225">            <span class="tok-kw">if</span> report.<span class="tok-fn">is_clean</span>() {</span>
-<span class="ln" id="L226">                State::Clean {</span>
-<span class="ln" id="L227">                    files: report.unchanged,</span>
-<span class="ln" id="L228">                    sealed: was_sealed,</span>
-<span class="ln" id="L229">                }</span>
-<span class="ln" id="L230">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L231">                State::<span class="tok-fn">Changed</span>(report.changes.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|c| c.<span class="tok-fn">describe</span>()).<span class="tok-fn">collect</span>())</span>
-<span class="ln" id="L232">            }</span>
-<span class="ln" id="L233">        }</span>
-<span class="ln" id="L234">        None =&gt; <span class="tok-kw">match</span> Manifest::<span class="tok-fn">of</span>(&amp;files) {</span>
-<span class="ln" id="L235">            <span class="tok-fn">Err</span>(e) =&gt; State::<span class="tok-fn">Failed</span>(e.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L236">            <span class="tok-fn">Ok</span>(manifest) =&gt; <span class="tok-kw">match</span> password {</span>
-<span class="ln" id="L237">                <span class="tok-fn">Some</span>(pw) =&gt; <span class="tok-kw">match</span> manifest.<span class="tok-fn">seal</span>(pw.<span class="tok-fn">as_bytes</span>()) {</span>
-<span class="ln" id="L238">                    <span class="tok-fn">Err</span>(e) =&gt; State::<span class="tok-fn">Failed</span>(e.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L239">                    <span class="tok-fn">Ok</span>(bytes) =&gt; <span class="tok-kw">match</span> <span class="tok-fn">write_private</span>(&amp;sealed, &amp;bytes) {</span>
-<span class="ln" id="L240">                        <span class="tok-fn">Err</span>(e) =&gt; State::<span class="tok-fn">Failed</span>(e),</span>
-<span class="ln" id="L241">                        <span class="tok-fn">Ok</span>(()) =&gt; {</span>
-<span class="ln" id="L242">                            <span class="tok-com">// A plain record left beside a sealed one is a</span></span>
-<span class="ln" id="L243">                            <span class="tok-com">// downgrade waiting to be used.</span></span>
-<span class="ln" id="L244">                            <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;plain);</span>
-<span class="ln" id="L245">                            State::Recorded { sealed: true }</span>
-<span class="ln" id="L246">                        }</span>
-<span class="ln" id="L247">                    },</span>
-<span class="ln" id="L248">                },</span>
-<span class="ln" id="L249">                None =&gt; <span class="tok-kw">match</span> manifest.<span class="tok-fn">save</span>(&amp;plain) {</span>
-<span class="ln" id="L250">                    <span class="tok-fn">Err</span>(e) =&gt; State::<span class="tok-fn">Failed</span>(e.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L251">                    <span class="tok-fn">Ok</span>(()) =&gt; State::Recorded { sealed: false },</span>
-<span class="ln" id="L252">                },</span>
-<span class="ln" id="L253">            },</span>
-<span class="ln" id="L254">        },</span>
-<span class="ln" id="L255">    }</span>
-<span class="ln" id="L256">}</span>
+<span class="ln" id="L209">            <span class="tok-com">// A sealed record that will not open is not an absent record.</span></span>
+<span class="ln" id="L210">            <span class="tok-com">// Treating it as absent would overwrite the evidence with a fresh</span></span>
+<span class="ln" id="L211">            <span class="tok-com">// record of whatever is on disk now, which is exactly what somebody</span></span>
+<span class="ln" id="L212">            <span class="tok-com">// who had changed those files would want to happen.</span></span>
+<span class="ln" id="L213">            <span class="tok-com">//</span></span>
+<span class="ln" id="L214">            <span class="tok-com">// The passphrase cannot be the reason: this only runs after an</span></span>
+<span class="ln" id="L215">            <span class="tok-com">// unlock that proved it. So the honest report is that the record</span></span>
+<span class="ln" id="L216">            <span class="tok-com">// will not open, and that a record that will not open is one of the</span></span>
+<span class="ln" id="L217">            <span class="tok-com">// things this is here to notice.</span></span>
+<span class="ln" id="L218">            None =&gt; {</span>
+<span class="ln" id="L219">                <span class="tok-kw">return</span> State::<span class="tok-fn">Failed</span>(</span>
+<span class="ln" id="L220">                    <span class="tok-str">&quot;the sealed record of VeilVoice&#x27;s own files will not open. It has been \</span></span>
+<span class="ln" id="L221"><span class="tok-str">                     changed or damaged since it was written.&quot;</span></span>
+<span class="ln" id="L222">                        .<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L223">                )</span>
+<span class="ln" id="L224">            }</span>
+<span class="ln" id="L225">        },</span>
+<span class="ln" id="L226">        _ =&gt; Manifest::<span class="tok-fn">load</span>(&amp;plain).<span class="tok-fn">ok</span>().<span class="tok-fn">map</span>(|m| (m, false)),</span>
+<span class="ln" id="L227">    };</span>
+<span class="ln" id="L228"></span>
+<span class="ln" id="L229">    <span class="tok-kw">match</span> existing {</span>
+<span class="ln" id="L230">        <span class="tok-fn">Some</span>((manifest, was_sealed)) =&gt; {</span>
+<span class="ln" id="L231">            <span class="tok-kw">let</span> report = manifest.check::&lt;PathBuf&gt;(&amp;[]);</span>
+<span class="ln" id="L232">            <span class="tok-kw">if</span> !report.<span class="tok-fn">is_clean</span>() {</span>
+<span class="ln" id="L233">                <span class="tok-kw">return</span> State::<span class="tok-fn">Changed</span>(report.changes.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|c| c.<span class="tok-fn">describe</span>()).<span class="tok-fn">collect</span>());</span>
+<span class="ln" id="L234">            }</span>
+<span class="ln" id="L235">            <span class="tok-com">// A plain record found while a passphrase is in hand is upgraded.</span></span>
+<span class="ln" id="L236">            <span class="tok-com">// Somebody who sets an app lock after their first run would</span></span>
+<span class="ln" id="L237">            <span class="tok-com">// otherwise keep the readable record for ever, having done exactly</span></span>
+<span class="ln" id="L238">            <span class="tok-com">// what would earn them the sealed one.</span></span>
+<span class="ln" id="L239">            <span class="tok-com">//</span></span>
+<span class="ln" id="L240">            <span class="tok-com">// Only after the check has come back clean. Sealing a record that</span></span>
+<span class="ln" id="L241">            <span class="tok-com">// no longer matches the files would seal somebody else&#x27;s version of</span></span>
+<span class="ln" id="L242">            <span class="tok-com">// them and call it authoritative.</span></span>
+<span class="ln" id="L243">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(pw), false) = (password, was_sealed) {</span>
+<span class="ln" id="L244">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(bytes) = manifest.<span class="tok-fn">seal</span>(pw.<span class="tok-fn">as_bytes</span>()) {</span>
+<span class="ln" id="L245">                    <span class="tok-kw">if</span> <span class="tok-fn">write_private</span>(&amp;sealed, &amp;bytes).<span class="tok-fn">is_ok</span>() {</span>
+<span class="ln" id="L246">                        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;plain);</span>
+<span class="ln" id="L247">                        <span class="tok-kw">return</span> State::Clean {</span>
+<span class="ln" id="L248">                            files: report.unchanged,</span>
+<span class="ln" id="L249">                            sealed: true,</span>
+<span class="ln" id="L250">                        };</span>
+<span class="ln" id="L251">                    }</span>
+<span class="ln" id="L252">                }</span>
+<span class="ln" id="L253">            }</span>
+<span class="ln" id="L254">            State::Clean {</span>
+<span class="ln" id="L255">                files: report.unchanged,</span>
+<span class="ln" id="L256">                sealed: was_sealed,</span>
+<span class="ln" id="L257">            }</span>
+<span class="ln" id="L258">        }</span>
+<span class="ln" id="L259">        None =&gt; <span class="tok-kw">match</span> Manifest::<span class="tok-fn">of</span>(&amp;files) {</span>
+<span class="ln" id="L260">            <span class="tok-fn">Err</span>(e) =&gt; State::<span class="tok-fn">Failed</span>(e.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L261">            <span class="tok-fn">Ok</span>(manifest) =&gt; <span class="tok-kw">match</span> password {</span>
+<span class="ln" id="L262">                <span class="tok-fn">Some</span>(pw) =&gt; <span class="tok-kw">match</span> manifest.<span class="tok-fn">seal</span>(pw.<span class="tok-fn">as_bytes</span>()) {</span>
+<span class="ln" id="L263">                    <span class="tok-fn">Err</span>(e) =&gt; State::<span class="tok-fn">Failed</span>(e.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L264">                    <span class="tok-fn">Ok</span>(bytes) =&gt; <span class="tok-kw">match</span> <span class="tok-fn">write_private</span>(&amp;sealed, &amp;bytes) {</span>
+<span class="ln" id="L265">                        <span class="tok-fn">Err</span>(e) =&gt; State::<span class="tok-fn">Failed</span>(e),</span>
+<span class="ln" id="L266">                        <span class="tok-fn">Ok</span>(()) =&gt; {</span>
+<span class="ln" id="L267">                            <span class="tok-com">// A plain record left beside a sealed one is a</span></span>
+<span class="ln" id="L268">                            <span class="tok-com">// downgrade waiting to be used.</span></span>
+<span class="ln" id="L269">                            <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;plain);</span>
+<span class="ln" id="L270">                            State::Recorded { sealed: true }</span>
+<span class="ln" id="L271">                        }</span>
+<span class="ln" id="L272">                    },</span>
+<span class="ln" id="L273">                },</span>
+<span class="ln" id="L274">                None =&gt; <span class="tok-kw">match</span> manifest.<span class="tok-fn">save</span>(&amp;plain) {</span>
+<span class="ln" id="L275">                    <span class="tok-fn">Err</span>(e) =&gt; State::<span class="tok-fn">Failed</span>(e.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L276">                    <span class="tok-fn">Ok</span>(()) =&gt; State::Recorded { sealed: false },</span>
+<span class="ln" id="L277">                },</span>
+<span class="ln" id="L278">            },</span>
+<span class="ln" id="L279">        },</span>
+<span class="ln" id="L280">    }</span>
+<span class="ln" id="L281">}</span>
 </span>
-<span class="ln" id="L257"></span>
+<span class="ln" id="L282"></span>
 <span class="src-item" id="fn-write_private">
-<span class="ln" id="L258"><span class="tok-kw">fn</span> <span class="tok-fn">write_private</span>(path: &amp;std::path::Path, bytes: &amp;[u8]) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L259">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
-<span class="ln" id="L260">        <span class="tok-kw">if</span> !parent.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L261">            std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L262">        }</span>
-<span class="ln" id="L263">    }</span>
-<span class="ln" id="L264">    veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(path, bytes).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L265">}</span>
+<span class="ln" id="L283"><span class="tok-kw">fn</span> <span class="tok-fn">write_private</span>(path: &amp;std::path::Path, bytes: &amp;[u8]) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L284">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
+<span class="ln" id="L285">        <span class="tok-kw">if</span> !parent.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L286">            std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L287">        }</span>
+<span class="ln" id="L288">    }</span>
+<span class="ln" id="L289">    veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(path, bytes).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L290">}</span>
 </span>
-<span class="ln" id="L266"></span>
-<span class="ln" id="L267"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L268"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L269">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L270"></span>
-<span class="ln" id="L271">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L272">    <span class="tok-kw">fn</span> <span class="tok-fn">a_fresh_record_is_idle_and_not_busy</span>() {</span>
-<span class="ln" id="L273">        <span class="tok-kw">let</span> guard = Integrity::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L274">        assert_eq!(guard.<span class="tok-fn">state</span>(), &amp;State::Idle);</span>
-<span class="ln" id="L275">        assert!(!guard.<span class="tok-fn">is_busy</span>());</span>
-<span class="ln" id="L276">        assert!(!guard.<span class="tok-fn">changed</span>());</span>
-<span class="ln" id="L277">    }</span>
-<span class="ln" id="L278"></span>
-<span class="ln" id="L279">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L280">    <span class="tok-kw">fn</span> <span class="tok-fn">polling_with_nothing_running_reports_no_change</span>() {</span>
-<span class="ln" id="L281">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> guard = Integrity::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L282">        assert!(!guard.<span class="tok-fn">poll</span>());</span>
-<span class="ln" id="L283">    }</span>
-<span class="ln" id="L284"></span>
-<span class="ln" id="L285">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L286">    <span class="tok-kw">fn</span> <span class="tok-fn">a_disconnected_worker_is_reported_rather_than_waited_for</span>() {</span>
-<span class="ln" id="L287">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> guard = Integrity::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L288">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L289">        guard.pending = <span class="tok-fn">Some</span>(rx);</span>
-<span class="ln" id="L290">        <span class="tok-fn">drop</span>(tx);</span>
-<span class="ln" id="L291">        assert!(guard.<span class="tok-fn">poll</span>());</span>
-<span class="ln" id="L292">        assert!(matches!(guard.<span class="tok-fn">state</span>(), State::<span class="tok-fn">Failed</span>(_)));</span>
-<span class="ln" id="L293">        assert!(!guard.<span class="tok-fn">is_busy</span>());</span>
-<span class="ln" id="L294">    }</span>
+<span class="ln" id="L291"></span>
+<span class="ln" id="L292"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L293"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L294">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L295"></span>
-<span class="ln" id="L296">    <span class="tok-com">/// The window must never wait on the disk. This is the same guard the</span></span>
-<span class="ln" id="L297">    <span class="tok-com">/// drawing thread carries, applied to the one module that reads files.</span></span>
-<span class="ln" id="L298">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L299">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_blocks_the_drawing_thread</span>() {</span>
-<span class="ln" id="L300">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;integrity.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L301">        <span class="tok-com">// Everything above the test module. The tests themselves name the very</span></span>
-<span class="ln" id="L302">        <span class="tok-com">// calls they forbid, and the first version of this counted its own</span></span>
-<span class="ln" id="L303">        <span class="tok-com">// assertion as the violation.</span></span>
-<span class="ln" id="L304">        <span class="tok-kw">let</span> shipped = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L305">        <span class="tok-kw">let</span> body: String = shipped</span>
-<span class="ln" id="L306">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L307">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
-<span class="ln" id="L308">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L309">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L310">        <span class="tok-kw">let</span> waits = body.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;recv()&quot;</span>).<span class="tok-fn">count</span>() - body.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;try_recv()&quot;</span>).<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L311">        assert_eq!(waits, <span class="tok-num">0</span>, <span class="tok-str">&quot;a blocking receive reached the window&#x27;s own code&quot;</span>);</span>
-<span class="ln" id="L312">        assert!(</span>
-<span class="ln" id="L313">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.join()&quot;</span>),</span>
-<span class="ln" id="L314">            <span class="tok-str">&quot;the window must not join the worker thread&quot;</span></span>
-<span class="ln" id="L315">        );</span>
-<span class="ln" id="L316">    }</span>
-<span class="ln" id="L317"></span>
-<span class="ln" id="L318">    <span class="tok-com">/// A sealed record must win over a plain one wherever both are present, or</span></span>
-<span class="ln" id="L319">    <span class="tok-com">/// dropping a plain file beside the sealed one downgrades the check.</span></span>
-<span class="ln" id="L320">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L321">    <span class="tok-kw">fn</span> <span class="tok-fn">the_sealed_record_is_preferred_over_a_plain_one</span>() {</span>
-<span class="ln" id="L322">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;integrity.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L323">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn run(password&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;run has to exist&quot;</span>);</span>
-<span class="ln" id="L324">        <span class="tok-kw">let</span> body = &amp;source[start..];</span>
-<span class="ln" id="L325">        <span class="tok-kw">let</span> sealed_at = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;Manifest::open_sealed&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;sealed read&quot;</span>);</span>
-<span class="ln" id="L326">        <span class="tok-kw">let</span> plain_at = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;Manifest::load&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;plain read&quot;</span>);</span>
-<span class="ln" id="L327">        assert!(</span>
-<span class="ln" id="L328">            sealed_at &lt; plain_at,</span>
-<span class="ln" id="L329">            <span class="tok-str">&quot;the plain record is consulted before the sealed one&quot;</span></span>
-<span class="ln" id="L330">        );</span>
-<span class="ln" id="L331">    }</span>
-<span class="ln" id="L332"></span>
-<span class="ln" id="L333">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L334">    <span class="tok-kw">fn</span> <span class="tok-fn">the_record_sits_beside_the_app_lock</span>() {</span>
-<span class="ln" id="L335">        <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(record), <span class="tok-fn">Some</span>(lock)) = (<span class="tok-fn">record_path</span>(), veilvoice_crypto::lock::<span class="tok-fn">default_path</span>())</span>
-<span class="ln" id="L336">        <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L337">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L338">        };</span>
-<span class="ln" id="L339">        assert_eq!(record.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
-<span class="ln" id="L340">        assert!(record.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;integrity.manifest&quot;</span>));</span>
+<span class="ln" id="L296">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L297">    <span class="tok-kw">fn</span> <span class="tok-fn">a_fresh_record_is_idle_and_not_busy</span>() {</span>
+<span class="ln" id="L298">        <span class="tok-kw">let</span> guard = Integrity::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L299">        assert_eq!(guard.<span class="tok-fn">state</span>(), &amp;State::Idle);</span>
+<span class="ln" id="L300">        assert!(!guard.<span class="tok-fn">is_busy</span>());</span>
+<span class="ln" id="L301">        assert!(!guard.<span class="tok-fn">changed</span>());</span>
+<span class="ln" id="L302">    }</span>
+<span class="ln" id="L303"></span>
+<span class="ln" id="L304">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L305">    <span class="tok-kw">fn</span> <span class="tok-fn">polling_with_nothing_running_reports_no_change</span>() {</span>
+<span class="ln" id="L306">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> guard = Integrity::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L307">        assert!(!guard.<span class="tok-fn">poll</span>());</span>
+<span class="ln" id="L308">    }</span>
+<span class="ln" id="L309"></span>
+<span class="ln" id="L310">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L311">    <span class="tok-kw">fn</span> <span class="tok-fn">a_disconnected_worker_is_reported_rather_than_waited_for</span>() {</span>
+<span class="ln" id="L312">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> guard = Integrity::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L313">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L314">        guard.pending = <span class="tok-fn">Some</span>(rx);</span>
+<span class="ln" id="L315">        <span class="tok-fn">drop</span>(tx);</span>
+<span class="ln" id="L316">        assert!(guard.<span class="tok-fn">poll</span>());</span>
+<span class="ln" id="L317">        assert!(matches!(guard.<span class="tok-fn">state</span>(), State::<span class="tok-fn">Failed</span>(_)));</span>
+<span class="ln" id="L318">        assert!(!guard.<span class="tok-fn">is_busy</span>());</span>
+<span class="ln" id="L319">    }</span>
+<span class="ln" id="L320"></span>
+<span class="ln" id="L321">    <span class="tok-com">/// The window must never wait on the disk. This is the same guard the</span></span>
+<span class="ln" id="L322">    <span class="tok-com">/// drawing thread carries, applied to the one module that reads files.</span></span>
+<span class="ln" id="L323">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L324">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_blocks_the_drawing_thread</span>() {</span>
+<span class="ln" id="L325">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;integrity.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L326">        <span class="tok-com">// Everything above the test module. The tests themselves name the very</span></span>
+<span class="ln" id="L327">        <span class="tok-com">// calls they forbid, and the first version of this counted its own</span></span>
+<span class="ln" id="L328">        <span class="tok-com">// assertion as the violation.</span></span>
+<span class="ln" id="L329">        <span class="tok-kw">let</span> shipped = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L330">        <span class="tok-kw">let</span> body: String = shipped</span>
+<span class="ln" id="L331">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L332">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
+<span class="ln" id="L333">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L334">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L335">        <span class="tok-kw">let</span> waits = body.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;recv()&quot;</span>).<span class="tok-fn">count</span>() - body.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;try_recv()&quot;</span>).<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L336">        assert_eq!(waits, <span class="tok-num">0</span>, <span class="tok-str">&quot;a blocking receive reached the window&#x27;s own code&quot;</span>);</span>
+<span class="ln" id="L337">        assert!(</span>
+<span class="ln" id="L338">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.join()&quot;</span>),</span>
+<span class="ln" id="L339">            <span class="tok-str">&quot;the window must not join the worker thread&quot;</span></span>
+<span class="ln" id="L340">        );</span>
 <span class="ln" id="L341">    }</span>
 <span class="ln" id="L342"></span>
-<span class="ln" id="L343">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L344">    <span class="tok-kw">fn</span> <span class="tok-fn">the_sealed_name_is_not_the_plain_one</span>() {</span>
-<span class="ln" id="L345">        <span class="tok-kw">let</span> plain = PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/somewhere/integrity.manifest&quot;</span>);</span>
-<span class="ln" id="L346">        assert_ne!(<span class="tok-fn">sealed_path</span>(&amp;plain), plain);</span>
-<span class="ln" id="L347">    }</span>
-<span class="ln" id="L348"></span>
-<span class="ln" id="L349">    <span class="tok-com">/// The watched set has to name a real file rather than a guess about where</span></span>
-<span class="ln" id="L350">    <span class="tok-com">/// somebody installed this.</span></span>
-<span class="ln" id="L351">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L352">    <span class="tok-kw">fn</span> <span class="tok-fn">the_watched_files_are_ones_that_actually_exist</span>() {</span>
-<span class="ln" id="L353">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> <span class="tok-fn">targets</span>() {</span>
-<span class="ln" id="L354">            assert!(</span>
-<span class="ln" id="L355">                path.<span class="tok-fn">exists</span>(),</span>
-<span class="ln" id="L356">                <span class="tok-str">&quot;{} was recorded and is not there&quot;</span>,</span>
-<span class="ln" id="L357">                path.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L358">            );</span>
-<span class="ln" id="L359">        }</span>
-<span class="ln" id="L360">    }</span>
-<span class="ln" id="L361">}</span>
+<span class="ln" id="L343">    <span class="tok-com">/// A sealed record must win over a plain one wherever both are present, or</span></span>
+<span class="ln" id="L344">    <span class="tok-com">/// dropping a plain file beside the sealed one downgrades the check.</span></span>
+<span class="ln" id="L345">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L346">    <span class="tok-kw">fn</span> <span class="tok-fn">the_sealed_record_is_preferred_over_a_plain_one</span>() {</span>
+<span class="ln" id="L347">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;integrity.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L348">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn run(password&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;run has to exist&quot;</span>);</span>
+<span class="ln" id="L349">        <span class="tok-kw">let</span> body = &amp;source[start..];</span>
+<span class="ln" id="L350">        <span class="tok-kw">let</span> sealed_at = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;Manifest::open_sealed&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;sealed read&quot;</span>);</span>
+<span class="ln" id="L351">        <span class="tok-kw">let</span> plain_at = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;Manifest::load&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;plain read&quot;</span>);</span>
+<span class="ln" id="L352">        assert!(</span>
+<span class="ln" id="L353">            sealed_at &lt; plain_at,</span>
+<span class="ln" id="L354">            <span class="tok-str">&quot;the plain record is consulted before the sealed one&quot;</span></span>
+<span class="ln" id="L355">        );</span>
+<span class="ln" id="L356">    }</span>
+<span class="ln" id="L357"></span>
+<span class="ln" id="L358">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L359">    <span class="tok-kw">fn</span> <span class="tok-fn">the_record_sits_beside_the_app_lock</span>() {</span>
+<span class="ln" id="L360">        <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(record), <span class="tok-fn">Some</span>(lock)) = (<span class="tok-fn">record_path</span>(), veilvoice_crypto::lock::<span class="tok-fn">default_path</span>())</span>
+<span class="ln" id="L361">        <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L362">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L363">        };</span>
+<span class="ln" id="L364">        assert_eq!(record.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
+<span class="ln" id="L365">        assert!(record.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;integrity.manifest&quot;</span>));</span>
+<span class="ln" id="L366">    }</span>
+<span class="ln" id="L367"></span>
+<span class="ln" id="L368">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L369">    <span class="tok-kw">fn</span> <span class="tok-fn">the_sealed_name_is_not_the_plain_one</span>() {</span>
+<span class="ln" id="L370">        <span class="tok-kw">let</span> plain = PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/somewhere/integrity.manifest&quot;</span>);</span>
+<span class="ln" id="L371">        assert_ne!(<span class="tok-fn">sealed_path</span>(&amp;plain), plain);</span>
+<span class="ln" id="L372">    }</span>
+<span class="ln" id="L373"></span>
+<span class="ln" id="L374">    <span class="tok-com">/// The watched set has to name a real file rather than a guess about where</span></span>
+<span class="ln" id="L375">    <span class="tok-com">/// somebody installed this.</span></span>
+<span class="ln" id="L376">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L377">    <span class="tok-kw">fn</span> <span class="tok-fn">the_watched_files_are_ones_that_actually_exist</span>() {</span>
+<span class="ln" id="L378">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> <span class="tok-fn">targets</span>() {</span>
+<span class="ln" id="L379">            assert!(</span>
+<span class="ln" id="L380">                path.<span class="tok-fn">exists</span>(),</span>
+<span class="ln" id="L381">                <span class="tok-str">&quot;{} was recorded and is not there&quot;</span>,</span>
+<span class="ln" id="L382">                path.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L383">            );</span>
+<span class="ln" id="L384">        }</span>
+<span class="ln" id="L385">    }</span>
+<span class="ln" id="L386">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

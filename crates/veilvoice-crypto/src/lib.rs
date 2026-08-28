@@ -147,6 +147,9 @@ pub enum Error {
     AppLockCooldown(u64),
     /// The app-lock file could not be read, written or removed.
     AppLockStore,
+    /// The password was changed, but the second copy of the lock could not be
+    /// updated, so it still holds the previous one.
+    AppLockSpareStale,
 }
 
 impl std::fmt::Display for Error {
@@ -184,6 +187,11 @@ impl std::fmt::Display for Error {
                 return write!(f, "too many attempts — wait {secs}s before trying again")
             }
             Self::AppLockStore => "could not read or write the app-lock file",
+            Self::AppLockSpareStale => {
+                "the password was changed here, but the administrator-owned copy of the lock \
+                 still holds the previous one. Run VeilVoice as an administrator once to \
+                 finish the change."
+            }
         };
         f.write_str(msg)
     }
