@@ -91,8 +91,23 @@ def shell(index_html):
     }
 
 
-def page(parts, section_id, title, description, body):
-    """One section, as a complete document."""
+def page(parts, section_id, title, description, body, relink_body=True):
+    """One section, as a complete document.
+
+    `relink_body` is for the callers that are not sections. A section's body
+    came out of `index.html` and its `#anchor` links point at *other* sections,
+    which exist on the front page and not on this one, so they are rewritten.
+    A page written for itself, like the questions page with its own contents
+    list, has `#anchor` links that point at its own headings, and rewriting
+    those sends every one of them to the front page where they land nowhere.
+
+    Found by `source.test.js`, which checks that a fragment naming another page
+    resolves on it. Twenty of them did not.
+
+    The header and the footer are relinked either way: the navigation is shared
+    from `index.html` and is full of `#what` and `#download`, whoever is
+    calling.
+    """
     head = parts["head"]
     head = re.sub(r"<title>.*?</title>", "<title>%s &mdash; VeilVoice</title>" % title,
                   head, count=1, flags=re.S)
@@ -112,7 +127,8 @@ def page(parts, section_id, title, description, body):
     def relink(text):
         return re.sub(r'href="#([a-z-]+)"', r'href="index.html#\1"', text)
 
-    body = relink(body)
+    if relink_body:
+        body = relink(body)
     header = relink(parts["header"])
     footer = relink(parts["footer"])
 

@@ -8,6 +8,28 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Twenty questions, answered, including the ones where the answer is no
+
+Marker 68. `docs/FAQ.md` and the page it renders to. Answers to what actually
+gets asked, and roughly half of them are limits rather than features: it does
+not hide what you said, it cannot tell who is speaking, it cannot detect a
+keylogger and nothing can, the app lock does not protect your recordings, the
+decoy passphrase is not deniability, and it has been audited only by its
+author.
+
+The answers live in a Markdown file because that file is readable on GitHub, in
+a checkout, and by somebody who cloned this and never opened the website, which
+is the audience this project keeps writing for. The page is generated from it
+and checked in CI, and the contents list at the top is derived from the
+headings rather than kept beside them.
+
+Building it found one defect in the tool the roadmap page also uses.
+`split.page` rewrites every `#anchor` in a body to `index.html#anchor`, which
+is right for a section lifted off the front page and wrong for a page written
+for itself: all twenty entries in the new contents list pointed at the front
+page, where none of them exists. Caught by `source.test.js`, the suite added
+with the source pages, doing exactly what it was written for.
+
 ### A working model of the application, and of the command line, in the page
 
 Marker 67. Everything else on the site describes the program. The screenshots

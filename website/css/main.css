@@ -891,6 +891,34 @@ html:not(.js) .bn { display: none; }
   .demo-mark { animation: none; }
 }
 
+/* ---------- the questions page ---------- */
+/*
+ * The contents list at the top of the questions page. Two columns on a wide
+ * screen, because twenty questions in one column is a page of links somebody
+ * scrolls past to reach the first answer, and one column on a narrow one,
+ * where two would be four words wide each.
+ */
+.faq-list { margin: 0 0 26px; }
+.faq-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 30px;
+}
+.faq-list li {
+  margin: 0 0 7px;
+  /* A question must not be split down the middle of the page. */
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+}
+.faq-list a { color: var(--muted); border: 0; }
+.faq-list a:hover { color: var(--accent); }
+
+@media (max-width: 720px) {
+  .faq-list ul { columns: 1; }
+}
+
 /* ---------- the interactive model ---------- */
 /*
  * `website/js/demo.js` draws a working model of the application and of the
