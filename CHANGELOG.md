@@ -8,6 +8,35 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### CI now runs the tests where a pointer is 32 bits wide
+
+`docs/AUDIT.md` has named this as the single highest-value change available to
+CI since the fifth round, and for a specific reason: **two shipped defects came
+out of its absence.** F-4 was an arithmetic overflow and F-11 was an erase loop
+that never terminated and left the file it was destroying intact. Both were
+reachable only on a 32-bit target, both were found by reading, and neither was
+reachable by any campaign in a matrix where every entry is 64-bit.
+
+The new job runs two targets. `i686-unknown-linux-gnu` runs on the runner's own
+kernel with nothing emulated. `armv7-unknown-linux-gnueabihf` is compiled with
+the cross linker and only its test binaries go through `qemu-arm-static`.
+Measured before the job was written: **the same 682 tests across 47 suites pass
+on both**, with 18 seconds of execution on i686 and 88 on armv7, so emulation
+is not what this costs. Compilation is.
+
+**It is not the whole workspace**, and the reason is packaging rather than
+correctness: four crates link ALSA, GTK and X11, and building those for a
+second architecture is a multiarch sysroot exercise. The arithmetic, the
+parsers and the erase loop are in the crates the job does run. The crate list
+is spelled out rather than written as an exclusion, so a crate added to the
+workspace is absent until somebody decides it belongs, rather than joining
+silently and failing for a linker reason that has nothing to do with 32-bit
+arithmetic.
+
+A passing run is not a campaign, and the audit entry says so: this shows the
+existing tests hold where a pointer is narrow, not that anybody has gone
+hunting there.
+
 ### F-79 - a security step that printed somebody else's error above its own "ok"
 
 The installer fetches the signing key from the website, and from the repository

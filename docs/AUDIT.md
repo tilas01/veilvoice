@@ -2189,12 +2189,31 @@ the top of this document now says.
    this" are different claims and only the first is true. `fuzz/README.md`
    says so in the same words.
 
-3. **32-bit targets are still not exercised in CI.** This is now the source of
-   *two* shipped defects rather than one: F-4 (an overflow) and F-11 (a
-   non-terminating erase loop), both reachable only on a 32-bit target, both
-   found by reading, and neither reachable by any campaign on an x86-64 host.
-   The matrix is Windows, macOS and Linux on x86-64. Adding `i686` and
-   `armv7` under emulation is the single highest-value change available to CI.
+3. **32-bit targets are now exercised in CI, and this entry says what that
+   does and does not cover.** It had been open since the fifth round, named
+   here as the single highest-value change available to CI, because *two*
+   shipped defects came out of its absence: F-4 (an overflow) and F-11 (a
+   non-terminating erase loop), both reachable only where a pointer is 32 bits
+   wide, both found by reading, and neither reachable by any campaign on an
+   x86-64 host.
+
+   The `narrow` job runs `i686-unknown-linux-gnu` on the runner's own kernel
+   and `armv7-unknown-linux-gnueabihf` under `qemu-user-static`. Measured
+   before it was written: the same 682 tests across 47 suites pass on both,
+   with 18 seconds of execution on i686 and 88 on armv7.
+
+   **It is not the whole workspace.** `veilvoice-audio`, `veilvoice-cli`,
+   `veilvoice-gui` and `veilvoice-video` link ALSA, GTK and X11, and building
+   those for a second architecture is a multiarch sysroot exercise rather than
+   a 32-bit correctness one. The arithmetic, the parsers and the erase loop are
+   in the crates the job does run, which is why those are the ones it runs.
+   Neither target has been exercised on Windows or macOS, and no 32-bit
+   *release* build is published for any platform.
+
+   And a passing run is not the same as a campaign: this proves the existing
+   tests hold where a pointer is narrow, not that a narrow pointer has been
+   hunted for. F-4 and F-11 were found by reading, and reading is still what
+   would find the next one.
 
 4. **A hostile file in a format VeilVoice does not itself parse.** F-9's
    pre-flight covers the one confirmed decoder crash. Under `panic = "abort"`
