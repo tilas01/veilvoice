@@ -8,6 +8,46 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Every workflow chart now carries its own colour key and explanation
+
+Marker 69. There are 303 of these drawings, one per crate and one per file, and
+until now each of them needed the page around it to mean anything: the colour
+key was a line of Markdown beside the picture and the explanation was a
+paragraph under it. That is fine on the page and useless everywhere else the
+drawing goes, which is a README, the wiki, and an `<img>` where nothing around
+it travels with it.
+
+Both are inside the picture now, wrapped to the canvas. So is a fourth entry
+the key never had: what the dashed line means, which a reader previously had to
+guess.
+
+**The arrows are coloured by where they come from**, so a reader can follow one
+call out of a box without tracing every line back to its start. That needs one
+arrowhead per colour rather than one in total, because an SVG marker does not
+inherit the stroke of the path it is on and `context-stroke` is not in every
+engine this site supports. A back edge stays one colour for all of them: what
+matters there is telling a cycle from a step, and colouring those by origin
+would bury it under five hues.
+
+**And a long name wraps instead of being cut.** It used to become an ellipsis
+past thirty characters. No name in the tree was long enough to trigger it,
+which is exactly why it was worth fixing rather than leaving: a truncation that
+has never fired is one waiting for the first long name, in a picture whose only
+job is saying what the box is.
+
+Getting that right took two goes, and the second failure is the more
+instructive. The first replacement wrapped to two lines and then cut the second
+one, so `DeidConfig::reseed_range_is_finer_than_a_frame` came out as
+`reseed_range_is_finer_than_a_f` with no ellipsis to admit it: the same defect
+with a longer fuse and less honesty. Names now break after their `::` and after
+an underscore, which is where a reader breaks them anyway, and only a run with
+no boundary in it at all is split by width.
+
+The note being clipped by the bottom edge of its own picture was the same
+shape of mistake in the third place: the height was worked out in one function
+and drawn in another, and the two disagreed by one row of the key. They are one
+function now.
+
 ### Twenty questions, answered, including the ones where the answer is no
 
 Marker 68. `docs/FAQ.md` and the page it renders to. Answers to what actually

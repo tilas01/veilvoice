@@ -82,13 +82,13 @@ flowchart TD
     n_seed_wav["seed_wav<br/>line 62"]
     n_mutate["mutate<br/>line 94"]
     n_check_output["check_output<br/>line 168"]
-    n_the_chunk_walker_survives_hostile_input["the_chunk_walker_survives_hos…<br/>line 192"]
-    n_the_realistic_policy_survives_hostile_input["the_realistic_policy_survives…<br/>line 208"]
-    n_pure_noise_is_rejected_or_handled["pure_noise_is_rejected_or_han…<br/>line 224"]
+    n_the_chunk_walker_survives_hostile_input["the_chunk_walker_survives_hostile_<br/>input<br/>line 192"]
+    n_the_realistic_policy_survives_hostile_input["the_realistic_policy_survives_hostile_<br/>input<br/>line 208"]
+    n_pure_noise_is_rejected_or_handled["pure_noise_is_rejected_or_handled<br/>line 224"]
     n_cleaning_is_idempotent["cleaning_is_idempotent<br/>line 238"]
-    n_every_truncation_of_a_valid_file_is_handled["every_truncation_of_a_valid_f…<br/>line 250"]
-    n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic["a_riff_size_of_u32_max_does_n…<br/>line 265"]
-    n_zero_sized_chunks_do_not_stall_the_walker["zero_sized_chunks_do_not_stal…<br/>line 282"]
+    n_every_truncation_of_a_valid_file_is_handled["every_truncation_of_a_valid_file_is_<br/>handled<br/>line 250"]
+    n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic["a_riff_size_of_u32_max_does_not_<br/>overflow_the_length_arithmetic<br/>line 265"]
+    n_zero_sized_chunks_do_not_stall_the_walker["zero_sized_chunks_do_not_stall_the_<br/>walker<br/>line 282"]
     n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic --> n_check_output
     n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic --> n_seed_wav
     n_below --> n_next_u32
