@@ -177,7 +177,23 @@ being sure it is working. Neither is answered by more features.
 | 70 | **This roadmap, published as a page**, with a picture of what is done and what is not, generated from this file so the two cannot disagree | **done** | — |
 | 71 | **A video of the roadmap**, scrolling what is finished, with a short pause and a countdown before it repeats | **done** | — |
 | 72 | **The front page animation, in more depth** — the same picture, saying what the engine actually does to the signal rather than one word | **done** | — |
-| 73 | **A full security and functionality audit, and an optimisation pass, before the next deploy** — the whole tree, both halves, and the last thing that happens | **next** | 4–6 d |
+| 73 | **A full security and functionality audit, and an optimisation pass, before the next deploy** — the whole tree, both halves, and the last thing that happens | **done** | — |
+
+## The lock, the guard, and a window that does not stutter
+
+Asked for after the tenth audit round. Four of these are one subject seen from
+different sides: the app lock is the weakest control this project ships, it is
+described as such in several places, and the request is to make it as strong as
+it can honestly be made rather than to keep apologising for it.
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 74 | **The lock screen tells an attacker nothing** — no explanation of what the lock is or is not worth while it is locked, the account of that moved to the documentation and to the unlocked application, and a small animation in its place | **next** | 1 d |
+| 75 | **`veilvoice-guard` inside the desktop application** — the integrity record taken at install and checked at every launch, sealed with the existing cryptography rather than left in the clear | **planned** | 2–3 d |
+| 76 | **The app lock, hardened as far as it honestly goes** — the file stored where only an administrator can write it, its contents and its name randomised, a tamper check on every read, restoration from the sealed copy when it fails, and an alert that does not go away until the tamper passphrase is given | **planned** | 4–5 d |
+| 77 | **What the lock is worth, written down properly** — one account, in the documentation, covering what the hardening buys and what it does not | **planned** | 1 d |
+| 78 | **Every website palette in the application, chosen from the interface** | **planned** | 1 d |
+| 79 | **A window that does not stutter** — the interface measured rather than described, every task off the drawing thread, and the smallest amount of code that does it | **planned** | 3–4 d |
 
 ## Finally
 
@@ -477,6 +493,29 @@ when run from a terminal. Switching at run time is FFI, and every crate here
 carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
 maintainer's call and not something to slip in, so it waits for one.
 
+**Markers 74 to 79, and the two places they meet a rule this project already
+has.**
+
+*Storing the lock where only an administrator can write it* is worth having and
+it runs into marker 39's decision, which is that VeilVoice **never acquires
+privilege**: it does not re-launch itself elevated, install a service, or ask
+for a password, because those are changes to somebody's machine and they belong
+to the person whose machine it is. The shape that keeps both: when VeilVoice is
+*already* running with administrator rights it writes the lock somewhere only
+an administrator can, and when it is not it says so, prints the one command
+that would move it there, and carries on with the file it can write. What it
+will not do is prompt for elevation on its own.
+
+*Hiding the file's name and contents* is obscurity, and obscurity is not a
+security property. Randomising where the lock lives and what it looks like
+raises the cost for somebody poking around and stops nothing that a determined
+local attacker with a debugger will do. It is worth doing for the first case
+and it must not be described as protection against the second. Marker 77 is
+that sentence, written where a user reads it, and marker 74 is the decision
+that the *lock screen* is not the place for it: telling somebody standing at a
+locked window what the lock cannot do is helping the one person who should not
+be told.
+
 **Marker 71 is an animation rather than an encoded file, and that is a
 decision.** A video was asked for and a video is the right shape for it:
 something to watch rather than a picture with a long dead pause in it. What it
@@ -566,7 +605,7 @@ on older engines, which is reasoning rather than evidence. This page will not
 say those two work until somebody has looked.
 
 **Marker 54's audit rounds are done and its deploy has been happening all
-along.** Nine rounds, eighty-three defects, and releases published from tags
+along.** Ten rounds, eighty-four defects, and releases published from tags
 with reproducibility checked per platform. There was never a single production
 deploy to save up for.
 
