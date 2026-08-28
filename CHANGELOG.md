@@ -8,6 +8,69 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The Debian package has been built, installed and run
+
+`docs/AUDIT.md` has listed "none of the package definitions has been built" as
+open since the fourth round. One of the six is now closed.
+
+`dpkg-buildpackage -us -uc -b` produced `veilvoice_0.1.14-1_amd64.deb` and
+`veilvoice-gui_0.1.14-1_amd64.deb`. Both installed with `dpkg -i`, the
+installed `veilvoice --version` reported 0.1.14, `veilvoice info` and
+`veilvoice-verify --help` ran, and both removed cleanly. The release build and
+`cargo test --release --workspace` ran as part of it, because that is what
+`debian/rules` does.
+
+One machine, x86-64, Ubuntu 24.04, with a rustup toolchain rather than Debian's
+own `cargo` and `rustc` packages, which is why the build needed `-d` to get
+past `dpkg-checkbuilddeps`. `lintian` has not been run and nothing has been
+uploaded anywhere. All of that is written beside the yes in
+`docs/PACKAGING.md`, because "we built a .deb once" and "this is a Debian
+package" are different claims.
+
+Doing it found two defects.
+
+### F-80 - the documented way to build the Debian package could not run
+
+Two things, either of which stops it before any compilation begins.
+
+**There was no `debian/changelog`.** `dpkg-buildpackage` takes the package's
+version from that file and refuses to start without it. The recipe in
+`docs/PACKAGING.md` copies `packaging/debian` into place and runs the build,
+and nothing in either creates one.
+
+**And `packaging/debian/rules` was tracked as mode 100644.**
+`dpkg-buildpackage` runs it directly, so it has to be executable, and the mode
+git records is the mode everybody who clones gets.
+
+So the printed recipe failed on its first command for anybody who tried it. The
+documentation said "not built", which is honest about the outcome and is not
+the same as knowing the route was broken. Both are fixed and both are checked,
+the mode through `git ls-files -s` rather than through the filesystem.
+
+### F-81 - every package definition was five releases behind
+
+Six files in `packaging/` name a version. All six said 0.1.9 while the
+workspace was at 0.1.14.
+
+What that meant, file by file: `brew install --build-from-source` would have
+fetched and compiled the **v0.1.9** tarball; `flatpak-builder` would have
+checked out the **v0.1.9** tag; the AppStream metadata told a software centre
+that 0.1.9 is the newest release there is; and `rpmbuild` with no `--define`
+would have stamped a package 0.1.9. Two of the commands printed in
+`docs/PACKAGING.md` for a reader to copy carried the same number.
+
+Nobody noticed because nothing was looking. It is the shape this repository
+keeps finding: F-41 was generated output drifting from its generator, F-61 and
+F-63 were comments that had stopped being true, F-71 was two hand-typed numbers
+agreeing with each other. This is six files agreeing with a number that had
+moved on without them.
+
+All six are at the workspace version now, and
+`tools/site-tests/packaging.test.js` compares nine version claims against
+`[workspace.package]` in `Cargo.toml`. Verified by putting the old version back
+in one file and watching the suite fail, rather than by assuming a new test
+tests anything.
+
 ### CI now runs the tests where a pointer is 32 bits wide
 
 `docs/AUDIT.md` has named this as the single highest-value change available to
