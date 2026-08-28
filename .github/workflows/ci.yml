@@ -67,6 +67,85 @@ jobs:
       - name: Release build
         run: cargo build --workspace --release --locked
 
+  # Two of this project's shipped defects were reachable only where a pointer
+  # is 32 bits wide: F-4, an arithmetic overflow, and F-11, an erase loop that
+  # never terminated and left the file it was destroying intact. Both were
+  # found by reading. Neither was reachable by any campaign in this matrix,
+  # because every entry in it is 64-bit, and `docs/AUDIT.md` has named this as
+  # the single highest-value change available to CI since the fifth round.
+  #
+  # Two targets, and only one of them is emulated:
+  #
+  #   * **i686** binaries run on the runner's own kernel. Nothing is emulated;
+  #     `gcc-multilib` is there for the linker and the 32-bit C runtime.
+  #   * **armv7** is compiled natively with the cross linker and only the test
+  #     binaries are run under `qemu-arm-static`, which needs the cross
+  #     sysroot as its loader prefix. Measured locally: the same 682 tests
+  #     take 18 seconds of execution on i686 and 88 on armv7, so the emulation
+  #     is not what this job costs. Compilation is.
+  #
+  # **Not the whole workspace, and the reason is packaging rather than
+  # correctness.** `veilvoice-audio`, `veilvoice-cli`, `veilvoice-gui` and
+  # `veilvoice-video` link ALSA, GTK and X11, and building them for a second
+  # architecture means a multiarch sysroot for all of it. The arithmetic, the
+  # parsers and the erase loop are in the crates listed below, which are the
+  # ones a narrow pointer can break. Saying "the workspace passes on 32-bit"
+  # would be the overstatement this project's second rule exists to prevent.
+  #
+  # Debug rather than release, for the same reason the fuzz job gives: the
+  # release profile turns overflow checks off, and an overflow is the thing
+  # being looked for.
+  narrow:
+    name: 32-bit / ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: i686-unknown-linux-gnu
+            packages: gcc-multilib libc6-dev-i386
+          - target: armv7-unknown-linux-gnueabihf
+            packages: gcc-arm-linux-gnueabihf libc6-dev-armhf-cross qemu-user-static
+    env:
+      # Read by cargo for the armv7 entry and simply unused by the i686 one,
+      # which needs no cross linker and no runner at all.
+      CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER: arm-linux-gnueabihf-gcc
+      CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_RUNNER: qemu-arm-static
+      QEMU_LD_PREFIX: /usr/arm-linux-gnueabihf
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the cross toolchain for ${{ matrix.target }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ${{ matrix.packages }}
+
+      - name: Install the pinned toolchain
+        run: rustup show
+
+      - name: Add the target
+        run: rustup target add ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      # The list is spelled out rather than `--workspace --exclude`, so that a
+      # crate added to the workspace is absent here until somebody decides it
+      # belongs, rather than joining silently and failing for a linker reason
+      # that has nothing to do with 32-bit arithmetic.
+      - name: Tests on a 32-bit target
+        run: |
+          cargo test --locked --target ${{ matrix.target }} \
+            -p veilvoice-core -p veilvoice-crypto -p veilvoice-meta \
+            -p veilvoice-conversation -p veilvoice-check -p veilvoice-workspace \
+            -p veilvoice-policy -p veilvoice-decoy -p veilvoice-guard \
+            -p veilvoice-verify -p veilvoice-proc -p veilvoice-sentry \
+            -p veilvoice-appctl -p veilvoice-update -p veilvoice-watch \
+            -p veilvoice-failsafe -p veilvoice-input -p veilvoice-priv \
+            -p veilvoice-drivers -p veilvoice-capture -p veilvoice-accel \
+            -p veilvoice-setup
+
   # The generated artwork is committed, so it must match what the generator
   # produces. Otherwise the two drift and the "verifiable from source" claim
   # quietly stops being true.
