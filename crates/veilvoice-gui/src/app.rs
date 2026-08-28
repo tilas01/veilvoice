@@ -274,6 +274,9 @@ pub struct VeilVoiceApp {
 
     // The app lock, and at-rest encryption of what jobs write.
     security: Security,
+    /// The integrity record, taken at the first launch and checked at every
+    /// one after. See [`crate::integrity`].
+    integrity: crate::integrity::Integrity,
 
     // Colour scheme and animation. Named `preferences` rather than `settings`
     // because this type already has a `settings` method, which is the engine's
@@ -364,6 +367,7 @@ impl VeilVoiceApp {
             frame_ms: 0.0,
             previewing: false,
             security: Security::default(),
+            integrity: crate::integrity::Integrity::default(),
             // Off. `VeilVoiceApp::new` is the only place the saved preference
             // is consulted, so no test and no `Default` can open in group mode
             // because of something on this machine's disk.
@@ -414,6 +418,101 @@ impl VeilVoiceApp {
     /// A deep link into a tab is a reasonable thing for an application to have
     /// on its own account, which is why this is a real argument rather than a
     /// hidden one.
+    /// What the integrity record found, drawn under the lock controls.
+    ///
+    /// **Marker 75.** An associated function rather than a method so it borrows
+    /// the state it reads and nothing else: `self.security.tab` already holds a
+    /// mutable borrow of the same struct on the line above.
+    ///
+    /// It says which of the two records was consulted, because a sealed record
+    /// and a plain one are worth different amounts and a reader who is not told
+    /// which they have will assume the better one.
+    fn integrity_panel(ui: &mut egui::Ui, state: &crate::integrity::State) {
+        use crate::integrity::State;
+
+        ui.add_space(16.0);
+        ui.separator();
+        ui.label(RichText::new("Its own files").color(p::blue()).small());
+
+        match state {
+            State::Idle => {
+                ui.label(RichText::new("not checked this session").color(p::muted()));
+            }
+            State::Working => {
+                ui.horizontal(|ui| {
+                    ui.spinner();
+                    ui.label(RichText::new("reading and hashing…").color(p::muted()));
+                });
+            }
+            State::Recorded { sealed } => {
+                ui.label(
+                    RichText::new(if *sealed {
+                        "first record taken, sealed with your app-lock passphrase"
+                    } else {
+                        "first record taken, written in the clear"
+                    })
+                    .color(p::green()),
+                );
+            }
+            State::Clean { files, sealed } => {
+                ui.label(
+                    RichText::new(format!(
+                        "{files} file(s) match the {} record",
+                        if *sealed { "sealed" } else { "plain" }
+                    ))
+                    .color(p::green()),
+                );
+            }
+            State::Changed(changes) => {
+                ui.label(
+                    RichText::new("VeilVoice's own files have changed since the record")
+                        .color(p::red())
+                        .strong(),
+                );
+                for change in changes.iter().take(8) {
+                    ui.label(RichText::new(change).color(p::fg()).small());
+                }
+                if changes.len() > 8 {
+                    ui.label(
+                        RichText::new(format!("and {} more", changes.len() - 8))
+                            .color(p::muted())
+                            .small(),
+                    );
+                }
+                ui.label(
+                    RichText::new(
+                        "An update you installed looks exactly like this. So does a file \
+                         somebody swapped. This cannot tell the two apart.",
+                    )
+                    .color(p::muted())
+                    .small(),
+                );
+            }
+            State::Failed(why) => {
+                ui.label(RichText::new(why).color(p::yellow()));
+            }
+        }
+
+        if matches!(state, State::Recorded { sealed: false }) {
+            ui.label(
+                RichText::new(
+                    "With no app lock set there is no passphrase to seal this with, so the \
+                     record is readable. It catches a file that changed by accident. It \
+                     does not catch one changed by somebody who also rewrote the record.",
+                )
+                .color(p::muted())
+                .small(),
+            );
+        }
+
+        ui.add_space(6.0);
+        ui.label(
+            RichText::new(veilvoice_guard::SCOPE)
+                .color(p::muted())
+                .small(),
+        );
+    }
+
     fn tab_from_arguments() -> Option<Tab> {
         let mut args = std::env::args().skip(1);
         while let Some(arg) = args.next() {
@@ -465,6 +564,14 @@ impl VeilVoiceApp {
             watch: WatchFeed::start(),
             ..Default::default()
         };
+        // The integrity record, started before anything is drawn and finished
+        // on its own thread. With an app lock set this run is skipped: the
+        // record is sealed under the app-lock passphrase, so it can only be
+        // read once that passphrase exists, and `poll` starts it again the
+        // moment the window unlocks.
+        if !app.security.has_lock() {
+            app.integrity.start(None);
+        }
         app.apply_policy();
         // After the policy, so a named tab is what the window opens on rather
         // than something the policy pass happened to leave selected.
@@ -541,6 +648,17 @@ impl eframe::App for VeilVoiceApp {
         }
 
         self.poll_job();
+
+        // The integrity record. Two things happen here and both are cheap: a
+        // finished check is collected, and a just-completed unlock hands over
+        // the passphrase the sealed record needs. Neither touches the disk on
+        // this thread.
+        if self.integrity.poll() {
+            ctx.request_repaint();
+        }
+        if let Some(passphrase) = self.security.take_unlock_passphrase() {
+            self.integrity.start(Some(passphrase));
+        }
 
         // Before anything is drawn, and it has to be: this was at the *bottom*
         // of `update`, after the panel that shows the result had already been
@@ -794,7 +912,10 @@ impl eframe::App for VeilVoiceApp {
                         Tab::Live => self.live_tab(ui),
                         Tab::Group => self.group.tab(ui, &mut self.preferences),
                         Tab::Watch => self.watch_tab(ui),
-                        Tab::Security => self.security.tab(ui),
+                        Tab::Security => {
+                            self.security.tab(ui);
+                            Self::integrity_panel(ui, self.integrity.state());
+                        }
                         Tab::Verify => self.verify.tab(ui),
                         Tab::Preferences => self.preferences.tab(ui, ctx),
                         Tab::Setup => self.setup.tab(ui, motion),
@@ -839,6 +960,7 @@ impl eframe::App for VeilVoiceApp {
             || self.group.is_busy()
             || self.job.is_some()
             || self.security.is_busy()
+            || self.integrity.is_busy()
             || self.setup.is_busy()
         {
             ctx.request_repaint_after(std::time::Duration::from_millis(50));
@@ -1803,6 +1925,39 @@ mod tests {
         );
     }
 
+    /// Marker 75. The record has to be taken without anybody knowing to ask,
+    /// and it has to wait for the passphrase when there is one to wait for.
+    #[test]
+    fn the_integrity_record_runs_itself_at_launch_and_again_at_unlock() {
+        let source = include_str!("app.rs").replace("\r\n", "\n");
+        let start = source
+            .find("pub fn new(cc:")
+            .expect("the constructor exists");
+        let end = source[start..]
+            .find("\n    /// Bring the controls")
+            .map(|at| start + at)
+            .unwrap_or(source.len());
+        let constructor = &source[start..end];
+        assert!(
+            constructor.contains("app.integrity.start(None)"),
+            "nothing takes the record at launch, so it is still a command \
+             somebody has to know to run"
+        );
+        assert!(
+            constructor.contains("if !app.security.has_lock()"),
+            "a sealed record cannot be read before the passphrase exists, so \
+             the launch run has to stand aside when a lock is set"
+        );
+
+        let update_at = source.find("fn update(&mut self").expect("update exists");
+        let drawing = &source[update_at..];
+        assert!(
+            drawing.contains("self.security.take_unlock_passphrase()"),
+            "the unlock is the one moment the sealing passphrase exists and \
+             nothing collects it"
+        );
+    }
+
     /// Every tab has a name, they are unique, and they round trip. The
     /// screenshot tool names each picture after one of these, so a change here
     /// renames a file the README links to.
@@ -2036,6 +2191,14 @@ mod tests {
             ..VeilVoiceApp::without_devices()
         };
         app.security.encrypt_recordings = false;
+        // The integrity record, started before anything is drawn and finished
+        // on its own thread. With an app lock set this run is skipped: the
+        // record is sealed under the app-lock passphrase, so it can only be
+        // read once that passphrase exists, and `poll` starts it again the
+        // moment the window unlocks.
+        if !app.security.has_lock() {
+            app.integrity.start(None);
+        }
         app.apply_policy();
         assert!(app.security.encryption_pinned);
         assert!(app.security.encrypt_recordings);
@@ -2052,6 +2215,14 @@ mod tests {
             policy: InForce::from_policy(policy),
             ..VeilVoiceApp::without_devices()
         };
+        // The integrity record, started before anything is drawn and finished
+        // on its own thread. With an app lock set this run is skipped: the
+        // record is sealed under the app-lock passphrase, so it can only be
+        // read once that passphrase exists, and `poll` starts it again the
+        // moment the window unlocks.
+        if !app.security.has_lock() {
+            app.integrity.start(None);
+        }
         app.apply_policy();
         assert!(app.security.lock_required);
         assert!(
@@ -2074,6 +2245,14 @@ mod tests {
             clean_metadata: false,
             ..VeilVoiceApp::without_devices()
         };
+        // The integrity record, started before anything is drawn and finished
+        // on its own thread. With an app lock set this run is skipped: the
+        // record is sealed under the app-lock passphrase, so it can only be
+        // read once that passphrase exists, and `poll` starts it again the
+        // moment the window unlocks.
+        if !app.security.has_lock() {
+            app.integrity.start(None);
+        }
         app.apply_policy();
         assert!(!app.security.encryption_pinned);
         assert!(!app.security.lock_required);

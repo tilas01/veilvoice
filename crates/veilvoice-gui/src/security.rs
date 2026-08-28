@@ -113,6 +113,9 @@ pub struct Security {
     /// on the lock screen: telling a stranger at the lock screen that their
     /// last attempt was noticed is telling them something they can use.
     tampered: bool,
+    /// The passphrase that just opened the lock, held for exactly one caller to
+    /// collect. See [`Security::take_unlock_passphrase`].
+    just_unlocked: Option<String>,
 
     // --- unlock screen ---
     entry: String,
@@ -175,6 +178,7 @@ impl Default for Security {
             load_error: None,
             locked: false,
             tampered: false,
+            just_unlocked: None,
             entry: String::new(),
             message: None,
             pending: None,
@@ -240,6 +244,17 @@ impl Security {
         security
     }
 
+    /// Take the passphrase that just opened the lock, once.
+    ///
+    /// Returns `Some` on exactly the frame after a successful unlock and `None`
+    /// on every other. It exists so [`crate::integrity`] can open a record
+    /// sealed under the app-lock passphrase without this module keeping that
+    /// passphrase for the life of the session. The caller must wipe what it
+    /// gets; the worker that receives it does.
+    pub fn take_unlock_passphrase(&mut self) -> Option<String> {
+        self.just_unlocked.take()
+    }
+
     /// Whether the lock reported having been interfered with.
     ///
     /// Stays true until an unlock acknowledges it, which needs the passphrase,
@@ -277,6 +292,12 @@ impl Security {
             &mut self.passphrase_repeat,
         ] {
             field.zeroize();
+        }
+        // The one-frame handover to the integrity record, wiped here in case
+        // nobody collected it. Locking the window again must not leave a
+        // passphrase behind because a caller happened not to look.
+        if let Some(mut carried) = self.just_unlocked.take() {
+            carried.zeroize();
         }
         self.held = None;
         self.passphrase_set = false;
@@ -366,7 +387,13 @@ impl Security {
         match outcome {
             Ok(Op::Unlock) => {
                 self.locked = false;
-                self.entry.zeroize();
+                // Moved rather than wiped, for one caller and one frame. The
+                // integrity record is sealed under this passphrase and the
+                // unlock is the only moment it exists, so wiping it here would
+                // mean the record could never be opened. Whoever takes it is
+                // responsible for wiping it; `take_unlock_passphrase` says so,
+                // and `wipe_secrets` catches the case where nobody does.
+                self.just_unlocked = Some(std::mem::take(&mut self.entry));
                 self.message = None;
             }
             Ok(Op::Acknowledge) => {
