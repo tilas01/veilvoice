@@ -294,7 +294,27 @@ fi
 GPG=$(command -v gpg 2>/dev/null || command -v gpg2)
 
 step "Checking the signing key's fingerprint"
-if ! fetch "$KEY_URL" "$WORK/key.asc"; then
+# F-79. The first attempt's own error output is suppressed and replaced with a
+# line of this script's.
+#
+# There are two places to get the key and the second one is a fallback, so a
+# failure here is not a failure at all. But `curl -fsS` prints its own message
+# on stderr, so what a reader saw was
+#
+#     ==> Checking the signing key's fingerprint
+#     curl: (22) The requested URL returned error: 403
+#       ok   fingerprint matches 8101FB...
+#
+# an error from another program inside a security step, immediately above the
+# word "ok", with nothing to say the two lines are about different things.
+# Measured on a machine whose network refuses the website but allows the
+# repository, which is an ordinary situation: a proxy, a filtered network, or
+# GitHub Pages simply being down.
+#
+# The final failure stays loud and names both addresses. What is silenced is an
+# attempt that did not matter.
+if ! fetch "$KEY_URL" "$WORK/key.asc" 2>/dev/null; then
+    say "  the website copy could not be fetched; trying the repository copy"
     fetch "$KEY_URL_FALLBACK" "$WORK/key.asc" \
         || refuse "could not download the public key" \
             "Tried: $KEY_URL" \
