@@ -8,6 +8,29 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The front page animation now says what the engine does, not one word of it
+
+The picture of a voice going in and an unidentifiable one coming out had the
+mark glowing in the middle and a caption that summarised the whole engine as
+the word **discarded**. That word is true. It is also one word for six things,
+and the one it names is the third of them.
+
+The middle of the picture now lists the six, lighting one at a time: framed,
+phase measured, phase discarded, pitch and formants moved, modulation seed
+rolled, words left alone. Under it the caption explains each one rather than
+gesturing at the set, including the two separate reasons there is nothing to
+invert, which the single word ran together: the phase is thrown away and never
+written anywhere, **and** every speaker is mapped onto one register and one
+vocal tract, so several different people arrive at the same place.
+
+Same style throughout: no script, no image, one animation, and it follows the
+reader's theme. Colour is the only thing that changes, because a step that
+moved or grew would push the labels around and six labels jostling for six
+seconds is a picture nobody reads. With motion reduced every step is drawn lit
+rather than dark, since the list is the content and the sequence is the
+decoration. On a narrow screen the mark turns on its side and the labels do
+not, because sideways text is not a label.
+
 ### The roadmap, published as a page, with a picture of where it has got to
 
 `ROADMAP.md` is the file that decides what is done. It is also two thousand
