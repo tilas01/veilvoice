@@ -95,16 +95,21 @@ your machine and the key is made from your password each time.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>190 lines"])
+    n_lib(["lib.rs<br/>192 lines"])
     n_aead["aead.rs<br/>178 lines"]
     n_amnesia["amnesia.rs<br/>326 lines"]
     n_container["container.rs<br/>491 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
-    n_lock["lock.rs<br/>745 lines"]
+    n_lock["lock.rs<br/>1276 lines"]
     n_privatefile["privatefile.rs<br/>169 lines"]
     n_shred["shred.rs<br/>415 lines"]
+    n_vault["vault.rs<br/>459 lines"]
+    n_lock --> n_aead
     n_lock --> n_privatefile
+    n_lock --> n_vault
+    n_vault --> n_kdf
+    n_vault --> n_privatefile
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs" "open the source"
     click n_aead href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" "open the source"
     click n_amnesia href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" "open the source"
@@ -114,6 +119,7 @@ flowchart TD
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" "open the source"
     click n_privatefile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" "open the source"
     click n_shred href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs" "open the source"
+    click n_vault href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" "open the source"
 ```
 
 </details>
@@ -127,10 +133,11 @@ flowchart TD
 | [[`container.rs`|File-veilvoice-crypto-container]] | 491 | The .veil encrypted container format. |
 | [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [[`kdf.rs`|File-veilvoice-crypto-kdf]] | 525 | Password-based key derivation with Argon2id. |
-| [[`lib.rs`|File-veilvoice-crypto-lib]] | 190 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [[`lock.rs`|File-veilvoice-crypto-lock]] | 745 | The application lock: an Argon2id password verifier with a rate limit. |
+| [[`lib.rs`|File-veilvoice-crypto-lib]] | 192 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [[`lock.rs`|File-veilvoice-crypto-lock]] | 1276 | The application lock: an Argon2id password verifier with a rate limit. |
 | [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] | 169 | Writing a file that only its owner can read. |
 | [[`shred.rs`|File-veilvoice-crypto-shred]] | 415 | Secure erasure — the self-destruct. |
+| [[`vault.rs`|File-veilvoice-crypto-vault]] | 459 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [[`seal_and_open.rs`|File-veilvoice-crypto-examples-seal_and_open]] | 80 | _no module documentation yet_ |
 | [[`parser_fuzz.rs`|File-veilvoice-crypto-tests-parser_fuzz]] | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [[`timing.rs`|File-veilvoice-crypto-tests-timing]] | 249 | Timing measurement of the password paths. |

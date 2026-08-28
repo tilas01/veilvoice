@@ -3,12 +3,13 @@
 
 # `crates/veilvoice-crypto/src/lock.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 745 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 1276 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs)
 
 ## Contents
 
 - [What this is worth, stated before anything else](#what-this-is-worth-stated-before-anything-else)
 - [Why a verifier and not a key](#why-a-verifier-and-not-a-key)
+- [The tag, and the one tamper claim this file can honestly make](#the-tag-and-the-one-tamper-claim-this-file-can-honestly-make)
 - [Rate limiting](#rate-limiting)
 - [Separate from the recording password](#separate-from-the-recording-password)
 - [In plain words](#in-plain-words)
@@ -37,17 +38,42 @@ recordings themselves. Neither of those is replaced by this module.
 
 # Why a verifier and not a key
 
-The lock stores `Argon2id(domain ‖ password, salt)` and compares it in
-constant time. It deliberately does **not** derive a key that encrypts
-anything, because there is nothing here it could usefully encrypt: the
-recordings have their own password (a *different* one — see
+The lock stores `Argon2id(domain ‖ password, salt)`, split by HKDF into a
+verifier and a tag key, and compares the verifier in constant time. It
+deliberately does **not** derive a key that encrypts your recordings,
+because those have their own password (a *different* one — see
 `crate::container`), and pretending the app lock protected them would be
 exactly the overclaim this project refuses to make.
 
-The stored verifier is therefore a password hash sitting on disk in the
-clear, and must be treated like one. Argon2id at the default cost (256 MiB,
-t=3, p=4) makes an offline attack expensive per guess, which matters for a
-decent passphrase and does not save a bad one.
+The stored verifier is a password hash sitting on disk in the clear, and
+must be treated like one. Argon2id at the default cost (256 MiB, t=3, p=4)
+makes an offline attack expensive per guess, which matters for a decent
+passphrase and does not save a bad one.
+
+# The tag, and the one tamper claim this file can honestly make
+
+Every record carries a 16-byte authentication tag over all the bytes before
+it, keyed by a value that exists only while a correct passphrase is in
+memory. The tag key is the second half of one Argon2id run, split from the
+verifier by HKDF, so publishing the verifier — which the file does, by
+sitting on disk — says nothing about the tag key.
+
+That buys exactly one thing, and it is worth naming precisely. Somebody who
+edits this file without knowing the passphrase cannot leave the edit
+looking authentic. Resetting the failure counter to zero, winding the
+last-failure timestamp back to escape a wait, or dropping the Argon2id cost
+so that a guess is cheap — all three are edits, and all three are caught at
+the next successful unlock, because that is the moment the tag key exists.
+
+It buys nothing at all against the two attacks people expect it to stop.
+Deleting the file still removes the lock. Replacing the file wholesale with
+a lock the attacker created still lets the attacker in, because their own
+record is authentic under *their* passphrase. `crate::vault` answers the
+first with a second copy and answers the second not at all.
+
+The tamper flag, once raised, is stored and is cleared only by an unlock
+that also proves the passphrase. So the report survives a restart, and the
+person who caused it cannot dismiss it.
 
 # Rate limiting
 
@@ -83,41 +109,54 @@ protects them; this protects the session.
 
 ## What this file contains
 
-745 lines defining **23 functions** (17 public), **2 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1276 lines defining **37 functions** (27 public), **3 types** and **13 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct AppLock` (line 132) -- A password verifier plus its attempt history.
-- `struct LockStore` (line 316) -- An AppLock bound to a file, which is persisted after every attempt.
+- `struct AppLock` (line 169) -- A password verifier plus its attempt history.
+- `struct LockStore` (line 559) -- An AppLock bound to a file, which is persisted after every attempt.
+- `enum Backing` (line 572) -- Where a LockStore keeps its record.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `AppLock::create` (line 146) -- Create a lock for password.
-  - reaches: `derive_verifier`
-- `AppLock::verify` (line 163) -- Check password, recording the outcome.
-  - reaches: `unix_now`, `verify_at`, `cooldown_at`, `derive_verifier`, `delay_secs`
-- `AppLock::cooldown` (line 184) -- Seconds still to wait before another attempt is accepted.
+- `AppLock::create` (line 201) -- Create a lock for password.
+  - reaches: `derive_pair`
+- `AppLock::tampered` (line 264) -- Whether a record has been found edited by somebody without the passphrase, at any point since this was last cleared.
+- `AppLock::acknowledge` (line 272) -- Clear the tamper report, after proving the passphrase.
+  - reaches: `verify`, `unix_now`, `verify_at`, `cooldown_at`, `derive_pair`, `tag_matches`, `delay_secs`, `tag`, `body`
+- `AppLock::needs_upgrade` (line 280) -- True when this record predates the authentication tag and should be rewritten once the passphrase is in hand.
+- `AppLock::cooldown` (line 312) -- Seconds still to wait before another attempt is accepted.
   - reaches: `cooldown_at`, `unix_now`, `delay_secs`
-- `AppLock::failures` (line 201) -- Consecutive failed attempts recorded so far.
-- `AppLock::params` (line 206) -- The Argon2id cost this lock was created with.
-- `AppLock::to_bytes` (line 230) -- Serialise exactly as it appears on disk.
-- `LockStore::open` (line 327) -- Load the lock at path, or Ok(None) if no lock is configured there.
+- `AppLock::failures` (line 329) -- Consecutive failed attempts recorded so far.
+- `AppLock::params` (line 334) -- The Argon2id cost this lock was created with.
+- `AppLock::retag` (line 372) -- Draw a fresh nonce and re-tag the record under password.
+  - reaches: `derive_pair`, `tag`, `body`
+- `AppLock::to_bytes` (line 403) -- Serialise exactly as it appears on disk.
+  - reaches: `body`
+- `LockStore::open` (line 592) -- Load the lock at path, or Ok(None) if no lock is configured there.
   - reaches: `parse`
-- `LockStore::create` (line 348) -- Create a lock at path, refusing to overwrite one already there.
-  - reaches: `derive_verifier`
-- `LockStore::change_password` (line 378) -- Replace the password, after proving the current one.
+- `LockStore::create` (line 613) -- Create a lock at path, refusing to overwrite one already there.
+  - reaches: `derive_pair`
+- `LockStore::tampered` (line 651) -- Whether the stored record has been found edited by somebody without the passphrase.
+- `LockStore::acknowledge` (line 656) -- Clear the tamper report, after proving the passphrase, and persist that.
+  - reaches: `verify`, `unix_now`, `verify_at`, `cooldown_at`, `derive_pair`, `tag_matches`, `delay_secs`, `tag`, `body`
+- `LockStore::report_tamper` (line 669) -- Raise the tamper report from outside, and persist it if the passphrase allows.
+- `LockStore::change_password` (line 674) -- Replace the password, after proving the current one.
   - reaches: `save`, `unlock`, `write_private`
-- `LockStore::remove` (line 388) -- Remove the lock, after proving the password.
+- `LockStore::remove` (line 690) -- Remove the lock, after proving the password.
   - reaches: `unlock`, `save`, `write_private`
-- `LockStore::cooldown` (line 394) -- Seconds still to wait before another attempt is accepted.
+- `LockStore::cooldown` (line 699) -- Seconds still to wait before another attempt is accepted.
   - reaches: `cooldown_at`, `unix_now`, `delay_secs`
-- `LockStore::failures` (line 399) -- Consecutive failed attempts recorded so far.
-- `LockStore::path` (line 404) -- Where this lock is stored.
-- `default_path` (line 446) -- Where the lock file lives on this platform, if the environment says.
+- `LockStore::failures` (line 704) -- Consecutive failed attempts recorded so far.
+- `LockStore::path` (line 710) -- Where this lock is stored.
+- `open_default` (line 740) -- Open the lock at the default location, wherever this platform keeps it.
+  - reaches: `default_dir`, `default_path`
+- `create_default` (line 756) -- Create a lock at the default location, refusing to replace one already there.
+  - reaches: `default_dir`, `default_path`
 
 ## What calls what
 
-_22 of 20 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 32 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
@@ -131,70 +170,67 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_delay_secs["delay_secs<br/>line 107"]
-    n_unix_now["unix_now<br/>line 120"]
-    n_create(["AppLock::create<br/>line 146"])
-    n_verify(["AppLock::verify<br/>line 163"])
-    n_verify_at["AppLock::verify_at<br/>line 167"]
-    n_cooldown(["AppLock::cooldown<br/>line 184"])
-    n_cooldown_at["AppLock::cooldown_at<br/>line 188"]
-    n_failures(["AppLock::failures<br/>line 201"])
-    n_params(["AppLock::params<br/>line 206"])
-    n_to_bytes(["AppLock::to_bytes<br/>line 230"])
-    n_parse["AppLock::parse<br/>line 247"]
-    n_derive_verifier["derive_verifier<br/>line 304"]
-    n_open(["LockStore::open<br/>line 327"])
-    n_create(["LockStore::create<br/>line 348"])
-    n_unlock["LockStore::unlock<br/>line 368"]
-    n_change_password(["LockStore::change_password<br/>line 378"])
-    n_remove(["LockStore::remove<br/>line 388"])
-    n_cooldown(["LockStore::cooldown<br/>line 394"])
-    n_failures(["LockStore::failures<br/>line 399"])
-    n_path(["LockStore::path<br/>line 404"])
-    n_save["LockStore::save<br/>line 408"]
-    n_write_private["write_private<br/>line 430"]
-    n_change_password --> n_save
+    n_delay_secs["delay_secs<br/>line 144"]
+    n_unix_now["unix_now<br/>line 157"]
+    n_create(["AppLock::create<br/>line 201"])
+    n_verify["AppLock::verify<br/>line 227"]
+    n_verify_at["AppLock::verify_at<br/>line 231"]
+    n_acknowledge(["AppLock::acknowledge<br/>line 272"])
+    n_tag_matches["AppLock::tag_matches<br/>line 284"]
+    n_cooldown(["AppLock::cooldown<br/>line 312"])
+    n_retag(["AppLock::retag<br/>line 372"])
+    n_to_bytes(["AppLock::to_bytes<br/>line 403"])
+    n_parse["AppLock::parse<br/>line 435"]
+    n_open(["LockStore::open<br/>line 592"])
+    n_create(["LockStore::create<br/>line 613"])
+    n_unlock["LockStore::unlock<br/>line 633"]
+    n_acknowledge(["LockStore::acknowledge<br/>line 656"])
+    n_change_password(["LockStore::change_password<br/>line 674"])
+    n_remove(["LockStore::remove<br/>line 690"])
+    n_cooldown(["LockStore::cooldown<br/>line 699"])
+    n_open_default(["open_default<br/>line 740"])
+    n_create_default(["create_default<br/>line 756"])
+    n_default_dir["default_dir<br/>line 793"]
+    n_default_path["default_path<br/>line 810"]
+    n_acknowledge --> n_verify
     n_change_password --> n_unlock
-    n_cooldown --> n_cooldown_at
     n_cooldown --> n_unix_now
-    n_cooldown_at --> n_delay_secs
-    n_create --> n_derive_verifier
+    n_create_default --> n_default_dir
+    n_default_dir --> n_default_path
     n_open --> n_parse
+    n_open_default --> n_default_dir
     n_remove --> n_unlock
-    n_save --> n_write_private
-    n_unlock --> n_save
     n_verify --> n_unix_now
     n_verify --> n_verify_at
-    n_verify_at --> n_cooldown_at
-    n_verify_at --> n_derive_verifier
-    click n_delay_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L107" "open the source"
-    click n_unix_now href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L120" "open the source"
-    click n_create href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L146" "open the source"
-    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L163" "open the source"
-    click n_verify_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L167" "open the source"
-    click n_cooldown href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L184" "open the source"
-    click n_cooldown_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L188" "open the source"
-    click n_failures href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L201" "open the source"
-    click n_params href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L206" "open the source"
-    click n_to_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L230" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L247" "open the source"
-    click n_derive_verifier href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L304" "open the source"
-    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L327" "open the source"
-    click n_create href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L348" "open the source"
-    click n_unlock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L368" "open the source"
-    click n_change_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L378" "open the source"
-    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L388" "open the source"
-    click n_cooldown href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L394" "open the source"
-    click n_failures href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L399" "open the source"
-    click n_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L404" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L408" "open the source"
-    click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L430" "open the source"
+    n_verify_at --> n_tag_matches
+    click n_delay_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L144" "open the source"
+    click n_unix_now href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L157" "open the source"
+    click n_create href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L201" "open the source"
+    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L227" "open the source"
+    click n_verify_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L231" "open the source"
+    click n_acknowledge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L272" "open the source"
+    click n_tag_matches href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L284" "open the source"
+    click n_cooldown href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L312" "open the source"
+    click n_retag href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L372" "open the source"
+    click n_to_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L403" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L435" "open the source"
+    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L592" "open the source"
+    click n_create href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L613" "open the source"
+    click n_unlock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L633" "open the source"
+    click n_acknowledge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L656" "open the source"
+    click n_change_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L674" "open the source"
+    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L690" "open the source"
+    click n_cooldown href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L699" "open the source"
+    click n_open_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L740" "open the source"
+    click n_create_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L756" "open the source"
+    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L793" "open the source"
+    click n_default_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L810" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_create,n_verify,n_cooldown,n_failures,n_params,n_to_bytes,n_open,n_create,n_change_password,n_remove,n_cooldown,n_failures,n_path entry
+    class n_create,n_acknowledge,n_cooldown,n_retag,n_to_bytes,n_open,n_create,n_acknowledge,n_change_password,n_remove,n_cooldown,n_open_default,n_create_default entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_delay_secs,n_parse,n_unlock api
+    class n_delay_secs,n_verify,n_parse,n_unlock,n_default_dir,n_default_path api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_unix_now,n_verify_at,n_cooldown_at,n_derive_verifier,n_save,n_write_private helper
+    class n_unix_now,n_verify_at,n_tag_matches helper
 ```
 
 </details>
@@ -203,36 +239,56 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `SCOPE` <sub>pub const</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L77) | What the app lock protects against, and what it does not, in the words a front-end should show the user. |
-| `MAGIC` <sub>pub const</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L84) | Magic bytes at the start of a lock file. |
-| `FORMAT_VERSION` <sub>pub const</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L86) | Format version this build writes. |
-| `LOCK_LEN` <sub>pub const</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L88) | Exact size of a lock file, in bytes. |
-| `DOMAIN` <sub>const</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L92) | Domain separator, so the app-lock verifier can never coincide with a key derived from the same passphrase anywhere else in this crate. |
-| `FREE_ATTEMPTS` <sub>const</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L95) | Failed attempts allowed before the wait starts. |
-| `BASE_DELAY_SECS` <sub>const</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L97) | The first enforced wait, in seconds. |
-| `MAX_DELAY_SECS` <sub>const</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L101) | The longest the wait ever gets. |
-| `delay_secs` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L107) | How long to refuse the next attempt after failures consecutive failures. |
-| `unix_now` <sub>fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L120) | Seconds since the Unix epoch, negative before it. |
-| `AppLock` <sub>pub struct</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L132) | A password verifier plus its attempt history. |
-| `AppLock::create` <sub>pub fn</sub> | [146](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L146) | Create a lock for password. |
-| `AppLock::verify` <sub>pub fn</sub> | [163](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L163) | Check password, recording the outcome. |
-| `AppLock::verify_at` <sub>fn</sub> | [167](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L167) |  |
-| `AppLock::cooldown` <sub>pub fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L184) | Seconds still to wait before another attempt is accepted. |
-| `AppLock::cooldown_at` <sub>fn</sub> | [188](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L188) |  |
-| `AppLock::failures` <sub>pub fn</sub> | [201](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L201) | Consecutive failed attempts recorded so far. |
-| `AppLock::params` <sub>pub fn</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L206) | The Argon2id cost this lock was created with. |
-| `AppLock::to_bytes` <sub>pub fn</sub> | [230](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L230) | Serialise exactly as it appears on disk. |
-| `AppLock::parse` <sub>pub fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L247) | Parse a lock file. |
-| `derive_verifier` <sub>fn</sub> | [304](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L304) | Derive the verifier for password. |
-| `LockStore` <sub>pub struct</sub> | [316](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L316) | An AppLock bound to a file, which is persisted after every attempt. |
-| `LockStore::open` <sub>pub fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L327) | Load the lock at path, or Ok(None) if no lock is configured there. |
-| `LockStore::create` <sub>pub fn</sub> | [348](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L348) | Create a lock at path, refusing to overwrite one already there. |
-| `LockStore::unlock` <sub>pub fn</sub> | [368](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L368) | Check password and persist the outcome. |
-| `LockStore::change_password` <sub>pub fn</sub> | [378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L378) | Replace the password, after proving the current one. |
-| `LockStore::remove` <sub>pub fn</sub> | [388](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L388) | Remove the lock, after proving the password. |
-| `LockStore::cooldown` <sub>pub fn</sub> | [394](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L394) | Seconds still to wait before another attempt is accepted. |
-| `LockStore::failures` <sub>pub fn</sub> | [399](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L399) | Consecutive failed attempts recorded so far. |
-| `LockStore::path` <sub>pub fn</sub> | [404](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L404) | Where this lock is stored. |
-| `LockStore::save` <sub>fn</sub> | [408](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L408) |  |
-| `write_private` <sub>fn</sub> | [430](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L430) | Write the lock file so it is owner-only from the moment it exists. |
-| `default_path` <sub>pub fn</sub> | [446](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L446) | Where the lock file lives on this platform, if the environment says. |
+| `SCOPE` <sub>pub const</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L102) | What the app lock protects against, and what it does not, in the words a front-end should show the user. |
+| `MAGIC` <sub>pub const</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L110) | Magic bytes at the start of a lock file. |
+| `FORMAT_VERSION` <sub>pub const</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L112) | Format version this build writes. |
+| `LOCK_LEN` <sub>pub const</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L114) | Exact size of a version 2 lock file, in bytes. |
+| `LOCK_LEN_V1` <sub>pub const</sub> | [116](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L116) | Exact size of a version 1 lock file, which this build still reads. |
+| `DOMAIN` <sub>const</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L120) | Domain separator, so the app-lock secret can never coincide with a key derived from the same passphrase anywhere else in this crate. |
+| `INFO_VERIFIER` <sub>const</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L122) | HKDF label for the half of the derivation that is written to disk. |
+| `INFO_TAG` <sub>const</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L124) | HKDF label for the half that is not, and that authenticates the record. |
+| `TAG_LEN` <sub>const</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L126) | Length of the record tag. |
+| `BODY_LEN` <sub>const</sub> | [129](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L129) | Length of the tagged part of a record, which is also the offset of the nonce that follows it. |
+| `FREE_ATTEMPTS` <sub>const</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L132) | Failed attempts allowed before the wait starts. |
+| `BASE_DELAY_SECS` <sub>const</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L134) | The first enforced wait, in seconds. |
+| `MAX_DELAY_SECS` <sub>const</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L138) | The longest the wait ever gets. |
+| `delay_secs` <sub>pub fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L144) | How long to refuse the next attempt after failures consecutive failures. |
+| `unix_now` <sub>fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L157) | Seconds since the Unix epoch, negative before it. |
+| `AppLock` <sub>pub struct</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L169) | A password verifier plus its attempt history. |
+| `AppLock::create` <sub>pub fn</sub> | [201](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L201) | Create a lock for password. |
+| `AppLock::verify` <sub>pub fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L227) | Check password, recording the outcome. |
+| `AppLock::verify_at` <sub>fn</sub> | [231](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L231) |  |
+| `AppLock::tampered` <sub>pub fn</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L264) | Whether a record has been found edited by somebody without the passphrase, at any point since this was last cleared. |
+| `AppLock::acknowledge` <sub>pub fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L272) | Clear the tamper report, after proving the passphrase. |
+| `AppLock::needs_upgrade` <sub>pub fn</sub> | [280](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L280) | True when this record predates the authentication tag and should be rewritten once the passphrase is in hand. |
+| `AppLock::tag_matches` <sub>fn</sub> | [284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L284) |  |
+| `AppLock::tag` <sub>fn</sub> | [301](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L301) | The authentication tag over everything in the record before it. |
+| `AppLock::cooldown` <sub>pub fn</sub> | [312](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L312) | Seconds still to wait before another attempt is accepted. |
+| `AppLock::cooldown_at` <sub>fn</sub> | [316](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L316) |  |
+| `AppLock::failures` <sub>pub fn</sub> | [329](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L329) | Consecutive failed attempts recorded so far. |
+| `AppLock::params` <sub>pub fn</sub> | [334](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L334) | The Argon2id cost this lock was created with. |
+| `AppLock::body` <sub>fn</sub> | [353](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L353) | The bytes the tag covers. |
+| `AppLock::retag` <sub>pub fn</sub> | [372](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L372) | Draw a fresh nonce and re-tag the record under password. |
+| `AppLock::to_bytes` <sub>pub fn</sub> | [403](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L403) | Serialise exactly as it appears on disk. |
+| `AppLock::parse` <sub>pub fn</sub> | [435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L435) | Parse a lock file, version 1 or version 2. |
+| `derive_pair` <sub>fn</sub> | [534](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L534) | Derive the verifier and the tag key for password. |
+| `LockStore` <sub>pub struct</sub> | [559](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L559) | An AppLock bound to a file, which is persisted after every attempt. |
+| `Backing` <sub>enum</sub> | [572](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L572) | Where a LockStore keeps its record. |
+| `Backing::primary` <sub>fn</sub> | [578](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L578) |  |
+| `LockStore::open` <sub>pub fn</sub> | [592](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L592) | Load the lock at path, or Ok(None) if no lock is configured there. |
+| `LockStore::create` <sub>pub fn</sub> | [613](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L613) | Create a lock at path, refusing to overwrite one already there. |
+| `LockStore::unlock` <sub>pub fn</sub> | [633](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L633) | Check password and persist the outcome. |
+| `LockStore::tampered` <sub>pub fn</sub> | [651](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L651) | Whether the stored record has been found edited by somebody without the passphrase. |
+| `LockStore::acknowledge` <sub>pub fn</sub> | [656](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L656) | Clear the tamper report, after proving the passphrase, and persist that. |
+| `LockStore::report_tamper` <sub>pub fn</sub> | [669](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L669) | Raise the tamper report from outside, and persist it if the passphrase allows. |
+| `LockStore::change_password` <sub>pub fn</sub> | [674](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L674) | Replace the password, after proving the current one. |
+| `LockStore::remove` <sub>pub fn</sub> | [690](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L690) | Remove the lock, after proving the password. |
+| `LockStore::cooldown` <sub>pub fn</sub> | [699](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L699) | Seconds still to wait before another attempt is accepted. |
+| `LockStore::failures` <sub>pub fn</sub> | [704](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L704) | Consecutive failed attempts recorded so far. |
+| `LockStore::path` <sub>pub fn</sub> | [710](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L710) | Where this lock is stored. |
+| `LockStore::save` <sub>fn</sub> | [714](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L714) |  |
+| `open_default` <sub>pub fn</sub> | [740](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L740) | Open the lock at the default location, wherever this platform keeps it. |
+| `create_default` <sub>pub fn</sub> | [756](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L756) | Create a lock at the default location, refusing to replace one already there. |
+| `write_private` <sub>fn</sub> | [782](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L782) | Write the lock file so it is owner-only from the moment it exists. |
+| `default_dir` <sub>pub fn</sub> | [793](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L793) | The configuration directory the vault keeps its files in, if the environment says where one is. |
+| `default_path` <sub>pub fn</sub> | [810](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs#L810) | Where the lock file lives on this platform, if the environment says. |

@@ -217,32 +217,98 @@ veilvoice lock remove
 The desktop app has the same controls under its **lock** tab, plus a **lock**
 button in the header that locks immediately and clears the session passphrase.
 
-`--path` puts the lock file somewhere other than this platform's config
-directory.
+`--path` puts the lock in one named file instead, somewhere of your choosing.
+Without it, the lock goes where §5.2 describes.
 
-### Read this part
+### 5.1 Read this part
 
 **The app lock is not tamper-proof, and cannot be.** A program running on your
-computer has nowhere to hide a secret from that computer. Anyone who can write
-to your files can delete the lock file; anyone holding the disk can edit the
-attempt counter, move the clock to defeat the wait, or attack the stored
-password hash offline.
+computer has nowhere to hide a secret from that computer. Anyone holding the
+disk can attack the stored password hash offline, and given enough access can
+still remove the lock entirely.
 
-What it does buy is real:
+What it does buy is real, and it is worth being precise about which parts are
+which, because two of the four things below are speed bumps and two are not.
+
+**Real, and the reason the lock exists:**
 
 - It stops **casual access** — the person who sits down at your unlocked
   session. That is a common threat, and a genuine one.
 - Three attempts are free, then the wait doubles — 5 s, 10 s, 20 s, up to
   fifteen minutes — and the count is **written to disk**, so killing the app
-  does not reset it.
+  does not reset it. Somebody who edits the file directly still defeats this;
+  see §5.3.
 - Argon2id at 256 MiB makes each offline guess expensive. That helps a good
   passphrase and does not save a bad one.
+
+**Real, and new:**
+
+- Each stored lock carries an **authentication tag** computed with a key that
+  exists only while your correct passphrase is in memory. If somebody swaps the
+  stored password for one of their own, or weakens the Argon2id cost so a guess
+  becomes cheap, the next time you unlock, VeilVoice tells you. The report is
+  written down, so it survives a restart, and clearing it asks for your
+  passphrase, so the person who caused it cannot dismiss it.
+- The lock is kept in **two copies**, in two directories. Deleting one does not
+  remove the lock: the other puts it back, and you are told it happened.
+- On Linux and macOS, when VeilVoice is run with administrator rights, the
+  second copy is written under `/etc/veilvoice` and is thereafter not writable
+  by an ordinary user. Removing the lock then needs `sudo`. VeilVoice never
+  asks for that privilege and never elevates itself; it uses what it already
+  has. On Windows the equivalent needs an access-control list VeilVoice does
+  not set, so there the second copy is a second copy and nothing more.
+
+**Not real, and not counted as security anywhere:**
+
+- The two files have **unguessable names** and their contents are **masked**,
+  so a search of your disk for the string `VEILLOK1` finds nothing and a backup
+  rule written against `applock.bin` misses. The names come from a value in an
+  index file at an obvious path, because something has to be findable or
+  VeilVoice could never open its own lock again. Anybody who reads that index,
+  or reads the source, recomputes both names in a second. This is obscurity. It
+  makes careless deletion and casual searching harder and it stops nobody who
+  is paying attention.
 
 If someone taking your disk is the threat, the answers are full-volume
 encryption (LUKS, BitLocker, FileVault) and the at-rest encryption above. Not
 this.
 
-### Use two different passwords
+### 5.2 Where the lock is kept
+
+In your platform's configuration directory: `%APPDATA%\veilvoice` on Windows,
+`~/Library/Application Support/veilvoice` on macOS, `$XDG_CONFIG_HOME/veilvoice`
+or `~/.config/veilvoice` on Linux.
+
+Inside it you will find `applock.index`, which is sixteen random bytes, and two
+files whose names are derived from it. The second copy is in the same directory
+unless VeilVoice was run with administrator rights, in which case it is under
+`/etc/veilvoice`.
+
+`veilvoice lock status` prints the directory rather than the file names, since
+the names carry no meaning for a reader. If you delete `applock.index`, both
+copies become unreachable and the lock is gone. Treat that file as part of the
+lock rather than as scratch.
+
+### 5.3 What the tag does not cover
+
+The failed-attempt counter and its timestamp sit **outside** the authentication
+tag, and the reason is unavoidable rather than an oversight: they are written at
+the one moment the tag key does not exist. A wrong passphrase has to be counted,
+counting it means writing the file, and that write cannot be authenticated by a
+key only a right passphrase produces. Putting them inside would mean either
+reporting every honest typo as tampering or not counting failures at all.
+
+So the rate limit is exactly as defeatable by a text editor as it always was.
+The tag covers the parts an attacker actually wants to change: the stored
+password, the Argon2id cost, and the tamper report itself.
+
+Two other things it does not cover. Replacing the lock wholesale with one the
+attacker created is not detected, because their record is authentic under their
+own passphrase. The second copy is what stands in the way of that, not the tag.
+And restoring an older copy of your own lock file, to wind the report back, is
+not detected either.
+
+### 5.4 Use two different passwords
 
 The app lock and the recording passphrase are deliberately separate secrets. If
 one password did both, opening the app would be the same act as unsealing
@@ -250,12 +316,19 @@ everything it had ever written. VeilVoice keeps the two derivations domain
 separated, so typing the same passphrase in both places still does not produce
 two copies of one value — but one guess would then open both, so do not.
 
-### If you forget the app-lock password
+### 5.5 If you forget the app-lock password
 
-Delete the lock file. That is not a backdoor: it is the same thing any attacker
-with access to your files could do, which is exactly why the lock is described
-as protecting against casual access rather than as a security boundary. The
-unlock screen shows the file's path.
+Delete `applock.index` and the two files beside it, in the directory §5.2 names.
+That is not a backdoor: it is the same thing anyone with access to your files
+could do, which is exactly why the lock is described as protecting against
+casual access rather than as a security boundary.
+
+If the second copy was written under `/etc/veilvoice`, removing it needs `sudo`.
+
+The unlock screen does not show any of this. It says the app is locked and asks
+for the passphrase, and nothing else. The person reading a locked window is
+either its owner, who does not need the file's location at that moment, or
+somebody who picked the machine up, who should not be handed it at all.
 
 Forgetting a **recording** passphrase is different. There is no recovery, by
 design.
