@@ -15,8 +15,10 @@ been taken — that is written down rather than absorbed into a number.
 eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
 marked *shipped* is work in progress.
 
-Since v0.1.14: a safety catch that reported a program it had closed as still
-running, and a test that failed one run in forty and was passing the other
+Since v0.1.14: every box in every flowchart on the reference pages opens the
+file it names **on this site**, in the theme the reader chose, with the whole
+function marked; a safety catch that reported a program it had closed as still
+running; and a test that failed one run in forty and was passing the other
 thirty-nine.
 
 Since v0.1.13: **Failsafe**, on by default, which notices the moment another
@@ -80,7 +82,7 @@ target directories, all three binaries byte for byte identical.
 | 24 | Demonstration animation: a voice going in, the mark lighting up, an unidentifiable wave coming out | **done** | — |
 | 25 | Cycling line of project facts, slow enough to read — CSS rather than an image, so it follows the reader's theme and needs no script | **done** | — |
 | 26 | Every website theme in the app, plus user-defined palettes with contrast computed rather than assumed | **done** | — |
-| 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **planned** | 3–4 d |
+| 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **done** | — |
 | 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **done** | — |
 | 29 | One single binary — the same executable runs as the desktop app or as the command line, installed or portable | **blocked** | — |
 | 30 | Installer with a window: Tokyo Night, animated, and **portable** described as the normal case rather than as something missing | **done** | — |
@@ -457,6 +459,29 @@ flash a console every time, and a windowed one would send its output nowhere
 when run from a terminal. Switching at run time is FFI, and every crate here
 carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
 maintainer's call and not something to slip in, so it waits for one.
+
+**Marker 27 opens the source here rather than sending the reader away, and
+what it does not do is guess.** Every box in every flowchart was a link to a
+blob on GitHub: correct for a README, which is read on GitHub, and wrong for a
+reference page where somebody has chosen a theme and is halfway through a call
+graph. There is now a page per file on this site carrying the file, coloured
+with the classes the site already uses for code, and a box opens it at the
+function it names with the whole function marked.
+
+Three things worth recording. The mark is `:target` in the stylesheet, so it
+needs no script and survives a bookmark; a version of this that ran JavaScript
+would have been shorter to write and would have marked nothing for a reader
+with scripts off, on a site whose no-JavaScript edition is a feature. The mark
+covers the function's documentation and attributes as well as its body, because
+that is where this project puts its reasons and a reader who clicked a box
+labelled `still_named` wants them. And the syntax colouring reads the comments
+and literals out of the *same scanner the call graph counts braces with*, so a
+keyword inside a comment and a brace inside a comment are one fact read twice
+rather than two guesses that can disagree.
+
+It costs 128 pages and about 6.5 MB under `website/reference/`, which the
+search index already excludes. That is stated rather than absorbed, because it
+is a third of the site again.
 
 **The test count this project states is a number about one machine, and now
 says so.** F-77. The same commit measures 996 tests on Windows and 988 on

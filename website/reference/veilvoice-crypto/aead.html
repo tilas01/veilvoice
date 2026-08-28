@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/aead.svg" alt="aead.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/aead.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 178 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 178 lines &middot; <a href="aead.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#in-plain-words">In plain words</a>
@@ -79,22 +79,22 @@
 <rect x="0" y="0" width="497" height="94" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M468.8 47.0 C 490.8 47.0, 490.8 47.0, 257.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
 <path d="M361.6 47.0 C 383.6 47.0, 383.6 47.0, 257.4 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L35" target="_blank" rel="noopener noreferrer">
+<a href="aead.src.html#fn-random_nonce">
 <rect x="28.0" y="20.0" width="119.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="87.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">random_nonce</text>
 <text x="87.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 35</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41" target="_blank" rel="noopener noreferrer">
+<a href="aead.src.html#fn-cipher">
 <rect x="173.2" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="213.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">cipher</text>
 <text x="213.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 41</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L51" target="_blank" rel="noopener noreferrer">
+<a href="aead.src.html#fn-seal">
 <rect x="280.4" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="321.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seal</text>
 <text x="321.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 51</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L70" target="_blank" rel="noopener noreferrer">
+<a href="aead.src.html#fn-open">
 <rect x="387.6" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="428.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open</text>
 <text x="428.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 70</text>
@@ -125,12 +125,12 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>NONCE_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L30" rel="noopener noreferrer">30</a></td><td>Nonce length for XChaCha20-Poly1305, in bytes.</td></tr>
-<tr><td><code>TAG_LEN</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L32" rel="noopener noreferrer">32</a></td><td>Poly1305 authentication tag length, in bytes.</td></tr>
-<tr><td><code>random_nonce</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L35" rel="noopener noreferrer">35</a></td><td>Draw a fresh random nonce from the OS CSPRNG.</td></tr>
-<tr><td><code>cipher</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L41" rel="noopener noreferrer">41</a></td><td></td></tr>
-<tr><td><code>seal</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L51" rel="noopener noreferrer">51</a></td><td>Encrypt plaintext, authenticating aad alongside it.</td></tr>
-<tr><td><code>open</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/aead.rs#L70" rel="noopener noreferrer">70</a></td><td>Decrypt and verify.</td></tr>
+<tr><td><code>NONCE_LEN</code> <sub>pub const</sub></td><td><a href="aead.src.html#fn-nonce_len">30</a></td><td>Nonce length for XChaCha20-Poly1305, in bytes.</td></tr>
+<tr><td><code>TAG_LEN</code> <sub>pub const</sub></td><td><a href="aead.src.html#fn-tag_len">32</a></td><td>Poly1305 authentication tag length, in bytes.</td></tr>
+<tr><td><code>random_nonce</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-random_nonce">35</a></td><td>Draw a fresh random nonce from the OS CSPRNG.</td></tr>
+<tr><td><code>cipher</code> <sub>fn</sub></td><td><a href="aead.src.html#fn-cipher">41</a></td><td></td></tr>
+<tr><td><code>seal</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-seal">51</a></td><td>Encrypt plaintext, authenticating aad alongside it.</td></tr>
+<tr><td><code>open</code> <sub>pub fn</sub></td><td><a href="aead.src.html#fn-open">70</a></td><td>Decrypt and verify.</td></tr>
 </tbody></table>
 </section>
 </div></div>

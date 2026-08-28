@@ -48,13 +48,41 @@ import socket
 import struct
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.request
 
-EDGE_CANDIDATES = (
+# Where to find a browser that speaks the DevTools protocol.
+#
+# Edge first, because that is what this was written against and what the
+# committed screenshots were taken with. The rest are here because the tool was
+# Windows-only and the rule it exists to serve -- look at the page -- is not:
+# a session on Linux could run every test in this repository and could not open
+# a single page of the site it had just rebuilt.
+#
+# `VEILVOICE_BROWSER` overrides the lot, for a browser installed somewhere
+# these lists do not name. Any Chromium will do; the protocol is the same.
+BROWSER_CANDIDATES = (
     r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
     r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+    "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    "/opt/pw-browsers/chromium",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+    "/usr/bin/google-chrome",
+    "/usr/bin/microsoft-edge",
+    "/snap/bin/chromium",
 )
+
+
+def find_browser():
+    """The first browser on this machine that can be driven, or nothing."""
+    override = os.environ.get("VEILVOICE_BROWSER", "").strip()
+    if override:
+        return override if os.path.exists(override) else None
+    return next((path for path in BROWSER_CANDIDATES if os.path.exists(path)), None)
 
 # The legal gate covers the page until it is accepted, so every screenshot would
 # otherwise be a picture of the same modal. Setting the key the gate looks for
@@ -138,17 +166,25 @@ class Socket(object):
 
 class Browser(object):
     def __init__(self, port, width, height):
-        edge = next((path for path in EDGE_CANDIDATES if os.path.exists(path)), None)
-        if edge is None:
-            raise SystemExit("Microsoft Edge was not found in either usual place")
+        browser = find_browser()
+        if browser is None:
+            raise SystemExit(
+                "no browser found. Looked in:\n  "
+                + "\n  ".join(BROWSER_CANDIDATES)
+                + "\n\nSet VEILVOICE_BROWSER to the one on this machine.")
+        profile = os.path.join(tempfile.gettempdir(), "vv-render-%d" % port)
+        command = [browser, "--headless=new", "--disable-gpu", "--hide-scrollbars",
+                   "--no-first-run", "--no-default-browser-check",
+                   "--remote-debugging-port=%d" % port,
+                   "--user-data-dir=%s" % profile,
+                   "--window-size=%d,%d" % (width, height)]
+        # Chromium refuses to run as root without this, and a container is
+        # very often root. It changes nothing about what is rendered.
+        if hasattr(os, "geteuid") and os.geteuid() == 0:
+            command.append("--no-sandbox")
+        command.append("about:blank")
         self.process = subprocess.Popen(
-            [edge, "--headless=new", "--disable-gpu", "--hide-scrollbars",
-             "--no-first-run", "--no-default-browser-check",
-             "--remote-debugging-port=%d" % port,
-             "--user-data-dir=C:/Windows/Temp/vv-render-%d" % port,
-             "--window-size=%d,%d" % (width, height),
-             "about:blank"],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.socket = Socket(self._wait_for_target(port))
         self.next_id = 0
 

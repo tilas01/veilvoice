@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/meter.svg" alt="meter.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/meter.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 259 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 259 lines &middot; <a href="meter.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-the-old-one-was-wrong">Why the old one was wrong</a>
@@ -88,22 +88,22 @@
 <defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker></defs>
 <rect x="0" y="0" width="481" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M452.8 47.0 C 474.8 47.0, 474.8 47.0, 112.2 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L74" target="_blank" rel="noopener noreferrer">
+<a href="meter.src.html#fn-render">
 <rect x="28.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="68.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">render</text>
 <text x="68.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 74</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L136" target="_blank" rel="noopener noreferrer">
+<a href="meter.src.html#fn-channel-default">
 <rect x="135.2" y="20.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="210.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Channel::default</text>
 <text x="210.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L147" target="_blank" rel="noopener noreferrer">
+<a href="meter.src.html#fn-channel-update">
 <rect x="310.8" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="381.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Channel::update</text>
 <text x="381.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L168" target="_blank" rel="noopener noreferrer">
+<a href="meter.src.html#fn-channel-has_clipped">
 <rect x="150.4" y="120.0" width="180.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="240.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Channel::has_clipped</text>
 <text x="240.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
@@ -135,13 +135,13 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>HOLD</code> <sub>pub const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L62" rel="noopener noreferrer">62</a></td><td>How long a peak marker is held before it falls back.</td></tr>
-<tr><td><code>EIGHTHS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L69" rel="noopener noreferrer">69</a></td><td>The eighth-block characters, so a bar of n characters has 8n steps.</td></tr>
-<tr><td><code>render</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L74" rel="noopener noreferrer">74</a></td><td>One meter: the bar, the peak marker, and the number.</td></tr>
-<tr><td><code>Channel</code> <sub>pub struct</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L129" rel="noopener noreferrer">129</a></td><td>One channel&#x27;s meter, keeping the peak between reads.</td></tr>
-<tr><td><code>Channel::default</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L136" rel="noopener noreferrer">136</a></td><td></td></tr>
-<tr><td><code>Channel::update</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L147" rel="noopener noreferrer">147</a></td><td>Take a new reading and give back the meter to print.</td></tr>
-<tr><td><code>Channel::has_clipped</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/meter.rs#L168" rel="noopener noreferrer">168</a></td><td>Whether this channel has clipped at any point in the session.</td></tr>
+<tr><td><code>HOLD</code> <sub>pub const</sub></td><td><a href="meter.src.html#fn-hold">62</a></td><td>How long a peak marker is held before it falls back.</td></tr>
+<tr><td><code>EIGHTHS</code> <sub>const</sub></td><td><a href="meter.src.html#fn-eighths">69</a></td><td>The eighth-block characters, so a bar of n characters has 8n steps.</td></tr>
+<tr><td><code>render</code> <sub>pub fn</sub></td><td><a href="meter.src.html#fn-render">74</a></td><td>One meter: the bar, the peak marker, and the number.</td></tr>
+<tr><td><code>Channel</code> <sub>pub struct</sub></td><td><a href="meter.src.html#fn-channel">129</a></td><td>One channel&#x27;s meter, keeping the peak between reads.</td></tr>
+<tr><td><code>Channel::default</code> <sub>fn</sub></td><td><a href="meter.src.html#fn-channel-default">136</a></td><td></td></tr>
+<tr><td><code>Channel::update</code> <sub>pub fn</sub></td><td><a href="meter.src.html#fn-channel-update">147</a></td><td>Take a new reading and give back the meter to print.</td></tr>
+<tr><td><code>Channel::has_clipped</code> <sub>pub fn</sub></td><td><a href="meter.src.html#fn-channel-has_clipped">168</a></td><td>Whether this channel has clipped at any point in the session.</td></tr>
 </tbody></table>
 </section>
 </div></div>

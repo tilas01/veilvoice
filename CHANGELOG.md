@@ -8,6 +8,45 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Every box in a flowchart now opens the source, here, in your colours
+
+Marker 27. The reference pages have drawn a call graph per crate and per file
+since marker 18, and every box in every one of them was a link that left the
+site: a blob on GitHub, in a new tab, in somebody else's colours.
+
+There is now a page per file on this site carrying the file itself, coloured
+with the same six classes the site already uses for code, so it follows
+whichever of the nine themes you picked. Clicking a box opens that file at that
+function, **with the whole function marked** rather than the one line its name
+is on, and the mark reaches up over the function's documentation and its
+attributes, because that is where this project puts the reason for anything.
+
+The mark is `:target` in the stylesheet and nothing else. No script runs, so it
+works with JavaScript off, it works from a bookmark, and it works on an engine
+that has never heard of any of this. Line numbers are a pseudo-element, so
+selecting the code and copying it does not take the numbers with it, and they
+stay put while a long line scrolls under them.
+
+Two things paid for by measurement rather than reasoning. A line is
+`width: max-content` with a floor of the full column, because a block inside a
+sideways scroller is only as wide as the *visible* box: the mark stopped where
+the column did, in the middle of the code it was pointing at. And the block is
+`white-space: normal` while each line inside it is `white-space: pre`, which
+looks backwards and is not: the newlines between one line element and the next
+are markup, and left as significant they drew the whole file double spaced.
+
+Costs, stated rather than buried: 128 new pages and about 6.5 MB, all of it
+under `website/reference/`, which the search index already excludes. A source
+edit now writes a proportional diff into one more generated file.
+
+The item table's line numbers land on the same pages. The GitHub link is still
+there, on each file's page, named as what it is.
+
+`tools/site-tests/source.test.js` is a new suite for this: every fragment that
+names another page has to resolve, every source page has to draw exactly as
+many lines as the file it claims to show, every box has to stay on this site,
+and the mark has to remain a CSS rule.
+
 ### F-78 - four tests shared one global and could undo each other
 
 The active theme in the desktop application is a process-global atomic, which
