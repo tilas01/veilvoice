@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/kdf.svg" alt="kdf.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/kdf.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 399 lines &middot; <a href="kdf.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 525 lines &middot; <a href="kdf.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#cost-parameters-arrive-from-a-file-so-they-are-hostile-input">Cost parameters arrive from a file, so they are hostile input</a>
@@ -71,19 +71,19 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>399 lines defining <strong>7 functions</strong> (5 public), <strong>1 type</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>525 lines defining <strong>7 functions</strong> (5 public), <strong>1 type</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct KdfParams</code> <span style="color:var(--muted)">line 63</span> &mdash; Argon2id cost parameters.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>KdfParams::weak_for_tests</code> <span style="color:var(--muted)">line 90</span> &mdash; A deliberately cheap profile for tests and low-memory devices.
 </li>
-<li><code>KdfParams::within</code> <span style="color:var(--muted)">line 148</span> &mdash; Check the costs against a caller-chosen memory ceiling as well as the built-in one.
+<li><code>KdfParams::within</code> <span style="color:var(--muted)">line 196</span> &mdash; Check the costs against a caller-chosen memory ceiling as well as the built-in one.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>checked</code></span>
 </li>
-<li><code>derive_key</code> <span style="color:var(--muted)">line 214</span> &mdash; Derive a 32-byte key from password and salt.
+<li><code>derive_key</code> <span style="color:var(--muted)">line 265</span> &mdash; Derive a 32-byte key from password and salt.
 </li>
-<li><code>random_salt</code> <span style="color:var(--muted)">line 227</span> &mdash; Draw a fresh random salt from the OS CSPRNG.
+<li><code>random_salt</code> <span style="color:var(--muted)">line 278</span> &mdash; Draw a fresh random salt from the OS CSPRNG.
 </li>
 </ul>
 </section>
@@ -109,27 +109,27 @@
 <a href="kdf.src.html#fn-kdfparams-within">
 <rect x="454.8" y="20.0" width="157.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="533.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">KdfParams::within</text>
-<text x="533.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 148</text>
+<text x="533.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 196</text>
 </a>
 <a href="kdf.src.html#fn-kdfparams-checked">
 <rect x="233.6" y="220.0" width="164.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="316.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">KdfParams::checked</text>
-<text x="316.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 177</text>
+<text x="316.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 225</text>
 </a>
 <a href="kdf.src.html#fn-kdfparams-build">
 <rect x="107.4" y="120.0" width="149.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="182.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">KdfParams::build</text>
-<text x="182.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
+<text x="182.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 248</text>
 </a>
 <a href="kdf.src.html#fn-derive_key">
 <rect x="283.0" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="335.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">derive_key</text>
-<text x="335.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 214</text>
+<text x="335.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 265</text>
 </a>
 <a href="kdf.src.html#fn-random_salt">
 <rect x="413.0" y="120.0" width="111.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="468.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">random_salt</text>
-<text x="468.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
+<text x="468.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 278</text>
 </a>
 </svg>
 </div>
@@ -139,20 +139,20 @@
 flowchart TD
     n_default[&quot;KdfParams::default&lt;br/&gt;line 77&quot;]
     n_weak_for_tests([&quot;KdfParams::weak_for_tests&lt;br/&gt;line 90&quot;])
-    n_within([&quot;KdfParams::within&lt;br/&gt;line 148&quot;])
-    n_checked[&quot;KdfParams::checked&lt;br/&gt;line 177&quot;]
-    n_build[&quot;KdfParams::build&lt;br/&gt;line 197&quot;]
-    n_derive_key([&quot;derive_key&lt;br/&gt;line 214&quot;])
-    n_random_salt([&quot;random_salt&lt;br/&gt;line 227&quot;])
+    n_within([&quot;KdfParams::within&lt;br/&gt;line 196&quot;])
+    n_checked[&quot;KdfParams::checked&lt;br/&gt;line 225&quot;]
+    n_build[&quot;KdfParams::build&lt;br/&gt;line 248&quot;]
+    n_derive_key([&quot;derive_key&lt;br/&gt;line 265&quot;])
+    n_random_salt([&quot;random_salt&lt;br/&gt;line 278&quot;])
     n_build --&gt; n_checked
     n_within --&gt; n_checked
     click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L77&quot; &quot;open the source&quot;
     click n_weak_for_tests href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L90&quot; &quot;open the source&quot;
-    click n_within href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L148&quot; &quot;open the source&quot;
-    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L177&quot; &quot;open the source&quot;
-    click n_build href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L197&quot; &quot;open the source&quot;
-    click n_derive_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L214&quot; &quot;open the source&quot;
-    click n_random_salt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L227&quot; &quot;open the source&quot;
+    click n_within href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L196&quot; &quot;open the source&quot;
+    click n_checked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L225&quot; &quot;open the source&quot;
+    click n_build href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L248&quot; &quot;open the source&quot;
+    click n_derive_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L265&quot; &quot;open the source&quot;
+    click n_random_salt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L278&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_weak_for_tests,n_within,n_derive_key,n_random_salt entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -170,14 +170,15 @@ flowchart TD
 <tr><td><code>KdfParams::weak_for_tests</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-weak_for_tests">90</a></td><td>A deliberately cheap profile for tests and low-memory devices.</td></tr>
 <tr><td><code>KdfParams::MAX_P_COST</code> <sub>const</sub></td><td><a href="kdf.src.html#fn-kdfparams-max_p_cost">99</a></td><td>Argon2&#x27;s own documented ceiling on parallelism: 2^24 - 1.</td></tr>
 <tr><td><code>KdfParams::MAX_M_COST</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-kdfparams-max_m_cost">120</a></td><td>The largest memory cost this build will attempt, in KiB &#8212; 4 GiB.</td></tr>
-<tr><td><code>KdfParams::UNATTENDED_MAX_M_COST</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-kdfparams-unattended_max_m_cost">136</a></td><td>A ceiling for a caller with nobody watching.</td></tr>
-<tr><td><code>KdfParams::within</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-within">148</a></td><td>Check the costs against a caller-chosen memory ceiling as well as the built-in one.</td></tr>
-<tr><td><code>KdfParams::checked</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-checked">177</a></td><td>Check the costs are ones Argon2 can accept, before handing them to it.</td></tr>
-<tr><td><code>KdfParams::build</code> <sub>fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-build">197</a></td><td>Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF.</td></tr>
-<tr><td><code>SALT_LEN</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-salt_len">206</a></td><td>Length of the salt stored in an encrypted container.</td></tr>
-<tr><td><code>KEY_LEN</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-key_len">208</a></td><td>Length of a derived symmetric key.</td></tr>
-<tr><td><code>derive_key</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-derive_key">214</a></td><td>Derive a 32-byte key from password and salt.</td></tr>
-<tr><td><code>random_salt</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-random_salt">227</a></td><td>Draw a fresh random salt from the OS CSPRNG.</td></tr>
+<tr><td><code>KdfParams::MAX_T_COST</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-kdfparams-max_t_cost">160</a></td><td>The largest number of passes this build will attempt.</td></tr>
+<tr><td><code>KdfParams::UNATTENDED_MAX_M_COST</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-kdfparams-unattended_max_m_cost">176</a></td><td>A ceiling for a caller with nobody watching.</td></tr>
+<tr><td><code>KdfParams::within</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-within">196</a></td><td>Check the costs against a caller-chosen memory ceiling as well as the built-in one.</td></tr>
+<tr><td><code>KdfParams::checked</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-checked">225</a></td><td>Check the costs are ones Argon2 can accept, before handing them to it.</td></tr>
+<tr><td><code>KdfParams::build</code> <sub>fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-build">248</a></td><td>Reject values Argon2 cannot accept, so a corrupt header fails loudly rather than panicking deep inside the KDF.</td></tr>
+<tr><td><code>SALT_LEN</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-salt_len">257</a></td><td>Length of the salt stored in an encrypted container.</td></tr>
+<tr><td><code>KEY_LEN</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-key_len">259</a></td><td>Length of a derived symmetric key.</td></tr>
+<tr><td><code>derive_key</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-derive_key">265</a></td><td>Derive a 32-byte key from password and salt.</td></tr>
+<tr><td><code>random_salt</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-random_salt">278</a></td><td>Draw a fresh random salt from the OS CSPRNG.</td></tr>
 </tbody></table>
 </section>
 </div></div>

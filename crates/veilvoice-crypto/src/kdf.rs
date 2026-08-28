@@ -119,6 +119,46 @@ impl KdfParams {
     /// small machine; it can stop an absurd number from being taken seriously.
     pub const MAX_M_COST: u32 = 4 * 1024 * 1024;
 
+    /// The largest number of passes this build will attempt.
+    ///
+    /// **F-82.** `m_cost` had a ceiling and `t_cost` had only a test for zero,
+    /// so a header could declare `u32::MAX` passes: four billion of them, over
+    /// however much memory it also asked for. Nothing overflows and nothing
+    /// allocates, so every check above passed and the derivation simply did not
+    /// finish.
+    ///
+    /// Found by the coverage-guided campaign, which produced a header
+    /// declaring `m_cost` 65535, `t_cost` 4521984 and `p_cost` 1280. Measured
+    /// on the machine that found it, in a release build: **about 74 hours**,
+    /// and that input is not the worst one, only the one the fuzzer happened
+    /// to reach. `u32::MAX` passes at the same memory is roughly eight years.
+    ///
+    /// It matters in two places and the second is worse. A `.veil` file is
+    /// something somebody sent you, and merely attempting to open it would hang
+    /// the program. The app-lock file carries the same three numbers and is
+    /// read **before anyone has authenticated**, so anything able to write it
+    /// could stop VeilVoice from starting, for ever, with no error and nothing
+    /// to see. That is the argument [`MAX_M_COST`](Self::MAX_M_COST) already
+    /// makes about memory; nobody had made it about time.
+    ///
+    /// 16 is chosen the way the memory ceiling was, and then tighter, because
+    /// time has no allocator to fail on its behalf. RFC 9106's two recommended
+    /// profiles use one pass and three, libsodium's most expensive preset uses
+    /// four, and this crate's default is three; 16 is four times the highest of
+    /// those. Measured in a release build: 16 passes at
+    /// [`MAX_M_COST`](Self::MAX_M_COST) is 75 seconds, and at
+    /// [`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) it is 18. So the
+    /// most expensive header this build will accept is a wait somebody can sit
+    /// through, rather than one they will never see the end of.
+    ///
+    /// This is one ceiling and it is enforced in [`checked`](Self::checked),
+    /// the single funnel every derivation passes through, so it holds for the
+    /// container, for the app lock, and for anything built against this crate.
+    /// The honest residual is the same one the memory ceiling states: a cap
+    /// cannot make a hostile file cheap, it can stop an absurd number from
+    /// being taken seriously.
+    pub const MAX_T_COST: u32 = 16;
+
     /// A ceiling for a caller with nobody watching.
     ///
     /// [`MAX_M_COST`](Self::MAX_M_COST) exists to stop an *absurd* value; it is
@@ -145,6 +185,14 @@ impl KdfParams {
     /// use this to decline instead of spending the memory. Pass
     /// [`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) unless there is a
     /// reason for something else.
+    ///
+    /// There is no time ceiling here and there does not need to be: unlike
+    /// memory, time is bounded for every caller by
+    /// [`MAX_T_COST`](Self::MAX_T_COST), which is tight enough that the worst
+    /// header this build will accept is a wait rather than a hang. A ceiling
+    /// here as well would sit on the *attended* path too, since that is
+    /// [`super::container::open_with_password`] with a larger number, and would
+    /// refuse a container somebody had deliberately chosen to open.
     pub fn within(&self, max_m_cost: u32) -> Result<(), Error> {
         self.checked()?;
         if self.m_cost > max_m_cost {
@@ -178,7 +226,10 @@ impl KdfParams {
         if self.p_cost == 0 || self.p_cost > Self::MAX_P_COST {
             return Err(Error::KdfParams);
         }
-        if self.t_cost == 0 {
+        // F-82. Zero is not a number of passes, and neither is four billion:
+        // a header declaring `u32::MAX` passes nothing overflows, nothing
+        // allocates, and nothing finishes.
+        if self.t_cost == 0 || self.t_cost > Self::MAX_T_COST {
             return Err(Error::KdfParams);
         }
         if self.m_cost > Self::MAX_M_COST {
@@ -283,6 +334,81 @@ mod tests {
         )
         .unwrap();
         assert_ne!(a, b);
+    }
+
+    /// **F-82.** The exact parameters the coverage-guided campaign found, and
+    /// the worst case it did not reach.
+    ///
+    /// These pass every other check: nothing overflows, nothing allocates
+    /// beyond the memory ceiling, and `m_cost >= p_cost * 8` holds. The only
+    /// thing wrong with them is that the derivation does not finish. Measured
+    /// in a release build before the ceiling existed: about 74 hours for the
+    /// first set, and roughly eight years for `u32::MAX`.
+    ///
+    /// The numbers are written out rather than referred to, because that is
+    /// what makes this a regression test for the input rather than a
+    /// restatement of the rule.
+    #[test]
+    fn a_number_of_passes_that_would_not_finish_is_refused() {
+        let found = KdfParams {
+            m_cost: 65535,
+            t_cost: 4_521_984,
+            p_cost: 1280,
+        };
+        assert!(
+            matches!(found.checked(), Err(Error::KdfParams)),
+            "{found:?}"
+        );
+        assert!(
+            matches!(
+                derive_key(P, &[0u8; SALT_LEN], found),
+                Err(Error::KdfParams)
+            ),
+            "the derivation must refuse, not run"
+        );
+
+        for t_cost in [u32::MAX, u32::MAX / 2, KdfParams::MAX_T_COST + 1] {
+            let bad = KdfParams { t_cost, ..weak() };
+            assert!(
+                matches!(bad.checked(), Err(Error::KdfParams)),
+                "t_cost {t_cost} was accepted"
+            );
+        }
+
+        // And the ceiling itself still works, so this refuses absurd values
+        // rather than everything.
+        let at_the_line = KdfParams {
+            t_cost: KdfParams::MAX_T_COST,
+            ..weak()
+        };
+        assert!(at_the_line.checked().is_ok(), "{at_the_line:?}");
+    }
+
+    /// Every parameter set this project actually writes stays acceptable, and
+    /// the ceiling sits well clear of them.
+    ///
+    /// A ceiling that refused the default would be a much louder bug than the
+    /// one it was added for, and "we chose a number" is not evidence that the
+    /// number is above the ones in use.
+    #[test]
+    fn the_time_ceiling_sits_above_every_cost_this_project_uses() {
+        for params in [KdfParams::default(), KdfParams::weak_for_tests()] {
+            assert!(params.checked().is_ok(), "{params:?}");
+            assert!(
+                params.t_cost * 4 <= KdfParams::MAX_T_COST,
+                "{params:?} leaves no room under the ceiling"
+            );
+        }
+        // The attended path must still reach the ceiling: a bound that nothing
+        // can get to is a bound on nothing.
+        let expensive = KdfParams {
+            t_cost: KdfParams::MAX_T_COST,
+            ..KdfParams::default()
+        };
+        assert!(
+            expensive.within(KdfParams::MAX_M_COST).is_ok(),
+            "{expensive:?}"
+        );
     }
 
     #[test]

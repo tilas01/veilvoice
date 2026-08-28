@@ -40,13 +40,15 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Eight defects found and fixed (F-74 to F-81.)** Three are in the security
+**Ten defects found and fixed (F-74 to F-83.)** Three are in the security
 crates written since the eighth round and none of those has shipped: `main`
 carries them and they are not in v0.1.14. One is on the published front page
 and has been there for as long as the count has. One is in the test suite
-itself, where it had been passing four runs in five. Three shipped: one in the
-installer, in v0.1.14 and in every release before it, and two in the package
-definitions, which have been five releases stale.
+itself, where it had been passing four runs in five. Three shipped in the
+installer and the package definitions. **And two are in the cryptography and
+the tamper record, both reachable from a file somebody sends you, both shipped,
+and both found by running the coverage-guided campaign that this document had
+listed as built and never run.**
 
 This round covers what was added after it: Failsafe, the application baseline,
 the privilege report, the hardware detection, the decoy passphrase, and the
@@ -61,13 +63,97 @@ running. F-77 trusted one machine's measurement to be a fact about the tree.
 F-78 trusted a test that passes to mean a test that holds. F-79 trusted another
 program's error message to be readable in the middle of this one's output.
 F-80 trusted a recipe nobody had run. F-81 trusted six files to keep up with a
-number that had moved five times. None would have been found by reading the
-code. F-74 was found by writing a test that killed a real process and watching
+number that had moved five times. F-82 trusted a number in a file to be a
+number of passes somebody would wait for. F-83 trusted a path in a record to be
+a path rather than a way of rewriting the report that prints it. None would
+have been found by reading the code. F-74 was found by writing a test that killed a real process and watching
 what it actually did; F-76, F-77 and F-78 by running that same suite on a
 second operating system, where one test failed, one number came out different,
 and one test failed only sometimes; F-79 by running the installer on that
 machine; and F-80 and F-81 by building a package, which are three things this
 document had listed as never done.
+
+### F-83 -- the tamper record refused to write what it was happy to read
+
+`veilvoice-guard/src/manifest.rs`. `Manifest::of` refused to record a path
+containing a line break. `Manifest::parse` accepted one. So VeilVoice would not
+write a record it was perfectly willing to read from somebody else, and
+`veilvoice guard check` reads whichever file is at the path it is given. A
+record is exactly the kind of thing that gets handed to you.
+
+Found by the coverage-guided campaign, which produced a manifest whose recorded
+path contained a **carriage return**.
+
+What that costs is not theoretical, and it is not about parsing. The entire
+product of this module is a report somebody reads to decide whether their files
+have been altered, and that report is printed to a terminal. A carriage return
+returns the cursor to the start of the line, so everything already printed is
+overwritten by whatever follows it: a crafted path makes the report say
+something other than what is recorded. An escape character does more again, and
+can colour, move the cursor, or clear the screen. **A tamper report that can be
+made to lie is the feature failing at the only thing it does.**
+
+Both ends now refuse the same thing, and they refuse the whole C0 and C1
+control range rather than the two characters that were found, because listing
+the ones somebody thought of is how the next one gets in. Refusing rather than
+stripping is deliberate: a path this format cannot represent faithfully is one
+it must not claim to hold. Such a filename is legal on Unix and vanishingly
+rare, and being told so is better than a record that quietly describes a
+different file.
+
+The asymmetry is the thing to hold rather than the character list, so the test
+asserts it directly: what `of` will not write, `parse` will not read.
+
+### F-82 -- a header could ask for four billion passes, and get them
+
+`veilvoice-crypto/src/kdf.rs`. The Argon2 memory cost has had a documented
+ceiling since F-2 and F-3, with a long note explaining that `m_cost` arrives
+from the file, that Argon2 allocates it before doing anything else, and that a
+header claiming `u32::MAX` asks for four terabytes. The time cost had a test
+for zero and nothing else.
+
+Nothing overflows and nothing allocates, so every check passed. The derivation
+simply did not finish.
+
+Found by the coverage-guided campaign, which produced a header declaring
+`m_cost` 65535, `t_cost` 4,521,984 and `p_cost` 1280. Every existing test that
+header would meet says it is fine: the arithmetic is in range, the memory is
+under the ceiling, and `m_cost >= p_cost * 8` holds. **Measured in a release
+build: about 74 hours.** That is not the worst case, only the one the fuzzer
+happened to reach; `u32::MAX` passes at the same memory is roughly eight years.
+
+**It matters in two places and the second is worse.** A `.veil` file is
+something somebody sent you, and merely attempting to open it hangs the
+program. The app-lock file carries the same three numbers and is read **before
+anyone has authenticated**, so anything able to write it could stop VeilVoice
+from starting, for ever, with no error and nothing to see. That is precisely
+the argument the memory ceiling already makes, and nobody had made it about
+time. The campaign found it through both doors independently, producing a
+lock-file input declaring 1,279,870,294 passes.
+
+`MAX_T_COST` is 16, enforced in `checked`, the single funnel every derivation
+passes through, so it holds for the container, for the app lock and for
+anything built against these crates. Chosen by measurement rather than by
+feel: RFC 9106's two recommended profiles use one pass and three, libsodium's
+most expensive preset uses four, and this crate's default is three, so 16 is
+four times the highest of them. At the memory ceiling it is 75 seconds and at
+the unattended ceiling 18. The most expensive header this build accepts is now
+a wait somebody can sit through.
+
+One ceiling, not two. The first attempt also put a tighter one inside
+`KdfParams::within`, which is wrong: `within` is on the *attended* path as well,
+since `open_with_password` is the same call with a larger number, so it would
+have refused a container a person had deliberately chosen to open. Caught by
+noticing that the regression test still passed with `MAX_T_COST` raised to
+`u32::MAX`, which meant something else was doing the refusing.
+
+The exact bytes are now a regression test in
+`crates/veilvoice-crypto/tests/parser_fuzz.rs`, where they run on every commit
+on every platform with no nightly toolchain. It is written with a deadline on a
+thread rather than a stopwatch around the call, because the defect is a *hang*:
+a test that times the call after it returns cannot fail, it can only never
+finish, and a test that hangs says less than one that fails in five seconds and
+names the reason.
 
 ### F-81 -- every package definition was five releases behind
 
@@ -842,7 +928,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 988 tests across 26 crates, plus doctests and 13 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 999 tests across 26 crates, plus doctests and 13 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -2249,14 +2335,23 @@ the top of this document now says.
    scope have each found real defects in code a previous round had called
    clean. This round it was F-37, live on the published site the whole time.
 
-2. **The coverage-guided campaign has been built but not run to convergence.**
-   `fuzz/` contains six libFuzzer targets, one per parser that reads bytes
-   somebody else produced, and they compile against the real APIs. They have
-   not been run to exhaustion by the maintainer, because libFuzzer needs a
-   clang-based toolchain that the `x86_64-pc-windows-msvc` host this was
-   developed on does not provide. "We have a fuzzing setup" and "we have fuzzed
-   this" are different claims and only the first is true. `fuzz/README.md`
-   says so in the same words.
+2. **The coverage-guided campaign has now been run once, for five minutes per
+   target, and that is not convergence.** All six targets, on x86-64 Linux.
+   It found two defects in its first run: F-82, an unbounded Argon2 time cost
+   reachable from a `.veil` file and from the app-lock file that is read before
+   anyone authenticates; and F-83, a tamper record whose path could rewrite the
+   report that prints it.
+
+   That is the strongest evidence in this document for what an unrun campaign
+   is worth. Both defects had shipped. Both were in code that three audit
+   rounds had read. Neither was reachable by the deterministic campaign, which
+   generates inputs by construction rather than by coverage feedback, and both
+   are now regression tests inside it.
+
+   What is still open: five minutes is not convergence, no corpus is kept
+   between runs, three of the six targets have never found anything, and
+   nobody has run any of it on Windows or macOS. `fuzz/README.md` carries the
+   run counts and says the same thing in its own words.
 
 3. **32-bit targets are now exercised in CI, and this entry says what that
    does and does not cover.** It had been open since the fifth round, named
@@ -2332,7 +2427,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Eighty-one defects found and fixed across nine audit rounds (F-1 to F-81):**
+**Eighty-three defects found and fixed across nine audit rounds (F-1 to F-83):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

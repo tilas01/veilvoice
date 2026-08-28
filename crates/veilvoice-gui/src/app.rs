@@ -252,14 +252,17 @@ pub struct VeilVoiceApp {
     chosen_output: Option<String>,
     session: Option<veilvoice_audio::LiveSession>,
     live_error: Option<String>,
-    meter_in: f32,
-    meter_out: f32,
-    // The highest level of the last moment or so, and when it was taken. A bar
-    // showing only the current frame cannot show a transient: the loud syllable
-    // is gone before an eye finishes moving.
-    hold_in: f32,
-    hold_out: f32,
-    hold_since: Option<std::time::Instant>,
+    /// The smoothed levels, updated once a frame from the session.
+    ///
+    /// One copy, because the live tab and the monitor strip both draw them and
+    /// two copies is two bars that disagree by a frame. Whichever of them
+    /// somebody happens to be looking at is then the wrong one.
+    levels: crate::monitor::Levels,
+    /// Whether the running session is a preview to this machine's own output
+    /// rather than the real thing going to a cable. Shown in the interface,
+    /// because a person who thinks they are live and is not, or the other way
+    /// round, is the whole problem this pair of buttons exists to prevent.
+    previewing: bool,
 
     // The app lock, and at-rest encryption of what jobs write.
     security: Security,
@@ -349,11 +352,8 @@ impl VeilVoiceApp {
             chosen_output: None,
             session: None,
             live_error: None,
-            meter_in: 0.0,
-            meter_out: 0.0,
-            hold_in: 0.0,
-            hold_out: 0.0,
-            hold_since: None,
+            levels: crate::monitor::Levels::default(),
+            previewing: false,
             security: Security::default(),
             // Off. `VeilVoiceApp::new` is the only place the saved preference
             // is consulted, so no test and no `Default` can open in group mode
@@ -674,6 +674,38 @@ impl eframe::App for VeilVoiceApp {
         // the setup tab's progress strip obeys the same answer rather than
         // asking the question a second time in the same frame.
         let motion = self.preferences.motion(ctx);
+
+        // The levels, once a frame, before anything draws them.
+        //
+        // Here rather than in the live tab, because the monitor strip below is
+        // drawn on every tab and the live tab is drawn on one. Reading the
+        // session from whichever happened to run would have made the strip
+        // freeze the moment somebody navigated away, which is the exact moment
+        // this feature exists for.
+        if let Some(session) = &self.session {
+            let stats = session.stats();
+            self.levels.update(stats.input_peak, stats.output_peak);
+        }
+
+        // The live monitor, on every tab and above the panel. Docked by
+        // default; a floating card or nothing if the reader has said so.
+        //
+        // Drawn before the central panel so the panel is laid out inside what
+        // is left, rather than under a strip that arrives after it.
+        if crate::monitor::show(
+            ctx,
+            self.preferences.live_monitor(),
+            self.session.is_some(),
+            self.previewing,
+            &self.levels,
+        ) == crate::monitor::Action::Dismiss
+        {
+            self.preferences
+                .set_live_monitor(crate::monitor::Style::Off);
+            self.notice = Some(crate::notify::Notice::note(
+                "The live monitor is off. Settings brings it back, and the live                  tab still has the full meters.",
+            ));
+        }
 
         // Above the panel content and below the tab strip, so it is seen
         // whatever tab is open. Drawn before the tab body rather than after,
@@ -1102,14 +1134,42 @@ impl VeilVoiceApp {
                 }
             } else if ui.button(RichText::new("  stop  ").strong()).clicked() {
                 self.session = None;
-                self.meter_in = 0.0;
-                self.meter_out = 0.0;
-                self.hold_in = 0.0;
-                self.hold_out = 0.0;
-                self.hold_since = None;
+                self.levels.clear();
+                self.previewing = false;
+            }
+            // Listening to yourself before anybody else does.
+            //
+            // Same session, one thing different: the veiled voice goes to this
+            // machine's own output rather than to a virtual cable, so it
+            // reaches your headphones and nothing else. It is the only check
+            // that answers the question the meters cannot, which is whether
+            // the voice coming out is a voice that is not yours.
+            if !running
+                && ui
+                    .button("  preview to my headphones  ")
+                    .on_hover_text(
+                        "Hear yourself veiled. The output goes to this machine's \
+                         speakers or headphones and to nothing else, so nobody on a \
+                         call hears it. Use headphones: speakers plus a microphone \
+                         is a feedback loop.",
+                    )
+                    .clicked()
+            {
+                self.start_live_preview();
             }
             if running {
-                ui.label(RichText::new("● live").color(p::green()));
+                ui.label(
+                    RichText::new(if self.previewing {
+                        "● preview"
+                    } else {
+                        "● live"
+                    })
+                    .color(if self.previewing {
+                        p::yellow()
+                    } else {
+                        p::green()
+                    }),
+                );
             }
         });
 
@@ -1120,33 +1180,21 @@ impl VeilVoiceApp {
 
         if let Some(session) = &self.session {
             let stats = session.stats();
-            // Meters fall smoothly rather than flickering with every frame.
-            self.meter_in = (self.meter_in * 0.7).max(stats.input_peak);
-            self.meter_out = (self.meter_out * 0.7).max(stats.output_peak);
-
-            // The hold rises at once and falls back after a second and a half,
-            // rather than sticking -- otherwise the bar slowly becomes a picture
-            // of the loudest thing that ever happened.
-            const HOLD: std::time::Duration = std::time::Duration::from_millis(1500);
-            let expired = self
-                .hold_since
-                .map(|at| at.elapsed() >= HOLD)
-                .unwrap_or(true);
-            if expired || self.meter_in >= self.hold_in || self.meter_out >= self.hold_out {
-                if expired {
-                    self.hold_in = self.meter_in;
-                    self.hold_out = self.meter_out;
-                } else {
-                    self.hold_in = self.hold_in.max(self.meter_in);
-                    self.hold_out = self.hold_out.max(self.meter_out);
-                }
-                self.hold_since = Some(std::time::Instant::now());
-            }
+            // The smoothing happens once a frame in `update`, so the strip and
+            // this panel are the same numbers rather than two readings taken a
+            // frame apart.
 
             ui.add_space(12.0);
             ui.label(RichText::new("Levels").color(p::blue()).small());
-            meter(ui, "in ", self.meter_in, self.hold_in);
-            meter(ui, "out", self.meter_out, self.hold_out);
+            meter(ui, "in ", self.levels.input, self.levels.hold_input);
+            meter(ui, "out", self.levels.output, self.levels.hold_output);
+            ui.label(
+                RichText::new(
+                    "  These say sound is arriving and sound is leaving. They cannot say                      the voice has been changed: a working meter and a bypassed engine                      draw the same bar. Listen to the output to hear that.",
+                )
+                .small()
+                .color(p::muted()),
+            );
 
             ui.add_space(12.0);
             ui.label(RichText::new("Performance").color(p::blue()).small());
@@ -1179,6 +1227,7 @@ impl VeilVoiceApp {
     }
 
     fn start_live(&mut self) {
+        self.previewing = false;
         self.live_error = None;
         let result = (|| {
             let input = devices::open(devices::Direction::Input, self.chosen_input.as_deref())?;
@@ -1187,6 +1236,32 @@ impl VeilVoiceApp {
         })();
         match result {
             Ok(session) => self.session = Some(session),
+            Err(e) => self.live_error = Some(e.to_string()),
+        }
+    }
+
+    /// The same session, pointed at this machine's own output.
+    ///
+    /// The chosen output is deliberately ignored: a preview that went to the
+    /// virtual cable would be heard by whatever is listening on it, which is
+    /// the one place somebody checking their setup does not want it to go.
+    /// `None` asks the audio layer for the default device.
+    fn start_live_preview(&mut self) {
+        self.live_error = None;
+        let result = (|| {
+            let input = devices::open(devices::Direction::Input, self.chosen_input.as_deref())?;
+            let output = devices::open(devices::Direction::Output, None)?;
+            veilvoice_audio::LiveSession::start(&input, &output, self.config())
+        })();
+        match result {
+            Ok(session) => {
+                self.session = Some(session);
+                self.previewing = true;
+                self.notice = Some(crate::notify::Notice::note(
+                    "Preview: the veiled voice is going to this machine's output and \
+                     nowhere else. Listen for a voice that is not yours.",
+                ));
+            }
             Err(e) => self.live_error = Some(e.to_string()),
         }
     }

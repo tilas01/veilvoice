@@ -61,6 +61,7 @@ mod app;
 pub mod crashlog;
 pub mod dialog;
 pub mod group;
+pub mod monitor;
 pub mod notify;
 pub mod palettes;
 pub mod policy;

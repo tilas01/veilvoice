@@ -508,7 +508,7 @@ on older engines, which is reasoning rather than evidence. This page will not
 say those two work until somebody has looked.
 
 **Marker 54's audit rounds are done and its deploy has been happening all
-along.** Nine rounds, eighty-one defects, and releases published from tags
+along.** Nine rounds, eighty-three defects, and releases published from tags
 with reproducibility checked per platform. There was never a single production
 deploy to save up for.
 

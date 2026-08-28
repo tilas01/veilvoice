@@ -135,6 +135,41 @@ fn normalise(path: &Path) -> String {
     path.to_string_lossy().replace('\\', "/")
 }
 
+/// Why this path cannot go in a manifest, if it cannot. **F-83.**
+///
+/// The record is a line-oriented text file that gets printed to a terminal, and
+/// those two facts decide what a path may contain.
+///
+/// A line break would end the record early and let one entry forge a second.
+/// A carriage return returns the cursor to the start of the line, so a crafted
+/// path overwrites what the report has already printed and the report says
+/// something other than what is recorded. An escape character does more again:
+/// colour, cursor movement, clearing the screen. The product of this module is
+/// a report somebody reads to decide whether their files have been altered, so
+/// a report that can be made to lie is the whole thing failing.
+///
+/// The refusal covers the C0 and C1 control ranges rather than the two
+/// characters that were found, because listing the ones somebody thought of is
+/// how the next one gets in. Refusing rather than stripping is deliberate: a
+/// path this format cannot represent faithfully is one it must not claim to
+/// hold. Such a filename is legal on Unix and vanishingly rare, and being told
+/// so is better than a record that quietly describes a different file.
+fn unrecordable(path: &str) -> Option<&'static str> {
+    if path.contains('\n') {
+        return Some("a line break");
+    }
+    if path.contains('\r') {
+        return Some("a carriage return");
+    }
+    if path.contains('\u{1b}') {
+        return Some("an escape character");
+    }
+    if path.chars().any(char::is_control) {
+        return Some("a control character");
+    }
+    None
+}
+
 fn digest_of(bytes: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(bytes);
@@ -160,9 +195,9 @@ impl Manifest {
                 continue;
             };
             let key = normalise(path);
-            if key.contains('\n') || key.contains('\r') {
+            if let Some(bad) = unrecordable(&key) {
                 return Err(Error::Malformed(format!(
-                    "path contains a line break and cannot be recorded: {key:?}"
+                    "path contains {bad} and cannot be recorded: {key:?}"
                 )));
             }
             entries.insert(
@@ -283,6 +318,35 @@ impl Manifest {
             if path.is_empty() {
                 return Err(Error::Malformed(format!("line {}: no path", number + 2)));
             }
+            // **F-83.** The same refusal `Manifest::of` makes when it writes.
+            //
+            // Those two ends disagreed. `of` refused to record a path with a
+            // line break in it, and `parse` accepted one, so VeilVoice would
+            // not write a record it was perfectly happy to read from somebody
+            // else. `veilvoice guard check` reads whichever file is at the
+            // path it is given, and a record is exactly the kind of thing that
+            // gets handed to you.
+            //
+            // What it costs to accept one is not theoretical. The product of
+            // this whole module is a report somebody reads to decide whether
+            // their files have been altered, and that report is printed to a
+            // terminal. A carriage return in a path returns the cursor to the
+            // start of the line, so everything already printed is overwritten
+            // by whatever follows: a crafted path can make the report say
+            // something other than what is recorded. An escape character does
+            // more than that, and can colour, move the cursor or clear the
+            // screen.
+            //
+            // So the whole control range is refused rather than the two
+            // characters the fuzzer happened to find, and the line is named.
+            // Refusing is right rather than sanitising: a record this format
+            // cannot represent faithfully is one it should not claim to hold.
+            if let Some(bad) = unrecordable(path) {
+                return Err(Error::Malformed(format!(
+                    "line {}: path contains {bad} and cannot be recorded: {path:?}",
+                    number + 2
+                )));
+            }
             // Normalised on the way in, exactly as `Manifest::of` normalises on
             // the way out. Without this, a manifest written by hand (or by an
             // older build) with backslashes produced entries keyed differently
@@ -365,6 +429,72 @@ pub fn files_in(dir: &Path) -> Result<Vec<PathBuf>, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-83.** A record somebody hands you cannot contain a character that
+    /// rewrites the report.
+    ///
+    /// `Manifest::of` refused a path with a line break in it and `parse`
+    /// accepted one, so VeilVoice would not write a record it was happy to
+    /// read from somebody else. `veilvoice guard check` reads whichever file
+    /// is at the path it is given.
+    ///
+    /// The carriage return is the one the coverage-guided campaign found. The
+    /// rest are here because listing the characters somebody thought of is how
+    /// the next one gets in.
+    #[test]
+    fn a_path_that_could_rewrite_the_report_is_refused_on_the_way_in() {
+        let digest = "a".repeat(64);
+        for (label, bad) in [
+            ("carriage return", "some\rthing"),
+            ("escape", "some\u{1b}[2Kthing"),
+            ("bell", "some\u{7}thing"),
+            ("nul", "some\0thing"),
+            ("backspace", "some\u{8}thing"),
+        ] {
+            let text = format!("{MAGIC}\n{digest}  12  {bad}\n");
+            let parsed = Manifest::parse(&text);
+            assert!(
+                matches!(parsed, Err(Error::Malformed(_))),
+                "{label} was accepted: {parsed:?}"
+            );
+        }
+    }
+
+    /// And an ordinary path, including the awkward but legitimate ones, still
+    /// parses. A refusal that catches real filenames is a worse bug than the
+    /// one it fixes.
+    #[test]
+    fn an_ordinary_path_is_still_recorded() {
+        let digest = "a".repeat(64);
+        for good in [
+            "notes.wav",
+            "a folder/with spaces/recording.wav",
+            "C:/Users/somebody/My Documents/x.wav",
+            "unicode \u{e9}\u{fc}\u{4e2d}\u{6587}.wav",
+            "punctuation!@#$%^&()_+-=[]{};'.wav",
+        ] {
+            let text = format!("{MAGIC}\n{digest}  12  {good}\n");
+            let parsed = Manifest::parse(&text);
+            assert!(parsed.is_ok(), "{good:?} was refused: {parsed:?}");
+        }
+    }
+
+    /// The two ends agree: what `of` will not write, `parse` will not read.
+    ///
+    /// That asymmetry *was* the finding, so it is the thing to hold rather
+    /// than the individual characters.
+    #[test]
+    fn what_cannot_be_written_cannot_be_read() {
+        for bad in ["a\rb", "a\nb", "a\u{1b}b", "a\0b"] {
+            assert!(
+                unrecordable(bad).is_some(),
+                "{bad:?} would be written but not read, or the other way round"
+            );
+        }
+        for good in ["a/b", "a b", "\u{e9}"] {
+            assert!(unrecordable(good).is_none(), "{good:?}");
+        }
+    }
 
     fn write(dir: &Path, name: &str, body: &[u8]) -> PathBuf {
         let path = dir.join(name);
