@@ -60,13 +60,24 @@
     use; this one requests less than most, and the absence of network access is
     the checkable form of the project's central claim.
   -->
+  <!--
+    The newest release only, and deliberately. Listing every release would mean
+    writing a date beside each one, and the dates of the releases between this
+    and 0.1.9 are not recorded anywhere this file could be generated from. An
+    invented date in a metadata file is the kind of unchecked claim this
+    project refuses everywhere else, so the full history stays in CHANGELOG.md
+    where it is written rather than being half-copied here.
+
+    The version is compared against the workspace version by the site suite.
+  -->
   <releases>
-    <release version="0.1.9" date="2026-08-18">
+    <release version="0.1.14" date="2026-08-28">
       <description>
         <p>
-          Search across the whole repository and website, a portable release
-          verifier that needs no GnuPG, install scripts that refuse rather than
-          continue, and an animated banner generated from source.
+          A safety catch that notices when another program picks up a real
+          microphone while you are being veiled, a baseline of what normally
+          runs on the machine, a second passphrase that opens the application
+          with nothing in it, and an interface that reads like English.
         </p>
       </description>
     </release>

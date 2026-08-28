@@ -40,12 +40,13 @@ longer offered as the explanation for anything.
 
 ## This round
 
-**Six defects found and fixed (F-74 to F-79.)** Three are in the security
+**Eight defects found and fixed (F-74 to F-81.)** Three are in the security
 crates written since the eighth round and none of those has shipped: `main`
 carries them and they are not in v0.1.14. One is on the published front page
 and has been there for as long as the count has. One is in the test suite
-itself, where it had been passing four runs in five. One is in the installer,
-and it shipped: it is in v0.1.14 and in every release before it.
+itself, where it had been passing four runs in five. Three shipped: one in the
+installer, in v0.1.14 and in every release before it, and two in the package
+definitions, which have been five releases stale.
 
 This round covers what was added after it: Failsafe, the application baseline,
 the privilege report, the hardware detection, the decoy passphrase, and the
@@ -58,13 +59,81 @@ F-75 trusted a file's default permissions to be appropriate for a security
 setting. F-76 trusted a name in the process table to mean the program is
 running. F-77 trusted one machine's measurement to be a fact about the tree.
 F-78 trusted a test that passes to mean a test that holds. F-79 trusted another
-program's error message to be readable in the middle of this one's output. None
-would have been found by reading the code. F-74 was found by writing a test
-that killed a real process and watching what it actually did; F-76, F-77 and
-F-78 by running that same suite on a second operating system, where one test
-failed, one number came out different, and one test failed only sometimes; and
-F-79 by running the installer on that machine, which is a thing this document
-had listed as never done.
+program's error message to be readable in the middle of this one's output.
+F-80 trusted a recipe nobody had run. F-81 trusted six files to keep up with a
+number that had moved five times. None would have been found by reading the
+code. F-74 was found by writing a test that killed a real process and watching
+what it actually did; F-76, F-77 and F-78 by running that same suite on a
+second operating system, where one test failed, one number came out different,
+and one test failed only sometimes; F-79 by running the installer on that
+machine; and F-80 and F-81 by building a package, which are three things this
+document had listed as never done.
+
+### F-81 -- every package definition was five releases behind
+
+`packaging/`. Six files name a version. All six said 0.1.9 while the workspace
+was at 0.1.14.
+
+What that meant, per file, rather than as a general complaint: `brew install
+--build-from-source` would have fetched and compiled the **v0.1.9** tarball;
+`flatpak-builder` would have checked out the **v0.1.9** tag; the AppStream
+metadata would have told a software centre that 0.1.9 is the newest release
+there is; and `rpmbuild` with no `--define` would have built a package stamped
+0.1.9 from whatever source it was pointed at. Two of the commands printed in
+`docs/PACKAGING.md` for a reader to copy carried the same number.
+
+Nobody had noticed because nobody was looking. This is the shape the repository
+keeps finding: F-41 was generated output drifting from its generator, F-61 and
+F-63 were comments that had stopped being true, F-71 was two hand-typed numbers
+agreeing with each other. Here it is six files agreeing with a number that had
+moved on without them, in the one directory this document had already recorded
+as never having been built or run.
+
+All six are at the workspace version, and
+`tools/site-tests/packaging.test.js` compares nine version claims against
+`[workspace.package]` in `Cargo.toml` and fails the build when any of them
+disagrees. Verified by putting the old version back in one file and watching it
+fail, rather than by assuming a new test tests anything.
+
+The AppStream file lists the newest release only. Listing every release means a
+date beside each one, and the dates between 0.1.9 and 0.1.14 are not recorded
+anywhere this file could be generated from. An invented date is the kind of
+unchecked claim this project refuses everywhere else.
+
+### F-80 -- the documented way to build the Debian package could not run
+
+`packaging/debian/`, and the recipe in `docs/PACKAGING.md`. Two things, either
+of which stops it before any compilation begins.
+
+**There was no `debian/changelog`.** `dpkg-buildpackage` reads the package's
+version out of that file and refuses to start without it: `error: cannot open
+file debian/changelog`. The recipe copies `packaging/debian` into place and
+runs the build, and nothing in either creates one.
+
+**And `packaging/debian/rules` was tracked as mode 100644.** `dpkg-buildpackage`
+runs `debian/rules` directly, so it has to be executable, and the mode git
+records is the mode everybody who clones gets.
+
+So the printed recipe failed on its first command for anybody who tried it, and
+`docs/PACKAGING.md` said "not built" without saying "and it cannot be". The
+first is honest about the outcome; it is not the same as knowing the route is
+broken.
+
+Both are fixed and both are now checked, the mode through `git ls-files -s`
+rather than through the filesystem, because that is what other people clone.
+
+**With those two in place it builds, and the row in `docs/PACKAGING.md` moves
+from no to yes.** `veilvoice_0.1.14-1_amd64.deb` and
+`veilvoice-gui_0.1.14-1_amd64.deb`, both installed with `dpkg -i`, the
+installed `veilvoice --version` reporting 0.1.14, `veilvoice info` and
+`veilvoice-verify --help` running, and both removing cleanly. The release build
+and `cargo test --release --workspace` ran as part of it, because that is what
+`debian/rules` does.
+
+One machine, x86-64, Ubuntu 24.04, with a rustup toolchain rather than Debian's
+own `cargo` and `rustc` packages, which is why `-d` was needed to get past
+`dpkg-checkbuilddeps`. `lintian` has not been run and nothing has been uploaded
+anywhere. That is written into `docs/PACKAGING.md` beside the yes.
 
 ### F-79 -- a security step that printed somebody else's error above its own "ok"
 
@@ -773,7 +842,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 988 tests across 26 crates, plus doctests and 12 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 988 tests across 26 crates, plus doctests and 13 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -2237,10 +2306,16 @@ the top of this document now says.
    point: every one of these runs is the project checking its own work.
    `docs/INSTALL.md` says so in its own words.
 
-7. **None of the package definitions has been built.** WiX, `.deb`, `.rpm`,
-   Flatpak, Homebrew and the Gentoo ebuild parse, and that is the whole of what
-   is claimed. `docs/PACKAGING.md` carries a per-format table saying so. A spec
-   file that has never produced an RPM is a draft.
+7. **One of the six package definitions has been built; five have not.** The
+   Debian one now builds, installs, runs and removes, on one x86-64 Ubuntu
+   machine, and doing that found F-80 and F-81. WiX, `.rpm`, Flatpak, Homebrew
+   and the Gentoo ebuild still only parse, and that is the whole of what is
+   claimed for them. `docs/PACKAGING.md` carries a per-format table saying
+   which is which. A spec file that has never produced an RPM is a draft.
+
+   Even the built one is short of what a distribution would ask: `lintian` has
+   not been run, the build used a rustup toolchain rather than Debian's own
+   `cargo` and `rustc` packages, and nothing has been uploaded anywhere.
 
 8. **`rsa` carries an unfixable advisory** (A-6). Accepted on the ground that
    the verifier performs no private-key operation, and enforced by a CI job
@@ -2257,7 +2332,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Seventy-nine defects found and fixed across nine audit rounds (F-1 to F-79):**
+**Eighty-one defects found and fixed across nine audit rounds (F-1 to F-81):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
