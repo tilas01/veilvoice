@@ -75,7 +75,15 @@ YELLOW = "#e0af68"
 RED = "#f7768e"
 
 MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
-CHAR_W = 8.04          # one character at 13.4px in this stack, near enough
+# One character at 13.4px in this stack.
+#
+# 0.62 of the font size rather than the 0.60 this had, and the difference
+# matters: `tools/site-tests/images.test.js` measures the result with 0.62, and
+# a generator that lays out with the smaller number produces drawings that
+# suite then reports as overflowing by a few pixels. The larger number is also
+# the safer one, because the font is whichever of the stack the reader has.
+TEXT_RATIO = 0.62
+CHAR_W = 13.4 * TEXT_RATIO
 LINE_H = 19.0
 FONT = 13.4
 PAD_X = 18.0

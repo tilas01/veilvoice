@@ -29,7 +29,8 @@
 <rect x="333.0" y="44.8" width="7.0" height="60.3" rx="3" fill="#bb9af7" opacity="0.85"/>
 <rect x="346.0" y="58.9" width="7.0" height="32.2" rx="3" fill="#bb9af7" opacity="0.71"/>
 <rect x="359.0" y="40.5" width="7.0" height="68.9" rx="3" fill="#bb9af7" opacity="0.89"/>
-<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-failsafe</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">The safety catch: notice the moment another program takes a real microphone while you are being veiled, and act -- without ever claiming to have prevented it.</text>
+<text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-failsafe</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">The safety catch: notice the moment another program takes a real microphone while</text>
+<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">you are being veiled, and act -- without ever claiming to have prevented it.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CRATE</text>
 </svg>

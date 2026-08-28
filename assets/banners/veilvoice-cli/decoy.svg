@@ -29,7 +29,7 @@
 <rect x="333.0" y="38.5" width="7.0" height="72.9" rx="3" fill="#bb9af7" opacity="0.91"/>
 <rect x="346.0" y="47.6" width="7.0" height="54.9" rx="3" fill="#bb9af7" opacity="0.82"/>
 <rect x="359.0" y="56.7" width="7.0" height="36.5" rx="3" fill="#bb9af7" opacity="0.73"/>
-<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">decoy.rs</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">veilvoice decoy &#8212; what a second passphrase is worth, and what it is not.</text>
+<text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">decoy.rs</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">veilvoice decoy &#8212; what a second passphrase is worth, and what it is not.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CLI</text>
 </svg>

@@ -29,7 +29,8 @@
 <rect x="333.0" y="45.5" width="7.0" height="59.0" rx="3" fill="#bb9af7" opacity="0.84"/>
 <rect x="346.0" y="49.3" width="7.0" height="51.5" rx="3" fill="#bb9af7" opacity="0.80"/>
 <rect x="359.0" y="53.9" width="7.0" height="42.3" rx="3" fill="#bb9af7" opacity="0.76"/>
-<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-core</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility.</text>
+<text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-core</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Irreversible voice de-identification DSP engine: cryptographically-modulated</text>
+<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">pitch/formant scrambling with preserved intelligibility.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CRATE</text>
 </svg>
