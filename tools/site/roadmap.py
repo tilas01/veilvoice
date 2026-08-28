@@ -228,6 +228,154 @@ def graphic(colours, groups, counts):
     return "\n".join(out) + "\n"
 
 
+# --- the film ----------------------------------------------------------------
+
+FILM_W = 640.0
+FILM_H = 360.0
+FILM_PAD = 20.0
+FILM_ROW = 17.0
+FILM_TOP = 46.0
+# How fast the list moves, and how long it waits at the end before repeating.
+FILM_SPEED = 42.0
+FILM_PAUSE = 4.0
+
+
+def film(colours, done):
+    """Everything that is finished, scrolling, with a countdown before it repeats.
+
+    # Why this is an animation and not an MP4
+
+    A video was asked for, and a video is the right shape for this: something
+    somebody watches rather than a picture with a long dead pause in it. What
+    it is not is a reason to put an H.264 file in this repository.
+
+    This project ships no codec and does not bundle `ffmpeg`, and `ROADMAP.md`
+    already settled what that means for video: render here, and *always write a
+    self-contained animation that needs nothing else installed*. An encoded
+    file would also be a committed binary whose bytes depend on which build of
+    which encoder made it, so it could not be regenerated and compared the way
+    every other picture in this repository is.
+
+    So it is an SVG that animates itself. It plays in any browser with no
+    plugin, no codec and no download, it is a few kilobytes rather than a few
+    megabytes, it takes the reader's colour scheme, and it is generated from
+    `ROADMAP.md`, so it cannot show a marker as finished that is not.
+    `docs/PACKAGING.md` is not the place for it; the command to turn it into an
+    actual file, for anybody who wants one, is under the picture on the page.
+
+    # The countdown
+
+    A loop with no warning restarts under the reader while they are still
+    reading the last line. The ring in the corner fills during the pause, so
+    the restart is something you can see coming rather than something that
+    happens to you. Four seconds: long enough to finish a line, short enough
+    that nobody is waiting.
+    """
+    rows = []
+    y = 0.0
+    columns = int((FILM_W - FILM_PAD * 2 - 34.0) / (12.0 * docs.TEXT_RATIO))
+    for row in done:
+        lines = wrap(plain(row["marker"]), columns)
+        rows.append((row["number"], lines, y))
+        y += len(lines) * FILM_ROW + 7.0
+    content = y
+
+    view_h = FILM_H - FILM_TOP - FILM_PAD
+    distance = max(0.0, content - view_h)
+    scroll = distance / FILM_SPEED if distance else 1.0
+    total = scroll + FILM_PAUSE
+    turn = (scroll / total) * 100.0
+
+    ring_r = 9.0
+    circumference = 2 * 3.14159265 * ring_r
+
+    out = []
+    add = out.append
+    add('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %.0f %.0f" '
+        'width="%.0f" height="%.0f" style="max-width:100%%;height:auto" '
+        'role="img" aria-label="everything finished, scrolling">'
+        % (FILM_W, FILM_H, FILM_W, FILM_H))
+    add("<!-- %s from ROADMAP.md. Do not edit. -->" % MARKER)
+    add("<style>")
+    add("  .film-list { animation: film-scroll %.2fs linear infinite; }" % total)
+    add("  .film-ring { animation: film-count %.2fs linear infinite; }" % total)
+    add("  @keyframes film-scroll {")
+    add("    0%% { transform: translateY(0); }")
+    add("    %.2f%%, 100%% { transform: translateY(-%.1fpx); }" % (turn, distance))
+    add("  }")
+    add("  @keyframes film-count {")
+    add("    0%%, %.2f%% { opacity: 0; stroke-dashoffset: %.2f; }" % (turn, circumference))
+    add("    %.2f%% { opacity: 1; stroke-dashoffset: %.2f; }" % (turn + 0.01, circumference))
+    add("    100%% { opacity: 1; stroke-dashoffset: 0; }")
+    add("  }")
+    # Somebody who asked their system for less movement gets the list at the
+    # top and no countdown, rather than a picture that never settles.
+    add("  @media (prefers-reduced-motion: reduce) {")
+    add("    .film-list, .film-ring { animation: none; }")
+    add("    .film-ring { opacity: 0; }")
+    add("  }")
+    add("</style>")
+    add('<defs><clipPath id="film-view"><rect x="0" y="%.1f" width="%.0f" '
+        'height="%.1f"/></clipPath></defs>' % (FILM_TOP, FILM_W, view_h))
+    add('<rect x="0" y="0" width="%.0f" height="%.0f" rx="10" '
+        'fill="var(--bg-inset, %s)"/>' % (FILM_W, FILM_H, colours["bg-inset"]))
+    add('<text x="%.1f" y="26" font-family="%s" font-size="13" '
+        'fill="var(--fg, %s)">%d markers finished</text>'
+        % (FILM_PAD, docs.MONO, colours["fg"], len(done)))
+    add('<line x1="0" y1="%.1f" x2="%.0f" y2="%.1f" stroke="var(--border, %s)"/>'
+        % (FILM_TOP - 8, FILM_W, FILM_TOP - 8, colours["border"]))
+
+    add('<g clip-path="url(#film-view)">')
+    add('<g class="film-list">')
+    for number, lines, top in rows:
+        base = FILM_TOP + 12.0 + top
+        add('<rect x="%.1f" y="%.1f" width="20" height="12" rx="3" '
+            'fill="var(--ok, %s)"/>' % (FILM_PAD, base - 9.5, colours["ok"]))
+        add('<text x="%.1f" y="%.1f" font-family="%s" font-size="9" '
+            'fill="var(--bg-inset, %s)" text-anchor="middle">%d</text>'
+            % (FILM_PAD + 10, base, docs.MONO, colours["bg-inset"], number))
+        for index, line in enumerate(lines):
+            add('<text x="%.1f" y="%.1f" font-family="%s" font-size="12" '
+                'fill="var(--%s, %s)">%s</text>'
+                % (FILM_PAD + 28, base + index * FILM_ROW, docs.MONO,
+                   "fg" if index == 0 else "muted",
+                   colours["fg"] if index == 0 else colours["muted"],
+                   docs.esc(line)))
+    add("</g>")
+    add("</g>")
+
+    # The countdown, over the top right, outside the clip so it never scrolls.
+    add('<g class="film-ring" opacity="0">')
+    add('<circle cx="%.1f" cy="24" r="%.1f" fill="none" '
+        'stroke="var(--border, %s)" stroke-width="3"/>'
+        % (FILM_W - 26, ring_r, colours["border"]))
+    add('<circle cx="%.1f" cy="24" r="%.1f" fill="none" '
+        'stroke="var(--accent, %s)" stroke-width="3" stroke-linecap="round" '
+        'stroke-dasharray="%.2f" stroke-dashoffset="%.2f" '
+        'transform="rotate(-90 %.1f 24)"/>'
+        % (FILM_W - 26, ring_r, colours["accent"], circumference, circumference,
+           FILM_W - 26))
+    add("</g>")
+    add("</svg>")
+    return "\n".join(out) + "\n"
+
+
+def wrap(text, columns):
+    """Prose as lines no wider than `columns`, broken on words."""
+    out = []
+    line = ""
+    for word in text.split():
+        candidate = word if not line else line + " " + word
+        if len(candidate) > columns and line:
+            out.append(line)
+            line = word
+        else:
+            line = candidate
+    if line:
+        out.append(line)
+    return out or [""]
+
+
 # --- the page ----------------------------------------------------------------
 
 def body(colours, groups, counts, generated_at):
@@ -249,6 +397,24 @@ def body(colours, groups, counts, generated_at):
         'and a marker is not a day: marker 1 is the whole signal engine and '
         'marker 68 is a page of questions. The estimates below are the closest '
         'thing to an answer, and they are estimates.</p>' % (done, total))
+
+    add('<h2 id="film">Everything that is finished, in one go</h2>')
+    add('<p>A little under half a minute. It scrolls what is done, waits four '
+        'seconds with a countdown in the corner, and starts again.</p>')
+    add('<div class="diagram">')
+    add(film(colours, [row for _, rows in groups for row in rows
+                       if row["status"] == "done"]).rstrip("\n"))
+    add("</div>")
+    add('<p style="color:var(--muted);font-size:13px">An animation rather than '
+        'a video file, and that is a decision rather than a shortcut. This '
+        'project ships no codec and does not bundle <code>ffmpeg</code>, and '
+        'the rule it already follows for video is to render here and always '
+        'produce something that needs nothing else installed. An encoded file '
+        'would also be a committed binary whose bytes depend on which build of '
+        'which encoder made it, so it could not be regenerated and compared '
+        'the way every other picture here is. If you want a file, '
+        '<code>ffmpeg -i roadmap-film.svg roadmap.mp4</code> will make you one '
+        'from this.</p>')
 
     add('<h2 id="what-is-left">What is left, and roughly what it takes</h2>')
     add('<p>Working days, one person, no interruptions, so the calendar will be '
@@ -336,9 +502,12 @@ def build(root):
         'marker lives.</p>' % (docs.REPO, docs.REF))
     page = page.replace("GENERATED by tools/site/split.py from website/index.html.",
                         "%s from ROADMAP.md." % MARKER)
+    moving = film(colours, [row for row in rows if row["status"] == "done"])
     return {
         "assets/roadmap.svg": drawing,
         "website/assets/roadmap.svg": drawing,
+        "assets/roadmap-film.svg": moving,
+        "website/assets/roadmap-film.svg": moving,
         "website/roadmap.html": page,
     }
 

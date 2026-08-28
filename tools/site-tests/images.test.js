@@ -49,7 +49,10 @@ const PLACES = [
   "website/assets/banners",
   "website/assets/screenshots"
 ];
-const SINGLES = ["assets/roadmap.svg", "website/assets/roadmap.svg"];
+const SINGLES = [
+  "assets/roadmap.svg", "website/assets/roadmap.svg",
+  "assets/roadmap-film.svg", "website/assets/roadmap-film.svg"
+];
 
 // A character is about this much of the font size, in the monospace stack
 // every one of these drawings uses. Rounded up on purpose: see the header.
@@ -80,6 +83,23 @@ function canvas(svg) {
   const box = /viewBox="([-\d.]+)\s+([-\d.]+)\s+([\d.]+)\s+([\d.]+)"/.exec(svg);
   if (!box) return null;
   return { width: parseFloat(box[3]), height: parseFloat(box[4]) };
+}
+
+/**
+ * A copy with the clipped groups removed.
+ *
+ * Text inside a `clip-path` is *meant* to be outside the frame: the roadmap
+ * film is a list that scrolls through a window, so at any one instant most of
+ * it is above or below the visible area, on purpose, and the clip is what
+ * makes that work. Measuring it against the canvas would report sixty rows as
+ * overflowing and would be wrong about every one of them.
+ *
+ * What is still measured in such a drawing is everything outside the clip: the
+ * heading, the countdown, the rule. Those are the parts that have to fit.
+ */
+function unclipped(svg) {
+  return svg.replace(/<g[^>]*\bclip-path="[^"]*"[^>]*>[\s\S]*?<\/g>\s*<\/g>/g, "")
+            .replace(/<g[^>]*\bclip-path="[^"]*"[^>]*>[\s\S]*?<\/g>/g, "");
 }
 
 /** Every `<text>` element, with what decides where its box lands. */
@@ -140,7 +160,7 @@ function run() {
       problems.push(`${rel}: no viewBox, so nothing can be measured against it`);
       continue;
     }
-    for (const item of texts(svg)) {
+    for (const item of texts(unclipped(svg))) {
       checked++;
       const width = item.length * item.size * CHAR_RATIO;
       let left = item.x;
