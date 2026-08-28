@@ -114,7 +114,7 @@ flowchart TD
     n_container["container.rs<br/>491 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
-    n_lock["lock.rs<br/>1379 lines"]
+    n_lock["lock.rs<br/>1425 lines"]
     n_privatefile["privatefile.rs<br/>251 lines"]
     n_shred["shred.rs<br/>415 lines"]
     n_vault["vault.rs<br/>615 lines"]
@@ -147,7 +147,7 @@ flowchart TD
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 200 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1379 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1425 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 251 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure — the self-destruct. |
 | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |

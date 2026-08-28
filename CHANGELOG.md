@@ -64,7 +64,7 @@ voice. The About tab now shows the measured frame time, because this was
 written on a machine with no display and a number from the person with the
 problem is worth more than a change made blind.
 
-### The eleventh audit round: six defects in the code above
+### The eleventh audit round: seven defects in the code above
 
 New security code written after an audit is precisely the code an audit exists
 for, so markers 74 to 79 got their own round. Six defects, every one in code
@@ -92,6 +92,13 @@ worth naming.
 - **F-90** Setting an app lock never upgraded an existing plain integrity
   record to a sealed one, so somebody who did the thing that earns the sealed
   record kept the readable one.
+- **F-91** A lock file could declare four gigabytes of Argon2 memory, which on
+  a modest machine is an allocation failure rather than a wait, and this build
+  aborts on one: the window would fail to start with no way in. The generous
+  ceiling is right for a container somebody chose to open and wrong for the one
+  file this program parses before anybody has authenticated. Found by
+  re-running the coverage-guided campaign, which the changed format made worth
+  doing again.
 
 ### The tenth audit round: security, functionality, and what it costs to run
 

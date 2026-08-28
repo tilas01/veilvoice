@@ -47,8 +47,10 @@ the app lock, a second copy of it in a vault, and the integrity record moved
 into the window. New security code written after the audit is precisely the
 code an audit exists for, so it got its own round.
 
-**Six defects found and fixed (F-85 to F-90), every one of them in code written
-in this cycle, and every one found by reading the diff rather than by a tool.**
+**Seven defects found and fixed (F-85 to F-91), every one of them in code
+written in this cycle. Six were found by reading the diff; the seventh was
+found by re-running the coverage-guided campaign, which the changed lock format
+made worth doing again.**
 
 Two of the six were worse than the thing they were added to improve, which is
 the pattern worth naming: *hardening that fails open*. A lock that could be
@@ -153,6 +155,60 @@ cleared without the passphrase.
 destination and renames over it, which the operating system does as one step.
 The temporary is created owner-only and the rename carries that permission, so
 there is no moment at which the contents are readable by anybody else.
+
+### F-91 -- a lock file could ask for more memory than the machine has
+
+`veilvoice-crypto/src/lock.rs`, found by the coverage-guided campaign after the
+format changed.
+
+The parser validated the Argon2id costs with `KdfParams::checked`, which permits
+up to four gigabytes of memory. That ceiling is deliberate and right for a
+container: somebody chose to open that file, it is slow, and they can decide to
+stop waiting. `KdfParams::within` exists for the other case and its own
+documentation names it exactly: "a caller running without a human present,
+anything processing files it did not choose".
+
+Nobody chooses to open an app-lock file. It is read at launch, before anything
+has been authenticated, and on a modest machine four gigabytes is not a wait,
+it is an allocation failure, and this build aborts on one. The window would
+fail to start with no way in.
+
+The campaign produced a header declaring 1,664 MiB, with sixteen passes and
+thirty-seven lanes, and libFuzzer flagged the unit as slow. Nothing crashed,
+which is why this had gone unnoticed through two previous campaigns: the
+finding is a permitted value, not a bug in handling one.
+
+Two things make it worth fixing now rather than accepting as before. The lock
+file is the *only* file this program parses before anybody has authenticated,
+so it is the only place where the attended argument does not apply at all. And
+the recovery is harder than it was last round, by this cycle's own doing: the
+vault derives its file names rather than using a fixed one, so "delete the lock
+file and start again" now needs the index read first. Hardening raised the cost
+of recovering from a hostile file, which is a reason to make the hostile file
+refusable rather than a reason to leave it.
+
+The parser now uses `within(UNATTENDED_MAX_M_COST)`, which is one gigabyte:
+four times what this program has ever written into one of these files.
+
+Measured on this machine, in a release build, rather than reasoned about:
+
+| What | Cost | Time |
+|---|---|---|
+| The default this program writes | 256 MiB, t=3, p=4 | **1.07 s** |
+| The worst a lock file may now declare | 1024 MiB, t=16, p=4 | **19.30 s** |
+| The unit libFuzzer flagged after the fix | 262 MiB, t=16, p=37 | **4.78 s** |
+
+So the fix moves the worst case from an allocation this build aborts on to a
+wait, which is what `within` documents itself as buying and is the honest
+description of it. Nineteen seconds to be told the password is wrong is a
+hostile file doing real damage to somebody's day; it is not a lock-out, and the
+owner can still get in and change it.
+
+The campaign flags the second slow unit as slow too, and that one is accepted:
+262 MiB at the maximum sixteen passes is under five seconds and Argon2 taking
+seconds is the entire point of Argon2. A ceiling tight enough to catch it would
+be tight enough to catch a legitimate lock somebody deliberately made expensive.
+The number of passes is already bounded at sixteen by F-82.
 
 ### F-90 -- setting an app lock never upgraded the integrity record
 
@@ -1151,7 +1207,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1039 tests across 26 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1040 tests across 26 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -2650,7 +2706,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Ninety defects found and fixed across eleven audit rounds (F-1 to F-90):**
+**Ninety-one defects found and fixed across eleven audit rounds (F-1 to F-91):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
