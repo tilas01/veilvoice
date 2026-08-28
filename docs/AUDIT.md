@@ -38,6 +38,140 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The eleventh round: the code written after the tenth round
+
+The tenth round was run last on purpose, on the grounds that an audit of code
+that is still moving is an audit of code that will not exist. Then markers 74
+to 79 were built, and three of them are security code: an authentication tag on
+the app lock, a second copy of it in a vault, and the integrity record moved
+into the window. New security code written after the audit is precisely the
+code an audit exists for, so it got its own round.
+
+**Six defects found and fixed (F-85 to F-90), every one of them in code written
+in this cycle, and every one found by reading the diff rather than by a tool.**
+
+Two of the six were worse than the thing they were added to improve, which is
+the pattern worth naming: *hardening that fails open*. A lock that could be
+orphaned by one refused read, and a spare copy that silently kept the previous
+password, are both worse than the plain single file they replaced.
+
+### F-85 -- one refused read would have orphaned the lock for ever
+
+`veilvoice-crypto/src/vault.rs`.
+
+The vault derives both file names from sixteen random bytes in an index file.
+`Vault::at` read that index and, on anything that was not a clean read of
+exactly sixteen bytes, drew a new value and wrote it. The comment beside it
+argued the case honestly enough: a damaged index has nothing to recover from,
+so there is nothing to lose by replacing it.
+
+The argument is right and the code was still wrong, because the arm caught
+every *other* failure too. A read refused by permissions, a Windows sharing
+violation, an exhausted file-descriptor table: any one of them, once, and a new
+index would be written over a perfectly good one. The lock files would still be
+on disk, under names that nothing could ever compute again, and the user's app
+lock would simply be gone.
+
+The fix is one match arm. Only `ErrorKind::NotFound` creates an index; every
+other outcome refuses and reports. A refusal costs a confusing session and
+loses nothing.
+
+This is the class the whole round is about: a piece of hardening whose failure
+mode is worse than the thing it hardened. The plain file it replaced could not
+be orphaned, because its name was a constant.
+
+### F-86 -- the spare copy kept the previous password
+
+`veilvoice-crypto/src/vault.rs` and `lock.rs`.
+
+The second copy is written under `/etc/veilvoice` when VeilVoice is already
+running with enough privilege to put it there, which is the point: removing the
+lock then needs `sudo`. An ordinary run cannot write it, and `store` swallowed
+that failure deliberately, on the reasoning that the arrangement was working as
+designed.
+
+It was, and the consequence was not designed. After `veilvoice lock change`
+from an ordinary run, the first copy holds the new password and the spare still
+holds the old one. Delete the first copy -- which anybody can, it is in the
+user's own directory -- and `load` restores from the spare. The lock reverts to
+the previous password. Somebody who knew the old password has a way back in,
+created by the feature that was supposed to make removal harder.
+
+Three fixes, because one was not enough:
+
+- `Vault::store` returns whether the spare was written instead of discarding it.
+- `LockStore::change_password` returns `Error::AppLockSpareStale` when it was
+  not, and both front ends print the one thing that finishes the change.
+- `Vault::load` compares the two copies' salt and verifier. When they differ it
+  returns `Found::Disagreed`, prefers the copy the running program writes, and
+  the disagreement is raised as a tamper report.
+
+The third is what closes it rather than merely reporting it: reverting now
+requires the copies to agree, and they do not.
+
+### F-87 -- a spare that could never be written was reported as a deleted one
+
+`veilvoice-crypto/src/vault.rs`.
+
+`load` reported `Found::Restored` whenever one copy was missing, and the caller
+turns that into a standing tamper report that only the passphrase clears. On a
+machine where `/etc/veilvoice` exists but is not writable by the user -- created
+by a package, or by one earlier elevated run -- the spare is never written, so
+every launch found it missing, rebuilt nothing, and raised the alarm again.
+
+An alarm that fires every time is an alarm nobody reads, which is the failure
+mode this project keeps writing tests against. `Restored` is now reported only
+when the rebuild actually reached the disk. A copy that cannot be written was
+never there; a copy that was there and went is evidence.
+
+### F-88 -- dismissing a warning cost three key derivations
+
+`veilvoice-crypto/src/lock.rs`.
+
+`LockStore::acknowledge` called `unlock`, which runs Argon2id at 256 MiB, and
+then `AppLock::acknowledge`, which calls `verify`, which runs it again -- and
+the store's own `unlock` inside that path made three. The better part of a
+minute on a slow machine to dismiss a message.
+
+Functionality rather than cryptography, and it belongs in a security audit
+anyway: a control nobody will wait for is a control nobody uses, and the
+control here is the one that tells somebody their lock was interfered with.
+`unlock` has already proved the passphrase by the time the flag is cleared, so
+the second and third proofs are removed.
+
+### F-89 -- a power cut read as tampering
+
+`veilvoice-crypto/src/vault.rs` and `privatefile.rs`.
+
+Both copies were written by truncating and rewriting. A process that dies
+part-way through leaves a short file, a short file does not parse, and a copy
+that does not parse is treated as one somebody interfered with. A power cut
+during a save would have raised a tamper report, and the report cannot be
+cleared without the passphrase.
+
+`privatefile::replace_owner_only` writes to a temporary file beside the
+destination and renames over it, which the operating system does as one step.
+The temporary is created owner-only and the rename carries that permission, so
+there is no moment at which the contents are readable by anybody else.
+
+### F-90 -- setting an app lock never upgraded the integrity record
+
+`veilvoice-gui/src/integrity.rs`.
+
+The record of VeilVoice's own files is sealed under the app-lock passphrase
+when there is one and written in the clear when there is not. Somebody whose
+first launch had no lock got the plain record, and setting a lock afterwards
+never replaced it: the sealed path only ran when a sealed file already existed.
+They had done exactly the thing that earns the sealed record and kept the
+readable one, with the interface telling them which they had and nothing
+telling them how to change it.
+
+The upgrade now happens on the first unlock that finds a plain record, and only
+after the check against it has come back clean. Sealing a record that no longer
+matches the files would seal somebody else's version of them and stamp it
+authoritative, which is the same failure as F-85 in a different place: the
+recovery path doing the attacker's work.
+
 ## The tenth round: security, functionality, and what it costs to run
 
 The round asked for before the next deploy, covering all three and run last on
@@ -1017,7 +1151,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1030 tests across 26 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1039 tests across 26 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -2516,7 +2650,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Eighty-four defects found and fixed across ten audit rounds (F-1 to F-84):**
+**Ninety defects found and fixed across eleven audit rounds (F-1 to F-90):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

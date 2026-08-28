@@ -206,13 +206,20 @@ fn run(password: Option<&str>) -> State {
             .and_then(|bytes| Manifest::open_sealed(pw.as_bytes(), &bytes).ok())
         {
             Some(m) => Some((m, true)),
-            // A sealed record that will not open is not an absent record. It
-            // may be a wrong passphrase, and it may be the tampering this is
-            // here to find; either way, treating it as absent would overwrite
-            // the evidence.
+            // A sealed record that will not open is not an absent record.
+            // Treating it as absent would overwrite the evidence with a fresh
+            // record of whatever is on disk now, which is exactly what somebody
+            // who had changed those files would want to happen.
+            //
+            // The passphrase cannot be the reason: this only runs after an
+            // unlock that proved it. So the honest report is that the record
+            // will not open, and that a record that will not open is one of the
+            // things this is here to notice.
             None => {
                 return State::Failed(
-                    "the sealed integrity record could not be opened with this passphrase".into(),
+                    "the sealed record of VeilVoice's own files will not open. It has been \
+                     changed or damaged since it was written."
+                        .into(),
                 )
             }
         },
@@ -222,13 +229,31 @@ fn run(password: Option<&str>) -> State {
     match existing {
         Some((manifest, was_sealed)) => {
             let report = manifest.check::<PathBuf>(&[]);
-            if report.is_clean() {
-                State::Clean {
-                    files: report.unchanged,
-                    sealed: was_sealed,
+            if !report.is_clean() {
+                return State::Changed(report.changes.iter().map(|c| c.describe()).collect());
+            }
+            // A plain record found while a passphrase is in hand is upgraded.
+            // Somebody who sets an app lock after their first run would
+            // otherwise keep the readable record for ever, having done exactly
+            // what would earn them the sealed one.
+            //
+            // Only after the check has come back clean. Sealing a record that
+            // no longer matches the files would seal somebody else's version of
+            // them and call it authoritative.
+            if let (Some(pw), false) = (password, was_sealed) {
+                if let Ok(bytes) = manifest.seal(pw.as_bytes()) {
+                    if write_private(&sealed, &bytes).is_ok() {
+                        let _ = std::fs::remove_file(&plain);
+                        return State::Clean {
+                            files: report.unchanged,
+                            sealed: true,
+                        };
+                    }
                 }
-            } else {
-                State::Changed(report.changes.iter().map(|c| c.describe()).collect())
+            }
+            State::Clean {
+                files: report.unchanged,
+                sealed: was_sealed,
             }
         }
         None => match Manifest::of(&files) {
