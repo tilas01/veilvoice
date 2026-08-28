@@ -192,6 +192,13 @@ REF = "main"
 # nobody can read, which is worse than no picture: it looks like information.
 MAX_DIAGRAM_NODES = 22
 MAX_LABEL = 30
+# How wide a wrapped line of a label may be.
+#
+# Wider than `MAX_LABEL`, which is the point at which wrapping *starts*, so
+# that a name broken at its own `::` does not then have to be broken again a
+# few characters later. `reseed_range_is_finer_than_a_frame` is 34: at 30 it
+# would wrap twice and read as three lines of fragments.
+WRAP_WIDTH = 38
 
 
 # --- palette ----------------------------------------------------------------
@@ -993,6 +1000,55 @@ def crate_graph(model):
     return nodes, list(model["edges"])
 
 
+def wrap_label(label):
+    """A box's label as however many lines it needs, never cut.
+
+    It used to be cut: anything past `MAX_LABEL` became an ellipsis. The first
+    replacement wrapped it to two lines and then cut the second one, which is
+    the same defect with a longer fuse and no ellipsis to admit it:
+    `DeidConfig::reseed_range_is_finer_than_a_frame` came out as
+    `reseed_range_is_finer_than_a_f`, and nothing on the page said so.
+
+    So it wraps at the name's own boundaries and does not cut. A qualified name
+    breaks after its `::`, and a long identifier breaks after an `_`, because
+    those are where a reader's eye breaks them anyway. Only a single run with
+    no boundary in it at all is split by width, and that is the one case where
+    there is nothing better to do.
+
+    The box grows to fit and the rank wraps to fit the box, both of which the
+    layout already does, so a long name costs height rather than legibility.
+    """
+    if len(label) <= MAX_LABEL:
+        return [label]
+
+    def fold(text):
+        """Wrap one run at `WRAP_WIDTH`, breaking after an underscore."""
+        if len(text) <= WRAP_WIDTH:
+            return [text]
+        pieces = [piece for piece in re.split(r"(?<=_)", text) if piece]
+        lines, current = [], ""
+        for piece in pieces:
+            if current and len(current) + len(piece) > WRAP_WIDTH:
+                lines.append(current)
+                current = piece
+            else:
+                current += piece
+            # A single piece longer than a line: nothing to break on.
+            while len(current) > WRAP_WIDTH:
+                lines.append(current[:WRAP_WIDTH])
+                current = current[WRAP_WIDTH:]
+        if current:
+            lines.append(current)
+        return lines
+
+    # The owner gets its own line where there is one. `Type::` above the method
+    # reads the way the name is said, and it is where the eye breaks it anyway.
+    if "::" in label:
+        owner, _, rest = label.rpartition("::")
+        return [owner + "::"] + fold(rest)
+    return fold(label)
+
+
 def file_graph(entry):
     """Nodes and edges for one file's flowchart.
 
@@ -1029,8 +1085,7 @@ def file_graph(entry):
         label = item["name"]
         if item["owner"]:
             label = "%s::%s" % (item["owner"], item["name"])
-        if len(label) > MAX_LABEL:
-            label = label[:MAX_LABEL - 1] + "…"
+        label = wrap_label(label)
 
         if item["public"] and item["name"] not in called:
             role = "entry"      # public, and nothing here calls it: a way in
@@ -1044,7 +1099,7 @@ def file_graph(entry):
             # The line number is half of "reference the lines"; the URL is the
             # other half. A reader who wants to know what a box actually does
             # should be one click from the code, not one search.
-            "label": [label, "line %d" % item["line"]],
+            "label": label + ["line %d" % item["line"]],
             "line": item["line"],
             "url": "https://github.com/%s/blob/%s/%s#L%d"
                    % (REPO, REF, entry["rel"], item["line"]),
@@ -1409,7 +1464,64 @@ def diagram_markdown(source, alt, note, mermaid_source, extra=None):
     return out
 
 
-def diagram_svg(colours, nodes, edges, width=640, on_site=False):
+def footer_height(key, note_lines):
+    """How much room the colour key and the note need under a drawing.
+
+    Written as one function because the first version worked it out in one
+    place and drew it in another, and the two disagreed: the dashed row of the
+    key was drawn and not counted, and nothing allowed for the descenders of
+    the last line. The note came out clipped by the bottom edge of its own
+    picture, which is the fault this whole change exists to fix.
+
+    The arithmetic here mirrors the drawing loop line for line. If one changes,
+    change both, and the pictures say immediately whether you did.
+    """
+    height = 4.0
+    if key:
+        # A row per role, plus one for the dashed back edge.
+        height += 6.0 + (len(key) + 1) * 16.0
+    if note_lines:
+        height += 6.0 + len(note_lines) * 15.0
+    # Descenders of the last line, and a little air under it.
+    return height + 12.0
+
+
+def strip_markup(text):
+    """A note's words without its markup, for drawing as plain SVG text.
+
+    The notes are written for HTML and carry `<strong>` and entities. An SVG
+    `<text>` renders neither, so the tags would appear as tags.
+    """
+    if not text:
+        return ""
+    plain = re.sub(r"<[^>]+>", "", text)
+    plain = (plain.replace("&mdash;", "--").replace("&amp;", "&")
+             .replace("&lt;", "<").replace("&gt;", ">"))
+    return re.sub(r"\s+", " ", plain).strip()
+
+
+def wrap_text(text, columns):
+    """Prose as lines no wider than `columns`, broken on words.
+
+    For the note drawn inside a diagram. Same rule the terminal drawings
+    follow, and for the same reason: a picture that cuts its own explanation
+    off at the edge has not explained anything.
+    """
+    out = []
+    line = ""
+    for word in text.split():
+        candidate = word if not line else line + " " + word
+        if len(candidate) > columns and line:
+            out.append(line)
+            line = word
+        else:
+            line = candidate
+    if line:
+        out.append(line)
+    return out
+
+
+def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None):
     """Lay the same graph out as SVG, for readers with no JavaScript.
 
     A simple layered drawing: rank by longest path, order within a rank by
@@ -1493,6 +1605,18 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False):
     canvas_w = max(line_widths) + margin * 2
     placed, canvas_h = lay_out(canvas_w)
 
+    # Room under the drawing for the colour key and the explanation.
+    #
+    # Both used to sit outside the picture: the key as a line of markdown and
+    # the note as a paragraph in the page. That is fine on the page and useless
+    # everywhere else the drawing goes, which is a README, the wiki, and an
+    # `<img>` where nothing around it comes with it. A picture that needs a
+    # caption it does not carry is a picture that arrives without its meaning.
+    role_names = {node.get("role") for node in nodes}
+    key = [(role, token, why) for role, token, why in ROLES if role in role_names]
+    note_lines = wrap_text(note, int((canvas_w - margin * 2) / CHAR_W)) if note else []
+    footer = footer_height(key, note_lines)
+
     # A back edge is drawn out to the side of both of its endpoints, so it can
     # need room the boxes did not. Widen and lay out again rather than let the
     # arrow leave the canvas -- an SVG does not clip to its viewBox on every
@@ -1510,6 +1634,12 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False):
         if overflow > 0:
             canvas_w += overflow * 2.0
             placed, canvas_h = lay_out(canvas_w)
+            note_lines = (wrap_text(note, int((canvas_w - margin * 2) / CHAR_W))
+                          if note else [])
+            footer = footer_height(key, note_lines)
+
+    drawing_h = canvas_h
+    canvas_h += footer
 
     out = []
     add = out.append
@@ -1518,10 +1648,20 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False):
         'role="img" aria-label="flowchart">' % (canvas_w, canvas_h,
                                                 canvas_w, canvas_h))
     add(marker)
-    add('<defs><marker id="a" viewBox="0 0 8 8" refX="7" refY="4" '
-        'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
-        '<path d="M0 0 L8 4 L0 8 z" fill="var(--muted, %s)"/></marker></defs>'
-        % colours["muted"])
+    # One arrowhead per colour that is used.
+    #
+    # An SVG marker does not inherit the stroke of the path it is on: there is
+    # `context-stroke` for that and it is not in every engine this site
+    # supports, so a single grey head on a coloured line would leave every
+    # arrow ending in the wrong colour. Cheaper to define the four.
+    arrow_tokens = ["muted", "warn"] + [token for _, token, _ in ROLES]
+    add("<defs>")
+    for token in arrow_tokens:
+        add('<marker id="a-%s" viewBox="0 0 8 8" refX="7" refY="4" '
+            'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
+            '<path d="M0 0 L8 4 L0 8 z" fill="var(--%s, %s)"/></marker>'
+            % (token, token, colours[token]))
+    add("</defs>")
     # `var(--token)` rather than a hex: this SVG is inline in the page, so it
     # inherits the custom properties the stylesheet defines, and the diagram
     # follows whichever of the nine themes the reader chose -- or one of their
@@ -1531,6 +1671,14 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False):
         'fill="var(--bg-inset, %s)" rx="8"/>'
         % (canvas_w, canvas_h, colours["bg-inset"]))
 
+    # An edge is drawn in the colour of the box it leaves, so a reader can
+    # follow one call out of a box and see where it went without tracing every
+    # line back. Grey when the source has no role, which is the crate diagram,
+    # where a file is a file and there is nothing to distinguish.
+    role_token = {role: token for role, token, _ in ROLES}
+    source_role = {node["id"]: role_token.get(node.get("role"), "muted")
+                   for node in nodes}
+
     for src, dst in edges:
         if src not in placed or dst not in placed:
             continue
@@ -1538,22 +1686,28 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False):
         dx, dy, dw, dh = placed[dst]
         x1, y1 = sx + sw / 2.0, sy + sh
         x2, y2 = dx + dw / 2.0, dy
+        token = source_role.get(src, "muted")
         if dy > sy + sh:
             add('<path d="M%.1f %.1f C %.1f %.1f, %.1f %.1f, %.1f %.1f" '
-                'fill="none" stroke="%s" stroke-width="1.2" marker-end="url(#a)"/>'
+                'fill="none" stroke="var(--%s, %s)" stroke-width="1.4" '
+                'opacity="0.85" marker-end="url(#a-%s)"/>'
                 % (x1, y1, x1, y1 + 20, x2, y2 - 20, x2, y2 - 3,
-                   "var(--muted, %s)" % colours["muted"]))
+                   token, colours[token], token))
         else:
             # A back edge -- or an edge between two nodes that wrapping put on
             # the same line -- drawn to the side so it cannot be mistaken for a
             # forward one, and kept rather than dropped.
+            # A back edge is the same call and a different fact about it, so
+            # it is one colour for all of them rather than the source's: what
+            # matters is that the reader can tell a cycle from a step, and
+            # colouring these by origin would bury that under five hues.
             side = max(sx + sw, dx + dw) + 22.0
             add('<path d="M%.1f %.1f C %.1f %.1f, %.1f %.1f, %.1f %.1f" '
-                'fill="none" stroke="%s" stroke-width="1.1" '
-                'stroke-dasharray="4 3" marker-end="url(#a)"/>'
+                'fill="none" stroke="var(--warn, %s)" stroke-width="1.1" '
+                'opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>'
                 % (sx + sw, sy + sh / 2.0, side, sy + sh / 2.0,
                    side, dy + dh / 2.0, dx + dw + 3, dy + dh / 2.0,
-                   "var(--border, %s)" % colours["border"]))
+                   colours["warn"]))
 
     role_token = {role: token for role, token, _ in ROLES}
     for node in nodes:
@@ -1595,6 +1749,36 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False):
                    MONO, token, colours[token], esc(line)))
         if linked:
             add('</a>')
+
+    y = drawing_h + 4.0
+    if key:
+        y += 6.0
+        for role, token, why in key:
+            add('<rect x="%.1f" y="%.1f" width="9" height="9" rx="2" '
+                'fill="var(--%s, %s)"/>'
+                % (margin, y, token, colours[token]))
+            add('<text x="%.1f" y="%.1f" font-family="%s" font-size="11" '
+                'fill="var(--muted, %s)">%s</text>'
+                % (margin + 15, y + 9, MONO, colours["muted"],
+                   esc("%s: %s" % (role, why))))
+            y += 16.0
+        # The dashed line means something too, and a key that explains three of
+        # four things is a key somebody has to guess the rest of.
+        add('<path d="M%.1f %.1f L%.1f %.1f" stroke="var(--warn, %s)" '
+            'stroke-width="1.1" stroke-dasharray="4 3"/>'
+            % (margin, y + 4.5, margin + 9, y + 4.5, colours["warn"]))
+        add('<text x="%.1f" y="%.1f" font-family="%s" font-size="11" '
+            'fill="var(--muted, %s)">%s</text>'
+            % (margin + 15, y + 9, MONO, colours["muted"],
+               esc("dashed: a call that goes back up, or across a wrapped rank")))
+        y += 16.0
+    if note_lines:
+        y += 6.0
+        for line in note_lines:
+            add('<text x="%.1f" y="%.1f" font-family="%s" font-size="11" '
+                'fill="var(--muted, %s)">%s</text>'
+                % (margin, y + 9, MONO, colours["muted"], esc(line)))
+            y += 15.0
     add('</svg>')
     return "\n".join(out) + "\n"
 
@@ -2213,9 +2397,17 @@ def doc_html(lines, anchors=None):
 
 
 def diagram_block(colours, nodes, edges, note, mermaid_source):
-    """The inline SVG, the explanation, and the Mermaid source beside it."""
+    """The inline SVG, the explanation, and the Mermaid source beside it.
+
+    The note goes *into* the drawing as well as under it. On this page the
+    paragraph below is the better place to read it; everywhere else the drawing
+    goes, which is a README, the wiki and an `<img>`, nothing around it comes
+    with it, and a picture that needs a caption it does not carry arrives
+    without its meaning.
+    """
     out = ['<div class="diagram">']
-    out.append(diagram_svg(colours, nodes, edges, on_site=True).rstrip("\n"))
+    out.append(diagram_svg(colours, nodes, edges, on_site=True,
+                           note=strip_markup(note)).rstrip("\n"))
     out.append('</div>')
     out.append('<p class="muted" style="color:var(--muted);font-size:13px">%s</p>'
                % note)
@@ -2681,7 +2873,10 @@ def outputs(root):
             colours, crate, model["description"], "crate")
         crate_nodes, crate_edges = crate_graph(model)
         files["assets/diagrams/%s.svg" % crate] = diagram_svg(
-            colours, crate_nodes, crate_edges)
+            colours, crate_nodes, crate_edges,
+            note="The files in %s, and which of them names which. An edge means "
+                 "the name appears in the other file, which is a reading of the "
+                 "source rather than a resolved import." % crate)
         if crate not in HAND_WRITTEN_README:
             files["%s/README.md" % crate_dir(crate)] = markdown_crate(
                 colours, model, (known, spellings["readme"])
@@ -2698,9 +2893,16 @@ def outputs(root):
                 subtitle = subtitle[:95] + "…"
             files["assets/banners/%s/%s.svg" % (crate, entry["stem"])] = banner_svg(
                 colours, entry["name"], subtitle, crate.replace("veilvoice-", ""))
-            file_nodes, file_edges, _, _ = file_graph(entry)
+            file_nodes, file_edges, drawn_short, drawn_total = file_graph(entry)
             files["assets/diagrams/%s/%s.svg" % (crate, entry["stem"])] = diagram_svg(
-                colours, file_nodes, file_edges)
+                colours, file_nodes, file_edges,
+                note=("The functions %s defines, and the calls between them. An "
+                      "edge means the callee's name appears, called, inside the "
+                      "caller's body: a syntactic reading, not a type-resolved "
+                      "one.%s"
+                      % (entry["name"],
+                         (" %d of %d are drawn, so the picture stays readable."
+                          % (len(file_nodes), drawn_total)) if drawn_short else "")))
             files[file_page_path(crate, entry["stem"])] = markdown_file(
                 colours, model, entry, (known, spellings["filepage"])
             ).replace(FINGERPRINT_PLACEHOLDER, fingerprint)

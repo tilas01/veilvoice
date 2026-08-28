@@ -102,11 +102,11 @@ flowchart TD
     n_mutate["mutate<br/>line 86"]
     n_weak["weak<br/>line 160"]
     n_cheap["cheap<br/>line 178"]
-    n_the_container_header_parser_survives_hostile_input["the_container_header_parser_s…<br/>line 183"]
-    n_the_app_lock_parser_survives_hostile_input["the_app_lock_parser_survives_…<br/>line 234"]
-    n_both_parsers_survive_pure_noise["both_parsers_survive_pure_noi…<br/>line 274"]
-    n_every_length_around_a_boundary_is_handled["every_length_around_a_boundar…<br/>line 294"]
-    n_the_header_the_coverage_guided_campaign_found_is_refused["the_header_the_coverage_guide…<br/>line 335"]
+    n_the_container_header_parser_survives_hostile_input["the_container_header_parser_survives_<br/>hostile_input<br/>line 183"]
+    n_the_app_lock_parser_survives_hostile_input["the_app_lock_parser_survives_hostile_<br/>input<br/>line 234"]
+    n_both_parsers_survive_pure_noise["both_parsers_survive_pure_noise<br/>line 274"]
+    n_every_length_around_a_boundary_is_handled["every_length_around_a_boundary_is_<br/>handled<br/>line 294"]
+    n_the_header_the_coverage_guided_campaign_found_is_refused["the_header_the_coverage_guided_<br/>campaign_found_is_refused<br/>line 335"]
     n_below --> n_next_u32
     n_both_parsers_survive_pure_noise --> n_cheap
     n_both_parsers_survive_pure_noise --> n_new

@@ -86,9 +86,9 @@ flowchart TD
     n_time_it["time_it<br/>line 81"]
     n_time_each["time_each<br/>line 105"]
     n_ratio["ratio<br/>line 118"]
-    n_opening_a_container_does_not_leak_how_much_of_the_password_was_right["opening_a_container_does_not_…<br/>line 124"]
-    n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right["the_app_lock_takes_the_same_t…<br/>line 168"]
-    n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended["a_rate_limited_attempt_is_vis…<br/>line 220"]
+    n_opening_a_container_does_not_leak_how_much_of_the_password_was_right["opening_a_container_does_not_leak_how_<br/>much_of_the_password_was_right<br/>line 124"]
+    n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right["the_app_lock_takes_the_same_time_<br/>whether_or_not_the_password_is_right<br/>line 168"]
+    n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended["a_rate_limited_attempt_is_visibly_<br/>cheaper_and_that_is_intended<br/>line 220"]
     n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended --> n_params
     n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended --> n_show
     n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended --> n_time_each

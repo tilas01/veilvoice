@@ -128,11 +128,11 @@ flowchart TD
     n_enabled(["AccentNeutralizer::enabled<br/>line 217"])
     n_stats(["AccentNeutralizer::stats<br/>line 222"])
     n_observe(["AccentNeutralizer::observe<br/>line 239"])
-    n_prosody_ratio(["AccentNeutralizer::prosody_ra…<br/>line 258"])
-    n_measure_envelope(["AccentNeutralizer::measure_en…<br/>line 269"])
+    n_prosody_ratio(["AccentNeutralizer::<br/>prosody_ratio<br/>line 258"])
+    n_measure_envelope(["AccentNeutralizer::<br/>measure_envelope<br/>line 269"])
     n_vtln_ratio(["AccentNeutralizer::vtln_ratio<br/>line 288"])
     n_shape(["AccentNeutralizer::shape<br/>line 308"])
-    n_recompute_shape["AccentNeutralizer::recompute_…<br/>line 351"]
+    n_recompute_shape["AccentNeutralizer::<br/>recompute_shape<br/>line 351"]
     n_log_centroid["log_centroid<br/>line 403"]
     n_gain_to_db["gain_to_db<br/>line 422"]
     n_db_to_gain["db_to_gain<br/>line 426"]

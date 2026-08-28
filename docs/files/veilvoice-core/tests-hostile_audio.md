@@ -69,17 +69,17 @@ _Colour key: **helper** -- private to this file._
 flowchart TD
     n_speech["speech<br/>line 27"]
     n_engine["engine<br/>line 40"]
-    n_a_single_nan_does_not_poison_the_engine_for_ever["a_single_nan_does_not_poison_…<br/>line 46"]
-    n_every_flavour_of_non_finite_is_survived["every_flavour_of_non_finite_i…<br/>line 73"]
-    n_an_entirely_non_finite_buffer_is_handled["an_entirely_non_finite_buffer…<br/>line 103"]
-    n_digital_silence_stays_silent_and_leaves_the_state_usable["digital_silence_stays_silent_…<br/>line 115"]
-    n_pathological_but_legal_audio_is_handled["pathological_but_legal_audio_…<br/>line 133"]
-    n_hostile_input_is_survived_with_accent_neutralisation_off["hostile_input_is_survived_wit…<br/>line 172"]
-    n_a_non_finite_sample_rate_is_refused_rather_than_built["a_non_finite_sample_rate_is_r…<br/>line 210"]
-    n_an_absurd_sample_rate_is_refused_rather_than_allocated["an_absurd_sample_rate_is_refu…<br/>line 231"]
-    n_an_absurd_frame_size_is_refused["an_absurd_frame_size_is_refus…<br/>line 270"]
-    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped["non_finite_parameters_are_ref…<br/>line 298"]
-    n_every_configuration_that_builds_produces_finite_audio["every_configuration_that_buil…<br/>line 349"]
+    n_a_single_nan_does_not_poison_the_engine_for_ever["a_single_nan_does_not_poison_the_<br/>engine_for_ever<br/>line 46"]
+    n_every_flavour_of_non_finite_is_survived["every_flavour_of_non_finite_is_<br/>survived<br/>line 73"]
+    n_an_entirely_non_finite_buffer_is_handled["an_entirely_non_finite_buffer_is_<br/>handled<br/>line 103"]
+    n_digital_silence_stays_silent_and_leaves_the_state_usable["digital_silence_stays_silent_and_<br/>leaves_the_state_usable<br/>line 115"]
+    n_pathological_but_legal_audio_is_handled["pathological_but_legal_audio_is_<br/>handled<br/>line 133"]
+    n_hostile_input_is_survived_with_accent_neutralisation_off["hostile_input_is_survived_with_accent_<br/>neutralisation_off<br/>line 172"]
+    n_a_non_finite_sample_rate_is_refused_rather_than_built["a_non_finite_sample_rate_is_refused_<br/>rather_than_built<br/>line 210"]
+    n_an_absurd_sample_rate_is_refused_rather_than_allocated["an_absurd_sample_rate_is_refused_<br/>rather_than_allocated<br/>line 231"]
+    n_an_absurd_frame_size_is_refused["an_absurd_frame_size_is_refused<br/>line 270"]
+    n_non_finite_parameters_are_refused_and_wild_ones_are_clamped["non_finite_parameters_are_refused_and_<br/>wild_ones_are_clamped<br/>line 298"]
+    n_every_configuration_that_builds_produces_finite_audio["every_configuration_that_builds_<br/>produces_finite_audio<br/>line 349"]
     n_a_single_nan_does_not_poison_the_engine_for_ever --> n_engine
     n_a_single_nan_does_not_poison_the_engine_for_ever --> n_speech
     n_an_entirely_non_finite_buffer_is_handled --> n_engine
