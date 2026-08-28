@@ -8,6 +8,38 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### The roadmap, published as a page, with a picture of where it has got to
+
+`ROADMAP.md` is the file that decides what is done. It is also two thousand
+lines in a repository, which is the wrong shape for the question people
+actually ask: is this finished, and if not, what is left.
+
+`website/roadmap.html` is that question answered. One square per marker,
+grouped by the sections the roadmap already has, coloured by state, with the
+unfinished ones listed under it with their estimates and the blocked ones
+listed separately with what each is waiting for.
+
+**It is generated from `ROADMAP.md` and checked against it**, the same
+arrangement the documentation, the artwork and the search index have. A
+published roadmap that quietly disagrees with the roadmap would be worse than
+not publishing one, and this repository has recorded that exact failure four
+times under other names.
+
+Two things the picture deliberately does not say. **Area is not progress**:
+every square is the same size and a marker is not a day, so reading the
+coloured fraction as "how far along this is" would be wrong, and the page says
+so directly under the picture. And **blocked is its own colour rather than a
+shade of unfinished**, because five markers are waiting on a decision or on
+somebody else's rules, and drawing them as "not done yet" would promise work
+that no amount of effort delivers.
+
+Eight new markers, 66 to 73, are the work asked for after v0.1.14, in the order
+it is expected to be done, ending with a full security and functionality audit
+and an optimisation pass before the next deploy. That one is last deliberately:
+an audit run before the code stops moving is an audit of code that no longer
+exists, and its estimate is the widest on the page because the audit's estimate
+is the number that has historically been wrong.
+
 ### The pictures: no black margin, and no sentence cut off mid-word
 
 Two things, both visible in the committed images and neither visible in any
