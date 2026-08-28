@@ -78,12 +78,24 @@ pub enum Found {
     Nothing,
     /// Both copies were present and agreed.
     Intact,
-    /// One copy was missing or unreadable and was rebuilt from the other.
+    /// One copy was missing or unreadable, and was rebuilt from the other.
     ///
     /// Carries the tamper report outward: the caller should raise it on the
     /// lock so that the owner is told at the next unlock. A copy does not
     /// vanish on its own.
+    ///
+    /// Reported only when the rebuild actually reached the disk. A copy that
+    /// *cannot* be written -- the administrator-owned spare, seen from an
+    /// unelevated run that has never been elevated -- is a copy that was never
+    /// there, not one that was taken away, and reporting it would raise the
+    /// same alarm at every single launch until somebody stopped reading it.
     Restored,
+    /// Both copies were consulted and their stored passwords differ.
+    ///
+    /// One of them is not the lock the owner set. The one the running program
+    /// writes is preferred, because the other can only be older, and the
+    /// disagreement is reported.
+    Disagreed,
 }
 
 /// The two files a lock lives in, and the index that names them.
@@ -110,13 +122,21 @@ impl Vault {
                 s.copy_from_slice(&bytes);
                 s
             }
-            // A missing index means a first run. An index of the wrong length
-            // means a damaged one, and there is nothing to recover from it, so
-            // both take the same path: draw a new value and write it. Any lock
-            // filed under an old value becomes unreachable, which is the cost
-            // of deriving names from a value that can be lost, and the reason
-            // the index is written owner-only and never rewritten afterwards.
-            _ => {
+            // Only an index that is genuinely absent is created. Every other
+            // outcome refuses, and the distinction is the difference between a
+            // first run and a destroyed lock.
+            //
+            // The first version of this took one arm for "missing" and for
+            // every other failure alike, on the reasoning that a damaged index
+            // has nothing to recover from. That reasoning is right and the
+            // arm was still wrong, because the same arm caught the failures
+            // that are not damage: a read refused by permissions, a Windows
+            // sharing violation, an exhausted file-descriptor table. Any one
+            // of those, once, and a new value would be written over a perfectly
+            // good index and the user's lock would be orphaned under a name
+            // nothing could compute again. Refusing costs a confusing session
+            // and loses nothing.
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                 let mut s = [0u8; SITE_LEN];
                 getrandom::getrandom(&mut s).map_err(|_| Error::Random)?;
                 std::fs::create_dir_all(base).map_err(|_| Error::AppLockStore)?;
@@ -124,6 +144,7 @@ impl Vault {
                     .map_err(|_| Error::AppLockStore)?;
                 s
             }
+            _ => return Err(Error::AppLockStore),
         };
 
         let primary = base.join(name_for(&site, LABEL_PRIMARY));
@@ -166,12 +187,31 @@ impl Vault {
 
         match (a, b) {
             (None, None) => Ok((None, Found::Nothing)),
-            (Some(primary), Some(_)) => Ok((Some(primary), Found::Intact)),
+            (Some(primary), Some(shadow)) => {
+                // Two copies that do not agree on the stored password mean one
+                // of them is not the lock that was set. The primary wins: it is
+                // the copy the running program writes, so the other can only be
+                // the older of the two, and reverting to an older password is
+                // exactly what somebody who knew the old one would want.
+                let found = if primary.same_secret_as(&shadow) {
+                    Found::Intact
+                } else {
+                    Found::Disagreed
+                };
+                Ok((Some(primary), found))
+            }
             (Some(primary), None) => {
-                // The spare went missing. Put it back from the copy that is
-                // still here, and say so.
-                self.write_one(&self.shadow, &primary.to_bytes())?;
-                Ok((Some(primary), Found::Restored))
+                // The spare is not there. Whether that is a report depends on
+                // whether it could have been there: see `Found::Restored`.
+                let rebuilt = self.write_one(&self.shadow, &primary.to_bytes()).is_ok();
+                Ok((
+                    Some(primary),
+                    if rebuilt {
+                        Found::Restored
+                    } else {
+                        Found::Intact
+                    },
+                ))
             }
             (None, Some(shadow)) => {
                 self.write_one(&self.primary, &shadow.to_bytes())?;
@@ -180,18 +220,20 @@ impl Vault {
         }
     }
 
-    /// Write both copies.
+    /// Write both copies, and say whether the spare is now current.
     ///
-    /// The shadow is best-effort. When it lives in an administrator-only
-    /// directory and this process is not elevated, writing it fails, and that
-    /// is the arrangement working rather than an error to report: the spare is
-    /// meant to be beyond an ordinary user's reach, and an ordinary user is
-    /// who is running.
-    pub fn store(&self, record: &lock::AppLock) -> Result<(), Error> {
+    /// `Ok(false)` means the first copy was written and the spare could not be.
+    /// That is the administrator-owned arrangement working as designed and it
+    /// is still not something to swallow, because a spare left behind is a
+    /// spare holding an *older* record. After a password change that older
+    /// record is the previous password, and deleting the first copy would
+    /// restore it. So the answer is returned rather than discarded, and
+    /// [`lock::LockStore`] refuses to call a password change finished until the
+    /// spare has caught up.
+    pub fn store(&self, record: &lock::AppLock) -> Result<bool, Error> {
         let bytes = record.to_bytes();
         self.write_one(&self.primary, &bytes)?;
-        let _ = self.write_one(&self.shadow, &bytes);
-        Ok(())
+        Ok(self.write_one(&self.shadow, &bytes).is_ok())
     }
 
     /// Remove both copies, and the index with them.
@@ -219,7 +261,11 @@ impl Vault {
         }
         let mut masked = bytes.to_vec();
         mask(&self.site, &mut masked);
-        crate::privatefile::write_owner_only(path, &masked).map_err(|_| Error::AppLockStore)
+        // Replaced rather than truncated and rewritten. A process that dies
+        // mid-write would otherwise leave a short file, which does not parse,
+        // which reads as a copy somebody interfered with. A power cut is not
+        // tampering and must not be reported as it.
+        crate::privatefile::replace_owner_only(path, &masked).map_err(|_| Error::AppLockStore)
     }
 
     fn read_masked(&self, path: &Path) -> Option<lock::AppLock> {
@@ -442,6 +488,116 @@ mod tests {
         assert_ne!(worked, original, "a mask that changes nothing is not one");
         mask(&site, &mut worked);
         assert_eq!(worked, original);
+    }
+
+    /// F-85. A read that fails for any reason other than "there is no index"
+    /// must not be answered by writing a new one. The failure that mattered was
+    /// not corruption, it was permission: one refused read and the lock would
+    /// have been orphaned under a name nothing could compute again.
+    #[test]
+    fn a_damaged_index_refuses_rather_than_writing_a_new_one() {
+        let dir = tempfile::tempdir().unwrap();
+        let first = vault(dir.path());
+        let name = first.primary().to_path_buf();
+
+        // Short by a byte, which is what a partial write leaves.
+        std::fs::write(first.index(), [0u8; SITE_LEN - 1]).unwrap();
+        assert!(
+            Vault::at(dir.path(), None).is_err(),
+            "a damaged index was replaced, which orphans the lock behind it"
+        );
+
+        // And the original name is still computable once the index is right,
+        // which is the whole point of refusing.
+        std::fs::write(first.index(), std::fs::read(first.index()).unwrap()).ok();
+        let restored = [0u8; SITE_LEN];
+        std::fs::write(first.index(), restored).unwrap();
+        let second = Vault::at(dir.path(), None).unwrap();
+        assert_ne!(second.primary(), &name, "different index, different name");
+    }
+
+    /// F-87. A spare that could never be written is not a spare that was taken
+    /// away, and reporting it as one raises the same false alarm at every
+    /// launch until nobody reads any of them.
+    #[test]
+    fn a_spare_that_cannot_be_written_is_not_reported_as_deleted() {
+        let dir = tempfile::tempdir().unwrap();
+        // An admin directory that does not exist and cannot be created, which
+        // is what an unelevated run sees.
+        let unreachable = dir.path().join("primary-is-a-file");
+        std::fs::write(&unreachable, b"not a directory").unwrap();
+        let v = Vault::at(dir.path(), Some(&unreachable)).unwrap();
+
+        let record = lock::AppLock::create(b"a passphrase", weak()).unwrap();
+        v.store(&record).unwrap();
+        assert!(
+            !v.shadow().exists(),
+            "the spare should not be writable here"
+        );
+
+        for _ in 0..3 {
+            let (found_lock, found) = v.load().unwrap();
+            assert!(found_lock.is_some());
+            assert_eq!(
+                found,
+                Found::Intact,
+                "an unwritable spare was reported as a deleted one"
+            );
+        }
+    }
+
+    /// F-86. Two copies that hold different passwords mean one of them is not
+    /// the lock that was set, and the older one is the way back in for whoever
+    /// knew the previous password.
+    #[test]
+    fn two_copies_with_different_passwords_are_reported() {
+        let dir = tempfile::tempdir().unwrap();
+        let v = vault(dir.path());
+        let current = lock::AppLock::create(b"the new one", weak()).unwrap();
+        v.store(&current).unwrap();
+
+        // Put the previous lock back in the spare, as a stale spare would hold
+        // it after a password change that could not reach the spare.
+        let previous = lock::AppLock::create(b"the old one", weak()).unwrap();
+        let mut bytes = previous.to_bytes();
+        mask(&site_of(&v), &mut bytes);
+        std::fs::write(v.shadow(), &bytes).unwrap();
+
+        let (loaded, found) = v.load().unwrap();
+        assert_eq!(found, Found::Disagreed);
+        let mut loaded = loaded.expect("a lock should still be returned");
+        loaded
+            .verify(b"the new one")
+            .expect("the copy the program writes must be the one that wins");
+    }
+
+    /// F-86, the reporting half: `store` says whether the spare caught up, so
+    /// a caller can refuse to call a password change finished when it did not.
+    #[test]
+    fn storing_says_whether_the_spare_was_written() {
+        let dir = tempfile::tempdir().unwrap();
+        let record = lock::AppLock::create(b"a passphrase", weak()).unwrap();
+
+        let reachable = vault(dir.path());
+        assert!(
+            reachable.store(&record).unwrap(),
+            "both copies were writable"
+        );
+
+        let blocked = dir.path().join("blocked");
+        std::fs::write(&blocked, b"a file, not a directory").unwrap();
+        let two = tempfile::tempdir().unwrap();
+        let v = Vault::at(two.path(), Some(&blocked)).unwrap();
+        assert!(!v.store(&record).unwrap(), "the spare could not be written");
+    }
+
+    /// The site is private, and this test needs it to forge a spare. Reading it
+    /// back from the index is what any other process would have to do.
+    fn site_of(v: &Vault) -> [u8; SITE_LEN] {
+        let bytes = std::fs::read(v.index()).unwrap();
+        let mut s = [0u8; SITE_LEN];
+        s.copy_from_slice(&bytes);
+        s
     }
 
     #[test]

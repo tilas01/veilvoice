@@ -167,6 +167,16 @@ fn status(site: &Site) -> Result<(), String> {
                 ),
                 None => println!("{}", field("Rate limit", "not currently in force")),
             }
+            if !store.every_copy_current() {
+                println!();
+                println!(
+                    "{}",
+                    warn(
+                        "the administrator-owned copy of this lock still holds the \
+                         previous password; run once as an administrator to finish"
+                    )
+                );
+            }
             if store.tampered() || restored {
                 println!();
                 println!(
