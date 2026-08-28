@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/tests/parser_fuzz.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests-parser_fuzz.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 315 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests-parser_fuzz.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 368 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -381,6 +381,61 @@
 <span class="ln" id="L313">    long.<span class="tok-fn">push</span>(<span class="tok-num">0</span>);</span>
 <span class="ln" id="L314">    assert!(lock::AppLock::<span class="tok-fn">parse</span>(&amp;long).<span class="tok-fn">is_err</span>());</span>
 <span class="ln" id="L315">}</span>
+</span>
+<span class="ln" id="L316"></span>
+<span class="src-item" id="fn-the_header_the_coverage_guided_campaign_found_is_refused">
+<span class="ln" id="L317"><span class="tok-com">/// **F-82.** The one input the coverage-guided campaign found, kept here.</span></span>
+<span class="ln" id="L318"><span class="tok-com">///</span></span>
+<span class="ln" id="L319"><span class="tok-com">/// `fuzz/README.md` says these two campaigns are different things and both are</span></span>
+<span class="ln" id="L320"><span class="tok-com">/// kept, and this is what that means in practice: the nightly campaign found an</span></span>
+<span class="ln" id="L321"><span class="tok-com">/// input, and the input lives here, where it is checked on every commit on</span></span>
+<span class="ln" id="L322"><span class="tok-com">/// every platform by anybody who cloned the repository.</span></span>
+<span class="ln" id="L323"><span class="tok-com">///</span></span>
+<span class="ln" id="L324"><span class="tok-com">/// The bytes are a whole `.veil` header declaring `m_cost` 65535, `t_cost`</span></span>
+<span class="ln" id="L325"><span class="tok-com">/// 4521984 and `p_cost` 1280. Nothing about them overflows, nothing allocates</span></span>
+<span class="ln" id="L326"><span class="tok-com">/// beyond the memory ceiling, and `m_cost &gt;= p_cost * 8` holds, so every check</span></span>
+<span class="ln" id="L327"><span class="tok-com">/// this file&#x27;s other tests make passed. The only thing wrong with them is that</span></span>
+<span class="ln" id="L328"><span class="tok-com">/// the derivation would not finish: about 74 hours, measured in a release</span></span>
+<span class="ln" id="L329"><span class="tok-com">/// build before `MAX_T_COST` existed.</span></span>
+<span class="ln" id="L330"><span class="tok-com">///</span></span>
+<span class="ln" id="L331"><span class="tok-com">/// Written out as bytes rather than built from `KdfParams`, because the point</span></span>
+<span class="ln" id="L332"><span class="tok-com">/// is the file, and a test that constructs the parameters would keep passing if</span></span>
+<span class="ln" id="L333"><span class="tok-com">/// the header ever stopped putting them where it puts them.</span></span>
+<span class="ln" id="L334"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L335"><span class="tok-kw">fn</span> <span class="tok-fn">the_header_the_coverage_guided_campaign_found_is_refused</span>() {</span>
+<span class="ln" id="L336">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> header = vec![0u8; <span class="tok-num">69</span>];</span>
+<span class="ln" id="L337">    header[..<span class="tok-num">8</span>].<span class="tok-fn">copy_from_slice</span>(b<span class="tok-str">&quot;VEILVOX1&quot;</span>);</span>
+<span class="ln" id="L338">    header[<span class="tok-num">8</span>] = <span class="tok-num">1</span>; <span class="tok-com">// format version</span></span>
+<span class="ln" id="L339">    header[<span class="tok-num">9</span>] = <span class="tok-num">1</span>; <span class="tok-com">// password mode</span></span>
+<span class="ln" id="L340">    header[<span class="tok-num">12</span>..<span class="tok-num">16</span>].<span class="tok-fn">copy_from_slice</span>(&amp;65_535u32.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// m_cost</span></span>
+<span class="ln" id="L341">    header[<span class="tok-num">16</span>..<span class="tok-num">20</span>].<span class="tok-fn">copy_from_slice</span>(&amp;4_521_984u32.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// t_cost</span></span>
+<span class="ln" id="L342">    header[<span class="tok-num">20</span>..<span class="tok-num">24</span>].<span class="tok-fn">copy_from_slice</span>(&amp;1280u32.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// p_cost</span></span>
+<span class="ln" id="L343"></span>
+<span class="ln" id="L344">    <span class="tok-com">// The header still parses: the numbers are structurally fine, and pretending</span></span>
+<span class="ln" id="L345">    <span class="tok-com">// otherwise would be testing the wrong thing.</span></span>
+<span class="ln" id="L346">    <span class="tok-kw">let</span> parsed = container::Header::<span class="tok-fn">parse</span>(&amp;header);</span>
+<span class="ln" id="L347">    assert!(</span>
+<span class="ln" id="L348">        parsed.<span class="tok-fn">is_ok</span>(),</span>
+<span class="ln" id="L349">        <span class="tok-str">&quot;the header itself is well formed: {parsed:?}&quot;</span></span>
+<span class="ln" id="L350">    );</span>
+<span class="ln" id="L351"></span>
+<span class="ln" id="L352">    <span class="tok-com">// What must not happen is that opening it runs. On a thread with a deadline,</span></span>
+<span class="ln" id="L353">    <span class="tok-com">// because the defect this guards against is a *hang*: timing the call after</span></span>
+<span class="ln" id="L354">    <span class="tok-com">// it returns cannot fail, it can only never finish, and a test that hangs</span></span>
+<span class="ln" id="L355">    <span class="tok-com">// says less than one that fails and says why.</span></span>
+<span class="ln" id="L356">    <span class="tok-kw">let</span> (done, answer) = std::sync::mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L357">    std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L358">        <span class="tok-kw">let</span> refused = container::<span class="tok-fn">open_with_password</span>(b<span class="tok-str">&quot;not the password&quot;</span>, &amp;header).<span class="tok-fn">is_err</span>();</span>
+<span class="ln" id="L359">        <span class="tok-kw">let</span> _ = done.<span class="tok-fn">send</span>(refused);</span>
+<span class="ln" id="L360">    });</span>
+<span class="ln" id="L361">    <span class="tok-kw">match</span> answer.<span class="tok-fn">recv_timeout</span>(std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>)) {</span>
+<span class="ln" id="L362">        <span class="tok-fn">Ok</span>(refused) =&gt; assert!(refused, <span class="tok-str">&quot;a header this expensive must be refused&quot;</span>),</span>
+<span class="ln" id="L363">        <span class="tok-fn">Err</span>(_) =&gt; panic!(</span>
+<span class="ln" id="L364">            <span class="tok-str">&quot;open_with_password did not come back within five seconds, so it is \</span></span>
+<span class="ln" id="L365"><span class="tok-str">             deriving rather than refusing. That is F-82: t_cost is unbounded.&quot;</span></span>
+<span class="ln" id="L366">        ),</span>
+<span class="ln" id="L367">    }</span>
+<span class="ln" id="L368">}</span>
 </span>
 </code></pre>
 </main>

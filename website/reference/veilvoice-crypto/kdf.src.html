@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/kdf.rs</code></h1>
-<p style="color:var(--muted)"><a href="kdf.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 399 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="kdf.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 525 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -172,300 +172,428 @@
 <span class="ln" id="L120">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_M_COST: u32 = <span class="tok-num">4</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>;</span>
 </span>
 <span class="ln" id="L121"></span>
-<span class="src-item" id="fn-kdfparams-unattended_max_m_cost">
-<span class="ln" id="L122">    <span class="tok-com">/// A ceiling for a caller with nobody watching.</span></span>
+<span class="src-item" id="fn-kdfparams-max_t_cost">
+<span class="ln" id="L122">    <span class="tok-com">/// The largest number of passes this build will attempt.</span></span>
 <span class="ln" id="L123">    <span class="tok-com">///</span></span>
-<span class="ln" id="L124">    <span class="tok-com">/// [`MAX_M_COST`](Self::MAX_M_COST) exists to stop an *absurd* value; it is</span></span>
-<span class="ln" id="L125">    <span class="tok-com">/// deliberately generous, so a container may still declare a legitimate but</span></span>
-<span class="ln" id="L126">    <span class="tok-com">/// expensive cost and make itself slow to open. That is fine when a person</span></span>
-<span class="ln" id="L127">    <span class="tok-com">/// chose to open that file and can decide to stop waiting. It is not fine</span></span>
-<span class="ln" id="L128">    <span class="tok-com">/// for a service processing whatever arrives, which is why</span></span>
-<span class="ln" id="L129">    <span class="tok-com">/// [`KdfParams::within`] exists and this is the value to pass it: 1 GiB is</span></span>
-<span class="ln" id="L130">    <span class="tok-com">/// four times this crate&#x27;s default and still opens in a few seconds, while</span></span>
-<span class="ln" id="L131">    <span class="tok-com">/// refusing a header that asks for four gigabytes of someone else&#x27;s memory.</span></span>
-<span class="ln" id="L132">    <span class="tok-com">///</span></span>
-<span class="ln" id="L133">    <span class="tok-com">/// This is a *policy*, not a security boundary &#8212; the honest framing is that</span></span>
-<span class="ln" id="L134">    <span class="tok-com">/// it bounds the cost of being handed a hostile file, not that it makes one</span></span>
-<span class="ln" id="L135">    <span class="tok-com">/// safe.</span></span>
-<span class="ln" id="L136">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> UNATTENDED_MAX_M_COST: u32 = <span class="tok-num">1024</span> * <span class="tok-num">1024</span>;</span>
+<span class="ln" id="L124">    <span class="tok-com">/// **F-82.** `m_cost` had a ceiling and `t_cost` had only a test for zero,</span></span>
+<span class="ln" id="L125">    <span class="tok-com">/// so a header could declare `u32::MAX` passes: four billion of them, over</span></span>
+<span class="ln" id="L126">    <span class="tok-com">/// however much memory it also asked for. Nothing overflows and nothing</span></span>
+<span class="ln" id="L127">    <span class="tok-com">/// allocates, so every check above passed and the derivation simply did not</span></span>
+<span class="ln" id="L128">    <span class="tok-com">/// finish.</span></span>
+<span class="ln" id="L129">    <span class="tok-com">///</span></span>
+<span class="ln" id="L130">    <span class="tok-com">/// Found by the coverage-guided campaign, which produced a header</span></span>
+<span class="ln" id="L131">    <span class="tok-com">/// declaring `m_cost` 65535, `t_cost` 4521984 and `p_cost` 1280. Measured</span></span>
+<span class="ln" id="L132">    <span class="tok-com">/// on the machine that found it, in a release build: **about 74 hours**,</span></span>
+<span class="ln" id="L133">    <span class="tok-com">/// and that input is not the worst one, only the one the fuzzer happened</span></span>
+<span class="ln" id="L134">    <span class="tok-com">/// to reach. `u32::MAX` passes at the same memory is roughly eight years.</span></span>
+<span class="ln" id="L135">    <span class="tok-com">///</span></span>
+<span class="ln" id="L136">    <span class="tok-com">/// It matters in two places and the second is worse. A `.veil` file is</span></span>
+<span class="ln" id="L137">    <span class="tok-com">/// something somebody sent you, and merely attempting to open it would hang</span></span>
+<span class="ln" id="L138">    <span class="tok-com">/// the program. The app-lock file carries the same three numbers and is</span></span>
+<span class="ln" id="L139">    <span class="tok-com">/// read **before anyone has authenticated**, so anything able to write it</span></span>
+<span class="ln" id="L140">    <span class="tok-com">/// could stop VeilVoice from starting, for ever, with no error and nothing</span></span>
+<span class="ln" id="L141">    <span class="tok-com">/// to see. That is the argument [`MAX_M_COST`](Self::MAX_M_COST) already</span></span>
+<span class="ln" id="L142">    <span class="tok-com">/// makes about memory; nobody had made it about time.</span></span>
+<span class="ln" id="L143">    <span class="tok-com">///</span></span>
+<span class="ln" id="L144">    <span class="tok-com">/// 16 is chosen the way the memory ceiling was, and then tighter, because</span></span>
+<span class="ln" id="L145">    <span class="tok-com">/// time has no allocator to fail on its behalf. RFC 9106&#x27;s two recommended</span></span>
+<span class="ln" id="L146">    <span class="tok-com">/// profiles use one pass and three, libsodium&#x27;s most expensive preset uses</span></span>
+<span class="ln" id="L147">    <span class="tok-com">/// four, and this crate&#x27;s default is three; 16 is four times the highest of</span></span>
+<span class="ln" id="L148">    <span class="tok-com">/// those. Measured in a release build: 16 passes at</span></span>
+<span class="ln" id="L149">    <span class="tok-com">/// [`MAX_M_COST`](Self::MAX_M_COST) is 75 seconds, and at</span></span>
+<span class="ln" id="L150">    <span class="tok-com">/// [`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) it is 18. So the</span></span>
+<span class="ln" id="L151">    <span class="tok-com">/// most expensive header this build will accept is a wait somebody can sit</span></span>
+<span class="ln" id="L152">    <span class="tok-com">/// through, rather than one they will never see the end of.</span></span>
+<span class="ln" id="L153">    <span class="tok-com">///</span></span>
+<span class="ln" id="L154">    <span class="tok-com">/// This is one ceiling and it is enforced in [`checked`](Self::checked),</span></span>
+<span class="ln" id="L155">    <span class="tok-com">/// the single funnel every derivation passes through, so it holds for the</span></span>
+<span class="ln" id="L156">    <span class="tok-com">/// container, for the app lock, and for anything built against this crate.</span></span>
+<span class="ln" id="L157">    <span class="tok-com">/// The honest residual is the same one the memory ceiling states: a cap</span></span>
+<span class="ln" id="L158">    <span class="tok-com">/// cannot make a hostile file cheap, it can stop an absurd number from</span></span>
+<span class="ln" id="L159">    <span class="tok-com">/// being taken seriously.</span></span>
+<span class="ln" id="L160">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_T_COST: u32 = <span class="tok-num">16</span>;</span>
 </span>
-<span class="ln" id="L137"></span>
+<span class="ln" id="L161"></span>
+<span class="src-item" id="fn-kdfparams-unattended_max_m_cost">
+<span class="ln" id="L162">    <span class="tok-com">/// A ceiling for a caller with nobody watching.</span></span>
+<span class="ln" id="L163">    <span class="tok-com">///</span></span>
+<span class="ln" id="L164">    <span class="tok-com">/// [`MAX_M_COST`](Self::MAX_M_COST) exists to stop an *absurd* value; it is</span></span>
+<span class="ln" id="L165">    <span class="tok-com">/// deliberately generous, so a container may still declare a legitimate but</span></span>
+<span class="ln" id="L166">    <span class="tok-com">/// expensive cost and make itself slow to open. That is fine when a person</span></span>
+<span class="ln" id="L167">    <span class="tok-com">/// chose to open that file and can decide to stop waiting. It is not fine</span></span>
+<span class="ln" id="L168">    <span class="tok-com">/// for a service processing whatever arrives, which is why</span></span>
+<span class="ln" id="L169">    <span class="tok-com">/// [`KdfParams::within`] exists and this is the value to pass it: 1 GiB is</span></span>
+<span class="ln" id="L170">    <span class="tok-com">/// four times this crate&#x27;s default and still opens in a few seconds, while</span></span>
+<span class="ln" id="L171">    <span class="tok-com">/// refusing a header that asks for four gigabytes of someone else&#x27;s memory.</span></span>
+<span class="ln" id="L172">    <span class="tok-com">///</span></span>
+<span class="ln" id="L173">    <span class="tok-com">/// This is a *policy*, not a security boundary &#8212; the honest framing is that</span></span>
+<span class="ln" id="L174">    <span class="tok-com">/// it bounds the cost of being handed a hostile file, not that it makes one</span></span>
+<span class="ln" id="L175">    <span class="tok-com">/// safe.</span></span>
+<span class="ln" id="L176">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> UNATTENDED_MAX_M_COST: u32 = <span class="tok-num">1024</span> * <span class="tok-num">1024</span>;</span>
+</span>
+<span class="ln" id="L177"></span>
 <span class="src-item" id="fn-kdfparams-within">
-<span class="ln" id="L138">    <span class="tok-com">/// Check the costs against a caller-chosen memory ceiling as well as the</span></span>
-<span class="ln" id="L139">    <span class="tok-com">/// built-in one.</span></span>
-<span class="ln" id="L140">    <span class="tok-com">///</span></span>
-<span class="ln" id="L141">    <span class="tok-com">/// Opening a container whose declared cost is legitimate but large is slow</span></span>
-<span class="ln" id="L142">    <span class="tok-com">/// by design, and that is the price of shipping the cost with the file so</span></span>
-<span class="ln" id="L143">    <span class="tok-com">/// old files keep opening. A caller running without a human present &#8212; a</span></span>
-<span class="ln" id="L144">    <span class="tok-com">/// batch job, a service, anything processing files it did not choose &#8212; can</span></span>
-<span class="ln" id="L145">    <span class="tok-com">/// use this to decline instead of spending the memory. Pass</span></span>
-<span class="ln" id="L146">    <span class="tok-com">/// [`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) unless there is a</span></span>
-<span class="ln" id="L147">    <span class="tok-com">/// reason for something else.</span></span>
-<span class="ln" id="L148">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">within</span>(&amp;<span class="tok-kw">self</span>, max_m_cost: u32) -&gt; Result&lt;(), Error&gt; {</span>
-<span class="ln" id="L149">        <span class="tok-kw">self</span>.<span class="tok-fn">checked</span>()?;</span>
-<span class="ln" id="L150">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.m_cost &gt; max_m_cost {</span>
-<span class="ln" id="L151">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfCostRefused {</span>
-<span class="ln" id="L152">                requested: <span class="tok-kw">self</span>.m_cost,</span>
-<span class="ln" id="L153">                ceiling: max_m_cost,</span>
-<span class="ln" id="L154">            });</span>
-<span class="ln" id="L155">        }</span>
-<span class="ln" id="L156">        <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L157">    }</span>
+<span class="ln" id="L178">    <span class="tok-com">/// Check the costs against a caller-chosen memory ceiling as well as the</span></span>
+<span class="ln" id="L179">    <span class="tok-com">/// built-in one.</span></span>
+<span class="ln" id="L180">    <span class="tok-com">///</span></span>
+<span class="ln" id="L181">    <span class="tok-com">/// Opening a container whose declared cost is legitimate but large is slow</span></span>
+<span class="ln" id="L182">    <span class="tok-com">/// by design, and that is the price of shipping the cost with the file so</span></span>
+<span class="ln" id="L183">    <span class="tok-com">/// old files keep opening. A caller running without a human present &#8212; a</span></span>
+<span class="ln" id="L184">    <span class="tok-com">/// batch job, a service, anything processing files it did not choose &#8212; can</span></span>
+<span class="ln" id="L185">    <span class="tok-com">/// use this to decline instead of spending the memory. Pass</span></span>
+<span class="ln" id="L186">    <span class="tok-com">/// [`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) unless there is a</span></span>
+<span class="ln" id="L187">    <span class="tok-com">/// reason for something else.</span></span>
+<span class="ln" id="L188">    <span class="tok-com">///</span></span>
+<span class="ln" id="L189">    <span class="tok-com">/// There is no time ceiling here and there does not need to be: unlike</span></span>
+<span class="ln" id="L190">    <span class="tok-com">/// memory, time is bounded for every caller by</span></span>
+<span class="ln" id="L191">    <span class="tok-com">/// [`MAX_T_COST`](Self::MAX_T_COST), which is tight enough that the worst</span></span>
+<span class="ln" id="L192">    <span class="tok-com">/// header this build will accept is a wait rather than a hang. A ceiling</span></span>
+<span class="ln" id="L193">    <span class="tok-com">/// here as well would sit on the *attended* path too, since that is</span></span>
+<span class="ln" id="L194">    <span class="tok-com">/// [`super::container::open_with_password`] with a larger number, and would</span></span>
+<span class="ln" id="L195">    <span class="tok-com">/// refuse a container somebody had deliberately chosen to open.</span></span>
+<span class="ln" id="L196">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">within</span>(&amp;<span class="tok-kw">self</span>, max_m_cost: u32) -&gt; Result&lt;(), Error&gt; {</span>
+<span class="ln" id="L197">        <span class="tok-kw">self</span>.<span class="tok-fn">checked</span>()?;</span>
+<span class="ln" id="L198">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.m_cost &gt; max_m_cost {</span>
+<span class="ln" id="L199">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfCostRefused {</span>
+<span class="ln" id="L200">                requested: <span class="tok-kw">self</span>.m_cost,</span>
+<span class="ln" id="L201">                ceiling: max_m_cost,</span>
+<span class="ln" id="L202">            });</span>
+<span class="ln" id="L203">        }</span>
+<span class="ln" id="L204">        <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L205">    }</span>
 </span>
-<span class="ln" id="L158"></span>
+<span class="ln" id="L206"></span>
 <span class="src-item" id="fn-kdfparams-checked">
-<span class="ln" id="L159">    <span class="tok-com">/// Check the costs are ones Argon2 can accept, **before** handing them to</span></span>
-<span class="ln" id="L160">    <span class="tok-com">/// it.</span></span>
-<span class="ln" id="L161">    <span class="tok-com">///</span></span>
-<span class="ln" id="L162">    <span class="tok-com">/// This is not belt-and-braces, it is a fix. `argon2` 0.5.3 validates in</span></span>
-<span class="ln" id="L163">    <span class="tok-com">/// the wrong order: `Params::new` evaluates `m_cost &lt; p_cost * 8` before it</span></span>
-<span class="ln" id="L164">    <span class="tok-com">/// checks `p_cost &gt; MAX_P_COST`, so a `p_cost` above `u32::MAX / 8`</span></span>
-<span class="ln" id="L165">    <span class="tok-com">/// overflows the multiplication. With overflow checks on &#8212; every debug</span></span>
-<span class="ln" id="L166">    <span class="tok-com">/// build, and any consumer of this crate as a library &#8212; that is a **panic</span></span>
-<span class="ln" id="L167">    <span class="tok-com">/// on attacker-controlled input**, since `p_cost` is read verbatim from a</span></span>
-<span class="ln" id="L168">    <span class="tok-com">/// `.veil` header or an app-lock file. Found by the campaign in</span></span>
-<span class="ln" id="L169">    <span class="tok-com">/// `tests/parser_fuzz.rs`.</span></span>
-<span class="ln" id="L170">    <span class="tok-com">///</span></span>
-<span class="ln" id="L171">    <span class="tok-com">/// VeilVoice&#x27;s own release profile disables overflow checks, where the</span></span>
-<span class="ln" id="L172">    <span class="tok-com">/// multiplication wraps and the `MAX_P_COST` test then rejects it anyway &#8212;</span></span>
-<span class="ln" id="L173">    <span class="tok-com">/// but &quot;our release profile happens to make the panic unreachable&quot; is not a</span></span>
-<span class="ln" id="L174">    <span class="tok-com">/// property to rely on, and it is not true for anyone building against</span></span>
-<span class="ln" id="L175">    <span class="tok-com">/// these crates. So the bound is enforced here, in the one place every</span></span>
-<span class="ln" id="L176">    <span class="tok-com">/// derivation passes through, in arithmetic that cannot overflow.</span></span>
-<span class="ln" id="L177">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">checked</span>(&amp;<span class="tok-kw">self</span>) -&gt; Result&lt;(), Error&gt; {</span>
-<span class="ln" id="L178">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.p_cost == <span class="tok-num">0</span> || <span class="tok-kw">self</span>.p_cost &gt; Self::MAX_P_COST {</span>
-<span class="ln" id="L179">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
-<span class="ln" id="L180">        }</span>
-<span class="ln" id="L181">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.t_cost == <span class="tok-num">0</span> {</span>
-<span class="ln" id="L182">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
-<span class="ln" id="L183">        }</span>
-<span class="ln" id="L184">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.m_cost &gt; Self::MAX_M_COST {</span>
-<span class="ln" id="L185">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
-<span class="ln" id="L186">        }</span>
-<span class="ln" id="L187">        <span class="tok-com">// Widened to u64 deliberately: this is the multiplication that</span></span>
-<span class="ln" id="L188">        <span class="tok-com">// overflows upstream.</span></span>
-<span class="ln" id="L189">        <span class="tok-kw">if</span> u64::<span class="tok-fn">from</span>(<span class="tok-kw">self</span>.m_cost) &lt; u64::<span class="tok-fn">from</span>(<span class="tok-kw">self</span>.p_cost) * <span class="tok-num">8</span> {</span>
-<span class="ln" id="L190">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
-<span class="ln" id="L191">        }</span>
-<span class="ln" id="L192">        <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L193">    }</span>
+<span class="ln" id="L207">    <span class="tok-com">/// Check the costs are ones Argon2 can accept, **before** handing them to</span></span>
+<span class="ln" id="L208">    <span class="tok-com">/// it.</span></span>
+<span class="ln" id="L209">    <span class="tok-com">///</span></span>
+<span class="ln" id="L210">    <span class="tok-com">/// This is not belt-and-braces, it is a fix. `argon2` 0.5.3 validates in</span></span>
+<span class="ln" id="L211">    <span class="tok-com">/// the wrong order: `Params::new` evaluates `m_cost &lt; p_cost * 8` before it</span></span>
+<span class="ln" id="L212">    <span class="tok-com">/// checks `p_cost &gt; MAX_P_COST`, so a `p_cost` above `u32::MAX / 8`</span></span>
+<span class="ln" id="L213">    <span class="tok-com">/// overflows the multiplication. With overflow checks on &#8212; every debug</span></span>
+<span class="ln" id="L214">    <span class="tok-com">/// build, and any consumer of this crate as a library &#8212; that is a **panic</span></span>
+<span class="ln" id="L215">    <span class="tok-com">/// on attacker-controlled input**, since `p_cost` is read verbatim from a</span></span>
+<span class="ln" id="L216">    <span class="tok-com">/// `.veil` header or an app-lock file. Found by the campaign in</span></span>
+<span class="ln" id="L217">    <span class="tok-com">/// `tests/parser_fuzz.rs`.</span></span>
+<span class="ln" id="L218">    <span class="tok-com">///</span></span>
+<span class="ln" id="L219">    <span class="tok-com">/// VeilVoice&#x27;s own release profile disables overflow checks, where the</span></span>
+<span class="ln" id="L220">    <span class="tok-com">/// multiplication wraps and the `MAX_P_COST` test then rejects it anyway &#8212;</span></span>
+<span class="ln" id="L221">    <span class="tok-com">/// but &quot;our release profile happens to make the panic unreachable&quot; is not a</span></span>
+<span class="ln" id="L222">    <span class="tok-com">/// property to rely on, and it is not true for anyone building against</span></span>
+<span class="ln" id="L223">    <span class="tok-com">/// these crates. So the bound is enforced here, in the one place every</span></span>
+<span class="ln" id="L224">    <span class="tok-com">/// derivation passes through, in arithmetic that cannot overflow.</span></span>
+<span class="ln" id="L225">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">checked</span>(&amp;<span class="tok-kw">self</span>) -&gt; Result&lt;(), Error&gt; {</span>
+<span class="ln" id="L226">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.p_cost == <span class="tok-num">0</span> || <span class="tok-kw">self</span>.p_cost &gt; Self::MAX_P_COST {</span>
+<span class="ln" id="L227">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
+<span class="ln" id="L228">        }</span>
+<span class="ln" id="L229">        <span class="tok-com">// F-82. Zero is not a number of passes, and neither is four billion:</span></span>
+<span class="ln" id="L230">        <span class="tok-com">// a header declaring `u32::MAX` passes nothing overflows, nothing</span></span>
+<span class="ln" id="L231">        <span class="tok-com">// allocates, and nothing finishes.</span></span>
+<span class="ln" id="L232">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.t_cost == <span class="tok-num">0</span> || <span class="tok-kw">self</span>.t_cost &gt; Self::MAX_T_COST {</span>
+<span class="ln" id="L233">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
+<span class="ln" id="L234">        }</span>
+<span class="ln" id="L235">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.m_cost &gt; Self::MAX_M_COST {</span>
+<span class="ln" id="L236">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
+<span class="ln" id="L237">        }</span>
+<span class="ln" id="L238">        <span class="tok-com">// Widened to u64 deliberately: this is the multiplication that</span></span>
+<span class="ln" id="L239">        <span class="tok-com">// overflows upstream.</span></span>
+<span class="ln" id="L240">        <span class="tok-kw">if</span> u64::<span class="tok-fn">from</span>(<span class="tok-kw">self</span>.m_cost) &lt; u64::<span class="tok-fn">from</span>(<span class="tok-kw">self</span>.p_cost) * <span class="tok-num">8</span> {</span>
+<span class="ln" id="L241">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
+<span class="ln" id="L242">        }</span>
+<span class="ln" id="L243">        <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L244">    }</span>
 </span>
-<span class="ln" id="L194"></span>
+<span class="ln" id="L245"></span>
 <span class="src-item" id="fn-kdfparams-build">
-<span class="ln" id="L195">    <span class="tok-com">/// Reject values Argon2 cannot accept, so a corrupt header fails loudly</span></span>
-<span class="ln" id="L196">    <span class="tok-com">/// rather than panicking deep inside the KDF.</span></span>
-<span class="ln" id="L197">    <span class="tok-kw">fn</span> <span class="tok-fn">build</span>(&amp;<span class="tok-kw">self</span>, out_len: usize) -&gt; Result&lt;Argon2&lt;&#x27;<span class="tok-kw">static</span>&gt;, Error&gt; {</span>
-<span class="ln" id="L198">        <span class="tok-kw">self</span>.<span class="tok-fn">checked</span>()?;</span>
-<span class="ln" id="L199">        <span class="tok-kw">let</span> params = Params::<span class="tok-fn">new</span>(<span class="tok-kw">self</span>.m_cost, <span class="tok-kw">self</span>.t_cost, <span class="tok-kw">self</span>.p_cost, <span class="tok-fn">Some</span>(out_len))</span>
-<span class="ln" id="L200">            .<span class="tok-fn">map_err</span>(|_| Error::KdfParams)?;</span>
-<span class="ln" id="L201">        <span class="tok-fn">Ok</span>(Argon2::<span class="tok-fn">new</span>(Algorithm::Argon2id, Version::V0x13, params))</span>
-<span class="ln" id="L202">    }</span>
+<span class="ln" id="L246">    <span class="tok-com">/// Reject values Argon2 cannot accept, so a corrupt header fails loudly</span></span>
+<span class="ln" id="L247">    <span class="tok-com">/// rather than panicking deep inside the KDF.</span></span>
+<span class="ln" id="L248">    <span class="tok-kw">fn</span> <span class="tok-fn">build</span>(&amp;<span class="tok-kw">self</span>, out_len: usize) -&gt; Result&lt;Argon2&lt;&#x27;<span class="tok-kw">static</span>&gt;, Error&gt; {</span>
+<span class="ln" id="L249">        <span class="tok-kw">self</span>.<span class="tok-fn">checked</span>()?;</span>
+<span class="ln" id="L250">        <span class="tok-kw">let</span> params = Params::<span class="tok-fn">new</span>(<span class="tok-kw">self</span>.m_cost, <span class="tok-kw">self</span>.t_cost, <span class="tok-kw">self</span>.p_cost, <span class="tok-fn">Some</span>(out_len))</span>
+<span class="ln" id="L251">            .<span class="tok-fn">map_err</span>(|_| Error::KdfParams)?;</span>
+<span class="ln" id="L252">        <span class="tok-fn">Ok</span>(Argon2::<span class="tok-fn">new</span>(Algorithm::Argon2id, Version::V0x13, params))</span>
+<span class="ln" id="L253">    }</span>
 </span>
-<span class="ln" id="L203">}</span>
-<span class="ln" id="L204"></span>
+<span class="ln" id="L254">}</span>
+<span class="ln" id="L255"></span>
 <span class="src-item" id="fn-salt_len">
-<span class="ln" id="L205"><span class="tok-com">/// Length of the salt stored in an encrypted container.</span></span>
-<span class="ln" id="L206"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SALT_LEN: usize = <span class="tok-num">16</span>;</span>
+<span class="ln" id="L256"><span class="tok-com">/// Length of the salt stored in an encrypted container.</span></span>
+<span class="ln" id="L257"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SALT_LEN: usize = <span class="tok-num">16</span>;</span>
 </span>
 <span class="src-item" id="fn-key_len">
-<span class="ln" id="L207"><span class="tok-com">/// Length of a derived symmetric key.</span></span>
-<span class="ln" id="L208"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> KEY_LEN: usize = <span class="tok-num">32</span>;</span>
+<span class="ln" id="L258"><span class="tok-com">/// Length of a derived symmetric key.</span></span>
+<span class="ln" id="L259"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> KEY_LEN: usize = <span class="tok-num">32</span>;</span>
 </span>
-<span class="ln" id="L209"></span>
+<span class="ln" id="L260"></span>
 <span class="src-item" id="fn-derive_key">
-<span class="ln" id="L210"><span class="tok-com">/// Derive a 32-byte key from `password` and `salt`.</span></span>
-<span class="ln" id="L211"><span class="tok-com">///</span></span>
-<span class="ln" id="L212"><span class="tok-com">/// The result lands directly in page-locked, zeroizing storage; it is never</span></span>
-<span class="ln" id="L213"><span class="tok-com">/// held in an ordinary `Vec` along the way.</span></span>
-<span class="ln" id="L214"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">derive_key</span>(password: &amp;[u8], salt: &amp;[u8], params: KdfParams) -&gt; Result&lt;Secret, Error&gt; {</span>
-<span class="ln" id="L215">    <span class="tok-kw">if</span> salt.<span class="tok-fn">len</span>() &lt; <span class="tok-num">8</span> {</span>
-<span class="ln" id="L216">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
-<span class="ln" id="L217">    }</span>
-<span class="ln" id="L218">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> key = Secret::<span class="tok-fn">zeroed</span>(KEY_LEN);</span>
-<span class="ln" id="L219">    params</span>
-<span class="ln" id="L220">        .<span class="tok-fn">build</span>(KEY_LEN)?</span>
-<span class="ln" id="L221">        .<span class="tok-fn">hash_password_into</span>(password, salt, key.<span class="tok-fn">expose_mut</span>())</span>
-<span class="ln" id="L222">        .<span class="tok-fn">map_err</span>(|_| Error::Kdf)?;</span>
-<span class="ln" id="L223">    <span class="tok-fn">Ok</span>(key)</span>
-<span class="ln" id="L224">}</span>
+<span class="ln" id="L261"><span class="tok-com">/// Derive a 32-byte key from `password` and `salt`.</span></span>
+<span class="ln" id="L262"><span class="tok-com">///</span></span>
+<span class="ln" id="L263"><span class="tok-com">/// The result lands directly in page-locked, zeroizing storage; it is never</span></span>
+<span class="ln" id="L264"><span class="tok-com">/// held in an ordinary `Vec` along the way.</span></span>
+<span class="ln" id="L265"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">derive_key</span>(password: &amp;[u8], salt: &amp;[u8], params: KdfParams) -&gt; Result&lt;Secret, Error&gt; {</span>
+<span class="ln" id="L266">    <span class="tok-kw">if</span> salt.<span class="tok-fn">len</span>() &lt; <span class="tok-num">8</span> {</span>
+<span class="ln" id="L267">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::KdfParams);</span>
+<span class="ln" id="L268">    }</span>
+<span class="ln" id="L269">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> key = Secret::<span class="tok-fn">zeroed</span>(KEY_LEN);</span>
+<span class="ln" id="L270">    params</span>
+<span class="ln" id="L271">        .<span class="tok-fn">build</span>(KEY_LEN)?</span>
+<span class="ln" id="L272">        .<span class="tok-fn">hash_password_into</span>(password, salt, key.<span class="tok-fn">expose_mut</span>())</span>
+<span class="ln" id="L273">        .<span class="tok-fn">map_err</span>(|_| Error::Kdf)?;</span>
+<span class="ln" id="L274">    <span class="tok-fn">Ok</span>(key)</span>
+<span class="ln" id="L275">}</span>
 </span>
-<span class="ln" id="L225"></span>
+<span class="ln" id="L276"></span>
 <span class="src-item" id="fn-random_salt">
-<span class="ln" id="L226"><span class="tok-com">/// Draw a fresh random salt from the OS CSPRNG.</span></span>
-<span class="ln" id="L227"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">random_salt</span>() -&gt; Result&lt;[u8; SALT_LEN], Error&gt; {</span>
-<span class="ln" id="L228">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> salt = [0u8; SALT_LEN];</span>
-<span class="ln" id="L229">    getrandom::<span class="tok-fn">getrandom</span>(&amp;<span class="tok-kw">mut</span> salt).<span class="tok-fn">map_err</span>(|_| Error::Random)?;</span>
-<span class="ln" id="L230">    <span class="tok-fn">Ok</span>(salt)</span>
-<span class="ln" id="L231">}</span>
+<span class="ln" id="L277"><span class="tok-com">/// Draw a fresh random salt from the OS CSPRNG.</span></span>
+<span class="ln" id="L278"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">random_salt</span>() -&gt; Result&lt;[u8; SALT_LEN], Error&gt; {</span>
+<span class="ln" id="L279">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> salt = [0u8; SALT_LEN];</span>
+<span class="ln" id="L280">    getrandom::<span class="tok-fn">getrandom</span>(&amp;<span class="tok-kw">mut</span> salt).<span class="tok-fn">map_err</span>(|_| Error::Random)?;</span>
+<span class="ln" id="L281">    <span class="tok-fn">Ok</span>(salt)</span>
+<span class="ln" id="L282">}</span>
 </span>
-<span class="ln" id="L232"></span>
-<span class="ln" id="L233"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L234"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L235">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L236"></span>
-<span class="ln" id="L237">    <span class="tok-kw">const</span> P: &amp;[u8] = b<span class="tok-str">&quot;correct horse battery staple&quot;</span>;</span>
-<span class="ln" id="L238"></span>
-<span class="ln" id="L239">    <span class="tok-kw">fn</span> <span class="tok-fn">weak</span>() -&gt; KdfParams {</span>
-<span class="ln" id="L240">        KdfParams::<span class="tok-fn">weak_for_tests</span>()</span>
-<span class="ln" id="L241">    }</span>
-<span class="ln" id="L242"></span>
-<span class="ln" id="L243">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L244">    <span class="tok-kw">fn</span> <span class="tok-fn">derivation_is_deterministic</span>() {</span>
-<span class="ln" id="L245">        <span class="tok-kw">let</span> salt = [9u8; SALT_LEN];</span>
-<span class="ln" id="L246">        <span class="tok-kw">let</span> a = <span class="tok-fn">derive_key</span>(P, &amp;salt, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L247">        <span class="tok-kw">let</span> b = <span class="tok-fn">derive_key</span>(P, &amp;salt, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L248">        assert_eq!(a, b);</span>
-<span class="ln" id="L249">        assert_eq!(a.<span class="tok-fn">len</span>(), KEY_LEN);</span>
-<span class="ln" id="L250">    }</span>
-<span class="ln" id="L251"></span>
-<span class="ln" id="L252">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L253">    <span class="tok-kw">fn</span> <span class="tok-fn">different_password_or_salt_diverges</span>() {</span>
-<span class="ln" id="L254">        <span class="tok-kw">let</span> base = <span class="tok-fn">derive_key</span>(P, &amp;[9u8; SALT_LEN], <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L255">        assert_ne!(</span>
-<span class="ln" id="L256">            base,</span>
-<span class="ln" id="L257">            <span class="tok-fn">derive_key</span>(b<span class="tok-str">&quot;wrong&quot;</span>, &amp;[9u8; SALT_LEN], <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L258">        );</span>
-<span class="ln" id="L259">        assert_ne!(base, <span class="tok-fn">derive_key</span>(P, &amp;[10u8; SALT_LEN], <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L260">    }</span>
-<span class="ln" id="L261"></span>
-<span class="ln" id="L262">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L263">    <span class="tok-kw">fn</span> <span class="tok-fn">cost_parameters_change_the_key</span>() {</span>
-<span class="ln" id="L264">        <span class="tok-com">// Parameters are part of the derivation, so a header that lies about</span></span>
-<span class="ln" id="L265">        <span class="tok-com">// them cannot yield the right key.</span></span>
-<span class="ln" id="L266">        <span class="tok-kw">let</span> salt = [3u8; SALT_LEN];</span>
-<span class="ln" id="L267">        <span class="tok-kw">let</span> a = <span class="tok-fn">derive_key</span>(</span>
-<span class="ln" id="L268">            P,</span>
-<span class="ln" id="L269">            &amp;salt,</span>
-<span class="ln" id="L270">            KdfParams {</span>
-<span class="ln" id="L271">                t_cost: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L272">                ..<span class="tok-fn">weak</span>()</span>
-<span class="ln" id="L273">            },</span>
-<span class="ln" id="L274">        )</span>
-<span class="ln" id="L275">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L276">        <span class="tok-kw">let</span> b = <span class="tok-fn">derive_key</span>(</span>
-<span class="ln" id="L277">            P,</span>
-<span class="ln" id="L278">            &amp;salt,</span>
-<span class="ln" id="L279">            KdfParams {</span>
-<span class="ln" id="L280">                t_cost: <span class="tok-num">2</span>,</span>
-<span class="ln" id="L281">                ..<span class="tok-fn">weak</span>()</span>
-<span class="ln" id="L282">            },</span>
-<span class="ln" id="L283">        )</span>
-<span class="ln" id="L284">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L285">        assert_ne!(a, b);</span>
-<span class="ln" id="L286">    }</span>
+<span class="ln" id="L283"></span>
+<span class="ln" id="L284"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L285"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L286">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L287"></span>
-<span class="ln" id="L288">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L289">    <span class="tok-kw">fn</span> <span class="tok-fn">key_material_is_page_locked_storage</span>() {</span>
-<span class="ln" id="L290">        <span class="tok-kw">let</span> k = <span class="tok-fn">derive_key</span>(P, &amp;[1u8; SALT_LEN], <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L291">        assert!(format!(<span class="tok-str">&quot;{k:?}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>));</span>
+<span class="ln" id="L288">    <span class="tok-kw">const</span> P: &amp;[u8] = b<span class="tok-str">&quot;correct horse battery staple&quot;</span>;</span>
+<span class="ln" id="L289"></span>
+<span class="ln" id="L290">    <span class="tok-kw">fn</span> <span class="tok-fn">weak</span>() -&gt; KdfParams {</span>
+<span class="ln" id="L291">        KdfParams::<span class="tok-fn">weak_for_tests</span>()</span>
 <span class="ln" id="L292">    }</span>
 <span class="ln" id="L293"></span>
 <span class="ln" id="L294">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L295">    <span class="tok-kw">fn</span> <span class="tok-fn">impossible_parameters_are_rejected_not_panicked</span>() {</span>
-<span class="ln" id="L296">        <span class="tok-kw">let</span> bad = KdfParams {</span>
-<span class="ln" id="L297">            m_cost: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L298">            t_cost: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L299">            p_cost: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L300">        };</span>
-<span class="ln" id="L301">        assert!(matches!(</span>
-<span class="ln" id="L302">            <span class="tok-fn">derive_key</span>(P, &amp;[0u8; SALT_LEN], bad),</span>
-<span class="ln" id="L303">            <span class="tok-fn">Err</span>(Error::KdfParams)</span>
-<span class="ln" id="L304">        ));</span>
-<span class="ln" id="L305">    }</span>
-<span class="ln" id="L306"></span>
-<span class="ln" id="L307">    <span class="tok-com">/// Regression for the panic the parser campaign found: `argon2` 0.5.3</span></span>
-<span class="ln" id="L308">    <span class="tok-com">/// computes `p_cost * 8` before checking `p_cost`&#x27;s ceiling, so a `p_cost`</span></span>
-<span class="ln" id="L309">    <span class="tok-com">/// above `u32::MAX / 8` overflows. `p_cost` comes straight out of a `.veil`</span></span>
-<span class="ln" id="L310">    <span class="tok-com">/// header or an app-lock file, so this is attacker-controlled.</span></span>
-<span class="ln" id="L311">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L312">    <span class="tok-kw">fn</span> <span class="tok-fn">an_absurd_parallelism_is_rejected_rather_than_overflowing</span>() {</span>
-<span class="ln" id="L313">        <span class="tok-kw">for</span> p_cost <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L314">            u32::MAX,</span>
-<span class="ln" id="L315">            u32::MAX / <span class="tok-num">8</span> + <span class="tok-num">1</span>,</span>
-<span class="ln" id="L316">            0x2000_0000,</span>
-<span class="ln" id="L317">            KdfParams::MAX_P_COST + <span class="tok-num">1</span>,</span>
-<span class="ln" id="L318">        ] {</span>
-<span class="ln" id="L319">            <span class="tok-kw">let</span> bad = KdfParams {</span>
-<span class="ln" id="L320">                m_cost: <span class="tok-num">1</span> &lt;&lt; <span class="tok-num">20</span>,</span>
-<span class="ln" id="L321">                t_cost: <span class="tok-num">3</span>,</span>
-<span class="ln" id="L322">                p_cost,</span>
-<span class="ln" id="L323">            };</span>
-<span class="ln" id="L324">            assert!(bad.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;p_cost {p_cost} accepted&quot;</span>);</span>
-<span class="ln" id="L325">            assert!(</span>
-<span class="ln" id="L326">                matches!(<span class="tok-fn">derive_key</span>(P, &amp;[0u8; SALT_LEN], bad), <span class="tok-fn">Err</span>(Error::KdfParams)),</span>
-<span class="ln" id="L327">                <span class="tok-str">&quot;p_cost {p_cost} reached Argon2&quot;</span></span>
-<span class="ln" id="L328">            );</span>
-<span class="ln" id="L329">        }</span>
-<span class="ln" id="L330">    }</span>
-<span class="ln" id="L331"></span>
-<span class="ln" id="L332">    <span class="tok-com">/// The other half of the same finding: `m_cost` is the number of KiB</span></span>
-<span class="ln" id="L333">    <span class="tok-com">/// Argon2 allocates up front, so `u32::MAX` asks for 4 TiB. The allocation</span></span>
-<span class="ln" id="L334">    <span class="tok-com">/// fails, and a failed allocation aborts the process &#8212; so simply *trying to</span></span>
-<span class="ln" id="L335">    <span class="tok-com">/// open* a hostile file would kill the program.</span></span>
-<span class="ln" id="L336">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L337">    <span class="tok-kw">fn</span> <span class="tok-fn">an_absurd_memory_cost_is_rejected_rather_than_allocated</span>() {</span>
-<span class="ln" id="L338">        <span class="tok-kw">for</span> m_cost <span class="tok-kw">in</span> [u32::MAX, u32::MAX - <span class="tok-num">1</span>, KdfParams::MAX_M_COST + <span class="tok-num">1</span>] {</span>
-<span class="ln" id="L339">            <span class="tok-kw">let</span> bad = KdfParams {</span>
-<span class="ln" id="L340">                m_cost,</span>
-<span class="ln" id="L341">                t_cost: <span class="tok-num">3</span>,</span>
-<span class="ln" id="L342">                p_cost: <span class="tok-num">4</span>,</span>
-<span class="ln" id="L343">            };</span>
-<span class="ln" id="L344">            assert!(bad.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;m_cost {m_cost} accepted&quot;</span>);</span>
-<span class="ln" id="L345">            assert!(</span>
-<span class="ln" id="L346">                matches!(<span class="tok-fn">derive_key</span>(P, &amp;[0u8; SALT_LEN], bad), <span class="tok-fn">Err</span>(Error::KdfParams)),</span>
-<span class="ln" id="L347">                <span class="tok-str">&quot;m_cost {m_cost} reached Argon2&quot;</span></span>
-<span class="ln" id="L348">            );</span>
-<span class="ln" id="L349">        }</span>
-<span class="ln" id="L350">        <span class="tok-com">// The ceiling itself is allowed, and comfortably exceeds both RFC</span></span>
-<span class="ln" id="L351">        <span class="tok-com">// 9106 recommendations.</span></span>
-<span class="ln" id="L352">        assert!(KdfParams {</span>
-<span class="ln" id="L353">            m_cost: KdfParams::MAX_M_COST,</span>
-<span class="ln" id="L354">            t_cost: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L355">            p_cost: <span class="tok-num">4</span></span>
-<span class="ln" id="L356">        }</span>
-<span class="ln" id="L357">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L358">        .<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L359">    }</span>
-<span class="ln" id="L360"></span>
-<span class="ln" id="L361">    <span class="tok-com">/// Checked at compile time: the ceiling must never be tightened below the</span></span>
-<span class="ln" id="L362">    <span class="tok-com">/// largest profile RFC 9106 actually recommends, or the cap would start</span></span>
-<span class="ln" id="L363">    <span class="tok-com">/// refusing legitimate files rather than absurd ones.</span></span>
-<span class="ln" id="L364">    <span class="tok-kw">const</span> _: () = assert!(KdfParams::MAX_M_COST &gt;= <span class="tok-num">2</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>);</span>
-<span class="ln" id="L365"></span>
-<span class="ln" id="L366">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L367">    <span class="tok-kw">fn</span> <span class="tok-fn">sane_parameters_still_pass_the_check</span>() {</span>
-<span class="ln" id="L368">        KdfParams::<span class="tok-fn">default</span>().<span class="tok-fn">checked</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L369">        KdfParams::<span class="tok-fn">weak_for_tests</span>().<span class="tok-fn">checked</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L370">        assert!(KdfParams {</span>
-<span class="ln" id="L371">            m_cost: <span class="tok-num">8</span>,</span>
-<span class="ln" id="L372">            t_cost: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L373">            p_cost: <span class="tok-num">1</span></span>
-<span class="ln" id="L374">        }</span>
-<span class="ln" id="L375">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L376">        .<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L377">        <span class="tok-com">// m_cost must still cover 8 blocks per lane.</span></span>
-<span class="ln" id="L378">        assert!(KdfParams {</span>
-<span class="ln" id="L379">            m_cost: <span class="tok-num">8</span>,</span>
-<span class="ln" id="L380">            t_cost: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L381">            p_cost: <span class="tok-num">2</span></span>
-<span class="ln" id="L382">        }</span>
-<span class="ln" id="L383">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L384">        .<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L295">    <span class="tok-kw">fn</span> <span class="tok-fn">derivation_is_deterministic</span>() {</span>
+<span class="ln" id="L296">        <span class="tok-kw">let</span> salt = [9u8; SALT_LEN];</span>
+<span class="ln" id="L297">        <span class="tok-kw">let</span> a = <span class="tok-fn">derive_key</span>(P, &amp;salt, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L298">        <span class="tok-kw">let</span> b = <span class="tok-fn">derive_key</span>(P, &amp;salt, <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L299">        assert_eq!(a, b);</span>
+<span class="ln" id="L300">        assert_eq!(a.<span class="tok-fn">len</span>(), KEY_LEN);</span>
+<span class="ln" id="L301">    }</span>
+<span class="ln" id="L302"></span>
+<span class="ln" id="L303">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L304">    <span class="tok-kw">fn</span> <span class="tok-fn">different_password_or_salt_diverges</span>() {</span>
+<span class="ln" id="L305">        <span class="tok-kw">let</span> base = <span class="tok-fn">derive_key</span>(P, &amp;[9u8; SALT_LEN], <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L306">        assert_ne!(</span>
+<span class="ln" id="L307">            base,</span>
+<span class="ln" id="L308">            <span class="tok-fn">derive_key</span>(b<span class="tok-str">&quot;wrong&quot;</span>, &amp;[9u8; SALT_LEN], <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L309">        );</span>
+<span class="ln" id="L310">        assert_ne!(base, <span class="tok-fn">derive_key</span>(P, &amp;[10u8; SALT_LEN], <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L311">    }</span>
+<span class="ln" id="L312"></span>
+<span class="ln" id="L313">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L314">    <span class="tok-kw">fn</span> <span class="tok-fn">cost_parameters_change_the_key</span>() {</span>
+<span class="ln" id="L315">        <span class="tok-com">// Parameters are part of the derivation, so a header that lies about</span></span>
+<span class="ln" id="L316">        <span class="tok-com">// them cannot yield the right key.</span></span>
+<span class="ln" id="L317">        <span class="tok-kw">let</span> salt = [3u8; SALT_LEN];</span>
+<span class="ln" id="L318">        <span class="tok-kw">let</span> a = <span class="tok-fn">derive_key</span>(</span>
+<span class="ln" id="L319">            P,</span>
+<span class="ln" id="L320">            &amp;salt,</span>
+<span class="ln" id="L321">            KdfParams {</span>
+<span class="ln" id="L322">                t_cost: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L323">                ..<span class="tok-fn">weak</span>()</span>
+<span class="ln" id="L324">            },</span>
+<span class="ln" id="L325">        )</span>
+<span class="ln" id="L326">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L327">        <span class="tok-kw">let</span> b = <span class="tok-fn">derive_key</span>(</span>
+<span class="ln" id="L328">            P,</span>
+<span class="ln" id="L329">            &amp;salt,</span>
+<span class="ln" id="L330">            KdfParams {</span>
+<span class="ln" id="L331">                t_cost: <span class="tok-num">2</span>,</span>
+<span class="ln" id="L332">                ..<span class="tok-fn">weak</span>()</span>
+<span class="ln" id="L333">            },</span>
+<span class="ln" id="L334">        )</span>
+<span class="ln" id="L335">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L336">        assert_ne!(a, b);</span>
+<span class="ln" id="L337">    }</span>
+<span class="ln" id="L338"></span>
+<span class="ln" id="L339">    <span class="tok-com">/// **F-82.** The exact parameters the coverage-guided campaign found, and</span></span>
+<span class="ln" id="L340">    <span class="tok-com">/// the worst case it did not reach.</span></span>
+<span class="ln" id="L341">    <span class="tok-com">///</span></span>
+<span class="ln" id="L342">    <span class="tok-com">/// These pass every other check: nothing overflows, nothing allocates</span></span>
+<span class="ln" id="L343">    <span class="tok-com">/// beyond the memory ceiling, and `m_cost &gt;= p_cost * 8` holds. The only</span></span>
+<span class="ln" id="L344">    <span class="tok-com">/// thing wrong with them is that the derivation does not finish. Measured</span></span>
+<span class="ln" id="L345">    <span class="tok-com">/// in a release build before the ceiling existed: about 74 hours for the</span></span>
+<span class="ln" id="L346">    <span class="tok-com">/// first set, and roughly eight years for `u32::MAX`.</span></span>
+<span class="ln" id="L347">    <span class="tok-com">///</span></span>
+<span class="ln" id="L348">    <span class="tok-com">/// The numbers are written out rather than referred to, because that is</span></span>
+<span class="ln" id="L349">    <span class="tok-com">/// what makes this a regression test for the input rather than a</span></span>
+<span class="ln" id="L350">    <span class="tok-com">/// restatement of the rule.</span></span>
+<span class="ln" id="L351">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L352">    <span class="tok-kw">fn</span> <span class="tok-fn">a_number_of_passes_that_would_not_finish_is_refused</span>() {</span>
+<span class="ln" id="L353">        <span class="tok-kw">let</span> found = KdfParams {</span>
+<span class="ln" id="L354">            m_cost: <span class="tok-num">65535</span>,</span>
+<span class="ln" id="L355">            t_cost: <span class="tok-num">4_521_984</span>,</span>
+<span class="ln" id="L356">            p_cost: <span class="tok-num">1280</span>,</span>
+<span class="ln" id="L357">        };</span>
+<span class="ln" id="L358">        assert!(</span>
+<span class="ln" id="L359">            matches!(found.<span class="tok-fn">checked</span>(), <span class="tok-fn">Err</span>(Error::KdfParams)),</span>
+<span class="ln" id="L360">            <span class="tok-str">&quot;{found:?}&quot;</span></span>
+<span class="ln" id="L361">        );</span>
+<span class="ln" id="L362">        assert!(</span>
+<span class="ln" id="L363">            matches!(</span>
+<span class="ln" id="L364">                <span class="tok-fn">derive_key</span>(P, &amp;[0u8; SALT_LEN], found),</span>
+<span class="ln" id="L365">                <span class="tok-fn">Err</span>(Error::KdfParams)</span>
+<span class="ln" id="L366">            ),</span>
+<span class="ln" id="L367">            <span class="tok-str">&quot;the derivation must refuse, not run&quot;</span></span>
+<span class="ln" id="L368">        );</span>
+<span class="ln" id="L369"></span>
+<span class="ln" id="L370">        <span class="tok-kw">for</span> t_cost <span class="tok-kw">in</span> [u32::MAX, u32::MAX / <span class="tok-num">2</span>, KdfParams::MAX_T_COST + <span class="tok-num">1</span>] {</span>
+<span class="ln" id="L371">            <span class="tok-kw">let</span> bad = KdfParams { t_cost, ..<span class="tok-fn">weak</span>() };</span>
+<span class="ln" id="L372">            assert!(</span>
+<span class="ln" id="L373">                matches!(bad.<span class="tok-fn">checked</span>(), <span class="tok-fn">Err</span>(Error::KdfParams)),</span>
+<span class="ln" id="L374">                <span class="tok-str">&quot;t_cost {t_cost} was accepted&quot;</span></span>
+<span class="ln" id="L375">            );</span>
+<span class="ln" id="L376">        }</span>
+<span class="ln" id="L377"></span>
+<span class="ln" id="L378">        <span class="tok-com">// And the ceiling itself still works, so this refuses absurd values</span></span>
+<span class="ln" id="L379">        <span class="tok-com">// rather than everything.</span></span>
+<span class="ln" id="L380">        <span class="tok-kw">let</span> at_the_line = KdfParams {</span>
+<span class="ln" id="L381">            t_cost: KdfParams::MAX_T_COST,</span>
+<span class="ln" id="L382">            ..<span class="tok-fn">weak</span>()</span>
+<span class="ln" id="L383">        };</span>
+<span class="ln" id="L384">        assert!(at_the_line.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{at_the_line:?}&quot;</span>);</span>
 <span class="ln" id="L385">    }</span>
 <span class="ln" id="L386"></span>
-<span class="ln" id="L387">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L388">    <span class="tok-kw">fn</span> <span class="tok-fn">short_salt_is_rejected</span>() {</span>
-<span class="ln" id="L389">        assert!(matches!(</span>
-<span class="ln" id="L390">            <span class="tok-fn">derive_key</span>(P, &amp;[0u8; <span class="tok-num">4</span>], <span class="tok-fn">weak</span>()),</span>
-<span class="ln" id="L391">            <span class="tok-fn">Err</span>(Error::KdfParams)</span>
-<span class="ln" id="L392">        ));</span>
-<span class="ln" id="L393">    }</span>
-<span class="ln" id="L394"></span>
-<span class="ln" id="L395">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L396">    <span class="tok-kw">fn</span> <span class="tok-fn">random_salts_differ</span>() {</span>
-<span class="ln" id="L397">        assert_ne!(<span class="tok-fn">random_salt</span>().<span class="tok-fn">unwrap</span>(), <span class="tok-fn">random_salt</span>().<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L398">    }</span>
-<span class="ln" id="L399">}</span>
+<span class="ln" id="L387">    <span class="tok-com">/// Every parameter set this project actually writes stays acceptable, and</span></span>
+<span class="ln" id="L388">    <span class="tok-com">/// the ceiling sits well clear of them.</span></span>
+<span class="ln" id="L389">    <span class="tok-com">///</span></span>
+<span class="ln" id="L390">    <span class="tok-com">/// A ceiling that refused the default would be a much louder bug than the</span></span>
+<span class="ln" id="L391">    <span class="tok-com">/// one it was added for, and &quot;we chose a number&quot; is not evidence that the</span></span>
+<span class="ln" id="L392">    <span class="tok-com">/// number is above the ones in use.</span></span>
+<span class="ln" id="L393">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L394">    <span class="tok-kw">fn</span> <span class="tok-fn">the_time_ceiling_sits_above_every_cost_this_project_uses</span>() {</span>
+<span class="ln" id="L395">        <span class="tok-kw">for</span> params <span class="tok-kw">in</span> [KdfParams::<span class="tok-fn">default</span>(), KdfParams::<span class="tok-fn">weak_for_tests</span>()] {</span>
+<span class="ln" id="L396">            assert!(params.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{params:?}&quot;</span>);</span>
+<span class="ln" id="L397">            assert!(</span>
+<span class="ln" id="L398">                params.t_cost * <span class="tok-num">4</span> &lt;= KdfParams::MAX_T_COST,</span>
+<span class="ln" id="L399">                <span class="tok-str">&quot;{params:?} leaves no room under the ceiling&quot;</span></span>
+<span class="ln" id="L400">            );</span>
+<span class="ln" id="L401">        }</span>
+<span class="ln" id="L402">        <span class="tok-com">// The attended path must still reach the ceiling: a bound that nothing</span></span>
+<span class="ln" id="L403">        <span class="tok-com">// can get to is a bound on nothing.</span></span>
+<span class="ln" id="L404">        <span class="tok-kw">let</span> expensive = KdfParams {</span>
+<span class="ln" id="L405">            t_cost: KdfParams::MAX_T_COST,</span>
+<span class="ln" id="L406">            ..KdfParams::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L407">        };</span>
+<span class="ln" id="L408">        assert!(</span>
+<span class="ln" id="L409">            expensive.<span class="tok-fn">within</span>(KdfParams::MAX_M_COST).<span class="tok-fn">is_ok</span>(),</span>
+<span class="ln" id="L410">            <span class="tok-str">&quot;{expensive:?}&quot;</span></span>
+<span class="ln" id="L411">        );</span>
+<span class="ln" id="L412">    }</span>
+<span class="ln" id="L413"></span>
+<span class="ln" id="L414">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L415">    <span class="tok-kw">fn</span> <span class="tok-fn">key_material_is_page_locked_storage</span>() {</span>
+<span class="ln" id="L416">        <span class="tok-kw">let</span> k = <span class="tok-fn">derive_key</span>(P, &amp;[1u8; SALT_LEN], <span class="tok-fn">weak</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L417">        assert!(format!(<span class="tok-str">&quot;{k:?}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;redacted&quot;</span>));</span>
+<span class="ln" id="L418">    }</span>
+<span class="ln" id="L419"></span>
+<span class="ln" id="L420">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L421">    <span class="tok-kw">fn</span> <span class="tok-fn">impossible_parameters_are_rejected_not_panicked</span>() {</span>
+<span class="ln" id="L422">        <span class="tok-kw">let</span> bad = KdfParams {</span>
+<span class="ln" id="L423">            m_cost: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L424">            t_cost: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L425">            p_cost: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L426">        };</span>
+<span class="ln" id="L427">        assert!(matches!(</span>
+<span class="ln" id="L428">            <span class="tok-fn">derive_key</span>(P, &amp;[0u8; SALT_LEN], bad),</span>
+<span class="ln" id="L429">            <span class="tok-fn">Err</span>(Error::KdfParams)</span>
+<span class="ln" id="L430">        ));</span>
+<span class="ln" id="L431">    }</span>
+<span class="ln" id="L432"></span>
+<span class="ln" id="L433">    <span class="tok-com">/// Regression for the panic the parser campaign found: `argon2` 0.5.3</span></span>
+<span class="ln" id="L434">    <span class="tok-com">/// computes `p_cost * 8` before checking `p_cost`&#x27;s ceiling, so a `p_cost`</span></span>
+<span class="ln" id="L435">    <span class="tok-com">/// above `u32::MAX / 8` overflows. `p_cost` comes straight out of a `.veil`</span></span>
+<span class="ln" id="L436">    <span class="tok-com">/// header or an app-lock file, so this is attacker-controlled.</span></span>
+<span class="ln" id="L437">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L438">    <span class="tok-kw">fn</span> <span class="tok-fn">an_absurd_parallelism_is_rejected_rather_than_overflowing</span>() {</span>
+<span class="ln" id="L439">        <span class="tok-kw">for</span> p_cost <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L440">            u32::MAX,</span>
+<span class="ln" id="L441">            u32::MAX / <span class="tok-num">8</span> + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L442">            0x2000_0000,</span>
+<span class="ln" id="L443">            KdfParams::MAX_P_COST + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L444">        ] {</span>
+<span class="ln" id="L445">            <span class="tok-kw">let</span> bad = KdfParams {</span>
+<span class="ln" id="L446">                m_cost: <span class="tok-num">1</span> &lt;&lt; <span class="tok-num">20</span>,</span>
+<span class="ln" id="L447">                t_cost: <span class="tok-num">3</span>,</span>
+<span class="ln" id="L448">                p_cost,</span>
+<span class="ln" id="L449">            };</span>
+<span class="ln" id="L450">            assert!(bad.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;p_cost {p_cost} accepted&quot;</span>);</span>
+<span class="ln" id="L451">            assert!(</span>
+<span class="ln" id="L452">                matches!(<span class="tok-fn">derive_key</span>(P, &amp;[0u8; SALT_LEN], bad), <span class="tok-fn">Err</span>(Error::KdfParams)),</span>
+<span class="ln" id="L453">                <span class="tok-str">&quot;p_cost {p_cost} reached Argon2&quot;</span></span>
+<span class="ln" id="L454">            );</span>
+<span class="ln" id="L455">        }</span>
+<span class="ln" id="L456">    }</span>
+<span class="ln" id="L457"></span>
+<span class="ln" id="L458">    <span class="tok-com">/// The other half of the same finding: `m_cost` is the number of KiB</span></span>
+<span class="ln" id="L459">    <span class="tok-com">/// Argon2 allocates up front, so `u32::MAX` asks for 4 TiB. The allocation</span></span>
+<span class="ln" id="L460">    <span class="tok-com">/// fails, and a failed allocation aborts the process &#8212; so simply *trying to</span></span>
+<span class="ln" id="L461">    <span class="tok-com">/// open* a hostile file would kill the program.</span></span>
+<span class="ln" id="L462">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L463">    <span class="tok-kw">fn</span> <span class="tok-fn">an_absurd_memory_cost_is_rejected_rather_than_allocated</span>() {</span>
+<span class="ln" id="L464">        <span class="tok-kw">for</span> m_cost <span class="tok-kw">in</span> [u32::MAX, u32::MAX - <span class="tok-num">1</span>, KdfParams::MAX_M_COST + <span class="tok-num">1</span>] {</span>
+<span class="ln" id="L465">            <span class="tok-kw">let</span> bad = KdfParams {</span>
+<span class="ln" id="L466">                m_cost,</span>
+<span class="ln" id="L467">                t_cost: <span class="tok-num">3</span>,</span>
+<span class="ln" id="L468">                p_cost: <span class="tok-num">4</span>,</span>
+<span class="ln" id="L469">            };</span>
+<span class="ln" id="L470">            assert!(bad.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;m_cost {m_cost} accepted&quot;</span>);</span>
+<span class="ln" id="L471">            assert!(</span>
+<span class="ln" id="L472">                matches!(<span class="tok-fn">derive_key</span>(P, &amp;[0u8; SALT_LEN], bad), <span class="tok-fn">Err</span>(Error::KdfParams)),</span>
+<span class="ln" id="L473">                <span class="tok-str">&quot;m_cost {m_cost} reached Argon2&quot;</span></span>
+<span class="ln" id="L474">            );</span>
+<span class="ln" id="L475">        }</span>
+<span class="ln" id="L476">        <span class="tok-com">// The ceiling itself is allowed, and comfortably exceeds both RFC</span></span>
+<span class="ln" id="L477">        <span class="tok-com">// 9106 recommendations.</span></span>
+<span class="ln" id="L478">        assert!(KdfParams {</span>
+<span class="ln" id="L479">            m_cost: KdfParams::MAX_M_COST,</span>
+<span class="ln" id="L480">            t_cost: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L481">            p_cost: <span class="tok-num">4</span></span>
+<span class="ln" id="L482">        }</span>
+<span class="ln" id="L483">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L484">        .<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L485">    }</span>
+<span class="ln" id="L486"></span>
+<span class="ln" id="L487">    <span class="tok-com">/// Checked at compile time: the ceiling must never be tightened below the</span></span>
+<span class="ln" id="L488">    <span class="tok-com">/// largest profile RFC 9106 actually recommends, or the cap would start</span></span>
+<span class="ln" id="L489">    <span class="tok-com">/// refusing legitimate files rather than absurd ones.</span></span>
+<span class="ln" id="L490">    <span class="tok-kw">const</span> _: () = assert!(KdfParams::MAX_M_COST &gt;= <span class="tok-num">2</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>);</span>
+<span class="ln" id="L491"></span>
+<span class="ln" id="L492">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L493">    <span class="tok-kw">fn</span> <span class="tok-fn">sane_parameters_still_pass_the_check</span>() {</span>
+<span class="ln" id="L494">        KdfParams::<span class="tok-fn">default</span>().<span class="tok-fn">checked</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L495">        KdfParams::<span class="tok-fn">weak_for_tests</span>().<span class="tok-fn">checked</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L496">        assert!(KdfParams {</span>
+<span class="ln" id="L497">            m_cost: <span class="tok-num">8</span>,</span>
+<span class="ln" id="L498">            t_cost: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L499">            p_cost: <span class="tok-num">1</span></span>
+<span class="ln" id="L500">        }</span>
+<span class="ln" id="L501">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L502">        .<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L503">        <span class="tok-com">// m_cost must still cover 8 blocks per lane.</span></span>
+<span class="ln" id="L504">        assert!(KdfParams {</span>
+<span class="ln" id="L505">            m_cost: <span class="tok-num">8</span>,</span>
+<span class="ln" id="L506">            t_cost: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L507">            p_cost: <span class="tok-num">2</span></span>
+<span class="ln" id="L508">        }</span>
+<span class="ln" id="L509">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L510">        .<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L511">    }</span>
+<span class="ln" id="L512"></span>
+<span class="ln" id="L513">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L514">    <span class="tok-kw">fn</span> <span class="tok-fn">short_salt_is_rejected</span>() {</span>
+<span class="ln" id="L515">        assert!(matches!(</span>
+<span class="ln" id="L516">            <span class="tok-fn">derive_key</span>(P, &amp;[0u8; <span class="tok-num">4</span>], <span class="tok-fn">weak</span>()),</span>
+<span class="ln" id="L517">            <span class="tok-fn">Err</span>(Error::KdfParams)</span>
+<span class="ln" id="L518">        ));</span>
+<span class="ln" id="L519">    }</span>
+<span class="ln" id="L520"></span>
+<span class="ln" id="L521">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L522">    <span class="tok-kw">fn</span> <span class="tok-fn">random_salts_differ</span>() {</span>
+<span class="ln" id="L523">        assert_ne!(<span class="tok-fn">random_salt</span>().<span class="tok-fn">unwrap</span>(), <span class="tok-fn">random_salt</span>().<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L524">    }</span>
+<span class="ln" id="L525">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

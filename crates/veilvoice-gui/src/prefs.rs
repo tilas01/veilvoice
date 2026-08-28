@@ -82,6 +82,14 @@ pub struct Prefs {
     /// choice -- which for the value `off` would mean turning their warnings
     /// back on, or worse, off.
     pub notify_style: String,
+    /// Where the live monitor sits: `toolbar`, `overlay` or `off`.
+    ///
+    /// Stored as its key, like the others. An unreadable value reads back as
+    /// the default, which **shows** it: the monitor is the only picture of a
+    /// live microphone available from a tab that is not the live one, and a
+    /// settings file this build cannot parse must not be the reason it is
+    /// missing.
+    pub live_monitor: String,
     /// The Failsafe posture: `close`, `warn` or `off`.
     ///
     /// Stored as its key. An unreadable value reads back as the **default**,
@@ -105,6 +113,11 @@ impl Default for Prefs {
             hide_install_tab: false,
             always_group: false,
             notify_style: crate::notify::Style::default().key().to_string(),
+            // On, and docked. Live scramble is the mode where what is being
+            // protected is happening now, and the two questions a person has
+            // are "is it hearing me" and "is anything coming out". Both are
+            // answered by a strip that is already on screen.
+            live_monitor: crate::monitor::Style::default().key().to_string(),
             failsafe: veilvoice_failsafe::Posture::default().key().to_string(),
             recovered_from_corrupt_file: false,
         }
@@ -202,6 +215,11 @@ impl Prefs {
                     // cannot read must never be the reason a warning is silent.
                     prefs.notify_style = crate::notify::Style::from_key(value).key().to_string();
                 }
+                "live_monitor" => {
+                    // Through `from_key`, so anything unrecognised lands on the
+                    // default, which shows the monitor.
+                    prefs.live_monitor = crate::monitor::Style::from_key(value).key().to_string();
+                }
                 "always_group" => {
                     if let Some(on) = parse_bool(value) {
                         prefs.always_group = on;
@@ -230,6 +248,7 @@ impl Prefs {
         out.push_str(&format!("hide_install_tab = {}\n", self.hide_install_tab));
         out.push_str(&format!("always_group = {}\n", self.always_group));
         out.push_str(&format!("notify_style = {}\n", self.notify_style));
+        out.push_str(&format!("live_monitor = {}\n", self.live_monitor));
         out.push_str(&format!("failsafe = {}\n", self.failsafe));
         out
     }
@@ -333,6 +352,7 @@ mod tests {
             always_group: true,
             notify_style: "alert".to_string(),
             failsafe: "warn".to_string(),
+            live_monitor: "toolbar".to_string(),
             recovered_from_corrupt_file: false,
         };
         let back = Prefs::parse(&prefs.to_text());
@@ -417,6 +437,7 @@ mod tests {
             configured: true,
             notify_style: "overlay".into(),
             failsafe: "close".into(),
+            live_monitor: "toolbar".into(),
             hide_install_tab: false,
             always_group: false,
             recovered_from_corrupt_file: false,
