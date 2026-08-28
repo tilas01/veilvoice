@@ -15,6 +15,10 @@ been taken — that is written down rather than absorbed into a number.
 eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
 marked *shipped* is work in progress.
 
+Since v0.1.14: a safety catch that reported a program it had closed as still
+running, and a test that failed one run in forty and was passing the other
+thirty-nine.
+
 Since v0.1.13: **Failsafe**, on by default, which notices the moment another
 program picks up a real microphone while you are being veiled; a baseline that
 learns what normally runs here; a report of what privilege VeilVoice holds; a
@@ -454,6 +458,16 @@ when run from a terminal. Switching at run time is FFI, and every crate here
 carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
 maintainer's call and not something to slip in, so it waits for one.
 
+**The test count this project states is a number about one machine, and now
+says so.** F-77. The same commit measures 996 tests on Windows and 988 on
+Linux: nine tests are compiled only on Windows. The number has been generated
+rather than typed since F-71, which is what stopped two hand-typed copies
+agreeing with each other, and it was still being presented as a fact about the
+tree. `docs/MEASURED.md` now records the host it was taken on. What is left is
+the wording on the front page, which states one platform's total with nothing
+beside it, and that is a change to the page's own voice rather than to a
+generator.
+
 **Marker 53 is done for the engine it can be tested on, and says which.** The
 mobile half was measured: twelve pages at five widths, with and without
 scripts, eight separate causes of horizontal scrolling found and fixed. The
@@ -469,7 +483,7 @@ on older engines, which is reasoning rather than evidence. This page will not
 say those two work until somebody has looked.
 
 **Marker 54's audit rounds are done and its deploy has been happening all
-along.** Nine rounds, seventy-five defects, and releases published from tags
+along.** Nine rounds, seventy-eight defects, and releases published from tags
 with reproducibility checked per platform. There was never a single production
 deploy to save up for.
 
