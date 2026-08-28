@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/soundbar.svg" alt="soundbar.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/soundbar.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 360 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" rel="noopener noreferrer">read the source</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 360 lines &middot; <a href="soundbar.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-same-mark-as-the-website">The same mark as the website</a>
@@ -83,17 +83,17 @@
 <rect x="0" y="0" width="305" height="194" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M236.6 74.0 C 236.6 94.0, 152.6 100.0, 152.6 117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.2" marker-end="url(#a)"/>
 <path d="M277.2 47.0 C 299.2 47.0, 299.2 47.0, 173.0 47.0" fill="none" stroke="var(--border, #2f3549)" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#a)"/>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L63" target="_blank" rel="noopener noreferrer">
+<a href="soundbar.src.html#fn-height_fraction">
 <rect x="28.0" y="20.0" width="142.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="99.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">height_fraction</text>
 <text x="99.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 63</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L79" target="_blank" rel="noopener noreferrer">
+<a href="soundbar.src.html#fn-draw">
 <rect x="196.0" y="20.0" width="81.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="236.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">draw</text>
 <text x="236.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 79</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L125" target="_blank" rel="noopener noreferrer">
+<a href="soundbar.src.html#fn-colour_for">
 <rect x="100.6" y="120.0" width="104.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="152.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">colour_for</text>
 <text x="152.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 125</text>
@@ -122,13 +122,13 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>PERIOD</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L48" rel="noopener noreferrer">48</a></td><td>Seconds for one full rise and fall.</td></tr>
-<tr><td><code>DELAYS</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L53" rel="noopener noreferrer">53</a></td><td>Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html.</td></tr>
-<tr><td><code>MIN_FRACTION</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L58" rel="noopener noreferrer">58</a></td><td>Height as a fraction of the available box, matching 16% and 82%.</td></tr>
-<tr><td><code>MAX_FRACTION</code> <sub>const</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L59" rel="noopener noreferrer">59</a></td><td></td></tr>
-<tr><td><code>height_fraction</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L63" rel="noopener noreferrer">63</a></td><td>How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases.</td></tr>
-<tr><td><code>draw</code> <sub>pub fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L79" rel="noopener noreferrer">79</a></td><td>Draw the mark at size, returning the response so it can carry a tooltip.</td></tr>
-<tr><td><code>colour_for</code> <sub>fn</sub></td><td><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L125" rel="noopener noreferrer">125</a></td><td>The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use.</td></tr>
+<tr><td><code>PERIOD</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-period">48</a></td><td>Seconds for one full rise and fall.</td></tr>
+<tr><td><code>DELAYS</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-delays">53</a></td><td>Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html.</td></tr>
+<tr><td><code>MIN_FRACTION</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-min_fraction">58</a></td><td>Height as a fraction of the available box, matching 16% and 82%.</td></tr>
+<tr><td><code>MAX_FRACTION</code> <sub>const</sub></td><td><a href="soundbar.src.html#fn-max_fraction">59</a></td><td></td></tr>
+<tr><td><code>height_fraction</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-height_fraction">63</a></td><td>How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases.</td></tr>
+<tr><td><code>draw</code> <sub>pub fn</sub></td><td><a href="soundbar.src.html#fn-draw">79</a></td><td>Draw the mark at size, returning the response so it can carry a tooltip.</td></tr>
+<tr><td><code>colour_for</code> <sub>fn</sub></td><td><a href="soundbar.src.html#fn-colour_for">125</a></td><td>The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use.</td></tr>
 </tbody></table>
 </section>
 </div></div>

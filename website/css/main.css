@@ -1429,6 +1429,80 @@ progress { width: 100%; height: 6px; margin-top: 12px; }
 .diagram { margin: 14px 0; overflow-x: auto; }
 .diagram svg { display: block; margin: 0 auto; }
 
+/* Every box in a flowchart is a link, and on these pages it goes to the file's
+ * source on this site rather than off to GitHub. That is worth making obvious,
+ * and it costs one hover state and no script.
+ *
+ * `stroke-width` and `fill` rather than a colour: the outline already carries
+ * the box's role -- a way in, a public function, a private helper -- and
+ * repainting it would throw that away for the one box the reader is pointing
+ * at. The transition is neutralised by the global reduced-motion rule at the
+ * top of this file. */
+.diagram a { cursor: pointer; }
+.diagram a rect { transition: stroke-width 0.12s ease, fill 0.12s ease; }
+.diagram a:hover rect { stroke-width: 3; fill: var(--bg); }
+.diagram a:focus rect { stroke-width: 3; fill: var(--bg); }
+
+/* ---------- a source file, on this site ---------- */
+
+/* `white-space: normal` on the block and `pre` on each line, which looks
+ * backwards and is not. Every line is its own element so it can be numbered
+ * and marked, and the newlines *between* those elements are markup rather than
+ * content: left as `pre` each one draws a second, empty line and the whole
+ * file comes out double-spaced.
+ *
+ * With no stylesheet at all this degrades to a plain `<pre>` of inline spans
+ * under the browser's own `white-space: pre`, which renders the file correctly
+ * and loses only the numbers. */
+pre.src {
+  white-space: normal;
+  padding: 12px 0;
+  counter-reset: srcline;
+  overscroll-behavior-x: contain;
+}
+
+/* `width: max-content` with a floor of the full column. A block child of a
+ * sideways scroller is only as wide as the *visible* box, so a marked line
+ * stopped being marked the moment the reader scrolled right -- the highlight
+ * ended where the column did, in the middle of the code it was meant to be
+ * pointing at. */
+.src .ln {
+  display: block;
+  white-space: pre;
+  width: max-content;
+  min-width: 100%;
+  min-height: 1.55em;
+  border-left: 3px solid transparent;
+}
+
+/* The number stays put while the line scrolls under it. It is a pseudo-element
+ * so that selecting the code and copying it does not take the numbers with it,
+ * which is the thing that makes a numbered listing useless to paste. */
+.src .ln::before {
+  counter-increment: srcline;
+  content: counter(srcline);
+  display: inline-block;
+  width: 3.4em;
+  margin-right: 1em;
+  text-align: right;
+  color: var(--muted);
+  background: var(--bg-inset);
+  position: sticky;
+  left: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* The mark, and it is `:target` rather than script: it works with JavaScript
+ * off, it survives a bookmark, and it is the browser's own idea of where the
+ * reader asked to be. A line number marks its line. A box in a diagram marks
+ * the whole function, because a function is what the reader clicked on. */
+.src .ln:target,
+.src .src-item:target .ln {
+  background: var(--bg-soft);
+  border-left-color: var(--accent);
+}
+
 details {
   border: 1px solid var(--border);
   border-radius: 8px;

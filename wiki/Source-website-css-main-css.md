@@ -3,7 +3,7 @@
 
 # `website/css/main.css`
 
-[[The website's source|Source-index]] &middot; 1975 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css)
+[[The website's source|Source-index]] &middot; 2049 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css)
 
 ## What it does
 
@@ -39,7 +39,8 @@ There is no framework and no font downloaded from anywhere else. Every remote th
 | the repository panel, while it loads | 1309 |
 | the screenshot gallery | 1360 |
 | wiki | 1400 |
-| footer | 1441 |
-| welcome / legal gate | 1466 |
-| search | 1579 |
-| the JavaScript edition toggle | 1749 |
+| a source file, on this site | 1446 |
+| footer | 1515 |
+| welcome / legal gate | 1540 |
+| search | 1653 |
+| the JavaScript edition toggle | 1823 |
