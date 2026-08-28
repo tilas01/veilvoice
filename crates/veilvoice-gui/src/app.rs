@@ -258,6 +258,14 @@ pub struct VeilVoiceApp {
     /// two copies is two bars that disagree by a frame. Whichever of them
     /// somebody happens to be looking at is then the wrong one.
     levels: crate::monitor::Levels,
+    /// A rolling average of how long a frame takes, in milliseconds.
+    ///
+    /// Shown on the About tab. Somebody reporting that the window is slow can
+    /// then say how slow, and whoever reads that report can tell a window
+    /// drawing at sixty frames a second from one drawing at eight. Describing
+    /// an interface is not measuring it, and this is the smallest thing that
+    /// turns one into the other.
+    frame_ms: f32,
     /// Whether the running session is a preview to this machine's own output
     /// rather than the real thing going to a cable. Shown in the interface,
     /// because a person who thinks they are live and is not, or the other way
@@ -353,6 +361,7 @@ impl VeilVoiceApp {
             session: None,
             live_error: None,
             levels: crate::monitor::Levels::default(),
+            frame_ms: 0.0,
             previewing: false,
             security: Security::default(),
             // Off. `VeilVoiceApp::new` is the only place the saved preference
@@ -519,6 +528,18 @@ impl VeilVoiceApp {
 
 impl eframe::App for VeilVoiceApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        // How long the last frame took, smoothed. `stable_dt` rather than `dt`
+        // because the raw one spikes whenever the window has been idle and the
+        // spike says nothing about how fast the drawing is.
+        let dt = ctx.input(|i| i.stable_dt) * 1000.0;
+        if dt.is_finite() && dt > 0.0 {
+            self.frame_ms = if self.frame_ms == 0.0 {
+                dt
+            } else {
+                self.frame_ms * 0.9 + dt * 0.1
+            };
+        }
+
         self.poll_job();
 
         // Before anything is drawn, and it has to be: this was at the *bottom*
@@ -544,7 +565,12 @@ impl eframe::App for VeilVoiceApp {
         // file names and no live session are reachable or even drawn.
         if self.security.is_locked() {
             self.session = None;
-            egui::CentralPanel::default().show(ctx, |ui| self.security.unlock_screen(ui));
+            // The motion preference is resolved here rather than inside the
+            // screen: the lock is drawn before the rest of the window exists,
+            // and the setting belongs to the application rather than to the
+            // lock.
+            let motion = self.preferences.motion(ctx);
+            egui::CentralPanel::default().show(ctx, |ui| self.security.unlock_screen(ui, motion));
             // The rate limit counts down whether or not anything else moves.
             ctx.request_repaint_after(std::time::Duration::from_millis(500));
             return;
@@ -603,6 +629,17 @@ impl eframe::App for VeilVoiceApp {
                     );
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         ui.label(RichText::new("offline").color(p::green()).small());
+                        // **Marker 78.** The colour scheme, in the header.
+                        //
+                        // Every one of the website's themes has been in this
+                        // application since marker 26, and the picker was on a
+                        // page inside Settings, which is a place somebody looks
+                        // only if they already believe there is something to
+                        // find. The website puts its picker in the header on
+                        // every page; so does this now, and Settings keeps the
+                        // fuller panel with the swatches and the custom
+                        // palettes.
+                        self.preferences.theme_picker(ui, ctx);
                         if self.security.has_lock()
                             && ui
                                 .button(RichText::new("lock").color(p::yellow()).small())
@@ -772,10 +809,27 @@ impl eframe::App for VeilVoiceApp {
         self.group.drain();
         self.verify.drain();
 
-        // The live meters only move if something repaints them, and the
-        // monitor has to keep ticking even while the window is idle.
-        if self.session.is_some()
-            || self.updates.is_busy()
+        // **Marker 79.** How often to come back, decided by what is moving.
+        //
+        // This was one number, 50 ms, for everything: a live session, a
+        // download, a file being veiled. Twenty frames a second is fine for a
+        // progress line that changes once a second and is not fine for a meter
+        // that follows a voice, which is the one thing here that moves
+        // continuously. At 20 Hz a meter steps rather than sweeps, and a window
+        // whose only moving part is stepping reads as a window that is
+        // struggling.
+        //
+        // So a live session asks for 16 ms and everything else keeps 50. The
+        // cost is bounded and it is paid only while somebody is actually being
+        // veiled, which is the moment worth spending it on.
+        //
+        // Not claimed: that this fixes anything somebody has reported. This
+        // machine has no display and the frame time is not measurable from
+        // here, which is why the About tab now shows it. A number the person
+        // with the problem can read is worth more than a change made blind.
+        if self.session.is_some() {
+            ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        } else if self.updates.is_busy()
             // Hovering, not only busy. An idle window requests no repaint, so
             // dragging a file over it lit nothing up and the file did not
             // appear until the mouse moved for some other reason -- the one
@@ -1518,6 +1572,22 @@ impl VeilVoiceApp {
         field(ui, "monitor", veilvoice_watch::VERSION);
         field(ui, "crypto", veilvoice_crypto::VERSION);
         field(ui, "licence", "GPL-3.0-or-later");
+        // Measured, not described. Somebody reporting that this window is slow
+        // can now say how slow, and 16 ms and 120 ms are different problems
+        // with different causes.
+        field(
+            ui,
+            "frame time",
+            &if self.frame_ms > 0.0 {
+                format!(
+                    "{:.1} ms ({:.0} a second)",
+                    self.frame_ms,
+                    1000.0 / self.frame_ms.max(0.1)
+                )
+            } else {
+                "not measured yet".to_string()
+            },
+        );
         // Precise rather than short. "None" stopped being true the moment the
         // update button existed, and a version string that overstates the thing
         // it is printed beside is worse than no version screen at all.
@@ -1673,6 +1743,65 @@ fn meter(ui: &mut egui::Ui, label: &str, peak: f32, hold: f32) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **Marker 79.** Nothing that waits happens on the thread that draws.
+    ///
+    /// A window stutters for one of two reasons: it is asked to draw too
+    /// rarely, or it is doing something slow between frames. The second is the
+    /// one that cannot be tuned away, and it is invisible in a screenshot: the
+    /// window simply stops for as long as the call takes.
+    ///
+    /// So the draw path is read for the calls that wait. Everything this
+    /// application does that can block already runs on its own thread and
+    /// reports back through a channel: the file dialogs after seven of them
+    /// froze the window, the update check, the verifier, the group render, the
+    /// key derivation. This keeps that true rather than assuming it.
+    ///
+    /// Comments are stripped first, for the reason the lock screen's guard
+    /// gives: the first version of a test like this flags its own explanation.
+    #[test]
+    fn the_drawing_thread_never_waits_on_anything() {
+        let source = include_str!("app.rs").replace("\r\n", "\n");
+        let body: String = source
+            .split("#[cfg(test)]")
+            .next()
+            .unwrap()
+            .lines()
+            .filter(|line| !line.trim_start().starts_with("//"))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        // The draw path is `update` and everything it reaches. Device
+        // enumeration is the one filesystem-shaped call in this file and it
+        // lives in `Default`, which runs once before the window opens.
+        let update_at = body.find("fn update(&mut self").expect("update exists");
+        let drawing = &body[update_at..];
+
+        for waits in [
+            "Command::new",
+            "std::fs::read",
+            "std::fs::write",
+            "read_to_string",
+            "join()",
+            "thread::sleep",
+            "devices::list",
+        ] {
+            assert!(
+                !drawing.contains(waits),
+                "the draw path calls {waits:?}, which waits. Move it to a thread \
+                 and report back through a channel, as everything else here does."
+            );
+        }
+
+        // The channels are drained without blocking. Counted rather than
+        // searched for, because `try_recv()` contains `recv()` and the first
+        // version of this reported the correct call as the fault.
+        let blocking = drawing.matches("recv()").count() - drawing.matches("try_recv()").count();
+        assert_eq!(
+            blocking, 0,
+            "a channel on the draw path is read with a blocking recv; use try_recv"
+        );
+    }
 
     /// Every tab has a name, they are unique, and they round trip. The
     /// screenshot tool names each picture after one of these, so a change here

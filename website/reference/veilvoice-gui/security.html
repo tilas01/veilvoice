@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/security.svg" alt="security.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/security.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1111 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1175 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-passwords-and-why">Two passwords, and why</a>
@@ -78,12 +78,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1111 lines defining <strong>25 functions</strong> (13 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1175 lines defining <strong>25 functions</strong> (13 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Sealing</code> <span style="color:var(--muted)">line 80</span> &mdash; How the recording that comes out of a job is protected.</li>
 <li><code>enum Op</code> <span style="color:var(--muted)">line 89</span> &mdash; What a background lock operation was trying to do.</li>
 <li><code>struct Security</code> <span style="color:var(--muted)">line 100</span> &mdash; Everything about locking the app and sealing its output.</li>
-<li><code>enum Plan</code> <span style="color:var(--muted)">line 812</span> &mdash; What a finished job should do with its bytes.</li>
+<li><code>enum Plan</code> <span style="color:var(--muted)">line 819</span> &mdash; What a finished job should do with its bytes.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Security::load</code> <span style="color:var(--muted)">line 199</span> &mdash; Read the lock file for this machine and start locked if one is set.
@@ -102,15 +102,15 @@
 <li><code>Security::unlock_screen</code> <span style="color:var(--muted)">line 380</span> &mdash; The full-window unlock screen.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>poll</code>, <code>spawn</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
 </li>
-<li><code>Security::tab</code> <span style="color:var(--muted)">line 479</span> &mdash; The security tab: manage the lock, and see what it is worth.
+<li><code>Security::tab</code> <span style="color:var(--muted)">line 486</span> &mdash; The security tab: manage the lock, and see what it is worth.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>has_lock</code>, <code>lock_now</code>, <code>password_row</code>, <code>poll</code>, <code>spawn</code>, <code>wipe_secrets</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
 </li>
-<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 635</span> &mdash; The at-rest controls that sit inside the file tab.
+<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 642</span> &mdash; The at-rest controls that sit inside the file tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>into_secret</code>, <code>password_row</code></span>
 </li>
-<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 760</span> &mdash; The dialogue shown when the user turns at-rest encryption off.
+<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 767</span> &mdash; The dialogue shown when the user turns at-rest encryption off.
 </li>
-<li><code>Plan::write</code> <span style="color:var(--muted)">line 837</span> &mdash; Seal wav if the plan says to, and write it.
+<li><code>Plan::write</code> <span style="color:var(--muted)">line 844</span> &mdash; Seal wav if the plan says to, and write it.
 </li>
 </ul>
 </section>
@@ -234,27 +234,27 @@
 <a href="security.src.html#fn-security-tab">
 <rect x="362.9" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="429.3" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::tab</text>
-<text x="429.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 479</text>
+<text x="429.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 486</text>
 </a>
 <a href="security.src.html#fn-security-recording_controls">
 <rect x="182.7" y="620.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="309.6" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::recording_controls</text>
-<text x="309.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 635</text>
+<text x="309.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 642</text>
 </a>
 <a href="security.src.html#fn-run_op">
 <rect x="482.6" y="720.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="528.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run_op</text>
-<text x="528.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 883</text>
+<text x="528.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 890</text>
 </a>
 <a href="security.src.html#fn-reopen">
 <rect x="263.3" y="920.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="309.6" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reopen</text>
-<text x="309.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 931</text>
+<text x="309.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 938</text>
 </a>
 <a href="security.src.html#fn-password_row">
 <rect x="247.2" y="820.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="309.6" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">password_row</text>
-<text x="309.6" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 935</text>
+<text x="309.6" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 942</text>
 </a>
 <rect x="20.0" y="1004.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -291,11 +291,11 @@ flowchart TD
     n_busy[&quot;Security::busy&lt;br/&gt;line 369&quot;]
     n_is_busy([&quot;Security::is_busy&lt;br/&gt;line 375&quot;])
     n_unlock_screen([&quot;Security::unlock_screen&lt;br/&gt;line 380&quot;])
-    n_tab([&quot;Security::tab&lt;br/&gt;line 479&quot;])
-    n_recording_controls([&quot;Security::recording_controls&lt;br/&gt;line 635&quot;])
-    n_run_op[&quot;run_op&lt;br/&gt;line 883&quot;]
-    n_reopen[&quot;reopen&lt;br/&gt;line 931&quot;]
-    n_password_row[&quot;password_row&lt;br/&gt;line 935&quot;]
+    n_tab([&quot;Security::tab&lt;br/&gt;line 486&quot;])
+    n_recording_controls([&quot;Security::recording_controls&lt;br/&gt;line 642&quot;])
+    n_run_op[&quot;run_op&lt;br/&gt;line 890&quot;]
+    n_reopen[&quot;reopen&lt;br/&gt;line 938&quot;]
+    n_password_row[&quot;password_row&lt;br/&gt;line 942&quot;]
     n_blocked_reason --&gt; n_ready_to_write
     n_drop --&gt; n_wipe_secrets
     n_is_busy --&gt; n_busy
@@ -332,11 +332,11 @@ flowchart TD
     click n_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L369&quot; &quot;open the source&quot;
     click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L375&quot; &quot;open the source&quot;
     click n_unlock_screen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L380&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L479&quot; &quot;open the source&quot;
-    click n_recording_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L635&quot; &quot;open the source&quot;
-    click n_run_op href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L883&quot; &quot;open the source&quot;
-    click n_reopen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L931&quot; &quot;open the source&quot;
-    click n_password_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L935&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L486&quot; &quot;open the source&quot;
+    click n_recording_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L642&quot; &quot;open the source&quot;
+    click n_run_op href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L890&quot; &quot;open the source&quot;
+    click n_reopen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L938&quot; &quot;open the source&quot;
+    click n_password_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L942&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load,n_is_locked,n_blocked_reason,n_plan,n_is_busy,n_unlock_screen,n_tab,n_recording_controls entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -370,16 +370,16 @@ flowchart TD
 <tr><td><code>Security::busy</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-busy">369</a></td><td></td></tr>
 <tr><td><code>Security::is_busy</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-is_busy">375</a></td><td>Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.</td></tr>
 <tr><td><code>Security::unlock_screen</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-unlock_screen">380</a></td><td>The full-window unlock screen.</td></tr>
-<tr><td><code>Security::tab</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-tab">479</a></td><td>The security tab: manage the lock, and see what it is worth.</td></tr>
-<tr><td><code>Security::recording_controls</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-recording_controls">635</a></td><td>The at-rest controls that sit inside the file tab.</td></tr>
-<tr><td><code>Security::disable_dialogue</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-disable_dialogue">760</a></td><td>The dialogue shown when the user turns at-rest encryption off.</td></tr>
-<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-disable_warning">799</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
-<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="security.src.html#fn-plan">812</a></td><td>What a finished job should do with its bytes.</td></tr>
-<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-plan-write">837</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
-<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="security.src.html#fn-plan-fmt">872</a></td><td></td></tr>
-<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="security.src.html#fn-run_op">883</a></td><td>Run one lock operation, off the UI thread.</td></tr>
-<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">931</a></td><td></td></tr>
-<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">935</a></td><td></td></tr>
+<tr><td><code>Security::tab</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-tab">486</a></td><td>The security tab: manage the lock, and see what it is worth.</td></tr>
+<tr><td><code>Security::recording_controls</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-recording_controls">642</a></td><td>The at-rest controls that sit inside the file tab.</td></tr>
+<tr><td><code>Security::disable_dialogue</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-disable_dialogue">767</a></td><td>The dialogue shown when the user turns at-rest encryption off.</td></tr>
+<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-disable_warning">806</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
+<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="security.src.html#fn-plan">819</a></td><td>What a finished job should do with its bytes.</td></tr>
+<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-plan-write">844</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
+<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="security.src.html#fn-plan-fmt">879</a></td><td></td></tr>
+<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="security.src.html#fn-run_op">890</a></td><td>Run one lock operation, off the UI thread.</td></tr>
+<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">938</a></td><td></td></tr>
+<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">942</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>
