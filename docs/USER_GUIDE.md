@@ -335,6 +335,38 @@ design.
 
 ---
 
+## 5.6 VeilVoice checking its own files
+
+The first time VeilVoice runs it writes down what its own program file looks
+like: the size and a SHA-256. Every launch after that it checks the file against
+that record and shows the answer on the security tab. Nothing has to be turned
+on and there is no command to remember, which was the whole problem with
+`veilvoice guard init` being a command.
+
+**With an app lock set**, the record is sealed under your app-lock passphrase,
+and the check runs at the moment you unlock, because that is the one moment the
+passphrase exists. Somebody who changes the program file then has to change the
+record too, and to do that they need your passphrase.
+
+**With no app lock**, there is no passphrase to seal it with, so the record is
+written in the clear and the security tab says so in those words. It still
+catches a file that changed by accident, a half-finished update, or a careless
+overwrite. It does not catch somebody who thought to rewrite the record as
+well, and a record sealed under a key kept beside it would be a decoration
+rather than a protection.
+
+Either way this **detects**; it does not prevent. And it cannot tell an update
+you installed from a file somebody swapped, because on disk those look
+identical. If you have just updated, a report of a change is the update.
+
+The record is taken at first launch rather than at install, because installing a
+package runs as an administrator and the record belongs to the user account that
+will run the program. A record written into the administrator's own
+configuration directory would describe nothing anybody checks.
+
+`veilvoice guard init`, `check` and `status` still work, read the same record,
+and can watch more files than the window does. See §4.
+
 ## 6. Things VeilVoice will not do
 
 Read this twice. Misunderstanding it is the only way this software gets someone

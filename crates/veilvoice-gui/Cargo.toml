@@ -26,6 +26,7 @@ veilvoice-video = { path = "../veilvoice-video" }
 veilvoice-workspace = { path = "../veilvoice-workspace" }
 veilvoice-failsafe = { path = "../veilvoice-failsafe" }
 veilvoice-watch = { path = "../veilvoice-watch" }
+veilvoice-guard = { path = "../veilvoice-guard" }
 eframe = { version = "0.29", default-features = false, features = ["glow", "default_fonts", "wayland", "x11"] }
 egui = "0.29"
 rfd = { version = "0.15", default-features = false, features = ["xdg-portal", "tokio"] }
