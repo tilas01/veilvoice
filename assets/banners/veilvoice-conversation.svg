@@ -29,7 +29,8 @@
 <rect x="333.0" y="54.7" width="7.0" height="40.5" rx="3" fill="#bb9af7" opacity="0.75"/>
 <rect x="346.0" y="63.8" width="7.0" height="22.3" rx="3" fill="#bb9af7" opacity="0.66"/>
 <rect x="359.0" y="46.3" width="7.0" height="57.4" rx="3" fill="#bb9af7" opacity="0.83"/>
-<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-conversation</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles.</text>
+<text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-conversation</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Several speakers in one recording: who spoke when, a distinct voice for each,</text>
+<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">names, and subtitles.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CRATE</text>
 </svg>

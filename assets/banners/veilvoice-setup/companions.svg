@@ -29,7 +29,7 @@
 <rect x="333.0" y="50.5" width="7.0" height="49.0" rx="3" fill="#bb9af7" opacity="0.79"/>
 <rect x="346.0" y="38.4" width="7.0" height="73.2" rx="3" fill="#bb9af7" opacity="0.91"/>
 <rect x="359.0" y="40.5" width="7.0" height="68.9" rx="3" fill="#bb9af7" opacity="0.89"/>
-<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">companions.rs</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Optional third-party software, detected rather than assumed.</text>
+<text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">companions.rs</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Optional third-party software, detected rather than assumed.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">SETUP</text>
 </svg>

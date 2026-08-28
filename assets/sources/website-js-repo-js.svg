@@ -29,7 +29,8 @@
 <rect x="333.0" y="43.0" width="7.0" height="64.0" rx="3" fill="#bb9af7" opacity="0.86"/>
 <rect x="346.0" y="42.4" width="7.0" height="65.2" rx="3" fill="#bb9af7" opacity="0.87"/>
 <rect x="359.0" y="35.0" width="7.0" height="80.0" rx="3" fill="#bb9af7" opacity="0.94"/>
-<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">website/js/repo.js</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Live repository data: stars, description, latest release, and the README rendered with syntax hi</text>
+<text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">website/js/repo.js</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">Live repository data: stars, description, latest release, and the README rendered</text>
+<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">with syntax hi</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">JS</text>
 </svg>

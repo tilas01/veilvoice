@@ -29,7 +29,8 @@
 <rect x="333.0" y="56.4" width="7.0" height="37.1" rx="3" fill="#bb9af7" opacity="0.73"/>
 <rect x="346.0" y="40.0" width="7.0" height="70.0" rx="3" fill="#bb9af7" opacity="0.89"/>
 <rect x="359.0" y="43.0" width="7.0" height="64.0" rx="3" fill="#bb9af7" opacity="0.86"/>
-<text x="396.0" y="69.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-accel</text>
-<text x="396.0" y="97.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">What graphics hardware this machine has, which of it can encode video, and the measured reason the audio engine does not use any of it.</text>
+<text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">veilvoice-accel</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">What graphics hardware this machine has, which of it can encode video, and the</text>
+<text x="396.0" y="108.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">measured reason the audio engine does not use any of it.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CRATE</text>
 </svg>
