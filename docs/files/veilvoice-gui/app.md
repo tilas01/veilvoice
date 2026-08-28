@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/app.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1952 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1971 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
 
 ## Contents
 
@@ -144,7 +144,7 @@ started on another thread and the answer is collected later.
 
 ## What this file contains
 
-1952 lines defining **27 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+1971 lines defining **27 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -199,10 +199,10 @@ flowchart TD
     n_live_tab["VeilVoiceApp::live_tab<br/>line 1100"]
     n_start_live["VeilVoiceApp::start_live<br/>line 1229"]
     n_start_live_preview["VeilVoiceApp::<br/>start_live_preview<br/>line 1249"]
-    n_check_failsafe["VeilVoiceApp::check_failsafe<br/>line 1278"]
-    n_watch_indicator["VeilVoiceApp::watch_indicator<br/>line 1354"]
-    n_watch_tab["VeilVoiceApp::watch_tab<br/>line 1384"]
-    n_previous_crash["VeilVoiceApp::previous_crash<br/>line 1467"]
+    n_check_failsafe["VeilVoiceApp::check_failsafe<br/>line 1297"]
+    n_watch_indicator["VeilVoiceApp::watch_indicator<br/>line 1373"]
+    n_watch_tab["VeilVoiceApp::watch_tab<br/>line 1403"]
+    n_previous_crash["VeilVoiceApp::previous_crash<br/>line 1486"]
     n_apply_policy --> n_posture
     n_config --> n_posture
     n_default --> n_preferred_input
@@ -245,10 +245,10 @@ flowchart TD
     click n_live_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1100" "open the source"
     click n_start_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1229" "open the source"
     click n_start_live_preview href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1249" "open the source"
-    click n_check_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1278" "open the source"
-    click n_watch_indicator href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1354" "open the source"
-    click n_watch_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1384" "open the source"
-    click n_previous_crash href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1467" "open the source"
+    click n_check_failsafe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1297" "open the source"
+    click n_watch_indicator href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1373" "open the source"
+    click n_watch_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1403" "open the source"
+    click n_previous_crash href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1486" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -286,14 +286,14 @@ flowchart TD
 | `VeilVoiceApp::live_tab` <sub>fn</sub> | [1100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1100) |  |
 | `VeilVoiceApp::start_live` <sub>fn</sub> | [1229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1229) |  |
 | `VeilVoiceApp::start_live_preview` <sub>fn</sub> | [1249](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1249) | The same session, pointed at this machine's own output. |
-| `VeilVoiceApp::check_failsafe` <sub>fn</sub> | [1278](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1278) | Ask the safety catch what it makes of what is holding a microphone. |
-| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [1354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1354) | Re-scan on a timer rather than every frame. |
-| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [1384](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1384) |  |
-| `VeilVoiceApp::previous_crash` <sub>fn</sub> | [1467](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1467) | Say so if the last run ended badly, and offer the file. |
-| `VeilVoiceApp::about_tab` <sub>fn</sub> | [1492](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1492) |  |
-| `device_picker` <sub>fn</sub> | [1561](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1561) |  |
-| `field` <sub>fn</sub> | [1586](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1586) |  |
-| `meter` <sub>fn</sub> | [1604](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1604) | One level meter: a bar on the decibel scale, and the number beside it. |
+| `VeilVoiceApp::check_failsafe` <sub>fn</sub> | [1297](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1297) | Ask the safety catch what it makes of what is holding a microphone. |
+| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [1373](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1373) | Re-scan on a timer rather than every frame. |
+| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [1403](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1403) |  |
+| `VeilVoiceApp::previous_crash` <sub>fn</sub> | [1486](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1486) | Say so if the last run ended badly, and offer the file. |
+| `VeilVoiceApp::about_tab` <sub>fn</sub> | [1511](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1511) |  |
+| `device_picker` <sub>fn</sub> | [1580](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1580) |  |
+| `field` <sub>fn</sub> | [1605](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1605) |  |
+| `meter` <sub>fn</sub> | [1623](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1623) | One level meter: a bar on the decibel scale, and the number beside it. |
 
 ---
 

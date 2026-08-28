@@ -38,6 +38,95 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The tenth round: security, functionality, and what it costs to run
+
+The round asked for before the next deploy, covering all three and run last on
+purpose: an audit of code that is still moving is an audit of code that will
+not exist.
+
+**One defect found and fixed (F-84), and one measured inefficiency removed.**
+
+### The mechanical checks, all of them
+
+Every claim this project makes that a machine can test, tested:
+
+| Claim | How it was checked | Result |
+|---|---|---|
+| No `unsafe`, in any crate | every `lib.rs` and `main.rs` for `#![forbid(unsafe_code)]`, then a sweep for the keyword | 26 of 26, none found |
+| It talks to no servers | the whole dependency graph for an HTTP client | none |
+| `veilvoice-priv` only reports | the guard test that names every subprocess the crate starts | two probes, both read-only |
+| The parsers survive hostile input | the coverage-guided campaign, six targets, five minutes each | **293 million inputs, nothing found** |
+| Every generated file matches its generator | `tools/verify.py` | all fourteen checks pass |
+| Every picture keeps its words inside | `images.test.js` | 4,958 pieces of text in 492 drawings |
+| The tests hold where a pointer is 32 bits | `i686` and `armv7` | 682 tests each, no failures |
+
+The campaign is the one worth dwelling on, because the number changed for a
+reason. Last round `lock_file` managed 3,274 inputs in five minutes; this round
+it managed **445,714**, which is 136 times more. That is F-82's fix: with no
+ceiling on the number of Argon2 passes, most of that target's five minutes went
+into a handful of absurd derivations. Fixing a denial of service made the
+campaign that found it two orders of magnitude more productive, which is worth
+knowing the next time a bound looks like a formality.
+
+### F-84 -- the preview said "nowhere else" before it knew where
+
+`veilvoice-cli/src/main.rs` and `veilvoice-gui/src/app.rs`, both in code
+written this cycle.
+
+`--preview` exists so somebody can hear their own veiled voice before an
+interview rather than during one, and it printed:
+
+> Preview. The veiled voice goes to this machine's output and nowhere else.
+
+It printed that **before naming the device**, and it is not always true.
+`--preview --output <a cable>` keeps the cable, because an explicit choice is
+honoured. And a machine whose *default* output is a virtual cable does the same
+thing without being asked, which is not a strange configuration: somebody who
+routes their audio through one may well have set it as the default. In either
+case whatever is listening on that cable hears the preview.
+
+**A false reassurance in the one place somebody is checking their setup is
+worse than none**, because checking is exactly what they came there to do. The
+claim now comes after the device, names it rather than the machine, and when
+the device is a cable it says so outright and says what to do instead. The
+desktop application made the same claim in a notice and now makes the same
+check.
+
+Not a confidentiality failure, and it is the same shape as one: a sentence that
+tells somebody a thing is private when the code has not established that.
+
+### The optimisation pass: 43.6 per cent of the search index was drawings
+
+Measured rather than guessed. `website/search-index.json` was 4,779,645 bytes,
+of which 3,903,419 was excerpt text, of which **1,700,062 was generated SVG
+markup and copies of assets**. Every byte of it is downloaded by every reader
+who uses the search.
+
+It bought them nothing. All 536 SVGs in this repository are produced by a
+generator and carry a marker saying so; not one is hand-written prose. The
+words inside a drawing are the words of the document it was drawn from, which
+is indexed at that document, and a search result pointing at an SVG file is a
+result nobody can use.
+
+The argument is not new. It is written at the top of
+`tools/search-index/generate.py` about the crate documentation, in those words,
+and it was applied to the banners and not to the diagrams. That is how 43.6 per
+cent accumulated without anybody deciding on it: an exclusion list naming the
+files somebody thought of.
+
+The index is now **2,532,102 bytes, 47 per cent smaller**, and 749 KB rather
+than 918 KB over the wire. The rule is a property of the file rather than a
+list of paths: a `.svg` is a drawing, and drawings are not indexed. Search
+still returns 63 results for "voiceprint" and the first is a document.
+
+### What this round did not do
+
+No outside review, which is the entry at the top of "still open" and remains
+the largest gap. No fuzzing on Windows or macOS. No profiling of the audio
+engine, which needs a machine with a microphone and is where an optimisation
+pass would find real numbers; the pass here measured what a reader downloads,
+because that is what this machine can measure honestly.
+
 ## This round
 
 **Ten defects found and fixed (F-74 to F-83.)** Three are in the security
@@ -2427,7 +2516,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Eighty-three defects found and fixed across nine audit rounds (F-1 to F-83):**
+**Eighty-four defects found and fixed across ten audit rounds (F-1 to F-84):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

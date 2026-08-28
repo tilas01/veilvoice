@@ -1672,14 +1672,47 @@ fn live(
             "Live scramble"
         })
     );
+    println!("{}", field("Input", &devices::name_of(&in_device)));
+    println!("{}", field("Output", &devices::name_of(&out_device)));
     if preview {
-        println!(
-            "{}",
-            paint(
-                colour::YELLOW,
-                "  Preview. The veiled voice goes to this machine's output and nowhere else."
-            )
-        );
+        // **F-84.** Printed after the device, and it names the device rather
+        // than claiming something about it.
+        //
+        // The first version said "goes to this machine's output and nowhere
+        // else" before the output was even named, and that is not always true:
+        // `--preview --output <a cable>` keeps the cable, and a machine whose
+        // *default* output is a cable does the same thing without being asked.
+        // Whatever is listening on that cable then hears the preview.
+        //
+        // A false reassurance in the one place somebody is checking their
+        // setup is worse than no reassurance, because checking is what they
+        // came here to do. So the claim is scoped to the named device, and
+        // when that device is a cable it is said outright.
+        let cable = devices::find_virtual_cable().map(|d| d.name);
+        let chosen = devices::name_of(&out_device);
+        let into_cable = cable.as_deref() == Some(chosen.as_str());
+        println!();
+        if into_cable {
+            println!(
+                "{}",
+                warn("that output is a virtual cable, so whatever is listening on it hears this")
+            );
+            println!(
+                "{}",
+                paint(
+                    colour::MUTED,
+                    "  For a preview only you can hear, run --preview with no --output."
+                )
+            );
+        } else {
+            println!(
+                "{}",
+                paint(
+                    colour::YELLOW,
+                    "  Preview. The veiled voice goes to the output named above and nowhere else."
+                )
+            );
+        }
         println!(
             "{}",
             paint(
@@ -1696,8 +1729,6 @@ fn live(
         );
         println!();
     }
-    println!("{}", field("Input", &devices::name_of(&in_device)));
-    println!("{}", field("Output", &devices::name_of(&out_device)));
     println!(
         "{}",
         field(

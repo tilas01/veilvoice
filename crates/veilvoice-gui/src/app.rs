@@ -1257,10 +1257,29 @@ impl VeilVoiceApp {
             Ok(session) => {
                 self.session = Some(session);
                 self.previewing = true;
-                self.notice = Some(crate::notify::Notice::note(
-                    "Preview: the veiled voice is going to this machine's output and \
-                     nowhere else. Listen for a voice that is not yours.",
-                ));
+                // **F-84.** The claim is checked rather than asserted.
+                //
+                // A preview goes to the default output, and on a machine whose
+                // default output *is* a virtual cable, whatever is listening on
+                // that cable hears it. Telling somebody the opposite in the one
+                // place they are checking their setup is worse than telling
+                // them nothing, because checking is what they came to do.
+                let cable = devices::find_virtual_cable().map(|d| d.name);
+                let default = devices::open(devices::Direction::Output, None)
+                    .ok()
+                    .map(|d| devices::name_of(&d));
+                let into_cable = cable.is_some() && cable == default;
+                self.notice = Some(if into_cable {
+                    crate::notify::Notice::warn(
+                        "Preview, but this machine's default output is a virtual cable, \
+                         so whatever is listening on it hears this too.",
+                    )
+                } else {
+                    crate::notify::Notice::note(
+                        "Preview: the veiled voice is going to this machine's own output \
+                         and nowhere else. Listen for a voice that is not yours.",
+                    )
+                });
             }
             Err(e) => self.live_error = Some(e.to_string()),
         }
