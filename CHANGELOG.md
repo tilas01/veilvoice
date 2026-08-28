@@ -8,6 +8,41 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### A working model of the application, and of the command line, in the page
+
+Marker 67. Everything else on the site describes the program. The screenshots
+are photographs of it, which are honest and are still pictures: a reader could
+not find out what happens when they change a setting, or what the command line
+answers, without downloading and running something. For a tool whose argument
+is "check this yourself", asking somebody to install it before they can look at
+it is the wrong way round.
+
+There is now an overlay, opened from four buttons under the front page
+animation, or from a link: `#try`, `#try-cli`, `#try-both`, `#try-verify`. It
+holds a model of the desktop application with all nine of its tabs and a panel
+for each, a terminal that replays what every subcommand printed, both side by
+side, and the release verifier walking its three checks in order. Point at
+anything and a line underneath says what it does, which is a helper rather than
+a tooltip because a tooltip is for somebody who already suspects there is
+something to find out.
+
+**It says what it is, at the top, where a reader meets it.** This is a drawing
+of VeilVoice and not VeilVoice: the panels are written by hand, the device
+names and levels are illustrations, and nothing in it touches any audio. A
+demonstration that lets somebody believe they have used the software has misled
+them, and that sentence is the price of having one.
+
+**What is not invented is generated and checked.** `tools/site/demo.py` reads
+the tab list out of the application's own source and the terminal output out of
+the committed captures of what the real program printed, and `--check` fails
+the build when either has moved. A model that drifts from the program is a
+claim rather than an omission, which is the distinction this repository has had
+to make four times under other names.
+
+The buttons are drawn only when scripts are running, through the class
+`theme.js` sets from a blocking head script. A button that does nothing is
+worse than no button, and the scripts-off edition has the photographs.
+
 ### The front page animation now says what the engine does, not one word of it
 
 The picture of a voice going in and an unidentifiable one coming out had the
