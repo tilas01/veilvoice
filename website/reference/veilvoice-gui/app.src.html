@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/app.rs</code></h1>
-<p style="color:var(--muted)"><a href="app.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1952 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="app.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1971 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1345,716 +1345,735 @@
 <span class="ln" id="L1257">            <span class="tok-fn">Ok</span>(session) =&gt; {</span>
 <span class="ln" id="L1258">                <span class="tok-kw">self</span>.session = <span class="tok-fn">Some</span>(session);</span>
 <span class="ln" id="L1259">                <span class="tok-kw">self</span>.previewing = true;</span>
-<span class="ln" id="L1260">                <span class="tok-kw">self</span>.notice = <span class="tok-fn">Some</span>(<span class="tok-kw">crate</span>::notify::Notice::<span class="tok-fn">note</span>(</span>
-<span class="ln" id="L1261">                    <span class="tok-str">&quot;Preview: the veiled voice is going to this machine&#x27;s output and \</span></span>
-<span class="ln" id="L1262"><span class="tok-str">                     nowhere else. Listen for a voice that is not yours.&quot;</span>,</span>
-<span class="ln" id="L1263">                ));</span>
-<span class="ln" id="L1264">            }</span>
-<span class="ln" id="L1265">            <span class="tok-fn">Err</span>(e) =&gt; <span class="tok-kw">self</span>.live_error = <span class="tok-fn">Some</span>(e.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L1266">        }</span>
-<span class="ln" id="L1267">    }</span>
+<span class="ln" id="L1260">                <span class="tok-com">// **F-84.** The claim is checked rather than asserted.</span></span>
+<span class="ln" id="L1261">                <span class="tok-com">//</span></span>
+<span class="ln" id="L1262">                <span class="tok-com">// A preview goes to the default output, and on a machine whose</span></span>
+<span class="ln" id="L1263">                <span class="tok-com">// default output *is* a virtual cable, whatever is listening on</span></span>
+<span class="ln" id="L1264">                <span class="tok-com">// that cable hears it. Telling somebody the opposite in the one</span></span>
+<span class="ln" id="L1265">                <span class="tok-com">// place they are checking their setup is worse than telling</span></span>
+<span class="ln" id="L1266">                <span class="tok-com">// them nothing, because checking is what they came to do.</span></span>
+<span class="ln" id="L1267">                <span class="tok-kw">let</span> cable = devices::<span class="tok-fn">find_virtual_cable</span>().<span class="tok-fn">map</span>(|d| d.name);</span>
+<span class="ln" id="L1268">                <span class="tok-kw">let</span> default = devices::<span class="tok-fn">open</span>(devices::Direction::Output, None)</span>
+<span class="ln" id="L1269">                    .<span class="tok-fn">ok</span>()</span>
+<span class="ln" id="L1270">                    .<span class="tok-fn">map</span>(|d| devices::<span class="tok-fn">name_of</span>(&amp;d));</span>
+<span class="ln" id="L1271">                <span class="tok-kw">let</span> into_cable = cable.<span class="tok-fn">is_some</span>() &amp;&amp; cable == default;</span>
+<span class="ln" id="L1272">                <span class="tok-kw">self</span>.notice = <span class="tok-fn">Some</span>(<span class="tok-kw">if</span> into_cable {</span>
+<span class="ln" id="L1273">                    <span class="tok-kw">crate</span>::notify::Notice::<span class="tok-fn">warn</span>(</span>
+<span class="ln" id="L1274">                        <span class="tok-str">&quot;Preview, but this machine&#x27;s default output is a virtual cable, \</span></span>
+<span class="ln" id="L1275"><span class="tok-str">                         so whatever is listening on it hears this too.&quot;</span>,</span>
+<span class="ln" id="L1276">                    )</span>
+<span class="ln" id="L1277">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1278">                    <span class="tok-kw">crate</span>::notify::Notice::<span class="tok-fn">note</span>(</span>
+<span class="ln" id="L1279">                        <span class="tok-str">&quot;Preview: the veiled voice is going to this machine&#x27;s own output \</span></span>
+<span class="ln" id="L1280"><span class="tok-str">                         and nowhere else. Listen for a voice that is not yours.&quot;</span>,</span>
+<span class="ln" id="L1281">                    )</span>
+<span class="ln" id="L1282">                });</span>
+<span class="ln" id="L1283">            }</span>
+<span class="ln" id="L1284">            <span class="tok-fn">Err</span>(e) =&gt; <span class="tok-kw">self</span>.live_error = <span class="tok-fn">Some</span>(e.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L1285">        }</span>
+<span class="ln" id="L1286">    }</span>
 </span>
-<span class="ln" id="L1268"></span>
+<span class="ln" id="L1287"></span>
 <span class="src-item" id="fn-veilvoiceapp-check_failsafe">
-<span class="ln" id="L1269">    <span class="tok-com">/// Ask the safety catch what it makes of what is holding a microphone.</span></span>
-<span class="ln" id="L1270">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1271">    <span class="tok-com">/// Called once a frame, straight after the watch feed is drained, because</span></span>
-<span class="ln" id="L1272">    <span class="tok-com">/// that is where the information arrives. The decision is arithmetic over a</span></span>
-<span class="ln" id="L1273">    <span class="tok-com">/// list -- see `veilvoice_failsafe` -- so doing it every frame costs</span></span>
-<span class="ln" id="L1274">    <span class="tok-com">/// nothing and means the answer is never a frame out of date.</span></span>
-<span class="ln" id="L1275">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1276">    <span class="tok-com">/// **Closing a program is done here and nowhere else**, and only when the</span></span>
-<span class="ln" id="L1277">    <span class="tok-com">/// guard has said it may be.</span></span>
-<span class="ln" id="L1278">    <span class="tok-kw">fn</span> <span class="tok-fn">check_failsafe</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L1279">        <span class="tok-kw">self</span>.failsafe.posture = <span class="tok-kw">self</span>.preferences.<span class="tok-fn">failsafe</span>();</span>
-<span class="ln" id="L1280">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.failsafe.posture.<span class="tok-fn">is_on</span>() {</span>
-<span class="ln" id="L1281">            <span class="tok-kw">self</span>.failsafe_finding = None;</span>
-<span class="ln" id="L1282">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L1283">        }</span>
-<span class="ln" id="L1284"></span>
-<span class="ln" id="L1285">        <span class="tok-com">// What VeilVoice is itself veiling, so a program on our own cable is</span></span>
-<span class="ln" id="L1286">        <span class="tok-com">// not mistaken for the accident.</span></span>
-<span class="ln" id="L1287">        <span class="tok-kw">self</span>.failsafe.live = <span class="tok-kw">self</span>.session.<span class="tok-fn">is_some</span>();</span>
-<span class="ln" id="L1288">        <span class="tok-kw">self</span>.failsafe.veiling = <span class="tok-kw">self</span>.chosen_output.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L1289"></span>
-<span class="ln" id="L1290">        <span class="tok-kw">let</span> holders: Vec&lt;veilvoice_failsafe::Holder&gt; = <span class="tok-kw">self</span></span>
-<span class="ln" id="L1291">            .watch</span>
-<span class="ln" id="L1292">            .<span class="tok-fn">active</span>()</span>
-<span class="ln" id="L1293">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L1294">            .<span class="tok-fn">filter</span>(|use_| use_.kind == veilvoice_watch::DeviceKind::Microphone)</span>
-<span class="ln" id="L1295">            .<span class="tok-fn">map</span>(|use_| veilvoice_failsafe::Holder {</span>
-<span class="ln" id="L1296">                app: use_.app.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L1297">                pid: use_.pid,</span>
-<span class="ln" id="L1298">                device: use_.device.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L1299">            })</span>
-<span class="ln" id="L1300">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1301">        <span class="tok-kw">let</span> problems: Vec&lt;String&gt; = <span class="tok-kw">self</span></span>
-<span class="ln" id="L1302">            .watch</span>
-<span class="ln" id="L1303">            .<span class="tok-fn">error</span>()</span>
-<span class="ln" id="L1304">            .<span class="tok-fn">map</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L1305">            .<span class="tok-fn">into_iter</span>()</span>
-<span class="ln" id="L1306">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1307"></span>
-<span class="ln" id="L1308">        <span class="tok-kw">let</span> finding = <span class="tok-kw">self</span>.failsafe.<span class="tok-fn">look</span>(&amp;holders, &amp;problems);</span>
-<span class="ln" id="L1309"></span>
-<span class="ln" id="L1310">        <span class="tok-com">// Only act on a *change*, or the same program is closed and reported</span></span>
-<span class="ln" id="L1311">        <span class="tok-com">// sixty times a second for as long as it takes to die.</span></span>
-<span class="ln" id="L1312">        <span class="tok-kw">let</span> fresh = <span class="tok-kw">self</span>.failsafe_finding.<span class="tok-fn">as_ref</span>() != <span class="tok-fn">Some</span>(&amp;finding);</span>
-<span class="ln" id="L1313">        <span class="tok-kw">if</span> fresh {</span>
-<span class="ln" id="L1314">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> veilvoice_failsafe::Finding::Foreign {</span>
-<span class="ln" id="L1315">                app,</span>
-<span class="ln" id="L1316">                pid,</span>
-<span class="ln" id="L1317">                closeable,</span>
-<span class="ln" id="L1318">                ..</span>
-<span class="ln" id="L1319">            } = &amp;finding</span>
-<span class="ln" id="L1320">            {</span>
-<span class="ln" id="L1321">                <span class="tok-kw">let</span> words = finding.<span class="tok-fn">phrasing</span>();</span>
-<span class="ln" id="L1322">                <span class="tok-kw">self</span>.notice = <span class="tok-fn">Some</span>(<span class="tok-kw">crate</span>::notify::Notice::<span class="tok-fn">warn</span>(words.<span class="tok-fn">clone</span>()));</span>
-<span class="ln" id="L1323">                <span class="tok-kw">if</span> *closeable {</span>
-<span class="ln" id="L1324">                    <span class="tok-kw">match</span> veilvoice_failsafe::act::<span class="tok-fn">close</span>(app, *pid) {</span>
-<span class="ln" id="L1325">                        <span class="tok-fn">Ok</span>(done) =&gt; {</span>
-<span class="ln" id="L1326">                            <span class="tok-kw">self</span>.failsafe</span>
-<span class="ln" id="L1327">                                .<span class="tok-fn">record</span>(std::time::SystemTime::<span class="tok-fn">now</span>(), app, true, &amp;done)</span>
-<span class="ln" id="L1328">                        }</span>
-<span class="ln" id="L1329">                        <span class="tok-fn">Err</span>(why) =&gt; {</span>
-<span class="ln" id="L1330">                            <span class="tok-kw">self</span>.failsafe</span>
-<span class="ln" id="L1331">                                .<span class="tok-fn">record</span>(std::time::SystemTime::<span class="tok-fn">now</span>(), app, false, &amp;why);</span>
-<span class="ln" id="L1332">                            <span class="tok-com">// Said, not swallowed. A guard that tried and could</span></span>
-<span class="ln" id="L1333">                            <span class="tok-com">// not is a different situation from one that did.</span></span>
-<span class="ln" id="L1334">                            <span class="tok-kw">self</span>.notice = <span class="tok-fn">Some</span>(<span class="tok-kw">crate</span>::notify::Notice::<span class="tok-fn">warn</span>(format!(</span>
-<span class="ln" id="L1335">                                <span class="tok-str">&quot;{words} It could not be closed: {why}&quot;</span></span>
-<span class="ln" id="L1336">                            )));</span>
-<span class="ln" id="L1337">                        }</span>
-<span class="ln" id="L1338">                    }</span>
-<span class="ln" id="L1339">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1340">                    <span class="tok-kw">self</span>.failsafe.<span class="tok-fn">record</span>(</span>
-<span class="ln" id="L1341">                        std::time::SystemTime::<span class="tok-fn">now</span>(),</span>
-<span class="ln" id="L1342">                        app,</span>
-<span class="ln" id="L1343">                        false,</span>
-<span class="ln" id="L1344">                        <span class="tok-str">&quot;left alone: protected, or the posture is warn-only&quot;</span>,</span>
-<span class="ln" id="L1345">                    );</span>
-<span class="ln" id="L1346">                }</span>
-<span class="ln" id="L1347">            }</span>
-<span class="ln" id="L1348">        }</span>
-<span class="ln" id="L1349">        <span class="tok-kw">self</span>.failsafe_finding = <span class="tok-fn">Some</span>(finding);</span>
-<span class="ln" id="L1350">    }</span>
+<span class="ln" id="L1288">    <span class="tok-com">/// Ask the safety catch what it makes of what is holding a microphone.</span></span>
+<span class="ln" id="L1289">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1290">    <span class="tok-com">/// Called once a frame, straight after the watch feed is drained, because</span></span>
+<span class="ln" id="L1291">    <span class="tok-com">/// that is where the information arrives. The decision is arithmetic over a</span></span>
+<span class="ln" id="L1292">    <span class="tok-com">/// list -- see `veilvoice_failsafe` -- so doing it every frame costs</span></span>
+<span class="ln" id="L1293">    <span class="tok-com">/// nothing and means the answer is never a frame out of date.</span></span>
+<span class="ln" id="L1294">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1295">    <span class="tok-com">/// **Closing a program is done here and nowhere else**, and only when the</span></span>
+<span class="ln" id="L1296">    <span class="tok-com">/// guard has said it may be.</span></span>
+<span class="ln" id="L1297">    <span class="tok-kw">fn</span> <span class="tok-fn">check_failsafe</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L1298">        <span class="tok-kw">self</span>.failsafe.posture = <span class="tok-kw">self</span>.preferences.<span class="tok-fn">failsafe</span>();</span>
+<span class="ln" id="L1299">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.failsafe.posture.<span class="tok-fn">is_on</span>() {</span>
+<span class="ln" id="L1300">            <span class="tok-kw">self</span>.failsafe_finding = None;</span>
+<span class="ln" id="L1301">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L1302">        }</span>
+<span class="ln" id="L1303"></span>
+<span class="ln" id="L1304">        <span class="tok-com">// What VeilVoice is itself veiling, so a program on our own cable is</span></span>
+<span class="ln" id="L1305">        <span class="tok-com">// not mistaken for the accident.</span></span>
+<span class="ln" id="L1306">        <span class="tok-kw">self</span>.failsafe.live = <span class="tok-kw">self</span>.session.<span class="tok-fn">is_some</span>();</span>
+<span class="ln" id="L1307">        <span class="tok-kw">self</span>.failsafe.veiling = <span class="tok-kw">self</span>.chosen_output.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L1308"></span>
+<span class="ln" id="L1309">        <span class="tok-kw">let</span> holders: Vec&lt;veilvoice_failsafe::Holder&gt; = <span class="tok-kw">self</span></span>
+<span class="ln" id="L1310">            .watch</span>
+<span class="ln" id="L1311">            .<span class="tok-fn">active</span>()</span>
+<span class="ln" id="L1312">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L1313">            .<span class="tok-fn">filter</span>(|use_| use_.kind == veilvoice_watch::DeviceKind::Microphone)</span>
+<span class="ln" id="L1314">            .<span class="tok-fn">map</span>(|use_| veilvoice_failsafe::Holder {</span>
+<span class="ln" id="L1315">                app: use_.app.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L1316">                pid: use_.pid,</span>
+<span class="ln" id="L1317">                device: use_.device.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L1318">            })</span>
+<span class="ln" id="L1319">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1320">        <span class="tok-kw">let</span> problems: Vec&lt;String&gt; = <span class="tok-kw">self</span></span>
+<span class="ln" id="L1321">            .watch</span>
+<span class="ln" id="L1322">            .<span class="tok-fn">error</span>()</span>
+<span class="ln" id="L1323">            .<span class="tok-fn">map</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L1324">            .<span class="tok-fn">into_iter</span>()</span>
+<span class="ln" id="L1325">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1326"></span>
+<span class="ln" id="L1327">        <span class="tok-kw">let</span> finding = <span class="tok-kw">self</span>.failsafe.<span class="tok-fn">look</span>(&amp;holders, &amp;problems);</span>
+<span class="ln" id="L1328"></span>
+<span class="ln" id="L1329">        <span class="tok-com">// Only act on a *change*, or the same program is closed and reported</span></span>
+<span class="ln" id="L1330">        <span class="tok-com">// sixty times a second for as long as it takes to die.</span></span>
+<span class="ln" id="L1331">        <span class="tok-kw">let</span> fresh = <span class="tok-kw">self</span>.failsafe_finding.<span class="tok-fn">as_ref</span>() != <span class="tok-fn">Some</span>(&amp;finding);</span>
+<span class="ln" id="L1332">        <span class="tok-kw">if</span> fresh {</span>
+<span class="ln" id="L1333">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> veilvoice_failsafe::Finding::Foreign {</span>
+<span class="ln" id="L1334">                app,</span>
+<span class="ln" id="L1335">                pid,</span>
+<span class="ln" id="L1336">                closeable,</span>
+<span class="ln" id="L1337">                ..</span>
+<span class="ln" id="L1338">            } = &amp;finding</span>
+<span class="ln" id="L1339">            {</span>
+<span class="ln" id="L1340">                <span class="tok-kw">let</span> words = finding.<span class="tok-fn">phrasing</span>();</span>
+<span class="ln" id="L1341">                <span class="tok-kw">self</span>.notice = <span class="tok-fn">Some</span>(<span class="tok-kw">crate</span>::notify::Notice::<span class="tok-fn">warn</span>(words.<span class="tok-fn">clone</span>()));</span>
+<span class="ln" id="L1342">                <span class="tok-kw">if</span> *closeable {</span>
+<span class="ln" id="L1343">                    <span class="tok-kw">match</span> veilvoice_failsafe::act::<span class="tok-fn">close</span>(app, *pid) {</span>
+<span class="ln" id="L1344">                        <span class="tok-fn">Ok</span>(done) =&gt; {</span>
+<span class="ln" id="L1345">                            <span class="tok-kw">self</span>.failsafe</span>
+<span class="ln" id="L1346">                                .<span class="tok-fn">record</span>(std::time::SystemTime::<span class="tok-fn">now</span>(), app, true, &amp;done)</span>
+<span class="ln" id="L1347">                        }</span>
+<span class="ln" id="L1348">                        <span class="tok-fn">Err</span>(why) =&gt; {</span>
+<span class="ln" id="L1349">                            <span class="tok-kw">self</span>.failsafe</span>
+<span class="ln" id="L1350">                                .<span class="tok-fn">record</span>(std::time::SystemTime::<span class="tok-fn">now</span>(), app, false, &amp;why);</span>
+<span class="ln" id="L1351">                            <span class="tok-com">// Said, not swallowed. A guard that tried and could</span></span>
+<span class="ln" id="L1352">                            <span class="tok-com">// not is a different situation from one that did.</span></span>
+<span class="ln" id="L1353">                            <span class="tok-kw">self</span>.notice = <span class="tok-fn">Some</span>(<span class="tok-kw">crate</span>::notify::Notice::<span class="tok-fn">warn</span>(format!(</span>
+<span class="ln" id="L1354">                                <span class="tok-str">&quot;{words} It could not be closed: {why}&quot;</span></span>
+<span class="ln" id="L1355">                            )));</span>
+<span class="ln" id="L1356">                        }</span>
+<span class="ln" id="L1357">                    }</span>
+<span class="ln" id="L1358">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1359">                    <span class="tok-kw">self</span>.failsafe.<span class="tok-fn">record</span>(</span>
+<span class="ln" id="L1360">                        std::time::SystemTime::<span class="tok-fn">now</span>(),</span>
+<span class="ln" id="L1361">                        app,</span>
+<span class="ln" id="L1362">                        false,</span>
+<span class="ln" id="L1363">                        <span class="tok-str">&quot;left alone: protected, or the posture is warn-only&quot;</span>,</span>
+<span class="ln" id="L1364">                    );</span>
+<span class="ln" id="L1365">                }</span>
+<span class="ln" id="L1366">            }</span>
+<span class="ln" id="L1367">        }</span>
+<span class="ln" id="L1368">        <span class="tok-kw">self</span>.failsafe_finding = <span class="tok-fn">Some</span>(finding);</span>
+<span class="ln" id="L1369">    }</span>
 </span>
-<span class="ln" id="L1351"></span>
+<span class="ln" id="L1370"></span>
 <span class="src-item" id="fn-veilvoiceapp-watch_indicator">
-<span class="ln" id="L1352">    <span class="tok-com">/// Re-scan on a timer rather than every frame.</span></span>
-<span class="ln" id="L1353">    <span class="tok-com">/// The always-visible indicator.</span></span>
-<span class="ln" id="L1354">    <span class="tok-kw">fn</span> <span class="tok-fn">watch_indicator</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> egui::Ui) {</span>
-<span class="ln" id="L1355">        <span class="tok-kw">let</span> support = <span class="tok-kw">self</span>.watch.<span class="tok-fn">support</span>();</span>
-<span class="ln" id="L1356">        <span class="tok-kw">if</span> !(support.microphone || support.camera) {</span>
-<span class="ln" id="L1357">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L1358">        }</span>
-<span class="ln" id="L1359">        <span class="tok-kw">let</span> active = <span class="tok-kw">self</span>.watch.<span class="tok-fn">active</span>();</span>
-<span class="ln" id="L1360">        <span class="tok-kw">if</span> active.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L1361">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L1362">        }</span>
-<span class="ln" id="L1363"></span>
-<span class="ln" id="L1364">        <span class="tok-kw">let</span> camera = active</span>
-<span class="ln" id="L1365">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L1366">            .<span class="tok-fn">any</span>(|u| u.kind == veilvoice_watch::DeviceKind::Camera);</span>
-<span class="ln" id="L1367">        <span class="tok-kw">let</span> colour = <span class="tok-kw">if</span> camera { p::<span class="tok-fn">red</span>() } <span class="tok-kw">else</span> { p::<span class="tok-fn">yellow</span>() };</span>
-<span class="ln" id="L1368">        <span class="tok-kw">let</span> names: Vec&lt;&amp;str&gt; = active.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|u| u.app.<span class="tok-fn">as_str</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1369">        <span class="tok-kw">let</span> label = format!(</span>
-<span class="ln" id="L1370">            <span class="tok-str">&quot;* {} IN USE - {}&quot;</span>,</span>
-<span class="ln" id="L1371">            <span class="tok-kw">if</span> camera { <span class="tok-str">&quot;CAMERA&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;MIC&quot;</span> },</span>
-<span class="ln" id="L1372">            names.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>)</span>
-<span class="ln" id="L1373">        );</span>
-<span class="ln" id="L1374"></span>
-<span class="ln" id="L1375">        <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L1376">            .<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(colour).<span class="tok-fn">small</span>().<span class="tok-fn">strong</span>())</span>
-<span class="ln" id="L1377">            .<span class="tok-fn">on_hover_text</span>(<span class="tok-str">&quot;Open the monitor tab for detail&quot;</span>)</span>
-<span class="ln" id="L1378">            .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L1379">        {</span>
-<span class="ln" id="L1380">            <span class="tok-kw">self</span>.tab = Tab::Watch;</span>
+<span class="ln" id="L1371">    <span class="tok-com">/// Re-scan on a timer rather than every frame.</span></span>
+<span class="ln" id="L1372">    <span class="tok-com">/// The always-visible indicator.</span></span>
+<span class="ln" id="L1373">    <span class="tok-kw">fn</span> <span class="tok-fn">watch_indicator</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> egui::Ui) {</span>
+<span class="ln" id="L1374">        <span class="tok-kw">let</span> support = <span class="tok-kw">self</span>.watch.<span class="tok-fn">support</span>();</span>
+<span class="ln" id="L1375">        <span class="tok-kw">if</span> !(support.microphone || support.camera) {</span>
+<span class="ln" id="L1376">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L1377">        }</span>
+<span class="ln" id="L1378">        <span class="tok-kw">let</span> active = <span class="tok-kw">self</span>.watch.<span class="tok-fn">active</span>();</span>
+<span class="ln" id="L1379">        <span class="tok-kw">if</span> active.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L1380">            <span class="tok-kw">return</span>;</span>
 <span class="ln" id="L1381">        }</span>
-<span class="ln" id="L1382">    }</span>
+<span class="ln" id="L1382"></span>
+<span class="ln" id="L1383">        <span class="tok-kw">let</span> camera = active</span>
+<span class="ln" id="L1384">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L1385">            .<span class="tok-fn">any</span>(|u| u.kind == veilvoice_watch::DeviceKind::Camera);</span>
+<span class="ln" id="L1386">        <span class="tok-kw">let</span> colour = <span class="tok-kw">if</span> camera { p::<span class="tok-fn">red</span>() } <span class="tok-kw">else</span> { p::<span class="tok-fn">yellow</span>() };</span>
+<span class="ln" id="L1387">        <span class="tok-kw">let</span> names: Vec&lt;&amp;str&gt; = active.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|u| u.app.<span class="tok-fn">as_str</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1388">        <span class="tok-kw">let</span> label = format!(</span>
+<span class="ln" id="L1389">            <span class="tok-str">&quot;* {} IN USE - {}&quot;</span>,</span>
+<span class="ln" id="L1390">            <span class="tok-kw">if</span> camera { <span class="tok-str">&quot;CAMERA&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;MIC&quot;</span> },</span>
+<span class="ln" id="L1391">            names.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>)</span>
+<span class="ln" id="L1392">        );</span>
+<span class="ln" id="L1393"></span>
+<span class="ln" id="L1394">        <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L1395">            .<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(colour).<span class="tok-fn">small</span>().<span class="tok-fn">strong</span>())</span>
+<span class="ln" id="L1396">            .<span class="tok-fn">on_hover_text</span>(<span class="tok-str">&quot;Open the monitor tab for detail&quot;</span>)</span>
+<span class="ln" id="L1397">            .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L1398">        {</span>
+<span class="ln" id="L1399">            <span class="tok-kw">self</span>.tab = Tab::Watch;</span>
+<span class="ln" id="L1400">        }</span>
+<span class="ln" id="L1401">    }</span>
 </span>
-<span class="ln" id="L1383"></span>
+<span class="ln" id="L1402"></span>
 <span class="src-item" id="fn-veilvoiceapp-watch_tab">
-<span class="ln" id="L1384">    <span class="tok-kw">fn</span> <span class="tok-fn">watch_tab</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> egui::Ui) {</span>
-<span class="ln" id="L1385">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L1386">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;What is listening&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L1387">        <span class="tok-kw">let</span> support = <span class="tok-kw">self</span>.watch.<span class="tok-fn">support</span>();</span>
-<span class="ln" id="L1388">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(support.explanation).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L1389"></span>
-<span class="ln" id="L1390">        <span class="tok-com">// An empty list from a platform that cannot see is not good news, and</span></span>
-<span class="ln" id="L1391">        <span class="tok-com">// must never be allowed to read like it.</span></span>
-<span class="ln" id="L1392">        <span class="tok-kw">if</span> !(support.microphone || support.camera) {</span>
-<span class="ln" id="L1393">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L1394">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L1395">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L1396">                    <span class="tok-str">&quot;This platform exposes no way to tell which application is using \</span></span>
-<span class="ln" id="L1397"><span class="tok-str">                     the microphone or camera, so nothing is shown. That is not the \</span></span>
-<span class="ln" id="L1398"><span class="tok-str">                     same as nothing being active.&quot;</span>,</span>
-<span class="ln" id="L1399">                )</span>
-<span class="ln" id="L1400">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L1401">            );</span>
-<span class="ln" id="L1402">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L1403">        }</span>
-<span class="ln" id="L1404"></span>
-<span class="ln" id="L1405">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(problem) = <span class="tok-kw">self</span>.watch.<span class="tok-fn">error</span>() {</span>
-<span class="ln" id="L1406">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(problem).<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()));</span>
-<span class="ln" id="L1407">        }</span>
+<span class="ln" id="L1403">    <span class="tok-kw">fn</span> <span class="tok-fn">watch_tab</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> egui::Ui) {</span>
+<span class="ln" id="L1404">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L1405">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;What is listening&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L1406">        <span class="tok-kw">let</span> support = <span class="tok-kw">self</span>.watch.<span class="tok-fn">support</span>();</span>
+<span class="ln" id="L1407">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(support.explanation).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
 <span class="ln" id="L1408"></span>
-<span class="ln" id="L1409">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L1410">        <span class="tok-kw">let</span> active: Vec&lt;_&gt; = <span class="tok-kw">self</span>.watch.<span class="tok-fn">active</span>().<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L1411">        <span class="tok-kw">if</span> active.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L1412">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Nothing is using the microphone or camera.&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>()));</span>
-<span class="ln" id="L1413">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1414">            <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> &amp;active {</span>
-<span class="ln" id="L1415">                <span class="tok-kw">let</span> colour = <span class="tok-kw">if</span> entry.kind == veilvoice_watch::DeviceKind::Camera {</span>
-<span class="ln" id="L1416">                    p::<span class="tok-fn">red</span>()</span>
-<span class="ln" id="L1417">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1418">                    p::<span class="tok-fn">yellow</span>()</span>
-<span class="ln" id="L1419">                };</span>
-<span class="ln" id="L1420">                ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L1421">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;*&quot;</span>).<span class="tok-fn">color</span>(colour));</span>
-<span class="ln" id="L1422">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(entry.<span class="tok-fn">describe</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
-<span class="ln" id="L1423">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(entry.kind.<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(colour).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L1424">                });</span>
-<span class="ln" id="L1425">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = &amp;entry.path {</span>
-<span class="ln" id="L1426">                    ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L1427">                        RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;    {path}&quot;</span>))</span>
-<span class="ln" id="L1428">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L1429">                            .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L1430">                    );</span>
-<span class="ln" id="L1431">                }</span>
-<span class="ln" id="L1432">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(held) = entry.<span class="tok-fn">held_for</span>() {</span>
-<span class="ln" id="L1433">                    ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L1434">                        RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;    held for {}s&quot;</span>, held.<span class="tok-fn">as_secs</span>()))</span>
-<span class="ln" id="L1435">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L1436">                            .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L1437">                    );</span>
-<span class="ln" id="L1438">                }</span>
-<span class="ln" id="L1439">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L1440">            }</span>
-<span class="ln" id="L1441">        }</span>
-<span class="ln" id="L1442"></span>
-<span class="ln" id="L1443">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.watch.<span class="tok-fn">log</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L1444">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
-<span class="ln" id="L1445">            ui.<span class="tok-fn">separator</span>();</span>
-<span class="ln" id="L1446">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Recent&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L1447">            egui::ScrollArea::<span class="tok-fn">vertical</span>()</span>
-<span class="ln" id="L1448">                .<span class="tok-fn">max_height</span>(<span class="tok-num">160.0</span>)</span>
-<span class="ln" id="L1449">                .<span class="tok-fn">show</span>(ui, |ui| {</span>
-<span class="ln" id="L1450">                    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">self</span>.watch.<span class="tok-fn">log</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">rev</span>() {</span>
-<span class="ln" id="L1451">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(line).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L1452">                    }</span>
-<span class="ln" id="L1453">                });</span>
-<span class="ln" id="L1454">        }</span>
-<span class="ln" id="L1455">    }</span>
+<span class="ln" id="L1409">        <span class="tok-com">// An empty list from a platform that cannot see is not good news, and</span></span>
+<span class="ln" id="L1410">        <span class="tok-com">// must never be allowed to read like it.</span></span>
+<span class="ln" id="L1411">        <span class="tok-kw">if</span> !(support.microphone || support.camera) {</span>
+<span class="ln" id="L1412">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L1413">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L1414">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L1415">                    <span class="tok-str">&quot;This platform exposes no way to tell which application is using \</span></span>
+<span class="ln" id="L1416"><span class="tok-str">                     the microphone or camera, so nothing is shown. That is not the \</span></span>
+<span class="ln" id="L1417"><span class="tok-str">                     same as nothing being active.&quot;</span>,</span>
+<span class="ln" id="L1418">                )</span>
+<span class="ln" id="L1419">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L1420">            );</span>
+<span class="ln" id="L1421">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L1422">        }</span>
+<span class="ln" id="L1423"></span>
+<span class="ln" id="L1424">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(problem) = <span class="tok-kw">self</span>.watch.<span class="tok-fn">error</span>() {</span>
+<span class="ln" id="L1425">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(problem).<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()));</span>
+<span class="ln" id="L1426">        }</span>
+<span class="ln" id="L1427"></span>
+<span class="ln" id="L1428">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L1429">        <span class="tok-kw">let</span> active: Vec&lt;_&gt; = <span class="tok-kw">self</span>.watch.<span class="tok-fn">active</span>().<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L1430">        <span class="tok-kw">if</span> active.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L1431">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Nothing is using the microphone or camera.&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>()));</span>
+<span class="ln" id="L1432">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1433">            <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> &amp;active {</span>
+<span class="ln" id="L1434">                <span class="tok-kw">let</span> colour = <span class="tok-kw">if</span> entry.kind == veilvoice_watch::DeviceKind::Camera {</span>
+<span class="ln" id="L1435">                    p::<span class="tok-fn">red</span>()</span>
+<span class="ln" id="L1436">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1437">                    p::<span class="tok-fn">yellow</span>()</span>
+<span class="ln" id="L1438">                };</span>
+<span class="ln" id="L1439">                ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L1440">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;*&quot;</span>).<span class="tok-fn">color</span>(colour));</span>
+<span class="ln" id="L1441">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(entry.<span class="tok-fn">describe</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
+<span class="ln" id="L1442">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(entry.kind.<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(colour).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L1443">                });</span>
+<span class="ln" id="L1444">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = &amp;entry.path {</span>
+<span class="ln" id="L1445">                    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L1446">                        RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;    {path}&quot;</span>))</span>
+<span class="ln" id="L1447">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L1448">                            .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L1449">                    );</span>
+<span class="ln" id="L1450">                }</span>
+<span class="ln" id="L1451">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(held) = entry.<span class="tok-fn">held_for</span>() {</span>
+<span class="ln" id="L1452">                    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L1453">                        RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;    held for {}s&quot;</span>, held.<span class="tok-fn">as_secs</span>()))</span>
+<span class="ln" id="L1454">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L1455">                            .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L1456">                    );</span>
+<span class="ln" id="L1457">                }</span>
+<span class="ln" id="L1458">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L1459">            }</span>
+<span class="ln" id="L1460">        }</span>
+<span class="ln" id="L1461"></span>
+<span class="ln" id="L1462">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.watch.<span class="tok-fn">log</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L1463">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
+<span class="ln" id="L1464">            ui.<span class="tok-fn">separator</span>();</span>
+<span class="ln" id="L1465">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Recent&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L1466">            egui::ScrollArea::<span class="tok-fn">vertical</span>()</span>
+<span class="ln" id="L1467">                .<span class="tok-fn">max_height</span>(<span class="tok-num">160.0</span>)</span>
+<span class="ln" id="L1468">                .<span class="tok-fn">show</span>(ui, |ui| {</span>
+<span class="ln" id="L1469">                    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">self</span>.watch.<span class="tok-fn">log</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">rev</span>() {</span>
+<span class="ln" id="L1470">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(line).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L1471">                    }</span>
+<span class="ln" id="L1472">                });</span>
+<span class="ln" id="L1473">        }</span>
+<span class="ln" id="L1474">    }</span>
 </span>
-<span class="ln" id="L1456"></span>
+<span class="ln" id="L1475"></span>
 <span class="src-item" id="fn-veilvoiceapp-previous_crash">
-<span class="ln" id="L1457">    <span class="tok-com">/// Say so if the last run ended badly, and offer the file.</span></span>
-<span class="ln" id="L1458">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1459">    <span class="tok-com">/// A report written to disk that nobody is told about is a report nobody</span></span>
-<span class="ln" id="L1460">    <span class="tok-com">/// reads. The crash log exists because this application had no way at all</span></span>
-<span class="ln" id="L1461">    <span class="tok-com">/// to explain a failure -- no console, and an abort on panic -- and leaving</span></span>
-<span class="ln" id="L1462">    <span class="tok-com">/// its output for the user to stumble across would only half fix that.</span></span>
-<span class="ln" id="L1463">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1464">    <span class="tok-com">/// Shown in the about tab rather than as a modal on launch: the previous</span></span>
-<span class="ln" id="L1465">    <span class="tok-com">/// run failing is worth knowing and is not worth a dialog in front of</span></span>
-<span class="ln" id="L1466">    <span class="tok-com">/// somebody who has just successfully opened the application.</span></span>
-<span class="ln" id="L1467">    <span class="tok-kw">fn</span> <span class="tok-fn">previous_crash</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> egui::Ui) {</span>
-<span class="ln" id="L1468">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((path, _)) = <span class="tok-kw">crate</span>::crashlog::<span class="tok-fn">previous</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1469">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L1470">        };</span>
-<span class="ln" id="L1471">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L1472">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L1473">                RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;The previous run ended unexpectedly.&quot;</span>)</span>
-<span class="ln" id="L1474">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
-<span class="ln" id="L1475">                    .<span class="tok-fn">strong</span>(),</span>
-<span class="ln" id="L1476">            );</span>
-<span class="ln" id="L1477">        });</span>
-<span class="ln" id="L1478">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L1479">            RichText::<span class="tok-fn">new</span>(format!(</span>
-<span class="ln" id="L1480">                <span class="tok-str">&quot;A report was written to {}. It was written on this machine and sent \n                 nowhere. VeilVoice has no network code at all.&quot;</span>,</span>
-<span class="ln" id="L1481">                path.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L1482">            ))</span>
-<span class="ln" id="L1483">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L1484">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
-<span class="ln" id="L1485">        );</span>
-<span class="ln" id="L1486">        <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;dismiss this notice&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L1487">            <span class="tok-kw">crate</span>::crashlog::<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L1488">        }</span>
-<span class="ln" id="L1489">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L1490">    }</span>
+<span class="ln" id="L1476">    <span class="tok-com">/// Say so if the last run ended badly, and offer the file.</span></span>
+<span class="ln" id="L1477">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1478">    <span class="tok-com">/// A report written to disk that nobody is told about is a report nobody</span></span>
+<span class="ln" id="L1479">    <span class="tok-com">/// reads. The crash log exists because this application had no way at all</span></span>
+<span class="ln" id="L1480">    <span class="tok-com">/// to explain a failure -- no console, and an abort on panic -- and leaving</span></span>
+<span class="ln" id="L1481">    <span class="tok-com">/// its output for the user to stumble across would only half fix that.</span></span>
+<span class="ln" id="L1482">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1483">    <span class="tok-com">/// Shown in the about tab rather than as a modal on launch: the previous</span></span>
+<span class="ln" id="L1484">    <span class="tok-com">/// run failing is worth knowing and is not worth a dialog in front of</span></span>
+<span class="ln" id="L1485">    <span class="tok-com">/// somebody who has just successfully opened the application.</span></span>
+<span class="ln" id="L1486">    <span class="tok-kw">fn</span> <span class="tok-fn">previous_crash</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> egui::Ui) {</span>
+<span class="ln" id="L1487">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((path, _)) = <span class="tok-kw">crate</span>::crashlog::<span class="tok-fn">previous</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1488">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L1489">        };</span>
+<span class="ln" id="L1490">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L1491">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L1492">                RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;The previous run ended unexpectedly.&quot;</span>)</span>
+<span class="ln" id="L1493">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
+<span class="ln" id="L1494">                    .<span class="tok-fn">strong</span>(),</span>
+<span class="ln" id="L1495">            );</span>
+<span class="ln" id="L1496">        });</span>
+<span class="ln" id="L1497">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L1498">            RichText::<span class="tok-fn">new</span>(format!(</span>
+<span class="ln" id="L1499">                <span class="tok-str">&quot;A report was written to {}. It was written on this machine and sent \n                 nowhere. VeilVoice has no network code at all.&quot;</span>,</span>
+<span class="ln" id="L1500">                path.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L1501">            ))</span>
+<span class="ln" id="L1502">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L1503">            .<span class="tok-fn">size</span>(<span class="tok-num">12.0</span>),</span>
+<span class="ln" id="L1504">        );</span>
+<span class="ln" id="L1505">        <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;dismiss this notice&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L1506">            <span class="tok-kw">crate</span>::crashlog::<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L1507">        }</span>
+<span class="ln" id="L1508">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L1509">    }</span>
 </span>
-<span class="ln" id="L1491"></span>
+<span class="ln" id="L1510"></span>
 <span class="src-item" id="fn-veilvoiceapp-about_tab">
-<span class="ln" id="L1492">    <span class="tok-kw">fn</span> <span class="tok-fn">about_tab</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> egui::Ui) {</span>
-<span class="ln" id="L1493">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L1494">        <span class="tok-kw">self</span>.<span class="tok-fn">previous_crash</span>(ui);</span>
-<span class="ln" id="L1495">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;app&quot;</span>, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>));</span>
-<span class="ln" id="L1496">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;engine&quot;</span>, veilvoice_core::VERSION);</span>
-<span class="ln" id="L1497">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;audio&quot;</span>, veilvoice_audio::VERSION);</span>
-<span class="ln" id="L1498">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;metadata&quot;</span>, veilvoice_meta::VERSION);</span>
-<span class="ln" id="L1499">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;monitor&quot;</span>, veilvoice_watch::VERSION);</span>
-<span class="ln" id="L1500">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;crypto&quot;</span>, veilvoice_crypto::VERSION);</span>
-<span class="ln" id="L1501">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;licence&quot;</span>, <span class="tok-str">&quot;GPL-3.0-or-later&quot;</span>);</span>
-<span class="ln" id="L1502">        <span class="tok-com">// Precise rather than short. &quot;None&quot; stopped being true the moment the</span></span>
-<span class="ln" id="L1503">        <span class="tok-com">// update button existed, and a version string that overstates the thing</span></span>
-<span class="ln" id="L1504">        <span class="tok-com">// it is printed beside is worse than no version screen at all.</span></span>
-<span class="ln" id="L1505">        <span class="tok-fn">field</span>(</span>
-<span class="ln" id="L1506">            ui,</span>
-<span class="ln" id="L1507">            <span class="tok-str">&quot;network access&quot;</span>,</span>
-<span class="ln" id="L1508">            <span class="tok-str">&quot;none, except the update check you press&quot;</span>,</span>
-<span class="ln" id="L1509">        );</span>
-<span class="ln" id="L1510">        <span class="tok-fn">field</span>(</span>
-<span class="ln" id="L1511">            ui,</span>
-<span class="ln" id="L1512">            <span class="tok-str">&quot;typeface&quot;</span>,</span>
-<span class="ln" id="L1513">            <span class="tok-kw">if</span> <span class="tok-kw">self</span>.jetbrains {</span>
-<span class="ln" id="L1514">                <span class="tok-str">&quot;JetBrains Mono&quot;</span></span>
-<span class="ln" id="L1515">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1516">                <span class="tok-str">&quot;built-in monospace&quot;</span></span>
-<span class="ln" id="L1517">            },</span>
-<span class="ln" id="L1518">        );</span>
-<span class="ln" id="L1519"></span>
-<span class="ln" id="L1520">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
-<span class="ln" id="L1521">        <span class="tok-kw">self</span>.updates.<span class="tok-fn">section</span>(ui, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>));</span>
-<span class="ln" id="L1522"></span>
-<span class="ln" id="L1523">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
-<span class="ln" id="L1524">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;What this protects&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L1525">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L1526">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L1527">                <span class="tok-str">&quot;The biometric voiceprint (pitch, formants, timbre, micro-timing and \</span></span>
-<span class="ln" id="L1528"><span class="tok-str">                 the melody of an accent) is destroyed and cannot be recovered from the \</span></span>
-<span class="ln" id="L1529"><span class="tok-str">                 output. Each frame&#x27;s measured phase is discarded, and every speaker is \</span></span>
-<span class="ln" id="L1530"><span class="tok-str">                 mapped onto one canonical register and vocal tract.&quot;</span>,</span>
-<span class="ln" id="L1531">            )</span>
-<span class="ln" id="L1532">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
-<span class="ln" id="L1533">        );</span>
-<span class="ln" id="L1534"></span>
-<span class="ln" id="L1535">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L1536">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L1537">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;What it does not do&quot;</span>)</span>
-<span class="ln" id="L1538">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
-<span class="ln" id="L1539">                .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L1540">        );</span>
-<span class="ln" id="L1541">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L1542">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L1543">                <span class="tok-str">&quot;The words are preserved on purpose, so de-identification alone does \</span></span>
-<span class="ln" id="L1544"><span class="tok-str">                 not keep the message secret, which is why the result is encrypted at \</span></span>
-<span class="ln" id="L1545"><span class="tok-str">                 rest by default. Nor can any signal-level transform change which \</span></span>
-<span class="ln" id="L1546"><span class="tok-str">                 phonemes you produced, so a strong regional accent may still be \</span></span>
-<span class="ln" id="L1547"><span class="tok-str">                 audible even though its melody is gone.&quot;</span>,</span>
-<span class="ln" id="L1548">            )</span>
-<span class="ln" id="L1549">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
-<span class="ln" id="L1550">        );</span>
-<span class="ln" id="L1551"></span>
-<span class="ln" id="L1552">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L1553">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;The app lock&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L1554">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(veilvoice_crypto::lock::SCOPE).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
-<span class="ln" id="L1555"></span>
-<span class="ln" id="L1556">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
-<span class="ln" id="L1557">        <span class="tok-kw">self</span>.policy.<span class="tok-fn">panel</span>(ui);</span>
-<span class="ln" id="L1558">    }</span>
+<span class="ln" id="L1511">    <span class="tok-kw">fn</span> <span class="tok-fn">about_tab</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> egui::Ui) {</span>
+<span class="ln" id="L1512">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L1513">        <span class="tok-kw">self</span>.<span class="tok-fn">previous_crash</span>(ui);</span>
+<span class="ln" id="L1514">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;app&quot;</span>, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>));</span>
+<span class="ln" id="L1515">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;engine&quot;</span>, veilvoice_core::VERSION);</span>
+<span class="ln" id="L1516">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;audio&quot;</span>, veilvoice_audio::VERSION);</span>
+<span class="ln" id="L1517">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;metadata&quot;</span>, veilvoice_meta::VERSION);</span>
+<span class="ln" id="L1518">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;monitor&quot;</span>, veilvoice_watch::VERSION);</span>
+<span class="ln" id="L1519">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;crypto&quot;</span>, veilvoice_crypto::VERSION);</span>
+<span class="ln" id="L1520">        <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;licence&quot;</span>, <span class="tok-str">&quot;GPL-3.0-or-later&quot;</span>);</span>
+<span class="ln" id="L1521">        <span class="tok-com">// Precise rather than short. &quot;None&quot; stopped being true the moment the</span></span>
+<span class="ln" id="L1522">        <span class="tok-com">// update button existed, and a version string that overstates the thing</span></span>
+<span class="ln" id="L1523">        <span class="tok-com">// it is printed beside is worse than no version screen at all.</span></span>
+<span class="ln" id="L1524">        <span class="tok-fn">field</span>(</span>
+<span class="ln" id="L1525">            ui,</span>
+<span class="ln" id="L1526">            <span class="tok-str">&quot;network access&quot;</span>,</span>
+<span class="ln" id="L1527">            <span class="tok-str">&quot;none, except the update check you press&quot;</span>,</span>
+<span class="ln" id="L1528">        );</span>
+<span class="ln" id="L1529">        <span class="tok-fn">field</span>(</span>
+<span class="ln" id="L1530">            ui,</span>
+<span class="ln" id="L1531">            <span class="tok-str">&quot;typeface&quot;</span>,</span>
+<span class="ln" id="L1532">            <span class="tok-kw">if</span> <span class="tok-kw">self</span>.jetbrains {</span>
+<span class="ln" id="L1533">                <span class="tok-str">&quot;JetBrains Mono&quot;</span></span>
+<span class="ln" id="L1534">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1535">                <span class="tok-str">&quot;built-in monospace&quot;</span></span>
+<span class="ln" id="L1536">            },</span>
+<span class="ln" id="L1537">        );</span>
+<span class="ln" id="L1538"></span>
+<span class="ln" id="L1539">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
+<span class="ln" id="L1540">        <span class="tok-kw">self</span>.updates.<span class="tok-fn">section</span>(ui, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>));</span>
+<span class="ln" id="L1541"></span>
+<span class="ln" id="L1542">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
+<span class="ln" id="L1543">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;What this protects&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L1544">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L1545">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L1546">                <span class="tok-str">&quot;The biometric voiceprint (pitch, formants, timbre, micro-timing and \</span></span>
+<span class="ln" id="L1547"><span class="tok-str">                 the melody of an accent) is destroyed and cannot be recovered from the \</span></span>
+<span class="ln" id="L1548"><span class="tok-str">                 output. Each frame&#x27;s measured phase is discarded, and every speaker is \</span></span>
+<span class="ln" id="L1549"><span class="tok-str">                 mapped onto one canonical register and vocal tract.&quot;</span>,</span>
+<span class="ln" id="L1550">            )</span>
+<span class="ln" id="L1551">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
+<span class="ln" id="L1552">        );</span>
+<span class="ln" id="L1553"></span>
+<span class="ln" id="L1554">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L1555">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L1556">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;What it does not do&quot;</span>)</span>
+<span class="ln" id="L1557">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
+<span class="ln" id="L1558">                .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L1559">        );</span>
+<span class="ln" id="L1560">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L1561">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L1562">                <span class="tok-str">&quot;The words are preserved on purpose, so de-identification alone does \</span></span>
+<span class="ln" id="L1563"><span class="tok-str">                 not keep the message secret, which is why the result is encrypted at \</span></span>
+<span class="ln" id="L1564"><span class="tok-str">                 rest by default. Nor can any signal-level transform change which \</span></span>
+<span class="ln" id="L1565"><span class="tok-str">                 phonemes you produced, so a strong regional accent may still be \</span></span>
+<span class="ln" id="L1566"><span class="tok-str">                 audible even though its melody is gone.&quot;</span>,</span>
+<span class="ln" id="L1567">            )</span>
+<span class="ln" id="L1568">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
+<span class="ln" id="L1569">        );</span>
+<span class="ln" id="L1570"></span>
+<span class="ln" id="L1571">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L1572">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;The app lock&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L1573">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(veilvoice_crypto::lock::SCOPE).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
+<span class="ln" id="L1574"></span>
+<span class="ln" id="L1575">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
+<span class="ln" id="L1576">        <span class="tok-kw">self</span>.policy.<span class="tok-fn">panel</span>(ui);</span>
+<span class="ln" id="L1577">    }</span>
 </span>
-<span class="ln" id="L1559">}</span>
-<span class="ln" id="L1560"></span>
+<span class="ln" id="L1578">}</span>
+<span class="ln" id="L1579"></span>
 <span class="src-item" id="fn-device_picker">
-<span class="ln" id="L1561"><span class="tok-kw">fn</span> <span class="tok-fn">device_picker</span>(</span>
-<span class="ln" id="L1562">    ui: &amp;<span class="tok-kw">mut</span> egui::Ui,</span>
-<span class="ln" id="L1563">    label: &amp;str,</span>
-<span class="ln" id="L1564">    devices: &amp;[devices::DeviceInfo],</span>
-<span class="ln" id="L1565">    chosen: &amp;<span class="tok-kw">mut</span> Option&lt;String&gt;,</span>
-<span class="ln" id="L1566">) {</span>
-<span class="ln" id="L1567">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L1568">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L1569">        <span class="tok-kw">let</span> current = chosen.<span class="tok-fn">clone</span>().<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;system default&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L1570">        egui::ComboBox::<span class="tok-fn">from_id_salt</span>(label)</span>
-<span class="ln" id="L1571">            .<span class="tok-fn">width</span>(<span class="tok-num">360.0</span>)</span>
-<span class="ln" id="L1572">            .<span class="tok-fn">selected_text</span>(RichText::<span class="tok-fn">new</span>(current).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()))</span>
-<span class="ln" id="L1573">            .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
-<span class="ln" id="L1574">                ui.<span class="tok-fn">selectable_value</span>(chosen, None, <span class="tok-str">&quot;system default&quot;</span>);</span>
-<span class="ln" id="L1575">                <span class="tok-kw">for</span> device <span class="tok-kw">in</span> devices {</span>
-<span class="ln" id="L1576">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> text = device.name.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L1577">                    <span class="tok-kw">if</span> device.is_virtual_cable {</span>
-<span class="ln" id="L1578">                        text.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;  &#183;  virtual cable&quot;</span>);</span>
-<span class="ln" id="L1579">                    }</span>
-<span class="ln" id="L1580">                    ui.<span class="tok-fn">selectable_value</span>(chosen, <span class="tok-fn">Some</span>(device.name.<span class="tok-fn">clone</span>()), text);</span>
-<span class="ln" id="L1581">                }</span>
-<span class="ln" id="L1582">            });</span>
-<span class="ln" id="L1583">    });</span>
-<span class="ln" id="L1584">}</span>
+<span class="ln" id="L1580"><span class="tok-kw">fn</span> <span class="tok-fn">device_picker</span>(</span>
+<span class="ln" id="L1581">    ui: &amp;<span class="tok-kw">mut</span> egui::Ui,</span>
+<span class="ln" id="L1582">    label: &amp;str,</span>
+<span class="ln" id="L1583">    devices: &amp;[devices::DeviceInfo],</span>
+<span class="ln" id="L1584">    chosen: &amp;<span class="tok-kw">mut</span> Option&lt;String&gt;,</span>
+<span class="ln" id="L1585">) {</span>
+<span class="ln" id="L1586">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L1587">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L1588">        <span class="tok-kw">let</span> current = chosen.<span class="tok-fn">clone</span>().<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;system default&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L1589">        egui::ComboBox::<span class="tok-fn">from_id_salt</span>(label)</span>
+<span class="ln" id="L1590">            .<span class="tok-fn">width</span>(<span class="tok-num">360.0</span>)</span>
+<span class="ln" id="L1591">            .<span class="tok-fn">selected_text</span>(RichText::<span class="tok-fn">new</span>(current).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()))</span>
+<span class="ln" id="L1592">            .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
+<span class="ln" id="L1593">                ui.<span class="tok-fn">selectable_value</span>(chosen, None, <span class="tok-str">&quot;system default&quot;</span>);</span>
+<span class="ln" id="L1594">                <span class="tok-kw">for</span> device <span class="tok-kw">in</span> devices {</span>
+<span class="ln" id="L1595">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> text = device.name.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L1596">                    <span class="tok-kw">if</span> device.is_virtual_cable {</span>
+<span class="ln" id="L1597">                        text.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;  &#183;  virtual cable&quot;</span>);</span>
+<span class="ln" id="L1598">                    }</span>
+<span class="ln" id="L1599">                    ui.<span class="tok-fn">selectable_value</span>(chosen, <span class="tok-fn">Some</span>(device.name.<span class="tok-fn">clone</span>()), text);</span>
+<span class="ln" id="L1600">                }</span>
+<span class="ln" id="L1601">            });</span>
+<span class="ln" id="L1602">    });</span>
+<span class="ln" id="L1603">}</span>
 </span>
-<span class="ln" id="L1585"></span>
+<span class="ln" id="L1604"></span>
 <span class="src-item" id="fn-field">
-<span class="ln" id="L1586"><span class="tok-kw">fn</span> <span class="tok-fn">field</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, label: &amp;str, value: &amp;str) {</span>
-<span class="ln" id="L1587">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L1588">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{label:&lt;18}&quot;</span>)).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L1589">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(value).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()));</span>
-<span class="ln" id="L1590">    });</span>
-<span class="ln" id="L1591">}</span>
+<span class="ln" id="L1605"><span class="tok-kw">fn</span> <span class="tok-fn">field</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, label: &amp;str, value: &amp;str) {</span>
+<span class="ln" id="L1606">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L1607">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{label:&lt;18}&quot;</span>)).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L1608">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(value).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()));</span>
+<span class="ln" id="L1609">    });</span>
+<span class="ln" id="L1610">}</span>
 </span>
-<span class="ln" id="L1592"></span>
+<span class="ln" id="L1611"></span>
 <span class="src-item" id="fn-meter">
-<span class="ln" id="L1593"><span class="tok-com">/// One level meter: a bar on the decibel scale, and the number beside it.</span></span>
-<span class="ln" id="L1594"><span class="tok-com">///</span></span>
-<span class="ln" id="L1595"><span class="tok-com">/// This was a **linear** bar with a decibel number printed next to it, which is</span></span>
-<span class="ln" id="L1596"><span class="tok-com">/// a meter arguing with itself: the number said -12 dB and the bar showed a</span></span>
-<span class="ln" id="L1597"><span class="tok-com">/// quarter. Ordinary speech at a sensible recording level peaks near -12 dBFS,</span></span>
-<span class="ln" id="L1598"><span class="tok-com">/// so the bar read as near-silence and the only way to fill it was to clip.</span></span>
-<span class="ln" id="L1599"><span class="tok-com">///</span></span>
-<span class="ln" id="L1600"><span class="tok-com">/// The scale now comes from `veilvoice_audio::meter`, which is where the peaks</span></span>
-<span class="ln" id="L1601"><span class="tok-com">/// come from, so this bar and the terminal&#x27;s are the same bar. `hold` is the</span></span>
-<span class="ln" id="L1602"><span class="tok-com">/// highest level of the last moment or so, drawn as a mark: a transient is over</span></span>
-<span class="ln" id="L1603"><span class="tok-com">/// before an eye finishes moving, and a bar showing only *now* cannot show one.</span></span>
-<span class="ln" id="L1604"><span class="tok-kw">fn</span> <span class="tok-fn">meter</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, label: &amp;str, peak: f32, hold: f32) {</span>
-<span class="ln" id="L1605">    <span class="tok-kw">use</span> veilvoice_audio::meter;</span>
-<span class="ln" id="L1606"></span>
-<span class="ln" id="L1607">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L1608">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L1609">        <span class="tok-kw">let</span> (rect, _) = ui.<span class="tok-fn">allocate_exact_size</span>(egui::<span class="tok-fn">vec2</span>(<span class="tok-num">280.0</span>, <span class="tok-num">12.0</span>), egui::Sense::<span class="tok-fn">hover</span>());</span>
-<span class="ln" id="L1610">        <span class="tok-kw">let</span> painter = ui.<span class="tok-fn">painter</span>();</span>
-<span class="ln" id="L1611">        painter.<span class="tok-fn">rect_filled</span>(rect, <span class="tok-num">2.0</span>, p::<span class="tok-fn">bg_dark</span>());</span>
-<span class="ln" id="L1612"></span>
-<span class="ln" id="L1613">        <span class="tok-kw">let</span> db = meter::<span class="tok-fn">dbfs</span>(peak);</span>
-<span class="ln" id="L1614">        <span class="tok-kw">let</span> colour = <span class="tok-kw">if</span> meter::<span class="tok-fn">clipping</span>(peak) {</span>
-<span class="ln" id="L1615">            p::<span class="tok-fn">red</span>()</span>
-<span class="ln" id="L1616">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> db &gt;= -<span class="tok-num">6.0</span> {</span>
-<span class="ln" id="L1617">            p::<span class="tok-fn">yellow</span>()</span>
-<span class="ln" id="L1618">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> db &gt;= -<span class="tok-num">40.0</span> {</span>
-<span class="ln" id="L1619">            p::<span class="tok-fn">green</span>()</span>
-<span class="ln" id="L1620">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1621">            <span class="tok-com">// Below -40 the signal is room tone rather than speech. Drawn muted,</span></span>
-<span class="ln" id="L1622">            <span class="tok-com">// so a quiet room does not read as a working microphone.</span></span>
-<span class="ln" id="L1623">            p::<span class="tok-fn">muted</span>()</span>
-<span class="ln" id="L1624">        };</span>
-<span class="ln" id="L1625">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> filled = rect;</span>
-<span class="ln" id="L1626">        filled.<span class="tok-fn">set_width</span>(rect.<span class="tok-fn">width</span>() * meter::<span class="tok-fn">position</span>(peak));</span>
-<span class="ln" id="L1627">        painter.<span class="tok-fn">rect_filled</span>(filled, <span class="tok-num">2.0</span>, colour);</span>
-<span class="ln" id="L1628"></span>
-<span class="ln" id="L1629">        <span class="tok-com">// The held peak, as a hairline. Only where the bar is empty: inside the</span></span>
-<span class="ln" id="L1630">        <span class="tok-com">// fill it would be saying what the fill already says.</span></span>
-<span class="ln" id="L1631">        <span class="tok-kw">if</span> meter::<span class="tok-fn">position</span>(hold) &gt; meter::<span class="tok-fn">position</span>(peak) {</span>
-<span class="ln" id="L1632">            <span class="tok-kw">let</span> x = rect.<span class="tok-fn">left</span>() + rect.<span class="tok-fn">width</span>() * meter::<span class="tok-fn">position</span>(hold);</span>
-<span class="ln" id="L1633">            painter.<span class="tok-fn">line_segment</span>(</span>
-<span class="ln" id="L1634">                [egui::<span class="tok-fn">pos2</span>(x, rect.<span class="tok-fn">top</span>()), egui::<span class="tok-fn">pos2</span>(x, rect.<span class="tok-fn">bottom</span>())],</span>
-<span class="ln" id="L1635">                egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.5</span>, p::<span class="tok-fn">fg</span>()),</span>
-<span class="ln" id="L1636">            );</span>
-<span class="ln" id="L1637">        }</span>
-<span class="ln" id="L1638"></span>
-<span class="ln" id="L1639">        painter.<span class="tok-fn">rect_stroke</span>(rect, <span class="tok-num">2.0</span>, egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()));</span>
-<span class="ln" id="L1640"></span>
-<span class="ln" id="L1641">        <span class="tok-kw">let</span> text = <span class="tok-kw">if</span> db &lt;= meter::FLOOR_DB {</span>
-<span class="ln" id="L1642">            <span class="tok-str">&quot;  -inf dBFS&quot;</span>.<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L1643">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1644">            format!(<span class="tok-str">&quot;{db:&gt;6.1} dBFS&quot;</span>)</span>
-<span class="ln" id="L1645">        };</span>
-<span class="ln" id="L1646">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">color</span>(<span class="tok-kw">if</span> meter::<span class="tok-fn">clipping</span>(peak) {</span>
-<span class="ln" id="L1647">            p::<span class="tok-fn">red</span>()</span>
-<span class="ln" id="L1648">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1649">            p::<span class="tok-fn">muted</span>()</span>
-<span class="ln" id="L1650">        }));</span>
-<span class="ln" id="L1651">    });</span>
-<span class="ln" id="L1652">}</span>
-</span>
-<span class="ln" id="L1653"></span>
-<span class="ln" id="L1654"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L1655"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L1656">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L1612"><span class="tok-com">/// One level meter: a bar on the decibel scale, and the number beside it.</span></span>
+<span class="ln" id="L1613"><span class="tok-com">///</span></span>
+<span class="ln" id="L1614"><span class="tok-com">/// This was a **linear** bar with a decibel number printed next to it, which is</span></span>
+<span class="ln" id="L1615"><span class="tok-com">/// a meter arguing with itself: the number said -12 dB and the bar showed a</span></span>
+<span class="ln" id="L1616"><span class="tok-com">/// quarter. Ordinary speech at a sensible recording level peaks near -12 dBFS,</span></span>
+<span class="ln" id="L1617"><span class="tok-com">/// so the bar read as near-silence and the only way to fill it was to clip.</span></span>
+<span class="ln" id="L1618"><span class="tok-com">///</span></span>
+<span class="ln" id="L1619"><span class="tok-com">/// The scale now comes from `veilvoice_audio::meter`, which is where the peaks</span></span>
+<span class="ln" id="L1620"><span class="tok-com">/// come from, so this bar and the terminal&#x27;s are the same bar. `hold` is the</span></span>
+<span class="ln" id="L1621"><span class="tok-com">/// highest level of the last moment or so, drawn as a mark: a transient is over</span></span>
+<span class="ln" id="L1622"><span class="tok-com">/// before an eye finishes moving, and a bar showing only *now* cannot show one.</span></span>
+<span class="ln" id="L1623"><span class="tok-kw">fn</span> <span class="tok-fn">meter</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, label: &amp;str, peak: f32, hold: f32) {</span>
+<span class="ln" id="L1624">    <span class="tok-kw">use</span> veilvoice_audio::meter;</span>
+<span class="ln" id="L1625"></span>
+<span class="ln" id="L1626">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L1627">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L1628">        <span class="tok-kw">let</span> (rect, _) = ui.<span class="tok-fn">allocate_exact_size</span>(egui::<span class="tok-fn">vec2</span>(<span class="tok-num">280.0</span>, <span class="tok-num">12.0</span>), egui::Sense::<span class="tok-fn">hover</span>());</span>
+<span class="ln" id="L1629">        <span class="tok-kw">let</span> painter = ui.<span class="tok-fn">painter</span>();</span>
+<span class="ln" id="L1630">        painter.<span class="tok-fn">rect_filled</span>(rect, <span class="tok-num">2.0</span>, p::<span class="tok-fn">bg_dark</span>());</span>
+<span class="ln" id="L1631"></span>
+<span class="ln" id="L1632">        <span class="tok-kw">let</span> db = meter::<span class="tok-fn">dbfs</span>(peak);</span>
+<span class="ln" id="L1633">        <span class="tok-kw">let</span> colour = <span class="tok-kw">if</span> meter::<span class="tok-fn">clipping</span>(peak) {</span>
+<span class="ln" id="L1634">            p::<span class="tok-fn">red</span>()</span>
+<span class="ln" id="L1635">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> db &gt;= -<span class="tok-num">6.0</span> {</span>
+<span class="ln" id="L1636">            p::<span class="tok-fn">yellow</span>()</span>
+<span class="ln" id="L1637">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> db &gt;= -<span class="tok-num">40.0</span> {</span>
+<span class="ln" id="L1638">            p::<span class="tok-fn">green</span>()</span>
+<span class="ln" id="L1639">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1640">            <span class="tok-com">// Below -40 the signal is room tone rather than speech. Drawn muted,</span></span>
+<span class="ln" id="L1641">            <span class="tok-com">// so a quiet room does not read as a working microphone.</span></span>
+<span class="ln" id="L1642">            p::<span class="tok-fn">muted</span>()</span>
+<span class="ln" id="L1643">        };</span>
+<span class="ln" id="L1644">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> filled = rect;</span>
+<span class="ln" id="L1645">        filled.<span class="tok-fn">set_width</span>(rect.<span class="tok-fn">width</span>() * meter::<span class="tok-fn">position</span>(peak));</span>
+<span class="ln" id="L1646">        painter.<span class="tok-fn">rect_filled</span>(filled, <span class="tok-num">2.0</span>, colour);</span>
+<span class="ln" id="L1647"></span>
+<span class="ln" id="L1648">        <span class="tok-com">// The held peak, as a hairline. Only where the bar is empty: inside the</span></span>
+<span class="ln" id="L1649">        <span class="tok-com">// fill it would be saying what the fill already says.</span></span>
+<span class="ln" id="L1650">        <span class="tok-kw">if</span> meter::<span class="tok-fn">position</span>(hold) &gt; meter::<span class="tok-fn">position</span>(peak) {</span>
+<span class="ln" id="L1651">            <span class="tok-kw">let</span> x = rect.<span class="tok-fn">left</span>() + rect.<span class="tok-fn">width</span>() * meter::<span class="tok-fn">position</span>(hold);</span>
+<span class="ln" id="L1652">            painter.<span class="tok-fn">line_segment</span>(</span>
+<span class="ln" id="L1653">                [egui::<span class="tok-fn">pos2</span>(x, rect.<span class="tok-fn">top</span>()), egui::<span class="tok-fn">pos2</span>(x, rect.<span class="tok-fn">bottom</span>())],</span>
+<span class="ln" id="L1654">                egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.5</span>, p::<span class="tok-fn">fg</span>()),</span>
+<span class="ln" id="L1655">            );</span>
+<span class="ln" id="L1656">        }</span>
 <span class="ln" id="L1657"></span>
-<span class="ln" id="L1658">    <span class="tok-com">/// Every tab has a name, they are unique, and they round trip. The</span></span>
-<span class="ln" id="L1659">    <span class="tok-com">/// screenshot tool names each picture after one of these, so a change here</span></span>
-<span class="ln" id="L1660">    <span class="tok-com">/// renames a file the README links to.</span></span>
-<span class="ln" id="L1661">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1662">    <span class="tok-kw">fn</span> <span class="tok-fn">every_tab_has_a_stable_unique_name</span>() {</span>
-<span class="ln" id="L1663">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = Tab::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|tab| tab.<span class="tok-fn">key</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1664">        <span class="tok-kw">let</span> count = keys.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L1665">        keys.<span class="tok-fn">sort_unstable</span>();</span>
-<span class="ln" id="L1666">        keys.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L1667">        assert_eq!(keys.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;two tabs share a name&quot;</span>);</span>
-<span class="ln" id="L1668">        assert_eq!(count, <span class="tok-num">9</span>);</span>
-<span class="ln" id="L1669">        <span class="tok-kw">for</span> tab <span class="tok-kw">in</span> Tab::ALL {</span>
-<span class="ln" id="L1670">            assert_eq!(Tab::<span class="tok-fn">from_key</span>(tab.<span class="tok-fn">key</span>()), <span class="tok-fn">Some</span>(*tab));</span>
-<span class="ln" id="L1671">            assert_eq!(Tab::<span class="tok-fn">from_key</span>(&amp;tab.<span class="tok-fn">key</span>().<span class="tok-fn">to_uppercase</span>()), <span class="tok-fn">Some</span>(*tab));</span>
-<span class="ln" id="L1672">        }</span>
-<span class="ln" id="L1673">        assert_eq!(Tab::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;nothing-like-this&quot;</span>), None);</span>
-<span class="ln" id="L1674">        assert_eq!(Tab::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;&quot;</span>), None);</span>
-<span class="ln" id="L1675">    }</span>
+<span class="ln" id="L1658">        painter.<span class="tok-fn">rect_stroke</span>(rect, <span class="tok-num">2.0</span>, egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()));</span>
+<span class="ln" id="L1659"></span>
+<span class="ln" id="L1660">        <span class="tok-kw">let</span> text = <span class="tok-kw">if</span> db &lt;= meter::FLOOR_DB {</span>
+<span class="ln" id="L1661">            <span class="tok-str">&quot;  -inf dBFS&quot;</span>.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L1662">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1663">            format!(<span class="tok-str">&quot;{db:&gt;6.1} dBFS&quot;</span>)</span>
+<span class="ln" id="L1664">        };</span>
+<span class="ln" id="L1665">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">color</span>(<span class="tok-kw">if</span> meter::<span class="tok-fn">clipping</span>(peak) {</span>
+<span class="ln" id="L1666">            p::<span class="tok-fn">red</span>()</span>
+<span class="ln" id="L1667">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1668">            p::<span class="tok-fn">muted</span>()</span>
+<span class="ln" id="L1669">        }));</span>
+<span class="ln" id="L1670">    });</span>
+<span class="ln" id="L1671">}</span>
+</span>
+<span class="ln" id="L1672"></span>
+<span class="ln" id="L1673"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L1674"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L1675">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L1676"></span>
-<span class="ln" id="L1677">    <span class="tok-com">/// Device selection is tested against synthetic lists, never the machine.</span></span>
-<span class="ln" id="L1678">    <span class="tok-com">/// See `preferred_output` for why that is not merely tidier.</span></span>
-<span class="ln" id="L1679">    <span class="tok-kw">fn</span> <span class="tok-fn">device</span>(name: &amp;str, default: bool, cable: bool) -&gt; devices::DeviceInfo {</span>
-<span class="ln" id="L1680">        devices::DeviceInfo {</span>
-<span class="ln" id="L1681">            name: name.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L1682">            is_default: default,</span>
-<span class="ln" id="L1683">            is_virtual_cable: cable,</span>
-<span class="ln" id="L1684">        }</span>
-<span class="ln" id="L1685">    }</span>
-<span class="ln" id="L1686"></span>
-<span class="ln" id="L1687">    <span class="tok-com">/// The bar and the number beside it have to be saying the same thing.</span></span>
-<span class="ln" id="L1688">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1689">    <span class="tok-com">/// They did not: the bar was filled linearly and the number was decibels,</span></span>
-<span class="ln" id="L1690">    <span class="tok-com">/// so at ordinary speech the number said -12 and the bar showed a quarter.</span></span>
-<span class="ln" id="L1691">    <span class="tok-com">/// Both now come from `veilvoice_audio::meter`, and this is the assertion</span></span>
-<span class="ln" id="L1692">    <span class="tok-com">/// that keeps them there.</span></span>
-<span class="ln" id="L1693">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1694">    <span class="tok-kw">fn</span> <span class="tok-fn">the_bar_and_the_number_agree_about_the_level</span>() {</span>
-<span class="ln" id="L1695">        <span class="tok-kw">use</span> veilvoice_audio::meter;</span>
-<span class="ln" id="L1696">        <span class="tok-kw">for</span> peak <span class="tok-kw">in</span> [<span class="tok-num">0</span>.0f32, <span class="tok-num">0.001</span>, <span class="tok-num">0.06</span>, <span class="tok-num">0.251</span>, <span class="tok-num">0.5</span>, <span class="tok-num">0.9</span>, <span class="tok-num">1.0</span>] {</span>
-<span class="ln" id="L1697">            <span class="tok-kw">let</span> along = meter::<span class="tok-fn">position</span>(peak);</span>
-<span class="ln" id="L1698">            <span class="tok-kw">let</span> db = meter::<span class="tok-fn">dbfs</span>(peak);</span>
-<span class="ln" id="L1699">            <span class="tok-com">// The bar&#x27;s fill is `position`; the number is `dbfs`. One is an</span></span>
-<span class="ln" id="L1700">            <span class="tok-com">// affine map of the other, so if they ever stop agreeing this fails.</span></span>
-<span class="ln" id="L1701">            <span class="tok-kw">let</span> from_db = ((db - meter::FLOOR_DB) / -meter::FLOOR_DB).<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L1702">            assert!(</span>
-<span class="ln" id="L1703">                (along - from_db).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>,</span>
-<span class="ln" id="L1704">                <span class="tok-str">&quot;peak {peak}: bar at {along}, number says {db} dBFS&quot;</span></span>
-<span class="ln" id="L1705">            );</span>
-<span class="ln" id="L1706">        }</span>
-<span class="ln" id="L1707">        <span class="tok-com">// And the thing the old meter got wrong, stated outright.</span></span>
-<span class="ln" id="L1708">        assert!(</span>
-<span class="ln" id="L1709">            meter::<span class="tok-fn">position</span>(<span class="tok-num">0.251</span>) &gt; <span class="tok-num">0.7</span>,</span>
-<span class="ln" id="L1710">            <span class="tok-str">&quot;speech at -12 dBFS must fill most of the bar&quot;</span></span>
-<span class="ln" id="L1711">        );</span>
-<span class="ln" id="L1712">    }</span>
-<span class="ln" id="L1713"></span>
-<span class="ln" id="L1714">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1715">    <span class="tok-kw">fn</span> <span class="tok-fn">defaults_are_the_safe_ones</span>() {</span>
-<span class="ln" id="L1716">        <span class="tok-kw">let</span> app = VeilVoiceApp::<span class="tok-fn">without_devices</span>();</span>
-<span class="ln" id="L1717">        assert!(</span>
-<span class="ln" id="L1718">            app.neutralise_accent,</span>
-<span class="ln" id="L1719">            <span class="tok-str">&quot;accent neutralisation should default on&quot;</span></span>
-<span class="ln" id="L1720">        );</span>
-<span class="ln" id="L1721">        assert!(app.clean_metadata, <span class="tok-str">&quot;metadata stripping should default on&quot;</span>);</span>
-<span class="ln" id="L1722">        assert_eq!(app.intensity, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L1723">        assert_eq!(app.reseed_secs, <span class="tok-num">2.0</span>, <span class="tok-str">&quot;the seed should roll by default&quot;</span>);</span>
-<span class="ln" id="L1724">        assert!(app.session.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L1725">        assert!(</span>
-<span class="ln" id="L1726">            app.security.encrypt_recordings,</span>
-<span class="ln" id="L1727">            <span class="tok-str">&quot;recordings should be encrypted at rest by default&quot;</span></span>
-<span class="ln" id="L1728">        );</span>
-<span class="ln" id="L1729">    }</span>
-<span class="ln" id="L1730"></span>
-<span class="ln" id="L1731">    <span class="tok-com">/// The default is only worth anything if the button honours it: with</span></span>
-<span class="ln" id="L1732">    <span class="tok-com">/// encryption on and nothing to encrypt with, a job must not start.</span></span>
+<span class="ln" id="L1677">    <span class="tok-com">/// Every tab has a name, they are unique, and they round trip. The</span></span>
+<span class="ln" id="L1678">    <span class="tok-com">/// screenshot tool names each picture after one of these, so a change here</span></span>
+<span class="ln" id="L1679">    <span class="tok-com">/// renames a file the README links to.</span></span>
+<span class="ln" id="L1680">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1681">    <span class="tok-kw">fn</span> <span class="tok-fn">every_tab_has_a_stable_unique_name</span>() {</span>
+<span class="ln" id="L1682">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = Tab::ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|tab| tab.<span class="tok-fn">key</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1683">        <span class="tok-kw">let</span> count = keys.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L1684">        keys.<span class="tok-fn">sort_unstable</span>();</span>
+<span class="ln" id="L1685">        keys.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L1686">        assert_eq!(keys.<span class="tok-fn">len</span>(), count, <span class="tok-str">&quot;two tabs share a name&quot;</span>);</span>
+<span class="ln" id="L1687">        assert_eq!(count, <span class="tok-num">9</span>);</span>
+<span class="ln" id="L1688">        <span class="tok-kw">for</span> tab <span class="tok-kw">in</span> Tab::ALL {</span>
+<span class="ln" id="L1689">            assert_eq!(Tab::<span class="tok-fn">from_key</span>(tab.<span class="tok-fn">key</span>()), <span class="tok-fn">Some</span>(*tab));</span>
+<span class="ln" id="L1690">            assert_eq!(Tab::<span class="tok-fn">from_key</span>(&amp;tab.<span class="tok-fn">key</span>().<span class="tok-fn">to_uppercase</span>()), <span class="tok-fn">Some</span>(*tab));</span>
+<span class="ln" id="L1691">        }</span>
+<span class="ln" id="L1692">        assert_eq!(Tab::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;nothing-like-this&quot;</span>), None);</span>
+<span class="ln" id="L1693">        assert_eq!(Tab::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;&quot;</span>), None);</span>
+<span class="ln" id="L1694">    }</span>
+<span class="ln" id="L1695"></span>
+<span class="ln" id="L1696">    <span class="tok-com">/// Device selection is tested against synthetic lists, never the machine.</span></span>
+<span class="ln" id="L1697">    <span class="tok-com">/// See `preferred_output` for why that is not merely tidier.</span></span>
+<span class="ln" id="L1698">    <span class="tok-kw">fn</span> <span class="tok-fn">device</span>(name: &amp;str, default: bool, cable: bool) -&gt; devices::DeviceInfo {</span>
+<span class="ln" id="L1699">        devices::DeviceInfo {</span>
+<span class="ln" id="L1700">            name: name.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L1701">            is_default: default,</span>
+<span class="ln" id="L1702">            is_virtual_cable: cable,</span>
+<span class="ln" id="L1703">        }</span>
+<span class="ln" id="L1704">    }</span>
+<span class="ln" id="L1705"></span>
+<span class="ln" id="L1706">    <span class="tok-com">/// The bar and the number beside it have to be saying the same thing.</span></span>
+<span class="ln" id="L1707">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1708">    <span class="tok-com">/// They did not: the bar was filled linearly and the number was decibels,</span></span>
+<span class="ln" id="L1709">    <span class="tok-com">/// so at ordinary speech the number said -12 and the bar showed a quarter.</span></span>
+<span class="ln" id="L1710">    <span class="tok-com">/// Both now come from `veilvoice_audio::meter`, and this is the assertion</span></span>
+<span class="ln" id="L1711">    <span class="tok-com">/// that keeps them there.</span></span>
+<span class="ln" id="L1712">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1713">    <span class="tok-kw">fn</span> <span class="tok-fn">the_bar_and_the_number_agree_about_the_level</span>() {</span>
+<span class="ln" id="L1714">        <span class="tok-kw">use</span> veilvoice_audio::meter;</span>
+<span class="ln" id="L1715">        <span class="tok-kw">for</span> peak <span class="tok-kw">in</span> [<span class="tok-num">0</span>.0f32, <span class="tok-num">0.001</span>, <span class="tok-num">0.06</span>, <span class="tok-num">0.251</span>, <span class="tok-num">0.5</span>, <span class="tok-num">0.9</span>, <span class="tok-num">1.0</span>] {</span>
+<span class="ln" id="L1716">            <span class="tok-kw">let</span> along = meter::<span class="tok-fn">position</span>(peak);</span>
+<span class="ln" id="L1717">            <span class="tok-kw">let</span> db = meter::<span class="tok-fn">dbfs</span>(peak);</span>
+<span class="ln" id="L1718">            <span class="tok-com">// The bar&#x27;s fill is `position`; the number is `dbfs`. One is an</span></span>
+<span class="ln" id="L1719">            <span class="tok-com">// affine map of the other, so if they ever stop agreeing this fails.</span></span>
+<span class="ln" id="L1720">            <span class="tok-kw">let</span> from_db = ((db - meter::FLOOR_DB) / -meter::FLOOR_DB).<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L1721">            assert!(</span>
+<span class="ln" id="L1722">                (along - from_db).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>,</span>
+<span class="ln" id="L1723">                <span class="tok-str">&quot;peak {peak}: bar at {along}, number says {db} dBFS&quot;</span></span>
+<span class="ln" id="L1724">            );</span>
+<span class="ln" id="L1725">        }</span>
+<span class="ln" id="L1726">        <span class="tok-com">// And the thing the old meter got wrong, stated outright.</span></span>
+<span class="ln" id="L1727">        assert!(</span>
+<span class="ln" id="L1728">            meter::<span class="tok-fn">position</span>(<span class="tok-num">0.251</span>) &gt; <span class="tok-num">0.7</span>,</span>
+<span class="ln" id="L1729">            <span class="tok-str">&quot;speech at -12 dBFS must fill most of the bar&quot;</span></span>
+<span class="ln" id="L1730">        );</span>
+<span class="ln" id="L1731">    }</span>
+<span class="ln" id="L1732"></span>
 <span class="ln" id="L1733">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1734">    <span class="tok-kw">fn</span> <span class="tok-fn">a_job_cannot_start_before_the_at_rest_choice_is_made</span>() {</span>
+<span class="ln" id="L1734">    <span class="tok-kw">fn</span> <span class="tok-fn">defaults_are_the_safe_ones</span>() {</span>
 <span class="ln" id="L1735">        <span class="tok-kw">let</span> app = VeilVoiceApp::<span class="tok-fn">without_devices</span>();</span>
-<span class="ln" id="L1736">        assert!(!app.security.<span class="tok-fn">ready_to_write</span>());</span>
-<span class="ln" id="L1737">        assert!(app.security.<span class="tok-fn">blocked_reason</span>().<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L1738">    }</span>
-<span class="ln" id="L1739"></span>
-<span class="ln" id="L1740">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1741">    <span class="tok-kw">fn</span> <span class="tok-fn">config_reflects_the_controls</span>() {</span>
-<span class="ln" id="L1742">        <span class="tok-kw">let</span> app = VeilVoiceApp {</span>
-<span class="ln" id="L1743">            intensity: <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L1744">            neutralise_accent: false,</span>
-<span class="ln" id="L1745">            reseed_secs: <span class="tok-num">5.0</span>,</span>
-<span class="ln" id="L1746">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
-<span class="ln" id="L1747">        };</span>
-<span class="ln" id="L1748">        <span class="tok-kw">let</span> cfg = app.<span class="tok-fn">config</span>();</span>
-<span class="ln" id="L1749">        assert_eq!(cfg.intensity, <span class="tok-num">0.5</span>);</span>
-<span class="ln" id="L1750">        assert!(!cfg.accent.enabled);</span>
-<span class="ln" id="L1751">        assert_eq!(cfg.reseed_secs, <span class="tok-num">5.0</span>);</span>
-<span class="ln" id="L1752">        cfg.<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L1753">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;every value the sliders can reach must be valid&quot;</span>);</span>
-<span class="ln" id="L1754">    }</span>
-<span class="ln" id="L1755"></span>
-<span class="ln" id="L1756">    <span class="tok-com">/// The slider&#x27;s whole range must produce a configuration the engine</span></span>
-<span class="ln" id="L1757">    <span class="tok-com">/// accepts, or a user could drag it into an error.</span></span>
-<span class="ln" id="L1758">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1759">    <span class="tok-kw">fn</span> <span class="tok-fn">every_reachable_reseed_setting_is_valid</span>() {</span>
-<span class="ln" id="L1760">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> app = VeilVoiceApp::<span class="tok-fn">without_devices</span>();</span>
-<span class="ln" id="L1761">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..=<span class="tok-num">30</span> {</span>
-<span class="ln" id="L1762">            app.reseed_secs = step <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L1763">            app.<span class="tok-fn">config</span>()</span>
-<span class="ln" id="L1764">                .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L1765">                .<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;reseed_secs={step} rejected: {e}&quot;</span>));</span>
-<span class="ln" id="L1766">        }</span>
-<span class="ln" id="L1767">    }</span>
-<span class="ln" id="L1768"></span>
-<span class="ln" id="L1769">    <span class="tok-com">/// A virtual cable must win, because routing there is the whole point of</span></span>
-<span class="ln" id="L1770">    <span class="tok-com">/// live mode. Every arrangement, none of them involving real hardware.</span></span>
-<span class="ln" id="L1771">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1772">    <span class="tok-kw">fn</span> <span class="tok-fn">a_virtual_cable_is_preferred_over_the_system_default</span>() {</span>
-<span class="ln" id="L1773">        <span class="tok-kw">let</span> cable = <span class="tok-fn">device</span>(<span class="tok-str">&quot;CABLE Input (VB-Audio Virtual Cable)&quot;</span>, false, true);</span>
-<span class="ln" id="L1774">        <span class="tok-kw">let</span> speakers = <span class="tok-fn">device</span>(<span class="tok-str">&quot;Speakers&quot;</span>, true, false);</span>
-<span class="ln" id="L1775">        <span class="tok-kw">let</span> other = <span class="tok-fn">device</span>(<span class="tok-str">&quot;HDMI&quot;</span>, false, false);</span>
-<span class="ln" id="L1776"></span>
-<span class="ln" id="L1777">        assert_eq!(</span>
-<span class="ln" id="L1778">            <span class="tok-fn">preferred_output</span>(&amp;[speakers.<span class="tok-fn">clone</span>(), cable.<span class="tok-fn">clone</span>(), other.<span class="tok-fn">clone</span>()]).<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L1779">            <span class="tok-fn">Some</span>(cable.name.<span class="tok-fn">as_str</span>()),</span>
-<span class="ln" id="L1780">            <span class="tok-str">&quot;a cable must beat the system default&quot;</span></span>
-<span class="ln" id="L1781">        );</span>
-<span class="ln" id="L1782">        assert_eq!(</span>
-<span class="ln" id="L1783">            <span class="tok-fn">preferred_output</span>(&amp;[other.<span class="tok-fn">clone</span>(), speakers.<span class="tok-fn">clone</span>()]).<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L1784">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Speakers&quot;</span>),</span>
-<span class="ln" id="L1785">            <span class="tok-str">&quot;with no cable, the default&quot;</span></span>
-<span class="ln" id="L1786">        );</span>
-<span class="ln" id="L1787">        <span class="tok-com">// With neither a cable nor a default, the picker stays on &quot;system</span></span>
-<span class="ln" id="L1788">        <span class="tok-com">// default&quot; rather than seizing on an arbitrary device. Output is not</span></span>
-<span class="ln" id="L1789">        <span class="tok-com">// input here, and deliberately so: guessing an input wrong means the</span></span>
-<span class="ln" id="L1790">        <span class="tok-com">// user hears nothing and fixes it, while guessing an *output* wrong</span></span>
-<span class="ln" id="L1791">        <span class="tok-com">// means the veiled voice is quietly playing out of the wrong device.</span></span>
-<span class="ln" id="L1792">        assert_eq!(</span>
-<span class="ln" id="L1793">            <span class="tok-fn">preferred_output</span>(std::slice::<span class="tok-fn">from_ref</span>(&amp;other)),</span>
-<span class="ln" id="L1794">            None,</span>
-<span class="ln" id="L1795">            <span class="tok-str">&quot;an arbitrary output must not be seized on&quot;</span></span>
-<span class="ln" id="L1796">        );</span>
-<span class="ln" id="L1797">        assert_eq!(</span>
-<span class="ln" id="L1798">            <span class="tok-fn">preferred_output</span>(&amp;[]),</span>
-<span class="ln" id="L1799">            None,</span>
-<span class="ln" id="L1800">            <span class="tok-str">&quot;an empty machine chooses nothing&quot;</span></span>
-<span class="ln" id="L1801">        );</span>
-<span class="ln" id="L1802">    }</span>
-<span class="ln" id="L1803"></span>
-<span class="ln" id="L1804">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1805">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_input_is_preferred_then_the_first</span>() {</span>
-<span class="ln" id="L1806">        <span class="tok-kw">let</span> default = <span class="tok-fn">device</span>(<span class="tok-str">&quot;Microphone&quot;</span>, true, false);</span>
-<span class="ln" id="L1807">        <span class="tok-kw">let</span> first = <span class="tok-fn">device</span>(<span class="tok-str">&quot;Line In&quot;</span>, false, false);</span>
-<span class="ln" id="L1808">        assert_eq!(</span>
-<span class="ln" id="L1809">            <span class="tok-fn">preferred_input</span>(&amp;[first.<span class="tok-fn">clone</span>(), default.<span class="tok-fn">clone</span>()]).<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L1810">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Microphone&quot;</span>)</span>
-<span class="ln" id="L1811">        );</span>
-<span class="ln" id="L1812">        assert_eq!(</span>
-<span class="ln" id="L1813">            <span class="tok-fn">preferred_input</span>(std::slice::<span class="tok-fn">from_ref</span>(&amp;first)).<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L1814">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Line In&quot;</span>),</span>
-<span class="ln" id="L1815">            <span class="tok-str">&quot;with no default, the first is better than nothing&quot;</span></span>
-<span class="ln" id="L1816">        );</span>
-<span class="ln" id="L1817">        assert_eq!(<span class="tok-fn">preferred_input</span>(&amp;[]), None);</span>
-<span class="ln" id="L1818">    }</span>
-<span class="ln" id="L1819"></span>
-<span class="ln" id="L1820">    <span class="tok-com">/// A policy that fixes the engine settings must reach the *job*, not just</span></span>
-<span class="ln" id="L1821">    <span class="tok-com">/// the widgets. The fields are deliberately left loose here: if `config`</span></span>
-<span class="ln" id="L1822">    <span class="tok-com">/// read them directly, this would fail.</span></span>
+<span class="ln" id="L1736">        assert!(</span>
+<span class="ln" id="L1737">            app.neutralise_accent,</span>
+<span class="ln" id="L1738">            <span class="tok-str">&quot;accent neutralisation should default on&quot;</span></span>
+<span class="ln" id="L1739">        );</span>
+<span class="ln" id="L1740">        assert!(app.clean_metadata, <span class="tok-str">&quot;metadata stripping should default on&quot;</span>);</span>
+<span class="ln" id="L1741">        assert_eq!(app.intensity, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L1742">        assert_eq!(app.reseed_secs, <span class="tok-num">2.0</span>, <span class="tok-str">&quot;the seed should roll by default&quot;</span>);</span>
+<span class="ln" id="L1743">        assert!(app.session.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L1744">        assert!(</span>
+<span class="ln" id="L1745">            app.security.encrypt_recordings,</span>
+<span class="ln" id="L1746">            <span class="tok-str">&quot;recordings should be encrypted at rest by default&quot;</span></span>
+<span class="ln" id="L1747">        );</span>
+<span class="ln" id="L1748">    }</span>
+<span class="ln" id="L1749"></span>
+<span class="ln" id="L1750">    <span class="tok-com">/// The default is only worth anything if the button honours it: with</span></span>
+<span class="ln" id="L1751">    <span class="tok-com">/// encryption on and nothing to encrypt with, a job must not start.</span></span>
+<span class="ln" id="L1752">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1753">    <span class="tok-kw">fn</span> <span class="tok-fn">a_job_cannot_start_before_the_at_rest_choice_is_made</span>() {</span>
+<span class="ln" id="L1754">        <span class="tok-kw">let</span> app = VeilVoiceApp::<span class="tok-fn">without_devices</span>();</span>
+<span class="ln" id="L1755">        assert!(!app.security.<span class="tok-fn">ready_to_write</span>());</span>
+<span class="ln" id="L1756">        assert!(app.security.<span class="tok-fn">blocked_reason</span>().<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L1757">    }</span>
+<span class="ln" id="L1758"></span>
+<span class="ln" id="L1759">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1760">    <span class="tok-kw">fn</span> <span class="tok-fn">config_reflects_the_controls</span>() {</span>
+<span class="ln" id="L1761">        <span class="tok-kw">let</span> app = VeilVoiceApp {</span>
+<span class="ln" id="L1762">            intensity: <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L1763">            neutralise_accent: false,</span>
+<span class="ln" id="L1764">            reseed_secs: <span class="tok-num">5.0</span>,</span>
+<span class="ln" id="L1765">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
+<span class="ln" id="L1766">        };</span>
+<span class="ln" id="L1767">        <span class="tok-kw">let</span> cfg = app.<span class="tok-fn">config</span>();</span>
+<span class="ln" id="L1768">        assert_eq!(cfg.intensity, <span class="tok-num">0.5</span>);</span>
+<span class="ln" id="L1769">        assert!(!cfg.accent.enabled);</span>
+<span class="ln" id="L1770">        assert_eq!(cfg.reseed_secs, <span class="tok-num">5.0</span>);</span>
+<span class="ln" id="L1771">        cfg.<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L1772">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;every value the sliders can reach must be valid&quot;</span>);</span>
+<span class="ln" id="L1773">    }</span>
+<span class="ln" id="L1774"></span>
+<span class="ln" id="L1775">    <span class="tok-com">/// The slider&#x27;s whole range must produce a configuration the engine</span></span>
+<span class="ln" id="L1776">    <span class="tok-com">/// accepts, or a user could drag it into an error.</span></span>
+<span class="ln" id="L1777">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1778">    <span class="tok-kw">fn</span> <span class="tok-fn">every_reachable_reseed_setting_is_valid</span>() {</span>
+<span class="ln" id="L1779">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> app = VeilVoiceApp::<span class="tok-fn">without_devices</span>();</span>
+<span class="ln" id="L1780">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..=<span class="tok-num">30</span> {</span>
+<span class="ln" id="L1781">            app.reseed_secs = step <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L1782">            app.<span class="tok-fn">config</span>()</span>
+<span class="ln" id="L1783">                .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L1784">                .<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;reseed_secs={step} rejected: {e}&quot;</span>));</span>
+<span class="ln" id="L1785">        }</span>
+<span class="ln" id="L1786">    }</span>
+<span class="ln" id="L1787"></span>
+<span class="ln" id="L1788">    <span class="tok-com">/// A virtual cable must win, because routing there is the whole point of</span></span>
+<span class="ln" id="L1789">    <span class="tok-com">/// live mode. Every arrangement, none of them involving real hardware.</span></span>
+<span class="ln" id="L1790">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1791">    <span class="tok-kw">fn</span> <span class="tok-fn">a_virtual_cable_is_preferred_over_the_system_default</span>() {</span>
+<span class="ln" id="L1792">        <span class="tok-kw">let</span> cable = <span class="tok-fn">device</span>(<span class="tok-str">&quot;CABLE Input (VB-Audio Virtual Cable)&quot;</span>, false, true);</span>
+<span class="ln" id="L1793">        <span class="tok-kw">let</span> speakers = <span class="tok-fn">device</span>(<span class="tok-str">&quot;Speakers&quot;</span>, true, false);</span>
+<span class="ln" id="L1794">        <span class="tok-kw">let</span> other = <span class="tok-fn">device</span>(<span class="tok-str">&quot;HDMI&quot;</span>, false, false);</span>
+<span class="ln" id="L1795"></span>
+<span class="ln" id="L1796">        assert_eq!(</span>
+<span class="ln" id="L1797">            <span class="tok-fn">preferred_output</span>(&amp;[speakers.<span class="tok-fn">clone</span>(), cable.<span class="tok-fn">clone</span>(), other.<span class="tok-fn">clone</span>()]).<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L1798">            <span class="tok-fn">Some</span>(cable.name.<span class="tok-fn">as_str</span>()),</span>
+<span class="ln" id="L1799">            <span class="tok-str">&quot;a cable must beat the system default&quot;</span></span>
+<span class="ln" id="L1800">        );</span>
+<span class="ln" id="L1801">        assert_eq!(</span>
+<span class="ln" id="L1802">            <span class="tok-fn">preferred_output</span>(&amp;[other.<span class="tok-fn">clone</span>(), speakers.<span class="tok-fn">clone</span>()]).<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L1803">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Speakers&quot;</span>),</span>
+<span class="ln" id="L1804">            <span class="tok-str">&quot;with no cable, the default&quot;</span></span>
+<span class="ln" id="L1805">        );</span>
+<span class="ln" id="L1806">        <span class="tok-com">// With neither a cable nor a default, the picker stays on &quot;system</span></span>
+<span class="ln" id="L1807">        <span class="tok-com">// default&quot; rather than seizing on an arbitrary device. Output is not</span></span>
+<span class="ln" id="L1808">        <span class="tok-com">// input here, and deliberately so: guessing an input wrong means the</span></span>
+<span class="ln" id="L1809">        <span class="tok-com">// user hears nothing and fixes it, while guessing an *output* wrong</span></span>
+<span class="ln" id="L1810">        <span class="tok-com">// means the veiled voice is quietly playing out of the wrong device.</span></span>
+<span class="ln" id="L1811">        assert_eq!(</span>
+<span class="ln" id="L1812">            <span class="tok-fn">preferred_output</span>(std::slice::<span class="tok-fn">from_ref</span>(&amp;other)),</span>
+<span class="ln" id="L1813">            None,</span>
+<span class="ln" id="L1814">            <span class="tok-str">&quot;an arbitrary output must not be seized on&quot;</span></span>
+<span class="ln" id="L1815">        );</span>
+<span class="ln" id="L1816">        assert_eq!(</span>
+<span class="ln" id="L1817">            <span class="tok-fn">preferred_output</span>(&amp;[]),</span>
+<span class="ln" id="L1818">            None,</span>
+<span class="ln" id="L1819">            <span class="tok-str">&quot;an empty machine chooses nothing&quot;</span></span>
+<span class="ln" id="L1820">        );</span>
+<span class="ln" id="L1821">    }</span>
+<span class="ln" id="L1822"></span>
 <span class="ln" id="L1823">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1824">    <span class="tok-kw">fn</span> <span class="tok-fn">a_policy_constrains_the_settings_a_job_actually_uses</span>() {</span>
-<span class="ln" id="L1825">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = veilvoice_policy::Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1826">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::NeutraliseAccent);</span>
-<span class="ln" id="L1827">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">80</span>));</span>
-<span class="ln" id="L1828">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::CleanMetadata);</span>
-<span class="ln" id="L1829"></span>
-<span class="ln" id="L1830">        <span class="tok-kw">let</span> app = VeilVoiceApp {</span>
-<span class="ln" id="L1831">            intensity: <span class="tok-num">0.1</span>,</span>
-<span class="ln" id="L1832">            neutralise_accent: false,</span>
-<span class="ln" id="L1833">            clean_metadata: false,</span>
-<span class="ln" id="L1834">            policy: InForce::<span class="tok-fn">from_policy</span>(policy),</span>
-<span class="ln" id="L1835">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
-<span class="ln" id="L1836">        };</span>
-<span class="ln" id="L1837"></span>
-<span class="ln" id="L1838">        <span class="tok-kw">let</span> config = app.<span class="tok-fn">config</span>();</span>
-<span class="ln" id="L1839">        assert!(</span>
-<span class="ln" id="L1840">            (config.intensity - <span class="tok-num">0.8</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>,</span>
-<span class="ln" id="L1841">            <span class="tok-str">&quot;the floor must reach the engine: {}&quot;</span>,</span>
-<span class="ln" id="L1842">            config.intensity</span>
-<span class="ln" id="L1843">        );</span>
-<span class="ln" id="L1844">        assert!(</span>
-<span class="ln" id="L1845">            config.accent.enabled,</span>
-<span class="ln" id="L1846">            <span class="tok-str">&quot;a required accent neutralisation must reach the engine&quot;</span></span>
-<span class="ln" id="L1847">        );</span>
-<span class="ln" id="L1848">        assert!(</span>
-<span class="ln" id="L1849">            app.<span class="tok-fn">posture</span>().clean_metadata,</span>
-<span class="ln" id="L1850">            <span class="tok-str">&quot;a required metadata strip must reach the job&quot;</span></span>
-<span class="ln" id="L1851">        );</span>
-<span class="ln" id="L1852">        config</span>
-<span class="ln" id="L1853">            .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L1854">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a constrained configuration must still be a valid one&quot;</span>);</span>
-<span class="ln" id="L1855">    }</span>
+<span class="ln" id="L1824">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_input_is_preferred_then_the_first</span>() {</span>
+<span class="ln" id="L1825">        <span class="tok-kw">let</span> default = <span class="tok-fn">device</span>(<span class="tok-str">&quot;Microphone&quot;</span>, true, false);</span>
+<span class="ln" id="L1826">        <span class="tok-kw">let</span> first = <span class="tok-fn">device</span>(<span class="tok-str">&quot;Line In&quot;</span>, false, false);</span>
+<span class="ln" id="L1827">        assert_eq!(</span>
+<span class="ln" id="L1828">            <span class="tok-fn">preferred_input</span>(&amp;[first.<span class="tok-fn">clone</span>(), default.<span class="tok-fn">clone</span>()]).<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L1829">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Microphone&quot;</span>)</span>
+<span class="ln" id="L1830">        );</span>
+<span class="ln" id="L1831">        assert_eq!(</span>
+<span class="ln" id="L1832">            <span class="tok-fn">preferred_input</span>(std::slice::<span class="tok-fn">from_ref</span>(&amp;first)).<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L1833">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Line In&quot;</span>),</span>
+<span class="ln" id="L1834">            <span class="tok-str">&quot;with no default, the first is better than nothing&quot;</span></span>
+<span class="ln" id="L1835">        );</span>
+<span class="ln" id="L1836">        assert_eq!(<span class="tok-fn">preferred_input</span>(&amp;[]), None);</span>
+<span class="ln" id="L1837">    }</span>
+<span class="ln" id="L1838"></span>
+<span class="ln" id="L1839">    <span class="tok-com">/// A policy that fixes the engine settings must reach the *job*, not just</span></span>
+<span class="ln" id="L1840">    <span class="tok-com">/// the widgets. The fields are deliberately left loose here: if `config`</span></span>
+<span class="ln" id="L1841">    <span class="tok-com">/// read them directly, this would fail.</span></span>
+<span class="ln" id="L1842">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1843">    <span class="tok-kw">fn</span> <span class="tok-fn">a_policy_constrains_the_settings_a_job_actually_uses</span>() {</span>
+<span class="ln" id="L1844">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = veilvoice_policy::Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1845">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::NeutraliseAccent);</span>
+<span class="ln" id="L1846">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">80</span>));</span>
+<span class="ln" id="L1847">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::CleanMetadata);</span>
+<span class="ln" id="L1848"></span>
+<span class="ln" id="L1849">        <span class="tok-kw">let</span> app = VeilVoiceApp {</span>
+<span class="ln" id="L1850">            intensity: <span class="tok-num">0.1</span>,</span>
+<span class="ln" id="L1851">            neutralise_accent: false,</span>
+<span class="ln" id="L1852">            clean_metadata: false,</span>
+<span class="ln" id="L1853">            policy: InForce::<span class="tok-fn">from_policy</span>(policy),</span>
+<span class="ln" id="L1854">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
+<span class="ln" id="L1855">        };</span>
 <span class="ln" id="L1856"></span>
-<span class="ln" id="L1857">    <span class="tok-com">/// Whatever the sliders say, a policy may only ever make the result more</span></span>
-<span class="ln" id="L1858">    <span class="tok-com">/// thoroughly processed. Checked across the slider&#x27;s whole range.</span></span>
-<span class="ln" id="L1859">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1860">    <span class="tok-kw">fn</span> <span class="tok-fn">a_policy_never_loosens_what_a_job_would_do</span>() {</span>
-<span class="ln" id="L1861">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = veilvoice_policy::Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1862">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">60</span>));</span>
-<span class="ln" id="L1863">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..=<span class="tok-num">10</span> {</span>
-<span class="ln" id="L1864">            <span class="tok-kw">let</span> asked = step <span class="tok-kw">as</span> f32 / <span class="tok-num">10.0</span>;</span>
-<span class="ln" id="L1865">            <span class="tok-kw">let</span> app = VeilVoiceApp {</span>
-<span class="ln" id="L1866">                intensity: asked,</span>
-<span class="ln" id="L1867">                neutralise_accent: false,</span>
-<span class="ln" id="L1868">                policy: InForce::<span class="tok-fn">from_policy</span>(policy.<span class="tok-fn">clone</span>()),</span>
-<span class="ln" id="L1869">                ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
-<span class="ln" id="L1870">            };</span>
-<span class="ln" id="L1871">            assert!(</span>
-<span class="ln" id="L1872">                app.<span class="tok-fn">config</span>().intensity &gt;= asked,</span>
-<span class="ln" id="L1873">                <span class="tok-str">&quot;asked for {asked}, got {}&quot;</span>,</span>
-<span class="ln" id="L1874">                app.<span class="tok-fn">config</span>().intensity</span>
-<span class="ln" id="L1875">            );</span>
-<span class="ln" id="L1876">        }</span>
-<span class="ln" id="L1877">    }</span>
-<span class="ln" id="L1878"></span>
-<span class="ln" id="L1879">    <span class="tok-com">/// The at-rest requirement is pinned in the state, not merely drawn</span></span>
-<span class="ln" id="L1880">    <span class="tok-com">/// disabled -- and pinning it must also close the dialogue that turns it</span></span>
-<span class="ln" id="L1881">    <span class="tok-com">/// off, which is reachable from more than one frame&#x27;s worth of state.</span></span>
-<span class="ln" id="L1882">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1883">    <span class="tok-kw">fn</span> <span class="tok-fn">a_required_encryption_is_pinned_rather_than_only_disabled</span>() {</span>
-<span class="ln" id="L1884">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = veilvoice_policy::Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1885">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::EncryptRecordings);</span>
-<span class="ln" id="L1886">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> app = VeilVoiceApp {</span>
-<span class="ln" id="L1887">            policy: InForce::<span class="tok-fn">from_policy</span>(policy),</span>
-<span class="ln" id="L1888">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
-<span class="ln" id="L1889">        };</span>
-<span class="ln" id="L1890">        app.security.encrypt_recordings = false;</span>
-<span class="ln" id="L1891">        app.<span class="tok-fn">apply_policy</span>();</span>
-<span class="ln" id="L1892">        assert!(app.security.encryption_pinned);</span>
-<span class="ln" id="L1893">        assert!(app.security.encrypt_recordings);</span>
-<span class="ln" id="L1894">        assert!(app.<span class="tok-fn">posture</span>().encrypt_recordings);</span>
-<span class="ln" id="L1895">    }</span>
-<span class="ln" id="L1896"></span>
-<span class="ln" id="L1897">    <span class="tok-com">/// A required lock is announced and never imposed: VeilVoice cannot set a</span></span>
-<span class="ln" id="L1898">    <span class="tok-com">/// lock, because that needs a passphrase only the user has.</span></span>
-<span class="ln" id="L1899">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1900">    <span class="tok-kw">fn</span> <span class="tok-fn">a_required_lock_is_announced_and_not_imposed</span>() {</span>
-<span class="ln" id="L1901">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = veilvoice_policy::Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1902">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::AppLock);</span>
-<span class="ln" id="L1903">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> app = VeilVoiceApp {</span>
-<span class="ln" id="L1904">            policy: InForce::<span class="tok-fn">from_policy</span>(policy),</span>
-<span class="ln" id="L1905">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
-<span class="ln" id="L1906">        };</span>
-<span class="ln" id="L1907">        app.<span class="tok-fn">apply_policy</span>();</span>
-<span class="ln" id="L1908">        assert!(app.security.lock_required);</span>
-<span class="ln" id="L1909">        assert!(</span>
-<span class="ln" id="L1910">            !app.security.<span class="tok-fn">has_lock</span>(),</span>
-<span class="ln" id="L1911">            <span class="tok-str">&quot;nothing may invent a lock the user did not set&quot;</span></span>
-<span class="ln" id="L1912">        );</span>
-<span class="ln" id="L1913">        assert!(</span>
-<span class="ln" id="L1914">            !app.security.<span class="tok-fn">is_locked</span>(),</span>
-<span class="ln" id="L1915">            <span class="tok-str">&quot;and the application must stay usable&quot;</span></span>
-<span class="ln" id="L1916">        );</span>
-<span class="ln" id="L1917">    }</span>
-<span class="ln" id="L1918"></span>
-<span class="ln" id="L1919">    <span class="tok-com">/// With no policy -- the ordinary case -- nothing is pinned and nothing is</span></span>
-<span class="ln" id="L1920">    <span class="tok-com">/// raised.</span></span>
-<span class="ln" id="L1921">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1922">    <span class="tok-kw">fn</span> <span class="tok-fn">without_a_policy_nothing_is_fixed</span>() {</span>
-<span class="ln" id="L1923">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> app = VeilVoiceApp {</span>
-<span class="ln" id="L1924">            intensity: <span class="tok-num">0.25</span>,</span>
-<span class="ln" id="L1925">            neutralise_accent: false,</span>
-<span class="ln" id="L1926">            clean_metadata: false,</span>
-<span class="ln" id="L1927">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
-<span class="ln" id="L1928">        };</span>
-<span class="ln" id="L1929">        app.<span class="tok-fn">apply_policy</span>();</span>
-<span class="ln" id="L1930">        assert!(!app.security.encryption_pinned);</span>
-<span class="ln" id="L1931">        assert!(!app.security.lock_required);</span>
-<span class="ln" id="L1932">        assert_eq!(app.intensity, <span class="tok-num">0.25</span>);</span>
-<span class="ln" id="L1933">        assert!(!app.neutralise_accent);</span>
-<span class="ln" id="L1934">        assert!(!app.clean_metadata);</span>
-<span class="ln" id="L1935">        assert_eq!(app.<span class="tok-fn">config</span>().intensity, <span class="tok-num">0.25</span>);</span>
+<span class="ln" id="L1857">        <span class="tok-kw">let</span> config = app.<span class="tok-fn">config</span>();</span>
+<span class="ln" id="L1858">        assert!(</span>
+<span class="ln" id="L1859">            (config.intensity - <span class="tok-num">0.8</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>,</span>
+<span class="ln" id="L1860">            <span class="tok-str">&quot;the floor must reach the engine: {}&quot;</span>,</span>
+<span class="ln" id="L1861">            config.intensity</span>
+<span class="ln" id="L1862">        );</span>
+<span class="ln" id="L1863">        assert!(</span>
+<span class="ln" id="L1864">            config.accent.enabled,</span>
+<span class="ln" id="L1865">            <span class="tok-str">&quot;a required accent neutralisation must reach the engine&quot;</span></span>
+<span class="ln" id="L1866">        );</span>
+<span class="ln" id="L1867">        assert!(</span>
+<span class="ln" id="L1868">            app.<span class="tok-fn">posture</span>().clean_metadata,</span>
+<span class="ln" id="L1869">            <span class="tok-str">&quot;a required metadata strip must reach the job&quot;</span></span>
+<span class="ln" id="L1870">        );</span>
+<span class="ln" id="L1871">        config</span>
+<span class="ln" id="L1872">            .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L1873">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a constrained configuration must still be a valid one&quot;</span>);</span>
+<span class="ln" id="L1874">    }</span>
+<span class="ln" id="L1875"></span>
+<span class="ln" id="L1876">    <span class="tok-com">/// Whatever the sliders say, a policy may only ever make the result more</span></span>
+<span class="ln" id="L1877">    <span class="tok-com">/// thoroughly processed. Checked across the slider&#x27;s whole range.</span></span>
+<span class="ln" id="L1878">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1879">    <span class="tok-kw">fn</span> <span class="tok-fn">a_policy_never_loosens_what_a_job_would_do</span>() {</span>
+<span class="ln" id="L1880">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = veilvoice_policy::Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1881">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">60</span>));</span>
+<span class="ln" id="L1882">        <span class="tok-kw">for</span> step <span class="tok-kw">in</span> <span class="tok-num">0</span>..=<span class="tok-num">10</span> {</span>
+<span class="ln" id="L1883">            <span class="tok-kw">let</span> asked = step <span class="tok-kw">as</span> f32 / <span class="tok-num">10.0</span>;</span>
+<span class="ln" id="L1884">            <span class="tok-kw">let</span> app = VeilVoiceApp {</span>
+<span class="ln" id="L1885">                intensity: asked,</span>
+<span class="ln" id="L1886">                neutralise_accent: false,</span>
+<span class="ln" id="L1887">                policy: InForce::<span class="tok-fn">from_policy</span>(policy.<span class="tok-fn">clone</span>()),</span>
+<span class="ln" id="L1888">                ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
+<span class="ln" id="L1889">            };</span>
+<span class="ln" id="L1890">            assert!(</span>
+<span class="ln" id="L1891">                app.<span class="tok-fn">config</span>().intensity &gt;= asked,</span>
+<span class="ln" id="L1892">                <span class="tok-str">&quot;asked for {asked}, got {}&quot;</span>,</span>
+<span class="ln" id="L1893">                app.<span class="tok-fn">config</span>().intensity</span>
+<span class="ln" id="L1894">            );</span>
+<span class="ln" id="L1895">        }</span>
+<span class="ln" id="L1896">    }</span>
+<span class="ln" id="L1897"></span>
+<span class="ln" id="L1898">    <span class="tok-com">/// The at-rest requirement is pinned in the state, not merely drawn</span></span>
+<span class="ln" id="L1899">    <span class="tok-com">/// disabled -- and pinning it must also close the dialogue that turns it</span></span>
+<span class="ln" id="L1900">    <span class="tok-com">/// off, which is reachable from more than one frame&#x27;s worth of state.</span></span>
+<span class="ln" id="L1901">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1902">    <span class="tok-kw">fn</span> <span class="tok-fn">a_required_encryption_is_pinned_rather_than_only_disabled</span>() {</span>
+<span class="ln" id="L1903">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = veilvoice_policy::Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1904">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::EncryptRecordings);</span>
+<span class="ln" id="L1905">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> app = VeilVoiceApp {</span>
+<span class="ln" id="L1906">            policy: InForce::<span class="tok-fn">from_policy</span>(policy),</span>
+<span class="ln" id="L1907">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
+<span class="ln" id="L1908">        };</span>
+<span class="ln" id="L1909">        app.security.encrypt_recordings = false;</span>
+<span class="ln" id="L1910">        app.<span class="tok-fn">apply_policy</span>();</span>
+<span class="ln" id="L1911">        assert!(app.security.encryption_pinned);</span>
+<span class="ln" id="L1912">        assert!(app.security.encrypt_recordings);</span>
+<span class="ln" id="L1913">        assert!(app.<span class="tok-fn">posture</span>().encrypt_recordings);</span>
+<span class="ln" id="L1914">    }</span>
+<span class="ln" id="L1915"></span>
+<span class="ln" id="L1916">    <span class="tok-com">/// A required lock is announced and never imposed: VeilVoice cannot set a</span></span>
+<span class="ln" id="L1917">    <span class="tok-com">/// lock, because that needs a passphrase only the user has.</span></span>
+<span class="ln" id="L1918">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1919">    <span class="tok-kw">fn</span> <span class="tok-fn">a_required_lock_is_announced_and_not_imposed</span>() {</span>
+<span class="ln" id="L1920">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = veilvoice_policy::Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1921">        policy.<span class="tok-fn">require</span>(veilvoice_policy::Requirement::AppLock);</span>
+<span class="ln" id="L1922">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> app = VeilVoiceApp {</span>
+<span class="ln" id="L1923">            policy: InForce::<span class="tok-fn">from_policy</span>(policy),</span>
+<span class="ln" id="L1924">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
+<span class="ln" id="L1925">        };</span>
+<span class="ln" id="L1926">        app.<span class="tok-fn">apply_policy</span>();</span>
+<span class="ln" id="L1927">        assert!(app.security.lock_required);</span>
+<span class="ln" id="L1928">        assert!(</span>
+<span class="ln" id="L1929">            !app.security.<span class="tok-fn">has_lock</span>(),</span>
+<span class="ln" id="L1930">            <span class="tok-str">&quot;nothing may invent a lock the user did not set&quot;</span></span>
+<span class="ln" id="L1931">        );</span>
+<span class="ln" id="L1932">        assert!(</span>
+<span class="ln" id="L1933">            !app.security.<span class="tok-fn">is_locked</span>(),</span>
+<span class="ln" id="L1934">            <span class="tok-str">&quot;and the application must stay usable&quot;</span></span>
+<span class="ln" id="L1935">        );</span>
 <span class="ln" id="L1936">    }</span>
 <span class="ln" id="L1937"></span>
-<span class="ln" id="L1938">    <span class="tok-com">/// The one test that talks to the machine&#x27;s audio stack. Kept single, and</span></span>
-<span class="ln" id="L1939">    <span class="tok-com">/// last: enumerating devices from several test threads at once on a</span></span>
-<span class="ln" id="L1940">    <span class="tok-com">/// headless runner is what produced an access violation in CI.</span></span>
-<span class="ln" id="L1941">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1942">    <span class="tok-kw">fn</span> <span class="tok-fn">building_the_app_with_real_device_enumeration_does_not_panic</span>() {</span>
-<span class="ln" id="L1943">        <span class="tok-kw">let</span> app = VeilVoiceApp::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1944">        <span class="tok-com">// Whatever the machine has, the choice must be one of its own devices.</span></span>
-<span class="ln" id="L1945">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(chosen) = app.chosen_output.<span class="tok-fn">as_deref</span>() {</span>
-<span class="ln" id="L1946">            assert!(app.outputs.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|d| d.name == chosen));</span>
-<span class="ln" id="L1947">        }</span>
-<span class="ln" id="L1948">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(chosen) = app.chosen_input.<span class="tok-fn">as_deref</span>() {</span>
-<span class="ln" id="L1949">            assert!(app.inputs.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|d| d.name == chosen));</span>
-<span class="ln" id="L1950">        }</span>
-<span class="ln" id="L1951">    }</span>
-<span class="ln" id="L1952">}</span>
+<span class="ln" id="L1938">    <span class="tok-com">/// With no policy -- the ordinary case -- nothing is pinned and nothing is</span></span>
+<span class="ln" id="L1939">    <span class="tok-com">/// raised.</span></span>
+<span class="ln" id="L1940">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1941">    <span class="tok-kw">fn</span> <span class="tok-fn">without_a_policy_nothing_is_fixed</span>() {</span>
+<span class="ln" id="L1942">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> app = VeilVoiceApp {</span>
+<span class="ln" id="L1943">            intensity: <span class="tok-num">0.25</span>,</span>
+<span class="ln" id="L1944">            neutralise_accent: false,</span>
+<span class="ln" id="L1945">            clean_metadata: false,</span>
+<span class="ln" id="L1946">            ..VeilVoiceApp::<span class="tok-fn">without_devices</span>()</span>
+<span class="ln" id="L1947">        };</span>
+<span class="ln" id="L1948">        app.<span class="tok-fn">apply_policy</span>();</span>
+<span class="ln" id="L1949">        assert!(!app.security.encryption_pinned);</span>
+<span class="ln" id="L1950">        assert!(!app.security.lock_required);</span>
+<span class="ln" id="L1951">        assert_eq!(app.intensity, <span class="tok-num">0.25</span>);</span>
+<span class="ln" id="L1952">        assert!(!app.neutralise_accent);</span>
+<span class="ln" id="L1953">        assert!(!app.clean_metadata);</span>
+<span class="ln" id="L1954">        assert_eq!(app.<span class="tok-fn">config</span>().intensity, <span class="tok-num">0.25</span>);</span>
+<span class="ln" id="L1955">    }</span>
+<span class="ln" id="L1956"></span>
+<span class="ln" id="L1957">    <span class="tok-com">/// The one test that talks to the machine&#x27;s audio stack. Kept single, and</span></span>
+<span class="ln" id="L1958">    <span class="tok-com">/// last: enumerating devices from several test threads at once on a</span></span>
+<span class="ln" id="L1959">    <span class="tok-com">/// headless runner is what produced an access violation in CI.</span></span>
+<span class="ln" id="L1960">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1961">    <span class="tok-kw">fn</span> <span class="tok-fn">building_the_app_with_real_device_enumeration_does_not_panic</span>() {</span>
+<span class="ln" id="L1962">        <span class="tok-kw">let</span> app = VeilVoiceApp::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1963">        <span class="tok-com">// Whatever the machine has, the choice must be one of its own devices.</span></span>
+<span class="ln" id="L1964">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(chosen) = app.chosen_output.<span class="tok-fn">as_deref</span>() {</span>
+<span class="ln" id="L1965">            assert!(app.outputs.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|d| d.name == chosen));</span>
+<span class="ln" id="L1966">        }</span>
+<span class="ln" id="L1967">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(chosen) = app.chosen_input.<span class="tok-fn">as_deref</span>() {</span>
+<span class="ln" id="L1968">            assert!(app.inputs.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|d| d.name == chosen));</span>
+<span class="ln" id="L1969">        }</span>
+<span class="ln" id="L1970">    }</span>
+<span class="ln" id="L1971">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
