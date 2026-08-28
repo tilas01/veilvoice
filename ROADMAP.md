@@ -171,12 +171,12 @@ being sure it is working. Neither is answered by more features.
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
 | 66 | **The live monitor** — what is going in and what is coming out, on every tab, on by default, and a preview that lets you hear yourself veiled before anybody else does | **done** | — |
-| 67 | **An interactive demonstration on the website** — the inside of the application and of the command line, laid out in the site's own colours, that a reader can click through before downloading anything | **next** | 3–4 d |
-| 68 | **A frequently asked questions page**, answering what gets asked rather than what is convenient to answer | **planned** | 1 d |
+| 67 | **An interactive demonstration on the website** — the inside of the application and of the command line, laid out in the site's own colours, that a reader can click through before downloading anything | **done** | — |
+| 68 | **A frequently asked questions page**, answering what gets asked rather than what is convenient to answer | **next** | 1 d |
 | 69 | **A drawn graphic for every workflow chart** — coloured arrows, an explanation inside the picture, and every word wrapped rather than running off the edge | **planned** | 2 d |
-| 70 | **This roadmap, published as a page**, with a picture of what is done and what is not, generated from this file so the two cannot disagree | **next** | 1 d |
+| 70 | **This roadmap, published as a page**, with a picture of what is done and what is not, generated from this file so the two cannot disagree | **done** | — |
 | 71 | **A video of the roadmap**, scrolling what is finished, with a short pause and a countdown before it repeats | **planned** | 1 d |
-| 72 | **The front page animation, in more depth** — the same picture, saying what the engine actually does to the signal rather than one word | **planned** | 1 d |
+| 72 | **The front page animation, in more depth** — the same picture, saying what the engine actually does to the signal rather than one word | **done** | — |
 | 73 | **A full security and functionality audit, and an optimisation pass, before the next deploy** — the whole tree, both halves, and the last thing that happens | **planned** | 4–6 d |
 
 ## Finally
