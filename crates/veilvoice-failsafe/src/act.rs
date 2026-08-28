@@ -66,24 +66,86 @@ fn still_named(app: &str, pid: u32) -> bool {
     text.contains(&file_name(app).to_ascii_lowercase())
 }
 
-/// Whether this process id still belongs to this program.
+/// The one-letter run state in a line of `/proc/<pid>/stat`.
+///
+/// The second field is the program's own name in brackets, and a program is
+/// free to have brackets and spaces in its name, so the split is on the **last**
+/// `)` rather than on whitespace. Splitting on the first one reads the state of
+/// a process called `foo)bar` out of the middle of its own name.
+#[cfg(not(windows))]
+fn run_state(stat: &str) -> Option<char> {
+    stat.rsplit_once(')')?
+        .1
+        .split_whitespace()
+        .next()?
+        .chars()
+        .next()
+}
+
+/// Whether this process id still belongs to this program **and is running**.
 ///
 /// See F-74. Asked immediately before the kill, which narrows the window rather
 /// than removing it: that is the best a caller outside the kernel can do, and
 /// saying so is better than pretending the problem is gone.
+///
+/// # F-76: a program that has died is still listed until somebody collects it
+///
+/// On Unix a process that has exited stays in the table, holding its id and its
+/// name, until its parent asks for its exit status. Measured on Linux: after
+/// `kill -TERM`, `/proc/<pid>/comm` still reads `sleep`, `ps -p <pid> -o comm=`
+/// still prints `sleep` and still exits 0, and the only field that has changed
+/// is the run state, which is now `Z`.
+///
+/// So a check that asks only for the name answers "yes, still there" about a
+/// program that is already dead. That is F-74's false report in the other
+/// direction: [`close`] would wait out its whole retry loop and then tell
+/// somebody to go and close a program by hand that had closed nearly three
+/// seconds earlier. The state is read first, and a collected-but-not-yet-reaped
+/// process counts as gone, because it is.
 #[cfg(not(windows))]
 fn still_named(app: &str, pid: u32) -> bool {
     let wanted = file_name(app).to_ascii_lowercase();
 
-    // Linux publishes it, so nothing has to be run.
+    // Linux publishes both, so nothing has to be run.
+    if let Ok(stat) = std::fs::read_to_string(format!("/proc/{pid}/stat")) {
+        if run_state(&stat) == Some('Z') {
+            return false;
+        }
+    }
     if let Ok(comm) = std::fs::read_to_string(format!("/proc/{pid}/comm")) {
         return comm.trim().to_ascii_lowercase() == wanted;
     }
-    match Command::new("/bin/ps")
-        .args(["-p", &pid.to_string(), "-o", "comm="])
-        .output()
-    {
-        Ok(output) if output.status.success() => {
+
+    let number = pid.to_string();
+    let ask = |columns: &str| {
+        Command::new("/bin/ps")
+            .args(["-p", &number, "-o", columns])
+            .output()
+            .ok()
+            .filter(|output| output.status.success())
+    };
+
+    // The state and the name in one line. Asked for first because the name
+    // alone cannot tell a running program from a dead one, and asked for
+    // separately below because `state` is not a column every `ps` has and a
+    // platform without it should lose the extra check rather than the feature.
+    if let Some(output) = ask("state=,comm=") {
+        let text = String::from_utf8_lossy(&output.stdout);
+        let line = text.trim();
+        let (state, name) = line.split_once(char::is_whitespace).unwrap_or((line, ""));
+        if state.starts_with('Z') {
+            return false;
+        }
+        return name
+            .trim()
+            .rsplit('/')
+            .next()
+            .unwrap_or("")
+            .to_ascii_lowercase()
+            == wanted;
+    }
+    match ask("comm=") {
+        Some(output) => {
             let text = String::from_utf8_lossy(&output.stdout);
             let name = text
                 .trim()
@@ -317,6 +379,49 @@ mod tests {
                 "not being able to tell must mean not closing it"
             );
         }
+    }
+
+    /// **F-76.** A program that has died is reported as gone, not as running.
+    ///
+    /// On Unix a process that has exited keeps its id and its name in the
+    /// table until its parent collects its exit status. This test is that
+    /// parent, and it deliberately does not collect: after the signal the
+    /// child is dead, `/proc/<pid>/comm` still reads `sleep`, and `ps` still
+    /// prints `sleep` and still exits 0.
+    ///
+    /// Before the fix, [`close`] read that as "still running", waited out its
+    /// whole retry loop, and then told the reader to go and close by hand a
+    /// program that had been dead for nearly three seconds. Measured: the two
+    /// tests below this one failed on Linux for exactly that reason while
+    /// passing on Windows, where a terminated process leaves the table at once.
+    #[cfg(unix)]
+    #[test]
+    fn a_program_that_has_died_but_not_been_collected_counts_as_gone() {
+        let Ok(mut child) = Command::new("/bin/sleep").arg("30").spawn() else {
+            // No such tool on this machine. Not a failure of the code under
+            // test, and better skipped than asserted around.
+            return;
+        };
+        let pid = child.id();
+        let told = close("sleep", Some(pid));
+        assert!(
+            told.is_ok(),
+            "a dead child must not be reported as running: {told:?}"
+        );
+
+        // Nothing has collected it yet, so the operating system is still
+        // holding the entry this used to be fooled by. Prove that rather than
+        // assume it: without it this test would pass for the wrong reason on
+        // any platform that reaps early.
+        let listed = std::fs::read_to_string(format!("/proc/{pid}/comm"));
+        if let Ok(name) = listed {
+            assert_eq!(
+                name.trim(),
+                "sleep",
+                "the entry should still be there, which is what makes this a test"
+            );
+        }
+        let _ = child.wait();
     }
 
     /// A real process, closed for real. Started here so nothing else is at

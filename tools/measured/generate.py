@@ -63,6 +63,13 @@ memory. Regenerated and checked by `tools/verify.py`; the documents and the
 website that quote them are compared against this file, so a claim that drifts
 fails the build instead of ageing quietly.
 
+**The test count is a number about one machine.** Some tests are compiled only
+on one operating system, so running the same tree on another gives a different
+total: this tree measures 996 on Windows and 988 on Linux. The row below says
+which machine produced the number in it, because a count with no platform
+beside it reads as a fact about the tree and is a fact about a computer. See
+F-77 in `docs/AUDIT.md`.
+
 | What | Measured |
 |---|---:|
 """
@@ -125,6 +132,24 @@ def measured_tests() -> int:
     return sum(totals)
 
 
+def host_triple() -> str:
+    """The target this machine builds for, as rustc names it.
+
+    Recorded beside the test count because that count is a number about this
+    machine rather than about the tree. `rustc -vV` prints it; a compiler that
+    will not answer leaves the row saying so rather than guessing, because a
+    guessed platform is worse than a missing one.
+    """
+    try:
+        finished = subprocess.run(
+            ["rustc", "-vV"], cwd=ROOT, capture_output=True, check=False)
+    except OSError:
+        return "unknown"
+    text = finished.stdout.decode("utf-8", errors="replace")
+    found = re.search(r"^host:\s*(\S+)$", text, re.M)
+    return found.group(1) if found else "unknown"
+
+
 def render() -> str:
     rows = [
         ("Tests, measured by running them", measured_tests()),
@@ -132,6 +157,7 @@ def render() -> str:
         ("Website suites", site_suites()),
     ]
     body = "".join(f"| {name} | {value} |\n" for name, value in rows)
+    body += f"| Measured on | `{host_triple()}` |\n"
     return HEADER + body
 
 
