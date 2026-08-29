@@ -173,6 +173,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`settings.rs`|File-veilvoice-gui-settings]] &mdash; The settings panel: a menu of pages, each a titled group of choices.
 - [[`setup.rs`|File-veilvoice-gui-setup]] &mdash; The setup tab: install this copy, undo that, and the optional companions.
 - [[`soundbar.rs`|File-veilvoice-gui-soundbar]] &mdash; The animated mark: a row of bars that rise and fall.
+- [[`storage.rs`|File-veilvoice-gui-storage]] &mdash; Where veiled recordings are written, and the encrypted volume that may hold them.
 - [[`theme.rs`|File-veilvoice-gui-theme]] &mdash; Colour schemes for the desktop app.
 - [[`updates.rs`|File-veilvoice-gui-updates]] &mdash; The manual update check, as the window shows it.
 - [[`verify.rs`|File-veilvoice-gui-verify]] &mdash; The verify tab: drop a download on the window and be told what it is.

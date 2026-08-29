@@ -85,6 +85,18 @@ pub struct Prefs {
     /// direction it can fail in is the safe one, so it survives a restart and
     /// the user is not asked to choose it again every launch.
     pub seal_with_app_lock: bool,
+    /// The encrypted folder veiled recordings are written into, or empty.
+    ///
+    /// **Markers 82 to 84.** Three fields rather than one, because the hidden
+    /// state has to survive a restart alongside the path: a destination whose
+    /// answer was forgotten would ask again, and a user asked the same question
+    /// every launch stops reading it.
+    pub vault_dir: String,
+    /// Which tool that folder belongs to: `cryptomator` or `veracrypt`.
+    pub vault_tool: String,
+    /// The answer to the hidden-volume question. Anything unrecognised, or
+    /// missing, reads as unanswered and blocks writing.
+    pub vault_hidden: String,
     /// How notifications are shown: `overlay`, `alert` or `off`.
     ///
     /// Stored as its key rather than as a number, so a settings file stays
@@ -123,6 +135,9 @@ impl Default for Prefs {
             hide_install_tab: false,
             always_group: false,
             seal_with_app_lock: false,
+            vault_dir: String::new(),
+            vault_tool: String::new(),
+            vault_hidden: String::new(),
             notify_style: crate::notify::Style::default().key().to_string(),
             // On, and docked. Live scramble is the mode where what is being
             // protected is happening now, and the two questions a person has
@@ -243,6 +258,18 @@ impl Prefs {
                         understood += 1;
                     }
                 }
+                "vault_dir" => {
+                    prefs.vault_dir = value.to_string();
+                    understood += 1;
+                }
+                "vault_tool" => {
+                    prefs.vault_tool = value.to_string();
+                    understood += 1;
+                }
+                "vault_hidden" => {
+                    prefs.vault_hidden = value.to_string();
+                    understood += 1;
+                }
                 _ => {}
             }
         }
@@ -268,6 +295,9 @@ impl Prefs {
             "seal_with_app_lock = {}\n",
             self.seal_with_app_lock
         ));
+        out.push_str(&format!("vault_dir = {}\n", self.vault_dir));
+        out.push_str(&format!("vault_tool = {}\n", self.vault_tool));
+        out.push_str(&format!("vault_hidden = {}\n", self.vault_hidden));
         out.push_str(&format!("notify_style = {}\n", self.notify_style));
         out.push_str(&format!("live_monitor = {}\n", self.live_monitor));
         out.push_str(&format!("failsafe = {}\n", self.failsafe));
@@ -372,6 +402,9 @@ mod tests {
             hide_install_tab: true,
             always_group: true,
             seal_with_app_lock: false,
+            vault_dir: String::new(),
+            vault_tool: String::new(),
+            vault_hidden: String::new(),
             notify_style: "alert".to_string(),
             failsafe: "warn".to_string(),
             live_monitor: "toolbar".to_string(),
@@ -463,6 +496,9 @@ mod tests {
             hide_install_tab: false,
             always_group: false,
             seal_with_app_lock: true,
+            vault_dir: "/media/veracrypt1".into(),
+            vault_tool: "veracrypt".into(),
+            vault_hidden: "none".into(),
             recovered_from_corrupt_file: false,
         };
         prefs.save(&path).unwrap();
