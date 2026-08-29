@@ -214,7 +214,7 @@ it can honestly be made rather than to keep apologising for it.
 | 83 | **The hidden-volume question, asked properly** — when a VeraCrypt destination is marked as hidden, confirm it before anything is written, and never guess | **planned** | 2 d |
 | 84 | **The guided path, for when detection fails** — plain instructions, and a refusal to continue until the user has confirmed which volume they mean | **planned** | 2 d |
 | 85 | **What full-disk encryption is for, said once and said properly** — BitLocker, FileVault, LUKS and LUKS2, and the OpenBSD and FreeBSD equivalents, in the documentation and in the application | **planned** | 1–2 d |
-| 86 | **The app lock as a key, not only a verifier** — the app-lock passphrase derives a file key by domain separation, and everything VeilVoice veils is sealed with it automatically | **planned, and it reverses a locked decision** | 3–4 d |
+| 86 | **The app lock as a key, not only a verifier** — the app-lock passphrase seals everything VeilVoice veils, automatically, as an option that says what it costs | **done** | — |
 
 ---
 
@@ -584,11 +584,15 @@ The request is that the app lock stop being only a password check and become a
 key, so that every file VeilVoice veils is encrypted automatically without
 anybody choosing a second passphrase.
 
-The machinery is already there and the change is small. `lock.rs` runs Argon2id
-once and splits it with HKDF into a verifier and a tag key; a third label
-produces a file key, at no extra cost, that never touches disk. Marker 76 built
-that split for the authentication tag, and a file key is the same construction
-with a different info string.
+**Built, and the construction is simpler than the one this paragraph first
+proposed.** The plan was a third HKDF label producing a file key from the lock's
+own derivation. That would have worked and it had a defect worth catching before
+it shipped: a key tied to the lock file's salt means deleting the lock destroys
+every recording sealed under it, and deleting the lock is the documented remedy
+for forgetting the passphrase. So the recordings are sealed under the
+*passphrase* instead, through the ordinary container path, with a fresh salt per
+file. Nothing about opening them later depends on the lock existing, and
+`veilvoice decrypt` opens them on any machine.
 
 What has to be stated, because the current code states the opposite in as many
 words, is the property that is being given up. `lock.rs` says today that the
@@ -602,23 +606,25 @@ marker 86 they reveal the archive as well.
 So this is a genuine trade, not a free improvement, and it goes in with three
 things attached or it does not go in:
 
-- **The container passphrase stays.** The app-lock key is an *additional*
-  automatic layer for files that would otherwise be written in the clear, not a
-  replacement for a passphrase somebody chose deliberately. A file already
-  sealed under its own passphrase is not re-sealed under a weaker arrangement.
+- **The container passphrase stays.** App-lock sealing is a third choice beside
+  *passphrase* and *public key*, not a replacement for either. A user who chose
+  a separate recording passphrase keeps it.
 - **It is opt-in, and the interface says what it costs**, in the same place and
-  the same plain words the app lock already uses to say what it is worth. A
-  user who wants one passphrase for everything can have it; a user who wants
-  the separation keeps it.
-- **Losing the app-lock passphrase then loses the files.** Today, forgetting it
-  costs a session and the fix is deleting the lock. With marker 86 that is no
-  longer true for anything sealed under it, and deleting the lock would destroy
-  access to the archive. That has to be said before the feature is switched on,
-  not discovered afterwards.
+  the same plain words the app lock already uses to say what it is worth. It is
+  offered only where a lock exists, because there is nothing to seal with
+  otherwise.
+- **Losing the app-lock passphrase then loses the files.** Without it,
+  forgetting the passphrase costs a session and the fix is deleting the lock.
+  With it, deleting the lock does not help, and there is no recovery. Said in
+  the interface and in `USER_GUIDE.md` section 5.4 before it can be switched
+  on, rather than discovered afterwards.
 
-None of that is a reason to refuse the request. It is the reason the marker is
-four days rather than one, and it is why the estimate is mostly documentation
-and interface rather than cryptography.
+One thing fell out of building it that the plan had not anticipated. The
+passphrase has to be kept for the session to seal with, and keeping it is a
+real cost, so it is kept *only when the mode is already chosen*: a user who has
+not asked for this keeps the previous behaviour exactly, where the passphrase
+is wiped the instant it has been checked. A test holds that, because the lazy
+version of this change is one line and holds the passphrase for everybody.
 
 **Marker 80 is the work a roadmap marker does not describe, and it found a
 defect.** Every marker above being finished is not the same as a tree being

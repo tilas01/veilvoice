@@ -308,13 +308,41 @@ own passphrase. The second copy is what stands in the way of that, not the tag.
 And restoring an older copy of your own lock file, to wind the report back, is
 not detected either.
 
-### 5.4 Use two different passwords
+### 5.4 Two passwords by default, and one if you choose it
 
-The app lock and the recording passphrase are deliberately separate secrets. If
+The app lock and the recording passphrase are separate secrets by default. If
 one password did both, opening the app would be the same act as unsealing
 everything it had ever written. VeilVoice keeps the two derivations domain
 separated, so typing the same passphrase in both places still does not produce
-two copies of one value — but one guess would then open both, so do not.
+two copies of one value, though one guess would then open both.
+
+**You can now choose to have one.** On the security tab, under how recordings
+are sealed, there is a third option beside *passphrase* and *public key*: **app
+lock**. With it on, every recording VeilVoice writes is sealed with your
+app-lock password automatically, with nothing else to set up and nothing else
+to remember. The choice is remembered between launches.
+
+Read this before turning it on:
+
+- **One password now opens the application and everything it has ever
+  written.** Somebody who makes you unlock VeilVoice in front of them has
+  opened the archive, not just the session. That is the entire cost, and it is
+  the reason the two are separate by default.
+- **Forgetting that password loses the recordings**, not just a session.
+  Without this on, forgetting the app-lock password costs you the lock and the
+  fix is deleting it. With it on, deleting the lock does not help: the
+  recordings are encrypted, and there is no recovery.
+- **The recordings do not depend on the lock file.** Each file carries its own
+  salt and cost, so `veilvoice decrypt` opens it with the same password on any
+  machine, with or without a lock. Removing the lock does not lock you out of
+  anything.
+- **It takes effect at the next unlock.** The password is taken as the lock
+  opens, because that is the only moment it exists. Turning the option on
+  mid-session tells you to lock and unlock again, rather than quietly writing
+  the next recording unencrypted.
+
+Only offered when an app lock is set, because there is nothing to seal with
+otherwise.
 
 ### 5.5 If you forget the app-lock password
 
