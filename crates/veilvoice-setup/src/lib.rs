@@ -67,6 +67,7 @@
 
 pub mod companions;
 pub mod install;
+pub mod volumes;
 
 use std::ffi::OsStr;
 use std::process::Command;

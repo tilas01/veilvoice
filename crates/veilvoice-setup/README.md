@@ -103,12 +103,15 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>168 lines"])
+    n_lib(["lib.rs<br/>169 lines"])
     n_companions["companions.rs<br/>771 lines"]
     n_install["install.rs<br/>568 lines"]
+    n_volumes["volumes.rs<br/>536 lines"]
+    n_volumes --> n_companions
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" "open the source"
     click n_companions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" "open the source"
     click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" "open the source"
+    click n_volumes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs" "open the source"
 ```
 
 </details>
@@ -119,7 +122,8 @@ flowchart TD
 |---|---:|---|
 | [`companions.rs`](../../docs/files/veilvoice-setup/companions.md) | 771 | Optional third-party software, detected rather than assumed. |
 | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 568 | Put this program somewhere the system can find it. |
-| [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 168 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 169 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | 536 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
 ## Public items
 
@@ -141,6 +145,13 @@ flowchart TD
 | `fn install` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | Install for this user. |
 | `fn uninstall` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | Remove what install added. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | Crate version string, surfaced in the About panel. |
+| `const DISK_ADVICE` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | What VeilVoice tells the user about the disk under the volume. |
+| `enum Tool` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | One of the two tools this module knows about. |
+| `enum Hidden` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | Whether a destination is, or might be, a VeraCrypt hidden volume. |
+| `struct Volume` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | A mounted volume VeilVoice could write into. |
+| `fn installed` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | Whether tool looks installed on this machine. |
+| `fn mounted` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | Every mounted volume either tool is currently offering. |
+| `fn from_proc_mounts` | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | Parse a Linux mount table into the volumes we recognise. |
 
 ## Reading it elsewhere
 
