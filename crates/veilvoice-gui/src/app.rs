@@ -277,6 +277,9 @@ pub struct VeilVoiceApp {
     /// The integrity record, taken at the first launch and checked at every
     /// one after. See [`crate::integrity`].
     integrity: crate::integrity::Integrity,
+    /// Where veiled recordings go, and the encrypted volume that may hold
+    /// them. See [`crate::storage`].
+    storage: crate::storage::Storage,
 
     // Colour scheme and animation. Named `preferences` rather than `settings`
     // because this type already has a `settings` method, which is the engine's
@@ -368,6 +371,7 @@ impl VeilVoiceApp {
             previewing: false,
             security: Security::default(),
             integrity: crate::integrity::Integrity::default(),
+            storage: crate::storage::Storage::default(),
             // Off. `VeilVoiceApp::new` is the only place the saved preference
             // is consulted, so no test and no `Default` can open in group mode
             // because of something on this machine's disk.
@@ -569,6 +573,12 @@ impl VeilVoiceApp {
         // opens, and only when this mode is already the chosen one.
         let seal_with_app_lock = app.preferences.seal_with_app_lock();
         app.security.prefer_app_lock_sealing(seal_with_app_lock);
+
+        // Markers 82 to 84. The remembered destination, and one look at what is
+        // mounted. Both at startup rather than per frame: `refresh` reads the
+        // mount table, and the draw path reads no files.
+        app.storage.destination = app.preferences.destination();
+        app.storage.refresh();
 
         // The integrity record, started before anything is drawn and finished
         // on its own thread. With an app lock set this run is skipped: the
@@ -925,6 +935,12 @@ impl eframe::App for VeilVoiceApp {
                         Tab::Security => {
                             self.security.tab(ui);
                             Self::integrity_panel(ui, self.integrity.state());
+                            // Markers 82 to 84. Returns true when the choice
+                            // changed, which is when it is worth a write to
+                            // the settings file rather than every frame.
+                            if crate::storage::panel(&mut self.storage, ui) {
+                                self.preferences.set_destination(&self.storage.destination);
+                            }
                         }
                         Tab::Verify => self.verify.tab(ui),
                         Tab::Preferences => self.preferences.tab(ui, ctx),
@@ -1181,7 +1197,15 @@ impl VeilVoiceApp {
 
         ui.add_space(12.0);
         let busy = self.job.is_some();
-        let ready = self.input.is_some() && !busy && self.security.ready_to_write();
+        // Marker 83. A destination whose hidden-volume question is unanswered
+        // blocks the job rather than quietly writing beside the source file.
+        // The silent fallback is the failure this exists to prevent: a veiled
+        // recording sitting outside a vault while its owner believes it is
+        // inside one.
+        let ready = self.input.is_some()
+            && !busy
+            && self.security.ready_to_write()
+            && self.storage.destination.ready();
         let button = ui.add_enabled(
             ready,
             egui::Button::new(RichText::new("  anonymise  ").strong()),
@@ -1190,6 +1214,9 @@ impl VeilVoiceApp {
             self.start_job();
         }
         if let Some(reason) = self.security.blocked_reason() {
+            ui.label(RichText::new(reason).color(p::yellow()).small());
+        }
+        if let Some(reason) = self.storage.destination.blocked() {
             ui.label(RichText::new(reason).color(p::yellow()).small());
         }
         if busy {
@@ -1236,6 +1263,12 @@ impl VeilVoiceApp {
             o.set_extension("veiled.wav");
             o
         });
+        // Marker 82. The encrypted destination replaces the folder and keeps
+        // the name. `place` returns the original untouched when nothing is
+        // chosen, and also when the destination is not cleared to be used, so
+        // a job that got past the button somehow still cannot write into a
+        // volume whose hidden-volume question is unanswered.
+        let output = self.storage.destination.place(&output);
         let config = self.config();
         let clean = self.posture().clean_metadata;
         let plan = self.security.plan();
@@ -1971,6 +2004,23 @@ mod tests {
                 tab.key()
             );
         }
+    }
+
+    /// Marker 83. An unanswered hidden-volume question must stop the job, not
+    /// quietly redirect it back beside the source file. A user who believes
+    /// their recording went into a vault and finds it next to the original is
+    /// the failure the whole question exists to prevent.
+    #[test]
+    fn an_unanswered_vault_question_blocks_the_job_rather_than_redirecting_it() {
+        let source = include_str!("app.rs").replace("\r\n", "\n");
+        let start = source
+            .find("let ready = self.input.is_some()")
+            .expect("the gate exists");
+        let gate = &source[start..start + 400];
+        assert!(
+            gate.contains("self.storage.destination.ready()"),
+            "the start button ignores whether the destination is cleared for use"
+        );
     }
 
     /// Marker 75. The record has to be taken without anybody knowing to ask,

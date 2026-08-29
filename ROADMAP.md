@@ -209,11 +209,11 @@ it can honestly be made rather than to keep apologising for it.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 81 | **Find the encrypted volumes this machine already has** — detect an installed Cryptomator or VeraCrypt, and the vaults and mounted volumes each is offering, without asking either to do anything | **planned** | 3–4 d |
-| 82 | **Write veiled output into a chosen volume** — a destination that is a Cryptomator vault or a mounted VeraCrypt volume, remembered, and used for every export | **planned** | 2–3 d |
-| 83 | **The hidden-volume question, asked properly** — when a VeraCrypt destination is marked as hidden, confirm it before anything is written, and never guess | **planned** | 2 d |
-| 84 | **The guided path, for when detection fails** — plain instructions, and a refusal to continue until the user has confirmed which volume they mean | **planned** | 2 d |
-| 85 | **What full-disk encryption is for, said once and said properly** — BitLocker, FileVault, LUKS and LUKS2, and the OpenBSD and FreeBSD equivalents, in the documentation and in the application | **planned** | 1–2 d |
+| 81 | **Find the encrypted volumes this machine already has** — detect an installed Cryptomator or VeraCrypt, and the vaults and mounted volumes each is offering, without asking either to do anything | **done** | — |
+| 82 | **Write veiled output into a chosen volume** — a destination that is a Cryptomator vault or a mounted VeraCrypt volume, remembered, and used for every export | **done** | — |
+| 83 | **The hidden-volume question, asked properly** — asked before the first write, three answers, and a job that will not start until one is given | **done** | — |
+| 84 | **The guided path, for when detection fails** — plain instructions, a folder chosen by hand, and the same confirmation a detected one gets | **done** | — |
+| 85 | **What full-disk encryption is for, said once and said properly** — BitLocker, FileVault, LUKS and LUKS2, and the OpenBSD and FreeBSD equivalents, single-sourced and shown in both | **done** | — |
 | 86 | **The app lock as a key, not only a verifier** — the app-lock passphrase seals everything VeilVoice veils, automatically, as an option that says what it costs | **done** | — |
 
 ---
@@ -576,6 +576,30 @@ encrypted with its own cryptography, and nothing here replaces or weakens that.
 A veiled recording written into a Cryptomator vault is encrypted twice, by two
 independent tools, and the useful property of that is not extra strength but
 independence: a defect in one is not a defect in both.
+
+**Markers 81 to 85 are built, and two things were learned in the building.**
+
+The first is that the hidden-volume question is worth more than the feature
+around it. Everything else here is a remembered output directory; that question
+is the only part where getting it wrong destroys data that cannot be recovered.
+So it is not a checkbox: `Hidden` starts `Unanswered`, an unanswered
+destination refuses to place a file, the outer volume of a declared pair is
+refused outright, and a settings file edited into nonsense reads as unanswered
+rather than as "fine". A job with an unanswered destination is **blocked**
+rather than redirected back beside the source, because the silent fallback puts
+a recording outside a vault while its owner believes it is inside one.
+
+The second was found by writing it. The panel called `still_there`, a stat
+syscall, once per frame, for an answer that changes when somebody unlocks a
+volume. That is precisely what marker 79 taught the draw path to refuse, and it
+went straight into a new module where that guard test does not look. The answer
+is cached at refresh now and a second guard test lives beside the panel.
+
+Detection stayed read-only throughout, as marker 39 requires, and a test refuses
+`Command::new` in the shipped half of the module. Verified on this machine end
+to end: a real binary on `PATH` is found, a mount table produces the two
+volumes and none of the ordinary mounts, and a VeraCrypt volume is refused until
+answered.
 
 **Marker 86 reverses a decision this project has documented and defended, and
 it is written down that way rather than quietly.**

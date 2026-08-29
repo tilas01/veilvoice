@@ -395,6 +395,80 @@ configuration directory would describe nothing anybody checks.
 `veilvoice guard init`, `check` and `status` still work, read the same record,
 and can watch more files than the window does. See §4.
 
+## 5.7 Saving into a Cryptomator vault or a VeraCrypt volume
+
+VeilVoice can write every veiled recording straight into an encrypted folder you
+already have, instead of leaving it beside the original. The security tab has a
+section called **Where recordings go**.
+
+It looks for a mounted Cryptomator vault or VeraCrypt volume and offers what it
+finds. If it finds nothing, point at the folder by hand and say which of the two
+it belongs to; a folder you chose yourself is treated exactly like one that was
+found, including the question below.
+
+**VeilVoice never opens or closes these for you, and never asks for their
+password.** Unlock the volume in its own program first. Mounting your encrypted
+storage is your act, taken in the tool you chose, and a voice de-identifier is
+not the program to be doing it on your behalf.
+
+### The hidden-volume question
+
+If you choose a **VeraCrypt** volume, VeilVoice asks one question before it will
+write anything, and will not start a job until you answer:
+
+> Does this container have a hidden volume inside it?
+
+It asks because it cannot tell, and neither can anything else. A VeraCrypt
+container can hold a second volume inside the free space of the first, so that
+somebody forced to hand over a password can open the outer one truthfully while
+the inner one stays unprovable. That only works because the two are
+indistinguishable from outside.
+
+The danger is specific. **Writing into the outer volume of a container that has
+a hidden one can destroy the hidden data**, because the outer filesystem does
+not know the inner one is there and will allocate over it. VeraCrypt has a
+protection mode for this and it needs the hidden volume's password, which
+VeilVoice does not have and will not ask for.
+
+So there are three answers and they do different things:
+
+| Answer | What happens |
+|---|---|
+| No hidden volume | VeilVoice writes there |
+| This is the hidden one | VeilVoice writes there; you are already inside the hidden volume, which is safe |
+| This is the outer one | VeilVoice refuses, and says why |
+
+Cryptomator is not asked, because it has no such concept and a question with no
+meaning only teaches people to click through questions.
+
+A destination you have not answered for **blocks the job**. It does not quietly
+fall back to writing beside the original, because a recording sitting outside a
+vault while you believe it is inside one is exactly what this is here to
+prevent. If the volume is locked when you come to use it, VeilVoice says so
+rather than writing into the empty mount point.
+
+### 5.8 Encrypt the disk as well
+
+An encrypted volume protects the files inside it. It does not protect the
+temporary files, swap or hibernation image, thumbnails or recently-opened lists
+your system writes about them, and any of those can outlive the recording.
+
+Encrypt the whole disk too:
+
+| System | Use |
+|---|---|
+| Windows | BitLocker |
+| macOS | FileVault |
+| Linux | LUKS or LUKS2 |
+| OpenBSD | `softraid -C` |
+| FreeBSD | GELI |
+
+This is defence in depth, not a second lock on the same door. The volume
+protects the file; the disk protects everything the system wrote about the file
+without being asked. A veiled recording inside a Cryptomator vault on an
+encrypted disk is encrypted by two independent tools, and what that buys is not
+extra strength so much as independence: a defect in one is not a defect in both.
+
 ## 6. Things VeilVoice will not do
 
 Read this twice. Misunderstanding it is the only way this software gets someone
