@@ -26,6 +26,7 @@ BuildRequires:  cargo
 BuildRequires:  rust >= 1.96
 BuildRequires:  pkgconfig(alsa)
 BuildRequires:  gcc
+BuildRequires:  python3
 # The desktop app needs the windowing stack; the CLI does not.
 BuildRequires:  pkgconfig(gtk+-3.0)
 BuildRequires:  pkgconfig(xkbcommon)
@@ -66,6 +67,18 @@ install -Dpm 0755 target/release/veilvoice-gui    %{buildroot}%{_bindir}/veilvoi
 install -Dpm 0644 assets/icon.png                 %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/veilvoice.png
 install -Dpm 0644 packaging/veilvoice.desktop     %{buildroot}%{_datadir}/applications/veilvoice.desktop
 
+# Manual pages, generated from each binary's own `--help`. Written out by hand
+# they would be a second description of the interface, kept in step with the
+# first by nothing but attention.
+python3 tools/release/manpage.py target/release/veilvoice \
+    %{buildroot}%{_mandir}/man1/veilvoice.1
+python3 tools/release/manpage.py target/release/veilvoice-verify \
+    %{buildroot}%{_mandir}/man1/veilvoice-verify.1 \
+    --summary "check a VeilVoice release against its signature"
+python3 tools/release/manpage.py target/release/veilvoice-gui \
+    %{buildroot}%{_mandir}/man1/veilvoice-gui.1 \
+    --summary "the VeilVoice desktop application"
+
 %check
 cargo test --release --locked --workspace
 
@@ -74,9 +87,12 @@ cargo test --release --locked --workspace
 %doc README.md docs/
 %{_bindir}/veilvoice
 %{_bindir}/veilvoice-verify
+%{_mandir}/man1/veilvoice.1*
+%{_mandir}/man1/veilvoice-verify.1*
 
 %files gui
 %{_bindir}/veilvoice-gui
+%{_mandir}/man1/veilvoice-gui.1*
 %{_datadir}/icons/hicolor/256x256/apps/veilvoice.png
 %{_datadir}/applications/veilvoice.desktop
 

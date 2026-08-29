@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-guard/manifest.svg" alt="manifest.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-guard/src/manifest.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-guard.html">veilvoice-guard</a> &middot; 678 lines &middot; <a href="manifest.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-guard.html">veilvoice-guard</a> &middot; 730 lines &middot; <a href="manifest.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#format">Format</a>
@@ -64,7 +64,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>678 lines defining <strong>18 functions</strong> (15 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>730 lines defining <strong>18 functions</strong> (15 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Entry</code> <span style="color:var(--muted)">line 43</span> &mdash; One recorded file.</li>
 <li><code>enum Change</code> <span style="color:var(--muted)">line 52</span> &mdash; How a file differs from its record.</li>
@@ -99,10 +99,10 @@
 <li><code>Manifest::seal</code> <span style="color:var(--muted)">line 395</span> &mdash; Seal the manifest under a passphrase.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Manifest::open_sealed</code> <span style="color:var(--muted)">line 404</span> &mdash; Open a manifest sealed by Manifest::seal.
+<li><code>Manifest::open_sealed</code> <span style="color:var(--muted)">line 424</span> &mdash; Open a manifest sealed by Manifest::seal.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>unrecordable</code></span>
 </li>
-<li><code>files_in</code> <span style="color:var(--muted)">line 417</span> &mdash; Every file directly inside dir, for use as check&#x27;s extra argument.
+<li><code>files_in</code> <span style="color:var(--muted)">line 441</span> &mdash; Every file directly inside dir, for use as check&#x27;s extra argument.
 </li>
 </ul>
 </section>
@@ -212,12 +212,12 @@
 <a href="manifest.src.html#fn-manifest-open_sealed">
 <rect x="134.4" y="520.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="233.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Manifest::open_sealed</text>
-<text x="233.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 404</text>
+<text x="233.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 424</text>
 </a>
 <a href="manifest.src.html#fn-files_in">
 <rect x="357.6" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="403.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">files_in</text>
-<text x="403.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 417</text>
+<text x="403.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 441</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -252,8 +252,8 @@ flowchart TD
     n_save([&quot;Manifest::save&lt;br/&gt;line 370&quot;])
     n_load([&quot;Manifest::load&lt;br/&gt;line 381&quot;])
     n_seal([&quot;Manifest::seal&lt;br/&gt;line 395&quot;])
-    n_open_sealed([&quot;Manifest::open_sealed&lt;br/&gt;line 404&quot;])
-    n_files_in([&quot;files_in&lt;br/&gt;line 417&quot;])
+    n_open_sealed([&quot;Manifest::open_sealed&lt;br/&gt;line 424&quot;])
+    n_files_in([&quot;files_in&lt;br/&gt;line 441&quot;])
     n_check --&gt; n_digest_of
     n_check --&gt; n_normalise
     n_load --&gt; n_parse
@@ -280,8 +280,8 @@ flowchart TD
     click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L370&quot; &quot;open the source&quot;
     click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L381&quot; &quot;open the source&quot;
     click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L395&quot; &quot;open the source&quot;
-    click n_open_sealed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L404&quot; &quot;open the source&quot;
-    click n_files_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L417&quot; &quot;open the source&quot;
+    click n_open_sealed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L424&quot; &quot;open the source&quot;
+    click n_files_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L441&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_path,n_describe,n_is_clean,n_of,n_len,n_is_empty,n_paths,n_check,n_save,n_load,n_seal,n_open_sealed,n_files_in entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -315,8 +315,8 @@ flowchart TD
 <tr><td><code>Manifest::save</code> <sub>pub fn</sub></td><td><a href="manifest.src.html#fn-manifest-save">370</a></td><td>Write the manifest to path in the clear.</td></tr>
 <tr><td><code>Manifest::load</code> <sub>pub fn</sub></td><td><a href="manifest.src.html#fn-manifest-load">381</a></td><td>Read a manifest written by Manifest::save.</td></tr>
 <tr><td><code>Manifest::seal</code> <sub>pub fn</sub></td><td><a href="manifest.src.html#fn-manifest-seal">395</a></td><td>Seal the manifest under a passphrase.</td></tr>
-<tr><td><code>Manifest::open_sealed</code> <sub>pub fn</sub></td><td><a href="manifest.src.html#fn-manifest-open_sealed">404</a></td><td>Open a manifest sealed by Manifest::seal.</td></tr>
-<tr><td><code>files_in</code> <sub>pub fn</sub></td><td><a href="manifest.src.html#fn-files_in">417</a></td><td>Every file directly inside dir, for use as check&#x27;s extra argument.</td></tr>
+<tr><td><code>Manifest::open_sealed</code> <sub>pub fn</sub></td><td><a href="manifest.src.html#fn-manifest-open_sealed">424</a></td><td>Open a manifest sealed by Manifest::seal.</td></tr>
+<tr><td><code>files_in</code> <sub>pub fn</sub></td><td><a href="manifest.src.html#fn-files_in">441</a></td><td>Every file directly inside dir, for use as check&#x27;s extra argument.</td></tr>
 </tbody></table>
 </section>
 </div></div>

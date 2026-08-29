@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-policy/policy.svg" alt="policy.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-policy/src/policy.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-policy.html">veilvoice-policy</a> &middot; 905 lines &middot; <a href="policy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-policy.html">veilvoice-policy</a> &middot; 922 lines &middot; <a href="policy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#every-requirement-tightens-and-there-is-nowhere-to-write-one-that-does-not">Every requirement tightens, and there is nowhere to write one that does not</a>
@@ -71,12 +71,12 @@ require  minimum-intensity  80</code></pre>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>905 lines defining <strong>25 functions</strong> (23 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>922 lines defining <strong>25 functions</strong> (23 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Requirement</code> <span style="color:var(--muted)">line 69</span> &mdash; One thing a policy can insist on.</li>
 <li><code>struct Posture</code> <span style="color:var(--muted)">line 137</span> &mdash; The settings a policy can reach, as a front end holds them.</li>
 <li><code>struct Policy</code> <span style="color:var(--muted)">line 194</span> &mdash; A set of requirements, and an optional note from whoever wrote them.</li>
-<li><code>enum Verification</code> <span style="color:var(--muted)">line 456</span> &mdash; What is known about the seal on a policy.</li>
+<li><code>enum Verification</code> <span style="color:var(--muted)">line 473</span> &mdash; What is known about the seal on a policy.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Requirement::keyword</code> <span style="color:var(--muted)">line 88</span> &mdash; The keyword this is written as.
@@ -102,14 +102,14 @@ require  minimum-intensity  80</code></pre>
 <li><code>Policy::constrain</code> <span style="color:var(--muted)">line 283</span> &mdash; Apply the policy to a posture.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>minimum_intensity</code>, <code>requires</code></span>
 </li>
-<li><code>Policy::save</code> <span style="color:var(--muted)">line 398</span> &mdash; Write the plain policy into dir, and the sealed copy beside it.
+<li><code>Policy::save</code> <span style="color:var(--muted)">line 415</span> &mdash; Write the plain policy into dir, and the sealed copy beside it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>seal</code>, <code>to_text</code></span>
 </li>
-<li><code>Verification::describe</code> <span style="color:var(--muted)">line 476</span> &mdash; One line for a front end.
+<li><code>Verification::describe</code> <span style="color:var(--muted)">line 493</span> &mdash; One line for a front end.
 </li>
-<li><code>Verification::wants_attention</code> <span style="color:var(--muted)">line 501</span> &mdash; Whether this is a state somebody should look at.
+<li><code>Verification::wants_attention</code> <span style="color:var(--muted)">line 518</span> &mdash; Whether this is a state somebody should look at.
 </li>
-<li><code>verify</code> <span style="color:var(--muted)">line 513</span> &mdash; Check the plain policy in dir against its sealed copy.
+<li><code>verify</code> <span style="color:var(--muted)">line 530</span> &mdash; Check the plain policy in dir against its sealed copy.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>open_sealed</code>, <code>parse</code>, <code>new</code>, <code>requirement_from</code>, <code>default</code></span>
 </li>
 </ul>
@@ -228,27 +228,27 @@ require  minimum-intensity  80</code></pre>
 <a href="policy.src.html#fn-policy-open_sealed">
 <rect x="235.1" y="637.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="325.7" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Policy::open_sealed</text>
-<text x="325.7" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 385</text>
+<text x="325.7" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 398</text>
 </a>
 <a href="policy.src.html#fn-policy-save">
 <rect x="442.3" y="637.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="504.6" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Policy::save</text>
-<text x="504.6" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 398</text>
+<text x="504.6" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 415</text>
 </a>
 <a href="policy.src.html#fn-policy-load">
 <rect x="204.1" y="737.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="266.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Policy::load</text>
-<text x="266.5" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 415</text>
+<text x="266.5" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 432</text>
 </a>
 <a href="policy.src.html#fn-requirement_from">
 <rect x="247.2" y="837.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="325.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">requirement_from</text>
-<text x="325.7" y="876.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 424</text>
+<text x="325.7" y="876.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 441</text>
 </a>
 <a href="policy.src.html#fn-verify">
 <rect x="354.8" y="737.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="401.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">verify</text>
-<text x="401.1" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 513</text>
+<text x="401.1" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 530</text>
 </a>
 <rect x="20.0" y="921.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="930.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -284,11 +284,11 @@ flowchart TD
     n_to_text[&quot;Policy::to_text&lt;br/&gt;line 304&quot;]
     n_parse[&quot;Policy::parse&lt;br/&gt;line 330&quot;]
     n_seal[&quot;Policy::seal&lt;br/&gt;line 376&quot;]
-    n_open_sealed[&quot;Policy::open_sealed&lt;br/&gt;line 385&quot;]
-    n_save([&quot;Policy::save&lt;br/&gt;line 398&quot;])
-    n_load[&quot;Policy::load&lt;br/&gt;line 415&quot;]
-    n_requirement_from[&quot;requirement_from&lt;br/&gt;line 424&quot;]
-    n_verify([&quot;verify&lt;br/&gt;line 513&quot;])
+    n_open_sealed[&quot;Policy::open_sealed&lt;br/&gt;line 398&quot;]
+    n_save([&quot;Policy::save&lt;br/&gt;line 415&quot;])
+    n_load[&quot;Policy::load&lt;br/&gt;line 432&quot;]
+    n_requirement_from[&quot;requirement_from&lt;br/&gt;line 441&quot;]
+    n_verify([&quot;verify&lt;br/&gt;line 530&quot;])
     n_constrain --&gt; n_minimum_intensity
     n_constrain --&gt; n_requires
     n_load --&gt; n_parse
@@ -318,11 +318,11 @@ flowchart TD
     click n_to_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L304&quot; &quot;open the source&quot;
     click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L330&quot; &quot;open the source&quot;
     click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L376&quot; &quot;open the source&quot;
-    click n_open_sealed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L385&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L398&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L415&quot; &quot;open the source&quot;
-    click n_requirement_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L424&quot; &quot;open the source&quot;
-    click n_verify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L513&quot; &quot;open the source&quot;
+    click n_open_sealed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L398&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L415&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L432&quot; &quot;open the source&quot;
+    click n_requirement_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L441&quot; &quot;open the source&quot;
+    click n_verify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L530&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_keyword,n_describe,n_most_permissive,n_is_at_least_as_strict_as,n_require,n_with_note,n_note,n_is_empty,n_len,n_constrain,n_save,n_verify entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -359,14 +359,14 @@ flowchart TD
 <tr><td><code>Policy::to_text</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy-to_text">304</a></td><td>Serialise to the text format described at the top of this module.</td></tr>
 <tr><td><code>Policy::parse</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy-parse">330</a></td><td>Parse the text format.</td></tr>
 <tr><td><code>Policy::seal</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy-seal">376</a></td><td>Seal the policy under a passphrase.</td></tr>
-<tr><td><code>Policy::open_sealed</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy-open_sealed">385</a></td><td>Open a policy sealed by Policy::seal.</td></tr>
-<tr><td><code>Policy::save</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy-save">398</a></td><td>Write the plain policy into dir, and the sealed copy beside it.</td></tr>
-<tr><td><code>Policy::load</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy-load">415</a></td><td>Read the plain policy from dir.</td></tr>
-<tr><td><code>requirement_from</code> <sub>fn</sub></td><td><a href="policy.src.html#fn-requirement_from">424</a></td><td></td></tr>
-<tr><td><code>Verification</code> <sub>pub enum</sub></td><td><a href="policy.src.html#fn-verification">456</a></td><td>What is known about the seal on a policy.</td></tr>
-<tr><td><code>Verification::describe</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-verification-describe">476</a></td><td>One line for a front end.</td></tr>
-<tr><td><code>Verification::wants_attention</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-verification-wants_attention">501</a></td><td>Whether this is a state somebody should look at.</td></tr>
-<tr><td><code>verify</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-verify">513</a></td><td>Check the plain policy in dir against its sealed copy.</td></tr>
+<tr><td><code>Policy::open_sealed</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy-open_sealed">398</a></td><td>Open a policy sealed by Policy::seal.</td></tr>
+<tr><td><code>Policy::save</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy-save">415</a></td><td>Write the plain policy into dir, and the sealed copy beside it.</td></tr>
+<tr><td><code>Policy::load</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy-load">432</a></td><td>Read the plain policy from dir.</td></tr>
+<tr><td><code>requirement_from</code> <sub>fn</sub></td><td><a href="policy.src.html#fn-requirement_from">441</a></td><td></td></tr>
+<tr><td><code>Verification</code> <sub>pub enum</sub></td><td><a href="policy.src.html#fn-verification">473</a></td><td>What is known about the seal on a policy.</td></tr>
+<tr><td><code>Verification::describe</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-verification-describe">493</a></td><td>One line for a front end.</td></tr>
+<tr><td><code>Verification::wants_attention</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-verification-wants_attention">518</a></td><td>Whether this is a state somebody should look at.</td></tr>
+<tr><td><code>verify</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-verify">530</a></td><td>Check the plain policy in dir against its sealed copy.</td></tr>
 </tbody></table>
 </section>
 </div></div>

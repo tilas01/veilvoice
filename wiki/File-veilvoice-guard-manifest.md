@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-guard/src/manifest.rs`
 
-[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 678 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs)
+[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 730 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs)
 
 ## Contents
 
@@ -45,7 +45,7 @@ which rather defeats the point of having it.
 
 ## What this file contains
 
-678 lines defining **18 functions** (15 public), **4 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+730 lines defining **18 functions** (15 public), **4 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -72,9 +72,9 @@ which rather defeats the point of having it.
   - reaches: `parse`, `unrecordable`
 - `Manifest::seal` (line 395) -- Seal the manifest under a passphrase.
   - reaches: `to_text`
-- `Manifest::open_sealed` (line 404) -- Open a manifest sealed by Manifest::seal.
+- `Manifest::open_sealed` (line 424) -- Open a manifest sealed by Manifest::seal.
   - reaches: `parse`, `unrecordable`
-- `files_in` (line 417) -- Every file directly inside dir, for use as check's extra argument.
+- `files_in` (line 441) -- Every file directly inside dir, for use as check's extra argument.
 
 ## What calls what
 
@@ -106,8 +106,8 @@ flowchart TD
     n_save(["Manifest::save<br/>line 370"])
     n_load(["Manifest::load<br/>line 381"])
     n_seal(["Manifest::seal<br/>line 395"])
-    n_open_sealed(["Manifest::open_sealed<br/>line 404"])
-    n_files_in(["files_in<br/>line 417"])
+    n_open_sealed(["Manifest::open_sealed<br/>line 424"])
+    n_files_in(["files_in<br/>line 441"])
     n_check --> n_digest_of
     n_check --> n_normalise
     n_load --> n_parse
@@ -134,8 +134,8 @@ flowchart TD
     click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L370" "open the source"
     click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L381" "open the source"
     click n_seal href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L395" "open the source"
-    click n_open_sealed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L404" "open the source"
-    click n_files_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L417" "open the source"
+    click n_open_sealed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L424" "open the source"
+    click n_files_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L441" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_path,n_describe,n_is_clean,n_of,n_len,n_is_empty,n_paths,n_check,n_save,n_load,n_seal,n_open_sealed,n_files_in entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -171,5 +171,5 @@ flowchart TD
 | `Manifest::save` <sub>pub fn</sub> | [370](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L370) | Write the manifest to path in the clear. |
 | `Manifest::load` <sub>pub fn</sub> | [381](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L381) | Read a manifest written by Manifest::save. |
 | `Manifest::seal` <sub>pub fn</sub> | [395](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L395) | Seal the manifest under a passphrase. |
-| `Manifest::open_sealed` <sub>pub fn</sub> | [404](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L404) | Open a manifest sealed by Manifest::seal. |
-| `files_in` <sub>pub fn</sub> | [417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L417) | Every file directly inside dir, for use as check's extra argument. |
+| `Manifest::open_sealed` <sub>pub fn</sub> | [424](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L424) | Open a manifest sealed by Manifest::seal. |
+| `files_in` <sub>pub fn</sub> | [441](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs#L441) | Every file directly inside dir, for use as check's extra argument. |
