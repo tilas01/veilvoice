@@ -205,6 +205,19 @@ it can honestly be made rather than to keep apologising for it.
 
 ---
 
+## Encrypted volumes: Cryptomator, VeraCrypt, and the disk underneath
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 81 | **Find the encrypted volumes this machine already has** — detect an installed Cryptomator or VeraCrypt, and the vaults and mounted volumes each is offering, without asking either to do anything | **planned** | 3–4 d |
+| 82 | **Write veiled output into a chosen volume** — a destination that is a Cryptomator vault or a mounted VeraCrypt volume, remembered, and used for every export | **planned** | 2–3 d |
+| 83 | **The hidden-volume question, asked properly** — when a VeraCrypt destination is marked as hidden, confirm it before anything is written, and never guess | **planned** | 2 d |
+| 84 | **The guided path, for when detection fails** — plain instructions, and a refusal to continue until the user has confirmed which volume they mean | **planned** | 2 d |
+| 85 | **What full-disk encryption is for, said once and said properly** — BitLocker, FileVault, LUKS and LUKS2, and the OpenBSD and FreeBSD equivalents, in the documentation and in the application | **planned** | 1–2 d |
+| 86 | **The app lock as a key, not only a verifier** — the app-lock passphrase derives a file key by domain separation, and everything VeilVoice veils is sealed with it automatically | **planned, and it reverses a locked decision** | 3–4 d |
+
+---
+
 ## The things that are not just work
 
 Some of the markers above depend on something other than effort, and
@@ -493,6 +506,119 @@ flash a console every time, and a windowed one would send its output nowhere
 when run from a terminal. Switching at run time is FFI, and every crate here
 carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
 maintainer's call and not something to slip in, so it waits for one.
+
+**Markers 81 to 85 are two encryption tools and one honest sentence about what
+stacking them buys.**
+
+The request is that VeilVoice notice an installed Cryptomator or VeraCrypt,
+offer to put every exported file inside one, support VeraCrypt's hidden
+volumes, guide the user by hand when it cannot manage the integration itself,
+and say plainly that the disk underneath should be encrypted too. Each of those
+is a separate marker because each can be finished, shipped and judged on its
+own, and because the first one being impossible on some platform must not stop
+the last one being written.
+
+*Detection is reading, never driving.* Marker 81 finds what is installed and
+what is currently mounted, and does nothing else. It does not launch either
+program, does not ask either to mount or unlock anything, and never handles a
+volume passphrase. VeilVoice already refuses to acquire privilege (marker 39)
+and this is the same rule in a new place: mounting somebody's encrypted volume
+is their act, taken in the tool they chose, not something a voice de-identifier
+does on their behalf. A mounted Cryptomator vault and a mounted VeraCrypt
+volume are both just directories by the time VeilVoice sees them, which is
+exactly why this can be honest and small.
+
+*Writing into one is a destination, not a mode.* Marker 82 is a remembered
+output directory with a label saying what kind of volume it is. The encryption
+is entirely the other tool's, and calling it "VeilVoice encryption" would be
+the overclaim this project refuses. What VeilVoice adds is that the export
+lands there by default rather than in a Downloads folder somebody meant to
+clear out.
+
+*The hidden-volume question is the one that must not be guessed.* VeraCrypt's
+hidden volumes exist so that a person under compulsion can hand over one
+passphrase and reveal an outer volume. Writing to the outer volume of a
+container that has a hidden one can destroy the hidden data, because the outer
+filesystem does not know the hidden one is there. VeilVoice cannot tell the two
+apart by looking, and no amount of cleverness will change that: it is the
+design of the feature that they are indistinguishable. So marker 83 asks, once,
+before the first write, and stores the answer with the destination. It never
+infers, never defaults to "probably fine", and refuses to write until it has an
+answer. A tool that quietly guessed wrong here would destroy exactly the data
+its user was most careful about.
+
+*Marker 84 exists because detection will fail.* Portable installs, custom
+paths, a distribution that packages either tool somewhere unexpected, a
+platform neither supports. The answer is not a silent fallback to writing
+somewhere unencrypted: it is instructions, a directory the user picks by hand,
+and a confirmation step that will not continue until they have said which
+volume they mean and what kind it is. The failure mode to avoid is a user who
+believes their exports are in a vault and finds them beside it.
+
+*Marker 85 is a sentence, and it is the most important one in the group.*
+Cryptomator and VeraCrypt protect files at rest inside a container. They do not
+protect the temporary files an operating system writes, the swap or hibernation
+image the kernel writes, the thumbnails a file manager writes, or the recently-
+opened list a desktop keeps. A veiled recording that lives inside a vault can
+still have left traces outside it, and full-volume encryption is what covers
+those: BitLocker on Windows, FileVault on macOS, LUKS or LUKS2 on Linux,
+`softraid -C` on OpenBSD, GELI on FreeBSD.
+
+So the honest framing, and the one the documentation and the application will
+both use, is that this is **defence in depth and not a second lock on the same
+door**: the volume protects the file, the disk protects everything the system
+wrote about the file without being asked. Describing the pair as "dual layer
+encryption" without that sentence would leave somebody thinking a vault alone
+is enough, and it is not.
+
+*What none of it changes*: VeilVoice's own `.veil` containers are already
+encrypted with its own cryptography, and nothing here replaces or weakens that.
+A veiled recording written into a Cryptomator vault is encrypted twice, by two
+independent tools, and the useful property of that is not extra strength but
+independence: a defect in one is not a defect in both.
+
+**Marker 86 reverses a decision this project has documented and defended, and
+it is written down that way rather than quietly.**
+
+The request is that the app lock stop being only a password check and become a
+key, so that every file VeilVoice veils is encrypted automatically without
+anybody choosing a second passphrase.
+
+The machinery is already there and the change is small. `lock.rs` runs Argon2id
+once and splits it with HKDF into a verifier and a tag key; a third label
+produces a file key, at no extra cost, that never touches disk. Marker 76 built
+that split for the authentication tag, and a file key is the same construction
+with a different info string.
+
+What has to be stated, because the current code states the opposite in as many
+words, is the property that is being given up. `lock.rs` says today that the
+lock *deliberately* does not derive a key that encrypts recordings, and
+`USER_GUIDE.md` says to use two different passwords, both for one reason: if a
+single passphrase did both, then opening the application would be the same act
+as unsealing everything it had ever written. Somebody who is compelled to
+unlock VeilVoice in front of another person currently reveals the session; with
+marker 86 they reveal the archive as well.
+
+So this is a genuine trade, not a free improvement, and it goes in with three
+things attached or it does not go in:
+
+- **The container passphrase stays.** The app-lock key is an *additional*
+  automatic layer for files that would otherwise be written in the clear, not a
+  replacement for a passphrase somebody chose deliberately. A file already
+  sealed under its own passphrase is not re-sealed under a weaker arrangement.
+- **It is opt-in, and the interface says what it costs**, in the same place and
+  the same plain words the app lock already uses to say what it is worth. A
+  user who wants one passphrase for everything can have it; a user who wants
+  the separation keeps it.
+- **Losing the app-lock passphrase then loses the files.** Today, forgetting it
+  costs a session and the fix is deleting the lock. With marker 86 that is no
+  longer true for anything sealed under it, and deleting the lock would destroy
+  access to the archive. That has to be said before the feature is switched on,
+  not discovered afterwards.
+
+None of that is a reason to refuse the request. It is the reason the marker is
+four days rather than one, and it is why the estimate is mostly documentation
+and interface rather than cryptography.
 
 **Marker 80 is the work a roadmap marker does not describe, and it found a
 defect.** Every marker above being finished is not the same as a tree being

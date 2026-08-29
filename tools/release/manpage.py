@@ -74,6 +74,26 @@ def roff(text):
     return text
 
 
+def wrapped(text, width=78):
+    """Break a line of roff prose on spaces, never inside an escape.
+
+    Escapes are what makes this more than `textwrap`: `\\(em` is four
+    characters that must stay together, and splitting inside one puts a stray
+    `(em` in the page.
+    """
+    words = text.split(" ")
+    lines, current = [], ""
+    for word in words:
+        if current and len(current) + 1 + len(word) > width:
+            lines.append(current)
+            current = word
+        else:
+            current = f"{current} {word}" if current else word
+    if current:
+        lines.append(current)
+    return lines or [""]
+
+
 def help_text(binary):
     """What the program says about itself."""
     out = subprocess.run(
@@ -155,7 +175,14 @@ def page(binary, name, summary, version, date):
                 continue
             out += [".SH DESCRIPTION"]
             # Prose: let roff fill and justify it, which is what prose wants.
-            out += [roff(l.strip()) for l in body]
+            #
+            # Wrapped at 80 columns in the *source*, which changes nothing
+            # about the rendered page because roff refills it, and quiets
+            # `mandoc -Tlint`'s "input text line longer than 80 bytes". A
+            # generated file that a linter complains about is a generated file
+            # somebody eventually stops running the linter over.
+            for line in body:
+                out += wrapped(roff(line.strip()))
             continue
         if heading.lower().startswith("usage"):
             out += [".SH SYNOPSIS"]
