@@ -58,6 +58,18 @@ function trackedFiles() {
 /** Legitimately binary, and not text anyone reads. */
 const BINARY = /\.(png|jpg|jpeg|gif|ico|icns|rgba|woff2?|ttf|otf|pdf|zip|gz|asc|wav|mp3|flac)$/i;
 
+/**
+ * Directories whose contents are bytes rather than text, whatever they are
+ * named.
+ *
+ * The fuzzing seed corpus is deliberately hostile input: truncated headers,
+ * impossible lengths, control characters by the hundred. That is what it is
+ * for. Its files are named after their own hash and carry no extension, so the
+ * list above cannot reach them, and a checker demanding that a fuzzing corpus
+ * be clean readable text would be asking it to stop being a fuzzing corpus.
+ */
+const BINARY_DIRS = [/^fuzz\/seeds\//];
+
 const RULES = [
   {
     // Tab and newline are fine, and so is carriage return: this repository is
@@ -138,7 +150,12 @@ function run() {
 
   for (const rel of trackedFiles()) {
     const full = path.join(ROOT, rel);
-    if (BINARY.test(rel) || !fs.existsSync(full) || fs.statSync(full).isDirectory()) { continue; }
+    if (
+      BINARY.test(rel) ||
+      BINARY_DIRS.some((dir) => dir.test(rel)) ||
+      !fs.existsSync(full) ||
+      fs.statSync(full).isDirectory()
+    ) { continue; }
 
     const text = fs.readFileSync(full, "utf8");
     scanned++;
