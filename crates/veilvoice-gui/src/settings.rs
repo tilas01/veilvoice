@@ -204,6 +204,32 @@ impl Settings {
         self.prefs.seal_with_app_lock
     }
 
+    /// The remembered encrypted destination, rebuilt from the settings file.
+    pub fn destination(&self) -> crate::storage::Destination {
+        crate::storage::Destination::from_prefs(
+            &self.prefs.vault_dir,
+            &self.prefs.vault_tool,
+            &self.prefs.vault_hidden,
+        )
+    }
+
+    /// Remember a destination, including the answer to the hidden question.
+    pub fn set_destination(&mut self, destination: &crate::storage::Destination) {
+        let (dir, tool, hidden) = destination.to_prefs();
+        if (
+            &self.prefs.vault_dir,
+            &self.prefs.vault_tool,
+            &self.prefs.vault_hidden,
+        ) == (&dir, &tool, &hidden)
+        {
+            return;
+        }
+        self.prefs.vault_dir = dir;
+        self.prefs.vault_tool = tool;
+        self.prefs.vault_hidden = hidden;
+        self.persist();
+    }
+
     /// The Failsafe posture in force.
     pub fn failsafe(&self) -> veilvoice_failsafe::Posture {
         veilvoice_failsafe::Posture::from_key(&self.prefs.failsafe)
@@ -1035,6 +1061,9 @@ mod tests {
                 hide_install_tab: false,
                 always_group: false,
                 seal_with_app_lock: false,
+                vault_dir: String::new(),
+                vault_tool: String::new(),
+                vault_hidden: String::new(),
                 recovered_from_corrupt_file: false,
             },
             page: Page::Storage,
