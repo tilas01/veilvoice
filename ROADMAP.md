@@ -201,6 +201,7 @@ it can honestly be made rather than to keep apologising for it.
 |---:|---|---|---|
 | 44 | Fifth audit round — every vulnerability class across the tree, twelve findings written up individually (F-48 to F-59) | **done** | — |
 | 45 | **v0.1.10 released** — ten platforms, signed, and verified by hand after publication | **done** | — |
+| 80 | **Ready for the release audit** — the RPM built, `lintian` run and its findings fixed, manual pages generated from the binaries, 32-bit re-run over the new code, and the parser campaign run over all six targets with a seed corpus kept | **done** | — |
 
 ---
 
@@ -492,6 +493,29 @@ flash a console every time, and a windowed one would send its output nowhere
 when run from a terminal. Switching at run time is FFI, and every crate here
 carries `#![forbid(unsafe_code)]`. Relaxing that for one convenience is the
 maintainer's call and not something to slip in, so it waits for one.
+
+**Marker 80 is the work a roadmap marker does not describe, and it found a
+defect.** Every marker above being finished is not the same as a tree being
+ready to release, and the difference is the list `docs/AUDIT.md` keeps under
+"Still open": things nobody had run rather than things nobody had written.
+
+Four of them were runnable and were run. The RPM builds, which turns a spec
+file from a draft into a package and proves the one thing a parse cannot, that
+`%files` and `%install` agree. `lintian` reports no errors over the Debian
+packages, and the three warnings it did have are fixed rather than recorded.
+The 32-bit targets were re-run over the new lock, vault and integrity code,
+which had never run anywhere but x86-64. The parser campaign ran over all six
+targets rather than one, at twice the length, and now starts from a committed
+seed corpus for the two that would otherwise spend their budget rediscovering
+a magic string.
+
+The defect came out of the last of those, and not from a crash. The campaign
+reported a slow unit, which is the least interesting thing it can report, since
+a deliberately slow key derivation taking a second is what a deliberately slow
+key derivation is for. Reading the cost out of it and asking which callers
+reach that path without a person choosing the file produced F-92: two more
+places using the ceiling meant for a file somebody was sent, one of which this
+cycle had itself made automatic.
 
 **Marker 75 seals the record with the only secret the program ever has, and
 that decides when it can run.** Sealing needs a passphrase, and a window that

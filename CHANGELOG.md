@@ -8,6 +8,53 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Getting the tree ready for a release audit
+
+The work that a roadmap marker does not cover, and that a deploy needs.
+
+**Manual pages.** `lintian` reported `no-manual-page` for all three binaries,
+and it was right: `man veilvoice` produced nothing.
+`tools/release/manpage.py` now derives each page from the binary's own
+`--help` while a package is being built, so nothing is committed and no page
+can drift from the command it describes. `help2man` does this job and was
+tried first; it turns every em dash in VeilVoice's help into `???`, at every
+locale, and a page that renders the program's own description as three question
+marks looks finished and is not.
+
+`veilvoice-gui` had no `--help` at all. It opened a window instead, and on a
+machine with no display answered with a winit error naming `WAYLAND_DISPLAY`.
+It now answers, on Unix, where a release build is guaranteed a console; on
+Windows `windows_subsystem = "windows"` sends `println!` nowhere, so behaviour
+there is deliberately unchanged rather than quietly made worse.
+
+**The RPM builds.** A source RPM and two binary subpackages, and the thing a
+build proves that a parse cannot is that `%files` and `%install` agree. They
+do. The gaps are named rather than glossed: it ran on Ubuntu rather than any
+RPM distribution, and it needed `--nodeps` and `--nocheck`. Four of the six
+package definitions are still drafts and are still described as drafts.
+
+**32-bit.** 716 tests pass on `i686` and `armv7` alike, up from 682, because
+the new lock, vault and integrity code brought its own tests and had never run
+anywhere but x86-64. Two of this project's shipped defects came from that gap.
+
+**The parser campaign, over all six targets at ten minutes each.**
+703,074,471 inputs, no crash, no hang, no out-of-memory. A **seed corpus** is
+now committed for the two targets that start cold, and what it buys was
+measured: on `lock_file`, a cold run starts at 25 code paths and reaches 460
+after 64,309 inputs, while a seeded run *starts* at 625.
+
+- **F-92** `Manifest::open_sealed` and `Policy::open_sealed` used the
+  four-gigabyte Argon2 ceiling meant for a container somebody was sent and
+  chose to open. Neither is that. The manifest sits at a fixed path, and this
+  cycle's own marker 75 made the desktop application read it at every unlock,
+  so anybody able to write that directory could make every unlock allocate four
+  gigabytes, which on a modest machine is an abort. Both now use the unattended
+  ceiling that F-91 gave the app lock. Found by decoding a slow unit the
+  campaign reported rather than filing it as Argon2 being slow on purpose, and
+  the lesson is one already recorded twice: F-91 was written up as being about
+  the app-lock file when it was about any file the program opens without being
+  asked.
+
 ### The app lock, hardened as far as it honestly goes
 
 Markers 74 to 79, and one round of audit on the result.
