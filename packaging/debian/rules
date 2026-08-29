@@ -18,6 +18,21 @@ override_dh_auto_test:
 	cargo test --release --locked --workspace
 
 override_dh_auto_install:
+	# Manual pages, generated from each binary's own `--help` rather than
+	# written out and kept in step by hand. `lintian` reported
+	# `no-manual-page` for all three; a page written separately would be a
+	# second description of the interface, and this project has already paid
+	# for that arrangement once (F-71).
+	python3 tools/release/manpage.py target/release/veilvoice \
+		debian/veilvoice/usr/share/man/man1/veilvoice.1
+	python3 tools/release/manpage.py target/release/veilvoice-verify \
+		debian/veilvoice/usr/share/man/man1/veilvoice-verify.1 \
+		--summary "check a VeilVoice release against its signature"
+	python3 tools/release/manpage.py target/release/veilvoice-gui \
+		debian/veilvoice-gui/usr/share/man/man1/veilvoice-gui.1 \
+		--summary "the VeilVoice desktop application"
+	gzip -9n debian/veilvoice/usr/share/man/man1/*.1
+	gzip -9n debian/veilvoice-gui/usr/share/man/man1/*.1
 	install -Dpm 0755 target/release/veilvoice \
 		debian/veilvoice/usr/bin/veilvoice
 	install -Dpm 0755 target/release/veilvoice-verify \

@@ -401,8 +401,32 @@ impl Manifest {
     }
 
     /// Open a manifest sealed by [`Manifest::seal`].
+    ///
+    /// # Why the unattended cost ceiling, and not the generous one
+    ///
+    /// F-92. This used the same ceiling as any other container, which is four
+    /// gigabytes of Argon2 memory, and that ceiling is right for a `.veil` a
+    /// person was sent and chose to open: it is slow, they can decide to stop
+    /// waiting, and refusing a legitimate-but-expensive file would be worse.
+    ///
+    /// Nobody chooses to open this one. It sits at a known path beside the app
+    /// lock, and since the desktop application started checking it at every
+    /// unlock, it is read automatically whenever somebody logs in. Anybody who
+    /// can write that directory can leave a sealed manifest declaring four
+    /// gigabytes, and on a modest machine that is not a wait, it is an
+    /// allocation failure, and this workspace aborts on one. The window would
+    /// die immediately after a correct passphrase.
+    ///
+    /// This is the same defect F-91 fixed on the app-lock file, in the second
+    /// place it applies. Fixing one and not the other is the exclusion list
+    /// naming the files somebody happened to think of, which is the failure
+    /// this project has already recorded twice.
     pub fn open_sealed(password: &[u8], sealed: &[u8]) -> Result<Self, Error> {
-        let text = veilvoice_crypto::container::open_with_password(password, sealed)?;
+        let text = veilvoice_crypto::container::open_with_password_within(
+            password,
+            sealed,
+            veilvoice_crypto::kdf::KdfParams::UNATTENDED_MAX_M_COST,
+        )?;
         let text = String::from_utf8(text)
             .map_err(|_| Error::Malformed("sealed manifest is not text".into()))?;
         Self::parse(&text)
@@ -657,6 +681,34 @@ mod tests {
             manifest
         );
         assert!(Manifest::open_sealed(b"the wrong one", &sealed).is_err());
+    }
+
+    /// F-92. The sealed record is read automatically at every unlock, so the
+    /// cost it declares is not a cost anybody chose to pay.
+    #[test]
+    fn a_sealed_manifest_cannot_demand_more_memory_than_the_machine_has() {
+        let mut sealed = veilvoice_crypto::container::seal_with_password(
+            b"a passphrase",
+            b"nothing that matters",
+            veilvoice_crypto::kdf::KdfParams::default(),
+        )
+        .unwrap();
+
+        // The cost sits at offset 12 in the header and is authenticated, so an
+        // edit here makes the tag fail rather than the derivation run. What is
+        // being tested is the order: the ceiling has to be consulted *before*
+        // the memory is asked for, so a refusal is what comes back rather than
+        // an allocation.
+        sealed[12..16].copy_from_slice(&(4u32 * 1024 * 1024).to_le_bytes());
+
+        let err = Manifest::open_sealed(b"a passphrase", &sealed).unwrap_err();
+        let text = err.to_string();
+        assert!(
+            text.contains("ceiling"),
+            "a four gigabyte cost should be refused by the ceiling, before the \
+             memory is asked for, rather than attempted and then failed on the \
+             authentication tag: {text}"
+        );
     }
 
     #[test]
