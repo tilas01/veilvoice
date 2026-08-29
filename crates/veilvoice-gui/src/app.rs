@@ -564,6 +564,12 @@ impl VeilVoiceApp {
             watch: WatchFeed::start(),
             ..Default::default()
         };
+        // Marker 86. Before the first frame, and so before anything can be
+        // unlocked: `Security` captures the app-lock passphrase as the lock
+        // opens, and only when this mode is already the chosen one.
+        let seal_with_app_lock = app.preferences.seal_with_app_lock();
+        app.security.prefer_app_lock_sealing(seal_with_app_lock);
+
         // The integrity record, started before anything is drawn and finished
         // on its own thread. With an app lock set this run is skipped: the
         // record is sealed under the app-lock passphrase, so it can only be
@@ -659,6 +665,10 @@ impl eframe::App for VeilVoiceApp {
         if let Some(passphrase) = self.security.take_unlock_passphrase() {
             self.integrity.start(Some(passphrase));
         }
+        // Marker 86, kept in step. `set_` is a no-op when nothing changed, so
+        // this costs a comparison per frame and never a write.
+        self.preferences
+            .set_seal_with_app_lock(self.security.seals_with_app_lock());
 
         // Before anything is drawn, and it has to be: this was at the *bottom*
         // of `update`, after the panel that shows the result had already been

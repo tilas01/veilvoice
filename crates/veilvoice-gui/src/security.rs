@@ -82,6 +82,22 @@ pub enum Sealing {
     Password,
     /// X25519 + ML-KEM-768 to a recipient's public key file.
     PublicKey,
+    /// Argon2id over the **app-lock** passphrase, so everything VeilVoice
+    /// writes is sealed without anybody choosing a second secret.
+    ///
+    /// **Marker 86.** This reverses a decision the crypto crate states in as
+    /// many words, and the reversal is deliberate rather than accidental, so
+    /// the cost is written here as well as in the documentation: one passphrase
+    /// now opens the application *and* everything it has ever written.
+    /// Somebody compelled to unlock VeilVoice in front of another person used
+    /// to reveal the session; with this on, they reveal the archive too.
+    ///
+    /// The container is sealed under the passphrase itself rather than under a
+    /// key derived from the lock file. That is what keeps a deleted or damaged
+    /// lock from taking the recordings with it: the file carries its own salt
+    /// and cost, so `veilvoice decrypt` opens it with the same passphrase on
+    /// any machine, with or without a lock.
+    AppLock,
 }
 
 /// What a background lock operation was trying to do.
@@ -116,6 +132,15 @@ pub struct Security {
     /// The passphrase that just opened the lock, held for exactly one caller to
     /// collect. See [`Security::take_unlock_passphrase`].
     just_unlocked: Option<String>,
+    /// The app-lock passphrase, kept for the session so [`Sealing::AppLock`]
+    /// can seal with it.
+    ///
+    /// Only ever populated when that mode is already chosen, which is the
+    /// point: a user who has not asked for it keeps the old behaviour, where
+    /// the passphrase is wiped the instant it has been checked. Page-locked
+    /// and zeroed on drop, like every other secret here, and cleared by
+    /// [`Security::lock_now`].
+    app_secret: Option<Secret>,
 
     // --- unlock screen ---
     entry: String,
@@ -179,6 +204,7 @@ impl Default for Security {
             locked: false,
             tampered: false,
             just_unlocked: None,
+            app_secret: None,
             entry: String::new(),
             message: None,
             pending: None,
@@ -255,6 +281,23 @@ impl Security {
         self.just_unlocked.take()
     }
 
+    /// Start in [`Sealing::AppLock`], because the user asked for that last time.
+    ///
+    /// Applied at startup, before the window is drawn and so before anything
+    /// can be unlocked, which matters: the passphrase is captured as the lock
+    /// opens and only when this mode is already chosen.
+    pub fn prefer_app_lock_sealing(&mut self, on: bool) {
+        if on && self.store.is_some() {
+            self.sealing = Sealing::AppLock;
+        }
+    }
+
+    /// Whether the app-lock sealing mode is currently chosen, so the window can
+    /// have the choice remembered.
+    pub fn seals_with_app_lock(&self) -> bool {
+        self.sealing == Sealing::AppLock
+    }
+
     /// Whether the lock reported having been interfered with.
     ///
     /// Stays true until an unlock acknowledges it, which needs the passphrase,
@@ -299,6 +342,10 @@ impl Security {
         if let Some(mut carried) = self.just_unlocked.take() {
             carried.zeroize();
         }
+        // Marker 86's session copy of the app-lock passphrase goes with
+        // everything else. Locking the window has to put back the state a
+        // fresh launch would be in, or "lock" is a picture of a lock.
+        self.app_secret = None;
         self.held = None;
         self.passphrase_set = false;
     }
@@ -312,6 +359,7 @@ impl Security {
         match self.sealing {
             Sealing::Password => self.held.is_some(),
             Sealing::PublicKey => self.public_key.is_some(),
+            Sealing::AppLock => self.app_secret.is_some(),
         }
     }
 
@@ -323,6 +371,10 @@ impl Security {
         Some(match self.sealing {
             Sealing::Password => "set a recording passphrase first",
             Sealing::PublicKey => "choose a recipient public key first",
+            // The passphrase is captured as the lock opens, so this is what a
+            // user sees who turned the mode on after unlocking. Saying "lock
+            // and unlock" is the actual remedy; "no passphrase" would not be.
+            Sealing::AppLock => "lock the app and unlock it again to use this",
         })
     }
 
@@ -344,6 +396,14 @@ impl Security {
                 // Unreachable through the UI, which gates on `ready_to_write`,
                 // but falling back to plaintext here would silently do the one
                 // thing the user did not ask for.
+                None => Plan::Missing,
+            },
+            Sealing::AppLock => match &self.app_secret {
+                // A password plan, because that is exactly what it is: the
+                // container is sealed under the app-lock passphrase and
+                // carries its own salt, so nothing about opening it later
+                // depends on the lock file still existing.
+                Some(secret) => Plan::Password(secret.clone()),
                 None => Plan::Missing,
             },
         }
@@ -393,7 +453,17 @@ impl Security {
                 // mean the record could never be opened. Whoever takes it is
                 // responsible for wiping it; `take_unlock_passphrase` says so,
                 // and `wipe_secrets` catches the case where nobody does.
-                self.just_unlocked = Some(std::mem::take(&mut self.entry));
+                let opened = std::mem::take(&mut self.entry);
+                // Marker 86. Kept for the session only when the mode that
+                // needs it is already chosen. A user who has not asked for
+                // this keeps the old behaviour exactly: the passphrase is
+                // wiped the moment it has been checked, and never sits in
+                // memory waiting for a feature nobody switched on.
+                if self.sealing == Sealing::AppLock {
+                    let mut copy = opened.clone();
+                    self.app_secret = Some(into_secret(&mut copy));
+                }
+                self.just_unlocked = Some(opened);
                 self.message = None;
             }
             Ok(Op::Acknowledge) => {
@@ -836,6 +906,12 @@ impl Security {
         ui.horizontal(|ui| {
             ui.selectable_value(&mut self.sealing, Sealing::Password, "passphrase");
             ui.selectable_value(&mut self.sealing, Sealing::PublicKey, "public key");
+            // Offered only where there is a lock to seal with. Showing a mode
+            // that cannot work, greyed out, invites the reading that VeilVoice
+            // is withholding something.
+            if self.store.is_some() {
+                ui.selectable_value(&mut self.sealing, Sealing::AppLock, "app lock");
+            }
         });
 
         match self.sealing {
@@ -873,6 +949,45 @@ impl Security {
                     RichText::new(
                         "Argon2id, 256 MiB. Separate from the app-lock password, and \
                          there is no way to recover it.",
+                    )
+                    .color(p::muted())
+                    .small(),
+                );
+            }
+            Sealing::AppLock => {
+                if self.app_secret.is_some() {
+                    ui.label(
+                        RichText::new("every recording is sealed with your app-lock password")
+                            .color(p::green()),
+                    );
+                } else {
+                    ui.label(
+                        RichText::new(
+                            "lock the app and unlock it again to start using this. The \
+                             password is taken as the lock opens, which is the only \
+                             moment it exists.",
+                        )
+                        .color(p::yellow()),
+                    );
+                }
+                ui.add_space(4.0);
+                ui.label(
+                    RichText::new(
+                        "One password for the application and for everything it writes. \
+                         That is the convenience and it is also the whole of the cost: \
+                         anybody who makes you unlock VeilVoice has opened every \
+                         recording as well, not just this session. Two separate \
+                         passwords keep those apart.",
+                    )
+                    .color(p::muted())
+                    .small(),
+                );
+                ui.label(
+                    RichText::new(
+                        "Recordings stay openable if the lock is ever removed: each file \
+                         carries its own salt, so `veilvoice decrypt` opens it with the \
+                         same password on any machine. Forgetting that password still \
+                         loses them, and nothing can undo that.",
                     )
                     .color(p::muted())
                     .small(),
@@ -1114,6 +1229,82 @@ mod tests {
     /// because what is being held is that certain sentences are not reachable
     /// from that function at all. A rendering test would only prove they were
     /// absent from one frame.
+    /// Marker 86. The passphrase is kept only for the mode that needs it.
+    ///
+    /// A user who has not asked for app-lock sealing must keep the old
+    /// behaviour exactly: the passphrase is wiped the instant it has been
+    /// checked. Holding it "just in case" would be a security regression paid
+    /// for by everybody, to make a feature nobody switched on slightly more
+    /// convenient.
+    #[test]
+    fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used() {
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        let poll = source.find("fn poll(&mut self)").expect("poll exists");
+        let end = source[poll..]
+            .find("\n    fn wipe_form")
+            .map(|at| poll + at)
+            .unwrap_or(source.len());
+        let body = &source[poll..end];
+        assert!(
+            body.contains("if self.sealing == Sealing::AppLock"),
+            "the capture is unconditional, so every user now carries their \
+             app-lock passphrase in memory for the session"
+        );
+    }
+
+    /// Marker 86. Locking the window must put the state back where a fresh
+    /// launch would leave it, or the lock is a picture of a lock.
+    #[test]
+    fn locking_the_window_drops_the_sealing_passphrase() {
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        let wipe = source
+            .find("fn wipe_secrets(&mut self)")
+            .expect("wipe_secrets exists");
+        let end = source[wipe..]
+            .find("\n    /// ")
+            .unwrap_or(source.len() - wipe);
+        assert!(
+            source[wipe..wipe + end].contains("self.app_secret = None"),
+            "the session copy of the app-lock passphrase outlives a lock"
+        );
+    }
+
+    /// Marker 86. The plan has to be a password plan, because that is what
+    /// keeps the recordings openable after the lock is gone.
+    #[test]
+    fn app_lock_sealing_produces_a_container_that_outlives_the_lock() {
+        let mut security = Security::default();
+        security.encrypt_recordings = true;
+        security.sealing = Sealing::AppLock;
+
+        // Nothing captured yet: refused rather than quietly written in clear.
+        assert!(matches!(security.plan(), Plan::Missing));
+        assert!(!security.ready_to_write());
+
+        let mut typed = String::from("the app lock passphrase");
+        security.app_secret = Some(into_secret(&mut typed));
+        assert!(security.ready_to_write());
+
+        let Plan::Password(secret) = security.plan() else {
+            panic!(
+                "app-lock sealing must produce a password plan, so the file \
+                    carries its own salt and needs no lock file to open"
+            );
+        };
+        assert_eq!(secret.expose(), b"the app lock passphrase");
+    }
+
+    /// The mode is only offered where there is a lock to seal with.
+    #[test]
+    fn app_lock_sealing_is_not_offered_without_a_lock() {
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        assert!(
+            source.contains("if self.store.is_some() {")
+                && source.contains("Sealing::AppLock, \"app lock\""),
+            "the app-lock mode must be offered only when a lock exists"
+        );
+    }
+
     /// Marker 76. The report has to be reachable from the tab and only from
     /// the tab, and clearing it has to go through the passphrase rather than
     /// through a flag the drawing code can set.

@@ -75,6 +75,16 @@ pub struct Prefs {
     /// it. So the toggle is per-run, and this separate, explicit tick is the
     /// only way it starts on.
     pub always_group: bool,
+    /// Whether every recording is sealed with the app-lock passphrase.
+    ///
+    /// **Marker 86.** Persisted, unlike group mode, and the difference is what
+    /// happens when somebody forgets it is on. A forgotten group mode renders a
+    /// single speaker against a plan that does not describe them, which is
+    /// wrong output. A forgotten sealing mode encrypts a file that would
+    /// otherwise have been encrypted some other way, which is not. The
+    /// direction it can fail in is the safe one, so it survives a restart and
+    /// the user is not asked to choose it again every launch.
+    pub seal_with_app_lock: bool,
     /// How notifications are shown: `overlay`, `alert` or `off`.
     ///
     /// Stored as its key rather than as a number, so a settings file stays
@@ -112,6 +122,7 @@ impl Default for Prefs {
             configured: false,
             hide_install_tab: false,
             always_group: false,
+            seal_with_app_lock: false,
             notify_style: crate::notify::Style::default().key().to_string(),
             // On, and docked. Live scramble is the mode where what is being
             // protected is happening now, and the two questions a person has
@@ -226,6 +237,12 @@ impl Prefs {
                         understood += 1;
                     }
                 }
+                "seal_with_app_lock" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.seal_with_app_lock = on;
+                        understood += 1;
+                    }
+                }
                 _ => {}
             }
         }
@@ -247,6 +264,10 @@ impl Prefs {
         out.push_str(&format!("configured = {}\n", self.configured));
         out.push_str(&format!("hide_install_tab = {}\n", self.hide_install_tab));
         out.push_str(&format!("always_group = {}\n", self.always_group));
+        out.push_str(&format!(
+            "seal_with_app_lock = {}\n",
+            self.seal_with_app_lock
+        ));
         out.push_str(&format!("notify_style = {}\n", self.notify_style));
         out.push_str(&format!("live_monitor = {}\n", self.live_monitor));
         out.push_str(&format!("failsafe = {}\n", self.failsafe));
@@ -350,6 +371,7 @@ mod tests {
             configured: true,
             hide_install_tab: true,
             always_group: true,
+            seal_with_app_lock: false,
             notify_style: "alert".to_string(),
             failsafe: "warn".to_string(),
             live_monitor: "toolbar".to_string(),
@@ -440,6 +462,7 @@ mod tests {
             live_monitor: "toolbar".into(),
             hide_install_tab: false,
             always_group: false,
+            seal_with_app_lock: true,
             recovered_from_corrupt_file: false,
         };
         prefs.save(&path).unwrap();

@@ -199,6 +199,11 @@ impl Settings {
         self.prefs.always_group
     }
 
+    /// Whether every recording is sealed with the app-lock passphrase.
+    pub fn seal_with_app_lock(&self) -> bool {
+        self.prefs.seal_with_app_lock
+    }
+
     /// The Failsafe posture in force.
     pub fn failsafe(&self) -> veilvoice_failsafe::Posture {
         veilvoice_failsafe::Posture::from_key(&self.prefs.failsafe)
@@ -247,6 +252,20 @@ impl Settings {
             return;
         }
         self.prefs.always_group = always;
+        self.persist();
+    }
+
+    /// Remember, or stop remembering, that recordings are sealed with the
+    /// app-lock passphrase.
+    ///
+    /// Marker 86. Same pair-of-methods shape as `always_group` and for the same
+    /// reason: the security tab asks for a choice to be kept without knowing
+    /// where preferences live or what happens when the platform will not say.
+    pub fn set_seal_with_app_lock(&mut self, seal: bool) {
+        if self.prefs.seal_with_app_lock == seal {
+            return;
+        }
+        self.prefs.seal_with_app_lock = seal;
         self.persist();
     }
 
@@ -1015,6 +1034,7 @@ mod tests {
                 live_monitor: "toolbar".into(),
                 hide_install_tab: false,
                 always_group: false,
+                seal_with_app_lock: false,
                 recovered_from_corrupt_file: false,
             },
             page: Page::Storage,
