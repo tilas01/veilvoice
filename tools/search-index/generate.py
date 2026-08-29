@@ -171,6 +171,15 @@ BINARY = re.compile(
     r"\.(png|jpg|jpeg|gif|ico|icns|rgba|woff2?|ttf|otf|pdf|zip|gz|asc|wav|mp3|flac)$", re.I
 )
 
+# Whole directories of bytes, whatever their files are named.
+#
+# The fuzzing seed corpus is deliberately hostile input whose files are named
+# after their own hash and carry no extension, so the pattern above cannot
+# reach them. Indexing it put raw control characters into the index and from
+# there into the no-JS search page, where the character suite found them. A
+# search result pointing at a truncated header is no use to anybody either.
+BINARY_DIRS = re.compile(r"^fuzz/seeds/")
+
 # Rust items worth an index entry of their own.
 RUST_ITEM = re.compile(
     r"^\s*(?:pub(?:\s*\([^)]*\))?\s+)?"
@@ -227,7 +236,7 @@ def warn_about_untracked(root):
     """
     would_index = [
         rel for rel in untracked_files(root)
-        if not BINARY.search(rel) and not is_generated(rel)
+        if not BINARY.search(rel) and not BINARY_DIRS.search(rel) and not is_generated(rel)
     ]
     if not would_index:
         return
@@ -468,7 +477,7 @@ def build(root):
     secs = []
 
     for rel in tracked_files(root):
-        if BINARY.search(rel) or is_generated(rel):
+        if BINARY.search(rel) or BINARY_DIRS.search(rel) or is_generated(rel):
             continue
         full = os.path.join(root, rel.replace("/", os.sep))
         try:

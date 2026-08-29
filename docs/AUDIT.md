@@ -57,31 +57,48 @@ the pattern worth naming: *hardening that fails open*. A lock that could be
 orphaned by one refused read, and a spare copy that silently kept the previous
 password, are both worse than the plain single file they replaced.
 
-### What was re-run, and what was not
+### The campaign, run again over all six targets
 
-One target, `lock_file`, because one input format changed. The app-lock record
-went from version 1 to version 2 in this cycle: a different length, three new
-fields and a keyed tag. The other five targets parse formats this cycle did not
-touch, so re-running them would have cost twenty-five minutes to re-confirm the
-tenth round's result rather than to learn anything.
+Ten minutes each rather than the tenth round's five, and all six rather than
+only the one whose format changed. **703,074,471 inputs. No crash, no hang, no
+out-of-memory on any target.**
 
-Against the fixed parser: **5,493 inputs, 586 code paths, no crash and no
-hang.** One slow unit, at 518 MiB and sixteen passes, which is the accepted
-class described under F-91.
+| Target | Inputs in 10 minutes | Artefacts |
+|---|---|---|
+| `container_header` | 67,305 | one slow unit, which became F-92 |
+| `lock_file` | 1,280 | two slow units, both the class F-91 accepts |
+| `wav_chunks` | 75,412,092 | none |
+| `wav_preflight` | 291,305,857 | none |
+| `guard_manifest` | 11,926,580 | none |
+| `hybrid_keys` | 324,361,357 | none |
 
-That input count is not comparable with the tenth round's 445,714 for this
-target, and the reason is measurable rather than arguable. **Thirty-six of the
-53 corpus entries the campaign kept now parse successfully**, so most of what it
-runs reaches the Argon2id derivation instead of being turned away by the header
-checks, and a permitted derivation costs between one and nineteen seconds by
-design. A campaign that spends its time inside the key derivation does fewer
-runs and covers more, which is what the coverage number says: 586 paths against
-a target that used to bounce off the parser.
+The two crypto targets run four and five orders of magnitude fewer inputs than
+the rest, and that is the campaign working rather than failing. Both parse a
+header carrying Argon2id cost parameters, so an input that gets past the header
+checks costs a real key derivation: between one and nineteen seconds, measured
+under F-91. Everything else parses bytes and returns.
 
-The same pattern, in reverse, is what the tenth round recorded for F-82: fixing
-an unbounded time cost made this target 136 times more productive. Bounding the
-*memory* cost in F-91 moves it the other way, and both are the campaign
-reporting the truth about where the program spends its time.
+`lock_file`'s 1,280 is the extreme, against 445,714 in the tenth round for the
+same target, and the reason is measurable rather than arguable. **Thirty-six of
+the 53 corpus entries the campaign has kept now parse successfully**, so most of
+what it runs reaches the derivation instead of being turned away. Fewer runs,
+deeper ones. The tenth round recorded the same relationship in reverse, when
+F-82 bounded an unbounded time cost and made this target 136 times more
+productive.
+
+**Three slow units, and the difference between filing them and reading them is
+this round's most useful lesson.** libFuzzer flags any input taking over a
+second, and a deliberately slow key derivation taking over a second is the
+whole point of a deliberately slow key derivation, so the easy reading is that
+all three are noise. Two of them are: 518 MiB at sixteen passes, inside every
+bound, about five seconds. The third declared 640 MiB on the *container*
+target, and asking which callers reach that path without a person choosing the
+file turned a non-finding into F-92 and two real fixes.
+
+What is still open, and it is the same sentence as before with better numbers
+behind it: ten minutes is not convergence either, no corpus is committed so
+every cold run rediscovers the structure, and nobody has run any of this on
+Windows or macOS.
 
 ### F-85 -- one refused read would have orphaned the lock for ever
 
@@ -2677,8 +2694,10 @@ the top of this document now says.
    scope have each found real defects in code a previous round had called
    clean. This round it was F-37, live on the published site the whole time.
 
-2. **The coverage-guided campaign has now been run once, for five minutes per
-   target, and that is not convergence.** All six targets, on x86-64 Linux.
+2. **The coverage-guided campaign has now been run twice, at five and then ten
+   minutes per target, and that is still not convergence.** All six targets, on
+   x86-64 Linux. The second run is 703 million inputs and is written up above;
+   it found F-92.
    It found two defects in its first run: F-82, an unbounded Argon2 time cost
    reachable from a `.veil` file and from the app-lock file that is read before
    anyone authenticates; and F-83, a tamper record whose path could rewrite the
@@ -2690,10 +2709,24 @@ the top of this document now says.
    generates inputs by construction rather than by coverage feedback, and both
    are now regression tests inside it.
 
-   What is still open: five minutes is not convergence, no corpus is kept
-   between runs, three of the six targets have never found anything, and
-   nobody has run any of it on Windows or macOS. `fuzz/README.md` carries the
-   run counts and says the same thing in its own words.
+   **A seed corpus is now committed for the two targets that need one.** The
+   gap it closes was measured rather than assumed, on `lock_file`, two minutes
+   each way: a cold run starts at 25 code paths and reaches 460 after 64,309
+   inputs, while a seeded run *starts* at 625. The seeds give a campaign more
+   coverage in its first second than two minutes of cold running achieves,
+   because both crypto targets hide their interesting code behind a magic
+   string, a version byte and three cost fields.
+
+   Only `container_header` and `lock_file` have seeds, and the other four are
+   left deliberately: they manage between twelve and three hundred million
+   inputs in ten minutes and find their own structure in seconds.
+   `guard_manifest`'s minimised corpus alone is 3.9 MB, which is a great many
+   committed bytes to save a target no time at all.
+
+   What is still open: ten minutes is not convergence either, three of the six
+   targets have never found anything, and nobody has run any of it on Windows
+   or macOS. `fuzz/README.md` carries the run counts and the seed measurement
+   and says the same thing in its own words.
 
 3. **32-bit targets are now exercised in CI, and this entry says what that
    does and does not cover.** It had been open since the fifth round, named
@@ -2812,9 +2845,20 @@ the top of this document now says.
     `install`), which would have shipped inside the package. A test now
     compares the help text against `Tab::ALL`.
 
-    Still open: the pages have been rendered with `groff` and read, on Linux.
-    Nobody has read them on macOS or through a different `man` implementation,
-    and `mandoc -Tlint` has not been run.
+    Confirmed rather than assumed: `lintian` over the rebuilt packages reports
+    no errors and two warnings, both about uploading into Debian's own archive,
+    and all three `no-manual-page` warnings are gone. `dpkg -c` shows each page
+    in the right package, and each was installed and rendered with `groff`.
+    That check took one detour worth recording, because it looked like a
+    packaging bug and was not: this build machine is a *minimized* Ubuntu
+    image, which carries `path-exclude=/usr/share/man/*` and discards manual
+    pages as it installs them. The pages were in the packages all along, and
+    believing the first `ls` would have produced a confident and wrong entry
+    here.
+
+    Still open: read on Linux, with `groff`. Nobody has read them on macOS or
+    through a different `man` implementation, and `mandoc -Tlint` has not been
+    run.
 
 11. **VeilVoice's own interface text uses em dashes, against the project's own
     rule.** Fifty occurrences across thirteen files in `veilvoice-cli` alone,
