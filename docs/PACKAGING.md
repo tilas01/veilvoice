@@ -66,16 +66,27 @@ the build needed `-d` to get past `dpkg-checkbuilddeps`. On a real Debian build
 machine those packages are what `Build-Depends` names and the flag is not
 wanted. Nothing has been uploaded anywhere.
 
-**`lintian` has now been run**, over both packages: **no errors, five
-warnings.** Two are `initial-upload-closes-no-bugs`, which asks the changelog
-to close an ITP bug and applies to a package being uploaded into Debian's own
-archive rather than one a project publishes itself. The other three are
-`no-manual-page`, one for each binary, and that one is a real gap rather than a
-formality: somebody who installs a package on a Unix system types `man
-veilvoice` and gets nothing. It is recorded here rather than quietly fixed,
-because a man page generated from anything other than the command's own
-definition is a second description of the interface that will drift from the
-first, and this project has already been bitten by exactly that (F-71).
+**`lintian` has now been run**, over both packages. The first run found no
+errors and five warnings; three of those were `no-manual-page`, one per binary,
+and that one was a real gap rather than a formality: somebody who installs a
+package on a Unix system types `man veilvoice` and got nothing.
+
+Those three are fixed. `tools/release/manpage.py` derives each page from the
+binary's own `--help` during `override_dh_auto_install`, so nothing is
+committed and no page can drift from the command it describes. A second run of
+`lintian` over the rebuilt packages reports **no errors and two warnings**,
+both `initial-upload-closes-no-bugs`, which asks the changelog to close an ITP
+bug and applies to a package being uploaded into Debian's own archive rather
+than one a project publishes itself.
+
+Verified rather than assumed: `dpkg -c` shows `veilvoice.1.gz` and
+`veilvoice-verify.1.gz` in the main package and `veilvoice-gui.1.gz` in the
+`gui` one, and each was installed and rendered with `groff`. That took one
+detour worth recording, because it looked like a packaging bug and was not:
+this build machine is a *minimized* Ubuntu image, which carries
+`path-exclude=/usr/share/man/*` in `/etc/dpkg/dpkg.cfg.d/excludes` and throws
+manual pages away as it installs them. The pages were in the packages the whole
+time.
 
 Doing it found two defects, F-80 and F-81, both recorded in
 [`AUDIT.md`](AUDIT.md). The first was that the recipe below could not run at

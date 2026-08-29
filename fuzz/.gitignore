@@ -1,6 +1,11 @@
-# cargo-fuzz working directories. Corpora and crash artefacts are local
-# findings, not source: a crash worth keeping becomes a test in the crate it
-# belongs to, which is where it will actually keep being run.
+# cargo-fuzz working directories. The *working* corpus and the crash artefacts
+# are local findings, not source: a crash worth keeping becomes a test in the
+# crate it belongs to, which is where it will actually keep being run.
+#
+# `seeds/` is deliberately not here, and the difference is worth stating.
+# A crash artefact is an output. A seed is an *input*: it is what stops a cold
+# run spending its budget rediscovering that a lock file begins with
+# `VEILLOK1`. See README.md for why only two targets have one.
 target/
 corpus/
 artifacts/
