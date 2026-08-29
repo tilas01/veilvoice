@@ -8,6 +8,55 @@ than a summary written afterwards.
 
 ## Unreleased
 
+### Encrypted volumes, and one password if you want one
+
+**Cryptomator and VeraCrypt.** VeilVoice can write every veiled recording
+straight into an encrypted folder you already have. It finds mounted vaults and
+volumes, offers them, and takes a folder you point at by hand when it finds
+none. `veilvoice volumes` reports the same thing from the command line.
+
+It never opens, closes or unlocks anything, and never asks for a volume
+password. Mounting your encrypted storage is your act, taken in the tool you
+chose; a test refuses `Command::new` in the shipped half of the detection
+module.
+
+**The hidden-volume question** is the part that needed care rather than code. A
+VeraCrypt container can hold a second volume inside the free space of the first,
+and writing into the outer one can allocate over the hidden data. The two are
+indistinguishable from outside by design, so nothing can detect it and only the
+owner can answer. VeilVoice asks once, before the first write, and offers three
+answers: no hidden volume, this *is* the hidden one, or this is the outer one.
+The last is refused with a reason that says what would happen.
+
+A destination nobody has answered for **blocks the job**. It does not quietly
+fall back to writing beside the original, because a recording sitting outside a
+vault while its owner believes it is inside one is the failure this exists to
+prevent. A settings file edited into nonsense reads as unanswered rather than as
+fine.
+
+**What a vault is worth** is single-sourced and said in both front ends: it
+protects the files inside it, not the temporary files, swap or hibernation
+image, thumbnails or recently-opened lists the system writes about them.
+Encrypt the disk as well, with BitLocker, FileVault, LUKS or LUKS2, `softraid`
+or GELI. Defence in depth, not a second lock on the same door.
+
+**The app lock can now seal every recording.** A third choice beside
+*passphrase* and *public key*, offered where a lock exists, remembered between
+launches. It reverses a decision this project has documented and defended, so
+the cost is stated where it is chosen: one password then opens the application
+*and* everything it has ever written, and forgetting it loses the recordings
+rather than a session. Two separate secrets remain the default.
+
+Recordings sealed this way do not depend on the lock file. Each carries its own
+salt, so `veilvoice decrypt` opens it with the same password on any machine.
+That is deliberate: a key derived from the lock's own salt would have meant
+deleting the lock destroyed the archive, and deleting the lock is the documented
+remedy for forgetting the password.
+
+The passphrase is kept for the session only when that mode is already chosen. A
+user who has not asked for it keeps the previous behaviour exactly, where it is
+wiped the instant it has been checked.
+
 ### Getting the tree ready for a release audit
 
 The work that a roadmap marker does not cover, and that a deploy needs.
