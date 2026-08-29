@@ -72,6 +72,7 @@ pub mod security;
 pub mod settings;
 pub mod setup;
 pub mod soundbar;
+pub mod storage;
 pub mod theme;
 pub mod updates;
 pub mod verify;
