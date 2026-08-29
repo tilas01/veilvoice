@@ -527,6 +527,13 @@ enum Command {
         #[arg(long, value_name = "NAME")]
         install: Option<String>,
     },
+    /// Encrypted volumes this machine has: Cryptomator and VeraCrypt
+    ///
+    /// Reports what is installed and what is mounted right now. It never opens,
+    /// closes or unlocks anything, and never asks for a volume password:
+    /// mounting your encrypted storage is your act, taken in the tool you
+    /// chose.
+    Volumes,
 }
 
 /// What `veilvoice conversation` can do.
@@ -1270,6 +1277,60 @@ fn run(command: Command) -> Result<(), String> {
             }
             Some(name) => install_companion(&name),
         },
+        Command::Volumes => {
+            list_volumes();
+            Ok(())
+        }
+    }
+}
+
+/// Report the encrypted volumes this machine is offering.
+///
+/// Markers 81 to 85, from the command line. Reporting only: the same rule the
+/// window follows, and for the same reason. A hidden-volume question cannot be
+/// answered here because there is nothing to remember it against, so this
+/// prints what a volume would need before the desktop application would write
+/// to it rather than pretending to settle it.
+fn list_volumes() {
+    use veilvoice_setup::volumes::{self, Tool};
+
+    println!("{}", heading("Encrypted volumes"));
+    println!("  None of these is part of VeilVoice and none of them is required.");
+    println!();
+    for tool in Tool::ALL {
+        println!("{}", paint(colour::BLUE, tool.name()));
+        println!("{}", field("key", tool.key()));
+        println!("{}", field("state", &volumes::installed(*tool).describe()));
+        println!("{}", field("home", tool.home_page()));
+        println!();
+    }
+
+    let mounted = volumes::mounted();
+    println!("{}", heading("Mounted now"));
+    if mounted.is_empty() {
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  nothing recognisable is mounted. Unlock a volume in its own program \
+                 first; VeilVoice will not do it for you."
+            )
+        );
+    }
+    for volume in &mounted {
+        println!(
+            "{}",
+            field(volume.tool.name(), &volume.path.display().to_string())
+        );
+        if let Some(why) = volume.blocked() {
+            println!("{}", warn(why));
+        }
+    }
+
+    println!();
+    println!("{}", paint(colour::MUTED, "  What this is worth:"));
+    for line in crate::lock::wrap(volumes::DISK_ADVICE, 66) {
+        println!("{}", paint(colour::MUTED, &format!("    {line}")));
     }
 }
 
