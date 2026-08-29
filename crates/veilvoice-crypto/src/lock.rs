@@ -23,10 +23,21 @@
 //!
 //! The lock stores `Argon2id(domain ‖ password, salt)`, split by HKDF into a
 //! verifier and a tag key, and compares the verifier in constant time. It
-//! deliberately does **not** derive a key that encrypts your recordings,
-//! because those have their own password (a *different* one — see
-//! [`crate::container`]), and pretending the app lock protected them would be
-//! exactly the overclaim this project refuses to make.
+//! derives no key that encrypts anything, and that is still true of this
+//! module after marker 86.
+//!
+//! What changed is one level up. The desktop application can now be told to
+//! seal every recording it writes *with the app-lock passphrase*, and it does
+//! that through [`crate::container`] in the ordinary way, with a fresh salt
+//! per file. So the recordings do not depend on this file: delete the lock and
+//! they still open, given the passphrase. Nothing here holds a key to them and
+//! nothing here can.
+//!
+//! The property that is given up by switching that on is not cryptographic, it
+//! is human, and it belongs in the interface rather than in a comment: one
+//! passphrase then opens the application and the archive together. The default
+//! is still two separate secrets, and `docs/USER_GUIDE.md` section 5.4 states
+//! the trade in the words a user reads.
 //!
 //! The stored verifier is a password hash sitting on disk in the clear, and
 //! must be treated like one. Argon2id at the default cost (256 MiB, t=3, p=4)
