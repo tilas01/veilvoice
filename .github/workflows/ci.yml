@@ -103,9 +103,21 @@ jobs:
       matrix:
         include:
           - target: i686-unknown-linux-gnu
-            packages: gcc-multilib libc6-dev-i386
+            # `libasound2-dev:i386` is what lets `veilvoice-audio` and
+            # `veilvoice-video` join the list below. They were excluded for
+            # years as "a multiarch sysroot exercise"; for ALSA it is one
+            # package and one `--add-architecture`. GTK is the one that is
+            # genuinely hard, so `veilvoice-cli` and `veilvoice-gui` are still
+            # out.
+            packages: gcc-multilib libc6-dev-i386 libasound2-dev:i386
+            multiarch: i386
+            extra: -p veilvoice-audio -p veilvoice-video
+            pkgconfig: /usr/lib/i386-linux-gnu/pkgconfig
           - target: armv7-unknown-linux-gnueabihf
             packages: gcc-arm-linux-gnueabihf libc6-dev-armhf-cross qemu-user-static
+            multiarch: ""
+            extra: ""
+            pkgconfig: ""
     env:
       # Read by cargo for the armv7 entry and simply unused by the i686 one,
       # which needs no cross linker and no runner at all.
@@ -117,6 +129,9 @@ jobs:
 
       - name: Install the cross toolchain for ${{ matrix.target }}
         run: |
+          if [ -n "${{ matrix.multiarch }}" ]; then
+            sudo dpkg --add-architecture ${{ matrix.multiarch }}
+          fi
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends ${{ matrix.packages }}
 
@@ -135,8 +150,13 @@ jobs:
       # belongs, rather than joining silently and failing for a linker reason
       # that has nothing to do with 32-bit arithmetic.
       - name: Tests on a 32-bit target
+        env:
+          # Only set for the entry that has a 32-bit sysroot; empty elsewhere,
+          # where pkg-config must keep finding the host's own files.
+          PKG_CONFIG_PATH: ${{ matrix.pkgconfig }}
+          PKG_CONFIG_ALLOW_CROSS: 1
         run: |
-          cargo test --locked --target ${{ matrix.target }} \
+          cargo test --locked --target ${{ matrix.target }} ${{ matrix.extra }} \
             -p veilvoice-core -p veilvoice-crypto -p veilvoice-meta \
             -p veilvoice-conversation -p veilvoice-check -p veilvoice-workspace \
             -p veilvoice-policy -p veilvoice-decoy -p veilvoice-guard \

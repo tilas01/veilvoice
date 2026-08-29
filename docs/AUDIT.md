@@ -2745,10 +2745,15 @@ the top of this document now says.
    filesystem paths are exactly the kind of code where a narrow pointer shows
    up, and none of it had been run anywhere but on x86-64 until this pass.
 
-   **It is not the whole workspace.** `veilvoice-audio`, `veilvoice-cli`,
-   `veilvoice-gui` and `veilvoice-video` link ALSA, GTK and X11, and building
-   those for a second architecture is a multiarch sysroot exercise rather than
-   a 32-bit correctness one. The arithmetic, the parsers and the erase loop are
+   **It is not the whole workspace, but it is two crates wider than it was.**
+   `veilvoice-audio` and `veilvoice-video` have joined the `i686` list: they
+   link ALSA and nothing else, and the multiarch sysroot that had been written
+   off as an exercise turned out to be `dpkg --add-architecture i386` and one
+   package. That is 81 more tests on a 32-bit target, in the crates that walk
+   RIFF chunks, which is where F-4 was. `veilvoice-cli` and `veilvoice-gui` are
+   still out and GTK is why: its 32-bit development packages do not install
+   cleanly here, and that one really is a sysroot exercise rather than a 32-bit
+   correctness one. The arithmetic, the parsers and the erase loop are
    in the crates the job does run, which is why those are the ones it runs.
    Neither target has been exercised on Windows or macOS, and no 32-bit
    *release* build is published for any platform.
