@@ -100,7 +100,7 @@
 <a href="veilvoice-guard/manifest.src.html">
 <rect x="273.1" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="331.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">manifest.rs</text>
-<text x="331.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">678 lines</text>
+<text x="331.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">730 lines</text>
 </a>
 <text x="20.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">Every arrow is a crate:: or super:: path one module</text>
 <text x="20.0" y="128.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">actually uses, read out of the source rather than</text>
@@ -113,7 +113,7 @@
 flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;150 lines&quot;])
     n_blame[&quot;blame.rs&lt;br/&gt;421 lines&quot;]
-    n_manifest[&quot;manifest.rs&lt;br/&gt;678 lines&quot;]
+    n_manifest[&quot;manifest.rs&lt;br/&gt;730 lines&quot;]
     click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs&quot; &quot;open the source&quot;
     click n_blame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs&quot; &quot;open the source&quot;
     click n_manifest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs&quot; &quot;open the source&quot;</code></pre>
@@ -125,7 +125,7 @@ flowchart TD
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-guard/blame.html"><code>blame.rs</code></a></td><td>421</td><td>Best-effort attribution: which program changed a file.</td></tr>
 <tr><td><a href="veilvoice-guard/lib.html"><code>lib.rs</code></a></td><td>150</td><td>Tamper detection for VeilVoice&#x27;s own files: a manifest of what they should be, a check of what they are, and a best-effort answer to &quot;what changed them&quot;.</td></tr>
-<tr><td><a href="veilvoice-guard/manifest.html"><code>manifest.rs</code></a></td><td>678</td><td>The integrity manifest: what the files were, and what they are now.</td></tr>
+<tr><td><a href="veilvoice-guard/manifest.html"><code>manifest.rs</code></a></td><td>730</td><td>The integrity manifest: what the files were, and what they are now.</td></tr>
 </tbody></table>
 </section>
 </div></div>

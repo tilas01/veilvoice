@@ -92,7 +92,7 @@ change the list too. What it catches is a change nobody was hiding.
 flowchart TD
     n_lib(["lib.rs<br/>150 lines"])
     n_blame["blame.rs<br/>421 lines"]
-    n_manifest["manifest.rs<br/>678 lines"]
+    n_manifest["manifest.rs<br/>730 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs" "open the source"
     click n_blame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" "open the source"
     click n_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs" "open the source"
@@ -106,4 +106,4 @@ flowchart TD
 |---|---:|---|
 | [[`blame.rs`|File-veilvoice-guard-blame]] | 421 | Best-effort attribution: which program changed a file. |
 | [[`lib.rs`|File-veilvoice-guard-lib]] | 150 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
-| [[`manifest.rs`|File-veilvoice-guard-manifest]] | 678 | The integrity manifest: what the files were, and what they are now. |
+| [[`manifest.rs`|File-veilvoice-guard-manifest]] | 730 | The integrity manifest: what the files were, and what they are now. |

@@ -47,10 +47,10 @@ the app lock, a second copy of it in a vault, and the integrity record moved
 into the window. New security code written after the audit is precisely the
 code an audit exists for, so it got its own round.
 
-**Seven defects found and fixed (F-85 to F-91), every one of them in code
-written in this cycle. Six were found by reading the diff; the seventh was
-found by re-running the coverage-guided campaign, which the changed lock format
-made worth doing again.**
+**Eight defects found and fixed (F-85 to F-92), every one of them in code
+written in this cycle or reachable only because of it. Six were found by
+reading the diff; two came out of re-running the coverage-guided campaign,
+which the changed lock format made worth doing again.**
 
 Two of the six were worse than the thing they were added to improve, which is
 the pattern worth naming: *hardening that fails open*. A lock that could be
@@ -181,6 +181,43 @@ cleared without the passphrase.
 destination and renames over it, which the operating system does as one step.
 The temporary is created owner-only and the rename carries that permission, so
 there is no moment at which the contents are readable by anybody else.
+
+### F-92 -- the same defect as F-91, in the two places it was not looked for
+
+`veilvoice-guard/src/manifest.rs` and `veilvoice-policy/src/policy.rs`, found
+by decoding a slow unit the `container_header` target produced.
+
+F-91 gave the app-lock file an unattended memory ceiling, on the argument that
+nobody chooses to open a file the program reads by itself at launch. The
+argument is general and it was applied to exactly one file.
+
+Two others have the same shape. `Manifest::open_sealed` reads the integrity
+record, and this cycle's own marker 75 made that automatic: it used to run only
+when somebody typed `veilvoice guard check`, and now the desktop application
+reads it at every unlock. `Policy::open_sealed` reads the sealed policy at a
+fixed path beside the plain one. Both used the generous four-gigabyte ceiling
+meant for a `.veil` somebody was sent and decided to open.
+
+So anybody who can write the configuration directory can leave a sealed
+manifest declaring four gigabytes of Argon2 memory, and every unlock from then
+on allocates it. On a modest machine that is an allocation failure, and this
+workspace aborts on one, so the window dies immediately after a correct
+passphrase is entered. Both now pass `UNATTENDED_MAX_M_COST`, which is one
+gigabyte and four times what either ever writes.
+
+The general lesson is the one this project keeps relearning and has now
+recorded three times: a fix applied to the instance that was found, rather than
+to the class, leaves an exclusion list that names the files somebody happened
+to think of. F-91 was written up as being about the app-lock file. It was
+about *any* file the program opens without being asked, and the sentence that
+would have found these two was already in `container.rs`, describing when to
+use `open_with_password_within`.
+
+**What made the difference was decoding the artefact rather than filing it.**
+The campaign reported a slow unit on `container_header`, not a crash, and the
+easy reading is that a slow Argon2 is Argon2 working. Reading the actual cost
+out of it, and then asking which callers reach that path without a person
+choosing the file, is what turned a non-finding into two.
 
 ### F-91 -- a lock file could ask for more memory than the machine has
 
@@ -1233,7 +1270,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1040 tests across 26 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1042 tests across 26 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -2667,9 +2704,13 @@ the top of this document now says.
    x86-64 host.
 
    The `narrow` job runs `i686-unknown-linux-gnu` on the runner's own kernel
-   and `armv7-unknown-linux-gnueabihf` under `qemu-user-static`. Measured
-   before it was written: the same 682 tests across 47 suites pass on both,
-   with 18 seconds of execution on i686 and 88 on armv7.
+   and `armv7-unknown-linux-gnueabihf` under `qemu-user-static`. Re-measured
+   after the app lock gained its version 2 record, the vault and the integrity
+   module: **716 tests pass on both targets, with no failures on either.** The
+   count moved from 682 because the new code brought its own tests with it, and
+   running them here was the point: a keyed tag, a masked file and two
+   filesystem paths are exactly the kind of code where a narrow pointer shows
+   up, and none of it had been run anywhere but on x86-64 until this pass.
 
    **It is not the whole workspace.** `veilvoice-audio`, `veilvoice-cli`,
    `veilvoice-gui` and `veilvoice-video` link ALSA, GTK and X11, and building
@@ -2706,16 +2747,32 @@ the top of this document now says.
    point: every one of these runs is the project checking its own work.
    `docs/INSTALL.md` says so in its own words.
 
-7. **One of the six package definitions has been built; five have not.** The
-   Debian one now builds, installs, runs and removes, on one x86-64 Ubuntu
-   machine, and doing that found F-80 and F-81. WiX, `.rpm`, Flatpak, Homebrew
-   and the Gentoo ebuild still only parse, and that is the whole of what is
-   claimed for them. `docs/PACKAGING.md` carries a per-format table saying
-   which is which. A spec file that has never produced an RPM is a draft.
+7. **Two of the six package definitions have been built; four have not.** The
+   Debian one builds, installs, runs and removes, on one x86-64 Ubuntu machine,
+   and doing that found F-80 and F-81. The RPM now builds too, on the same
+   machine: a source RPM from a `git archive` tarball, then two binary
+   subpackages whose contents were checked against the spec. WiX, Flatpak,
+   Homebrew and the Gentoo ebuild still only parse, and that is the whole of
+   what is claimed for them. `docs/PACKAGING.md` carries a per-format table
+   saying which is which.
 
-   Even the built one is short of what a distribution would ask: `lintian` has
-   not been run, the build used a rustup toolchain rather than Debian's own
-   `cargo` and `rustc` packages, and nothing has been uploaded anywhere.
+   The RPM build is weaker than the Debian one and the gap is named rather than
+   glossed: it ran on Ubuntu rather than on any RPM distribution, it needed
+   `--nodeps` because `rpm` cannot read `dpkg`'s database (every build
+   dependency was confirmed present by hand first), it needed `--nocheck` so
+   the spec's own `%check` has never run, and `rpmlint` has not been run.
+   What it did prove is the thing a parse cannot: `%files` and `%install`
+   agree, in both subpackages, which is the classic spec defect.
+
+   **`lintian` has now been run** over both Debian packages: no errors, five
+   warnings. Two concern uploading into Debian's own archive and do not apply.
+   The other three were `no-manual-page`, one per binary, and that one was
+   real: `man veilvoice` produced nothing. It is now fixed, in the packaging
+   rather than by hand, and the fix is described in item 10.
+
+   Still open: nothing has been uploaded anywhere, `rpmlint` has not been run,
+   the Debian build used a rustup toolchain rather than Debian's own `cargo`
+   and `rustc` packages, and four formats remain drafts.
 
 8. **`rsa` carries an unfixable advisory** (A-6). Accepted on the ground that
    the verifier performs no private-key operation, and enforced by a CI job
@@ -2730,9 +2787,50 @@ the top of this document now says.
    three is a change to the page's own voice rather than to a generator, so it
    waits for the maintainer.
 
+10. **Manual pages are generated from each binary, and the third one needed a
+    `--help` to generate from.** `lintian` reported `no-manual-page` for all
+    three binaries. A page written by hand would be a second description of the
+    interface kept in step with the first by nothing but attention, which is
+    the arrangement that produced F-71, so `tools/release/manpage.py` derives
+    each page from the binary's own `--help` at package build time. Nothing is
+    committed, so nothing can go stale.
+
+    `help2man` does this job and was tried first. It mangles the output: every
+    em dash in VeilVoice's help came back as `???`, at `C`, at `C.utf8`, and
+    with `LC_ALL` set either way. A page that renders the program's own
+    description as three question marks looks finished and is not, so the forty
+    lines that get the encoding right were worth writing.
+
+    Two things fell out of doing it. `veilvoice-gui` had no `--help` at all: it
+    opened a window instead, and on a machine with no display it answered a
+    reasonable question with a winit error naming `WAYLAND_DISPLAY`. It now
+    answers, on Unix, where a release build is guaranteed a console; on Windows
+    `windows_subsystem = "windows"` means `println!` writes to nothing, so
+    behaviour there is deliberately unchanged rather than silently made worse.
+    And the first version of that help text named three tabs that do not exist
+    (`watch` and `security` for what are really `monitor` and `lock`, and no
+    `install`), which would have shipped inside the package. A test now
+    compares the help text against `Tab::ALL`.
+
+    Still open: the pages have been rendered with `groff` and read, on Linux.
+    Nobody has read them on macOS or through a different `man` implementation,
+    and `mandoc -Tlint` has not been run.
+
+11. **VeilVoice's own interface text uses em dashes, against the project's own
+    rule.** Fifty occurrences across thirteen files in `veilvoice-cli` alone,
+    in `--help` output, in warnings and in printed results. The rule is that a
+    dash does not appear in prose, comments, documentation or interface text.
+
+    It is recorded rather than fixed, because fixing it is not a small change:
+    the committed CLI drawings in `assets/screenshots/` are checked against the
+    text those commands print, so rewriting the strings invalidates every one
+    of them and the re-capture is the manual step that needs a build, a machine
+    and somebody deciding the new output is right. That is a maintainer's pass,
+    not something to slip in beside a packaging change.
+
 ## 6. Verdict
 
-**Ninety-one defects found and fixed across eleven audit rounds (F-1 to F-91):**
+**Ninety-two defects found and fixed across eleven audit rounds (F-1 to F-92):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
