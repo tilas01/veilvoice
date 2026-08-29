@@ -382,8 +382,25 @@ impl Policy {
     }
 
     /// Open a policy sealed by [`Policy::seal`].
+    ///
+    /// F-92, the third place the same question comes up. The generous
+    /// four-gigabyte ceiling is for a container somebody was sent and chose to
+    /// open. This file is not that: it sits at a fixed path beside the policy,
+    /// and the person running `veilvoice policy verify` chose the command, not
+    /// the file. [`Policy::seal`] writes it at this crate's default cost, so a
+    /// ceiling of one gigabyte leaves four times the headroom anything
+    /// legitimate needs and refuses a planted file instead of allocating for
+    /// it.
+    ///
+    /// Changed at the same time as the sealed manifest, deliberately. Fixing
+    /// the two places a campaign happened to point at and leaving the third
+    /// would be the exclusion list that names the files somebody thought of.
     pub fn open_sealed(container: &[u8], password: &[u8]) -> Result<Self, Error> {
-        let bytes = veilvoice_crypto::container::open_with_password(password, container)?;
+        let bytes = veilvoice_crypto::container::open_with_password_within(
+            password,
+            container,
+            veilvoice_crypto::kdf::KdfParams::UNATTENDED_MAX_M_COST,
+        )?;
         let text = String::from_utf8(bytes)
             .map_err(|_| Error::Malformed("the sealed policy is not text".into()))?;
         Self::parse(&text)

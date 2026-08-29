@@ -4,9 +4,9 @@
 
 Package definitions for the platforms that have one, in [`packaging/`](../packaging/).
 
-## Status: one of them has been built
+## Status: two of them have been built
 
-**One of these has produced a package, and five have not.** The rest are
+**Two of these have produced packages, and four have not.** The rest are
 written against each format's documentation and validated as far as parsing
 goes: the WiX source and the AppStream metadata are well-formed XML, the
 Flatpak manifest is valid YAML. That is all that can honestly be claimed about
@@ -18,11 +18,38 @@ which is which:
 | Format | File | Built? | Installed and run? |
 |---|---|---|---|
 | Windows MSI | `packaging/wix/veilvoice.wxs` | no | no |
-| Debian/Ubuntu | `packaging/debian/` | **yes**, on Ubuntu 24.04, x86-64 | **yes** |
-| Fedora/RHEL/SUSE | `packaging/rpm/veilvoice.spec` | no | no |
+| Debian/Ubuntu | `packaging/debian/` | **yes**, on Ubuntu 24.04, x86-64 | **yes**, installed and removed |
+| Fedora/RHEL/SUSE | `packaging/rpm/veilvoice.spec` | **yes**, on Ubuntu 24.04, x86-64 | binaries run; **not** installed by `rpm` |
 | Flatpak | `packaging/flatpak/` | no | no |
 | Homebrew | `packaging/homebrew/veilvoice.rb` | no | no |
 | Gentoo | `packaging/gentoo/` | no | no |
+
+### What the RPM build proved, and what it did not
+
+`rpmbuild -bs` produced `veilvoice-0.1.14-1.src.rpm` from a `git archive`
+tarball, and `rpmbuild -bb` produced two binary packages:
+`veilvoice-0.1.14-1.x86_64.rpm` and `veilvoice-gui-0.1.14-1.x86_64.rpm`.
+
+The thing a build proves that a parse cannot is that `%files` and `%install`
+agree. They do: the main package carries `/usr/bin/veilvoice`,
+`/usr/bin/veilvoice-verify`, the licence and the whole of `docs/`; the `gui`
+subpackage carries `/usr/bin/veilvoice-gui`, the desktop entry and the icon.
+Nothing is listed that is not installed and nothing is installed that is not
+listed, which is the classic spec defect and is the one that had never been
+looked for. Extracted with `rpm2cpio`, the packaged `veilvoice --version`,
+`veilvoice info` and `veilvoice-verify --version` all ran.
+
+What it did not prove, and the gap is wider than the Debian one. **This was
+built on Ubuntu, not on Fedora or RHEL or openSUSE**, so `%{dist}`, the system
+RPM macros and the distribution's own Rust packaging are all untested. It
+needed `--nodeps`, because `rpm` on a Debian machine cannot read `dpkg`'s
+database and so cannot see that `cargo`, `gcc`, `alsa`, `gtk+-3.0` and
+`xkbcommon` are in fact all installed; every one of them was confirmed present
+by hand before the flag was used. It needed `--nocheck`, so the spec's own
+`%check` stanza has never run as part of an RPM build, although the identical
+command runs inside the Debian build. It has not been installed with `rpm -i`,
+because doing that on a Debian machine tests nothing, and `rpmlint` has not
+been run. Nothing has been uploaded anywhere.
 
 ### What the Debian build actually proved, and what it did not
 
@@ -37,7 +64,18 @@ What it did not prove: this was one machine, on x86-64, with the toolchain from
 rustup rather than from Debian's own `cargo` and `rustc` packages, which is why
 the build needed `-d` to get past `dpkg-checkbuilddeps`. On a real Debian build
 machine those packages are what `Build-Depends` names and the flag is not
-wanted. `lintian` has not been run. Nothing has been uploaded anywhere.
+wanted. Nothing has been uploaded anywhere.
+
+**`lintian` has now been run**, over both packages: **no errors, five
+warnings.** Two are `initial-upload-closes-no-bugs`, which asks the changelog
+to close an ITP bug and applies to a package being uploaded into Debian's own
+archive rather than one a project publishes itself. The other three are
+`no-manual-page`, one for each binary, and that one is a real gap rather than a
+formality: somebody who installs a package on a Unix system types `man
+veilvoice` and gets nothing. It is recorded here rather than quietly fixed,
+because a man page generated from anything other than the command's own
+definition is a second description of the interface that will drift from the
+first, and this project has already been bitten by exactly that (F-71).
 
 Doing it found two defects, F-80 and F-81, both recorded in
 [`AUDIT.md`](AUDIT.md). The first was that the recipe below could not run at

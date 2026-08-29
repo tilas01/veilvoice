@@ -1938,6 +1938,31 @@ mod tests {
         );
     }
 
+    /// The tab names `veilvoice-gui --help` lists have to be the tab names
+    /// that exist.
+    ///
+    /// Written after the first version of that help text named `watch`,
+    /// `security` and no `install`, when the keys are `monitor`, `lock` and
+    /// `install`. Three wrong names in the one place somebody reads to find
+    /// out what the right ones are, and the manual page is generated from that
+    /// text, so the error would have shipped inside the package as well.
+    #[test]
+    fn the_help_text_lists_the_tabs_that_exist() {
+        let usage = include_str!("main.rs")
+            .split("const USAGE: &str = \"\\\n")
+            .nth(1)
+            .and_then(|rest| rest.split("\";").next())
+            .expect("the usage text has to be findable");
+        for tab in Tab::ALL {
+            assert!(
+                usage.contains(tab.key()),
+                "`--help` does not mention the {:?} tab, whose name is {:?}",
+                tab,
+                tab.key()
+            );
+        }
+    }
+
     /// Marker 75. The record has to be taken without anybody knowing to ask,
     /// and it has to wait for the passphrase when there is one to wait for.
     #[test]

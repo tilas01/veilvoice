@@ -58,7 +58,68 @@
 const ICON_RGBA: &[u8] = include_bytes!("../../../assets/icon-32.rgba");
 const ICON_SIZE: u32 = 32;
 
+/// What `--help` prints, on the platforms where printing works.
+///
+/// Kept beside the argument parsing rather than in a file somewhere, because a
+/// second description of an interface drifts from the first: `tools/release/
+/// manpage.py` turns this text into the installed manual page at package build
+/// time, so the page and the program cannot disagree.
+const USAGE: &str = "\
+veilvoice-gui - the VeilVoice desktop application
+
+Usage:
+  veilvoice-gui [--tab <NAME>]
+
+Options:
+  --tab <NAME>  Open on a named tab rather than the last one used.
+                Names are the ones the tabs carry: file, live, group,
+                monitor, lock, verify, settings, install, about.
+  -h, --help    Print this message.
+  -V, --version Print the version.
+
+The command line is `veilvoice`, and `veilvoice gui` opens this window too.
+Everything this window does, that command can do without one.
+";
+
+/// Answer `--help` and `--version` before a window is opened.
+///
+/// Unix only, and the restriction is the honest part rather than an oversight.
+/// A release build on Windows declares `windows_subsystem = "windows"` and has
+/// no console attached, so `println!` there writes to nothing: the program
+/// would appear to do nothing at all, which is worse than the window it
+/// currently opens. Where a console is guaranteed, this answers; where it is
+/// not, behaviour is unchanged.
+///
+/// It exists because `veilvoice-gui --help` used to try to open a window and,
+/// on a machine with no display, failed with a winit error naming
+/// `WAYLAND_DISPLAY`. That is the reply to a reasonable question, and it is
+/// also what `lintian` was pointing at with `no-manual-page`: a binary with no
+/// help text has no page to derive.
+#[cfg(unix)]
+fn answered_without_a_window() -> bool {
+    for arg in std::env::args().skip(1) {
+        if arg == "-h" || arg == "--help" {
+            print!("{USAGE}");
+            return true;
+        }
+        if arg == "-V" || arg == "--version" {
+            println!("veilvoice-gui {}", env!("CARGO_PKG_VERSION"));
+            return true;
+        }
+    }
+    false
+}
+
+#[cfg(not(unix))]
+fn answered_without_a_window() -> bool {
+    false
+}
+
 fn main() -> eframe::Result<()> {
+    if answered_without_a_window() {
+        return Ok(());
+    }
+
     // First, before anything that can fail.
     //
     // This binary has no console (`windows_subsystem = "windows"`) and the
