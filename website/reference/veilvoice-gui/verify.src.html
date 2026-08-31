@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/verify.rs</code></h1>
-<p style="color:var(--muted)"><a href="verify.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 667 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="verify.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 767 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -474,272 +474,374 @@
 <span class="ln" id="L404">            }</span>
 <span class="ln" id="L405">            <span class="tok-kw">self</span>.report = None;</span>
 <span class="ln" id="L406">        }</span>
-<span class="ln" id="L407">    }</span>
+<span class="ln" id="L407"></span>
+<span class="ln" id="L408">        <span class="tok-kw">self</span>.<span class="tok-fn">gnupg_section</span>(ui);</span>
+<span class="ln" id="L409">    }</span>
 </span>
-<span class="ln" id="L408"></span>
+<span class="ln" id="L410"></span>
+<span class="src-item" id="fn-verify-gnupg_section">
+<span class="ln" id="L411">    <span class="tok-com">/// Marker 90. The same check, with a GnuPG this project did not write.</span></span>
+<span class="ln" id="L412">    <span class="tok-com">///</span></span>
+<span class="ln" id="L413">    <span class="tok-com">/// Here rather than on its own tab because this is where somebody is</span></span>
+<span class="ln" id="L414">    <span class="tok-com">/// already asking &quot;is this download genuine&quot;, and the honest answer to that</span></span>
+<span class="ln" id="L415">    <span class="tok-com">/// question includes &quot;and here is how to ask something other than me&quot;.</span></span>
+<span class="ln" id="L416">    <span class="tok-com">///</span></span>
+<span class="ln" id="L417">    <span class="tok-com">/// The commands come from [`veilvoice_check::gnupg_commands`], which the</span></span>
+<span class="ln" id="L418">    <span class="tok-com">/// portable verifier also uses, so the window and the command line cannot</span></span>
+<span class="ln" id="L419">    <span class="tok-com">/// drift into printing two different recipes.</span></span>
+<span class="ln" id="L420">    <span class="tok-kw">fn</span> <span class="tok-fn">gnupg_section</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L421">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
+<span class="ln" id="L422">        ui.<span class="tok-fn">separator</span>();</span>
+<span class="ln" id="L423">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L424">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Check it again with your own GnuPG&quot;</span>)</span>
+<span class="ln" id="L425">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>())</span>
+<span class="ln" id="L426">                .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L427">        );</span>
+<span class="ln" id="L428"></span>
+<span class="ln" id="L429">        <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(sums), <span class="tok-fn">Some</span>(signature)) = (<span class="tok-kw">self</span>.sums.<span class="tok-fn">clone</span>(), <span class="tok-kw">self</span>.signature.<span class="tok-fn">clone</span>()) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L430">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L431">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L432">                    <span class="tok-str">&quot;choose a hash list and a signature above, and the commands appear here&quot;</span>,</span>
+<span class="ln" id="L433">                )</span>
+<span class="ln" id="L434">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L435">                .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L436">            );</span>
+<span class="ln" id="L437">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L438">        };</span>
+<span class="ln" id="L439"></span>
+<span class="ln" id="L440">        <span class="tok-kw">match</span> veilvoice_check::<span class="tok-fn">gnupg_on_path</span>() {</span>
+<span class="ln" id="L441">            <span class="tok-fn">Some</span>(gpg) =&gt; ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L442">                RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;GnuPG found at {}&quot;</span>, gpg.<span class="tok-fn">display</span>()))</span>
+<span class="ln" id="L443">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>())</span>
+<span class="ln" id="L444">                    .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L445">            ),</span>
+<span class="ln" id="L446">            None =&gt; ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L447">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L448">                    <span class="tok-str">&quot;GnuPG is not on your PATH. These are the commands if you install it.&quot;</span>,</span>
+<span class="ln" id="L449">                )</span>
+<span class="ln" id="L450">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L451">                .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L452">            ),</span>
+<span class="ln" id="L453">        };</span>
+<span class="ln" id="L454"></span>
+<span class="ln" id="L455">        <span class="tok-com">// The signing key beside the hash list, when the release shipped one.</span></span>
+<span class="ln" id="L456">        <span class="tok-kw">let</span> key = sums.<span class="tok-fn">with_file_name</span>(<span class="tok-str">&quot;veilvoice-signing-key.asc&quot;</span>);</span>
+<span class="ln" id="L457">        <span class="tok-kw">let</span> key = key.<span class="tok-fn">is_file</span>().<span class="tok-fn">then_some</span>(key);</span>
+<span class="ln" id="L458">        <span class="tok-kw">let</span> commands = veilvoice_check::<span class="tok-fn">gnupg_commands</span>(&amp;sums, &amp;signature, key.<span class="tok-fn">as_deref</span>());</span>
+<span class="ln" id="L459">        <span class="tok-kw">let</span> script = commands.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L460"></span>
+<span class="ln" id="L461">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L462">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> &amp;commands {</span>
+<span class="ln" id="L463">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(line).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">monospace</span>());</span>
+<span class="ln" id="L464">        }</span>
+<span class="ln" id="L465">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L466">        <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;copy these commands&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L467">            ui.<span class="tok-fn">ctx</span>().<span class="tok-fn">copy_text</span>(script);</span>
+<span class="ln" id="L468">        }</span>
+<span class="ln" id="L469">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L470">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L471">                <span class="tok-str">&quot;Worth doing. VeilVoice checked the signature with a key built into \</span></span>
+<span class="ln" id="L472"><span class="tok-str">                 itself, and this program came out of the same download you are \</span></span>
+<span class="ln" id="L473"><span class="tok-str">                 checking. GnuPG, and the fingerprint on the website, are the \</span></span>
+<span class="ln" id="L474"><span class="tok-str">                 independent answer.&quot;</span>,</span>
+<span class="ln" id="L475">            )</span>
+<span class="ln" id="L476">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L477">            .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L478">        );</span>
+<span class="ln" id="L479">    }</span>
+</span>
+<span class="ln" id="L480"></span>
 <span class="src-item" id="fn-verify-verdict">
-<span class="ln" id="L409">    <span class="tok-com">/// The answer, in the colour it deserves.</span></span>
-<span class="ln" id="L410">    <span class="tok-kw">fn</span> <span class="tok-fn">verdict</span>(&amp;<span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
-<span class="ln" id="L411">        <span class="tok-kw">match</span> &amp;<span class="tok-kw">self</span>.report {</span>
-<span class="ln" id="L412">            None =&gt; {</span>
-<span class="ln" id="L413">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Not checked.&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L414">            }</span>
-<span class="ln" id="L415">            <span class="tok-fn">Some</span>(<span class="tok-fn">Ok</span>(checked)) <span class="tok-kw">if</span> checked.matched =&gt; {</span>
-<span class="ln" id="L416">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L417">                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{} is the file this key published.&quot;</span>, checked.name))</span>
-<span class="ln" id="L418">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>()),</span>
-<span class="ln" id="L419">                );</span>
-<span class="ln" id="L420">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L421">                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;sha256  {}&quot;</span>, checked.actual))</span>
-<span class="ln" id="L422">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L423">                        .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L424">                );</span>
-<span class="ln" id="L425">            }</span>
-<span class="ln" id="L426">            <span class="tok-fn">Some</span>(<span class="tok-fn">Ok</span>(checked)) =&gt; {</span>
-<span class="ln" id="L427">                <span class="tok-com">// The signature was good and the hash was not. Said in the</span></span>
-<span class="ln" id="L428">                <span class="tok-com">// strongest words this panel has, because it is the one outcome</span></span>
-<span class="ln" id="L429">                <span class="tok-com">// that means something is actually wrong with the file.</span></span>
-<span class="ln" id="L430">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L431">                    RichText::<span class="tok-fn">new</span>(format!(</span>
-<span class="ln" id="L432">                        <span class="tok-str">&quot;{} does NOT match the signed list. Do not run it.&quot;</span>,</span>
-<span class="ln" id="L433">                        checked.name</span>
-<span class="ln" id="L434">                    ))</span>
-<span class="ln" id="L435">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()),</span>
-<span class="ln" id="L436">                );</span>
-<span class="ln" id="L437">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L438">                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;expected  {}&quot;</span>, checked.expected))</span>
-<span class="ln" id="L439">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L440">                        .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L441">                );</span>
-<span class="ln" id="L442">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L443">                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;actual    {}&quot;</span>, checked.actual))</span>
-<span class="ln" id="L444">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L445">                        .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L446">                );</span>
-<span class="ln" id="L447">            }</span>
-<span class="ln" id="L448">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(error)) =&gt; {</span>
-<span class="ln" id="L449">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(error.<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()));</span>
-<span class="ln" id="L450">                <span class="tok-kw">if</span> matches!(error, Error::<span class="tok-fn">NotListed</span>(_)) {</span>
-<span class="ln" id="L451">                    ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L452">                        RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L453">                            <span class="tok-str">&quot;That usually means the SHA256SUMS is from a different release \</span></span>
-<span class="ln" id="L454"><span class="tok-str">                             than the file.&quot;</span>,</span>
-<span class="ln" id="L455">                        )</span>
-<span class="ln" id="L456">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L457">                        .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L458">                    );</span>
-<span class="ln" id="L459">                }</span>
-<span class="ln" id="L460">            }</span>
-<span class="ln" id="L461">        }</span>
-<span class="ln" id="L462">    }</span>
+<span class="ln" id="L481">    <span class="tok-com">/// The answer, in the colour it deserves.</span></span>
+<span class="ln" id="L482">    <span class="tok-kw">fn</span> <span class="tok-fn">verdict</span>(&amp;<span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L483">        <span class="tok-kw">match</span> &amp;<span class="tok-kw">self</span>.report {</span>
+<span class="ln" id="L484">            None =&gt; {</span>
+<span class="ln" id="L485">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Not checked.&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L486">            }</span>
+<span class="ln" id="L487">            <span class="tok-fn">Some</span>(<span class="tok-fn">Ok</span>(checked)) <span class="tok-kw">if</span> checked.matched =&gt; {</span>
+<span class="ln" id="L488">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L489">                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{} is the file this key published.&quot;</span>, checked.name))</span>
+<span class="ln" id="L490">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>()),</span>
+<span class="ln" id="L491">                );</span>
+<span class="ln" id="L492">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L493">                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;sha256  {}&quot;</span>, checked.actual))</span>
+<span class="ln" id="L494">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L495">                        .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L496">                );</span>
+<span class="ln" id="L497">            }</span>
+<span class="ln" id="L498">            <span class="tok-fn">Some</span>(<span class="tok-fn">Ok</span>(checked)) =&gt; {</span>
+<span class="ln" id="L499">                <span class="tok-com">// The signature was good and the hash was not. Said in the</span></span>
+<span class="ln" id="L500">                <span class="tok-com">// strongest words this panel has, because it is the one outcome</span></span>
+<span class="ln" id="L501">                <span class="tok-com">// that means something is actually wrong with the file.</span></span>
+<span class="ln" id="L502">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L503">                    RichText::<span class="tok-fn">new</span>(format!(</span>
+<span class="ln" id="L504">                        <span class="tok-str">&quot;{} does NOT match the signed list. Do not run it.&quot;</span>,</span>
+<span class="ln" id="L505">                        checked.name</span>
+<span class="ln" id="L506">                    ))</span>
+<span class="ln" id="L507">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()),</span>
+<span class="ln" id="L508">                );</span>
+<span class="ln" id="L509">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L510">                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;expected  {}&quot;</span>, checked.expected))</span>
+<span class="ln" id="L511">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L512">                        .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L513">                );</span>
+<span class="ln" id="L514">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L515">                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;actual    {}&quot;</span>, checked.actual))</span>
+<span class="ln" id="L516">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L517">                        .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L518">                );</span>
+<span class="ln" id="L519">            }</span>
+<span class="ln" id="L520">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(error)) =&gt; {</span>
+<span class="ln" id="L521">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(error.<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()));</span>
+<span class="ln" id="L522">                <span class="tok-kw">if</span> matches!(error, Error::<span class="tok-fn">NotListed</span>(_)) {</span>
+<span class="ln" id="L523">                    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L524">                        RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L525">                            <span class="tok-str">&quot;That usually means the SHA256SUMS is from a different release \</span></span>
+<span class="ln" id="L526"><span class="tok-str">                             than the file.&quot;</span>,</span>
+<span class="ln" id="L527">                        )</span>
+<span class="ln" id="L528">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L529">                        .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L530">                    );</span>
+<span class="ln" id="L531">                }</span>
+<span class="ln" id="L532">            }</span>
+<span class="ln" id="L533">        }</span>
+<span class="ln" id="L534">    }</span>
 </span>
-<span class="ln" id="L463"></span>
+<span class="ln" id="L535"></span>
 <span class="src-item" id="fn-verify-start">
-<span class="ln" id="L464">    <span class="tok-com">/// Run the check on a thread of its own.</span></span>
-<span class="ln" id="L465">    <span class="tok-com">///</span></span>
-<span class="ln" id="L466">    <span class="tok-com">/// Hashing a release archive is tens of megabytes of reading, and OpenPGP</span></span>
-<span class="ln" id="L467">    <span class="tok-com">/// verification is not free either. `update()` may start work; it may never</span></span>
-<span class="ln" id="L468">    <span class="tok-com">/// wait for it.</span></span>
-<span class="ln" id="L469">    <span class="tok-kw">fn</span> <span class="tok-fn">start</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L470">        <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(download), <span class="tok-fn">Some</span>(sums), <span class="tok-fn">Some</span>(signature)) = (</span>
-<span class="ln" id="L471">            <span class="tok-kw">self</span>.download.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L472">            <span class="tok-kw">self</span>.sums.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L473">            <span class="tok-kw">self</span>.signature.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L474">        ) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L475">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L476">        };</span>
-<span class="ln" id="L477">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L478">        <span class="tok-kw">self</span>.job = <span class="tok-fn">Some</span>(rx);</span>
-<span class="ln" id="L479">        <span class="tok-kw">self</span>.report = None;</span>
-<span class="ln" id="L480">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L481">            <span class="tok-kw">let</span> answer = (|| {</span>
-<span class="ln" id="L482">                <span class="tok-kw">let</span> sums = std::fs::<span class="tok-fn">read_to_string</span>(&amp;sums)</span>
-<span class="ln" id="L483">                    .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot read {}: {e}&quot;</span>, sums.<span class="tok-fn">display</span>())))?;</span>
-<span class="ln" id="L484">                <span class="tok-kw">let</span> signature = std::fs::<span class="tok-fn">read_to_string</span>(&amp;signature)</span>
-<span class="ln" id="L485">                    .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot read {}: {e}&quot;</span>, signature.<span class="tok-fn">display</span>())))?;</span>
-<span class="ln" id="L486">                veilvoice_check::<span class="tok-fn">check_file</span>(&amp;download, &amp;sums, &amp;signature)</span>
-<span class="ln" id="L487">            })();</span>
-<span class="ln" id="L488">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(answer);</span>
-<span class="ln" id="L489">        });</span>
-<span class="ln" id="L490">    }</span>
+<span class="ln" id="L536">    <span class="tok-com">/// Run the check on a thread of its own.</span></span>
+<span class="ln" id="L537">    <span class="tok-com">///</span></span>
+<span class="ln" id="L538">    <span class="tok-com">/// Hashing a release archive is tens of megabytes of reading, and OpenPGP</span></span>
+<span class="ln" id="L539">    <span class="tok-com">/// verification is not free either. `update()` may start work; it may never</span></span>
+<span class="ln" id="L540">    <span class="tok-com">/// wait for it.</span></span>
+<span class="ln" id="L541">    <span class="tok-kw">fn</span> <span class="tok-fn">start</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L542">        <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(download), <span class="tok-fn">Some</span>(sums), <span class="tok-fn">Some</span>(signature)) = (</span>
+<span class="ln" id="L543">            <span class="tok-kw">self</span>.download.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L544">            <span class="tok-kw">self</span>.sums.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L545">            <span class="tok-kw">self</span>.signature.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L546">        ) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L547">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L548">        };</span>
+<span class="ln" id="L549">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L550">        <span class="tok-kw">self</span>.job = <span class="tok-fn">Some</span>(rx);</span>
+<span class="ln" id="L551">        <span class="tok-kw">self</span>.report = None;</span>
+<span class="ln" id="L552">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L553">            <span class="tok-kw">let</span> answer = (|| {</span>
+<span class="ln" id="L554">                <span class="tok-kw">let</span> sums = std::fs::<span class="tok-fn">read_to_string</span>(&amp;sums)</span>
+<span class="ln" id="L555">                    .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot read {}: {e}&quot;</span>, sums.<span class="tok-fn">display</span>())))?;</span>
+<span class="ln" id="L556">                <span class="tok-kw">let</span> signature = std::fs::<span class="tok-fn">read_to_string</span>(&amp;signature)</span>
+<span class="ln" id="L557">                    .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;cannot read {}: {e}&quot;</span>, signature.<span class="tok-fn">display</span>())))?;</span>
+<span class="ln" id="L558">                veilvoice_check::<span class="tok-fn">check_file</span>(&amp;download, &amp;sums, &amp;signature)</span>
+<span class="ln" id="L559">            })();</span>
+<span class="ln" id="L560">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(answer);</span>
+<span class="ln" id="L561">        });</span>
+<span class="ln" id="L562">    }</span>
 </span>
-<span class="ln" id="L491">}</span>
-<span class="ln" id="L492"></span>
-<span class="ln" id="L493"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L494"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L495">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L496"></span>
-<span class="ln" id="L497">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L498">    <span class="tok-kw">fn</span> <span class="tok-fn">a_dropped_file_lands_in_the_slot_its_name_says</span>() {</span>
-<span class="ln" id="L499">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>)), Slot::Sums);</span>
-<span class="ln" id="L500">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;sha256sums&quot;</span>)), Slot::Sums);</span>
-<span class="ln" id="L501">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>)), Slot::Signature);</span>
-<span class="ln" id="L502">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;release.sig&quot;</span>)), Slot::Signature);</span>
-<span class="ln" id="L503">        assert_eq!(</span>
-<span class="ln" id="L504">            <span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-0.1.12-windows.zip&quot;</span>)),</span>
-<span class="ln" id="L505">            Slot::Download</span>
-<span class="ln" id="L506">        );</span>
-<span class="ln" id="L507">        <span class="tok-com">// `.asc` wins over the word &quot;sha256sums&quot;, because the signature file is</span></span>
-<span class="ln" id="L508">        <span class="tok-com">// named after the thing it signs and would otherwise land in the wrong</span></span>
-<span class="ln" id="L509">        <span class="tok-com">// slot every single time.</span></span>
-<span class="ln" id="L510">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>)), Slot::Signature);</span>
-<span class="ln" id="L511">    }</span>
-<span class="ln" id="L512"></span>
-<span class="ln" id="L513">    <span class="tok-com">/// **The three files arrive together.** A release is downloaded as an</span></span>
-<span class="ln" id="L514">    <span class="tok-com">/// archive plus `SHA256SUMS` plus `SHA256SUMS.asc`, into one folder.</span></span>
-<span class="ln" id="L515">    <span class="tok-com">/// Making somebody find each of them by hand is making them give up.</span></span>
-<span class="ln" id="L516">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L517">    <span class="tok-kw">fn</span> <span class="tok-fn">dropping_the_archive_finds_the_hash_list_and_signature_beside_it</span>() {</span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L519">        <span class="tok-kw">let</span> archive = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.13-windows-x86_64.zip&quot;</span>);</span>
-<span class="ln" id="L520">        std::fs::<span class="tok-fn">write</span>(&amp;archive, b<span class="tok-str">&quot;pretend&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L521">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>), b<span class="tok-str">&quot;list&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L522">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>), b<span class="tok-str">&quot;sig&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L523"></span>
-<span class="ln" id="L524">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L525">        verify.<span class="tok-fn">accept</span>(archive.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L526"></span>
-<span class="ln" id="L527">        assert_eq!(verify.download.<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(archive.<span class="tok-fn">as_path</span>()));</span>
-<span class="ln" id="L528">        assert_eq!(</span>
-<span class="ln" id="L529">            verify.sums.<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L530">            <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>).<span class="tok-fn">as_path</span>())</span>
-<span class="ln" id="L531">        );</span>
-<span class="ln" id="L532">        assert_eq!(</span>
-<span class="ln" id="L533">            verify.signature.<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L534">            <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>).<span class="tok-fn">as_path</span>())</span>
-<span class="ln" id="L535">        );</span>
-<span class="ln" id="L536">        assert_eq!(</span>
-<span class="ln" id="L537">            verify.<span class="tok-fn">found_beside</span>(&amp;archive),</span>
-<span class="ln" id="L538">            vec![<span class="tok-str">&quot;SHA256SUMS&quot;</span>, <span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>]</span>
-<span class="ln" id="L539">        );</span>
-<span class="ln" id="L540">    }</span>
-<span class="ln" id="L541"></span>
-<span class="ln" id="L542">    <span class="tok-com">/// A slot somebody chose is never replaced by a guess. They said which</span></span>
-<span class="ln" id="L543">    <span class="tok-com">/// file they meant, and overriding that is how the wrong thing gets</span></span>
-<span class="ln" id="L544">    <span class="tok-com">/// verified and reported as right.</span></span>
-<span class="ln" id="L545">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L546">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_that_was_chosen_is_never_replaced_by_one_found_nearby</span>() {</span>
-<span class="ln" id="L547">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L548">        <span class="tok-kw">let</span> elsewhere = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L549">        <span class="tok-kw">let</span> archive = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;release.zip&quot;</span>);</span>
-<span class="ln" id="L550">        std::fs::<span class="tok-fn">write</span>(&amp;archive, b<span class="tok-str">&quot;pretend&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L551">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>), b<span class="tok-str">&quot;the one beside it&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L552"></span>
-<span class="ln" id="L553">        <span class="tok-kw">let</span> chosen = elsewhere.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>);</span>
-<span class="ln" id="L554">        std::fs::<span class="tok-fn">write</span>(&amp;chosen, b<span class="tok-str">&quot;the one they picked&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L555"></span>
-<span class="ln" id="L556">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify {</span>
-<span class="ln" id="L557">            sums: <span class="tok-fn">Some</span>(chosen.<span class="tok-fn">clone</span>()),</span>
-<span class="ln" id="L558">            ..Verify::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L559">        };</span>
-<span class="ln" id="L560">        verify.<span class="tok-fn">accept</span>(archive);</span>
-<span class="ln" id="L561"></span>
-<span class="ln" id="L562">        assert_eq!(</span>
-<span class="ln" id="L563">            verify.sums.<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L564">            <span class="tok-fn">Some</span>(chosen.<span class="tok-fn">as_path</span>()),</span>
-<span class="ln" id="L565">            <span class="tok-str">&quot;the chosen file must survive&quot;</span></span>
-<span class="ln" id="L566">        );</span>
-<span class="ln" id="L567">    }</span>
+<span class="ln" id="L563">}</span>
+<span class="ln" id="L564"></span>
+<span class="ln" id="L565"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L566"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L567">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L568"></span>
-<span class="ln" id="L569">    <span class="tok-com">/// Only the exact published names. Anything looser starts matching files</span></span>
-<span class="ln" id="L570">    <span class="tok-com">/// that merely happen to be nearby, and a hash list is not something to be</span></span>
-<span class="ln" id="L571">    <span class="tok-com">/// clever about finding.</span></span>
-<span class="ln" id="L572">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L573">    <span class="tok-kw">fn</span> <span class="tok-fn">only_the_exact_names_are_taken_from_the_folder</span>() {</span>
-<span class="ln" id="L574">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L575">        <span class="tok-kw">let</span> archive = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;release.zip&quot;</span>);</span>
-<span class="ln" id="L576">        std::fs::<span class="tok-fn">write</span>(&amp;archive, b<span class="tok-str">&quot;pretend&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L577">        <span class="tok-kw">for</span> decoy <span class="tok-kw">in</span> [<span class="tok-str">&quot;SHA256SUMS.old&quot;</span>, <span class="tok-str">&quot;sha256sums.txt&quot;</span>, <span class="tok-str">&quot;SHA256SUMS.asc.bak&quot;</span>] {</span>
-<span class="ln" id="L578">            std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(decoy), b<span class="tok-str">&quot;no&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L579">        }</span>
-<span class="ln" id="L580"></span>
-<span class="ln" id="L581">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L582">        verify.<span class="tok-fn">accept</span>(archive.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L583">        assert_eq!(verify.sums, None, <span class="tok-str">&quot;no decoy may be taken&quot;</span>);</span>
-<span class="ln" id="L584">        assert_eq!(verify.signature, None);</span>
-<span class="ln" id="L585">        assert!(verify.<span class="tok-fn">found_beside</span>(&amp;archive).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L586">    }</span>
-<span class="ln" id="L587"></span>
+<span class="ln" id="L569">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L570">    <span class="tok-kw">fn</span> <span class="tok-fn">a_dropped_file_lands_in_the_slot_its_name_says</span>() {</span>
+<span class="ln" id="L571">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>)), Slot::Sums);</span>
+<span class="ln" id="L572">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;sha256sums&quot;</span>)), Slot::Sums);</span>
+<span class="ln" id="L573">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>)), Slot::Signature);</span>
+<span class="ln" id="L574">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;release.sig&quot;</span>)), Slot::Signature);</span>
+<span class="ln" id="L575">        assert_eq!(</span>
+<span class="ln" id="L576">            <span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-0.1.12-windows.zip&quot;</span>)),</span>
+<span class="ln" id="L577">            Slot::Download</span>
+<span class="ln" id="L578">        );</span>
+<span class="ln" id="L579">        <span class="tok-com">// `.asc` wins over the word &quot;sha256sums&quot;, because the signature file is</span></span>
+<span class="ln" id="L580">        <span class="tok-com">// named after the thing it signs and would otherwise land in the wrong</span></span>
+<span class="ln" id="L581">        <span class="tok-com">// slot every single time.</span></span>
+<span class="ln" id="L582">        assert_eq!(<span class="tok-fn">slot_for</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>)), Slot::Signature);</span>
+<span class="ln" id="L583">    }</span>
+<span class="ln" id="L584"></span>
+<span class="ln" id="L585">    <span class="tok-com">/// **The three files arrive together.** A release is downloaded as an</span></span>
+<span class="ln" id="L586">    <span class="tok-com">/// archive plus `SHA256SUMS` plus `SHA256SUMS.asc`, into one folder.</span></span>
+<span class="ln" id="L587">    <span class="tok-com">/// Making somebody find each of them by hand is making them give up.</span></span>
 <span class="ln" id="L588">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L589">    <span class="tok-kw">fn</span> <span class="tok-fn">accepting_files_fills_the_three_slots</span>() {</span>
-<span class="ln" id="L590">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L591">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;veilvoice.zip&quot;</span>));</span>
-<span class="ln" id="L592">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>));</span>
-<span class="ln" id="L593">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>));</span>
-<span class="ln" id="L594">        assert_eq!(verify.download, <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;veilvoice.zip&quot;</span>)));</span>
-<span class="ln" id="L595">        assert_eq!(verify.sums, <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>)));</span>
-<span class="ln" id="L596">        assert_eq!(verify.signature, <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>)));</span>
-<span class="ln" id="L597">    }</span>
+<span class="ln" id="L589">    <span class="tok-kw">fn</span> <span class="tok-fn">dropping_the_archive_finds_the_hash_list_and_signature_beside_it</span>() {</span>
+<span class="ln" id="L590">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L591">        <span class="tok-kw">let</span> archive = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.13-windows-x86_64.zip&quot;</span>);</span>
+<span class="ln" id="L592">        std::fs::<span class="tok-fn">write</span>(&amp;archive, b<span class="tok-str">&quot;pretend&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L593">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>), b<span class="tok-str">&quot;list&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L594">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>), b<span class="tok-str">&quot;sig&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L595"></span>
+<span class="ln" id="L596">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L597">        verify.<span class="tok-fn">accept</span>(archive.<span class="tok-fn">clone</span>());</span>
 <span class="ln" id="L598"></span>
-<span class="ln" id="L599">    <span class="tok-com">/// A new file makes the last answer stale, and a stale verdict shown beside</span></span>
-<span class="ln" id="L600">    <span class="tok-com">/// a different file is the worst thing this panel could do.</span></span>
-<span class="ln" id="L601">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L602">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_file_clears_the_previous_answer</span>() {</span>
-<span class="ln" id="L603">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify {</span>
-<span class="ln" id="L604">            report: <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(Error::BadSignature)),</span>
-<span class="ln" id="L605">            ..Verify::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L606">        };</span>
-<span class="ln" id="L607">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;veilvoice.zip&quot;</span>));</span>
-<span class="ln" id="L608">        assert!(verify.report.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L609">    }</span>
-<span class="ln" id="L610"></span>
-<span class="ln" id="L611">    <span class="tok-com">/// The window has to keep drawing while a file is over it, not only while</span></span>
-<span class="ln" id="L612">    <span class="tok-com">/// a check is running. This is the assertion behind that.</span></span>
-<span class="ln" id="L613">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L614">    <span class="tok-kw">fn</span> <span class="tok-fn">hovering_keeps_the_window_awake</span>() {</span>
-<span class="ln" id="L615">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L616">        assert!(!verify.<span class="tok-fn">wants_repaint</span>(), <span class="tok-str">&quot;an idle panel asks for nothing&quot;</span>);</span>
-<span class="ln" id="L617">        verify.hovering = true;</span>
-<span class="ln" id="L618">        assert!(verify.<span class="tok-fn">wants_repaint</span>(), <span class="tok-str">&quot;a file over the window is a reason&quot;</span>);</span>
-<span class="ln" id="L619">        assert!(!verify.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;hovering is not a running check&quot;</span>);</span>
-<span class="ln" id="L620">    }</span>
-<span class="ln" id="L621"></span>
-<span class="ln" id="L622">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L623">    <span class="tok-kw">fn</span> <span class="tok-fn">a_check_cannot_start_without_all_three</span>() {</span>
-<span class="ln" id="L624">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L625">        verify.<span class="tok-fn">start</span>();</span>
-<span class="ln" id="L626">        assert!(!verify.<span class="tok-fn">is_busy</span>());</span>
-<span class="ln" id="L627">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;veilvoice.zip&quot;</span>));</span>
-<span class="ln" id="L628">        verify.<span class="tok-fn">start</span>();</span>
-<span class="ln" id="L629">        assert!(!verify.<span class="tok-fn">is_busy</span>());</span>
-<span class="ln" id="L630">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>));</span>
-<span class="ln" id="L631">        verify.<span class="tok-fn">start</span>();</span>
-<span class="ln" id="L632">        assert!(!verify.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;still no signature&quot;</span>);</span>
-<span class="ln" id="L633">    }</span>
-<span class="ln" id="L634"></span>
-<span class="ln" id="L635">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L636">    <span class="tok-kw">fn</span> <span class="tok-fn">a_worker_that_dies_without_answering_is_reported</span>() {</span>
-<span class="ln" id="L637">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L638">        <span class="tok-fn">drop</span>(tx);</span>
-<span class="ln" id="L639">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify {</span>
-<span class="ln" id="L640">            job: <span class="tok-fn">Some</span>(rx),</span>
-<span class="ln" id="L641">            ..Verify::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L642">        };</span>
-<span class="ln" id="L643">        verify.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L644">        assert!(!verify.<span class="tok-fn">is_busy</span>());</span>
-<span class="ln" id="L645">        <span class="tok-kw">match</span> verify.report {</span>
-<span class="ln" id="L646">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(Error::<span class="tok-fn">Io</span>(<span class="tok-kw">ref</span> why))) =&gt; assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;without answering&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>),</span>
-<span class="ln" id="L647">            other =&gt; panic!(<span class="tok-str">&quot;expected a reported failure, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L648">        }</span>
-<span class="ln" id="L649">    }</span>
-<span class="ln" id="L650"></span>
-<span class="ln" id="L651">    <span class="tok-com">/// The whole thing, end to end, against a file this test makes: the</span></span>
-<span class="ln" id="L652">    <span class="tok-com">/// signature check has to fail before any hash is believed, even when the</span></span>
-<span class="ln" id="L653">    <span class="tok-com">/// hash is perfect.</span></span>
-<span class="ln" id="L654">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L655">    <span class="tok-kw">fn</span> <span class="tok-fn">a_perfect_hash_under_a_bad_signature_still_fails</span>() {</span>
-<span class="ln" id="L656">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L657">        <span class="tok-kw">let</span> file = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;release.zip&quot;</span>);</span>
-<span class="ln" id="L658">        std::fs::<span class="tok-fn">write</span>(&amp;file, b<span class="tok-str">&quot;contents&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L659">        <span class="tok-kw">let</span> sums = format!(</span>
-<span class="ln" id="L660">            <span class="tok-str">&quot;{}  release.zip\n&quot;</span>,</span>
-<span class="ln" id="L661">            veilvoice_check::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;contents&quot;</span>)</span>
-<span class="ln" id="L662">        );</span>
-<span class="ln" id="L663">        <span class="tok-kw">let</span> error = veilvoice_check::<span class="tok-fn">check_file</span>(&amp;file, &amp;sums, <span class="tok-str">&quot;not a signature&quot;</span>)</span>
-<span class="ln" id="L664">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a bad signature must stop the check&quot;</span>);</span>
-<span class="ln" id="L665">        assert!(matches!(error, Error::<span class="tok-fn">Malformed</span>(_)), <span class="tok-str">&quot;{error:?}&quot;</span>);</span>
-<span class="ln" id="L666">    }</span>
-<span class="ln" id="L667">}</span>
+<span class="ln" id="L599">        assert_eq!(verify.download.<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(archive.<span class="tok-fn">as_path</span>()));</span>
+<span class="ln" id="L600">        assert_eq!(</span>
+<span class="ln" id="L601">            verify.sums.<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L602">            <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>).<span class="tok-fn">as_path</span>())</span>
+<span class="ln" id="L603">        );</span>
+<span class="ln" id="L604">        assert_eq!(</span>
+<span class="ln" id="L605">            verify.signature.<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L606">            <span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>).<span class="tok-fn">as_path</span>())</span>
+<span class="ln" id="L607">        );</span>
+<span class="ln" id="L608">        assert_eq!(</span>
+<span class="ln" id="L609">            verify.<span class="tok-fn">found_beside</span>(&amp;archive),</span>
+<span class="ln" id="L610">            vec![<span class="tok-str">&quot;SHA256SUMS&quot;</span>, <span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>]</span>
+<span class="ln" id="L611">        );</span>
+<span class="ln" id="L612">    }</span>
+<span class="ln" id="L613"></span>
+<span class="ln" id="L614">    <span class="tok-com">/// A slot somebody chose is never replaced by a guess. They said which</span></span>
+<span class="ln" id="L615">    <span class="tok-com">/// file they meant, and overriding that is how the wrong thing gets</span></span>
+<span class="ln" id="L616">    <span class="tok-com">/// verified and reported as right.</span></span>
+<span class="ln" id="L617">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L618">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_that_was_chosen_is_never_replaced_by_one_found_nearby</span>() {</span>
+<span class="ln" id="L619">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L620">        <span class="tok-kw">let</span> elsewhere = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L621">        <span class="tok-kw">let</span> archive = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;release.zip&quot;</span>);</span>
+<span class="ln" id="L622">        std::fs::<span class="tok-fn">write</span>(&amp;archive, b<span class="tok-str">&quot;pretend&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L623">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>), b<span class="tok-str">&quot;the one beside it&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L624"></span>
+<span class="ln" id="L625">        <span class="tok-kw">let</span> chosen = elsewhere.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>);</span>
+<span class="ln" id="L626">        std::fs::<span class="tok-fn">write</span>(&amp;chosen, b<span class="tok-str">&quot;the one they picked&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L627"></span>
+<span class="ln" id="L628">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify {</span>
+<span class="ln" id="L629">            sums: <span class="tok-fn">Some</span>(chosen.<span class="tok-fn">clone</span>()),</span>
+<span class="ln" id="L630">            ..Verify::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L631">        };</span>
+<span class="ln" id="L632">        verify.<span class="tok-fn">accept</span>(archive);</span>
+<span class="ln" id="L633"></span>
+<span class="ln" id="L634">        assert_eq!(</span>
+<span class="ln" id="L635">            verify.sums.<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L636">            <span class="tok-fn">Some</span>(chosen.<span class="tok-fn">as_path</span>()),</span>
+<span class="ln" id="L637">            <span class="tok-str">&quot;the chosen file must survive&quot;</span></span>
+<span class="ln" id="L638">        );</span>
+<span class="ln" id="L639">    }</span>
+<span class="ln" id="L640"></span>
+<span class="ln" id="L641">    <span class="tok-com">/// Only the exact published names. Anything looser starts matching files</span></span>
+<span class="ln" id="L642">    <span class="tok-com">/// that merely happen to be nearby, and a hash list is not something to be</span></span>
+<span class="ln" id="L643">    <span class="tok-com">/// clever about finding.</span></span>
+<span class="ln" id="L644">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L645">    <span class="tok-kw">fn</span> <span class="tok-fn">only_the_exact_names_are_taken_from_the_folder</span>() {</span>
+<span class="ln" id="L646">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L647">        <span class="tok-kw">let</span> archive = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;release.zip&quot;</span>);</span>
+<span class="ln" id="L648">        std::fs::<span class="tok-fn">write</span>(&amp;archive, b<span class="tok-str">&quot;pretend&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L649">        <span class="tok-kw">for</span> decoy <span class="tok-kw">in</span> [<span class="tok-str">&quot;SHA256SUMS.old&quot;</span>, <span class="tok-str">&quot;sha256sums.txt&quot;</span>, <span class="tok-str">&quot;SHA256SUMS.asc.bak&quot;</span>] {</span>
+<span class="ln" id="L650">            std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(decoy), b<span class="tok-str">&quot;no&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L651">        }</span>
+<span class="ln" id="L652"></span>
+<span class="ln" id="L653">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L654">        verify.<span class="tok-fn">accept</span>(archive.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L655">        assert_eq!(verify.sums, None, <span class="tok-str">&quot;no decoy may be taken&quot;</span>);</span>
+<span class="ln" id="L656">        assert_eq!(verify.signature, None);</span>
+<span class="ln" id="L657">        assert!(verify.<span class="tok-fn">found_beside</span>(&amp;archive).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L658">    }</span>
+<span class="ln" id="L659"></span>
+<span class="ln" id="L660">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L661">    <span class="tok-kw">fn</span> <span class="tok-fn">accepting_files_fills_the_three_slots</span>() {</span>
+<span class="ln" id="L662">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L663">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;veilvoice.zip&quot;</span>));</span>
+<span class="ln" id="L664">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>));</span>
+<span class="ln" id="L665">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>));</span>
+<span class="ln" id="L666">        assert_eq!(verify.download, <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;veilvoice.zip&quot;</span>)));</span>
+<span class="ln" id="L667">        assert_eq!(verify.sums, <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>)));</span>
+<span class="ln" id="L668">        assert_eq!(verify.signature, <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>)));</span>
+<span class="ln" id="L669">    }</span>
+<span class="ln" id="L670"></span>
+<span class="ln" id="L671">    <span class="tok-com">/// A new file makes the last answer stale, and a stale verdict shown beside</span></span>
+<span class="ln" id="L672">    <span class="tok-com">/// a different file is the worst thing this panel could do.</span></span>
+<span class="ln" id="L673">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L674">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_file_clears_the_previous_answer</span>() {</span>
+<span class="ln" id="L675">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify {</span>
+<span class="ln" id="L676">            report: <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(Error::BadSignature)),</span>
+<span class="ln" id="L677">            ..Verify::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L678">        };</span>
+<span class="ln" id="L679">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;veilvoice.zip&quot;</span>));</span>
+<span class="ln" id="L680">        assert!(verify.report.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L681">    }</span>
+<span class="ln" id="L682"></span>
+<span class="ln" id="L683">    <span class="tok-com">/// The window has to keep drawing while a file is over it, not only while</span></span>
+<span class="ln" id="L684">    <span class="tok-com">/// a check is running. This is the assertion behind that.</span></span>
+<span class="ln" id="L685">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L686">    <span class="tok-kw">fn</span> <span class="tok-fn">hovering_keeps_the_window_awake</span>() {</span>
+<span class="ln" id="L687">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L688">        assert!(!verify.<span class="tok-fn">wants_repaint</span>(), <span class="tok-str">&quot;an idle panel asks for nothing&quot;</span>);</span>
+<span class="ln" id="L689">        verify.hovering = true;</span>
+<span class="ln" id="L690">        assert!(verify.<span class="tok-fn">wants_repaint</span>(), <span class="tok-str">&quot;a file over the window is a reason&quot;</span>);</span>
+<span class="ln" id="L691">        assert!(!verify.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;hovering is not a running check&quot;</span>);</span>
+<span class="ln" id="L692">    }</span>
+<span class="ln" id="L693"></span>
+<span class="ln" id="L694">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L695">    <span class="tok-kw">fn</span> <span class="tok-fn">a_check_cannot_start_without_all_three</span>() {</span>
+<span class="ln" id="L696">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L697">        verify.<span class="tok-fn">start</span>();</span>
+<span class="ln" id="L698">        assert!(!verify.<span class="tok-fn">is_busy</span>());</span>
+<span class="ln" id="L699">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;veilvoice.zip&quot;</span>));</span>
+<span class="ln" id="L700">        verify.<span class="tok-fn">start</span>();</span>
+<span class="ln" id="L701">        assert!(!verify.<span class="tok-fn">is_busy</span>());</span>
+<span class="ln" id="L702">        verify.<span class="tok-fn">accept</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>));</span>
+<span class="ln" id="L703">        verify.<span class="tok-fn">start</span>();</span>
+<span class="ln" id="L704">        assert!(!verify.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;still no signature&quot;</span>);</span>
+<span class="ln" id="L705">    }</span>
+<span class="ln" id="L706"></span>
+<span class="ln" id="L707">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L708">    <span class="tok-kw">fn</span> <span class="tok-fn">a_worker_that_dies_without_answering_is_reported</span>() {</span>
+<span class="ln" id="L709">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L710">        <span class="tok-fn">drop</span>(tx);</span>
+<span class="ln" id="L711">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = Verify {</span>
+<span class="ln" id="L712">            job: <span class="tok-fn">Some</span>(rx),</span>
+<span class="ln" id="L713">            ..Verify::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L714">        };</span>
+<span class="ln" id="L715">        verify.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L716">        assert!(!verify.<span class="tok-fn">is_busy</span>());</span>
+<span class="ln" id="L717">        <span class="tok-kw">match</span> verify.report {</span>
+<span class="ln" id="L718">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(Error::<span class="tok-fn">Io</span>(<span class="tok-kw">ref</span> why))) =&gt; assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;without answering&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>),</span>
+<span class="ln" id="L719">            other =&gt; panic!(<span class="tok-str">&quot;expected a reported failure, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L720">        }</span>
+<span class="ln" id="L721">    }</span>
+<span class="ln" id="L722"></span>
+<span class="ln" id="L723">    <span class="tok-com">/// Marker 90. The window and the command line must print the same GnuPG</span></span>
+<span class="ln" id="L724">    <span class="tok-com">/// recipe, which is why the body of it lives in `veilvoice-check` and both</span></span>
+<span class="ln" id="L725">    <span class="tok-com">/// call it rather than each keeping a copy.</span></span>
+<span class="ln" id="L726">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L727">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_prints_the_shared_gnupg_commands</span>() {</span>
+<span class="ln" id="L728">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;verify.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L729">        <span class="tok-kw">let</span> start = source</span>
+<span class="ln" id="L730">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn gnupg_section(&quot;</span>)</span>
+<span class="ln" id="L731">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the section exists&quot;</span>);</span>
+<span class="ln" id="L732">        <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L733">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    /// The answer, in the colour&quot;</span>)</span>
+<span class="ln" id="L734">            .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L735">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L736">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
+<span class="ln" id="L737">        assert!(</span>
+<span class="ln" id="L738">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice_check::gnupg_commands&quot;</span>),</span>
+<span class="ln" id="L739">            <span class="tok-str">&quot;the window builds its own commands, which will drift from the \</span></span>
+<span class="ln" id="L740"><span class="tok-str">             verifier&#x27;s&quot;</span></span>
+<span class="ln" id="L741">        );</span>
+<span class="ln" id="L742">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;Command::new&quot;</span>, <span class="tok-str">&quot;process::Command&quot;</span>] {</span>
+<span class="ln" id="L743">            assert!(</span>
+<span class="ln" id="L744">                !body.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L745">                <span class="tok-str">&quot;the window runs {forbidden:?}: the independent check is \</span></span>
+<span class="ln" id="L746"><span class="tok-str">                 independent because the person runs it&quot;</span></span>
+<span class="ln" id="L747">            );</span>
+<span class="ln" id="L748">        }</span>
+<span class="ln" id="L749">    }</span>
+<span class="ln" id="L750"></span>
+<span class="ln" id="L751">    <span class="tok-com">/// The whole thing, end to end, against a file this test makes: the</span></span>
+<span class="ln" id="L752">    <span class="tok-com">/// signature check has to fail before any hash is believed, even when the</span></span>
+<span class="ln" id="L753">    <span class="tok-com">/// hash is perfect.</span></span>
+<span class="ln" id="L754">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L755">    <span class="tok-kw">fn</span> <span class="tok-fn">a_perfect_hash_under_a_bad_signature_still_fails</span>() {</span>
+<span class="ln" id="L756">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L757">        <span class="tok-kw">let</span> file = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;release.zip&quot;</span>);</span>
+<span class="ln" id="L758">        std::fs::<span class="tok-fn">write</span>(&amp;file, b<span class="tok-str">&quot;contents&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L759">        <span class="tok-kw">let</span> sums = format!(</span>
+<span class="ln" id="L760">            <span class="tok-str">&quot;{}  release.zip\n&quot;</span>,</span>
+<span class="ln" id="L761">            veilvoice_check::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;contents&quot;</span>)</span>
+<span class="ln" id="L762">        );</span>
+<span class="ln" id="L763">        <span class="tok-kw">let</span> error = veilvoice_check::<span class="tok-fn">check_file</span>(&amp;file, &amp;sums, <span class="tok-str">&quot;not a signature&quot;</span>)</span>
+<span class="ln" id="L764">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a bad signature must stop the check&quot;</span>);</span>
+<span class="ln" id="L765">        assert!(matches!(error, Error::<span class="tok-fn">Malformed</span>(_)), <span class="tok-str">&quot;{error:?}&quot;</span>);</span>
+<span class="ln" id="L766">    }</span>
+<span class="ln" id="L767">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

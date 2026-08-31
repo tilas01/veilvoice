@@ -404,6 +404,78 @@ impl Verify {
             }
             self.report = None;
         }
+
+        self.gnupg_section(ui);
+    }
+
+    /// Marker 90. The same check, with a GnuPG this project did not write.
+    ///
+    /// Here rather than on its own tab because this is where somebody is
+    /// already asking "is this download genuine", and the honest answer to that
+    /// question includes "and here is how to ask something other than me".
+    ///
+    /// The commands come from [`veilvoice_check::gnupg_commands`], which the
+    /// portable verifier also uses, so the window and the command line cannot
+    /// drift into printing two different recipes.
+    fn gnupg_section(&mut self, ui: &mut Ui) {
+        ui.add_space(16.0);
+        ui.separator();
+        ui.label(
+            RichText::new("Check it again with your own GnuPG")
+                .color(p::blue())
+                .small(),
+        );
+
+        let (Some(sums), Some(signature)) = (self.sums.clone(), self.signature.clone()) else {
+            ui.label(
+                RichText::new(
+                    "choose a hash list and a signature above, and the commands appear here",
+                )
+                .color(p::muted())
+                .small(),
+            );
+            return;
+        };
+
+        match veilvoice_check::gnupg_on_path() {
+            Some(gpg) => ui.label(
+                RichText::new(format!("GnuPG found at {}", gpg.display()))
+                    .color(p::green())
+                    .small(),
+            ),
+            None => ui.label(
+                RichText::new(
+                    "GnuPG is not on your PATH. These are the commands if you install it.",
+                )
+                .color(p::muted())
+                .small(),
+            ),
+        };
+
+        // The signing key beside the hash list, when the release shipped one.
+        let key = sums.with_file_name("veilvoice-signing-key.asc");
+        let key = key.is_file().then_some(key);
+        let commands = veilvoice_check::gnupg_commands(&sums, &signature, key.as_deref());
+        let script = commands.join("\n");
+
+        ui.add_space(4.0);
+        for line in &commands {
+            ui.label(RichText::new(line).color(p::fg()).monospace());
+        }
+        ui.add_space(4.0);
+        if ui.button("copy these commands").clicked() {
+            ui.ctx().copy_text(script);
+        }
+        ui.label(
+            RichText::new(
+                "Worth doing. VeilVoice checked the signature with a key built into \
+                 itself, and this program came out of the same download you are \
+                 checking. GnuPG, and the fingerprint on the website, are the \
+                 independent answer.",
+            )
+            .color(p::muted())
+            .small(),
+        );
     }
 
     /// The answer, in the colour it deserves.
@@ -645,6 +717,34 @@ mod tests {
         match verify.report {
             Some(Err(Error::Io(ref why))) => assert!(why.contains("without answering"), "{why}"),
             other => panic!("expected a reported failure, got {other:?}"),
+        }
+    }
+
+    /// Marker 90. The window and the command line must print the same GnuPG
+    /// recipe, which is why the body of it lives in `veilvoice-check` and both
+    /// call it rather than each keeping a copy.
+    #[test]
+    fn the_window_prints_the_shared_gnupg_commands() {
+        let source = include_str!("verify.rs").replace("\r\n", "\n");
+        let start = source
+            .find("fn gnupg_section(")
+            .expect("the section exists");
+        let end = source[start..]
+            .find("\n    /// The answer, in the colour")
+            .map(|at| start + at)
+            .unwrap_or(source.len());
+        let body = &source[start..end];
+        assert!(
+            body.contains("veilvoice_check::gnupg_commands"),
+            "the window builds its own commands, which will drift from the \
+             verifier's"
+        );
+        for forbidden in ["Command::new", "process::Command"] {
+            assert!(
+                !body.contains(forbidden),
+                "the window runs {forbidden:?}: the independent check is \
+                 independent because the person runs it"
+            );
         }
     }
 

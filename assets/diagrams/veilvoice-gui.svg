@@ -170,7 +170,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs" target="_blank" rel="noopener noreferrer">
 <rect x="289.2" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="339.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">verify.rs</text>
-<text x="339.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">667 lines</text>
+<text x="339.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">767 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs" target="_blank" rel="noopener noreferrer">
 <rect x="415.7" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
