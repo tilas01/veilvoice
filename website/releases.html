@@ -111,6 +111,13 @@ Every release, newest first. Open one to read what changed in it and to reach it
 <ul>
 <li>The release workflow&#x27;s <code>tag</code> input was declared and ignored. A dry run started from a branch named every archive after that branch and would have tried to publish a release called <code>main</code>. It now checks out the tag it was given, names everything after it, and publishes nothing at all on a manual run, which is what &quot;dry run&quot; was always supposed to mean.</li>
 </ul>
+<h4 id="the-fourteenth-audit-round-run-on-the-verifier-written-an-hour-earlier">The fourteenth audit round, run on the verifier written an hour earlier</h4>
+<p>New code in the one program whose entire job is not to be fooled is exactly the code an audit exists for. Three defects, all found by reading, and all three the same mistake: a check that could not see, answering as though it had.</p>
+<ul>
+<li><strong>F-98</strong> A folder the sweep could not open was reported as holding nothing extra. Measured: a tree deep enough to pass <code>PATH_MAX</code> stops the walk at about 1988 levels and a file below that read as absent rather than unreachable; a permission bit does it in one line. What could not be read is now named and withholds the pass, because unknown is not empty.</li>
+<li><strong>F-99</strong> A symbolic link standing where a program should be, pointing at a copy of the genuine bytes, was reported as matching the signed list. The release published a file, not a link, and a link is a name somebody else may repoint after this has looked. The sweep for extra files already refused to walk through links, so the two halves of one module disagreed about what a link is.</li>
+<li><strong>F-100</strong> A release signed by the project key <em>and</em> by somebody else&#x27;s, in that order, would have been refused: only the first of GnuPG&#x27;s signature reports was read. Safe direction, still a defect. A verifier people learn to work around protects nobody.</li>
+</ul>
 <h4 id="the-thirteenth-audit-round-run-on-what-ci-refused">The thirteenth audit round, run on what CI refused</h4>
 <ul>
 <li><strong>F-96</strong> A program that has just been started is not yet wearing its own name. The failsafe checks that a process id still belongs to the program it means to close, and its own tests start a <code>sleep</code> and act on it microseconds later. Measured, once in four thousand spawns: the kernel hands the parent back before it sets the new name, so the check reads the name of the process that did the starting. The shipped code already refuses on that answer, which is the direction that closes nothing when unsure; the tests now wait for the child to appear under its own name first.</li>

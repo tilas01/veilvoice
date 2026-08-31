@@ -112,6 +112,16 @@ pub enum Verdict {
     Missing,
     /// The file is there and could not be read.
     Unreadable(String),
+    /// Something is there under that name and it is not an ordinary file.
+    ///
+    /// **F-99.** A symbolic link at a published path used to hash whatever it
+    /// pointed at and report `Matches`, which is wrong twice over. The release
+    /// published a file, not a link; and a link is a name that somebody else
+    /// may be able to repoint after this has looked, which is the one
+    /// substitution a hash check cannot notice. The sweep for extra files
+    /// already refuses to walk through links, so accepting one here was the
+    /// two halves of this module disagreeing about what a link is.
+    NotAFile(String),
 }
 
 /// One published file, checked against the disk.
@@ -230,14 +240,22 @@ pub fn check(root: &Path, archive: &ArchiveContents) -> Vec<Outcome> {
         .iter()
         .map(|member| {
             let path = root.join(&member.path);
-            let verdict = if !path.exists() {
-                Verdict::Missing
-            } else {
-                match crate::sha256_file(&path) {
+            // `symlink_metadata`, not `metadata`: the question is what is at
+            // this name, not what it leads to. See `Verdict::NotAFile`.
+            let verdict = match std::fs::symlink_metadata(&path) {
+                Err(_) => Verdict::Missing,
+                Ok(meta) if meta.file_type().is_symlink() => {
+                    Verdict::NotAFile("a symbolic link".to_string())
+                }
+                Ok(meta) if meta.is_dir() => Verdict::NotAFile("a directory".to_string()),
+                Ok(meta) if !meta.is_file() => {
+                    Verdict::NotAFile("not an ordinary file".to_string())
+                }
+                Ok(_) => match crate::sha256_file(&path) {
                     Err(why) => Verdict::Unreadable(why.to_string()),
                     Ok(found) if crate::digests_match(&found, &member.digest) => Verdict::Matches,
                     Ok(found) => Verdict::Differs { found },
-                }
+                },
             };
             Outcome {
                 path: member.path.clone(),
@@ -247,51 +265,105 @@ pub fn check(root: &Path, archive: &ArchiveContents) -> Vec<Outcome> {
         .collect()
 }
 
+/// What a sweep of the extracted directory found.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct Sweep {
+    /// Files that are there and were never published.
+    pub extras: Vec<PathBuf>,
+    /// Directories the sweep could not read, and so could not clear.
+    ///
+    /// **F-98.** This used to be nothing: an unreadable directory ended the
+    /// walk and the caller was handed an empty list, which reads as "there is
+    /// nothing else in the folder" and means "I could not look". Measured: a
+    /// directory tree deep enough that its absolute path passes `PATH_MAX`
+    /// stops `read_dir` at about 1988 levels on Linux, and a file below that
+    /// point was reported as absent rather than as unreachable. Permissions do
+    /// the same thing far more easily.
+    ///
+    /// That is the failure this project has now made in several places and
+    /// named each time: a check that cannot see must not answer "clear". The
+    /// callers treat a non-empty list here as a reason to withhold the pass.
+    pub unreadable: Vec<PathBuf>,
+}
+
+impl Sweep {
+    /// Whether the folder is exactly what the release published.
+    ///
+    /// False when anything extra was found **and** false when anything could
+    /// not be read, which is the distinction F-98 was about.
+    pub fn is_clean(&self) -> bool {
+        self.extras.is_empty() && self.unreadable.is_empty()
+    }
+}
+
 /// Files sitting in the extracted directory that the release never published.
 ///
 /// Reported rather than ignored. Everything else here answers "is what should
 /// be there, there"; this answers the other half, and the other half is the one
 /// an attacker uses. A directory holding every published file, unmodified, plus
 /// one extra program, passes every check above and is not the release.
-pub fn extras(root: &Path, archive: &ArchiveContents) -> Vec<PathBuf> {
+pub fn extras(root: &Path, archive: &ArchiveContents) -> Sweep {
     let published: BTreeSet<PathBuf> = archive
         .members
         .iter()
         .map(|member| root.join(&member.path))
         .collect();
-    let mut found = Vec::new();
+    let mut sweep = Sweep::default();
     for directory in archive.roots() {
-        walk(&root.join(directory), &published, &mut found);
+        walk(&root.join(directory), &published, &mut sweep);
     }
-    found.sort();
-    found
+    sweep.extras.sort();
+    sweep.unreadable.sort();
+    sweep
 }
 
 /// Every file under `directory` that is not in `published`.
 ///
-/// Depth is bounded by the tree on disk rather than by a counter, and the walk
-/// never follows a symbolic link into a directory: an extracted release with a
-/// link back to `/` in it would otherwise walk the whole filesystem, which is a
-/// denial of service written by the person being checked.
-fn walk(directory: &Path, published: &BTreeSet<PathBuf>, found: &mut Vec<PathBuf>) {
-    let Ok(entries) = std::fs::read_dir(directory) else {
-        return;
-    };
-    for entry in entries.flatten() {
-        let path = entry.path();
-        let Ok(kind) = entry.file_type() else {
-            continue;
-        };
-        if kind.is_symlink() {
-            // A link is neither walked nor hashed through. It is not a file the
-            // release published, so it is reported as an extra and left alone.
-            if !published.contains(&path) {
-                found.push(path);
+/// Iterative rather than recursive. Measured on Linux, the deepest directory
+/// an absolute path can name is about 1988 levels, so the recursion this
+/// replaced would not in fact have overflowed a stack -- but the bound came
+/// from `PATH_MAX` rather than from this code, and a bound nobody here chose is
+/// not a bound this code can rely on. An explicit stack has one.
+///
+/// A symbolic link is never walked into and never hashed through. An extracted
+/// release with a link back to `/` in it would otherwise walk the whole
+/// filesystem, which is a denial of service written by the person being
+/// checked. The link is reported as an extra, because it is not a file the
+/// release published.
+fn walk(start: &Path, published: &BTreeSet<PathBuf>, sweep: &mut Sweep) {
+    let mut pending = vec![start.to_path_buf()];
+    while let Some(directory) = pending.pop() {
+        let entries = match std::fs::read_dir(&directory) {
+            Ok(entries) => entries,
+            // F-98. Recorded rather than skipped. A directory that could not be
+            // opened is a directory whose contents are unknown, and unknown is
+            // not the same as empty.
+            Err(_) => {
+                sweep.unreadable.push(directory);
+                continue;
             }
-        } else if kind.is_dir() {
-            walk(&path, published, found);
-        } else if !published.contains(&path) {
-            found.push(path);
+        };
+        for entry in entries {
+            let Ok(entry) = entry else {
+                // The listing itself failed part way through, so what is left
+                // in this directory is unknown for the same reason.
+                sweep.unreadable.push(directory.clone());
+                continue;
+            };
+            let path = entry.path();
+            let Ok(kind) = entry.file_type() else {
+                sweep.unreadable.push(path);
+                continue;
+            };
+            if kind.is_symlink() {
+                if !published.contains(&path) {
+                    sweep.extras.push(path);
+                }
+            } else if kind.is_dir() {
+                pending.push(path);
+            } else if !published.contains(&path) {
+                sweep.extras.push(path);
+            }
         }
     }
 }
@@ -404,13 +476,126 @@ mod tests {
         let real = crate::sha256_bytes(b"the real one");
         let text = format!("# a.tar.gz\n{real}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n");
         let all = parse(&text).unwrap();
-        let extra = extras(&room, &all[0]);
-        let names: Vec<String> = extra
+        let sweep = extras(&room, &all[0]);
+        let names: Vec<String> = sweep
+            .extras
             .iter()
             .map(|p| p.file_name().unwrap().to_string_lossy().to_string())
             .collect();
         assert_eq!(names, vec!["extra.md".to_string(), "helper.sh".to_string()]);
+        assert!(sweep.unreadable.is_empty(), "{sweep:?}");
+        assert!(!sweep.is_clean(), "a folder with extras in it is not clean");
         std::fs::remove_dir_all(&room).ok();
+    }
+
+    /// **F-99.** A link where a file should be is not the published file, even
+    /// when what it points at hashes correctly.
+    ///
+    /// The release published a file. A link is a name somebody else may be
+    /// able to repoint after this has looked, which is the one substitution a
+    /// hash check cannot notice, and the sweep for extra files already refuses
+    /// to walk through links: accepting one here was the two halves of this
+    /// module disagreeing about what a link is.
+    #[test]
+    #[cfg(unix)]
+    fn a_link_pointing_at_the_right_bytes_is_still_not_the_published_file() {
+        let room = tempdir();
+        let release = room.join("veilvoice-v0.1.15-linux-x86_64");
+        std::fs::create_dir_all(&release).unwrap();
+        // The genuine bytes, somewhere else entirely, with a link to them
+        // standing where the program should be.
+        let elsewhere = room.join("elsewhere");
+        std::fs::write(&elsewhere, b"the real one").unwrap();
+        std::os::unix::fs::symlink(&elsewhere, release.join("veilvoice")).unwrap();
+
+        let real = crate::sha256_bytes(b"the real one");
+        let text = format!("# a.tar.gz\n{real}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n");
+        let all = parse(&text).unwrap();
+        let outcomes = check(&room, &all[0]);
+        assert!(
+            matches!(outcomes[0].verdict, Verdict::NotAFile(_)),
+            "a link hashing to the right value is still not the file: {:?}",
+            outcomes[0].verdict
+        );
+        assert!(!outcomes[0].is_good());
+        std::fs::remove_dir_all(&room).ok();
+    }
+
+    /// A directory standing where a file should be is refused for the same
+    /// reason, and without hashing anything.
+    #[test]
+    fn a_directory_where_a_file_should_be_is_not_the_published_file() {
+        let room = tempdir();
+        let release = room.join("veilvoice-v0.1.15-linux-x86_64");
+        std::fs::create_dir_all(release.join("veilvoice")).unwrap();
+        let text = format!(
+            "# a.tar.gz\n{}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n",
+            "0".repeat(64)
+        );
+        let all = parse(&text).unwrap();
+        let outcomes = check(&room, &all[0]);
+        assert!(
+            matches!(outcomes[0].verdict, Verdict::NotAFile(_)),
+            "{:?}",
+            outcomes[0].verdict
+        );
+        std::fs::remove_dir_all(&room).ok();
+    }
+
+    /// **F-98.** A directory that cannot be read is reported, never treated as
+    /// empty.
+    ///
+    /// Measured with a permission bit here, because it is the way this happens
+    /// to ordinary people: a folder extracted by another account, or one whose
+    /// mode came out of the archive wrong. The deep-tree case that found it is
+    /// the same failure with a different cause.
+    ///
+    /// Skipped where the test can read anything regardless, which is what
+    /// running as root means, since the case cannot be created there.
+    #[test]
+    #[cfg(unix)]
+    fn a_directory_that_cannot_be_read_is_not_reported_as_empty() {
+        use std::os::unix::fs::PermissionsExt as _;
+
+        let room = tempdir();
+        let release = room.join("veilvoice-v0.1.15-linux-x86_64");
+        let shut = release.join("shut");
+        std::fs::create_dir_all(&shut).unwrap();
+        std::fs::write(shut.join("something"), b"hidden").unwrap();
+        std::fs::write(release.join("veilvoice"), b"the real one").unwrap();
+        std::fs::set_permissions(&shut, std::fs::Permissions::from_mode(0o000)).unwrap();
+
+        let readable = std::fs::read_dir(&shut).is_ok();
+        if !readable {
+            let real = crate::sha256_bytes(b"the real one");
+            let text = format!("# a.tar.gz\n{real}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n");
+            let all = parse(&text).unwrap();
+            let sweep = extras(&room, &all[0]);
+            assert_eq!(
+                sweep.unreadable.len(),
+                1,
+                "the shut directory must be reported: {sweep:?}"
+            );
+            assert!(
+                !sweep.is_clean(),
+                "a folder with a door this could not open is not clean"
+            );
+        }
+        std::fs::set_permissions(&shut, std::fs::Permissions::from_mode(0o700)).ok();
+        std::fs::remove_dir_all(&room).ok();
+    }
+
+    /// The walk keeps its own stack, so its depth is not the call stack's.
+    #[test]
+    fn the_sweep_does_not_recurse() {
+        let source = include_str!("contents.rs");
+        let body = source.split("#[cfg(test)]").next().unwrap();
+        let walk = body.split("fn walk(").nth(1).unwrap();
+        assert!(
+            !walk.contains("walk("),
+            "the sweep calls itself, so its depth is the call stack's"
+        );
+        assert!(walk.contains("while let Some("), "and it must have its own");
     }
 
     /// An empty manifest is not an error and is not a pass either: it lists no
