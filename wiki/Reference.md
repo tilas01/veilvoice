@@ -240,6 +240,7 @@ Verify a VeilVoice release without GnuPG installed
 - [[`builder.rs`|File-veilvoice-verify-builder]] &mdash; Build VeilVoice here, and compare what came out against what was published.
 - [[`deps.rs`|File-veilvoice-verify-deps]] &mdash; What this machine needs before it can build VeilVoice, and who ships it.
 - [[`discover.rs`|File-veilvoice-verify-discover]] &mdash; Finding a release to check, without being told where it is.
+- [[`extracted.rs`|File-veilvoice-verify-extracted]] &mdash; What came out of the archive, and the GnuPG somebody already has.
 - [[`fetch.rs`|File-veilvoice-verify-fetch]] &mdash; Download a release, without putting an HTTP client in the dependency graph.
 - [[`main.rs`|File-veilvoice-verify-main]] &mdash; The portable verifier: check a VeilVoice release without GnuPG installed.
 - [[`report.rs`|File-veilvoice-verify-report]] &mdash; How much this program says, and what it returns when it says nothing.

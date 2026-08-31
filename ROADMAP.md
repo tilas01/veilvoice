@@ -227,7 +227,7 @@ it can honestly be made rather than to keep apologising for it.
 | 88 | **Import from every format OBS writes** — bring in a recording made elsewhere, video or audio, and take the sound out of it | **planned** | 2 d |
 | 89 | **Veil the other person afterwards** — the interviewee given their own voice in post, through the group plan that already exists | **planned** | 2–3 d |
 | 90 | **GnuPG verification inside the window** — in the verify tab, beside the hash check, using the GnuPG somebody already has | **planned** | 2 d |
-| 91 | **`veilvoice-verify` finds the release itself** — GnuPG arguments where wanted, and an `auto` that looks in Downloads, checks the archive, and checks what came out of it | **planned** | 2–3 d |
+| 91 | **`veilvoice-verify` finds the release itself** — GnuPG arguments where wanted, and an `auto` that looks in Downloads, checks the archive, and checks what came out of it | **done** | — |
 | 92 | **An autolock timeout** — off by default, and when on, from five minutes to forty eight hours, chosen from a list or typed, with the range itself adjustable | **done** | — |
 | 93 | **Group mode explained where it is used** — how to build a plan, what each field does, and what happens without one | **planned** | 2 d |
 | 94 | **Release notes people can actually read** — every release listed newest first, its notes opening in place, and every file one click away | **planned** | 2 d |
@@ -599,6 +599,40 @@ encrypted with its own cryptography, and nothing here replaces or weakens that.
 A veiled recording written into a Cryptomator vault is encrypted twice, by two
 independent tools, and the useful property of that is not extra strength but
 independence: a defect in one is not a defect in both.
+
+**Marker 91 reports the archive and the extracted folder separately, and that
+separation is the whole of the thinking.**
+
+`auto` already found the release and checked the archive. What was asked for on
+top is that it check what came out of the archive, and that GnuPG be available
+for anybody who wants it.
+
+The second is easy. The first has a limit that must not be papered over:
+`SHA256SUMS` is signed and it covers **archives**. Nothing signs the contents of
+a directory somebody unzipped last week, and nothing on disk records which
+archive a folder was extracted from. So verifying `veilvoice-0.1.14-linux-x86_64.zip`
+proves that archive is the signed one, and proves nothing whatever about the
+folder beside it, which may predate the download or have been edited since.
+
+Rolling both into one green result would tell somebody their installed copy is
+verified when it is not, which is the most expensive kind of wrong this project
+can be. The two are reported separately, the limit is stated in the output in
+those words, and the one thing that resolves it is given: extract the archive
+that was just checked, now, and use that.
+
+What can honestly be said about the extracted folder is whether the programs are
+there and whether the system will run them, and that is a real thing to get
+wrong: an unpacking tool that drops the execute bit leaves somebody with files
+that look right and will not start. A failed archive stops before any of this,
+held by a test, because "the archive is bad, and here are the programs beside
+it" reads as reassurance and there is none to give.
+
+*GnuPG commands are printed, never run.* A verifier that shells out to `gpg` and
+reports what it said has not escaped the circularity it exists to escape: the
+thing running `gpg` is the binary under suspicion. `veilvoice-verify gnupg` is
+its own subcommand rather than a footnote under `auto`, because somebody who
+wants the independent answer should not have to be told the answer by this
+binary first.
 
 **Markers 81 to 85 are built, and two things were learned in the building.**
 
