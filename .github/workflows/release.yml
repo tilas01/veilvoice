@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Tag to build (for a dry run)
+        description: Tag to build (a dry run -- nothing is published)
         required: true
 
 permissions:
@@ -28,6 +28,18 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
+  # The tag being built.
+  #
+  # This input existed and was **ignored**: every job named its artefacts after
+  # `github.ref_name`, which on a dispatch is the branch, so a dry run from
+  # `main` produced files called `veilvoice-main-...` and would have tried to
+  # publish a release named `main`. A declared input that changes nothing is
+  # worse than no input, because it reads like a supported way to do the thing.
+  #
+  # `github.event.inputs.tag` is empty on a tag push, so this is the tag either
+  # way, and every job checks that ref out rather than whatever the dispatch
+  # happened to start from.
+  VERSION_TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
 jobs:
   build:
@@ -96,6 +108,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
 
       # Only the GUI needs the windowing stack. A CLI-only target does not, and
       # on a cross target these packages would be for the wrong architecture.
@@ -237,7 +251,7 @@ jobs:
       - name: Stage the archive
         shell: bash
         run: |
-          out="veilvoice-${{ github.ref_name }}-${{ matrix.label }}"
+          out="veilvoice-${{ env.VERSION_TAG }}-${{ matrix.label }}"
           mkdir -p "dist/$out"
           bin="target/${{ matrix.target }}/release"
           for name in $BINARIES; do
@@ -322,6 +336,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
       - name: Build the CLI in a FreeBSD VM
         uses: vmactions/freebsd-vm@v1
         with:
@@ -333,7 +349,7 @@ jobs:
             ./target/release/veilvoice info
       - name: Stage the archive
         run: |
-          out="veilvoice-${{ github.ref_name }}-freebsd-x86_64"
+          out="veilvoice-${{ env.VERSION_TAG }}-freebsd-x86_64"
           mkdir -p "dist/$out"
           cp target/release/veilvoice "dist/$out/"
           cp README.md LICENSE "dist/$out/"
@@ -374,6 +390,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
       - name: Build the CLI in a Openbsd VM
         uses: vmactions/openbsd-vm@v1
         with:
@@ -385,7 +403,7 @@ jobs:
             ./target/release/veilvoice info
       - name: Stage the archive
         run: |
-          out="veilvoice-${{ github.ref_name }}-openbsd-x86_64"
+          out="veilvoice-${{ env.VERSION_TAG }}-openbsd-x86_64"
           mkdir -p "dist/$out"
           cp target/release/veilvoice "dist/$out/"
           cp target/release/veilvoice-verify "dist/$out/" 2>/dev/null || true
@@ -431,6 +449,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
       - name: Build the CLI in a Netbsd VM
         uses: vmactions/netbsd-vm@v1
         with:
@@ -442,7 +462,7 @@ jobs:
             ./target/release/veilvoice info
       - name: Stage the archive
         run: |
-          out="veilvoice-${{ github.ref_name }}-netbsd-x86_64"
+          out="veilvoice-${{ env.VERSION_TAG }}-netbsd-x86_64"
           mkdir -p "dist/$out"
           cp target/release/veilvoice "dist/$out/"
           cp target/release/veilvoice-verify "dist/$out/" 2>/dev/null || true
@@ -492,6 +512,8 @@ jobs:
       HAS_SIGNING_KEY: ${{ secrets.GPG_PRIVATE_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
 
       - uses: actions/download-artifact@v4
         with:
@@ -587,7 +609,7 @@ jobs:
           # The changelog lives in the repository, so what a release claims to
           # contain is reviewable in the same commit that contains it, rather
           # than being written from memory at tag time.
-          tag="${{ github.ref_name }}"
+          tag="${{ env.VERSION_TAG }}"
           changes=""
           if [ -f CHANGELOG.md ]; then
             changes="$(awk -v want="## $tag" '
@@ -598,7 +620,7 @@ jobs:
           fi
 
           {
-            echo "## VeilVoice ${{ github.ref_name }}"
+            echo "## VeilVoice ${{ env.VERSION_TAG }}"
             echo
             echo "Irreversible voice de-identification, fully offline."
             echo
@@ -669,9 +691,25 @@ jobs:
             echo "Built on: \`${{ runner.os }}\` runners, toolchain pinned by \`rust-toolchain.toml\`."
           } > NOTES.md
 
+      # A dry run builds, compares, hashes, signs and writes the notes, and
+      # stops here. That is what the input says it does, and publishing from a
+      # dispatch would mean a release could be cut from any branch by anybody
+      # who can press a button.
       - uses: softprops/action-gh-release@v2
+        if: github.event_name != 'workflow_dispatch'
         with:
+          tag_name: ${{ env.VERSION_TAG }}
           files: staging/*
           body_path: NOTES.md
           draft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          prerelease: ${{ contains(env.VERSION_TAG, '-') }}
+
+      - name: What a dry run produced
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "Dry run for ${{ env.VERSION_TAG }}. Nothing was published."
+          echo
+          cat staging/SHA256SUMS
+          echo
+          echo "--- release notes ---"
+          cat NOTES.md
