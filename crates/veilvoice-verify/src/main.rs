@@ -155,21 +155,41 @@ fn verify_detached(key: &SignedPublicKey, signature: &str, data: &[u8]) -> Resul
 }
 
 const USAGE: &str = "\
-veilvoice-verify -- check a VeilVoice release without GnuPG installed
+veilvoice-verify -- check a VeilVoice download, with or without GnuPG
+
+IF YOU ONLY READ ONE LINE
+  Put this program in the folder you downloaded to and run it. That is all.
+  It finds the release, checks the signature, checks the archive, and checks
+  every file you extracted out of it, one by one.
 
 USAGE
   veilvoice-verify
   veilvoice-verify auto [DIRECTORY]
-      Find a downloaded release near you and check it, with nothing else to
-      type. Looks in the directory given, then the current one, then beside
-      this program, then your Downloads and Desktop. Entirely offline.
+      Find a downloaded release near you and check all of it, with nothing
+      else to type. Looks in the directory given, then the current one, then
+      beside this program, then your Downloads and Desktop.
 
-      This is also what double-clicking the program does.
+      In order, and each step only if the one before it passed:
+        1. the signature over SHA256SUMS
+        2. every archive, against SHA256SUMS
+        3. CONTENTS.sha256, against SHA256SUMS
+        4. every file you extracted, against CONTENTS.sha256
+        5. all of it again through your own GnuPG, if you have one
+
+      Step 4 is what tells you the program you are about to run is the one
+      that was published, rather than only that the zip was. Releases before
+      v0.1.15 carry no CONTENTS.sha256 and are checked as far as step 2,
+      which it says at the time.
+
+      Entirely offline. This is also what double-clicking the program does.
 
   veilvoice-verify gnupg [DIRECTORY]
-      Print the commands that check this release with your own GnuPG,
-      rather than with the key built into this program. Worth doing: the
-      program telling you a download is genuine came out of that download.
+      The same check through the GnuPG on this machine rather than the key
+      built into this program. It adds the VeilVoice public key to your
+      keyring, tells you it did and how to remove it, runs gpg, and prints
+      what gpg said. It also prints the commands so you can run them
+      yourself, which is the part no program can do for you: the one telling
+      you a download is genuine came out of that download.
 
   veilvoice-verify key
       Print the signing key this binary carries, and its fingerprint.
@@ -776,20 +796,58 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
         return worst;
     }
 
-    report_extracted(&found);
-    report_gnupg(&found);
+    // Marker 97. Both of these now check rather than describe, so both can
+    // fail the run. A verifier that prints "CHANGED veilvoice" and then exits
+    // zero has told somebody nothing they will act on.
+    let wrong = report_extracted(&found) + report_gnupg(&found);
+    if wrong > 0 {
+        verdict!("  {wrong} thing(s) above did not check out.");
+        return Status::Refused.into();
+    }
     worst
 }
 
-/// Marker 91. What is in the folder beside the archive, and what that is worth.
+/// Marker 97. Every file in the extracted folder, against the signed list.
 ///
-/// Reported separately from the archive check, and the separation is the point.
-/// `SHA256SUMS` covers archives; nothing signs the contents of a directory
-/// somebody unzipped last week, and nothing on disk records which archive it
-/// came from. Rolling the two into one green result would tell somebody their
-/// installed copy is verified when it is not. See `extracted` for the whole
-/// argument.
-fn report_extracted(found: &discover::Found) {
+/// # What changed, and why the old caveat is gone
+///
+/// This used to report that the programs were present and runnable, and then
+/// say in as many words that it could not tell whether the folder came out of
+/// the archive it had just checked. That was true: `SHA256SUMS` covers the
+/// archives, nothing on disk records what a directory was extracted from, and
+/// no signed list covered the loose files.
+///
+/// A release now publishes `CONTENTS.sha256`, which lists every file inside
+/// every archive with its SHA-256 and is itself covered by `SHA256SUMS` and so
+/// by the signature. The chain is complete:
+///
+/// ```text
+/// SHA256SUMS.asc -> SHA256SUMS -> CONTENTS.sha256 -> each file on disk
+/// ```
+///
+/// So the question is now answered rather than deferred. Where a release does
+/// not carry that file -- everything published before v0.1.15 -- the old report
+/// and the old caveat are what is printed, because they were honest and still
+/// are.
+///
+/// Returns how many things were wrong, so the caller can fail the run.
+fn report_extracted(found: &discover::Found) -> usize {
+    let published = match manifest(found) {
+        Manifest::None => None,
+        Manifest::Unusable(why) => {
+            out!("Beside it, the extracted folder");
+            out!("  the release published a contents list and it could not be used:");
+            out!("  {why}");
+            out!();
+            out!("  Nothing about the extracted folder was checked. Do not treat what");
+            out!("  is in it as verified.");
+            out!();
+            return 1;
+        }
+        Manifest::Ready(all) => Some(all),
+    };
+
+    let mut problems = 0usize;
     let mut looked = false;
     for archive in &found.archives {
         let Some(directory) = extracted::directory_for(archive) else {
@@ -800,61 +858,302 @@ fn report_extracted(found: &discover::Found) {
         }
         looked = true;
         out!("Beside it, {}", directory.display());
-        let here = extracted::look_in(&directory);
-        if here.is_empty() {
-            out!("  nothing that looks like a VeilVoice program is in it");
-            continue;
-        }
-        for program in &here.programs {
-            let name = program
-                .path
-                .file_name()
-                .unwrap_or_default()
-                .to_string_lossy();
-            if program.runnable {
-                out!("  {name}: present, and your system will run it");
-            } else {
-                out!("  {name}: present, but your system will NOT run it");
+
+        let name = archive
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .into_owned();
+        let section = published
+            .as_ref()
+            .and_then(|all| veilvoice_check::contents::for_archive(all, &name));
+
+        match section {
+            Some(section) => problems += report_against_manifest(&found.directory, section),
+            None => {
+                if published.is_some() {
+                    out!("  the contents list does not mention {name}, so nothing in this");
+                    out!("  folder could be checked against it");
+                    problems += 1;
+                }
+                report_presence_only(&directory);
             }
-        }
-        if !here.not_runnable().is_empty() {
-            out!();
-            out!("  Some tools drop the execute bit when they unpack an archive.");
-            out!("  On Linux or macOS: chmod +x {}/*", directory.display());
         }
     }
 
-    if looked {
+    if looked && published.is_none() {
         out!();
-        out!("  The archive above is the one that was signed. That does NOT prove");
-        out!("  this folder came out of it: nothing on disk records which archive a");
-        out!("  folder was extracted from, and no signed list covers loose files.");
-        out!("  To be certain, extract the checked archive again and use that.");
+        out!("  This release published no list of what is inside its archives, so");
+        out!("  the folder can only be reported on, not checked. The archive above");
+        out!("  is the one that was signed; nothing on disk records that this folder");
+        out!("  came out of it. To be certain, extract the checked archive again.");
         out!();
+    } else if looked {
+        out!();
+    }
+    problems
+}
+
+/// What the release said is inside its archives, if anything usable.
+enum Manifest {
+    /// No contents list was published beside the archive.
+    None,
+    /// One was, and it cannot be trusted or read.
+    Unusable(String),
+    /// One was, and it is genuine.
+    Ready(Vec<veilvoice_check::contents::ArchiveContents>),
+}
+
+/// Read `CONTENTS.sha256`, having first proved it is the published one.
+///
+/// The order is this program's usual one and it matters more here than
+/// anywhere else: this file decides which paths get read and what they are
+/// compared against, so checking it against the signed hash list **before**
+/// parsing it is the difference between a verifier and a program that does what
+/// a downloaded text file tells it to.
+fn manifest(found: &discover::Found) -> Manifest {
+    let Some(path) = &found.contents else {
+        return Manifest::None;
+    };
+    let (Some(sums_path), Some(sig_path)) = (&found.sums, &found.signature) else {
+        return Manifest::Unusable("there is no signed hash list to check it against".to_string());
+    };
+    let sums = match read_text(sums_path) {
+        Ok(text) => text,
+        Err(why) => return Manifest::Unusable(why),
+    };
+    let signature = match read_text(sig_path) {
+        Ok(text) => text,
+        Err(why) => return Manifest::Unusable(why),
+    };
+    match veilvoice_check::check_file(path, &sums, &signature) {
+        Err(why) => Manifest::Unusable(format!("{why}")),
+        Ok(checked) if !checked.matched => Manifest::Unusable(
+            "it is not the list this release signed: the hashes do not agree".to_string(),
+        ),
+        Ok(_) => match read_text(path) {
+            Err(why) => Manifest::Unusable(why),
+            Ok(text) => match veilvoice_check::contents::parse(&text) {
+                Ok(all) => Manifest::Ready(all),
+                Err(why) => Manifest::Unusable(format!("{why}")),
+            },
+        },
     }
 }
 
-/// Marker 91. The same check, through a GnuPG this project did not write.
-fn report_gnupg(found: &discover::Found) {
+/// Check one extracted folder against the section of the list that covers it.
+fn report_against_manifest(
+    root: &Path,
+    section: &veilvoice_check::contents::ArchiveContents,
+) -> usize {
+    use veilvoice_check::contents::Verdict;
+
+    let outcomes = veilvoice_check::contents::check(root, section);
+    let extras = veilvoice_check::contents::extras(root, section);
+    let as_published = outcomes.iter().filter(|o| o.is_good()).count();
+
+    for outcome in &outcomes {
+        match &outcome.verdict {
+            // The ones that pass are counted rather than listed. A release
+            // carries about seventy files and printing every one of them buries
+            // the three lines somebody actually needs to read.
+            Verdict::Matches => {}
+            Verdict::Differs { found } => {
+                verdict!("  CHANGED  {}", outcome.path);
+                note!("expected {}", digest_for(section, &outcome.path));
+                note!("found    {found}");
+            }
+            Verdict::Missing => verdict!("  MISSING  {}", outcome.path),
+            Verdict::Unreadable(why) => verdict!("  UNREADABLE  {}: {why}", outcome.path),
+        }
+    }
+    for extra in &extras {
+        verdict!(
+            "  NOT PART OF THE RELEASE  {}",
+            extra.strip_prefix(root).unwrap_or(extra).display()
+        );
+    }
+
+    let wrong = outcomes.len() - as_published + extras.len();
+    if wrong == 0 {
+        good(&format!(
+            "all {} files match the signed list, and there is nothing else in the folder",
+            outcomes.len()
+        ));
+        report_runnable(root, section);
+    } else {
+        out!();
+        verdict!(
+            "  {as_published} of {} files are as published.",
+            outcomes.len()
+        );
+        out!();
+        out!("  A file that has changed, gone missing, or arrived from somewhere");
+        out!("  else is not what was signed. Extract the checked archive again and");
+        out!("  use what comes out of it.");
+    }
+    wrong
+}
+
+/// The published hash for one path, for a `--verbose` line.
+fn digest_for(section: &veilvoice_check::contents::ArchiveContents, path: &str) -> String {
+    section
+        .members
+        .iter()
+        .find(|m| m.path == path)
+        .map(|m| m.digest.clone())
+        .unwrap_or_default()
+}
+
+/// Whether the operating system will run the programs that are there.
+///
+/// The other half of what an extracted folder can be wrong about, and it
+/// survives the manifest: a hash says a file is byte for byte correct, and an
+/// unpacking tool that dropped the execute bit leaves that correct file
+/// unrunnable.
+fn report_runnable(root: &Path, section: &veilvoice_check::contents::ArchiveContents) {
+    let mut stuck = Vec::new();
+    for directory in section.roots() {
+        let here = extracted::look_in(&root.join(&directory));
+        for program in here.not_runnable() {
+            stuck.push(program.path.clone());
+        }
+    }
+    if stuck.is_empty() {
+        return;
+    }
+    out!();
+    for path in &stuck {
+        verdict!(
+            "  present and correct, but your system will NOT run it: {}",
+            path.file_name().unwrap_or_default().to_string_lossy()
+        );
+    }
+    out!();
+    out!("  Some tools drop the execute bit when they unpack an archive.");
+    out!("  On Linux or macOS: chmod +x <the files above>");
+}
+
+/// The old report, for a release that published no contents list.
+fn report_presence_only(directory: &Path) {
+    let here = extracted::look_in(directory);
+    if here.is_empty() {
+        out!("  nothing that looks like a VeilVoice program is in it");
+        return;
+    }
+    for program in &here.programs {
+        let name = program
+            .path
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy();
+        if program.runnable {
+            out!("  {name}: present, and your system will run it");
+        } else {
+            out!("  {name}: present, but your system will NOT run it");
+        }
+    }
+    if !here.not_runnable().is_empty() {
+        out!();
+        out!("  Some tools drop the execute bit when they unpack an archive.");
+        out!("  On Linux or macOS: chmod +x {}/*", directory.display());
+    }
+}
+
+/// Marker 97. The same check, run through the GnuPG the reader already has.
+///
+/// Two implementations, both reported. This program checked the signature with
+/// a key compiled into itself, and it came out of the same download; GnuPG's
+/// answer is arrived at by somebody else's code. Where the two disagree, that
+/// is the loudest thing this tool can find and it fails the run.
+///
+/// **GnuPG failing to run is not a disagreement.** A missing keyring directory,
+/// a read-only home, an agent that will not start: none of those is a statement
+/// about the file that was downloaded, and counting them as refusals would tell
+/// somebody not to run a release that is entirely sound. Only an answer counts,
+/// and only a bad answer counts against.
+///
+/// The commands are still printed, every time. Running GnuPG from inside the
+/// binary under suspicion makes the *implementation* independent and does not
+/// make the *invocation* independent, and only the reader can supply that.
+///
+/// Returns how many things were wrong.
+fn report_gnupg(found: &discover::Found) -> usize {
     let sums = found.sums.clone().unwrap_or_default();
     let signature = found.signature.clone().unwrap_or_default();
     let key = found.directory.join("veilvoice-signing-key.asc");
     let key = key.is_file().then_some(key);
 
     out!("Checking it again with your own GnuPG");
-    match extracted::gnupg_on_path() {
-        Some(gpg) => out!("  found at {}", gpg.display()),
-        None => out!("  GnuPG is not on your PATH. These are the commands if you install it."),
+    let mut problems = 0usize;
+    match veilvoice_gnupg::Gnupg::found() {
+        Err(why) => {
+            out!("  {why}. These are the commands if you install it.");
+        }
+        Ok(gpg) => {
+            out!("  found at {}", gpg.program().display());
+            // The key first, because GnuPG cannot check a signature by a key it
+            // has never seen, and asking somebody to import it by hand is the
+            // step at which almost everybody stops.
+            match gpg.import(veilvoice_check::PUBLIC_KEY, FINGERPRINT) {
+                // Not counted against the release. GnuPG being unusable on this
+                // machine -- no keyring directory, a read-only home, an agent
+                // that will not start -- says nothing whatever about the file
+                // that was downloaded, and reporting it as a refusal would tell
+                // somebody not to run a download that is perfectly good.
+                Err(why) => {
+                    out!("  the signing key could not be added to your keyring: {why}");
+                    out!("  so GnuPG could not be asked. Nothing about the download changed.");
+                }
+                Ok(import) => {
+                    for line in import.note() {
+                        out!("  {line}");
+                    }
+                    match gpg.verify(&signature, &sums, FINGERPRINT) {
+                        // Again: GnuPG failing to run is the machine, not the
+                        // release.
+                        Err(why) => {
+                            out!("  GnuPG could not check the signature: {why}");
+                            out!("  Nothing about the download changed.");
+                        }
+                        Ok(run) => {
+                            out!();
+                            for line in &run.status {
+                                note!("{line}");
+                            }
+                            if run.outcome.is_good() {
+                                good(&run.outcome.plainly());
+                            } else {
+                                verdict!("  {}", run.outcome.plainly());
+                                // What GnuPG printed, shown rather than
+                                // summarised away. A verifier that reports a
+                                // refusal without the evidence for it is asking
+                                // to be taken on trust.
+                                for line in run.said.lines() {
+                                    out!("    {line}");
+                                }
+                                problems += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
+
+    out!();
+    out!("  And the same thing, typed by you, which is the part this program");
+    out!("  cannot do for itself:");
     out!();
     for line in extracted::gnupg_commands(&sums, &signature, key.as_deref()) {
         out!("    {line}");
     }
     out!();
     out!("  Worth doing. This program checked the signature with a key built into");
-    out!("  itself, and it came out of the same download you are checking. GnuPG");
-    out!("  and the fingerprint on the website are the independent answer.");
+    out!("  itself, and it came out of the same download you are checking. The");
+    out!("  fingerprint on the website is the independent answer.");
     out!();
+    problems
 }
 
 /// Marker 91. Print the commands that check this release with somebody else's
@@ -882,9 +1181,12 @@ fn command_gnupg(explicit: Option<&Path>) -> ExitCode {
 
     out!("In {}", found.directory.display());
     out!();
-    report_gnupg(&found);
+    let wrong = report_gnupg(&found);
     out!("  The fingerprint to compare against is on the release page and in");
     out!("  README.md. `veilvoice-verify key` prints the one this binary carries.");
+    if wrong > 0 {
+        return Status::Refused.into();
+    }
     ExitCode::SUCCESS
 }
 

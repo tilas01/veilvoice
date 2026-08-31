@@ -116,6 +116,36 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
       <a href="assets/veilvoice-signing-key.asc" download>download the public key</a> —
       user ID is exactly <code>tilas01</code>, with no e-mail address attached.
     </p>
+
+    <h3>Or let it do all of that for you</h3>
+    <p class="lede">
+      <code>veilvoice-verify</code> ships in every release and is a single small
+      program with no installer. Put it in the folder you downloaded to and run
+      it, or open the desktop application's <strong>verify</strong> tab and drop
+      the archive on the window. One press does all four steps:
+    </p>
+    <ol class="lede">
+      <li>the signature over <code>SHA256SUMS</code>;</li>
+      <li>the archive, against <code>SHA256SUMS</code>;</li>
+      <li><code>CONTENTS.sha256</code>, against <code>SHA256SUMS</code>;</li>
+      <li><strong>every file you extracted</strong>, against
+        <code>CONTENTS.sha256</code> — and it names anything in that folder the
+        release never published.</li>
+    </ol>
+    <p class="lede">
+      Step 4 is the one worth having. A hash over the archive tells you the
+      <em>zip</em> is genuine; this tells you the <em>program you are about to
+      run</em> is. Releases before v0.1.15 carry no contents list and are
+      checked as far as step 2, which it says at the time.
+    </p>
+    <p class="lede">
+      If GnuPG is on your machine it is used as well: the key is added to your
+      keyring, <code>gpg --verify</code> is run, and what GnuPG said is shown.
+      The signature is then checked by two independent implementations. The
+      commands above are still printed for you to run yourself, because a
+      program telling you a download is genuine came out of that download —
+      only you typing them makes the answer independent of it.
+    </p>
   </div>
 </section>
 </main>

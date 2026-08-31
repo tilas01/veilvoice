@@ -9,6 +9,7 @@ Every crate and every source file, generated from the doc comments in the code b
 - [[`guard_manifest.rs`|File-fuzz-fuzz_targets-guard_manifest]] &mdash; The integrity manifest parser, coverage-guided.
 - [[`hybrid_keys.rs`|File-fuzz-fuzz_targets-hybrid_keys]] &mdash; Key and encapsulation decoding, coverage-guided.
 - [[`lock_file.rs`|File-fuzz-fuzz_targets-lock_file]] &mdash; The app-lock file, coverage-guided.
+- [[`release_contents.rs`|File-fuzz-fuzz_targets-release_contents]] &mdash; The release contents list parser, coverage-guided.
 - [[`wav_chunks.rs`|File-fuzz-fuzz_targets-wav_chunks]] &mdash; The RIFF chunk walker in veilvoice-meta, coverage-guided.
 - [[`wav_preflight.rs`|File-fuzz-fuzz_targets-wav_preflight]] &mdash; The WAV pre-flight in veilvoice-audio, coverage-guided.
 
@@ -46,6 +47,7 @@ Which screen-recording programs are running, an allowlist for the ones you meant
 
 Check a VeilVoice release: the SHA-256 of a file, its line in a signed SHA256SUMS, and the detached signature over that list. No GnuPG, no network.
 
+- [[`contents.rs`|File-veilvoice-check-contents]] &mdash; The signed list of what is inside each release archive.
 - [[`lib.rs`|File-veilvoice-check-lib]] &mdash; Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list.
 
 ## [[veilvoice-cli|Crate-veilvoice-cli]]
@@ -151,6 +153,12 @@ Integrity manifest and tamper detection for VeilVoice's own files, with best-eff
 Which running programs can see your keyboard and mouse, reported as the heuristic it is -- and why a clean result proves nothing.
 
 - [[`lib.rs`|File-veilvoice-input-lib]] &mdash; What on this machine could be watching the keyboard and the mouse.
+
+## [[veilvoice-gnupg|Crate-veilvoice-gnupg]]
+
+Run the GnuPG already on this machine: import the VeilVoice signing key and check a detached signature, reading GnuPG's machine-readable status rather than its translated prose.
+
+- [[`lib.rs`|File-veilvoice-gnupg-lib]] &mdash; Run the GnuPG that is already on this machine.
 
 ## [[veilvoice-gui|Crate-veilvoice-gui]]
 

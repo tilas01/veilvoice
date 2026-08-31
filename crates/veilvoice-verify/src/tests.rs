@@ -355,3 +355,103 @@ fn the_repository_pins_its_line_endings() {
         );
     }
 }
+
+/// **Marker 97.** The contents list decides which paths get read and what they
+/// are compared against, so it is checked against the signed hash list *before*
+/// it is parsed.
+///
+/// Written as a test over the source because the ordering is the whole
+/// property and it cannot be observed from outside: a version that parsed
+/// first and checked afterwards would give the same answers on every good
+/// release and would be doing what a downloaded text file told it to on a bad
+/// one.
+#[test]
+fn the_contents_list_is_verified_before_it_is_parsed() {
+    let source = include_str!("main.rs").replace("\r\n", "\n");
+    let body = source
+        .split("fn manifest(")
+        .nth(1)
+        .expect("the manifest reader has to be findable");
+    let body = body.split("\nfn ").next().unwrap();
+    let checked = body
+        .find("check_file")
+        .expect("the contents list must be checked against the signed hash list");
+    let parsed = body.find("contents::parse").expect("and then parsed");
+    assert!(
+        checked < parsed,
+        "the contents list is parsed before it is verified"
+    );
+}
+
+/// A release that published no contents list is still checkable.
+///
+/// Everything before v0.1.15 is in that position, and a verifier that refused
+/// them would be refusing files it can check perfectly well. `None` is a state,
+/// not an error.
+#[test]
+fn a_release_without_a_contents_list_is_not_a_failure() {
+    let found = discover::Found {
+        directory: std::path::PathBuf::from("."),
+        archives: Vec::new(),
+        sums: None,
+        signature: None,
+        contents: None,
+    };
+    assert!(matches!(manifest(&found), Manifest::None));
+}
+
+/// A contents list with no signed hash list beside it cannot be used, and
+/// "cannot be used" is reported rather than quietly skipped.
+#[test]
+fn a_contents_list_with_nothing_to_check_it_against_is_unusable() {
+    let found = discover::Found {
+        directory: std::path::PathBuf::from("."),
+        archives: Vec::new(),
+        sums: None,
+        signature: None,
+        contents: Some(std::path::PathBuf::from("CONTENTS.sha256")),
+    };
+    match manifest(&found) {
+        Manifest::Unusable(why) => assert!(why.contains("signed hash list"), "{why}"),
+        other => panic!("expected Unusable, got {}", matches_name(&other)),
+    }
+}
+
+/// A name for a [`Manifest`], for a failing assertion to print.
+fn matches_name(manifest: &Manifest) -> &'static str {
+    match manifest {
+        Manifest::None => "None",
+        Manifest::Unusable(_) => "Unusable",
+        Manifest::Ready(_) => "Ready",
+    }
+}
+
+/// **Marker 97.** GnuPG being unusable is not a statement about the download.
+///
+/// The distinction is the one a verifier is most tempted to get wrong: a
+/// missing keyring directory reads like a failure, and reporting it as one
+/// tells somebody not to run a release that is entirely sound. Only an answer
+/// from GnuPG counts, and only a bad answer counts against.
+#[test]
+fn a_gnupg_that_cannot_run_is_never_counted_against_the_release() {
+    let source = include_str!("main.rs").replace("\r\n", "\n");
+    let body = source
+        .split("fn report_gnupg(")
+        .nth(1)
+        .expect("the GnuPG report has to be findable");
+    let body = body.split("\nfn ").next().unwrap();
+    for arm in [
+        "the signing key could not be added to your keyring",
+        "GnuPG could not check the signature",
+    ] {
+        let at = body.find(arm).unwrap_or_else(|| panic!("{arm} is gone"));
+        // The next `problems += 1` must belong to a later arm, not this one.
+        let rest = &body[at..];
+        let next_arm = rest.find("Nothing about the download changed");
+        let next_count = rest.find("problems += 1");
+        assert!(
+            next_arm.is_some() && next_arm < next_count,
+            "{arm} counts against the release"
+        );
+    }
+}
