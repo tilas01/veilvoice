@@ -106,6 +106,7 @@ macro_rules! note {
 mod builder;
 mod deps;
 mod discover;
+mod extracted;
 mod fetch;
 mod report;
 
@@ -164,6 +165,11 @@ USAGE
       this program, then your Downloads and Desktop. Entirely offline.
 
       This is also what double-clicking the program does.
+
+  veilvoice-verify gnupg [DIRECTORY]
+      Print the commands that check this release with your own GnuPG,
+      rather than with the key built into this program. Worth doing: the
+      program telling you a download is genuine came out of that download.
 
   veilvoice-verify key
       Print the signing key this binary carries, and its fingerprint.
@@ -767,8 +773,119 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
             "{failures} of {} did not check out. Nothing above should be run.",
             found.archives.len()
         );
+        return worst;
     }
+
+    report_extracted(&found);
+    report_gnupg(&found);
     worst
+}
+
+/// Marker 91. What is in the folder beside the archive, and what that is worth.
+///
+/// Reported separately from the archive check, and the separation is the point.
+/// `SHA256SUMS` covers archives; nothing signs the contents of a directory
+/// somebody unzipped last week, and nothing on disk records which archive it
+/// came from. Rolling the two into one green result would tell somebody their
+/// installed copy is verified when it is not. See `extracted` for the whole
+/// argument.
+fn report_extracted(found: &discover::Found) {
+    let mut looked = false;
+    for archive in &found.archives {
+        let Some(directory) = extracted::directory_for(archive) else {
+            continue;
+        };
+        if !directory.is_dir() {
+            continue;
+        }
+        looked = true;
+        out!("Beside it, {}", directory.display());
+        let here = extracted::look_in(&directory);
+        if here.is_empty() {
+            out!("  nothing that looks like a VeilVoice program is in it");
+            continue;
+        }
+        for program in &here.programs {
+            let name = program
+                .path
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy();
+            if program.runnable {
+                out!("  {name}: present, and your system will run it");
+            } else {
+                out!("  {name}: present, but your system will NOT run it");
+            }
+        }
+        if !here.not_runnable().is_empty() {
+            out!();
+            out!("  Some tools drop the execute bit when they unpack an archive.");
+            out!("  On Linux or macOS: chmod +x {}/*", directory.display());
+        }
+    }
+
+    if looked {
+        out!();
+        out!("  The archive above is the one that was signed. That does NOT prove");
+        out!("  this folder came out of it: nothing on disk records which archive a");
+        out!("  folder was extracted from, and no signed list covers loose files.");
+        out!("  To be certain, extract the checked archive again and use that.");
+        out!();
+    }
+}
+
+/// Marker 91. The same check, through a GnuPG this project did not write.
+fn report_gnupg(found: &discover::Found) {
+    let sums = found.sums.clone().unwrap_or_default();
+    let signature = found.signature.clone().unwrap_or_default();
+    let key = found.directory.join("veilvoice-signing-key.asc");
+    let key = key.is_file().then_some(key);
+
+    out!("Checking it again with your own GnuPG");
+    match extracted::gnupg_on_path() {
+        Some(gpg) => out!("  found at {}", gpg.display()),
+        None => out!("  GnuPG is not on your PATH. These are the commands if you install it."),
+    }
+    out!();
+    for line in extracted::gnupg_commands(&sums, &signature, key.as_deref()) {
+        out!("    {line}");
+    }
+    out!();
+    out!("  Worth doing. This program checked the signature with a key built into");
+    out!("  itself, and it came out of the same download you are checking. GnuPG");
+    out!("  and the fingerprint on the website are the independent answer.");
+    out!();
+}
+
+/// Marker 91. Print the commands that check this release with somebody else's
+/// GnuPG, and nothing else.
+///
+/// A separate subcommand rather than only a footnote under `auto`, because the
+/// person who wants this is the person who does not want to be told the answer
+/// by this binary. Making them run the full check first to reach the commands
+/// would be the wrong way round.
+fn command_gnupg(explicit: Option<&Path>) -> ExitCode {
+    let (complete, all) = discover::search(explicit);
+    let found = complete.or_else(|| all.into_iter().next());
+
+    let Some(found) = found else {
+        return incomplete_deny(
+            "no VeilVoice release was found",
+            &[
+                "Looked in: the directory given, the current directory, the folder this",
+                "program is in, and your Downloads and Desktop.",
+                "",
+                "  veilvoice-verify gnupg <DIRECTORY>",
+            ],
+        );
+    };
+
+    out!("In {}", found.directory.display());
+    out!();
+    report_gnupg(&found);
+    out!("  The fingerprint to compare against is on the release page and in");
+    out!("  README.md. `veilvoice-verify key` prints the one this binary carries.");
+    ExitCode::SUCCESS
 }
 
 /// Keep the window open when there was nobody watching a terminal.
@@ -1208,6 +1325,8 @@ fn main() -> ExitCode {
         "auto" => command_auto(args.get(1).map(Path::new)),
 
         "key" => command_key(),
+
+        "gnupg" => command_gnupg(args.get(1).map(Path::new)),
 
         "deps" => {
             let install = args.iter().any(|a| a == "--install");
