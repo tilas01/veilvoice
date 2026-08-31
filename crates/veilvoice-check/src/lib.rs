@@ -53,6 +53,8 @@
 //! the one this cannot do for you: it needs somebody other than the author to have
 //! built the same thing and got the same answer.
 
+pub mod contents;
+
 use std::fmt::Write as _;
 use std::path::Path;
 
@@ -121,52 +123,11 @@ impl std::fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
-/// The embedded key, with its fingerprint checked.
-/// The commands that check a release with a GnuPG this project did not write.
-///
-/// **Marker 90.** Returned rather than run, and the reason is the one this
-/// whole crate exists for. VeilVoice checks the signature itself, with
-/// [`PUBLIC_KEY`] compiled into the binary, so that somebody with no GnuPG is
-/// not stuck. That is a convenience with an obvious circularity: the program
-/// telling you a download is genuine came out of that download.
-///
-/// A verifier that shelled out to `gpg` and reported what it said would not
-/// escape that, because the thing running `gpg` is the binary under suspicion.
-/// The independent article is the commands themselves, run by the person who
-/// wants the answer, against a fingerprint published somewhere this project
-/// does not control.
-///
-/// Shared by the portable verifier and the desktop application's verify tab, so
-/// the two cannot drift into printing different commands.
-pub fn gnupg_commands(sums: &Path, signature: &Path, key: Option<&Path>) -> Vec<String> {
-    let mut out = Vec::new();
-    if let Some(key) = key {
-        out.push(format!("gpg --import {}", key.display()));
-    }
-    out.push(format!(
-        "gpg --verify {} {}",
-        signature.display(),
-        sums.display()
-    ));
-    out.push("sha256sum -c SHA256SUMS --ignore-missing".to_string());
-    out
-}
-
-/// Where GnuPG is, if it is on `PATH`.
-///
-/// A lookup and nothing else: it never runs the program to find out.
-pub fn gnupg_on_path() -> Option<std::path::PathBuf> {
-    let path = std::env::var_os("PATH")?;
-    for dir in std::env::split_paths(&path) {
-        for name in ["gpg", "gpg2", "gpg.exe"] {
-            let candidate = dir.join(name);
-            if candidate.is_file() {
-                return Some(candidate);
-            }
-        }
-    }
-    None
-}
+// `gnupg_commands` and `gnupg_on_path` used to live here, and moved to
+// `veilvoice-gnupg` when that crate was written. This crate's own note says it
+// never runs a program, and a crate that hands out the arguments for one is
+// half a step from doing it: keeping the two apart is what lets that sentence
+// stay true and checkable. Both front ends call the new crate directly.
 
 /// The embedded key, with its fingerprint checked.
 pub fn key() -> Result<SignedPublicKey, Error> {

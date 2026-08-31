@@ -27,6 +27,7 @@ libfuzzer-sys = "0.4"
 veilvoice-crypto = { path = "../crates/veilvoice-crypto" }
 veilvoice-meta = { path = "../crates/veilvoice-meta" }
 veilvoice-guard = { path = "../crates/veilvoice-guard" }
+veilvoice-check = { path = "../crates/veilvoice-check" }
 # `default-features = false` drops cpal: the fuzzers touch decoding and header
 # checking only, and there is no reason to link an audio backend into them.
 veilvoice-audio = { path = "../crates/veilvoice-audio", default-features = false }
@@ -64,6 +65,12 @@ doc = false
 [[bin]]
 name = "hybrid_keys"
 path = "fuzz_targets/hybrid_keys.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "release_contents"
+path = "fuzz_targets/release_contents.rs"
 test = false
 doc = false
 

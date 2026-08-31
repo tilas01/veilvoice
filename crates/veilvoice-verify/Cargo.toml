@@ -36,6 +36,11 @@ veilvoice-check = { path = "../veilvoice-check" }
 # Where an installation goes on each platform, so the `install` command puts
 # files exactly where the application itself would. No dependencies of its own.
 veilvoice-setup = { path = "../veilvoice-setup" }
+# Marker 97. Runs the GnuPG already on the machine, so the signature is
+# checked by two independent implementations rather than only this one. No
+# dependencies of its own, which matters in the one binary here whose size is
+# a feature.
+veilvoice-gnupg = { path = "../veilvoice-gnupg" }
 pgp = { version = "0.20", default-features = false }
 sha2 = "0.10"
 

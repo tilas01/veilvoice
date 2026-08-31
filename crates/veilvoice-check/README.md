@@ -93,8 +93,10 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>510 lines"])
+    n_lib(["lib.rs<br/>471 lines"])
+    n_contents["contents.rs<br/>438 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs" "open the source"
+    click n_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs" "open the source"
 ```
 
 </details>
@@ -103,18 +105,26 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | 510 | Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list. |
+| [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | 438 | The signed list of what is inside each release archive. |
+| [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | 471 | Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list. |
 
 ## Public items
 
 | Item | Where | What |
 |---|---|---|
+| `const CONTENTS` | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | The name a release publishes its contents list under. |
+| `struct Member` | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | One file inside a release archive, and the hash published for it. |
+| `struct ArchiveContents` | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | Everything one archive carries. |
+| `enum Verdict` | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | What checking one published file against the disk found. |
+| `struct Outcome` | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | One published file, checked against the disk. |
+| `fn parse` | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | Read a CONTENTS.sha256. |
+| `fn for_archive` | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | The section of a manifest covering one archive. |
+| `fn check` | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | Check every file the archive published, against root. |
+| `fn extras` | [`contents.rs`](../../docs/files/veilvoice-check/contents.md) | Files sitting in the extracted directory that the release never published. |
 | `const PUBLIC_KEY` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | The project's signing key, in ASCII armour. |
 | `const FINGERPRINT` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | The fingerprint, written out rather than derived. |
 | `const SCOPE` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | What a passing check is worth, in the words a user should be shown. |
 | `enum Error` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | Something that went wrong, in words a person can act on. |
-| `fn gnupg_commands` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | The embedded key, with its fingerprint checked. |
-| `fn gnupg_on_path` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | Where GnuPG is, if it is on PATH. |
 | `fn key` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | The embedded key, with its fingerprint checked. |
 | `fn fingerprint_of` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | A key's fingerprint, uppercase hex, no spaces. |
 | `fn sha256_file` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | SHA-256 of a file, read in chunks. |

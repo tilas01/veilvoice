@@ -15,6 +15,49 @@ Nothing yet. The next release goes here.
 Encrypted volumes, one password if you want one, a window that locks itself,
 and an interview from an OBS recording through to a video.
 
+### A verifier anybody can use, checking everything
+
+**One press, or one command, and it checks the lot.** `veilvoice-verify` and
+the desktop application's verify tab now check the signature over the hash
+list, then the archive against that list, then **every file you extracted out
+of the archive**, and then ask the GnuPG on your own machine the same question
+and show you what it said.
+
+**The extracted folder is now checked, not described.** A release publishes
+`CONTENTS.sha256`, listing every file inside every archive with its SHA-256. It
+is staged before `SHA256SUMS` is computed, so the hash list covers it and the
+signature covers it too, and the chain runs all the way down:
+
+    SHA256SUMS.asc -> SHA256SUMS -> CONTENTS.sha256 -> each file on disk
+
+That answers the question somebody actually has. "This zip is the published
+one" is a step; "the program I am about to run is the published one" is the
+thing worth knowing, and until now nothing on disk recorded which archive a
+folder came out of, so the honest report was two separate answers and the
+advice to unzip it again. Anything in that folder the release never published
+is named as well, because a folder holding every correct file plus one extra
+program passes every other check and is not the release.
+
+Releases before v0.1.15 carry no such list and are checked as far as the
+archive, which the tool says at the time rather than implying more.
+
+**Your own GnuPG, run for you.** If `gpg` is on the machine, VeilVoice adds the
+signing key to your keyring, tells you it did and how to remove it in one
+command, runs `gpg --verify`, and reports the answer. The signature is then
+checked by two independent implementations, and where they disagree the run
+fails. GnuPG's machine-readable status channel is what is read, never its
+prose, so a GnuPG in any language gives the same answer. A good signature by
+some *other* key is a failure rather than a pass, which is the check the
+instructions have always asked people to remember to make.
+
+A GnuPG that cannot run on your machine is not counted against the download,
+and is not drawn in red: that is a fact about the computer, and reporting it as
+a refusal would tell somebody not to run a release that is perfectly sound.
+
+The commands are still printed every time. Running GnuPG from inside the
+program under suspicion makes the *implementation* independent; only you typing
+them makes the *invocation* independent.
+
 ### The thirteenth audit round, run on what CI refused
 
 - **F-96** A program that has just been started is not yet wearing its own

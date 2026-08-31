@@ -19,6 +19,7 @@ veilvoice-crypto = { path = "../veilvoice-crypto" }
 veilvoice-meta = { path = "../veilvoice-meta" }
 veilvoice-policy = { path = "../veilvoice-policy" }
 veilvoice-check = { path = "../veilvoice-check" }
+veilvoice-gnupg = { path = "../veilvoice-gnupg" }
 veilvoice-conversation = { path = "../veilvoice-conversation" }
 veilvoice-setup = { path = "../veilvoice-setup" }
 veilvoice-update = { path = "../veilvoice-update" }

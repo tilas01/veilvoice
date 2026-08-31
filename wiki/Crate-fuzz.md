@@ -34,5 +34,6 @@ flowchart TD
 | [[`guard_manifest.rs`|File-fuzz-fuzz_targets-guard_manifest]] | 53 | The integrity manifest parser, coverage-guided. |
 | [[`hybrid_keys.rs`|File-fuzz-fuzz_targets-hybrid_keys]] | 36 | Key and encapsulation decoding, coverage-guided. |
 | [[`lock_file.rs`|File-fuzz-fuzz_targets-lock_file]] | 37 | The app-lock file, coverage-guided. |
+| [[`release_contents.rs`|File-fuzz-fuzz_targets-release_contents]] | 86 | The release contents list parser, coverage-guided. |
 | [[`wav_chunks.rs`|File-fuzz-fuzz_targets-wav_chunks]] | 46 | The RIFF chunk walker in veilvoice-meta, coverage-guided. |
 | [[`wav_preflight.rs`|File-fuzz-fuzz_targets-wav_preflight]] | 35 | The WAV pre-flight in veilvoice-audio, coverage-guided. |
