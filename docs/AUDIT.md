@@ -47,9 +47,12 @@ program: two were tests asserting something that is not true of every machine,
 one was a constant that only one platform reads, and the fourth was a generated
 file committed a few minutes before the file it is generated from changed.
 
-**One defect found and fixed (F-96)**, and two test defects and one process
-failure written down beside it, because a test that fails on somebody else's
-machine costs exactly as much as a bug until it is understood.
+**Two defects found and fixed (F-96 and F-97)**, with two test defects and one
+process failure written down beside them, because a test that fails on somebody
+else's machine costs exactly as much as a bug until it is understood. F-97 was
+found by the fix for the fourth failure rather than by reading, which is the
+round's own small lesson: the first explanation for a stale generated file was
+true and was not the whole truth.
 
 ### F-96 -- a just-started program is not yet wearing its own name
 
@@ -100,6 +103,40 @@ dead code, `-D warnings` is on, and the Windows job was the only one that could
 see it. It is declared where it is read now. The test that checks the help text
 against the tab names reads the file rather than the constant, so it still runs
 on every platform.
+
+### F-97 -- a committed drawing that depended on which Python was installed
+
+`tools/docs/generate.py`.
+
+The fourth job was written off as the process failure below, and the process
+failure was real. Regenerating and committing did not fix it. The same job
+failed again on six files nobody had touched, and this time the explanation was
+not staleness.
+
+`tools/docs/generate.py` lays out a call graph and writes the coordinates into
+an SVG. It summed box widths with the built-in `sum`, and **CPython 3.12 gave
+`sum` compensated summation over floats**. The same widths therefore add up to a
+value a fraction different from the one 3.11 produces, everything downstream is
+a centring calculation, and one box landed at `x=40.1` under one interpreter and
+`x=40.2` under the other. Six generated files, three drawings and their three
+pages, differed by a tenth of a pixel that no eye could see and that a byte
+comparison could not miss.
+
+Measured: the committed files match under 3.11 and differ under 3.12, on this
+machine, with nothing else changed. That is the whole defect. This repository
+commits its generated output and compares it byte for byte precisely so that
+"generated from the source" is checkable rather than asserted, and a check that
+passes or fails on which interpreter a contributor happens to have is not a
+check.
+
+The sum is `math.fsum` now, which is exactly rounded and therefore identical on
+every version and platform. Verified across 3.10, 3.11, 3.12 and 3.13: the same
+1108 files, byte for byte.
+
+**And the check that would have caught it is now there.** The assets job runs
+the generators under two Python versions rather than one. A single-interpreter
+check cannot see this class of defect at all, which is why it took a red build
+on somebody else's machine to find the first one.
 
 ### The process failure, which is the one worth remembering
 
@@ -3003,7 +3040,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Ninety-six defects found and fixed across thirteen audit rounds (F-1 to F-96):**
+**Ninety-seven defects found and fixed across thirteen audit rounds (F-1 to F-97):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
