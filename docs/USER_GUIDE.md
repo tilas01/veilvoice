@@ -486,6 +486,104 @@ without being asked. A veiled recording inside a Cryptomator vault on an
 encrypted disk is encrypted by two independent tools, and what that buys is not
 extra strength so much as independence: a defect in one is not a defect in both.
 
+## 5.9 An interview, start to finish
+
+The commonest thing people ask VeilVoice to do, in the order it happens. This is
+also how to veil the person you were interviewing rather than only yourself.
+
+### Step 1: get the sound out of what you recorded
+
+If you recorded in OBS, or anything like it, you have a `.mkv` or `.mp4`
+holding a video track and an audio track. VeilVoice reads audio:
+
+```bash
+veilvoice import interview.mkv          # writes interview.wav
+```
+
+That needs `ffmpeg`. VeilVoice does not ship one and will not install one; when
+it is missing you get the exact command printed, to run yourself or after
+installing it. `--dry-run` prints it without running anything.
+
+Already have a `.wav`, `.mp3`, `.flac`, `.ogg`, `.m4a`, `.aac` or `.opus`? Skip
+this step; those go straight into `anonymise`.
+
+### Step 2: write a plan, so each person gets their own voice
+
+Running an interview through `anonymise` gives **both people the same voice**.
+That is private and useless: nobody can tell a question from its answer. A plan
+gives each speaker their own destination voice.
+
+**VeilVoice will not work out who is talking.** That is speaker diarisation, it
+needs a trained model, this project ships none and asks no server, and a wrong
+guess would either merge two people or invent a third with nothing in the output
+showing it. So you tell it. A plan is a text file:
+
+```text
+VEILCONV1
+title    Interview with Sam
+speaker  0  Me
+speaker  1  Sam
+turn  0.000   4.200  0  So, how did it go?
+turn  4.100  19.050  1
+turn 19.000  22.400  0  And after that?
+```
+
+Line by line:
+
+| Line | What it is |
+|---|---|
+| `VEILCONV1` | The first line of every plan, so the file says what it is |
+| `title` | What the recording is called, shown in the player |
+| `speaker  <n>  <name>` | One per person. The number is how turns refer to them |
+| `turn  <from>  <to>  <speaker>  [words]` | One per stretch of speech, in seconds |
+
+The words on a turn are optional. With them the subtitles carry what was said;
+without them they carry the speaker's name, which is still enough to follow a
+conversation whose voices have all been replaced.
+
+Overlapping turns are fine. People talk over each other, and VeilVoice mixes
+them rather than picking a winner.
+
+**Anything no turn claims is silenced, not passed through.** A gap in a plan
+must never put a real voice into the result, and how much was silenced is
+printed so you can tell a deliberate pause from a plan that missed a minute.
+
+Check a plan before spending time on a render:
+
+```bash
+veilvoice conversation inspect interview.plan
+```
+
+It prints who is in it, which voice each gets, and any overlaps.
+
+### Step 3: render it
+
+```bash
+veilvoice conversation render interview.plan interview.wav -o veiled.wav
+```
+
+Every speaker comes out with their own voice and every voiceprint is destroyed,
+including the interviewee's. Subtitles are written beside the audio in both
+formats, and a self-contained player page comes with it that needs nothing
+installed.
+
+### Step 4: a video, if you need one
+
+Somewhere that will not accept an audio file:
+
+```bash
+veilvoice video veiled.wav              # writes veiled.mp4
+```
+
+A black picture for the length of the recording. The picture is not the point
+and does not pretend to be. Needs `ffmpeg`, same as step 1.
+
+### Recording each person on their own microphone instead
+
+If your recording already has one channel per person, the split is exact and
+there is no plan to write. That is the better arrangement whenever you can
+manage it: no times to type, and no chance of typing them wrong.
+
 ## 6. Things VeilVoice will not do
 
 Read this twice. Misunderstanding it is the only way this software gets someone
