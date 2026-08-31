@@ -93,10 +93,11 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1396 lines"])
+    n_main(["main.rs<br/>1515 lines"])
     n_builder["builder.rs<br/>1148 lines"]
     n_deps["deps.rs<br/>650 lines"]
     n_discover["discover.rs<br/>353 lines"]
+    n_extracted["extracted.rs<br/>333 lines"]
     n_fetch["fetch.rs<br/>329 lines"]
     n_report["report.rs<br/>385 lines"]
     n_tests["tests.rs<br/>357 lines"]
@@ -107,6 +108,7 @@ flowchart TD
     click n_builder href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs" "open the source"
     click n_deps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs" "open the source"
     click n_discover href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" "open the source"
+    click n_extracted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs" "open the source"
     click n_fetch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" "open the source"
     click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/report.rs" "open the source"
     click n_tests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" "open the source"
@@ -121,8 +123,9 @@ flowchart TD
 | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 1148 | Build VeilVoice here, and compare what came out against what was published. |
 | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 650 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 353 | Finding a release to check, without being told where it is. |
+| [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 333 | What came out of the archive, and the GnuPG somebody already has. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 329 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 1396 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 1515 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 357 | The verifier's own tests. |
 
@@ -164,6 +167,13 @@ flowchart TD
 | `fn look_in` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Look in one directory, one level deep. |
 | `fn places` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Every place worth looking, in order, without duplicates. |
 | `fn search` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Look everywhere worth looking and return the first directory that holds a complete, checkable set — or, failing that, everything that turned up. |
+| `const PROGRAMS` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | The programs a release archive carries. |
+| `struct Program` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | One program found in an extracted directory. |
+| `struct Extracted` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | What an extracted directory turned out to hold. |
+| `fn directory_for` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | The directory an archive would extract into, by this project's naming. |
+| `fn look_in` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | Look in directory for the programs a release carries. |
+| `fn gnupg_commands` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | The commands that check this release with somebody else's GnuPG. |
+| `fn gnupg_on_path` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | Whether GnuPG appears to be installed, and where. |
 | `const HOST` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The only host this will ever talk to. |
 | `const REPO` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The repository releases are fetched from. |
 | `const MAX_BYTES` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The largest file this will accept. |
