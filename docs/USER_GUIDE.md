@@ -363,6 +363,23 @@ design.
 
 ---
 
+## 5.5 Locking the window when you walk away
+
+Off unless you turn it on, under **Settings, Locking**.
+
+When it is on, choose how long from the list, which runs from five minutes to
+two days, or type your own: `90m`, `2h`, `1d`. Typing a value outside the list
+widens the list to hold it, so the range is yours rather than ours. There is a
+button to put it back.
+
+**Starting a long job does not count as using the window.** That is deliberate,
+and it is the case the feature exists for: somebody who starts a render and
+leaves the room has left the room, and the recording being produced is the thing
+worth locking away.
+
+The countdown runs on the window's own clock, not the system one, so changing
+the machine's time neither brings the lock forward nor pushes it back.
+
 ## 5.6 VeilVoice checking its own files
 
 The first time VeilVoice runs it writes down what its own program file looks

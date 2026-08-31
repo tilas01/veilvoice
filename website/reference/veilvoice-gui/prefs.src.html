@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/prefs.rs</code></h1>
-<p style="color:var(--muted)"><a href="prefs.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 549 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="prefs.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 601 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/prefs.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -141,477 +141,529 @@
 <span class="ln" id="L97">    <span class="tok-com">/// The answer to the hidden-volume question. Anything unrecognised, or</span></span>
 <span class="ln" id="L98">    <span class="tok-com">/// missing, reads as unanswered and blocks writing.</span></span>
 <span class="ln" id="L99">    <span class="tok-kw">pub</span> vault_hidden: String,</span>
-<span class="ln" id="L100">    <span class="tok-com">/// How notifications are shown: `overlay`, `alert` or `off`.</span></span>
+<span class="ln" id="L100">    <span class="tok-com">/// Whether the window locks itself after a period of no use.</span></span>
 <span class="ln" id="L101">    <span class="tok-com">///</span></span>
-<span class="ln" id="L102">    <span class="tok-com">/// Stored as its key rather than as a number, so a settings file stays</span></span>
-<span class="ln" id="L103">    <span class="tok-com">/// readable and so reordering the enum cannot silently change somebody&#x27;s</span></span>
-<span class="ln" id="L104">    <span class="tok-com">/// choice -- which for the value `off` would mean turning their warnings</span></span>
-<span class="ln" id="L105">    <span class="tok-com">/// back on, or worse, off.</span></span>
-<span class="ln" id="L106">    <span class="tok-kw">pub</span> notify_style: String,</span>
-<span class="ln" id="L107">    <span class="tok-com">/// Where the live monitor sits: `toolbar`, `overlay` or `off`.</span></span>
-<span class="ln" id="L108">    <span class="tok-com">///</span></span>
-<span class="ln" id="L109">    <span class="tok-com">/// Stored as its key, like the others. An unreadable value reads back as</span></span>
-<span class="ln" id="L110">    <span class="tok-com">/// the default, which **shows** it: the monitor is the only picture of a</span></span>
-<span class="ln" id="L111">    <span class="tok-com">/// live microphone available from a tab that is not the live one, and a</span></span>
-<span class="ln" id="L112">    <span class="tok-com">/// settings file this build cannot parse must not be the reason it is</span></span>
-<span class="ln" id="L113">    <span class="tok-com">/// missing.</span></span>
-<span class="ln" id="L114">    <span class="tok-kw">pub</span> live_monitor: String,</span>
-<span class="ln" id="L115">    <span class="tok-com">/// The Failsafe posture: `close`, `warn` or `off`.</span></span>
-<span class="ln" id="L116">    <span class="tok-com">///</span></span>
-<span class="ln" id="L117">    <span class="tok-com">/// Stored as its key. An unreadable value reads back as the **default**,</span></span>
-<span class="ln" id="L118">    <span class="tok-com">/// which is on -- a settings file this build cannot parse must never be</span></span>
-<span class="ln" id="L119">    <span class="tok-com">/// the reason the safety catch is off.</span></span>
-<span class="ln" id="L120">    <span class="tok-kw">pub</span> failsafe: String,</span>
-<span class="ln" id="L121">    <span class="tok-com">/// Set when the file on disk could not be understood, so the settings</span></span>
-<span class="ln" id="L122">    <span class="tok-com">/// panel can say the defaults are in force and why. Never persisted.</span></span>
-<span class="ln" id="L123">    <span class="tok-kw">pub</span> recovered_from_corrupt_file: bool,</span>
-<span class="ln" id="L124">}</span>
+<span class="ln" id="L102">    <span class="tok-com">/// **Marker 92.** Off by default, and the reason is in</span></span>
+<span class="ln" id="L103">    <span class="tok-com">/// [`crate::autolock`]: a lock that engages part way through a recording is</span></span>
+<span class="ln" id="L104">    <span class="tok-com">/// a lock somebody removes.</span></span>
+<span class="ln" id="L105">    <span class="tok-kw">pub</span> autolock: bool,</span>
+<span class="ln" id="L106">    <span class="tok-com">/// How long that period is, in seconds.</span></span>
+<span class="ln" id="L107">    <span class="tok-kw">pub</span> autolock_after: u64,</span>
+<span class="ln" id="L108">    <span class="tok-com">/// The bottom of the range the interface offers, in seconds.</span></span>
+<span class="ln" id="L109">    <span class="tok-kw">pub</span> autolock_floor: u64,</span>
+<span class="ln" id="L110">    <span class="tok-com">/// The top of it.</span></span>
+<span class="ln" id="L111">    <span class="tok-kw">pub</span> autolock_ceiling: u64,</span>
+<span class="ln" id="L112">    <span class="tok-com">/// How notifications are shown: `overlay`, `alert` or `off`.</span></span>
+<span class="ln" id="L113">    <span class="tok-com">///</span></span>
+<span class="ln" id="L114">    <span class="tok-com">/// Stored as its key rather than as a number, so a settings file stays</span></span>
+<span class="ln" id="L115">    <span class="tok-com">/// readable and so reordering the enum cannot silently change somebody&#x27;s</span></span>
+<span class="ln" id="L116">    <span class="tok-com">/// choice -- which for the value `off` would mean turning their warnings</span></span>
+<span class="ln" id="L117">    <span class="tok-com">/// back on, or worse, off.</span></span>
+<span class="ln" id="L118">    <span class="tok-kw">pub</span> notify_style: String,</span>
+<span class="ln" id="L119">    <span class="tok-com">/// Where the live monitor sits: `toolbar`, `overlay` or `off`.</span></span>
+<span class="ln" id="L120">    <span class="tok-com">///</span></span>
+<span class="ln" id="L121">    <span class="tok-com">/// Stored as its key, like the others. An unreadable value reads back as</span></span>
+<span class="ln" id="L122">    <span class="tok-com">/// the default, which **shows** it: the monitor is the only picture of a</span></span>
+<span class="ln" id="L123">    <span class="tok-com">/// live microphone available from a tab that is not the live one, and a</span></span>
+<span class="ln" id="L124">    <span class="tok-com">/// settings file this build cannot parse must not be the reason it is</span></span>
+<span class="ln" id="L125">    <span class="tok-com">/// missing.</span></span>
+<span class="ln" id="L126">    <span class="tok-kw">pub</span> live_monitor: String,</span>
+<span class="ln" id="L127">    <span class="tok-com">/// The Failsafe posture: `close`, `warn` or `off`.</span></span>
+<span class="ln" id="L128">    <span class="tok-com">///</span></span>
+<span class="ln" id="L129">    <span class="tok-com">/// Stored as its key. An unreadable value reads back as the **default**,</span></span>
+<span class="ln" id="L130">    <span class="tok-com">/// which is on -- a settings file this build cannot parse must never be</span></span>
+<span class="ln" id="L131">    <span class="tok-com">/// the reason the safety catch is off.</span></span>
+<span class="ln" id="L132">    <span class="tok-kw">pub</span> failsafe: String,</span>
+<span class="ln" id="L133">    <span class="tok-com">/// Set when the file on disk could not be understood, so the settings</span></span>
+<span class="ln" id="L134">    <span class="tok-com">/// panel can say the defaults are in force and why. Never persisted.</span></span>
+<span class="ln" id="L135">    <span class="tok-kw">pub</span> recovered_from_corrupt_file: bool,</span>
+<span class="ln" id="L136">}</span>
 </span>
-<span class="ln" id="L125"></span>
-<span class="ln" id="L126"><span class="tok-kw">impl</span> Default <span class="tok-kw">for</span> Prefs {</span>
+<span class="ln" id="L137"></span>
+<span class="ln" id="L138"><span class="tok-kw">impl</span> Default <span class="tok-kw">for</span> Prefs {</span>
 <span class="src-item" id="fn-prefs-default">
-<span class="ln" id="L127">    <span class="tok-kw">fn</span> <span class="tok-fn">default</span>() -&gt; Self {</span>
-<span class="ln" id="L128">        Self {</span>
-<span class="ln" id="L129">            theme: <span class="tok-str">&quot;tokyo-night&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L130">            <span class="tok-com">// On by default, as asked. The system&#x27;s reduce-motion setting still</span></span>
-<span class="ln" id="L131">            <span class="tok-com">// overrides this at the point of use -- see `Motion`.</span></span>
-<span class="ln" id="L132">            animations: true,</span>
-<span class="ln" id="L133">            animated_icon: true,</span>
-<span class="ln" id="L134">            configured: false,</span>
-<span class="ln" id="L135">            hide_install_tab: false,</span>
-<span class="ln" id="L136">            always_group: false,</span>
-<span class="ln" id="L137">            seal_with_app_lock: false,</span>
-<span class="ln" id="L138">            vault_dir: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L139">            vault_tool: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L140">            vault_hidden: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L141">            notify_style: <span class="tok-kw">crate</span>::notify::Style::<span class="tok-fn">default</span>().<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L142">            <span class="tok-com">// On, and docked. Live scramble is the mode where what is being</span></span>
-<span class="ln" id="L143">            <span class="tok-com">// protected is happening now, and the two questions a person has</span></span>
-<span class="ln" id="L144">            <span class="tok-com">// are &quot;is it hearing me&quot; and &quot;is anything coming out&quot;. Both are</span></span>
-<span class="ln" id="L145">            <span class="tok-com">// answered by a strip that is already on screen.</span></span>
-<span class="ln" id="L146">            live_monitor: <span class="tok-kw">crate</span>::monitor::Style::<span class="tok-fn">default</span>().<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L147">            failsafe: veilvoice_failsafe::Posture::<span class="tok-fn">default</span>().<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L148">            recovered_from_corrupt_file: false,</span>
-<span class="ln" id="L149">        }</span>
-<span class="ln" id="L150">    }</span>
+<span class="ln" id="L139">    <span class="tok-kw">fn</span> <span class="tok-fn">default</span>() -&gt; Self {</span>
+<span class="ln" id="L140">        Self {</span>
+<span class="ln" id="L141">            theme: <span class="tok-str">&quot;tokyo-night&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L142">            <span class="tok-com">// On by default, as asked. The system&#x27;s reduce-motion setting still</span></span>
+<span class="ln" id="L143">            <span class="tok-com">// overrides this at the point of use -- see `Motion`.</span></span>
+<span class="ln" id="L144">            animations: true,</span>
+<span class="ln" id="L145">            animated_icon: true,</span>
+<span class="ln" id="L146">            configured: false,</span>
+<span class="ln" id="L147">            hide_install_tab: false,</span>
+<span class="ln" id="L148">            always_group: false,</span>
+<span class="ln" id="L149">            seal_with_app_lock: false,</span>
+<span class="ln" id="L150">            vault_dir: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L151">            vault_tool: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L152">            vault_hidden: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L153">            autolock: false,</span>
+<span class="ln" id="L154">            autolock_after: <span class="tok-num">15</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L155">            autolock_floor: <span class="tok-kw">crate</span>::autolock::FLOOR_SECS,</span>
+<span class="ln" id="L156">            autolock_ceiling: <span class="tok-kw">crate</span>::autolock::CEILING_SECS,</span>
+<span class="ln" id="L157">            notify_style: <span class="tok-kw">crate</span>::notify::Style::<span class="tok-fn">default</span>().<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L158">            <span class="tok-com">// On, and docked. Live scramble is the mode where what is being</span></span>
+<span class="ln" id="L159">            <span class="tok-com">// protected is happening now, and the two questions a person has</span></span>
+<span class="ln" id="L160">            <span class="tok-com">// are &quot;is it hearing me&quot; and &quot;is anything coming out&quot;. Both are</span></span>
+<span class="ln" id="L161">            <span class="tok-com">// answered by a strip that is already on screen.</span></span>
+<span class="ln" id="L162">            live_monitor: <span class="tok-kw">crate</span>::monitor::Style::<span class="tok-fn">default</span>().<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L163">            failsafe: veilvoice_failsafe::Posture::<span class="tok-fn">default</span>().<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L164">            recovered_from_corrupt_file: false,</span>
+<span class="ln" id="L165">        }</span>
+<span class="ln" id="L166">    }</span>
 </span>
-<span class="ln" id="L151">}</span>
-<span class="ln" id="L152"></span>
+<span class="ln" id="L167">}</span>
+<span class="ln" id="L168"></span>
 <span class="src-item" id="fn-default_path">
-<span class="ln" id="L153"><span class="tok-com">/// Where preferences live: beside the app lock, in this platform&#x27;s config</span></span>
-<span class="ln" id="L154"><span class="tok-com">/// directory. `None` when the environment does not say where that is, in which</span></span>
-<span class="ln" id="L155"><span class="tok-com">/// case the app runs on defaults and simply does not persist them.</span></span>
-<span class="ln" id="L156"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">default_path</span>() -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L157">    veilvoice_crypto::lock::<span class="tok-fn">default_path</span>().<span class="tok-fn">map</span>(|lock| lock.<span class="tok-fn">with_file_name</span>(<span class="tok-str">&quot;settings.conf&quot;</span>))</span>
-<span class="ln" id="L158">}</span>
+<span class="ln" id="L169"><span class="tok-com">/// Where preferences live: beside the app lock, in this platform&#x27;s config</span></span>
+<span class="ln" id="L170"><span class="tok-com">/// directory. `None` when the environment does not say where that is, in which</span></span>
+<span class="ln" id="L171"><span class="tok-com">/// case the app runs on defaults and simply does not persist them.</span></span>
+<span class="ln" id="L172"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">default_path</span>() -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L173">    veilvoice_crypto::lock::<span class="tok-fn">default_path</span>().<span class="tok-fn">map</span>(|lock| lock.<span class="tok-fn">with_file_name</span>(<span class="tok-str">&quot;settings.conf&quot;</span>))</span>
+<span class="ln" id="L174">}</span>
 </span>
-<span class="ln" id="L159"></span>
-<span class="ln" id="L160"><span class="tok-kw">impl</span> Prefs {</span>
+<span class="ln" id="L175"></span>
+<span class="ln" id="L176"><span class="tok-kw">impl</span> Prefs {</span>
 <span class="src-item" id="fn-prefs-load">
-<span class="ln" id="L161">    <span class="tok-com">/// Read preferences from `path`.</span></span>
-<span class="ln" id="L162">    <span class="tok-com">///</span></span>
-<span class="ln" id="L163">    <span class="tok-com">/// Never fails. A missing file gives the defaults; an unreadable or</span></span>
-<span class="ln" id="L164">    <span class="tok-com">/// unparseable one gives the defaults with</span></span>
-<span class="ln" id="L165">    <span class="tok-com">/// [`recovered_from_corrupt_file`](Self::recovered_from_corrupt_file) set,</span></span>
-<span class="ln" id="L166">    <span class="tok-com">/// so the UI can be honest about it.</span></span>
-<span class="ln" id="L167">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">load</span>(path: &amp;Path) -&gt; Self {</span>
-<span class="ln" id="L168">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = std::fs::<span class="tok-fn">read_to_string</span>(path) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L169">            <span class="tok-com">// Missing is the ordinary case on a first run, and is not worth</span></span>
-<span class="ln" id="L170">            <span class="tok-com">// reporting. An unreadable file is reported below only if it</span></span>
-<span class="ln" id="L171">            <span class="tok-com">// parses to nothing useful, because the distinction the user cares</span></span>
-<span class="ln" id="L172">            <span class="tok-com">// about is &quot;are my settings in force&quot;, not &quot;which syscall failed&quot;.</span></span>
-<span class="ln" id="L173">            <span class="tok-kw">return</span> Self::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L174">        };</span>
-<span class="ln" id="L175">        Self::<span class="tok-fn">parse</span>(&amp;text)</span>
-<span class="ln" id="L176">    }</span>
+<span class="ln" id="L177">    <span class="tok-com">/// Read preferences from `path`.</span></span>
+<span class="ln" id="L178">    <span class="tok-com">///</span></span>
+<span class="ln" id="L179">    <span class="tok-com">/// Never fails. A missing file gives the defaults; an unreadable or</span></span>
+<span class="ln" id="L180">    <span class="tok-com">/// unparseable one gives the defaults with</span></span>
+<span class="ln" id="L181">    <span class="tok-com">/// [`recovered_from_corrupt_file`](Self::recovered_from_corrupt_file) set,</span></span>
+<span class="ln" id="L182">    <span class="tok-com">/// so the UI can be honest about it.</span></span>
+<span class="ln" id="L183">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">load</span>(path: &amp;Path) -&gt; Self {</span>
+<span class="ln" id="L184">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = std::fs::<span class="tok-fn">read_to_string</span>(path) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L185">            <span class="tok-com">// Missing is the ordinary case on a first run, and is not worth</span></span>
+<span class="ln" id="L186">            <span class="tok-com">// reporting. An unreadable file is reported below only if it</span></span>
+<span class="ln" id="L187">            <span class="tok-com">// parses to nothing useful, because the distinction the user cares</span></span>
+<span class="ln" id="L188">            <span class="tok-com">// about is &quot;are my settings in force&quot;, not &quot;which syscall failed&quot;.</span></span>
+<span class="ln" id="L189">            <span class="tok-kw">return</span> Self::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L190">        };</span>
+<span class="ln" id="L191">        Self::<span class="tok-fn">parse</span>(&amp;text)</span>
+<span class="ln" id="L192">    }</span>
 </span>
-<span class="ln" id="L177"></span>
+<span class="ln" id="L193"></span>
 <span class="src-item" id="fn-prefs-parse">
-<span class="ln" id="L178">    <span class="tok-com">/// Parse the `key = value` format. Unknown keys are ignored, so a file</span></span>
-<span class="ln" id="L179">    <span class="tok-com">/// written by a newer build still works in an older one.</span></span>
-<span class="ln" id="L180">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(text: &amp;str) -&gt; Self {</span>
-<span class="ln" id="L181">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> prefs = Self::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L182">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> understood = 0usize;</span>
-<span class="ln" id="L183">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = 0usize;</span>
-<span class="ln" id="L184"></span>
-<span class="ln" id="L185">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L186">            <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L187">            <span class="tok-kw">if</span> line.<span class="tok-fn">is_empty</span>() || line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>) {</span>
-<span class="ln" id="L188">                continue;</span>
-<span class="ln" id="L189">            }</span>
-<span class="ln" id="L190">            lines += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L191">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((key, value)) = line.<span class="tok-fn">split_once</span>(<span class="tok-str">&#x27;=&#x27;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L192">                continue;</span>
-<span class="ln" id="L193">            };</span>
-<span class="ln" id="L194">            <span class="tok-kw">let</span> key = key.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L195">            <span class="tok-kw">let</span> value = value.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L196">            <span class="tok-kw">match</span> key {</span>
-<span class="ln" id="L197">                <span class="tok-str">&quot;theme&quot;</span> =&gt; {</span>
-<span class="ln" id="L198">                    <span class="tok-com">// Only accept a theme this build actually has. An unknown</span></span>
-<span class="ln" id="L199">                    <span class="tok-com">// one keeps the default rather than leaving the app</span></span>
-<span class="ln" id="L200">                    <span class="tok-com">// pointing at a scheme that does not exist.</span></span>
-<span class="ln" id="L201">                    <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::theme::<span class="tok-fn">by_id</span>(value).<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L202">                        prefs.theme = value.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L203">                        understood += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L204">                    }</span>
-<span class="ln" id="L205">                }</span>
-<span class="ln" id="L206">                <span class="tok-str">&quot;animations&quot;</span> =&gt; {</span>
-<span class="ln" id="L207">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
-<span class="ln" id="L208">                        prefs.animations = on;</span>
-<span class="ln" id="L209">                        understood += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L210">                    }</span>
-<span class="ln" id="L211">                }</span>
-<span class="ln" id="L212">                <span class="tok-str">&quot;animated_icon&quot;</span> =&gt; {</span>
-<span class="ln" id="L213">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
-<span class="ln" id="L214">                        prefs.animated_icon = on;</span>
-<span class="ln" id="L215">                        understood += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L216">                    }</span>
-<span class="ln" id="L217">                }</span>
-<span class="ln" id="L218">                <span class="tok-str">&quot;configured&quot;</span> =&gt; {</span>
-<span class="ln" id="L219">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
-<span class="ln" id="L220">                        prefs.configured = on;</span>
-<span class="ln" id="L221">                        understood += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L222">                    }</span>
-<span class="ln" id="L223">                }</span>
-<span class="ln" id="L224">                <span class="tok-str">&quot;hide_install_tab&quot;</span> =&gt; {</span>
-<span class="ln" id="L225">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
-<span class="ln" id="L226">                        prefs.hide_install_tab = on;</span>
-<span class="ln" id="L227">                        understood += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L228">                    }</span>
-<span class="ln" id="L229">                }</span>
-<span class="ln" id="L230">                <span class="tok-str">&quot;failsafe&quot;</span> =&gt; {</span>
-<span class="ln" id="L231">                    <span class="tok-com">// Through `from_key`, so an unrecognised value lands on the</span></span>
-<span class="ln" id="L232">                    <span class="tok-com">// default rather than being stored and acted on. The</span></span>
-<span class="ln" id="L233">                    <span class="tok-com">// default is on.</span></span>
-<span class="ln" id="L234">                    prefs.failsafe = veilvoice_failsafe::Posture::<span class="tok-fn">from_key</span>(value)</span>
-<span class="ln" id="L235">                        .<span class="tok-fn">key</span>()</span>
-<span class="ln" id="L236">                        .<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L237">                }</span>
-<span class="ln" id="L238">                <span class="tok-str">&quot;notify_style&quot;</span> =&gt; {</span>
-<span class="ln" id="L239">                    <span class="tok-com">// Anything unrecognised becomes the default rather than an</span></span>
-<span class="ln" id="L240">                    <span class="tok-com">// error, and the default shows something. A file this build</span></span>
-<span class="ln" id="L241">                    <span class="tok-com">// cannot read must never be the reason a warning is silent.</span></span>
-<span class="ln" id="L242">                    prefs.notify_style = <span class="tok-kw">crate</span>::notify::Style::<span class="tok-fn">from_key</span>(value).<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L243">                }</span>
-<span class="ln" id="L244">                <span class="tok-str">&quot;live_monitor&quot;</span> =&gt; {</span>
-<span class="ln" id="L245">                    <span class="tok-com">// Through `from_key`, so anything unrecognised lands on the</span></span>
-<span class="ln" id="L246">                    <span class="tok-com">// default, which shows the monitor.</span></span>
-<span class="ln" id="L247">                    prefs.live_monitor = <span class="tok-kw">crate</span>::monitor::Style::<span class="tok-fn">from_key</span>(value).<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L248">                }</span>
-<span class="ln" id="L249">                <span class="tok-str">&quot;always_group&quot;</span> =&gt; {</span>
-<span class="ln" id="L250">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
-<span class="ln" id="L251">                        prefs.always_group = on;</span>
-<span class="ln" id="L252">                        understood += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L253">                    }</span>
-<span class="ln" id="L254">                }</span>
-<span class="ln" id="L255">                <span class="tok-str">&quot;seal_with_app_lock&quot;</span> =&gt; {</span>
-<span class="ln" id="L256">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
-<span class="ln" id="L257">                        prefs.seal_with_app_lock = on;</span>
-<span class="ln" id="L258">                        understood += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L259">                    }</span>
-<span class="ln" id="L260">                }</span>
-<span class="ln" id="L261">                <span class="tok-str">&quot;vault_dir&quot;</span> =&gt; {</span>
-<span class="ln" id="L262">                    prefs.vault_dir = value.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L263">                    understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L194">    <span class="tok-com">/// Parse the `key = value` format. Unknown keys are ignored, so a file</span></span>
+<span class="ln" id="L195">    <span class="tok-com">/// written by a newer build still works in an older one.</span></span>
+<span class="ln" id="L196">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(text: &amp;str) -&gt; Self {</span>
+<span class="ln" id="L197">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> prefs = Self::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L198">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> understood = 0usize;</span>
+<span class="ln" id="L199">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = 0usize;</span>
+<span class="ln" id="L200"></span>
+<span class="ln" id="L201">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L202">            <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L203">            <span class="tok-kw">if</span> line.<span class="tok-fn">is_empty</span>() || line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>) {</span>
+<span class="ln" id="L204">                continue;</span>
+<span class="ln" id="L205">            }</span>
+<span class="ln" id="L206">            lines += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L207">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((key, value)) = line.<span class="tok-fn">split_once</span>(<span class="tok-str">&#x27;=&#x27;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L208">                continue;</span>
+<span class="ln" id="L209">            };</span>
+<span class="ln" id="L210">            <span class="tok-kw">let</span> key = key.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L211">            <span class="tok-kw">let</span> value = value.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L212">            <span class="tok-kw">match</span> key {</span>
+<span class="ln" id="L213">                <span class="tok-str">&quot;theme&quot;</span> =&gt; {</span>
+<span class="ln" id="L214">                    <span class="tok-com">// Only accept a theme this build actually has. An unknown</span></span>
+<span class="ln" id="L215">                    <span class="tok-com">// one keeps the default rather than leaving the app</span></span>
+<span class="ln" id="L216">                    <span class="tok-com">// pointing at a scheme that does not exist.</span></span>
+<span class="ln" id="L217">                    <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::theme::<span class="tok-fn">by_id</span>(value).<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L218">                        prefs.theme = value.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L219">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L220">                    }</span>
+<span class="ln" id="L221">                }</span>
+<span class="ln" id="L222">                <span class="tok-str">&quot;animations&quot;</span> =&gt; {</span>
+<span class="ln" id="L223">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
+<span class="ln" id="L224">                        prefs.animations = on;</span>
+<span class="ln" id="L225">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L226">                    }</span>
+<span class="ln" id="L227">                }</span>
+<span class="ln" id="L228">                <span class="tok-str">&quot;animated_icon&quot;</span> =&gt; {</span>
+<span class="ln" id="L229">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
+<span class="ln" id="L230">                        prefs.animated_icon = on;</span>
+<span class="ln" id="L231">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L232">                    }</span>
+<span class="ln" id="L233">                }</span>
+<span class="ln" id="L234">                <span class="tok-str">&quot;configured&quot;</span> =&gt; {</span>
+<span class="ln" id="L235">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
+<span class="ln" id="L236">                        prefs.configured = on;</span>
+<span class="ln" id="L237">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L238">                    }</span>
+<span class="ln" id="L239">                }</span>
+<span class="ln" id="L240">                <span class="tok-str">&quot;hide_install_tab&quot;</span> =&gt; {</span>
+<span class="ln" id="L241">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
+<span class="ln" id="L242">                        prefs.hide_install_tab = on;</span>
+<span class="ln" id="L243">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L244">                    }</span>
+<span class="ln" id="L245">                }</span>
+<span class="ln" id="L246">                <span class="tok-str">&quot;failsafe&quot;</span> =&gt; {</span>
+<span class="ln" id="L247">                    <span class="tok-com">// Through `from_key`, so an unrecognised value lands on the</span></span>
+<span class="ln" id="L248">                    <span class="tok-com">// default rather than being stored and acted on. The</span></span>
+<span class="ln" id="L249">                    <span class="tok-com">// default is on.</span></span>
+<span class="ln" id="L250">                    prefs.failsafe = veilvoice_failsafe::Posture::<span class="tok-fn">from_key</span>(value)</span>
+<span class="ln" id="L251">                        .<span class="tok-fn">key</span>()</span>
+<span class="ln" id="L252">                        .<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L253">                }</span>
+<span class="ln" id="L254">                <span class="tok-str">&quot;notify_style&quot;</span> =&gt; {</span>
+<span class="ln" id="L255">                    <span class="tok-com">// Anything unrecognised becomes the default rather than an</span></span>
+<span class="ln" id="L256">                    <span class="tok-com">// error, and the default shows something. A file this build</span></span>
+<span class="ln" id="L257">                    <span class="tok-com">// cannot read must never be the reason a warning is silent.</span></span>
+<span class="ln" id="L258">                    prefs.notify_style = <span class="tok-kw">crate</span>::notify::Style::<span class="tok-fn">from_key</span>(value).<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L259">                }</span>
+<span class="ln" id="L260">                <span class="tok-str">&quot;live_monitor&quot;</span> =&gt; {</span>
+<span class="ln" id="L261">                    <span class="tok-com">// Through `from_key`, so anything unrecognised lands on the</span></span>
+<span class="ln" id="L262">                    <span class="tok-com">// default, which shows the monitor.</span></span>
+<span class="ln" id="L263">                    prefs.live_monitor = <span class="tok-kw">crate</span>::monitor::Style::<span class="tok-fn">from_key</span>(value).<span class="tok-fn">key</span>().<span class="tok-fn">to_string</span>();</span>
 <span class="ln" id="L264">                }</span>
-<span class="ln" id="L265">                <span class="tok-str">&quot;vault_tool&quot;</span> =&gt; {</span>
-<span class="ln" id="L266">                    prefs.vault_tool = value.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L267">                    understood += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L268">                }</span>
-<span class="ln" id="L269">                <span class="tok-str">&quot;vault_hidden&quot;</span> =&gt; {</span>
-<span class="ln" id="L270">                    prefs.vault_hidden = value.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L271">                    understood += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L272">                }</span>
-<span class="ln" id="L273">                _ =&gt; {}</span>
-<span class="ln" id="L274">            }</span>
-<span class="ln" id="L275">        }</span>
-<span class="ln" id="L276"></span>
-<span class="ln" id="L277">        <span class="tok-com">// A file with content, none of which we could use, is a corrupt file.</span></span>
-<span class="ln" id="L278">        <span class="tok-com">// An empty one is just an empty one.</span></span>
-<span class="ln" id="L279">        prefs.recovered_from_corrupt_file = lines &gt; <span class="tok-num">0</span> &amp;&amp; understood == <span class="tok-num">0</span>;</span>
-<span class="ln" id="L280">        prefs</span>
-<span class="ln" id="L281">    }</span>
+<span class="ln" id="L265">                <span class="tok-str">&quot;always_group&quot;</span> =&gt; {</span>
+<span class="ln" id="L266">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
+<span class="ln" id="L267">                        prefs.always_group = on;</span>
+<span class="ln" id="L268">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L269">                    }</span>
+<span class="ln" id="L270">                }</span>
+<span class="ln" id="L271">                <span class="tok-str">&quot;seal_with_app_lock&quot;</span> =&gt; {</span>
+<span class="ln" id="L272">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
+<span class="ln" id="L273">                        prefs.seal_with_app_lock = on;</span>
+<span class="ln" id="L274">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L275">                    }</span>
+<span class="ln" id="L276">                }</span>
+<span class="ln" id="L277">                <span class="tok-str">&quot;vault_dir&quot;</span> =&gt; {</span>
+<span class="ln" id="L278">                    prefs.vault_dir = value.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L279">                    understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L280">                }</span>
+<span class="ln" id="L281">                <span class="tok-str">&quot;vault_tool&quot;</span> =&gt; {</span>
+<span class="ln" id="L282">                    prefs.vault_tool = value.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L283">                    understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L284">                }</span>
+<span class="ln" id="L285">                <span class="tok-str">&quot;vault_hidden&quot;</span> =&gt; {</span>
+<span class="ln" id="L286">                    prefs.vault_hidden = value.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L287">                    understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L288">                }</span>
+<span class="ln" id="L289">                <span class="tok-str">&quot;autolock&quot;</span> =&gt; {</span>
+<span class="ln" id="L290">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(on) = <span class="tok-fn">parse_bool</span>(value) {</span>
+<span class="ln" id="L291">                        prefs.autolock = on;</span>
+<span class="ln" id="L292">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L293">                    }</span>
+<span class="ln" id="L294">                }</span>
+<span class="ln" id="L295">                <span class="tok-str">&quot;autolock_after&quot;</span> =&gt; {</span>
+<span class="ln" id="L296">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(secs) = value.<span class="tok-fn">parse</span>() {</span>
+<span class="ln" id="L297">                        prefs.autolock_after = secs;</span>
+<span class="ln" id="L298">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L299">                    }</span>
+<span class="ln" id="L300">                }</span>
+<span class="ln" id="L301">                <span class="tok-str">&quot;autolock_floor&quot;</span> =&gt; {</span>
+<span class="ln" id="L302">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(secs) = value.<span class="tok-fn">parse</span>() {</span>
+<span class="ln" id="L303">                        prefs.autolock_floor = secs;</span>
+<span class="ln" id="L304">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L305">                    }</span>
+<span class="ln" id="L306">                }</span>
+<span class="ln" id="L307">                <span class="tok-str">&quot;autolock_ceiling&quot;</span> =&gt; {</span>
+<span class="ln" id="L308">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(secs) = value.<span class="tok-fn">parse</span>() {</span>
+<span class="ln" id="L309">                        prefs.autolock_ceiling = secs;</span>
+<span class="ln" id="L310">                        understood += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L311">                    }</span>
+<span class="ln" id="L312">                }</span>
+<span class="ln" id="L313">                _ =&gt; {}</span>
+<span class="ln" id="L314">            }</span>
+<span class="ln" id="L315">        }</span>
+<span class="ln" id="L316"></span>
+<span class="ln" id="L317">        <span class="tok-com">// A file with content, none of which we could use, is a corrupt file.</span></span>
+<span class="ln" id="L318">        <span class="tok-com">// An empty one is just an empty one.</span></span>
+<span class="ln" id="L319">        prefs.recovered_from_corrupt_file = lines &gt; <span class="tok-num">0</span> &amp;&amp; understood == <span class="tok-num">0</span>;</span>
+<span class="ln" id="L320">        prefs</span>
+<span class="ln" id="L321">    }</span>
 </span>
-<span class="ln" id="L282"></span>
+<span class="ln" id="L322"></span>
 <span class="src-item" id="fn-prefs-to_text">
-<span class="ln" id="L283">    <span class="tok-com">/// Serialise to the text format.</span></span>
-<span class="ln" id="L284">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">to_text</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
-<span class="ln" id="L285">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L286">        out.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;# VeilVoice settings. Plain text on purpose: edit it, or delete\n&quot;</span>);</span>
-<span class="ln" id="L287">        out.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;# it to go back to the defaults. Nothing here is secret.\n&quot;</span>);</span>
-<span class="ln" id="L288">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;theme = {}\n&quot;</span>, <span class="tok-kw">self</span>.theme));</span>
-<span class="ln" id="L289">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;animations = {}\n&quot;</span>, <span class="tok-kw">self</span>.animations));</span>
-<span class="ln" id="L290">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;animated_icon = {}\n&quot;</span>, <span class="tok-kw">self</span>.animated_icon));</span>
-<span class="ln" id="L291">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;configured = {}\n&quot;</span>, <span class="tok-kw">self</span>.configured));</span>
-<span class="ln" id="L292">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;hide_install_tab = {}\n&quot;</span>, <span class="tok-kw">self</span>.hide_install_tab));</span>
-<span class="ln" id="L293">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;always_group = {}\n&quot;</span>, <span class="tok-kw">self</span>.always_group));</span>
-<span class="ln" id="L294">        out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
-<span class="ln" id="L295">            <span class="tok-str">&quot;seal_with_app_lock = {}\n&quot;</span>,</span>
-<span class="ln" id="L296">            <span class="tok-kw">self</span>.seal_with_app_lock</span>
-<span class="ln" id="L297">        ));</span>
-<span class="ln" id="L298">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;vault_dir = {}\n&quot;</span>, <span class="tok-kw">self</span>.vault_dir));</span>
-<span class="ln" id="L299">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;vault_tool = {}\n&quot;</span>, <span class="tok-kw">self</span>.vault_tool));</span>
-<span class="ln" id="L300">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;vault_hidden = {}\n&quot;</span>, <span class="tok-kw">self</span>.vault_hidden));</span>
-<span class="ln" id="L301">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;notify_style = {}\n&quot;</span>, <span class="tok-kw">self</span>.notify_style));</span>
-<span class="ln" id="L302">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;live_monitor = {}\n&quot;</span>, <span class="tok-kw">self</span>.live_monitor));</span>
-<span class="ln" id="L303">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;failsafe = {}\n&quot;</span>, <span class="tok-kw">self</span>.failsafe));</span>
-<span class="ln" id="L304">        out</span>
-<span class="ln" id="L305">    }</span>
+<span class="ln" id="L323">    <span class="tok-com">/// Serialise to the text format.</span></span>
+<span class="ln" id="L324">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">to_text</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L325">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L326">        out.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;# VeilVoice settings. Plain text on purpose: edit it, or delete\n&quot;</span>);</span>
+<span class="ln" id="L327">        out.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;# it to go back to the defaults. Nothing here is secret.\n&quot;</span>);</span>
+<span class="ln" id="L328">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;theme = {}\n&quot;</span>, <span class="tok-kw">self</span>.theme));</span>
+<span class="ln" id="L329">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;animations = {}\n&quot;</span>, <span class="tok-kw">self</span>.animations));</span>
+<span class="ln" id="L330">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;animated_icon = {}\n&quot;</span>, <span class="tok-kw">self</span>.animated_icon));</span>
+<span class="ln" id="L331">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;configured = {}\n&quot;</span>, <span class="tok-kw">self</span>.configured));</span>
+<span class="ln" id="L332">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;hide_install_tab = {}\n&quot;</span>, <span class="tok-kw">self</span>.hide_install_tab));</span>
+<span class="ln" id="L333">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;always_group = {}\n&quot;</span>, <span class="tok-kw">self</span>.always_group));</span>
+<span class="ln" id="L334">        out.<span class="tok-fn">push_str</span>(&amp;format!(</span>
+<span class="ln" id="L335">            <span class="tok-str">&quot;seal_with_app_lock = {}\n&quot;</span>,</span>
+<span class="ln" id="L336">            <span class="tok-kw">self</span>.seal_with_app_lock</span>
+<span class="ln" id="L337">        ));</span>
+<span class="ln" id="L338">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;vault_dir = {}\n&quot;</span>, <span class="tok-kw">self</span>.vault_dir));</span>
+<span class="ln" id="L339">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;vault_tool = {}\n&quot;</span>, <span class="tok-kw">self</span>.vault_tool));</span>
+<span class="ln" id="L340">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;vault_hidden = {}\n&quot;</span>, <span class="tok-kw">self</span>.vault_hidden));</span>
+<span class="ln" id="L341">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;autolock = {}\n&quot;</span>, <span class="tok-kw">self</span>.autolock));</span>
+<span class="ln" id="L342">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;autolock_after = {}\n&quot;</span>, <span class="tok-kw">self</span>.autolock_after));</span>
+<span class="ln" id="L343">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;autolock_floor = {}\n&quot;</span>, <span class="tok-kw">self</span>.autolock_floor));</span>
+<span class="ln" id="L344">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;autolock_ceiling = {}\n&quot;</span>, <span class="tok-kw">self</span>.autolock_ceiling));</span>
+<span class="ln" id="L345">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;notify_style = {}\n&quot;</span>, <span class="tok-kw">self</span>.notify_style));</span>
+<span class="ln" id="L346">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;live_monitor = {}\n&quot;</span>, <span class="tok-kw">self</span>.live_monitor));</span>
+<span class="ln" id="L347">        out.<span class="tok-fn">push_str</span>(&amp;format!(<span class="tok-str">&quot;failsafe = {}\n&quot;</span>, <span class="tok-kw">self</span>.failsafe));</span>
+<span class="ln" id="L348">        out</span>
+<span class="ln" id="L349">    }</span>
 </span>
-<span class="ln" id="L306"></span>
+<span class="ln" id="L350"></span>
 <span class="src-item" id="fn-prefs-save">
-<span class="ln" id="L307">    <span class="tok-com">/// Write preferences to `path`, creating the directory if needed.</span></span>
-<span class="ln" id="L308">    <span class="tok-com">///</span></span>
-<span class="ln" id="L309">    <span class="tok-com">/// Returns the reason on failure so the settings panel can show it. A</span></span>
-<span class="ln" id="L310">    <span class="tok-com">/// failure here must never be fatal: the choice still applies for this</span></span>
-<span class="ln" id="L311">    <span class="tok-com">/// session, it simply will not be remembered.</span></span>
-<span class="ln" id="L312">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">save</span>(&amp;<span class="tok-kw">self</span>, path: &amp;Path) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L313">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
-<span class="ln" id="L314">            <span class="tok-kw">if</span> !parent.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L315">                std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L316">            }</span>
-<span class="ln" id="L317">        }</span>
-<span class="ln" id="L318">        std::fs::<span class="tok-fn">write</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>()).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L319">    }</span>
-</span>
-<span class="ln" id="L320">}</span>
-<span class="ln" id="L321"></span>
-<span class="src-item" id="fn-parse_bool">
-<span class="ln" id="L322"><span class="tok-kw">fn</span> <span class="tok-fn">parse_bool</span>(value: &amp;str) -&gt; Option&lt;bool&gt; {</span>
-<span class="ln" id="L323">    <span class="tok-kw">match</span> value.<span class="tok-fn">to_ascii_lowercase</span>().<span class="tok-fn">as_str</span>() {</span>
-<span class="ln" id="L324">        <span class="tok-str">&quot;true&quot;</span> | <span class="tok-str">&quot;yes&quot;</span> | <span class="tok-str">&quot;on&quot;</span> | <span class="tok-str">&quot;1&quot;</span> =&gt; <span class="tok-fn">Some</span>(true),</span>
-<span class="ln" id="L325">        <span class="tok-str">&quot;false&quot;</span> | <span class="tok-str">&quot;no&quot;</span> | <span class="tok-str">&quot;off&quot;</span> | <span class="tok-str">&quot;0&quot;</span> =&gt; <span class="tok-fn">Some</span>(false),</span>
-<span class="ln" id="L326">        _ =&gt; None,</span>
-<span class="ln" id="L327">    }</span>
-<span class="ln" id="L328">}</span>
-</span>
-<span class="ln" id="L329"></span>
-<span class="src-item" id="fn-motion">
-<span class="ln" id="L330"><span class="tok-com">/// Whether movement is allowed, and how much.</span></span>
-<span class="ln" id="L331"><span class="tok-com">///</span></span>
-<span class="ln" id="L332"><span class="tok-com">/// Resolved once per frame from three inputs, in order of authority:</span></span>
-<span class="ln" id="L333"><span class="tok-com">///</span></span>
-<span class="ln" id="L334"><span class="tok-com">/// 1. **The operating system&#x27;s reduce-motion setting.** Someone who has told</span></span>
-<span class="ln" id="L335"><span class="tok-com">///    their system they do not want movement has answered this already.</span></span>
-<span class="ln" id="L336"><span class="tok-com">/// 2. **`VEILVOICE_NO_ANIMATION`**, so a machine that struggles with animation</span></span>
-<span class="ln" id="L337"><span class="tok-com">///    can be fixed without opening the interface that is struggling.</span></span>
-<span class="ln" id="L338"><span class="tok-com">/// 3. **The preference**, which is on by default.</span></span>
-<span class="ln" id="L339"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
-<span class="ln" id="L340"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Motion {</span>
-<span class="ln" id="L341">    <span class="tok-com">/// Whether anything may move at all.</span></span>
-<span class="ln" id="L342">    <span class="tok-kw">pub</span> enabled: bool,</span>
-<span class="ln" id="L343">    <span class="tok-com">/// Whether the header mark may animate.</span></span>
-<span class="ln" id="L344">    <span class="tok-kw">pub</span> icon: bool,</span>
-<span class="ln" id="L345">    <span class="tok-com">/// Whether the system asked for reduced motion, so the UI can say that is</span></span>
-<span class="ln" id="L346">    <span class="tok-com">/// why the toggle is doing nothing rather than appearing broken.</span></span>
-<span class="ln" id="L347">    <span class="tok-kw">pub</span> system_reduced: bool,</span>
-<span class="ln" id="L348">}</span>
-</span>
-<span class="ln" id="L349"></span>
-<span class="ln" id="L350"><span class="tok-kw">impl</span> Motion {</span>
-<span class="src-item" id="fn-motion-resolve">
-<span class="ln" id="L351">    <span class="tok-com">/// Resolve for this frame.</span></span>
-<span class="ln" id="L352">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">resolve</span>(prefs: &amp;Prefs, system_reduced_motion: bool) -&gt; Self {</span>
-<span class="ln" id="L353">        <span class="tok-kw">let</span> env_off = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;VEILVOICE_NO_ANIMATION&quot;</span>)</span>
-<span class="ln" id="L354">            .<span class="tok-fn">map</span>(|v| v != <span class="tok-str">&quot;0&quot;</span> &amp;&amp; !v.<span class="tok-fn">is_empty</span>())</span>
-<span class="ln" id="L355">            .<span class="tok-fn">unwrap_or</span>(false);</span>
-<span class="ln" id="L356">        <span class="tok-kw">let</span> enabled = prefs.animations &amp;&amp; !env_off &amp;&amp; !system_reduced_motion;</span>
-<span class="ln" id="L357">        Self {</span>
-<span class="ln" id="L358">            enabled,</span>
-<span class="ln" id="L359">            icon: enabled &amp;&amp; prefs.animated_icon,</span>
-<span class="ln" id="L360">            system_reduced: system_reduced_motion,</span>
+<span class="ln" id="L351">    <span class="tok-com">/// Write preferences to `path`, creating the directory if needed.</span></span>
+<span class="ln" id="L352">    <span class="tok-com">///</span></span>
+<span class="ln" id="L353">    <span class="tok-com">/// Returns the reason on failure so the settings panel can show it. A</span></span>
+<span class="ln" id="L354">    <span class="tok-com">/// failure here must never be fatal: the choice still applies for this</span></span>
+<span class="ln" id="L355">    <span class="tok-com">/// session, it simply will not be remembered.</span></span>
+<span class="ln" id="L356">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">save</span>(&amp;<span class="tok-kw">self</span>, path: &amp;Path) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L357">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
+<span class="ln" id="L358">            <span class="tok-kw">if</span> !parent.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L359">                std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L360">            }</span>
 <span class="ln" id="L361">        }</span>
-<span class="ln" id="L362">    }</span>
+<span class="ln" id="L362">        std::fs::<span class="tok-fn">write</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>()).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L363">    }</span>
 </span>
-<span class="ln" id="L363"></span>
+<span class="ln" id="L364">}</span>
+<span class="ln" id="L365"></span>
+<span class="src-item" id="fn-parse_bool">
+<span class="ln" id="L366"><span class="tok-kw">fn</span> <span class="tok-fn">parse_bool</span>(value: &amp;str) -&gt; Option&lt;bool&gt; {</span>
+<span class="ln" id="L367">    <span class="tok-kw">match</span> value.<span class="tok-fn">to_ascii_lowercase</span>().<span class="tok-fn">as_str</span>() {</span>
+<span class="ln" id="L368">        <span class="tok-str">&quot;true&quot;</span> | <span class="tok-str">&quot;yes&quot;</span> | <span class="tok-str">&quot;on&quot;</span> | <span class="tok-str">&quot;1&quot;</span> =&gt; <span class="tok-fn">Some</span>(true),</span>
+<span class="ln" id="L369">        <span class="tok-str">&quot;false&quot;</span> | <span class="tok-str">&quot;no&quot;</span> | <span class="tok-str">&quot;off&quot;</span> | <span class="tok-str">&quot;0&quot;</span> =&gt; <span class="tok-fn">Some</span>(false),</span>
+<span class="ln" id="L370">        _ =&gt; None,</span>
+<span class="ln" id="L371">    }</span>
+<span class="ln" id="L372">}</span>
+</span>
+<span class="ln" id="L373"></span>
+<span class="src-item" id="fn-motion">
+<span class="ln" id="L374"><span class="tok-com">/// Whether movement is allowed, and how much.</span></span>
+<span class="ln" id="L375"><span class="tok-com">///</span></span>
+<span class="ln" id="L376"><span class="tok-com">/// Resolved once per frame from three inputs, in order of authority:</span></span>
+<span class="ln" id="L377"><span class="tok-com">///</span></span>
+<span class="ln" id="L378"><span class="tok-com">/// 1. **The operating system&#x27;s reduce-motion setting.** Someone who has told</span></span>
+<span class="ln" id="L379"><span class="tok-com">///    their system they do not want movement has answered this already.</span></span>
+<span class="ln" id="L380"><span class="tok-com">/// 2. **`VEILVOICE_NO_ANIMATION`**, so a machine that struggles with animation</span></span>
+<span class="ln" id="L381"><span class="tok-com">///    can be fixed without opening the interface that is struggling.</span></span>
+<span class="ln" id="L382"><span class="tok-com">/// 3. **The preference**, which is on by default.</span></span>
+<span class="ln" id="L383"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L384"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Motion {</span>
+<span class="ln" id="L385">    <span class="tok-com">/// Whether anything may move at all.</span></span>
+<span class="ln" id="L386">    <span class="tok-kw">pub</span> enabled: bool,</span>
+<span class="ln" id="L387">    <span class="tok-com">/// Whether the header mark may animate.</span></span>
+<span class="ln" id="L388">    <span class="tok-kw">pub</span> icon: bool,</span>
+<span class="ln" id="L389">    <span class="tok-com">/// Whether the system asked for reduced motion, so the UI can say that is</span></span>
+<span class="ln" id="L390">    <span class="tok-com">/// why the toggle is doing nothing rather than appearing broken.</span></span>
+<span class="ln" id="L391">    <span class="tok-kw">pub</span> system_reduced: bool,</span>
+<span class="ln" id="L392">}</span>
+</span>
+<span class="ln" id="L393"></span>
+<span class="ln" id="L394"><span class="tok-kw">impl</span> Motion {</span>
+<span class="src-item" id="fn-motion-resolve">
+<span class="ln" id="L395">    <span class="tok-com">/// Resolve for this frame.</span></span>
+<span class="ln" id="L396">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">resolve</span>(prefs: &amp;Prefs, system_reduced_motion: bool) -&gt; Self {</span>
+<span class="ln" id="L397">        <span class="tok-kw">let</span> env_off = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;VEILVOICE_NO_ANIMATION&quot;</span>)</span>
+<span class="ln" id="L398">            .<span class="tok-fn">map</span>(|v| v != <span class="tok-str">&quot;0&quot;</span> &amp;&amp; !v.<span class="tok-fn">is_empty</span>())</span>
+<span class="ln" id="L399">            .<span class="tok-fn">unwrap_or</span>(false);</span>
+<span class="ln" id="L400">        <span class="tok-kw">let</span> enabled = prefs.animations &amp;&amp; !env_off &amp;&amp; !system_reduced_motion;</span>
+<span class="ln" id="L401">        Self {</span>
+<span class="ln" id="L402">            enabled,</span>
+<span class="ln" id="L403">            icon: enabled &amp;&amp; prefs.animated_icon,</span>
+<span class="ln" id="L404">            system_reduced: system_reduced_motion,</span>
+<span class="ln" id="L405">        }</span>
+<span class="ln" id="L406">    }</span>
+</span>
+<span class="ln" id="L407"></span>
 <span class="src-item" id="fn-motion-secs">
-<span class="ln" id="L364">    <span class="tok-com">/// A duration scaled by whether motion is allowed.</span></span>
-<span class="ln" id="L365">    <span class="tok-com">///</span></span>
-<span class="ln" id="L366">    <span class="tok-com">/// Returns zero when it is not, so a caller can pass this straight to an</span></span>
-<span class="ln" id="L367">    <span class="tok-com">/// easing function and get an instant result rather than having to branch</span></span>
-<span class="ln" id="L368">    <span class="tok-com">/// at every call site. That matters: a branch nobody wrote is how a stray</span></span>
-<span class="ln" id="L369">    <span class="tok-com">/// animation survives the toggle.</span></span>
-<span class="ln" id="L370">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">secs</span>(&amp;<span class="tok-kw">self</span>, wanted: f32) -&gt; f32 {</span>
-<span class="ln" id="L371">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.enabled {</span>
-<span class="ln" id="L372">            wanted</span>
-<span class="ln" id="L373">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L374">            <span class="tok-num">0.0</span></span>
-<span class="ln" id="L375">        }</span>
-<span class="ln" id="L376">    }</span>
+<span class="ln" id="L408">    <span class="tok-com">/// A duration scaled by whether motion is allowed.</span></span>
+<span class="ln" id="L409">    <span class="tok-com">///</span></span>
+<span class="ln" id="L410">    <span class="tok-com">/// Returns zero when it is not, so a caller can pass this straight to an</span></span>
+<span class="ln" id="L411">    <span class="tok-com">/// easing function and get an instant result rather than having to branch</span></span>
+<span class="ln" id="L412">    <span class="tok-com">/// at every call site. That matters: a branch nobody wrote is how a stray</span></span>
+<span class="ln" id="L413">    <span class="tok-com">/// animation survives the toggle.</span></span>
+<span class="ln" id="L414">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">secs</span>(&amp;<span class="tok-kw">self</span>, wanted: f32) -&gt; f32 {</span>
+<span class="ln" id="L415">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.enabled {</span>
+<span class="ln" id="L416">            wanted</span>
+<span class="ln" id="L417">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L418">            <span class="tok-num">0.0</span></span>
+<span class="ln" id="L419">        }</span>
+<span class="ln" id="L420">    }</span>
 </span>
-<span class="ln" id="L377">}</span>
-<span class="ln" id="L378"></span>
-<span class="ln" id="L379"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L380"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L381">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L382"></span>
-<span class="ln" id="L383">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L384">    <span class="tok-kw">fn</span> <span class="tok-fn">the_defaults_are_the_documented_ones</span>() {</span>
-<span class="ln" id="L385">        <span class="tok-kw">let</span> d = Prefs::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L386">        assert_eq!(d.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
-<span class="ln" id="L387">        assert!(d.animations, <span class="tok-str">&quot;animations are on by default, as specified&quot;</span>);</span>
-<span class="ln" id="L388">        assert!(d.animated_icon, <span class="tok-str">&quot;the animated icon is on by default&quot;</span>);</span>
-<span class="ln" id="L389">        assert!(</span>
-<span class="ln" id="L390">            !d.configured,</span>
-<span class="ln" id="L391">            <span class="tok-str">&quot;a fresh install has not answered the first run&quot;</span></span>
-<span class="ln" id="L392">        );</span>
-<span class="ln" id="L393">    }</span>
-<span class="ln" id="L394"></span>
-<span class="ln" id="L395">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L396">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_its_text_format</span>() {</span>
-<span class="ln" id="L397">        <span class="tok-kw">let</span> prefs = Prefs {</span>
-<span class="ln" id="L398">            theme: <span class="tok-str">&quot;gruvbox&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L399">            animations: false,</span>
-<span class="ln" id="L400">            animated_icon: false,</span>
-<span class="ln" id="L401">            configured: true,</span>
-<span class="ln" id="L402">            hide_install_tab: true,</span>
-<span class="ln" id="L403">            always_group: true,</span>
-<span class="ln" id="L404">            seal_with_app_lock: false,</span>
-<span class="ln" id="L405">            vault_dir: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L406">            vault_tool: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L407">            vault_hidden: String::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L408">            notify_style: <span class="tok-str">&quot;alert&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L409">            failsafe: <span class="tok-str">&quot;warn&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L410">            live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L411">            recovered_from_corrupt_file: false,</span>
-<span class="ln" id="L412">        };</span>
-<span class="ln" id="L413">        <span class="tok-kw">let</span> back = Prefs::<span class="tok-fn">parse</span>(&amp;prefs.<span class="tok-fn">to_text</span>());</span>
-<span class="ln" id="L414">        assert_eq!(back, prefs);</span>
-<span class="ln" id="L415">    }</span>
-<span class="ln" id="L416"></span>
-<span class="ln" id="L417">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L418">    <span class="tok-kw">fn</span> <span class="tok-fn">every_boolean_spelling_people_actually_type_is_accepted</span>() {</span>
-<span class="ln" id="L419">        <span class="tok-kw">for</span> on <span class="tok-kw">in</span> [<span class="tok-str">&quot;true&quot;</span>, <span class="tok-str">&quot;yes&quot;</span>, <span class="tok-str">&quot;on&quot;</span>, <span class="tok-str">&quot;1&quot;</span>, <span class="tok-str">&quot;TRUE&quot;</span>, <span class="tok-str">&quot;Yes&quot;</span>] {</span>
-<span class="ln" id="L420">            assert!(</span>
-<span class="ln" id="L421">                Prefs::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;animations = {on}&quot;</span>)).animations,</span>
-<span class="ln" id="L422">                <span class="tok-str">&quot;{on} should mean on&quot;</span></span>
-<span class="ln" id="L423">            );</span>
-<span class="ln" id="L424">        }</span>
-<span class="ln" id="L425">        <span class="tok-kw">for</span> off <span class="tok-kw">in</span> [<span class="tok-str">&quot;false&quot;</span>, <span class="tok-str">&quot;no&quot;</span>, <span class="tok-str">&quot;off&quot;</span>, <span class="tok-str">&quot;0&quot;</span>, <span class="tok-str">&quot;FALSE&quot;</span>, <span class="tok-str">&quot;Off&quot;</span>] {</span>
-<span class="ln" id="L426">            assert!(</span>
-<span class="ln" id="L427">                !Prefs::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;animations = {off}&quot;</span>)).animations,</span>
-<span class="ln" id="L428">                <span class="tok-str">&quot;{off} should mean off&quot;</span></span>
-<span class="ln" id="L429">            );</span>
-<span class="ln" id="L430">        }</span>
-<span class="ln" id="L431">    }</span>
-<span class="ln" id="L432"></span>
-<span class="ln" id="L433">    <span class="tok-com">/// A settings file must never be able to stop the app starting.</span></span>
-<span class="ln" id="L434">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L435">    <span class="tok-kw">fn</span> <span class="tok-fn">hostile_and_broken_files_fall_back_to_the_defaults</span>() {</span>
-<span class="ln" id="L436">        <span class="tok-kw">for</span> text <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L437">            <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L438">            <span class="tok-str">&quot;\0\0\0\0&quot;</span>,</span>
-<span class="ln" id="L439">            <span class="tok-str">&quot;theme&quot;</span>,</span>
-<span class="ln" id="L440">            <span class="tok-str">&quot;= = = =&quot;</span>,</span>
-<span class="ln" id="L441">            <span class="tok-str">&quot;theme = &quot;</span>,</span>
-<span class="ln" id="L442">            <span class="tok-str">&quot;theme = ../../etc/passwd&quot;</span>,</span>
-<span class="ln" id="L443">            <span class="tok-str">&quot;theme = &lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>,</span>
-<span class="ln" id="L444">            <span class="tok-str">&quot;animations = perhaps&quot;</span>,</span>
-<span class="ln" id="L445">            &amp;<span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">100_000</span>),</span>
-<span class="ln" id="L446">            <span class="tok-str">&quot;[section]\nkey: value&quot;</span>,</span>
-<span class="ln" id="L447">        ] {</span>
-<span class="ln" id="L448">            <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">parse</span>(text);</span>
-<span class="ln" id="L449">            <span class="tok-com">// Whatever it said, the result is usable.</span></span>
-<span class="ln" id="L450">            assert!(</span>
-<span class="ln" id="L451">                <span class="tok-kw">crate</span>::theme::<span class="tok-fn">by_id</span>(&amp;prefs.theme).<span class="tok-fn">is_some</span>(),</span>
-<span class="ln" id="L452">                <span class="tok-str">&quot;parsing {:?} left an unknown theme: {}&quot;</span>,</span>
-<span class="ln" id="L453">                &amp;text[..text.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(<span class="tok-num">30</span>)],</span>
-<span class="ln" id="L454">                prefs.theme</span>
-<span class="ln" id="L455">            );</span>
-<span class="ln" id="L456">        }</span>
-<span class="ln" id="L457">    }</span>
-<span class="ln" id="L458"></span>
-<span class="ln" id="L459">    <span class="tok-com">/// A file whose every line was rejected should say so, so the settings</span></span>
-<span class="ln" id="L460">    <span class="tok-com">/// panel can explain why the defaults are in force.</span></span>
-<span class="ln" id="L461">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L462">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wholly_unreadable_file_is_reported_rather_than_hidden</span>() {</span>
-<span class="ln" id="L463">        assert!(Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;nonsense\nmore nonsense&quot;</span>).recovered_from_corrupt_file);</span>
-<span class="ln" id="L464">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).recovered_from_corrupt_file);</span>
-<span class="ln" id="L465">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;# just a comment&quot;</span>).recovered_from_corrupt_file);</span>
-<span class="ln" id="L466">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;theme = nord&quot;</span>).recovered_from_corrupt_file);</span>
-<span class="ln" id="L467">    }</span>
-<span class="ln" id="L468"></span>
-<span class="ln" id="L469">    <span class="tok-com">/// A newer build&#x27;s keys must not break an older one.</span></span>
-<span class="ln" id="L470">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_keys_are_ignored_not_fatal</span>() {</span>
-<span class="ln" id="L472">        <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;theme = nord\nsomething_new = 42\nanimations = false&quot;</span>);</span>
-<span class="ln" id="L473">        assert_eq!(prefs.theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
-<span class="ln" id="L474">        assert!(!prefs.animations);</span>
-<span class="ln" id="L475">        assert!(!prefs.recovered_from_corrupt_file);</span>
-<span class="ln" id="L476">    }</span>
-<span class="ln" id="L477"></span>
-<span class="ln" id="L478">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L479">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_file_is_not_an_error</span>() {</span>
-<span class="ln" id="L480">        <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">load</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;no-such-settings-file-anywhere.conf&quot;</span>));</span>
-<span class="ln" id="L481">        assert_eq!(prefs, Prefs::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L482">    }</span>
-<span class="ln" id="L483"></span>
-<span class="ln" id="L484">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L485">    <span class="tok-kw">fn</span> <span class="tok-fn">saving_and_loading_round_trips_through_a_real_file</span>() {</span>
-<span class="ln" id="L486">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L487">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
-<span class="ln" id="L488">        <span class="tok-kw">let</span> prefs = Prefs {</span>
-<span class="ln" id="L489">            theme: <span class="tok-str">&quot;dracula&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L490">            animations: false,</span>
-<span class="ln" id="L491">            animated_icon: true,</span>
-<span class="ln" id="L492">            configured: true,</span>
-<span class="ln" id="L493">            notify_style: <span class="tok-str">&quot;overlay&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L494">            failsafe: <span class="tok-str">&quot;close&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L495">            live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L496">            hide_install_tab: false,</span>
-<span class="ln" id="L497">            always_group: false,</span>
-<span class="ln" id="L498">            seal_with_app_lock: true,</span>
-<span class="ln" id="L499">            vault_dir: <span class="tok-str">&quot;/media/veracrypt1&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L500">            vault_tool: <span class="tok-str">&quot;veracrypt&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L501">            vault_hidden: <span class="tok-str">&quot;none&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L502">            recovered_from_corrupt_file: false,</span>
-<span class="ln" id="L503">        };</span>
-<span class="ln" id="L504">        prefs.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L505">        assert_eq!(Prefs::<span class="tok-fn">load</span>(&amp;path), prefs);</span>
-<span class="ln" id="L506">    }</span>
-<span class="ln" id="L507"></span>
-<span class="ln" id="L508">    <span class="tok-com">/// The system&#x27;s reduce-motion setting outranks the preference. Someone who</span></span>
-<span class="ln" id="L509">    <span class="tok-com">/// asked their OS for less movement has already answered.</span></span>
-<span class="ln" id="L510">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L511">    <span class="tok-kw">fn</span> <span class="tok-fn">the_system_setting_wins_over_the_preference</span>() {</span>
-<span class="ln" id="L512">        <span class="tok-kw">let</span> on = Prefs {</span>
-<span class="ln" id="L513">            animations: true,</span>
-<span class="ln" id="L514">            animated_icon: true,</span>
-<span class="ln" id="L515">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L516">        };</span>
-<span class="ln" id="L517">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;on, true);</span>
-<span class="ln" id="L518">        assert!(!motion.enabled, <span class="tok-str">&quot;the system asked for reduced motion&quot;</span>);</span>
-<span class="ln" id="L519">        assert!(!motion.icon);</span>
-<span class="ln" id="L520">        assert!(motion.system_reduced, <span class="tok-str">&quot;the UI must be able to say why&quot;</span>);</span>
-<span class="ln" id="L521">        assert_eq!(motion.<span class="tok-fn">secs</span>(<span class="tok-num">0.4</span>), <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L522"></span>
-<span class="ln" id="L523">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;on, false);</span>
-<span class="ln" id="L524">        assert!(motion.enabled);</span>
-<span class="ln" id="L525">        assert!(motion.icon);</span>
-<span class="ln" id="L526">        assert_eq!(motion.<span class="tok-fn">secs</span>(<span class="tok-num">0.4</span>), <span class="tok-num">0.4</span>);</span>
-<span class="ln" id="L527">    }</span>
-<span class="ln" id="L528"></span>
-<span class="ln" id="L529">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L530">    <span class="tok-kw">fn</span> <span class="tok-fn">the_icon_can_be_stilled_without_stilling_everything_else</span>() {</span>
-<span class="ln" id="L531">        <span class="tok-kw">let</span> prefs = Prefs {</span>
-<span class="ln" id="L532">            animations: true,</span>
-<span class="ln" id="L533">            animated_icon: false,</span>
-<span class="ln" id="L534">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L535">        };</span>
-<span class="ln" id="L536">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;prefs, false);</span>
-<span class="ln" id="L537">        assert!(motion.enabled, <span class="tok-str">&quot;other animation is unaffected&quot;</span>);</span>
-<span class="ln" id="L538">        assert!(!motion.icon);</span>
-<span class="ln" id="L539">    }</span>
-<span class="ln" id="L540"></span>
-<span class="ln" id="L541">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L542">    <span class="tok-kw">fn</span> <span class="tok-fn">the_settings_file_sits_beside_the_app_lock</span>() {</span>
-<span class="ln" id="L543">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(prefs), <span class="tok-fn">Some</span>(lock)) = (<span class="tok-fn">default_path</span>(), veilvoice_crypto::lock::<span class="tok-fn">default_path</span>())</span>
-<span class="ln" id="L544">        {</span>
-<span class="ln" id="L545">            assert_eq!(prefs.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
-<span class="ln" id="L546">            assert!(prefs.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;settings.conf&quot;</span>));</span>
-<span class="ln" id="L547">        }</span>
-<span class="ln" id="L548">    }</span>
-<span class="ln" id="L549">}</span>
+<span class="ln" id="L421">}</span>
+<span class="ln" id="L422"></span>
+<span class="ln" id="L423"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L424"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L425">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L426"></span>
+<span class="ln" id="L427">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L428">    <span class="tok-kw">fn</span> <span class="tok-fn">the_defaults_are_the_documented_ones</span>() {</span>
+<span class="ln" id="L429">        <span class="tok-kw">let</span> d = Prefs::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L430">        assert_eq!(d.theme, <span class="tok-str">&quot;tokyo-night&quot;</span>);</span>
+<span class="ln" id="L431">        assert!(d.animations, <span class="tok-str">&quot;animations are on by default, as specified&quot;</span>);</span>
+<span class="ln" id="L432">        assert!(d.animated_icon, <span class="tok-str">&quot;the animated icon is on by default&quot;</span>);</span>
+<span class="ln" id="L433">        assert!(</span>
+<span class="ln" id="L434">            !d.configured,</span>
+<span class="ln" id="L435">            <span class="tok-str">&quot;a fresh install has not answered the first run&quot;</span></span>
+<span class="ln" id="L436">        );</span>
+<span class="ln" id="L437">    }</span>
+<span class="ln" id="L438"></span>
+<span class="ln" id="L439">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L440">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_its_text_format</span>() {</span>
+<span class="ln" id="L441">        <span class="tok-kw">let</span> prefs = Prefs {</span>
+<span class="ln" id="L442">            theme: <span class="tok-str">&quot;gruvbox&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L443">            animations: false,</span>
+<span class="ln" id="L444">            animated_icon: false,</span>
+<span class="ln" id="L445">            configured: true,</span>
+<span class="ln" id="L446">            hide_install_tab: true,</span>
+<span class="ln" id="L447">            always_group: true,</span>
+<span class="ln" id="L448">            seal_with_app_lock: false,</span>
+<span class="ln" id="L449">            vault_dir: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L450">            vault_tool: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L451">            vault_hidden: String::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L452">            autolock: true,</span>
+<span class="ln" id="L453">            autolock_after: <span class="tok-num">8</span> * <span class="tok-num">3_600</span>,</span>
+<span class="ln" id="L454">            autolock_floor: <span class="tok-num">30</span>,</span>
+<span class="ln" id="L455">            autolock_ceiling: <span class="tok-num">7</span> * <span class="tok-num">86_400</span>,</span>
+<span class="ln" id="L456">            notify_style: <span class="tok-str">&quot;alert&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L457">            failsafe: <span class="tok-str">&quot;warn&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L458">            live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L459">            recovered_from_corrupt_file: false,</span>
+<span class="ln" id="L460">        };</span>
+<span class="ln" id="L461">        <span class="tok-kw">let</span> back = Prefs::<span class="tok-fn">parse</span>(&amp;prefs.<span class="tok-fn">to_text</span>());</span>
+<span class="ln" id="L462">        assert_eq!(back, prefs);</span>
+<span class="ln" id="L463">    }</span>
+<span class="ln" id="L464"></span>
+<span class="ln" id="L465">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L466">    <span class="tok-kw">fn</span> <span class="tok-fn">every_boolean_spelling_people_actually_type_is_accepted</span>() {</span>
+<span class="ln" id="L467">        <span class="tok-kw">for</span> on <span class="tok-kw">in</span> [<span class="tok-str">&quot;true&quot;</span>, <span class="tok-str">&quot;yes&quot;</span>, <span class="tok-str">&quot;on&quot;</span>, <span class="tok-str">&quot;1&quot;</span>, <span class="tok-str">&quot;TRUE&quot;</span>, <span class="tok-str">&quot;Yes&quot;</span>] {</span>
+<span class="ln" id="L468">            assert!(</span>
+<span class="ln" id="L469">                Prefs::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;animations = {on}&quot;</span>)).animations,</span>
+<span class="ln" id="L470">                <span class="tok-str">&quot;{on} should mean on&quot;</span></span>
+<span class="ln" id="L471">            );</span>
+<span class="ln" id="L472">        }</span>
+<span class="ln" id="L473">        <span class="tok-kw">for</span> off <span class="tok-kw">in</span> [<span class="tok-str">&quot;false&quot;</span>, <span class="tok-str">&quot;no&quot;</span>, <span class="tok-str">&quot;off&quot;</span>, <span class="tok-str">&quot;0&quot;</span>, <span class="tok-str">&quot;FALSE&quot;</span>, <span class="tok-str">&quot;Off&quot;</span>] {</span>
+<span class="ln" id="L474">            assert!(</span>
+<span class="ln" id="L475">                !Prefs::<span class="tok-fn">parse</span>(&amp;format!(<span class="tok-str">&quot;animations = {off}&quot;</span>)).animations,</span>
+<span class="ln" id="L476">                <span class="tok-str">&quot;{off} should mean off&quot;</span></span>
+<span class="ln" id="L477">            );</span>
+<span class="ln" id="L478">        }</span>
+<span class="ln" id="L479">    }</span>
+<span class="ln" id="L480"></span>
+<span class="ln" id="L481">    <span class="tok-com">/// A settings file must never be able to stop the app starting.</span></span>
+<span class="ln" id="L482">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L483">    <span class="tok-kw">fn</span> <span class="tok-fn">hostile_and_broken_files_fall_back_to_the_defaults</span>() {</span>
+<span class="ln" id="L484">        <span class="tok-kw">for</span> text <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L485">            <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L486">            <span class="tok-str">&quot;\0\0\0\0&quot;</span>,</span>
+<span class="ln" id="L487">            <span class="tok-str">&quot;theme&quot;</span>,</span>
+<span class="ln" id="L488">            <span class="tok-str">&quot;= = = =&quot;</span>,</span>
+<span class="ln" id="L489">            <span class="tok-str">&quot;theme = &quot;</span>,</span>
+<span class="ln" id="L490">            <span class="tok-str">&quot;theme = ../../etc/passwd&quot;</span>,</span>
+<span class="ln" id="L491">            <span class="tok-str">&quot;theme = &lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>,</span>
+<span class="ln" id="L492">            <span class="tok-str">&quot;animations = perhaps&quot;</span>,</span>
+<span class="ln" id="L493">            &amp;<span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">100_000</span>),</span>
+<span class="ln" id="L494">            <span class="tok-str">&quot;[section]\nkey: value&quot;</span>,</span>
+<span class="ln" id="L495">        ] {</span>
+<span class="ln" id="L496">            <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">parse</span>(text);</span>
+<span class="ln" id="L497">            <span class="tok-com">// Whatever it said, the result is usable.</span></span>
+<span class="ln" id="L498">            assert!(</span>
+<span class="ln" id="L499">                <span class="tok-kw">crate</span>::theme::<span class="tok-fn">by_id</span>(&amp;prefs.theme).<span class="tok-fn">is_some</span>(),</span>
+<span class="ln" id="L500">                <span class="tok-str">&quot;parsing {:?} left an unknown theme: {}&quot;</span>,</span>
+<span class="ln" id="L501">                &amp;text[..text.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(<span class="tok-num">30</span>)],</span>
+<span class="ln" id="L502">                prefs.theme</span>
+<span class="ln" id="L503">            );</span>
+<span class="ln" id="L504">        }</span>
+<span class="ln" id="L505">    }</span>
+<span class="ln" id="L506"></span>
+<span class="ln" id="L507">    <span class="tok-com">/// A file whose every line was rejected should say so, so the settings</span></span>
+<span class="ln" id="L508">    <span class="tok-com">/// panel can explain why the defaults are in force.</span></span>
+<span class="ln" id="L509">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L510">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wholly_unreadable_file_is_reported_rather_than_hidden</span>() {</span>
+<span class="ln" id="L511">        assert!(Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;nonsense\nmore nonsense&quot;</span>).recovered_from_corrupt_file);</span>
+<span class="ln" id="L512">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).recovered_from_corrupt_file);</span>
+<span class="ln" id="L513">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;# just a comment&quot;</span>).recovered_from_corrupt_file);</span>
+<span class="ln" id="L514">        assert!(!Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;theme = nord&quot;</span>).recovered_from_corrupt_file);</span>
+<span class="ln" id="L515">    }</span>
+<span class="ln" id="L516"></span>
+<span class="ln" id="L517">    <span class="tok-com">/// A newer build&#x27;s keys must not break an older one.</span></span>
+<span class="ln" id="L518">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L519">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_keys_are_ignored_not_fatal</span>() {</span>
+<span class="ln" id="L520">        <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;theme = nord\nsomething_new = 42\nanimations = false&quot;</span>);</span>
+<span class="ln" id="L521">        assert_eq!(prefs.theme, <span class="tok-str">&quot;nord&quot;</span>);</span>
+<span class="ln" id="L522">        assert!(!prefs.animations);</span>
+<span class="ln" id="L523">        assert!(!prefs.recovered_from_corrupt_file);</span>
+<span class="ln" id="L524">    }</span>
+<span class="ln" id="L525"></span>
+<span class="ln" id="L526">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L527">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_file_is_not_an_error</span>() {</span>
+<span class="ln" id="L528">        <span class="tok-kw">let</span> prefs = Prefs::<span class="tok-fn">load</span>(std::path::Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;no-such-settings-file-anywhere.conf&quot;</span>));</span>
+<span class="ln" id="L529">        assert_eq!(prefs, Prefs::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L530">    }</span>
+<span class="ln" id="L531"></span>
+<span class="ln" id="L532">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L533">    <span class="tok-kw">fn</span> <span class="tok-fn">saving_and_loading_round_trips_through_a_real_file</span>() {</span>
+<span class="ln" id="L534">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L535">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nested&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;settings.conf&quot;</span>);</span>
+<span class="ln" id="L536">        <span class="tok-kw">let</span> prefs = Prefs {</span>
+<span class="ln" id="L537">            theme: <span class="tok-str">&quot;dracula&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L538">            animations: false,</span>
+<span class="ln" id="L539">            animated_icon: true,</span>
+<span class="ln" id="L540">            configured: true,</span>
+<span class="ln" id="L541">            notify_style: <span class="tok-str">&quot;overlay&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L542">            failsafe: <span class="tok-str">&quot;close&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L543">            live_monitor: <span class="tok-str">&quot;toolbar&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L544">            hide_install_tab: false,</span>
+<span class="ln" id="L545">            always_group: false,</span>
+<span class="ln" id="L546">            seal_with_app_lock: true,</span>
+<span class="ln" id="L547">            vault_dir: <span class="tok-str">&quot;/media/veracrypt1&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L548">            vault_tool: <span class="tok-str">&quot;veracrypt&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L549">            vault_hidden: <span class="tok-str">&quot;none&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L550">            autolock: true,</span>
+<span class="ln" id="L551">            autolock_after: <span class="tok-num">3_600</span>,</span>
+<span class="ln" id="L552">            autolock_floor: <span class="tok-num">60</span>,</span>
+<span class="ln" id="L553">            autolock_ceiling: <span class="tok-num">7</span> * <span class="tok-num">86_400</span>,</span>
+<span class="ln" id="L554">            recovered_from_corrupt_file: false,</span>
+<span class="ln" id="L555">        };</span>
+<span class="ln" id="L556">        prefs.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L557">        assert_eq!(Prefs::<span class="tok-fn">load</span>(&amp;path), prefs);</span>
+<span class="ln" id="L558">    }</span>
+<span class="ln" id="L559"></span>
+<span class="ln" id="L560">    <span class="tok-com">/// The system&#x27;s reduce-motion setting outranks the preference. Someone who</span></span>
+<span class="ln" id="L561">    <span class="tok-com">/// asked their OS for less movement has already answered.</span></span>
+<span class="ln" id="L562">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L563">    <span class="tok-kw">fn</span> <span class="tok-fn">the_system_setting_wins_over_the_preference</span>() {</span>
+<span class="ln" id="L564">        <span class="tok-kw">let</span> on = Prefs {</span>
+<span class="ln" id="L565">            animations: true,</span>
+<span class="ln" id="L566">            animated_icon: true,</span>
+<span class="ln" id="L567">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L568">        };</span>
+<span class="ln" id="L569">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;on, true);</span>
+<span class="ln" id="L570">        assert!(!motion.enabled, <span class="tok-str">&quot;the system asked for reduced motion&quot;</span>);</span>
+<span class="ln" id="L571">        assert!(!motion.icon);</span>
+<span class="ln" id="L572">        assert!(motion.system_reduced, <span class="tok-str">&quot;the UI must be able to say why&quot;</span>);</span>
+<span class="ln" id="L573">        assert_eq!(motion.<span class="tok-fn">secs</span>(<span class="tok-num">0.4</span>), <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L574"></span>
+<span class="ln" id="L575">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;on, false);</span>
+<span class="ln" id="L576">        assert!(motion.enabled);</span>
+<span class="ln" id="L577">        assert!(motion.icon);</span>
+<span class="ln" id="L578">        assert_eq!(motion.<span class="tok-fn">secs</span>(<span class="tok-num">0.4</span>), <span class="tok-num">0.4</span>);</span>
+<span class="ln" id="L579">    }</span>
+<span class="ln" id="L580"></span>
+<span class="ln" id="L581">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L582">    <span class="tok-kw">fn</span> <span class="tok-fn">the_icon_can_be_stilled_without_stilling_everything_else</span>() {</span>
+<span class="ln" id="L583">        <span class="tok-kw">let</span> prefs = Prefs {</span>
+<span class="ln" id="L584">            animations: true,</span>
+<span class="ln" id="L585">            animated_icon: false,</span>
+<span class="ln" id="L586">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L587">        };</span>
+<span class="ln" id="L588">        <span class="tok-kw">let</span> motion = Motion::<span class="tok-fn">resolve</span>(&amp;prefs, false);</span>
+<span class="ln" id="L589">        assert!(motion.enabled, <span class="tok-str">&quot;other animation is unaffected&quot;</span>);</span>
+<span class="ln" id="L590">        assert!(!motion.icon);</span>
+<span class="ln" id="L591">    }</span>
+<span class="ln" id="L592"></span>
+<span class="ln" id="L593">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L594">    <span class="tok-kw">fn</span> <span class="tok-fn">the_settings_file_sits_beside_the_app_lock</span>() {</span>
+<span class="ln" id="L595">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(prefs), <span class="tok-fn">Some</span>(lock)) = (<span class="tok-fn">default_path</span>(), veilvoice_crypto::lock::<span class="tok-fn">default_path</span>())</span>
+<span class="ln" id="L596">        {</span>
+<span class="ln" id="L597">            assert_eq!(prefs.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
+<span class="ln" id="L598">            assert!(prefs.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;settings.conf&quot;</span>));</span>
+<span class="ln" id="L599">        }</span>
+<span class="ln" id="L600">    }</span>
+<span class="ln" id="L601">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
