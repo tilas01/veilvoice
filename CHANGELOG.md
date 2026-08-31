@@ -58,6 +58,14 @@ The commands are still printed every time. Running GnuPG from inside the
 program under suspicion makes the *implementation* independent; only you typing
 them makes the *invocation* independent.
 
+### Smaller things
+
+- The release workflow's `tag` input was declared and ignored. A dry run
+  started from a branch named every archive after that branch and would have
+  tried to publish a release called `main`. It now checks out the tag it was
+  given, names everything after it, and publishes nothing at all on a manual
+  run, which is what "dry run" was always supposed to mean.
+
 ### The thirteenth audit round, run on what CI refused
 
 - **F-96** A program that has just been started is not yet wearing its own
