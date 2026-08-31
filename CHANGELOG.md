@@ -66,6 +66,28 @@ them makes the *invocation* independent.
   given, names everything after it, and publishes nothing at all on a manual
   run, which is what "dry run" was always supposed to mean.
 
+### The fourteenth audit round, run on the verifier written an hour earlier
+
+New code in the one program whose entire job is not to be fooled is exactly the
+code an audit exists for. Three defects, all found by reading, and all three
+the same mistake: a check that could not see, answering as though it had.
+
+- **F-98** A folder the sweep could not open was reported as holding nothing
+  extra. Measured: a tree deep enough to pass `PATH_MAX` stops the walk at
+  about 1988 levels and a file below that read as absent rather than
+  unreachable; a permission bit does it in one line. What could not be read is
+  now named and withholds the pass, because unknown is not empty.
+- **F-99** A symbolic link standing where a program should be, pointing at a
+  copy of the genuine bytes, was reported as matching the signed list. The
+  release published a file, not a link, and a link is a name somebody else may
+  repoint after this has looked. The sweep for extra files already refused to
+  walk through links, so the two halves of one module disagreed about what a
+  link is.
+- **F-100** A release signed by the project key *and* by somebody else's, in
+  that order, would have been refused: only the first of GnuPG's signature
+  reports was read. Safe direction, still a defect. A verifier people learn to
+  work around protects nobody.
+
 ### The thirteenth audit round, run on what CI refused
 
 - **F-96** A program that has just been started is not yet wearing its own

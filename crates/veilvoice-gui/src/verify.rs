@@ -841,7 +841,7 @@ fn examine_contents(
 
     let root = download.parent().unwrap_or(Path::new("."));
     let outcomes = contents::check(root, section);
-    let extras = contents::extras(root, section);
+    let sweep = contents::extras(root, section);
     let good = outcomes.iter().filter(|o| o.is_good()).count();
 
     let mut problems = Vec::new();
@@ -855,12 +855,25 @@ fn examine_contents(
             contents::Verdict::Unreadable(why) => {
                 problems.push(format!("UNREADABLE  {}: {why}", outcome.path))
             }
+            // F-99. A link or a directory standing where a file should be is
+            // not the published file, whatever it points at.
+            contents::Verdict::NotAFile(what) => {
+                problems.push(format!("{what} WHERE A FILE SHOULD BE  {}", outcome.path))
+            }
         }
     }
-    for extra in &extras {
+    for extra in &sweep.extras {
         problems.push(format!(
             "NOT PART OF THE RELEASE  {}",
             extra.strip_prefix(root).unwrap_or(extra).display()
+        ));
+    }
+    // F-98. Unknown is not empty. A folder this could not open must not be
+    // drawn as one it looked in and found nothing.
+    for shut in &sweep.unreadable {
+        problems.push(format!(
+            "COULD NOT LOOK INSIDE  {}",
+            shut.strip_prefix(root).unwrap_or(shut).display()
         ));
     }
     Some(Contents {

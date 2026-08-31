@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/verify.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1224 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1237 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs)
 
 ## Contents
 
@@ -84,7 +84,7 @@ asks your own GnuPG the same question and shows you its answer.
 
 ## What this file contains
 
-1224 lines defining **21 functions** (7 public), **5 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1237 lines defining **21 functions** (7 public), **5 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -137,7 +137,7 @@ flowchart TD
     n_start["Verify::start<br/>line 735"]
     n_examine["examine<br/>line 758"]
     n_examine_contents["examine_contents<br/>line 792"]
-    n_examine_gnupg["examine_gnupg<br/>line 876"]
+    n_examine_gnupg["examine_gnupg<br/>line 889"]
     n_accept --> n_fill_from_beside
     n_accept --> n_slot_for
     n_body --> n_drop_target
@@ -175,7 +175,7 @@ flowchart TD
     click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L735" "open the source"
     click n_examine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L758" "open the source"
     click n_examine_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L792" "open the source"
-    click n_examine_gnupg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L876" "open the source"
+    click n_examine_gnupg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L889" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_wants_repaint,n_drain,n_take_dropped,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -215,4 +215,4 @@ flowchart TD
 | `Verify::start` <sub>fn</sub> | [735](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L735) | Run the check on a thread of its own. |
 | `examine` <sub>fn</sub> | [758](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L758) | The whole check, off the drawing thread. |
 | `examine_contents` <sub>fn</sub> | [792](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L792) | Marker 97. |
-| `examine_gnupg` <sub>fn</sub> | [876](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L876) | Marker 97. |
+| `examine_gnupg` <sub>fn</sub> | [889](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L889) | Marker 97. |
