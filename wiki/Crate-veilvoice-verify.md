@@ -80,7 +80,7 @@ Give it arguments and it does exactly what you asked.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>1817 lines"])
+    n_main(["main.rs<br/>1837 lines"])
     n_builder["builder.rs<br/>1148 lines"]
     n_deps["deps.rs<br/>650 lines"]
     n_discover["discover.rs<br/>364 lines"]
@@ -112,6 +112,6 @@ flowchart TD
 | [[`discover.rs`|File-veilvoice-verify-discover]] | 364 | Finding a release to check, without being told where it is. |
 | [[`extracted.rs`|File-veilvoice-verify-extracted]] | 312 | What came out of the archive, and the GnuPG somebody already has. |
 | [[`fetch.rs`|File-veilvoice-verify-fetch]] | 329 | Download a release, without putting an HTTP client in the dependency graph. |
-| [[`main.rs`|File-veilvoice-verify-main]] | 1817 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [[`main.rs`|File-veilvoice-verify-main]] | 1837 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [[`report.rs`|File-veilvoice-verify-report]] | 385 | How much this program says, and what it returns when it says nothing. |
 | [[`tests.rs`|File-veilvoice-verify-tests]] | 457 | The verifier's own tests. |

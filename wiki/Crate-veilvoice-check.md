@@ -81,7 +81,7 @@ built the same thing and got the same answer.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>471 lines"])
-    n_contents["contents.rs<br/>438 lines"]
+    n_contents["contents.rs<br/>623 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs" "open the source"
     click n_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs" "open the source"
 ```
@@ -92,5 +92,5 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`contents.rs`|File-veilvoice-check-contents]] | 438 | The signed list of what is inside each release archive. |
+| [[`contents.rs`|File-veilvoice-check-contents]] | 623 | The signed list of what is inside each release archive. |
 | [[`lib.rs`|File-veilvoice-check-lib]] | 471 | Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list. |

@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-check/contents.svg" alt="contents.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-check/src/contents.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-check.html">veilvoice-check</a> &middot; 438 lines &middot; <a href="contents.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-check.html">veilvoice-check</a> &middot; 623 lines &middot; <a href="contents.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-gap-this-closes">The gap this closes</a>
@@ -70,26 +70,29 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>438 lines defining <strong>9 functions</strong> (6 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>623 lines defining <strong>10 functions</strong> (7 public), <strong>5 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Member</code> <span style="color:var(--muted)">line 69</span> &mdash; One file inside a release archive, and the hash published for it.</li>
 <li><code>struct ArchiveContents</code> <span style="color:var(--muted)">line 78</span> &mdash; Everything one archive carries.</li>
 <li><code>enum Verdict</code> <span style="color:var(--muted)">line 103</span> &mdash; What checking one published file against the disk found.</li>
-<li><code>struct Outcome</code> <span style="color:var(--muted)">line 119</span> &mdash; One published file, checked against the disk.</li>
+<li><code>struct Outcome</code> <span style="color:var(--muted)">line 129</span> &mdash; One published file, checked against the disk.</li>
+<li><code>struct Sweep</code> <span style="color:var(--muted)">line 270</span> &mdash; What a sweep of the extracted directory found.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>ArchiveContents::roots</code> <span style="color:var(--muted)">line 91</span> &mdash; The top-level directories the archive extracts into.
 </li>
-<li><code>Outcome::is_good</code> <span style="color:var(--muted)">line 128</span> &mdash; Whether this one is as published.
+<li><code>Outcome::is_good</code> <span style="color:var(--muted)">line 138</span> &mdash; Whether this one is as published.
 </li>
-<li><code>parse</code> <span style="color:var(--muted)">line 166</span> &mdash; Read a CONTENTS.sha256.
+<li><code>parse</code> <span style="color:var(--muted)">line 176</span> &mdash; Read a CONTENTS.sha256.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>looks_like_a_digest</code>, <code>safe</code></span>
 </li>
-<li><code>for_archive</code> <span style="color:var(--muted)">line 217</span> &mdash; The section of a manifest covering one archive.
+<li><code>for_archive</code> <span style="color:var(--muted)">line 227</span> &mdash; The section of a manifest covering one archive.
 </li>
-<li><code>check</code> <span style="color:var(--muted)">line 227</span> &mdash; Check every file the archive published, against root.
+<li><code>check</code> <span style="color:var(--muted)">line 237</span> &mdash; Check every file the archive published, against root.
 </li>
-<li><code>extras</code> <span style="color:var(--muted)">line 256</span> &mdash; Files sitting in the extracted directory that the release never published.
+<li><code>Sweep::is_clean</code> <span style="color:var(--muted)">line 294</span> &mdash; Whether the folder is exactly what the release published.
+</li>
+<li><code>extras</code> <span style="color:var(--muted)">line 305</span> &mdash; Files sitting in the extracted directory that the release never published.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>walk</code></span>
 </li>
 </ul>
@@ -107,7 +110,7 @@
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
 <rect x="0" y="0" width="601" height="515" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M300.4 274.0 C 300.4 294.0, 300.4 300.0, 300.4 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M387.8 274.0 C 387.8 294.0, 300.4 300.0, 300.4 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M319.6 147.0 C 341.6 147.0, 341.6 147.0, 204.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M319.6 147.0 C 575.8 147.0, 575.8 47.0, 556.8 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <a href="contents.src.html#fn-archivecontents-roots">
@@ -118,42 +121,47 @@
 <a href="contents.src.html#fn-outcome-is_good">
 <rect x="278.3" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="356.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Outcome::is_good</text>
-<text x="356.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 128</text>
+<text x="356.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 138</text>
 </a>
 <a href="contents.src.html#fn-safe">
 <rect x="461.3" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="507.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">safe</text>
-<text x="507.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 137</text>
+<text x="507.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
 </a>
 <a href="contents.src.html#fn-looks_like_a_digest">
 <rect x="20.0" y="120.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="110.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">looks_like_a_digest</text>
-<text x="110.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 151</text>
+<text x="110.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
 </a>
 <a href="contents.src.html#fn-parse">
 <rect x="227.1" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="273.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse</text>
-<text x="273.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 166</text>
+<text x="273.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 176</text>
 </a>
 <a href="contents.src.html#fn-for_archive">
 <rect x="345.6" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="403.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">for_archive</text>
-<text x="403.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 217</text>
+<text x="403.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
 </a>
 <a href="contents.src.html#fn-check">
 <rect x="488.3" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="534.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check</text>
-<text x="534.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
+<text x="534.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 237</text>
+</a>
+<a href="contents.src.html#fn-sweep-is_clean">
+<rect x="166.7" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="241.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Sweep::is_clean</text>
+<text x="241.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 294</text>
 </a>
 <a href="contents.src.html#fn-extras">
-<rect x="254.1" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="300.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">extras</text>
-<text x="300.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 256</text>
+<rect x="341.6" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="387.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">extras</text>
+<text x="387.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 305</text>
 </a>
 <a href="contents.src.html#fn-walk">
 <rect x="254.1" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="300.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">walk</text>
-<text x="300.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 276</text>
+<text x="300.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 333</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -171,28 +179,30 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_roots([&quot;ArchiveContents::roots&lt;br/&gt;line 91&quot;])
-    n_is_good([&quot;Outcome::is_good&lt;br/&gt;line 128&quot;])
-    n_safe[&quot;safe&lt;br/&gt;line 137&quot;]
-    n_looks_like_a_digest[&quot;looks_like_a_digest&lt;br/&gt;line 151&quot;]
-    n_parse([&quot;parse&lt;br/&gt;line 166&quot;])
-    n_for_archive([&quot;for_archive&lt;br/&gt;line 217&quot;])
-    n_check([&quot;check&lt;br/&gt;line 227&quot;])
-    n_extras([&quot;extras&lt;br/&gt;line 256&quot;])
-    n_walk[&quot;walk&lt;br/&gt;line 276&quot;]
+    n_is_good([&quot;Outcome::is_good&lt;br/&gt;line 138&quot;])
+    n_safe[&quot;safe&lt;br/&gt;line 147&quot;]
+    n_looks_like_a_digest[&quot;looks_like_a_digest&lt;br/&gt;line 161&quot;]
+    n_parse([&quot;parse&lt;br/&gt;line 176&quot;])
+    n_for_archive([&quot;for_archive&lt;br/&gt;line 227&quot;])
+    n_check([&quot;check&lt;br/&gt;line 237&quot;])
+    n_is_clean([&quot;Sweep::is_clean&lt;br/&gt;line 294&quot;])
+    n_extras([&quot;extras&lt;br/&gt;line 305&quot;])
+    n_walk[&quot;walk&lt;br/&gt;line 333&quot;]
     n_extras --&gt; n_walk
     n_parse --&gt; n_looks_like_a_digest
     n_parse --&gt; n_safe
     click n_roots href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L91&quot; &quot;open the source&quot;
-    click n_is_good href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L128&quot; &quot;open the source&quot;
-    click n_safe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L137&quot; &quot;open the source&quot;
-    click n_looks_like_a_digest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L151&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L166&quot; &quot;open the source&quot;
-    click n_for_archive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L217&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L227&quot; &quot;open the source&quot;
-    click n_extras href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L256&quot; &quot;open the source&quot;
-    click n_walk href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L276&quot; &quot;open the source&quot;
+    click n_is_good href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L138&quot; &quot;open the source&quot;
+    click n_safe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L147&quot; &quot;open the source&quot;
+    click n_looks_like_a_digest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L161&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L176&quot; &quot;open the source&quot;
+    click n_for_archive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L227&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L237&quot; &quot;open the source&quot;
+    click n_is_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L294&quot; &quot;open the source&quot;
+    click n_extras href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L305&quot; &quot;open the source&quot;
+    click n_walk href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L333&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_roots,n_is_good,n_parse,n_for_archive,n_check,n_extras entry
+    class n_roots,n_is_good,n_parse,n_for_archive,n_check,n_is_clean,n_extras entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_safe,n_looks_like_a_digest,n_walk helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -206,15 +216,17 @@ flowchart TD
 <tr><td><code>ArchiveContents</code> <sub>pub struct</sub></td><td><a href="contents.src.html#fn-archivecontents">78</a></td><td>Everything one archive carries.</td></tr>
 <tr><td><code>ArchiveContents::roots</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-archivecontents-roots">91</a></td><td>The top-level directories the archive extracts into.</td></tr>
 <tr><td><code>Verdict</code> <sub>pub enum</sub></td><td><a href="contents.src.html#fn-verdict">103</a></td><td>What checking one published file against the disk found.</td></tr>
-<tr><td><code>Outcome</code> <sub>pub struct</sub></td><td><a href="contents.src.html#fn-outcome">119</a></td><td>One published file, checked against the disk.</td></tr>
-<tr><td><code>Outcome::is_good</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-outcome-is_good">128</a></td><td>Whether this one is as published.</td></tr>
-<tr><td><code>safe</code> <sub>fn</sub></td><td><a href="contents.src.html#fn-safe">137</a></td><td>Whether a path from the manifest is safe to join onto a directory.</td></tr>
-<tr><td><code>looks_like_a_digest</code> <sub>fn</sub></td><td><a href="contents.src.html#fn-looks_like_a_digest">151</a></td><td>Whether a string is 64 lowercase hex characters.</td></tr>
-<tr><td><code>parse</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-parse">166</a></td><td>Read a CONTENTS.sha256.</td></tr>
-<tr><td><code>for_archive</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-for_archive">217</a></td><td>The section of a manifest covering one archive.</td></tr>
-<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-check">227</a></td><td>Check every file the archive published, against root.</td></tr>
-<tr><td><code>extras</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-extras">256</a></td><td>Files sitting in the extracted directory that the release never published.</td></tr>
-<tr><td><code>walk</code> <sub>fn</sub></td><td><a href="contents.src.html#fn-walk">276</a></td><td>Every file under directory that is not in published.</td></tr>
+<tr><td><code>Outcome</code> <sub>pub struct</sub></td><td><a href="contents.src.html#fn-outcome">129</a></td><td>One published file, checked against the disk.</td></tr>
+<tr><td><code>Outcome::is_good</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-outcome-is_good">138</a></td><td>Whether this one is as published.</td></tr>
+<tr><td><code>safe</code> <sub>fn</sub></td><td><a href="contents.src.html#fn-safe">147</a></td><td>Whether a path from the manifest is safe to join onto a directory.</td></tr>
+<tr><td><code>looks_like_a_digest</code> <sub>fn</sub></td><td><a href="contents.src.html#fn-looks_like_a_digest">161</a></td><td>Whether a string is 64 lowercase hex characters.</td></tr>
+<tr><td><code>parse</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-parse">176</a></td><td>Read a CONTENTS.sha256.</td></tr>
+<tr><td><code>for_archive</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-for_archive">227</a></td><td>The section of a manifest covering one archive.</td></tr>
+<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-check">237</a></td><td>Check every file the archive published, against root.</td></tr>
+<tr><td><code>Sweep</code> <sub>pub struct</sub></td><td><a href="contents.src.html#fn-sweep">270</a></td><td>What a sweep of the extracted directory found.</td></tr>
+<tr><td><code>Sweep::is_clean</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-sweep-is_clean">294</a></td><td>Whether the folder is exactly what the release published.</td></tr>
+<tr><td><code>extras</code> <sub>pub fn</sub></td><td><a href="contents.src.html#fn-extras">305</a></td><td>Files sitting in the extracted directory that the release never published.</td></tr>
+<tr><td><code>walk</code> <sub>fn</sub></td><td><a href="contents.src.html#fn-walk">333</a></td><td>Every file under directory that is not in published.</td></tr>
 </tbody></table>
 </section>
 </div></div>

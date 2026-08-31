@@ -353,13 +353,23 @@ impl Gnupg {
         // fingerprint, so it is read first and compared. `GOODSIG` alone
         // carries a key id, which is short enough to be chosen by an attacker
         // and is never enough on its own.
-        let outcome = if let Some(valid) = field(&status, "VALIDSIG") {
-            let signer = valid.split_whitespace().next().unwrap_or("");
-            if same_fingerprint(signer, expected) {
+        //
+        // F-100: *every* `VALIDSIG`, not the first. A file can carry more than
+        // one signature and the expected key's may not be the one GnuPG prints
+        // first.
+        let signers: Vec<String> = fields(&status, "VALIDSIG")
+            .filter_map(|valid| valid.split_whitespace().next())
+            .map(str::to_string)
+            .collect();
+        let outcome = if !signers.is_empty() {
+            if signers
+                .iter()
+                .any(|signer| same_fingerprint(signer, expected))
+            {
                 Outcome::Good
             } else {
                 Outcome::AnotherKey {
-                    fingerprint: signer.to_string(),
+                    fingerprint: signers.join(", "),
                 }
             }
         } else if field(&status, "BADSIG").is_some() {
@@ -388,15 +398,32 @@ fn status_lines(stdout: &[u8]) -> Vec<String> {
         .collect()
 }
 
-/// The rest of a status line whose first word is `keyword`.
+/// The rest of the first status line whose first word is `keyword`.
 ///
 /// The space is load bearing: without it `NO_PUBKEY` would match a line
 /// beginning `NO_PUBKEYS`, and a keyword GnuPG adds later could quietly change
 /// what this decides.
-fn field<'a>(status: &'a [String], keyword: &str) -> Option<&'a str> {
+fn field<'a>(status: &'a [String], keyword: &'a str) -> Option<&'a str> {
+    fields(status, keyword).next()
+}
+
+/// Every status line whose first word is `keyword`.
+///
+/// **F-100.** A file can carry more than one signature, and GnuPG reports each
+/// one: several `NEWSIG`/`VALIDSIG` blocks in a single run. Reading only the
+/// first meant that a release signed by the project key *and* by somebody
+/// else's, in that other order, was reported as signed by the wrong key and
+/// refused.
+///
+/// That is the safe direction and it is still wrong: refusing a genuine release
+/// teaches people that the verifier is unreliable, and a verifier people work
+/// around is worse than none. What matters is whether the expected key signed
+/// this data, and that question is asked of every signature rather than of
+/// whichever GnuPG happened to print first.
+fn fields<'a>(status: &'a [String], keyword: &'a str) -> impl Iterator<Item = &'a str> {
     status
         .iter()
-        .find_map(|line| line.strip_prefix(keyword)?.strip_prefix(' '))
+        .filter_map(move |line| line.strip_prefix(keyword)?.strip_prefix(' '))
 }
 
 /// Whether two fingerprints are the same, ignoring case and spacing.
@@ -498,6 +525,40 @@ mod tests {
             field(&imported, "IMPORT_OK"),
             Some("1 520A54F1437E8CE8E18416AEF63C0EF4DF07E273")
         );
+    }
+
+    /// **F-100.** A file can carry more than one signature, and the expected
+    /// key's may not be the one GnuPG prints first.
+    ///
+    /// Reading only the first meant a genuine release signed by two keys was
+    /// reported as signed by the wrong one and refused. That is the safe
+    /// direction and it is still wrong: a verifier people learn to work around
+    /// is worse than none.
+    #[test]
+    fn the_expected_key_is_looked_for_in_every_signature_not_the_first() {
+        let two = status_lines(
+            b"[GNUPG:] NEWSIG\n\
+              [GNUPG:] VALIDSIG 0000000000000000000000000000000000000000 2026-08-31 1 0 4 0 1 10 00 0000000000000000000000000000000000000000\n\
+              [GNUPG:] NEWSIG\n\
+              [GNUPG:] VALIDSIG 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A 2026-08-31 1 0 4 0 1 10 00 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A\n",
+        );
+        let signers: Vec<&str> = fields(&two, "VALIDSIG")
+            .filter_map(|v| v.split_whitespace().next())
+            .collect();
+        assert_eq!(signers.len(), 2, "both signatures must be seen");
+        assert!(
+            signers.iter().any(|s| same_fingerprint(s, FINGERPRINT)),
+            "the expected key signed it, second"
+        );
+
+        // And a run where it signed nothing is still not a pass.
+        let neither = status_lines(
+            b"[GNUPG:] VALIDSIG 0000000000000000000000000000000000000000 2026-08-31 1 0 4 0 1 10 00 0000000000000000000000000000000000000000\n",
+        );
+        let signers: Vec<&str> = fields(&neither, "VALIDSIG")
+            .filter_map(|v| v.split_whitespace().next())
+            .collect();
+        assert!(!signers.iter().any(|s| same_fingerprint(s, FINGERPRINT)));
     }
 
     /// Prose is never read, so a translated GnuPG cannot change the answer.

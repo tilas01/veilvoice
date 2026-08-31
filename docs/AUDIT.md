@@ -38,6 +38,88 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The fourteenth round: reading the verifier written an hour earlier
+
+Marker 97 rewrote what `veilvoice-verify` and the desktop verify tab do: a
+signed list of every file inside every archive, checked file by file against
+the extracted folder, and the reader's own GnuPG run over the same signature.
+New code in the one program whose entire job is not to be fooled is exactly the
+code an audit exists for, so it got a round of its own before anything else was
+built on it.
+
+**Three defects found and fixed (F-98, F-99 and F-100), all by reading the code
+written an hour earlier**, and all three are the same mistake wearing different
+clothes: a check that could not see, answering as though it had seen.
+
+### F-98 -- a folder that could not be read was reported as holding nothing
+
+`veilvoice-check/src/contents.rs`.
+
+`extras` sweeps the extracted directory for files the release never published,
+because a folder holding every correct file plus one extra program passes every
+other check and is not the release. Its walk opened each directory and, on any
+error, returned. The caller got an empty list, and an empty list is drawn as
+**"there is nothing else in the folder"**.
+
+Measured rather than argued: a directory tree deep enough that its absolute
+path passes `PATH_MAX` stops `read_dir` at about 1988 levels on Linux, and a
+file below that point was reported as absent rather than as unreachable. A
+permission bit does the same thing in one line and is how it would actually
+happen: a folder extracted by another account, or one whose mode came out of
+the archive wrong.
+
+The sweep now returns what it could not read alongside what it found, and both
+front ends withhold the pass and name the folder. Unknown is not empty.
+
+The walk also stopped recursing while this was fixed. The measurement above
+says the recursion could not in fact have overflowed a stack, because
+`PATH_MAX` bounds the depth long before the stack does -- but that bound comes
+from the operating system rather than from this code, and a bound nobody here
+chose is not one this code can rely on.
+
+### F-99 -- a link where a file should be, hashing correctly, passed
+
+`veilvoice-check/src/contents.rs`.
+
+`check` asked whether the path exists and then hashed it. Both follow a
+symbolic link, so a link standing where a program should be, pointing at a copy
+of the genuine bytes, was reported as **matching the signed list**.
+
+Two things are wrong with that. The release published a file, not a link. And a
+link is a name somebody else may be able to repoint after this has looked,
+which is precisely the substitution a hash check cannot notice.
+
+It is caught by reading rather than by luck that the *other half of the same
+module* already knew this: the sweep for extra files deliberately does not walk
+through links. One function treated a link as a thing to refuse and the
+function beside it treated the same link as the file it pointed at.
+
+`check` asks `symlink_metadata` now, and a link, a directory or anything else
+that is not an ordinary file is its own verdict and never a pass.
+
+### F-100 -- a genuine release signed twice would have been refused
+
+`veilvoice-gnupg/src/lib.rs`.
+
+GnuPG reports every signature on a file: a run over a doubly signed file prints
+several `VALIDSIG` lines. The reader took the first one and compared it against
+the expected fingerprint, so a release signed by the project key **and** by
+somebody else's, in that other order, was reported as signed by the wrong key
+and refused.
+
+That is the safe direction and it is still a defect. A verifier that refuses
+genuine releases teaches people that verification is unreliable, and a check
+people learn to work around protects nobody. The question is whether the
+expected key signed this data, and it is now asked of every signature rather
+than of whichever one GnuPG happened to print first.
+
+**What the three have in common** is worth naming, because it is the fourth
+time this project has recorded it. Each was a place where the code could not
+answer and answered anyway: an unreadable directory read as empty, a link read
+as the file it points at, one signature read as all of them. The rule the
+failsafe already states in as many words -- "could not tell, so refuse" -- is
+the rule all three were missing.
+
 ## The thirteenth round: the three ways the release would not compile
 
 The twelfth round read the code. This one read the build machines, because
@@ -1448,7 +1530,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1119 tests across 27 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1124 tests across 27 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -3040,7 +3122,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Ninety-seven defects found and fixed across thirteen audit rounds (F-1 to F-97):**
+**One hundred defects found and fixed across fourteen audit rounds (F-1 to F-100):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

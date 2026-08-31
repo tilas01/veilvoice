@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-check/src/contents.rs`
 
-[[veilvoice-check|Crate-veilvoice-check]] &middot; 438 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs)
+[[veilvoice-check|Crate-veilvoice-check]] &middot; 623 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs)
 
 ## Contents
 
@@ -73,24 +73,26 @@ was.
 
 ## What this file contains
 
-438 lines defining **9 functions** (6 public), **4 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+623 lines defining **10 functions** (7 public), **5 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct Member` (line 69) -- One file inside a release archive, and the hash published for it.
 - `struct ArchiveContents` (line 78) -- Everything one archive carries.
 - `enum Verdict` (line 103) -- What checking one published file against the disk found.
-- `struct Outcome` (line 119) -- One published file, checked against the disk.
+- `struct Outcome` (line 129) -- One published file, checked against the disk.
+- `struct Sweep` (line 270) -- What a sweep of the extracted directory found.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `ArchiveContents::roots` (line 91) -- The top-level directories the archive extracts into.
-- `Outcome::is_good` (line 128) -- Whether this one is as published.
-- `parse` (line 166) -- Read a CONTENTS.sha256.
+- `Outcome::is_good` (line 138) -- Whether this one is as published.
+- `parse` (line 176) -- Read a CONTENTS.sha256.
   - reaches: `looks_like_a_digest`, `safe`
-- `for_archive` (line 217) -- The section of a manifest covering one archive.
-- `check` (line 227) -- Check every file the archive published, against root.
-- `extras` (line 256) -- Files sitting in the extracted directory that the release never published.
+- `for_archive` (line 227) -- The section of a manifest covering one archive.
+- `check` (line 237) -- Check every file the archive published, against root.
+- `Sweep::is_clean` (line 294) -- Whether the folder is exactly what the release published.
+- `extras` (line 305) -- Files sitting in the extracted directory that the release never published.
   - reaches: `walk`
 
 ## What calls what
@@ -108,28 +110,30 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_roots(["ArchiveContents::roots<br/>line 91"])
-    n_is_good(["Outcome::is_good<br/>line 128"])
-    n_safe["safe<br/>line 137"]
-    n_looks_like_a_digest["looks_like_a_digest<br/>line 151"]
-    n_parse(["parse<br/>line 166"])
-    n_for_archive(["for_archive<br/>line 217"])
-    n_check(["check<br/>line 227"])
-    n_extras(["extras<br/>line 256"])
-    n_walk["walk<br/>line 276"]
+    n_is_good(["Outcome::is_good<br/>line 138"])
+    n_safe["safe<br/>line 147"]
+    n_looks_like_a_digest["looks_like_a_digest<br/>line 161"]
+    n_parse(["parse<br/>line 176"])
+    n_for_archive(["for_archive<br/>line 227"])
+    n_check(["check<br/>line 237"])
+    n_is_clean(["Sweep::is_clean<br/>line 294"])
+    n_extras(["extras<br/>line 305"])
+    n_walk["walk<br/>line 333"]
     n_extras --> n_walk
     n_parse --> n_looks_like_a_digest
     n_parse --> n_safe
     click n_roots href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L91" "open the source"
-    click n_is_good href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L128" "open the source"
-    click n_safe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L137" "open the source"
-    click n_looks_like_a_digest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L151" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L166" "open the source"
-    click n_for_archive href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L217" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L227" "open the source"
-    click n_extras href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L256" "open the source"
-    click n_walk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L276" "open the source"
+    click n_is_good href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L138" "open the source"
+    click n_safe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L147" "open the source"
+    click n_looks_like_a_digest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L161" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L176" "open the source"
+    click n_for_archive href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L227" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L237" "open the source"
+    click n_is_clean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L294" "open the source"
+    click n_extras href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L305" "open the source"
+    click n_walk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L333" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_roots,n_is_good,n_parse,n_for_archive,n_check,n_extras entry
+    class n_roots,n_is_good,n_parse,n_for_archive,n_check,n_is_clean,n_extras entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_safe,n_looks_like_a_digest,n_walk helper
 ```
@@ -145,12 +149,14 @@ flowchart TD
 | `ArchiveContents` <sub>pub struct</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L78) | Everything one archive carries. |
 | `ArchiveContents::roots` <sub>pub fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L91) | The top-level directories the archive extracts into. |
 | `Verdict` <sub>pub enum</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L103) | What checking one published file against the disk found. |
-| `Outcome` <sub>pub struct</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L119) | One published file, checked against the disk. |
-| `Outcome::is_good` <sub>pub fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L128) | Whether this one is as published. |
-| `safe` <sub>fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L137) | Whether a path from the manifest is safe to join onto a directory. |
-| `looks_like_a_digest` <sub>fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L151) | Whether a string is 64 lowercase hex characters. |
-| `parse` <sub>pub fn</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L166) | Read a CONTENTS.sha256. |
-| `for_archive` <sub>pub fn</sub> | [217](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L217) | The section of a manifest covering one archive. |
-| `check` <sub>pub fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L227) | Check every file the archive published, against root. |
-| `extras` <sub>pub fn</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L256) | Files sitting in the extracted directory that the release never published. |
-| `walk` <sub>fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L276) | Every file under directory that is not in published. |
+| `Outcome` <sub>pub struct</sub> | [129](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L129) | One published file, checked against the disk. |
+| `Outcome::is_good` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L138) | Whether this one is as published. |
+| `safe` <sub>fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L147) | Whether a path from the manifest is safe to join onto a directory. |
+| `looks_like_a_digest` <sub>fn</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L161) | Whether a string is 64 lowercase hex characters. |
+| `parse` <sub>pub fn</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L176) | Read a CONTENTS.sha256. |
+| `for_archive` <sub>pub fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L227) | The section of a manifest covering one archive. |
+| `check` <sub>pub fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L237) | Check every file the archive published, against root. |
+| `Sweep` <sub>pub struct</sub> | [270](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L270) | What a sweep of the extracted directory found. |
+| `Sweep::is_clean` <sub>pub fn</sub> | [294](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L294) | Whether the folder is exactly what the release published. |
+| `extras` <sub>pub fn</sub> | [305](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L305) | Files sitting in the extracted directory that the release never published. |
+| `walk` <sub>fn</sub> | [333](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs#L333) | Every file under directory that is not in published. |
