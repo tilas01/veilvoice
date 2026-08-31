@@ -107,7 +107,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>89 lines"])
     n_accent["accent.rs<br/>696 lines"]
-    n_chain["chain.rs<br/>1581 lines"]
+    n_chain["chain.rs<br/>1621 lines"]
     n_effects["effects.rs<br/>226 lines"]
     n_modulation["modulation.rs<br/>313 lines"]
     n_pitch["pitch.rs<br/>286 lines"]
@@ -145,7 +145,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`accent.rs`](../../docs/files/veilvoice-core/accent.md) | 696 | Accent and speaker-trait neutralisation. |
-| [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 1581 | The assembled de-identification chain and its live performance statistics. |
+| [`chain.rs`](../../docs/files/veilvoice-core/chain.md) | 1621 | The assembled de-identification chain and its live performance statistics. |
 | [`effects.rs`](../../docs/files/veilvoice-core/effects.md) | 226 | Light time-domain effects applied after resynthesis. |
 | [`lib.rs`](../../docs/files/veilvoice-core/lib.md) | 89 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
 | [`modulation.rs`](../../docs/files/veilvoice-core/modulation.md) | 313 | Cryptographically-seeded modulation of the effect parameters. |

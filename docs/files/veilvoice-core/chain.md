@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-core/src/chain.rs`
 
-[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 1581 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs)
+[`veilvoice-core`](../../../crates/veilvoice-core/README.md) &middot; 1621 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs)
 
 ## Contents
 
@@ -158,7 +158,7 @@ needs in order to tell you honestly if the computer is not keeping up.
 
 ## What this file contains
 
-1581 lines defining **23 functions** (17 public), **4 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1621 lines defining **23 functions** (17 public), **4 types** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -311,7 +311,7 @@ flowchart TD
 | `Deidentifier::accent_stats` <sub>pub fn</sub> | [787](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L787) | Live accent-neutralisation read-out (detected f0, applied ratios). |
 | `Deidentifier::process` <sub>pub fn</sub> | [793](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L793) | Process input into output (equal length). |
 | `Deidentifier::process_vec` <sub>pub fn</sub> | [865](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L865) | Convenience: process a whole buffer and return a new Vec. |
-| `reseed_range_tests` <sub>mod</sub> | [1418](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L1418) |  |
+| `reseed_range_tests` <sub>mod</sub> | [1458](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L1458) |  |
 
 ---
 

@@ -64,6 +64,13 @@ const ICON_SIZE: u32 = 32;
 /// second description of an interface drifts from the first: `tools/release/
 /// manpage.py` turns this text into the installed manual page at package build
 /// time, so the page and the program cannot disagree.
+///
+/// Declared only where it is read. A Windows release build has no console to
+/// print to, so the reader below is Unix only, and a constant nothing reads is
+/// dead code: the Windows job failed on it under `-D warnings` while every
+/// other platform passed. The test that checks this text against the tab names
+/// reads the file rather than the constant, so it still runs everywhere.
+#[cfg(unix)]
 const USAGE: &str = "\
 veilvoice-gui - the VeilVoice desktop application
 

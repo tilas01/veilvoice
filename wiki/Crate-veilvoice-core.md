@@ -94,7 +94,7 @@ identify you, this has not touched that.
 flowchart TD
     n_lib(["lib.rs<br/>89 lines"])
     n_accent["accent.rs<br/>696 lines"]
-    n_chain["chain.rs<br/>1581 lines"]
+    n_chain["chain.rs<br/>1621 lines"]
     n_effects["effects.rs<br/>226 lines"]
     n_modulation["modulation.rs<br/>313 lines"]
     n_pitch["pitch.rs<br/>286 lines"]
@@ -132,7 +132,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [[`accent.rs`|File-veilvoice-core-accent]] | 696 | Accent and speaker-trait neutralisation. |
-| [[`chain.rs`|File-veilvoice-core-chain]] | 1581 | The assembled de-identification chain and its live performance statistics. |
+| [[`chain.rs`|File-veilvoice-core-chain]] | 1621 | The assembled de-identification chain and its live performance statistics. |
 | [[`effects.rs`|File-veilvoice-core-effects]] | 226 | Light time-domain effects applied after resynthesis. |
 | [[`lib.rs`|File-veilvoice-core-lib]] | 89 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
 | [[`modulation.rs`|File-veilvoice-core-modulation]] | 313 | Cryptographically-seeded modulation of the effect parameters. |
