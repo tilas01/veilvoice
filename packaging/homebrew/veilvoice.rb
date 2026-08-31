@@ -12,7 +12,7 @@
 class Veilvoice < Formula
   desc "Irreversible voice de-identification, fully offline"
   homepage "https://tilas01.github.io/veilvoice/"
-  url "https://github.com/tilas01/veilvoice/archive/refs/tags/v0.1.14.tar.gz"
+  url "https://github.com/tilas01/veilvoice/archive/refs/tags/v0.1.15.tar.gz"
   # Replace on each release with the sha256 from the published SHA256SUMS,
   # which is signed. `brew fetch --force veilvoice` then prints what it saw.
   sha256 "REPLACE_WITH_THE_SIGNED_SHA256_OF_THE_SOURCE_TARBALL"

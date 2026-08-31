@@ -8,6 +8,26 @@ than a summary written afterwards.
 
 ## Unreleased
 
+Nothing yet. The next release goes here.
+
+## v0.1.15
+
+Encrypted volumes, one password if you want one, a window that locks itself,
+and an interview from an OBS recording through to a video.
+
+### The twelfth audit round, run before this release
+
+- **F-95** A VeraCrypt volume chosen and answered for, then locked, still
+  received the file. F-93 earlier in this cycle fixed the *panel*, which asked
+  whether the folder existed when the question is whether anything is mounted
+  on it. The file is written somewhere else, and that path asked neither: it
+  checked only whether the hidden-volume question had been answered. So a
+  locked vault took the recording onto the ordinary disk while its owner
+  believed it had gone inside, which is the failure the feature exists to
+  prevent, surviving the fix aimed at it. The mount table is now read at the
+  moment of writing, and a job whose destination is not open is refused rather
+  than quietly redirected.
+
 ### Encrypted volumes, and one password if you want one
 
 **Cryptomator and VeraCrypt.** VeilVoice can write every veiled recording
