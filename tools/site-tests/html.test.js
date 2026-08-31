@@ -51,7 +51,13 @@ const PAGES = discoverPages();
 // these pages may *load* from anywhere but the same origin.
 const ALLOWED_LINK_HOSTS = [
   "github.com", "raw.githubusercontent.com", "api.github.com",
-  "www.audacityteam.org", "vb-audio.com", "creativecommons.org", "www.gnu.org"
+  "www.audacityteam.org", "vb-audio.com", "creativecommons.org", "www.gnu.org",
+  // This project's own published site, which the release notes link to when
+  // they tell somebody where to compare a key fingerprint, and the advisory
+  // database the audit cites by name. Both are links a reader follows on
+  // purpose; neither is an asset the page loads, which the separate check
+  // below still refuses outright.
+  "tilas01.github.io", "rustsec.org"
 ];
 
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input",
