@@ -1302,7 +1302,24 @@ impl VeilVoiceApp {
         // chosen, and also when the destination is not cleared to be used, so
         // a job that got past the button somehow still cannot write into a
         // volume whose hidden-volume question is unanswered.
-        let output = self.storage.destination.place(&output);
+        // F-95. The mount table is read here, at the moment of writing, rather
+        // than taken from what the panel last saw. A vault locked since it was
+        // chosen leaves its mount point behind as an empty directory, and
+        // writing into that puts a veiled recording on the ordinary disk while
+        // its owner believes it went into the vault. `start_job` runs on a
+        // click and spawns a thread, so this is not the draw path.
+        let mounts = veilvoice_setup::volumes::mounted();
+        let placed = self.storage.destination.place(&output, &mounts);
+        if self.storage.destination.volume.is_some() && placed == output {
+            self.status = Some((
+                "that encrypted folder is not open now, so nothing was written. \
+                 Unlock it in its own program, or choose the ordinary folder again."
+                    .to_string(),
+                p::red(),
+            ));
+            return;
+        }
+        let output = placed;
         let config = self.config();
         let clean = self.posture().clean_metadata;
         let plan = self.security.plan();

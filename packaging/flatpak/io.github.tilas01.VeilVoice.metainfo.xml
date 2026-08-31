@@ -71,6 +71,17 @@
     The version is compared against the workspace version by the site suite.
   -->
   <releases>
+    <release version="0.1.15" date="2026-08-31">
+      <description>
+        <p>
+          Veiled recordings can be written straight into a Cryptomator vault or
+          a VeraCrypt volume, the app lock can seal every recording it writes,
+          the window can lock itself when it has not been used, and an
+          interview can be taken from an OBS recording through to a video with
+          a voice for every person in it.
+        </p>
+      </description>
+    </release>
     <release version="0.1.14" date="2026-08-28">
       <description>
         <p>

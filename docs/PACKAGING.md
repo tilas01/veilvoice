@@ -26,9 +26,9 @@ which is which:
 
 ### What the RPM build proved, and what it did not
 
-`rpmbuild -bs` produced `veilvoice-0.1.14-1.src.rpm` from a `git archive`
+`rpmbuild -bs` produced `veilvoice-0.1.15-1.src.rpm` from a `git archive`
 tarball, and `rpmbuild -bb` produced two binary packages:
-`veilvoice-0.1.14-1.x86_64.rpm` and `veilvoice-gui-0.1.14-1.x86_64.rpm`.
+`veilvoice-0.1.15-1.x86_64.rpm` and `veilvoice-gui-0.1.15-1.x86_64.rpm`.
 
 The thing a build proves that a parse cannot is that `%files` and `%install`
 agree. They do: the main package carries `/usr/bin/veilvoice`,
@@ -53,9 +53,9 @@ been run. Nothing has been uploaded anywhere.
 
 ### What the Debian build actually proved, and what it did not
 
-`dpkg-buildpackage -us -uc -b` produced `veilvoice_0.1.14-1_amd64.deb` and
-`veilvoice-gui_0.1.14-1_amd64.deb`. Both installed with `dpkg -i`, the
-installed `veilvoice --version` reported 0.1.14, `veilvoice info` and
+`dpkg-buildpackage -us -uc -b` produced `veilvoice_0.1.15-1_amd64.deb` and
+`veilvoice-gui_0.1.15-1_amd64.deb`. Both installed with `dpkg -i`, the
+installed `veilvoice --version` reported 0.1.15, `veilvoice info` and
 `veilvoice-verify --help` ran, and both packages removed cleanly. The release
 build and `cargo test --release --workspace` both ran as part of it, because
 that is what `debian/rules` does.
@@ -91,7 +91,7 @@ time.
 Doing it found two defects, F-80 and F-81, both recorded in
 [`AUDIT.md`](AUDIT.md). The first was that the recipe below could not run at
 all. The second was that every definition here still named v0.1.9 while the
-workspace was at v0.1.14, and nothing was watching:
+workspace was at v0.1.15, and nothing was watching:
 `tools/site-tests/packaging.test.js` is watching now.
 
 The install scripts and the portable verifier are tested — see
@@ -178,8 +178,8 @@ install it.**
 ```bash
 # Windows MSI (needs: dotnet tool install -g wix)
 wix build packaging/wix/veilvoice.wxs -arch x64 \
-    -d Version=0.1.14 -d BinDir=dist/veilvoice-v0.1.14-windows-x86_64 \
-    -o dist/VeilVoice-0.1.14-x64.msi
+    -d Version=0.1.15 -d BinDir=dist/veilvoice-v0.1.15-windows-x86_64 \
+    -o dist/VeilVoice-0.1.15-x64.msi
 ```
 
 The WiX source refers to `packaging/wix/LICENSE.rtf` for the licence dialog,
@@ -204,7 +204,7 @@ dpkg-buildpackage -us -uc -b
 
 # Fedora / RHEL / openSUSE
 rpmbuild -ba packaging/rpm/veilvoice.spec \
-    --define "_sourcedir $PWD/dist" --define "vv_version 0.1.14"
+    --define "_sourcedir $PWD/dist" --define "vv_version 0.1.15"
 
 # Flatpak  (regenerate cargo-sources.json from Cargo.lock first)
 python flatpak-cargo-generator.py Cargo.lock -o packaging/flatpak/cargo-sources.json

@@ -79,6 +79,29 @@ Every release, newest first. Open one to read what changed in it and to reach it
 </p>
 <details class="release">
 <summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
+<p>Nothing yet. The next release goes here.</p>
+</details>
+<details class="release" id="v0.1.15" open>
+<summary><strong>v0.1.15</strong> <span class="muted">Encrypted volumes, one password if you want one, a window that locks...</span></summary>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.15-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.15-macos-aarch64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.15-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.15-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.15-linux-aarch64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.15" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+<p>Encrypted volumes, one password if you want one, a window that locks itself, and an interview from an OBS recording through to a video.</p>
+<h4 id="the-twelfth-audit-round-run-before-this-release">The twelfth audit round, run before this release</h4>
+<ul>
+<li><strong>F-95</strong> A VeraCrypt volume chosen and answered for, then locked, still received the file. F-93 earlier in this cycle fixed the <em>panel</em>, which asked whether the folder existed when the question is whether anything is mounted on it. The file is written somewhere else, and that path asked neither: it checked only whether the hidden-volume question had been answered. So a locked vault took the recording onto the ordinary disk while its owner believed it had gone inside, which is the failure the feature exists to prevent, surviving the fix aimed at it. The mount table is now read at the moment of writing, and a job whose destination is not open is refused rather than quietly redirected.</li>
+</ul>
 <h4 id="encrypted-volumes-and-one-password-if-you-want-one">Encrypted volumes, and one password if you want one</h4>
 <p><strong>Cryptomator and VeraCrypt.</strong> VeilVoice can write every veiled recording straight into an encrypted folder you already have. It finds mounted vaults and volumes, offers them, and takes a folder you point at by hand when it finds none. <code>veilvoice volumes</code> reports the same thing from the command line.</p>
 <p>It never opens, closes or unlocks anything, and never asks for a volume password. Mounting your encrypted storage is your act, taken in the tool you chose; a test refuses <code>Command::new</code> in the shipped half of the detection module.</p>
@@ -287,7 +310,7 @@ curl: (22) The requested URL returned error: 403
 <p>Threads are reported too, and documented as being for <strong>batches</strong>. One recording cannot be split across cores: the ratchet and the phase state run forward in time, so two halves veiled in parallel would not produce the file the whole of it would.</p>
 <p>Measured on the machine this was written on: one NVIDIA GeForce RTX 4060, driver 32.0.16.1062, NVENC, 28 threads.</p>
 </details>
-<details class="release" id="v0.1.14" open>
+<details class="release" id="v0.1.14">
 <summary><strong>v0.1.14</strong> <span class="muted">The safety catch, an interface that reads like English, and a window...</span></summary>
 <div class="release-files">
 <h4>Files</h4>

@@ -83,7 +83,7 @@ another thread, so the window keeps answering while it is busy.
 flowchart TD
     n_lib(["lib.rs<br/>85 lines"])
     n_main(["main.rs<br/>172 lines"])
-    n_app["app.rs<br/>2441 lines"]
+    n_app["app.rs<br/>2458 lines"]
     n_autolock["autolock.rs<br/>326 lines"]
     n_crashlog["crashlog.rs<br/>266 lines"]
     n_dialog["dialog.rs<br/>369 lines"]
@@ -99,7 +99,7 @@ flowchart TD
     n_settings["settings.rs<br/>1245 lines"]
     n_setup["setup.rs<br/>753 lines"]
     n_soundbar["soundbar.rs<br/>360 lines"]
-    n_storage["storage.rs<br/>611 lines"]
+    n_storage["storage.rs<br/>659 lines"]
     n_theme["theme.rs<br/>783 lines"]
     n_updates["updates.rs<br/>246 lines"]
     n_verify["verify.rs<br/>767 lines"]
@@ -189,7 +189,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`app.rs`|File-veilvoice-gui-app]] | 2441 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [[`app.rs`|File-veilvoice-gui-app]] | 2458 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [[`autolock.rs`|File-veilvoice-gui-autolock]] | 326 | Locking the window again after a period of no use. |
 | [[`crashlog.rs`|File-veilvoice-gui-crashlog]] | 266 | Make a failure that produces no output produce some. |
 | [[`dialog.rs`|File-veilvoice-gui-dialog]] | 369 | Asking for a file without stopping the window. |
@@ -207,7 +207,7 @@ flowchart TD
 | [[`settings.rs`|File-veilvoice-gui-settings]] | 1245 | The settings panel: a menu of pages, each a titled group of choices. |
 | [[`setup.rs`|File-veilvoice-gui-setup]] | 753 | The setup tab: install this copy, undo that, and the optional companions. |
 | [[`soundbar.rs`|File-veilvoice-gui-soundbar]] | 360 | The animated mark: a row of bars that rise and fall. |
-| [[`storage.rs`|File-veilvoice-gui-storage]] | 611 | Where veiled recordings are written, and the encrypted volume that may hold them. |
+| [[`storage.rs`|File-veilvoice-gui-storage]] | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [[`theme.rs`|File-veilvoice-gui-theme]] | 783 | Colour schemes for the desktop app. |
 | [[`updates.rs`|File-veilvoice-gui-updates]] | 246 | The manual update check, as the window shows it. |
 | [[`verify.rs`|File-veilvoice-gui-verify]] | 767 | The verify tab: drop a download on the window and be told what it is. |

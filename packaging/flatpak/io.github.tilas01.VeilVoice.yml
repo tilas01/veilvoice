@@ -74,7 +74,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/tilas01/veilvoice.git
-        tag: v0.1.14
+        tag: v0.1.15
       # `flatpak-cargo-generator.py` produces this from Cargo.lock so the build
       # needs no network. Regenerate it whenever Cargo.lock changes.
       - cargo-sources.json
