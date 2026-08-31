@@ -15,6 +15,28 @@ Nothing yet. The next release goes here.
 Encrypted volumes, one password if you want one, a window that locks itself,
 and an interview from an OBS recording through to a video.
 
+### The thirteenth audit round, run on what CI refused
+
+- **F-96** A program that has just been started is not yet wearing its own
+  name. The failsafe checks that a process id still belongs to the program it
+  means to close, and its own tests start a `sleep` and act on it microseconds
+  later. Measured, once in four thousand spawns: the kernel hands the parent
+  back before it sets the new name, so the check reads the name of the process
+  that did the starting. The shipped code already refuses on that answer, which
+  is the direction that closes nothing when unsure; the tests now wait for the
+  child to appear under its own name first.
+- The real-time headroom test asserted an absolute number and so measured the
+  machine: under emulation on the 32-bit job it failed while every native
+  target passed. It compares the same audio run with and without accent
+  tracking now, on the same machine in the same test, which is the claim it was
+  always making.
+- `veilvoice-gui`'s help text is read only on the platforms that have a console
+  to print it to, and was declared on all of them, so the Windows build failed
+  on a constant nothing reads.
+- The committed search index was seven bytes behind `ROADMAP.md`, which was
+  edited after the generators had run. The check that exists for this caught
+  it.
+
 ### The twelfth audit round, run before this release
 
 - **F-95** A VeraCrypt volume chosen and answered for, then locked, still

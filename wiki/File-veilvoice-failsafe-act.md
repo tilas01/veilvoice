@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-failsafe/src/act.rs`
 
-[[veilvoice-failsafe|Crate-veilvoice-failsafe]] &middot; 470 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs)
+[[veilvoice-failsafe|Crate-veilvoice-failsafe]] &middot; 516 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs)
 
 ## Contents
 
@@ -41,7 +41,7 @@ it did either way.
 
 ## What this file contains
 
-470 lines defining **5 functions** (1 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+516 lines defining **5 functions** (1 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 

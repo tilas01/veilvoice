@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-failsafe/src/act.rs</code></h1>
-<p style="color:var(--muted)"><a href="act.html">what this file is for</a> &middot; <a href="../veilvoice-failsafe.html">veilvoice-failsafe</a> &middot; 470 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="act.html">what this file is for</a> &middot; <a href="../veilvoice-failsafe.html">veilvoice-failsafe</a> &middot; 516 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-failsafe/src/act.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -368,159 +368,205 @@
 <span class="ln" id="L315">        assert!(body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;-TERM&quot;</span>), <span class="tok-str">&quot;and elsewhere it asks first&quot;</span>);</span>
 <span class="ln" id="L316">    }</span>
 <span class="ln" id="L317"></span>
-<span class="ln" id="L318">    <span class="tok-com">/// A name that does not match the process is refused, which is F-74&#x27;s</span></span>
-<span class="ln" id="L319">    <span class="tok-com">/// whole purpose: the id alone is not enough to know what will be closed.</span></span>
-<span class="ln" id="L320">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L321">    <span class="tok-kw">fn</span> <span class="tok-fn">a_process_whose_name_does_not_match_is_left_alone</span>() {</span>
-<span class="ln" id="L322">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> child = <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L323">            <span class="tok-kw">let</span> root = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">r&quot;C:\Windows&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L324">            Command::<span class="tok-fn">new</span>(format!(<span class="tok-str">r&quot;{root}\System32\ping.exe&quot;</span>))</span>
-<span class="ln" id="L325">                .<span class="tok-fn">args</span>([<span class="tok-str">&quot;-n&quot;</span>, <span class="tok-str">&quot;20&quot;</span>, <span class="tok-str">&quot;127.0.0.1&quot;</span>])</span>
-<span class="ln" id="L326">                .<span class="tok-fn">stdin</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
-<span class="ln" id="L327">                .<span class="tok-fn">stdout</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
-<span class="ln" id="L328">                .<span class="tok-fn">spawn</span>()</span>
-<span class="ln" id="L329">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L330">            Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/bin/sleep&quot;</span>).<span class="tok-fn">arg</span>(<span class="tok-str">&quot;20&quot;</span>).<span class="tok-fn">spawn</span>()</span>
-<span class="ln" id="L331">        };</span>
-<span class="ln" id="L332">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(child) = child.<span class="tok-fn">as_mut</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L333">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L334">        };</span>
-<span class="ln" id="L335">        <span class="tok-kw">let</span> pid = child.<span class="tok-fn">id</span>();</span>
-<span class="ln" id="L336"></span>
-<span class="ln" id="L337">        <span class="tok-com">// Somebody else&#x27;s program, wearing this one&#x27;s number.</span></span>
-<span class="ln" id="L338">        <span class="tok-kw">let</span> refused = <span class="tok-fn">close</span>(<span class="tok-str">&quot;not-what-is-running.exe&quot;</span>, <span class="tok-fn">Some</span>(pid));</span>
-<span class="ln" id="L339">        assert!(refused.<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{refused:?}&quot;</span>);</span>
-<span class="ln" id="L340"></span>
-<span class="ln" id="L341">        <span class="tok-com">// And it really is still running.</span></span>
-<span class="ln" id="L342">        <span class="tok-kw">let</span> name = <span class="tok-kw">if</span> cfg!(windows) { <span class="tok-str">&quot;ping.exe&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;sleep&quot;</span> };</span>
-<span class="ln" id="L343">        <span class="tok-fn">close</span>(name, <span class="tok-fn">Some</span>(pid)).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the right name still closes it&quot;</span>);</span>
-<span class="ln" id="L344">        <span class="tok-kw">let</span> _ = child.<span class="tok-fn">wait</span>();</span>
-<span class="ln" id="L345">    }</span>
-<span class="ln" id="L346"></span>
-<span class="ln" id="L347">    <span class="tok-com">/// **F-74.** A process id is not a durable handle to a program.</span></span>
-<span class="ln" id="L348">    <span class="tok-com">///</span></span>
-<span class="ln" id="L349">    <span class="tok-com">/// Between the scan that found something and the line that closes it, the</span></span>
-<span class="ln" id="L350">    <span class="tok-com">/// program can exit and the operating system can hand its id to a new</span></span>
-<span class="ln" id="L351">    <span class="tok-com">/// process. Closing by number alone would then terminate whatever inherited</span></span>
-<span class="ln" id="L352">    <span class="tok-com">/// it, and report having closed the one it meant.</span></span>
-<span class="ln" id="L353">    <span class="tok-com">///</span></span>
-<span class="ln" id="L354">    <span class="tok-com">/// On Windows the name travels with the kill as a filter, so the check and</span></span>
-<span class="ln" id="L355">    <span class="tok-com">/// the act are one operation. Elsewhere the name is checked immediately</span></span>
-<span class="ln" id="L356">    <span class="tok-com">/// before, which narrows the window rather than removing it.</span></span>
-<span class="ln" id="L357">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L358">    <span class="tok-kw">fn</span> <span class="tok-fn">a_process_is_never_closed_by_number_alone</span>() {</span>
-<span class="ln" id="L359">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;act.rs&quot;</span>).<span class="tok-fn">replace</span>(</span>
-<span class="ln" id="L360">            <span class="tok-str">&quot;</span></span>
-<span class="ln" id="L361"><span class="tok-str">&quot;</span>, <span class="tok-str">&quot;</span></span>
-<span class="ln" id="L362"><span class="tok-str">&quot;</span>,</span>
-<span class="ln" id="L363">        );</span>
-<span class="ln" id="L364">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L365">        assert!(</span>
-<span class="ln" id="L366">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;IMAGENAME eq&quot;</span>),</span>
-<span class="ln" id="L367">            <span class="tok-str">&quot;the Windows kill must carry the name as well as the id&quot;</span></span>
-<span class="ln" id="L368">        );</span>
-<span class="ln" id="L369">        assert!(</span>
-<span class="ln" id="L370">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;still_named&quot;</span>),</span>
-<span class="ln" id="L371">            <span class="tok-str">&quot;and elsewhere the name must be checked first&quot;</span></span>
-<span class="ln" id="L372">        );</span>
-<span class="ln" id="L373">        <span class="tok-com">// And the fallback when it cannot tell is to refuse.</span></span>
-<span class="ln" id="L374">        <span class="tok-kw">let</span> start = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn still_named&quot;</span>).<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L375">        <span class="tok-kw">if</span> start &gt; <span class="tok-num">0</span> {</span>
-<span class="ln" id="L376">            <span class="tok-kw">let</span> tail = &amp;body[start..];</span>
-<span class="ln" id="L377">            assert!(</span>
-<span class="ln" id="L378">                tail.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;_ =&gt; false&quot;</span>),</span>
-<span class="ln" id="L379">                <span class="tok-str">&quot;not being able to tell must mean not closing it&quot;</span></span>
-<span class="ln" id="L380">            );</span>
-<span class="ln" id="L381">        }</span>
-<span class="ln" id="L382">    }</span>
-<span class="ln" id="L383"></span>
-<span class="ln" id="L384">    <span class="tok-com">/// **F-76.** A program that has died is reported as gone, not as running.</span></span>
-<span class="ln" id="L385">    <span class="tok-com">///</span></span>
-<span class="ln" id="L386">    <span class="tok-com">/// On Unix a process that has exited keeps its id and its name in the</span></span>
-<span class="ln" id="L387">    <span class="tok-com">/// table until its parent collects its exit status. This test is that</span></span>
-<span class="ln" id="L388">    <span class="tok-com">/// parent, and it deliberately does not collect: after the signal the</span></span>
-<span class="ln" id="L389">    <span class="tok-com">/// child is dead, `/proc/&lt;pid&gt;/comm` still reads `sleep`, and `ps` still</span></span>
-<span class="ln" id="L390">    <span class="tok-com">/// prints `sleep` and still exits 0.</span></span>
+<span class="ln" id="L318">    <span class="tok-com">/// Wait until a just-started child is wearing its own name.</span></span>
+<span class="ln" id="L319">    <span class="tok-com">///</span></span>
+<span class="ln" id="L320">    <span class="tok-com">/// **F-96.** `Command::spawn` returns before the program it started is</span></span>
+<span class="ln" id="L321">    <span class="tok-com">/// visible under its own name. Measured on Linux, once in about four</span></span>
+<span class="ln" id="L322">    <span class="tok-com">/// thousand spawns: `/bin/sleep` is started and `/proc/&lt;pid&gt;/comm`, read on</span></span>
+<span class="ln" id="L323">    <span class="tok-com">/// the next line, still says the name of the program that started it. The</span></span>
+<span class="ln" id="L324">    <span class="tok-com">/// kernel releases the parent when the child&#x27;s address space goes, which</span></span>
+<span class="ln" id="L325">    <span class="tok-com">/// happens inside `begin_new_exec` and before the line that sets the new</span></span>
+<span class="ln" id="L326">    <span class="tok-com">/// name, so there is a short window where the id is live and belongs to the</span></span>
+<span class="ln" id="L327">    <span class="tok-com">/// program that is starting while still answering with somebody else&#x27;s</span></span>
+<span class="ln" id="L328">    <span class="tok-com">/// name.</span></span>
+<span class="ln" id="L329">    <span class="tok-com">///</span></span>
+<span class="ln" id="L330">    <span class="tok-com">/// [`still_named`] refuses during that window, which is the safe direction</span></span>
+<span class="ln" id="L331">    <span class="tok-com">/// and is what this program wants: a doubtful answer closes nothing. The</span></span>
+<span class="ln" id="L332">    <span class="tok-com">/// tests below are the ones that have to care, because they start a child</span></span>
+<span class="ln" id="L333">    <span class="tok-com">/// and act on it in the next few microseconds, which no scan ever does.</span></span>
+<span class="ln" id="L334">    <span class="tok-com">/// Without this wait they fail rarely and misleadingly: one CI run reported</span></span>
+<span class="ln" id="L335">    <span class="tok-com">/// &quot;sleep is no longer process 7030&quot; about a `sleep` that was still running</span></span>
+<span class="ln" id="L336">    <span class="tok-com">/// when the job cleaned up after it.</span></span>
+<span class="ln" id="L337">    <span class="tok-com">///</span></span>
+<span class="ln" id="L338">    <span class="tok-com">/// Waiting on the function under test is deliberate. The precondition these</span></span>
+<span class="ln" id="L339">    <span class="tok-com">/// tests need is exactly &quot;this id now belongs to this program&quot;, which is</span></span>
+<span class="ln" id="L340">    <span class="tok-com">/// what it answers, and a child that never arrives fails here with that</span></span>
+<span class="ln" id="L341">    <span class="tok-com">/// said plainly rather than inside an assertion about something else.</span></span>
+<span class="ln" id="L342">    <span class="tok-kw">fn</span> <span class="tok-fn">wearing_its_own_name</span>(name: &amp;str, pid: u32) -&gt; bool {</span>
+<span class="ln" id="L343">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">200</span> {</span>
+<span class="ln" id="L344">            <span class="tok-kw">if</span> <span class="tok-fn">still_named</span>(name, pid) {</span>
+<span class="ln" id="L345">                <span class="tok-kw">return</span> true;</span>
+<span class="ln" id="L346">            }</span>
+<span class="ln" id="L347">            std::thread::<span class="tok-fn">sleep</span>(std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">5</span>));</span>
+<span class="ln" id="L348">        }</span>
+<span class="ln" id="L349">        false</span>
+<span class="ln" id="L350">    }</span>
+<span class="ln" id="L351"></span>
+<span class="ln" id="L352">    <span class="tok-com">/// A name that does not match the process is refused, which is F-74&#x27;s</span></span>
+<span class="ln" id="L353">    <span class="tok-com">/// whole purpose: the id alone is not enough to know what will be closed.</span></span>
+<span class="ln" id="L354">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L355">    <span class="tok-kw">fn</span> <span class="tok-fn">a_process_whose_name_does_not_match_is_left_alone</span>() {</span>
+<span class="ln" id="L356">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> child = <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L357">            <span class="tok-kw">let</span> root = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">r&quot;C:\Windows&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L358">            Command::<span class="tok-fn">new</span>(format!(<span class="tok-str">r&quot;{root}\System32\ping.exe&quot;</span>))</span>
+<span class="ln" id="L359">                .<span class="tok-fn">args</span>([<span class="tok-str">&quot;-n&quot;</span>, <span class="tok-str">&quot;20&quot;</span>, <span class="tok-str">&quot;127.0.0.1&quot;</span>])</span>
+<span class="ln" id="L360">                .<span class="tok-fn">stdin</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L361">                .<span class="tok-fn">stdout</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L362">                .<span class="tok-fn">spawn</span>()</span>
+<span class="ln" id="L363">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L364">            Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/bin/sleep&quot;</span>).<span class="tok-fn">arg</span>(<span class="tok-str">&quot;20&quot;</span>).<span class="tok-fn">spawn</span>()</span>
+<span class="ln" id="L365">        };</span>
+<span class="ln" id="L366">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(child) = child.<span class="tok-fn">as_mut</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L367">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L368">        };</span>
+<span class="ln" id="L369">        <span class="tok-kw">let</span> pid = child.<span class="tok-fn">id</span>();</span>
+<span class="ln" id="L370">        <span class="tok-kw">let</span> name = <span class="tok-kw">if</span> cfg!(windows) { <span class="tok-str">&quot;ping.exe&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;sleep&quot;</span> };</span>
+<span class="ln" id="L371">        assert!(</span>
+<span class="ln" id="L372">            <span class="tok-fn">wearing_its_own_name</span>(name, pid),</span>
+<span class="ln" id="L373">            <span class="tok-str">&quot;the child never appeared as {name}, so there is nothing to test&quot;</span></span>
+<span class="ln" id="L374">        );</span>
+<span class="ln" id="L375"></span>
+<span class="ln" id="L376">        <span class="tok-com">// Somebody else&#x27;s program, wearing this one&#x27;s number.</span></span>
+<span class="ln" id="L377">        <span class="tok-kw">let</span> refused = <span class="tok-fn">close</span>(<span class="tok-str">&quot;not-what-is-running.exe&quot;</span>, <span class="tok-fn">Some</span>(pid));</span>
+<span class="ln" id="L378">        assert!(refused.<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{refused:?}&quot;</span>);</span>
+<span class="ln" id="L379"></span>
+<span class="ln" id="L380">        <span class="tok-com">// And it really is still running.</span></span>
+<span class="ln" id="L381">        <span class="tok-fn">close</span>(name, <span class="tok-fn">Some</span>(pid)).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the right name still closes it&quot;</span>);</span>
+<span class="ln" id="L382">        <span class="tok-kw">let</span> _ = child.<span class="tok-fn">wait</span>();</span>
+<span class="ln" id="L383">    }</span>
+<span class="ln" id="L384"></span>
+<span class="ln" id="L385">    <span class="tok-com">/// **F-74.** A process id is not a durable handle to a program.</span></span>
+<span class="ln" id="L386">    <span class="tok-com">///</span></span>
+<span class="ln" id="L387">    <span class="tok-com">/// Between the scan that found something and the line that closes it, the</span></span>
+<span class="ln" id="L388">    <span class="tok-com">/// program can exit and the operating system can hand its id to a new</span></span>
+<span class="ln" id="L389">    <span class="tok-com">/// process. Closing by number alone would then terminate whatever inherited</span></span>
+<span class="ln" id="L390">    <span class="tok-com">/// it, and report having closed the one it meant.</span></span>
 <span class="ln" id="L391">    <span class="tok-com">///</span></span>
-<span class="ln" id="L392">    <span class="tok-com">/// Before the fix, [`close`] read that as &quot;still running&quot;, waited out its</span></span>
-<span class="ln" id="L393">    <span class="tok-com">/// whole retry loop, and then told the reader to go and close by hand a</span></span>
-<span class="ln" id="L394">    <span class="tok-com">/// program that had been dead for nearly three seconds. Measured: the two</span></span>
-<span class="ln" id="L395">    <span class="tok-com">/// tests below this one failed on Linux for exactly that reason while</span></span>
-<span class="ln" id="L396">    <span class="tok-com">/// passing on Windows, where a terminated process leaves the table at once.</span></span>
-<span class="ln" id="L397">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L398">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L399">    <span class="tok-kw">fn</span> <span class="tok-fn">a_program_that_has_died_but_not_been_collected_counts_as_gone</span>() {</span>
-<span class="ln" id="L400">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> child) = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/bin/sleep&quot;</span>).<span class="tok-fn">arg</span>(<span class="tok-str">&quot;30&quot;</span>).<span class="tok-fn">spawn</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L401">            <span class="tok-com">// No such tool on this machine. Not a failure of the code under</span></span>
-<span class="ln" id="L402">            <span class="tok-com">// test, and better skipped than asserted around.</span></span>
-<span class="ln" id="L403">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L404">        };</span>
-<span class="ln" id="L405">        <span class="tok-kw">let</span> pid = child.<span class="tok-fn">id</span>();</span>
-<span class="ln" id="L406">        <span class="tok-kw">let</span> told = <span class="tok-fn">close</span>(<span class="tok-str">&quot;sleep&quot;</span>, <span class="tok-fn">Some</span>(pid));</span>
+<span class="ln" id="L392">    <span class="tok-com">/// On Windows the name travels with the kill as a filter, so the check and</span></span>
+<span class="ln" id="L393">    <span class="tok-com">/// the act are one operation. Elsewhere the name is checked immediately</span></span>
+<span class="ln" id="L394">    <span class="tok-com">/// before, which narrows the window rather than removing it.</span></span>
+<span class="ln" id="L395">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L396">    <span class="tok-kw">fn</span> <span class="tok-fn">a_process_is_never_closed_by_number_alone</span>() {</span>
+<span class="ln" id="L397">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;act.rs&quot;</span>).<span class="tok-fn">replace</span>(</span>
+<span class="ln" id="L398">            <span class="tok-str">&quot;</span></span>
+<span class="ln" id="L399"><span class="tok-str">&quot;</span>, <span class="tok-str">&quot;</span></span>
+<span class="ln" id="L400"><span class="tok-str">&quot;</span>,</span>
+<span class="ln" id="L401">        );</span>
+<span class="ln" id="L402">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L403">        assert!(</span>
+<span class="ln" id="L404">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;IMAGENAME eq&quot;</span>),</span>
+<span class="ln" id="L405">            <span class="tok-str">&quot;the Windows kill must carry the name as well as the id&quot;</span></span>
+<span class="ln" id="L406">        );</span>
 <span class="ln" id="L407">        assert!(</span>
-<span class="ln" id="L408">            told.<span class="tok-fn">is_ok</span>(),</span>
-<span class="ln" id="L409">            <span class="tok-str">&quot;a dead child must not be reported as running: {told:?}&quot;</span></span>
+<span class="ln" id="L408">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;still_named&quot;</span>),</span>
+<span class="ln" id="L409">            <span class="tok-str">&quot;and elsewhere the name must be checked first&quot;</span></span>
 <span class="ln" id="L410">        );</span>
-<span class="ln" id="L411"></span>
-<span class="ln" id="L412">        <span class="tok-com">// Nothing has collected it yet, so the operating system is still</span></span>
-<span class="ln" id="L413">        <span class="tok-com">// holding the entry this used to be fooled by. Prove that rather than</span></span>
-<span class="ln" id="L414">        <span class="tok-com">// assume it: without it this test would pass for the wrong reason on</span></span>
-<span class="ln" id="L415">        <span class="tok-com">// any platform that reaps early.</span></span>
-<span class="ln" id="L416">        <span class="tok-kw">let</span> listed = std::fs::<span class="tok-fn">read_to_string</span>(format!(<span class="tok-str">&quot;/proc/{pid}/comm&quot;</span>));</span>
-<span class="ln" id="L417">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(name) = listed {</span>
-<span class="ln" id="L418">            assert_eq!(</span>
-<span class="ln" id="L419">                name.<span class="tok-fn">trim</span>(),</span>
-<span class="ln" id="L420">                <span class="tok-str">&quot;sleep&quot;</span>,</span>
-<span class="ln" id="L421">                <span class="tok-str">&quot;the entry should still be there, which is what makes this a test&quot;</span></span>
-<span class="ln" id="L422">            );</span>
-<span class="ln" id="L423">        }</span>
-<span class="ln" id="L424">        <span class="tok-kw">let</span> _ = child.<span class="tok-fn">wait</span>();</span>
-<span class="ln" id="L425">    }</span>
-<span class="ln" id="L426"></span>
-<span class="ln" id="L427">    <span class="tok-com">/// A real process, closed for real. Started here so nothing else is at</span></span>
-<span class="ln" id="L428">    <span class="tok-com">/// risk, and it is a program that does nothing but wait.</span></span>
-<span class="ln" id="L429">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L430">    <span class="tok-kw">fn</span> <span class="tok-fn">a_process_this_test_started_is_actually_closed</span>() {</span>
-<span class="ln" id="L431">        <span class="tok-com">// `ping` rather than `timeout`: timeout.exe refuses to run without a</span></span>
-<span class="ln" id="L432">        <span class="tok-com">// console (&quot;input redirection is not supported&quot;) and exits at once, so</span></span>
-<span class="ln" id="L433">        <span class="tok-com">// the first version of this test closed a process that had already</span></span>
-<span class="ln" id="L434">        <span class="tok-com">// gone and reported that as a failure of the code under test.</span></span>
-<span class="ln" id="L435">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> child = <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L436">            <span class="tok-kw">let</span> root = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">&quot;C:\\Windows&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L437">            Command::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{root}\\System32\\ping.exe&quot;</span>))</span>
-<span class="ln" id="L438">                .<span class="tok-fn">args</span>([<span class="tok-str">&quot;-n&quot;</span>, <span class="tok-str">&quot;30&quot;</span>, <span class="tok-str">&quot;127.0.0.1&quot;</span>])</span>
-<span class="ln" id="L439">                .<span class="tok-fn">stdin</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
-<span class="ln" id="L440">                .<span class="tok-fn">stdout</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
-<span class="ln" id="L441">                .<span class="tok-fn">spawn</span>()</span>
-<span class="ln" id="L442">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L443">            Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/bin/sleep&quot;</span>).<span class="tok-fn">arg</span>(<span class="tok-str">&quot;30&quot;</span>).<span class="tok-fn">spawn</span>()</span>
-<span class="ln" id="L444">        };</span>
-<span class="ln" id="L445">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(child) = child.<span class="tok-fn">as_mut</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L446">            <span class="tok-com">// No such tool on this machine. Not a failure of the code under</span></span>
-<span class="ln" id="L447">            <span class="tok-com">// test, and better skipped than asserted around.</span></span>
-<span class="ln" id="L448">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L449">        };</span>
-<span class="ln" id="L450">        <span class="tok-kw">let</span> pid = child.<span class="tok-fn">id</span>();</span>
-<span class="ln" id="L451">        <span class="tok-com">// The real name, because F-74 made the name part of the kill. Passing a</span></span>
-<span class="ln" id="L452">        <span class="tok-com">// made-up one here used to work and now correctly does not, which is</span></span>
-<span class="ln" id="L453">        <span class="tok-com">// the whole point: the first run of this after that change sat for the</span></span>
-<span class="ln" id="L454">        <span class="tok-com">// full thirty seconds while taskkill refused and the process outlived</span></span>
-<span class="ln" id="L455">        <span class="tok-com">// it.</span></span>
-<span class="ln" id="L456">        <span class="tok-kw">let</span> name = <span class="tok-kw">if</span> cfg!(windows) { <span class="tok-str">&quot;ping.exe&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;sleep&quot;</span> };</span>
-<span class="ln" id="L457">        <span class="tok-kw">let</span> told = <span class="tok-fn">close</span>(name, <span class="tok-fn">Some</span>(pid));</span>
-<span class="ln" id="L458">        assert!(told.<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{told:?}&quot;</span>);</span>
-<span class="ln" id="L459">        assert!(told.<span class="tok-fn">unwrap</span>().<span class="tok-fn">contains</span>(&amp;pid.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L460"></span>
-<span class="ln" id="L461">        <span class="tok-com">// And it really is gone, rather than merely reported as gone. `wait`</span></span>
-<span class="ln" id="L462">        <span class="tok-com">// returns once it has been reaped, which will not happen if the close</span></span>
-<span class="ln" id="L463">        <span class="tok-com">// silently did nothing -- the test would hang rather than pass.</span></span>
-<span class="ln" id="L464">        <span class="tok-kw">let</span> status = child.<span class="tok-fn">wait</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;reap&quot;</span>);</span>
-<span class="ln" id="L465">        assert!(</span>
-<span class="ln" id="L466">            !status.<span class="tok-fn">success</span>(),</span>
-<span class="ln" id="L467">            <span class="tok-str">&quot;a terminated process should not report success: {status:?}&quot;</span></span>
-<span class="ln" id="L468">        );</span>
-<span class="ln" id="L469">    }</span>
-<span class="ln" id="L470">}</span>
+<span class="ln" id="L411">        <span class="tok-com">// And the fallback when it cannot tell is to refuse.</span></span>
+<span class="ln" id="L412">        <span class="tok-kw">let</span> start = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn still_named&quot;</span>).<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L413">        <span class="tok-kw">if</span> start &gt; <span class="tok-num">0</span> {</span>
+<span class="ln" id="L414">            <span class="tok-kw">let</span> tail = &amp;body[start..];</span>
+<span class="ln" id="L415">            assert!(</span>
+<span class="ln" id="L416">                tail.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;_ =&gt; false&quot;</span>),</span>
+<span class="ln" id="L417">                <span class="tok-str">&quot;not being able to tell must mean not closing it&quot;</span></span>
+<span class="ln" id="L418">            );</span>
+<span class="ln" id="L419">        }</span>
+<span class="ln" id="L420">    }</span>
+<span class="ln" id="L421"></span>
+<span class="ln" id="L422">    <span class="tok-com">/// **F-76.** A program that has died is reported as gone, not as running.</span></span>
+<span class="ln" id="L423">    <span class="tok-com">///</span></span>
+<span class="ln" id="L424">    <span class="tok-com">/// On Unix a process that has exited keeps its id and its name in the</span></span>
+<span class="ln" id="L425">    <span class="tok-com">/// table until its parent collects its exit status. This test is that</span></span>
+<span class="ln" id="L426">    <span class="tok-com">/// parent, and it deliberately does not collect: after the signal the</span></span>
+<span class="ln" id="L427">    <span class="tok-com">/// child is dead, `/proc/&lt;pid&gt;/comm` still reads `sleep`, and `ps` still</span></span>
+<span class="ln" id="L428">    <span class="tok-com">/// prints `sleep` and still exits 0.</span></span>
+<span class="ln" id="L429">    <span class="tok-com">///</span></span>
+<span class="ln" id="L430">    <span class="tok-com">/// Before the fix, [`close`] read that as &quot;still running&quot;, waited out its</span></span>
+<span class="ln" id="L431">    <span class="tok-com">/// whole retry loop, and then told the reader to go and close by hand a</span></span>
+<span class="ln" id="L432">    <span class="tok-com">/// program that had been dead for nearly three seconds. Measured: the two</span></span>
+<span class="ln" id="L433">    <span class="tok-com">/// tests below this one failed on Linux for exactly that reason while</span></span>
+<span class="ln" id="L434">    <span class="tok-com">/// passing on Windows, where a terminated process leaves the table at once.</span></span>
+<span class="ln" id="L435">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L436">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L437">    <span class="tok-kw">fn</span> <span class="tok-fn">a_program_that_has_died_but_not_been_collected_counts_as_gone</span>() {</span>
+<span class="ln" id="L438">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> child) = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/bin/sleep&quot;</span>).<span class="tok-fn">arg</span>(<span class="tok-str">&quot;30&quot;</span>).<span class="tok-fn">spawn</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L439">            <span class="tok-com">// No such tool on this machine. Not a failure of the code under</span></span>
+<span class="ln" id="L440">            <span class="tok-com">// test, and better skipped than asserted around.</span></span>
+<span class="ln" id="L441">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L442">        };</span>
+<span class="ln" id="L443">        <span class="tok-kw">let</span> pid = child.<span class="tok-fn">id</span>();</span>
+<span class="ln" id="L444">        assert!(</span>
+<span class="ln" id="L445">            <span class="tok-fn">wearing_its_own_name</span>(<span class="tok-str">&quot;sleep&quot;</span>, pid),</span>
+<span class="ln" id="L446">            <span class="tok-str">&quot;the child never appeared as sleep, so there is nothing to test&quot;</span></span>
+<span class="ln" id="L447">        );</span>
+<span class="ln" id="L448">        <span class="tok-kw">let</span> told = <span class="tok-fn">close</span>(<span class="tok-str">&quot;sleep&quot;</span>, <span class="tok-fn">Some</span>(pid));</span>
+<span class="ln" id="L449">        assert!(</span>
+<span class="ln" id="L450">            told.<span class="tok-fn">is_ok</span>(),</span>
+<span class="ln" id="L451">            <span class="tok-str">&quot;a dead child must not be reported as running: {told:?}&quot;</span></span>
+<span class="ln" id="L452">        );</span>
+<span class="ln" id="L453"></span>
+<span class="ln" id="L454">        <span class="tok-com">// Nothing has collected it yet, so the operating system is still</span></span>
+<span class="ln" id="L455">        <span class="tok-com">// holding the entry this used to be fooled by. Prove that rather than</span></span>
+<span class="ln" id="L456">        <span class="tok-com">// assume it: without it this test would pass for the wrong reason on</span></span>
+<span class="ln" id="L457">        <span class="tok-com">// any platform that reaps early.</span></span>
+<span class="ln" id="L458">        <span class="tok-kw">let</span> listed = std::fs::<span class="tok-fn">read_to_string</span>(format!(<span class="tok-str">&quot;/proc/{pid}/comm&quot;</span>));</span>
+<span class="ln" id="L459">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(name) = listed {</span>
+<span class="ln" id="L460">            assert_eq!(</span>
+<span class="ln" id="L461">                name.<span class="tok-fn">trim</span>(),</span>
+<span class="ln" id="L462">                <span class="tok-str">&quot;sleep&quot;</span>,</span>
+<span class="ln" id="L463">                <span class="tok-str">&quot;the entry should still be there, which is what makes this a test&quot;</span></span>
+<span class="ln" id="L464">            );</span>
+<span class="ln" id="L465">        }</span>
+<span class="ln" id="L466">        <span class="tok-kw">let</span> _ = child.<span class="tok-fn">wait</span>();</span>
+<span class="ln" id="L467">    }</span>
+<span class="ln" id="L468"></span>
+<span class="ln" id="L469">    <span class="tok-com">/// A real process, closed for real. Started here so nothing else is at</span></span>
+<span class="ln" id="L470">    <span class="tok-com">/// risk, and it is a program that does nothing but wait.</span></span>
+<span class="ln" id="L471">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L472">    <span class="tok-kw">fn</span> <span class="tok-fn">a_process_this_test_started_is_actually_closed</span>() {</span>
+<span class="ln" id="L473">        <span class="tok-com">// `ping` rather than `timeout`: timeout.exe refuses to run without a</span></span>
+<span class="ln" id="L474">        <span class="tok-com">// console (&quot;input redirection is not supported&quot;) and exits at once, so</span></span>
+<span class="ln" id="L475">        <span class="tok-com">// the first version of this test closed a process that had already</span></span>
+<span class="ln" id="L476">        <span class="tok-com">// gone and reported that as a failure of the code under test.</span></span>
+<span class="ln" id="L477">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> child = <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L478">            <span class="tok-kw">let</span> root = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">&quot;C:\\Windows&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L479">            Command::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{root}\\System32\\ping.exe&quot;</span>))</span>
+<span class="ln" id="L480">                .<span class="tok-fn">args</span>([<span class="tok-str">&quot;-n&quot;</span>, <span class="tok-str">&quot;30&quot;</span>, <span class="tok-str">&quot;127.0.0.1&quot;</span>])</span>
+<span class="ln" id="L481">                .<span class="tok-fn">stdin</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L482">                .<span class="tok-fn">stdout</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L483">                .<span class="tok-fn">spawn</span>()</span>
+<span class="ln" id="L484">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L485">            Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/bin/sleep&quot;</span>).<span class="tok-fn">arg</span>(<span class="tok-str">&quot;30&quot;</span>).<span class="tok-fn">spawn</span>()</span>
+<span class="ln" id="L486">        };</span>
+<span class="ln" id="L487">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(child) = child.<span class="tok-fn">as_mut</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L488">            <span class="tok-com">// No such tool on this machine. Not a failure of the code under</span></span>
+<span class="ln" id="L489">            <span class="tok-com">// test, and better skipped than asserted around.</span></span>
+<span class="ln" id="L490">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L491">        };</span>
+<span class="ln" id="L492">        <span class="tok-kw">let</span> pid = child.<span class="tok-fn">id</span>();</span>
+<span class="ln" id="L493">        <span class="tok-com">// The real name, because F-74 made the name part of the kill. Passing a</span></span>
+<span class="ln" id="L494">        <span class="tok-com">// made-up one here used to work and now correctly does not, which is</span></span>
+<span class="ln" id="L495">        <span class="tok-com">// the whole point: the first run of this after that change sat for the</span></span>
+<span class="ln" id="L496">        <span class="tok-com">// full thirty seconds while taskkill refused and the process outlived</span></span>
+<span class="ln" id="L497">        <span class="tok-com">// it.</span></span>
+<span class="ln" id="L498">        <span class="tok-kw">let</span> name = <span class="tok-kw">if</span> cfg!(windows) { <span class="tok-str">&quot;ping.exe&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;sleep&quot;</span> };</span>
+<span class="ln" id="L499">        assert!(</span>
+<span class="ln" id="L500">            <span class="tok-fn">wearing_its_own_name</span>(name, pid),</span>
+<span class="ln" id="L501">            <span class="tok-str">&quot;the child never appeared as {name}, so there is nothing to test&quot;</span></span>
+<span class="ln" id="L502">        );</span>
+<span class="ln" id="L503">        <span class="tok-kw">let</span> told = <span class="tok-fn">close</span>(name, <span class="tok-fn">Some</span>(pid));</span>
+<span class="ln" id="L504">        assert!(told.<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{told:?}&quot;</span>);</span>
+<span class="ln" id="L505">        assert!(told.<span class="tok-fn">unwrap</span>().<span class="tok-fn">contains</span>(&amp;pid.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L506"></span>
+<span class="ln" id="L507">        <span class="tok-com">// And it really is gone, rather than merely reported as gone. `wait`</span></span>
+<span class="ln" id="L508">        <span class="tok-com">// returns once it has been reaped, which will not happen if the close</span></span>
+<span class="ln" id="L509">        <span class="tok-com">// silently did nothing -- the test would hang rather than pass.</span></span>
+<span class="ln" id="L510">        <span class="tok-kw">let</span> status = child.<span class="tok-fn">wait</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;reap&quot;</span>);</span>
+<span class="ln" id="L511">        assert!(</span>
+<span class="ln" id="L512">            !status.<span class="tok-fn">success</span>(),</span>
+<span class="ln" id="L513">            <span class="tok-str">&quot;a terminated process should not report success: {status:?}&quot;</span></span>
+<span class="ln" id="L514">        );</span>
+<span class="ln" id="L515">    }</span>
+<span class="ln" id="L516">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
