@@ -58,6 +58,7 @@
 #![warn(missing_docs)]
 
 mod app;
+pub mod autolock;
 pub mod crashlog;
 pub mod dialog;
 pub mod group;

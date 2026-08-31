@@ -50,6 +50,8 @@ pub enum Page {
     Motion,
     /// Which tabs the window offers.
     Interface,
+    /// Locking the window again after a period of no use.
+    Security,
     /// Where settings live, and how to reset them.
     Storage,
 }
@@ -60,6 +62,7 @@ impl Page {
         (Page::Appearance, "appearance", "Colour scheme"),
         (Page::Motion, "motion", "Animation, and the mark"),
         (Page::Interface, "interface", "Which tabs are shown"),
+        (Page::Security, "security", "Locking"),
         (Page::Storage, "storage", "Where this is kept"),
     ];
 }
@@ -76,6 +79,10 @@ pub struct Settings {
     save_error: Option<String>,
     /// Whether the first-run choice is still to be made.
     first_run: bool,
+    /// The autolock delay being typed, before it is understood.
+    autolock_typed: String,
+    /// Why the last typed delay was not understood.
+    autolock_error: Option<String>,
     /// What the operating system said about reducing motion, read once at
     /// startup. Every platform answers through a subprocess, so asking per
     /// frame is out of the question.
@@ -97,6 +104,8 @@ impl Default for Settings {
             page: Page::Appearance,
             save_error: None,
             first_run: false,
+            autolock_typed: String::new(),
+            autolock_error: None,
             system_motion: crate::reduced_motion::Query::Unknown,
             palette_problems: Vec::new(),
         }
@@ -123,6 +132,8 @@ impl Settings {
             path,
             page: Page::Appearance,
             save_error: None,
+            autolock_typed: String::new(),
+            autolock_error: None,
             system_motion: crate::reduced_motion::query(),
             // Filled in by the caller, which reads the palettes before this
             // runs -- see `VeilVoiceApp::new` for why that order matters.
@@ -197,6 +208,30 @@ impl Settings {
     /// Whether the app should open in group mode.
     pub fn always_group(&self) -> bool {
         self.prefs.always_group
+    }
+
+    /// How the autolock is configured, brought into range.
+    pub fn autolock(&self) -> crate::autolock::Autolock {
+        crate::autolock::Autolock {
+            enabled: self.prefs.autolock,
+            after_secs: self.prefs.autolock_after,
+            floor_secs: self.prefs.autolock_floor,
+            ceiling_secs: self.prefs.autolock_ceiling,
+        }
+        .sane()
+    }
+
+    /// Remember an autolock setting.
+    pub fn set_autolock(&mut self, auto: crate::autolock::Autolock) {
+        let auto = auto.sane();
+        if self.autolock() == auto {
+            return;
+        }
+        self.prefs.autolock = auto.enabled;
+        self.prefs.autolock_after = auto.after_secs;
+        self.prefs.autolock_floor = auto.floor_secs;
+        self.prefs.autolock_ceiling = auto.ceiling_secs;
+        self.persist();
     }
 
     /// Whether every recording is sealed with the app-lock passphrase.
@@ -553,6 +588,7 @@ impl Settings {
             Page::Appearance => self.appearance_page(ui, ctx),
             Page::Motion => self.motion_page(ui, ctx),
             Page::Interface => self.interface_page(ui),
+            Page::Security => self.security_page(ui),
             Page::Storage => self.storage_page(ui),
         }
 
@@ -782,6 +818,106 @@ impl Settings {
         }
     }
 
+    /// Marker 92. The autolock, and the range it offers.
+    fn security_page(&mut self, ui: &mut Ui) {
+        use crate::autolock::{describe_secs, parse, Autolock, CHOICES};
+
+        let mut auto = self.autolock();
+        ui.label(RichText::new("Lock the window when it is not used").color(p::fg()));
+        ui.label(
+            RichText::new(
+                "Off unless you turn it on. Starting a long job does not count as using \
+                 the window: if you walk away while something is rendering, that is \
+                 exactly when you would want it locked.",
+            )
+            .color(p::muted())
+            .small(),
+        );
+        ui.add_space(6.0);
+
+        let mut changed = ui
+            .checkbox(&mut auto.enabled, "lock after a period of no use")
+            .changed();
+
+        if auto.enabled {
+            ui.add_space(6.0);
+            let current = auto.after_secs;
+            egui::ComboBox::from_id_salt("autolock-after")
+                .selected_text(describe_secs(auto.after_secs))
+                .show_ui(ui, |ui| {
+                    for choice in CHOICES {
+                        // Only the ones inside the range this user has set, so
+                        // a shortened range does not offer a delay it would
+                        // then clamp away behind their back.
+                        if *choice < auto.floor_secs || *choice > auto.ceiling_secs {
+                            continue;
+                        }
+                        ui.selectable_value(&mut auto.after_secs, *choice, describe_secs(*choice));
+                    }
+                });
+            changed |= auto.after_secs != current;
+
+            ui.add_space(4.0);
+            ui.horizontal(|ui| {
+                ui.label(RichText::new("or type one").color(p::muted()).small());
+                let box_ = ui.add(
+                    egui::TextEdit::singleline(&mut self.autolock_typed)
+                        .hint_text("90m, 2h, 1d")
+                        .desired_width(120.0),
+                );
+                if box_.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
+                    match parse(&self.autolock_typed) {
+                        Some(secs) => {
+                            auto.after_secs = secs;
+                            // Typing a value outside the range widens the range
+                            // to hold it, which is what somebody typing it
+                            // meant. Clamping it away silently would look like
+                            // the box being ignored.
+                            auto.floor_secs = auto.floor_secs.min(secs);
+                            auto.ceiling_secs = auto.ceiling_secs.max(secs);
+                            self.autolock_typed.clear();
+                            self.autolock_error = None;
+                            changed = true;
+                        }
+                        None => {
+                            self.autolock_error = Some(
+                                "that is not a length of time. Try 90m, 2h or 1d.".to_string(),
+                            );
+                        }
+                    }
+                }
+            });
+            if let Some(error) = &self.autolock_error {
+                ui.label(RichText::new(error).color(p::yellow()).small());
+            }
+
+            ui.add_space(8.0);
+            ui.label(
+                RichText::new(format!(
+                    "the list offers {} to {}",
+                    describe_secs(auto.floor_secs),
+                    describe_secs(auto.ceiling_secs)
+                ))
+                .color(p::muted())
+                .small(),
+            );
+            if auto != Autolock::default().sane()
+                && ui
+                    .button("put the list back to five minutes to two days")
+                    .clicked()
+            {
+                let default = Autolock::default();
+                auto.floor_secs = default.floor_secs;
+                auto.ceiling_secs = default.ceiling_secs;
+                changed = true;
+            }
+        }
+
+        if changed {
+            self.set_autolock(auto);
+        }
+    }
+
     fn storage_page(&mut self, ui: &mut Ui) {
         section(
             ui,
@@ -917,7 +1053,7 @@ mod tests {
         let count = seen.len();
         seen.dedup();
         assert_eq!(seen.len(), count, "a page is listed twice");
-        assert_eq!(count, 4, "a page was added without a menu entry");
+        assert_eq!(count, 5, "a page was added without a menu entry");
         for (_, label, blurb) in Page::ALL {
             assert!(!label.is_empty() && !blurb.is_empty());
         }
@@ -1064,6 +1200,10 @@ mod tests {
                 vault_dir: String::new(),
                 vault_tool: String::new(),
                 vault_hidden: String::new(),
+                autolock: false,
+                autolock_after: 15 * 60,
+                autolock_floor: crate::autolock::FLOOR_SECS,
+                autolock_ceiling: crate::autolock::CEILING_SECS,
                 recovered_from_corrupt_file: false,
             },
             page: Page::Storage,

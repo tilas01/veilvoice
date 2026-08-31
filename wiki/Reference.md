@@ -157,6 +157,7 @@ Which running programs can see your keyboard and mouse, reported as the heuristi
 egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 
 - [[`app.rs`|File-veilvoice-gui-app]] &mdash; The VeilVoice desktop application: seven tabs, one window, no menus.
+- [[`autolock.rs`|File-veilvoice-gui-autolock]] &mdash; Locking the window again after a period of no use.
 - [[`crashlog.rs`|File-veilvoice-gui-crashlog]] &mdash; Make a failure that produces no output produce some.
 - [[`dialog.rs`|File-veilvoice-gui-dialog]] &mdash; Asking for a file without stopping the window.
 - [[`group.rs`|File-veilvoice-gui-group]] &mdash; Group mode: several people in one recording, each with a name and a colour.
