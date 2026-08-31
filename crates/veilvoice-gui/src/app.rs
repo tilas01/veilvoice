@@ -280,6 +280,12 @@ pub struct VeilVoiceApp {
     /// Where veiled recordings go, and the encrypted volume that may hold
     /// them. See [`crate::storage`].
     storage: crate::storage::Storage,
+    /// Seconds since the window was last touched, for the autolock.
+    ///
+    /// Marker 92. Counted from egui's own frame time rather than the system
+    /// clock, so moving the machine's clock neither brings the lock forward nor
+    /// pushes it back.
+    idle_secs: f32,
 
     // Colour scheme and animation. Named `preferences` rather than `settings`
     // because this type already has a `settings` method, which is the engine's
@@ -372,6 +378,7 @@ impl VeilVoiceApp {
             security: Security::default(),
             integrity: crate::integrity::Integrity::default(),
             storage: crate::storage::Storage::default(),
+            idle_secs: 0.0,
             // Off. `VeilVoiceApp::new` is the only place the saved preference
             // is consulted, so no test and no `Default` can open in group mode
             // because of something on this machine's disk.
@@ -661,6 +668,26 @@ impl eframe::App for VeilVoiceApp {
             } else {
                 self.frame_ms * 0.9 + dt * 0.1
             };
+        }
+
+        // Marker 92. Any input at all is use; the passage of a job is not.
+        // Somebody who starts a long render and walks away has walked away, and
+        // what they are producing is the thing worth locking away.
+        let (touched, dt) = ctx.input(|i| {
+            let touched = !i.events.is_empty()
+                || i.pointer.velocity() != egui::Vec2::ZERO
+                || i.raw_scroll_delta != egui::Vec2::ZERO;
+            (touched, i.stable_dt)
+        });
+        if touched || self.security.is_locked() {
+            self.idle_secs = 0.0;
+        } else if dt.is_finite() {
+            self.idle_secs += dt;
+        }
+        let autolock = self.preferences.autolock();
+        if autolock.expired(std::time::Duration::from_secs_f32(self.idle_secs.max(0.0))) {
+            self.security.lock_now();
+            self.idle_secs = 0.0;
         }
 
         self.poll_job();
@@ -990,6 +1017,13 @@ impl eframe::App for VeilVoiceApp {
             || self.setup.is_busy()
         {
             ctx.request_repaint_after(std::time::Duration::from_millis(50));
+        } else if autolock.enabled && !self.security.is_locked() {
+            // Marker 92. Once a second is enough to notice a delay measured in
+            // minutes, and it is what makes the lock actually engage: an idle
+            // window requests no repaint, so without this the countdown would
+            // only advance while somebody was looking at it, which is the one
+            // time it should not.
+            ctx.request_repaint_after(std::time::Duration::from_secs(1));
         } else if self.watch.is_watching() {
             // Only often enough to notice an update that has arrived. The work
             // itself happens elsewhere, so this is a cheap wake rather than a
@@ -2004,6 +2038,36 @@ mod tests {
                 tab.key()
             );
         }
+    }
+
+    /// Marker 92. A job running is not the window being used.
+    ///
+    /// The tempting version of an idle timer treats "something is happening" as
+    /// "somebody is here", and it is exactly backwards for this program:
+    /// somebody who starts a long render and walks away has walked away, and
+    /// the recording being produced is the thing worth locking away.
+    #[test]
+    fn a_running_job_does_not_count_as_using_the_window() {
+        let source = include_str!("app.rs").replace("\r\n", "\n");
+        let start = source
+            .find("let (touched, dt) = ctx.input(")
+            .expect("the idle check exists");
+        let end = source[start..]
+            .find("self.poll_job();")
+            .map(|at| start + at)
+            .unwrap_or(source.len());
+        let body = &source[start..end];
+        for excuse in ["self.job", "is_busy()", "session.is_some()"] {
+            assert!(
+                !body.contains(excuse),
+                "the idle timer consults {excuse:?}, so walking away from a \
+                 running job would hold the window unlocked"
+            );
+        }
+        assert!(
+            body.contains("self.security.lock_now()"),
+            "nothing actually locks the window"
+        );
     }
 
     /// Marker 83. An unanswered hidden-volume question must stop the job, not

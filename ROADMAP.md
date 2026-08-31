@@ -159,7 +159,8 @@ about the signal, which is already done.
 |---:|---|---|---|
 | 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **done** | — |
 | 62 | **A name and a colour per speaker in the app** — the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **done** | — |
-| 63 | **Live levels and a wave per speaker**, in the app and in the terminal, while a recording is running | **blocked** | — |
+| 63 | **Live levels while a recording is running**, in the app and in the terminal | **done** | — |
+| 63b | **A wave per speaker while recording** — the same picture, but split by who is talking | **blocked** | — |
 | 64 | **Speaker detection through software you already have** — detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **blocked** | — |
 
 ## Seeing it before you install it
@@ -215,6 +216,23 @@ it can honestly be made rather than to keep apologising for it.
 | 84 | **The guided path, for when detection fails** — plain instructions, a folder chosen by hand, and the same confirmation a detected one gets | **done** | — |
 | 85 | **What full-disk encryption is for, said once and said properly** — BitLocker, FileVault, LUKS and LUKS2, and the OpenBSD and FreeBSD equivalents, single-sourced and shown in both | **done** | — |
 | 86 | **The app lock as a key, not only a verifier** — the app-lock passphrase seals everything VeilVoice veils, automatically, as an option that says what it costs | **done** | — |
+
+---
+
+## Asked for after the encrypted volumes
+
+| # | Marker | Status | Estimate |
+|---:|---|---|---|
+| 87 | **A video of a veiled recording** — a black frame and the audio, so a recording can be posted where only video is accepted | **planned** | 2–3 d |
+| 88 | **Import from every format OBS writes** — bring in a recording made elsewhere, video or audio, and take the sound out of it | **planned** | 2 d |
+| 89 | **Veil the other person afterwards** — the interviewee given their own voice in post, through the group plan that already exists | **planned** | 2–3 d |
+| 90 | **GnuPG verification inside the window** — in the verify tab, beside the hash check, using the GnuPG somebody already has | **planned** | 2 d |
+| 91 | **`veilvoice-verify` finds the release itself** — GnuPG arguments where wanted, and an `auto` that looks in Downloads, checks the archive, and checks what came out of it | **planned** | 2–3 d |
+| 92 | **An autolock timeout** — off by default, and when on, from five minutes to forty eight hours, chosen from a list or typed, with the range itself adjustable | **done** | — |
+| 93 | **Group mode explained where it is used** — how to build a plan, what each field does, and what happens without one | **planned** | 2 d |
+| 94 | **Release notes people can actually read** — every release listed newest first, its notes opening in place, and every file one click away | **planned** | 2 d |
+| 95 | **One version per release, in order, enforced** — the tag, the workspace and every package definition checked against each other before a release can go out | **planned** | 1 d |
+| 96 | **v0.1.15 released** — the audit run over everything since v0.1.14, CI green, and the release published | **planned** | 1–2 d |
 
 ---
 
@@ -483,8 +501,13 @@ inside it is diarisation, which is markers 43 and 64 and is blocked for the
 reason recorded there. The path that does work is one microphone per person,
 which is marker 63's other half.
 
-**Marker 63 is half shipped and half blocked, and it moves to blocked rather
-than sitting as planned.** The *levels* are done and have been for some time:
+**Marker 63 is split in two, because one half shipped and the other cannot
+start.** The maintainer confirmed the live output is what was wanted and that
+showing it is right, so the levels are marked done under their own number and
+the diarisation half is marker 63b, which stays blocked for the reason below.
+Carrying both under one number meant a finished feature reading as blocked.
+
+The *levels* are done and have been for some time:
 `veilvoice live` draws them in the terminal and the desktop application draws
 them beside the devices, both with peak-hold. The **wave per speaker** is a
 different thing entirely — it needs the live input separated by who is talking,
