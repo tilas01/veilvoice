@@ -107,11 +107,11 @@ flowchart TD
     n_policy["policy.rs<br/>320 lines"]
     n_prefs["prefs.rs<br/>549 lines"]
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
-    n_security["security.rs<br/>1555 lines"]
+    n_security["security.rs<br/>1608 lines"]
     n_settings["settings.rs<br/>1105 lines"]
     n_setup["setup.rs<br/>753 lines"]
     n_soundbar["soundbar.rs<br/>360 lines"]
-    n_storage["storage.rs<br/>584 lines"]
+    n_storage["storage.rs<br/>611 lines"]
     n_theme["theme.rs<br/>783 lines"]
     n_updates["updates.rs<br/>246 lines"]
     n_verify["verify.rs<br/>667 lines"]
@@ -211,11 +211,11 @@ flowchart TD
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 320 | The policy in force, and what the interface does about it. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 549 | What the user has chosen about how the app looks and moves. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 348 | Whether the operating system has been asked to reduce motion. |
-| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1555 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 1608 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1105 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 753 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 360 | The animated mark: a row of bars that rise and fall. |
-| [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 584 | Where veiled recordings are written, and the encrypted volume that may hold them. |
+| [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 611 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 783 | Colour schemes for the desktop app. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 246 | The manual update check, as the window shows it. |
 | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 667 | The verify tab: drop a download on the window and be told what it is. |

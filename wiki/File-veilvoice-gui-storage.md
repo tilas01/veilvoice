@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/storage.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 584 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 611 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs)
 
 ## Contents
 
@@ -64,12 +64,12 @@ wrong half of one of those can destroy what is hidden inside.
 
 ## What this file contains
 
-584 lines defining **21 functions** (18 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+611 lines defining **21 functions** (18 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct Destination` (line 55) -- The chosen place for veiled output, if there is one.
-- `struct Storage` (line 162) -- Everything the window shows about encrypted storage.
+- `struct Storage` (line 165) -- Everything the window shows about encrypted storage.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -80,19 +80,19 @@ wrong half of one of those can destroy what is hidden inside.
 - `Destination::ready` (line 98) -- Whether a job may start.
 - `Destination::blocked` (line 103) -- Why a job may not start, for the button's tooltip.
 - `Destination::place` (line 113) -- Where a recording should be written, given where it would have gone.
-- `Destination::still_there` (line 130) -- Whether the volume still exists, which is how a closed vault shows up.
-- `Storage::refresh` (line 203) -- Look again at what is installed and mounted.
-- `Storage::found` (line 216) -- What was found at the last refresh.
-- `Storage::found_nothing` (line 222) -- Whether anything was found at all, which decides whether marker 84's guided path is the main offer or the fallback.
-- `Storage::present` (line 227) -- Whether the chosen folder was there when this was last refreshed.
-- `Storage::take_hand_picked` (line 232) -- Take a folder the user picked by hand, if the picker has answered.
-- `Storage::pick_by_hand` (line 242) -- Start the folder picker for marker 84's guided path.
-- `Storage::choose` (line 248) -- Choose one of the detected volumes.
-- `Storage::clear` (line 256) -- Go back to writing beside the source file.
-- `Storage::answer_hidden` (line 262) -- Answer the hidden-volume question for the chosen destination.
-- `Storage::hand_picked_tool` (line 269) -- Which tool a hand-picked folder is being declared as.
-- `Storage::presence` (line 274) -- Whether either tool was detected, for the guided text.
-- `panel` (line 283) -- The encrypted-storage panel, drawn on the security tab.
+- `Destination::still_mounted` (line 133) -- Whether the volume is still mounted, judged against mounts.
+- `Storage::refresh` (line 205) -- Look again at what is installed and mounted.
+- `Storage::found` (line 218) -- What was found at the last refresh.
+- `Storage::found_nothing` (line 224) -- Whether anything was found at all, which decides whether marker 84's guided path is the main offer or the fallback.
+- `Storage::present` (line 229) -- Whether the chosen folder was there when this was last refreshed.
+- `Storage::take_hand_picked` (line 234) -- Take a folder the user picked by hand, if the picker has answered.
+- `Storage::pick_by_hand` (line 244) -- Start the folder picker for marker 84's guided path.
+- `Storage::choose` (line 250) -- Choose one of the detected volumes.
+- `Storage::clear` (line 258) -- Go back to writing beside the source file.
+- `Storage::answer_hidden` (line 264) -- Answer the hidden-volume question for the chosen destination.
+- `Storage::hand_picked_tool` (line 271) -- Which tool a hand-picked folder is being declared as.
+- `Storage::presence` (line 276) -- Whether either tool was detected, for the guided text.
+- `panel` (line 285) -- The encrypted-storage panel, drawn on the security tab.
 
 ## What calls what
 
@@ -113,22 +113,22 @@ flowchart TD
     n_ready(["Destination::ready<br/>line 98"])
     n_blocked(["Destination::blocked<br/>line 103"])
     n_place(["Destination::place<br/>line 113"])
-    n_still_there(["Destination::still_there<br/>line 130"])
-    n_hidden_key["hidden_key<br/>line 138"]
-    n_hidden_from_key["hidden_from_key<br/>line 152"]
-    n_default["Storage::default<br/>line 185"]
-    n_refresh(["Storage::refresh<br/>line 203"])
-    n_found(["Storage::found<br/>line 216"])
-    n_found_nothing(["Storage::found_nothing<br/>line 222"])
-    n_present(["Storage::present<br/>line 227"])
-    n_take_hand_picked(["Storage::take_hand_picked<br/>line 232"])
-    n_pick_by_hand(["Storage::pick_by_hand<br/>line 242"])
-    n_choose(["Storage::choose<br/>line 248"])
-    n_clear(["Storage::clear<br/>line 256"])
-    n_answer_hidden(["Storage::answer_hidden<br/>line 262"])
-    n_hand_picked_tool(["Storage::hand_picked_tool<br/>line 269"])
-    n_presence(["Storage::presence<br/>line 274"])
-    n_panel(["panel<br/>line 283"])
+    n_still_mounted(["Destination::still_mounted<br/>line 133"])
+    n_hidden_key["hidden_key<br/>line 141"]
+    n_hidden_from_key["hidden_from_key<br/>line 155"]
+    n_default["Storage::default<br/>line 187"]
+    n_refresh(["Storage::refresh<br/>line 205"])
+    n_found(["Storage::found<br/>line 218"])
+    n_found_nothing(["Storage::found_nothing<br/>line 224"])
+    n_present(["Storage::present<br/>line 229"])
+    n_take_hand_picked(["Storage::take_hand_picked<br/>line 234"])
+    n_pick_by_hand(["Storage::pick_by_hand<br/>line 244"])
+    n_choose(["Storage::choose<br/>line 250"])
+    n_clear(["Storage::clear<br/>line 258"])
+    n_answer_hidden(["Storage::answer_hidden<br/>line 264"])
+    n_hand_picked_tool(["Storage::hand_picked_tool<br/>line 271"])
+    n_presence(["Storage::presence<br/>line 276"])
+    n_panel(["panel<br/>line 285"])
     n_from_prefs --> n_default
     n_from_prefs --> n_hidden_from_key
     n_to_prefs --> n_hidden_key
@@ -137,24 +137,24 @@ flowchart TD
     click n_ready href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L98" "open the source"
     click n_blocked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L103" "open the source"
     click n_place href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L113" "open the source"
-    click n_still_there href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L130" "open the source"
-    click n_hidden_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L138" "open the source"
-    click n_hidden_from_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L152" "open the source"
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L185" "open the source"
-    click n_refresh href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L203" "open the source"
-    click n_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L216" "open the source"
-    click n_found_nothing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L222" "open the source"
-    click n_present href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L227" "open the source"
-    click n_take_hand_picked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L232" "open the source"
-    click n_pick_by_hand href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L242" "open the source"
-    click n_choose href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L248" "open the source"
-    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L256" "open the source"
-    click n_answer_hidden href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L262" "open the source"
-    click n_hand_picked_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L269" "open the source"
-    click n_presence href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L274" "open the source"
-    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L283" "open the source"
+    click n_still_mounted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L133" "open the source"
+    click n_hidden_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L141" "open the source"
+    click n_hidden_from_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L155" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L187" "open the source"
+    click n_refresh href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L205" "open the source"
+    click n_found href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L218" "open the source"
+    click n_found_nothing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L224" "open the source"
+    click n_present href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L229" "open the source"
+    click n_take_hand_picked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L234" "open the source"
+    click n_pick_by_hand href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L244" "open the source"
+    click n_choose href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L250" "open the source"
+    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L258" "open the source"
+    click n_answer_hidden href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L264" "open the source"
+    click n_hand_picked_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L271" "open the source"
+    click n_presence href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L276" "open the source"
+    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L285" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_from_prefs,n_to_prefs,n_ready,n_blocked,n_place,n_still_there,n_refresh,n_found,n_found_nothing,n_present,n_take_hand_picked,n_pick_by_hand,n_choose,n_clear,n_answer_hidden,n_hand_picked_tool,n_presence,n_panel entry
+    class n_from_prefs,n_to_prefs,n_ready,n_blocked,n_place,n_still_mounted,n_refresh,n_found,n_found_nothing,n_present,n_take_hand_picked,n_pick_by_hand,n_choose,n_clear,n_answer_hidden,n_hand_picked_tool,n_presence,n_panel entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_hidden_key,n_hidden_from_key,n_default helper
 ```
@@ -171,20 +171,20 @@ flowchart TD
 | `Destination::ready` <sub>pub fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L98) | Whether a job may start. |
 | `Destination::blocked` <sub>pub fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L103) | Why a job may not start, for the button's tooltip. |
 | `Destination::place` <sub>pub fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L113) | Where a recording should be written, given where it would have gone. |
-| `Destination::still_there` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L130) | Whether the volume still exists, which is how a closed vault shows up. |
-| `hidden_key` <sub>fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L138) | Stable settings-file spellings for Hidden. |
-| `hidden_from_key` <sub>fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L152) | The reverse, defaulting to unanswered. |
-| `Storage` <sub>pub struct</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L162) | Everything the window shows about encrypted storage. |
-| `Storage::default` <sub>fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L185) |  |
-| `Storage::refresh` <sub>pub fn</sub> | [203](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L203) | Look again at what is installed and mounted. |
-| `Storage::found` <sub>pub fn</sub> | [216](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L216) | What was found at the last refresh. |
-| `Storage::found_nothing` <sub>pub fn</sub> | [222](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L222) | Whether anything was found at all, which decides whether marker 84's guided path is the main offer or the fallback. |
-| `Storage::present` <sub>pub fn</sub> | [227](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L227) | Whether the chosen folder was there when this was last refreshed. |
-| `Storage::take_hand_picked` <sub>pub fn</sub> | [232](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L232) | Take a folder the user picked by hand, if the picker has answered. |
-| `Storage::pick_by_hand` <sub>pub fn</sub> | [242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L242) | Start the folder picker for marker 84's guided path. |
-| `Storage::choose` <sub>pub fn</sub> | [248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L248) | Choose one of the detected volumes. |
-| `Storage::clear` <sub>pub fn</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L256) | Go back to writing beside the source file. |
-| `Storage::answer_hidden` <sub>pub fn</sub> | [262](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L262) | Answer the hidden-volume question for the chosen destination. |
-| `Storage::hand_picked_tool` <sub>pub fn</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L269) | Which tool a hand-picked folder is being declared as. |
-| `Storage::presence` <sub>pub fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L274) | Whether either tool was detected, for the guided text. |
-| `panel` <sub>pub fn</sub> | [283](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L283) | The encrypted-storage panel, drawn on the security tab. |
+| `Destination::still_mounted` <sub>pub fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L133) | Whether the volume is still mounted, judged against mounts. |
+| `hidden_key` <sub>fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L141) | Stable settings-file spellings for Hidden. |
+| `hidden_from_key` <sub>fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L155) | The reverse, defaulting to unanswered. |
+| `Storage` <sub>pub struct</sub> | [165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L165) | Everything the window shows about encrypted storage. |
+| `Storage::default` <sub>fn</sub> | [187](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L187) |  |
+| `Storage::refresh` <sub>pub fn</sub> | [205](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L205) | Look again at what is installed and mounted. |
+| `Storage::found` <sub>pub fn</sub> | [218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L218) | What was found at the last refresh. |
+| `Storage::found_nothing` <sub>pub fn</sub> | [224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L224) | Whether anything was found at all, which decides whether marker 84's guided path is the main offer or the fallback. |
+| `Storage::present` <sub>pub fn</sub> | [229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L229) | Whether the chosen folder was there when this was last refreshed. |
+| `Storage::take_hand_picked` <sub>pub fn</sub> | [234](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L234) | Take a folder the user picked by hand, if the picker has answered. |
+| `Storage::pick_by_hand` <sub>pub fn</sub> | [244](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L244) | Start the folder picker for marker 84's guided path. |
+| `Storage::choose` <sub>pub fn</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L250) | Choose one of the detected volumes. |
+| `Storage::clear` <sub>pub fn</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L258) | Go back to writing beside the source file. |
+| `Storage::answer_hidden` <sub>pub fn</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L264) | Answer the hidden-volume question for the chosen destination. |
+| `Storage::hand_picked_tool` <sub>pub fn</sub> | [271](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L271) | Which tool a hand-picked folder is being declared as. |
+| `Storage::presence` <sub>pub fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L276) | Whether either tool was detected, for the guided text. |
+| `panel` <sub>pub fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L285) | The encrypted-storage panel, drawn on the security tab. |

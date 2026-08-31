@@ -294,6 +294,31 @@ pub fn mounted() -> Vec<Volume> {
     }
 }
 
+/// Whether `path` is inside one of `mounts` right now.
+///
+/// # F-93, and why existence is not the question
+///
+/// The obvious check is whether the directory is still there, and it is wrong
+/// in the one direction that matters. A mount point is an ordinary directory
+/// with a filesystem grafted onto it, and unmounting takes the filesystem away
+/// and **leaves the directory**. `/media/veracrypt1` exists before the volume
+/// is mounted, while it is mounted, and after it is unmounted.
+///
+/// So a destination checked by existence still looks fine the moment its volume
+/// is locked, and VeilVoice would write a veiled recording onto the ordinary
+/// unencrypted disk while its owner believed it had gone into the vault. That
+/// is the exact failure the whole feature exists to prevent, arriving through
+/// the check that was supposed to catch it.
+///
+/// Equal to, or inside, so that a folder chosen within a vault counts: somebody
+/// who points at `~/Vault/recordings` has chosen a place inside the mounted
+/// vault, not a different thing.
+pub fn covers(mounts: &[Volume], path: &Path) -> bool {
+    mounts
+        .iter()
+        .any(|volume| path == volume.path || path.starts_with(&volume.path))
+}
+
 /// Parse a Linux mount table into the volumes we recognise.
 ///
 /// Separated from the read so it can be tested against a fixed table rather
@@ -468,6 +493,25 @@ tmpfs /run/user/1000 tmpfs rw,nosuid 0 0
         let volume = Volume::found(PathBuf::from("/home/someone/Vault"), Tool::Cryptomator);
         assert!(volume.ready());
         assert!(volume.blocked().is_none());
+    }
+
+    /// F-93. Existence is not the question, because unmounting leaves the
+    /// directory behind.
+    #[test]
+    fn a_mount_point_that_is_no_longer_mounted_is_not_covered() {
+        let mounts = from_proc_mounts(SAMPLE);
+        assert!(covers(&mounts, Path::new("/media/veracrypt1")));
+        assert!(
+            covers(&mounts, Path::new("/media/veracrypt1/recordings")),
+            "a folder inside a mounted volume is inside it"
+        );
+        assert!(covers(&mounts, Path::new("/home/someone/Vault")));
+
+        // The same paths, with nothing mounted: the directories can still be
+        // there and are covered by nothing.
+        assert!(!covers(&[], Path::new("/media/veracrypt1")));
+        assert!(!covers(&mounts, Path::new("/home/someone/Elsewhere")));
+        assert!(!covers(&mounts, Path::new("/tmp")));
     }
 
     #[test]
