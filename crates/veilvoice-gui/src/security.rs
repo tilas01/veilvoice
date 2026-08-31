@@ -477,7 +477,25 @@ impl Security {
             }
             Ok(Op::Change) => {
                 self.wipe_form();
-                self.message = Some(("app lock password changed".into(), p::green()));
+                // F-94. The session copy is the *old* passphrase, and keeping
+                // it would seal every recording made from here with a password
+                // the user has just replaced and may never type again. Dropped
+                // rather than quietly updated: the new one went to the worker
+                // thread and was wiped there, so the honest move is to say the
+                // mode needs another unlock, which `blocked_reason` already
+                // does.
+                let had_secret = self.app_secret.take().is_some();
+                self.message = Some(if had_secret {
+                    (
+                        "app lock password changed. Lock and unlock to seal new \
+                         recordings with it; ones already written still open with the \
+                         old password."
+                            .into(),
+                        p::yellow(),
+                    )
+                } else {
+                    ("app lock password changed".into(), p::green())
+                });
             }
             Ok(Op::Remove) => {
                 self.wipe_form();
@@ -1250,6 +1268,41 @@ mod tests {
             "the capture is unconditional, so every user now carries their \
              app-lock passphrase in memory for the session"
         );
+    }
+
+    /// F-94. Changing the app-lock password must not leave the old one sealing
+    /// new recordings. A user who changes their password and keeps working
+    /// would otherwise produce files that open with a password they have just
+    /// replaced, and be told nothing.
+    #[test]
+    fn changing_the_password_drops_the_passphrase_that_was_sealing_with_it() {
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        let start = source.find("Ok(Op::Change) => {").expect("the arm exists");
+        // To the next arm rather than a fixed number of bytes: the first
+        // version of this used 900 and reported a message that was there.
+        let end = source[start..]
+            .find("Ok(Op::Remove)")
+            .map(|at| start + at)
+            .unwrap_or(source.len());
+        let arm = &source[start..end];
+        assert!(
+            arm.contains("self.app_secret.take()"),
+            "the old passphrase survives a password change and keeps sealing \
+             recordings with it"
+        );
+        // Two short phrases rather than one long one: the message is written
+        // across several source lines with Rust's string continuation, so the
+        // sentence never appears contiguously in the file. The first version of
+        // this searched for the whole sentence and failed on a message that was
+        // there and correct.
+        for phrase in ["Lock and unlock", "old password"] {
+            assert!(
+                arm.contains(phrase),
+                "the message does not mention {phrase:?}: a user whose \
+                 already-written recordings still use the previous password has \
+                 to be told, or they will delete it"
+            );
+        }
     }
 
     /// Marker 86. Locking the window must put the state back where a fresh
