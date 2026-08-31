@@ -5,31 +5,38 @@
 //! well as the archive, and offer the check through GnuPG for anybody who would
 //! rather trust their own tools than this binary.
 //!
-//! # The honest limit on checking an extracted copy
+//! # This used to be the honest limit, and it is not the limit any more
 //!
-//! This is the part worth reading before the code. A release signs
-//! `SHA256SUMS`, and `SHA256SUMS` covers the **archives**. It says nothing
-//! about a directory somebody unzipped last week.
+//! Worth reading before the code, because the module changed shape around it.
 //!
-//! So verifying `veilvoice-0.1.14-linux-x86_64.zip` proves that archive is the
-//! one that was signed. It does **not** prove that the folder sitting beside it
-//! came out of that archive. The folder may predate the download, may have been
-//! extracted from a different copy, may have been edited since. Nothing on disk
-//! records which archive an extracted directory came from, and no amount of
-//! hashing the loose files can invent that link, because there is no signed
-//! list of what those files should be.
+//! A release signs `SHA256SUMS`, and `SHA256SUMS` covers the **archives**. So
+//! verifying `veilvoice-0.1.14-linux-x86_64.zip` proved that archive was the
+//! one that was signed, and proved nothing at all about the folder sitting
+//! beside it. The folder may predate the download, may have come out of a
+//! different copy, may have been edited since. Nothing on disk records which
+//! archive a directory was extracted from.
 //!
-//! A verifier that reported "archive good, extracted files present" as one
-//! green result would be telling somebody their installed copy is verified when
-//! it is not. So this reports the two separately, in those words, and says the
-//! one thing that does resolve it: extract the archive that was just checked,
-//! now, and use that.
+//! That was written here as a limit that could not be lifted, and it could not
+//! be lifted **from this side**. It was lifted from the other one. A release
+//! now also publishes `CONTENTS.sha256`, listing every file inside every
+//! archive with its SHA-256, staged before `SHA256SUMS` is computed so that the
+//! signature covers it too. `veilvoice_check::contents` reads it and `main.rs`
+//! checks the extracted folder against it, file by file, and reports anything
+//! in that folder the release never published.
 //!
-//! What it can honestly say about the extracted copy is whether the programs
-//! are there and whether the operating system will run them, which is the other
-//! half of what was asked and is a real thing to get wrong: an archive
-//! extracted by a tool that drops the executable bit leaves somebody with files
-//! that look right and will not start.
+//! The lesson is worth keeping beside the code: "no signed list covers loose
+//! files" was a true statement about the release format, and it was being
+//! treated as a fact about the world. Publishing one more file changed it.
+//!
+//! What is left here is the part no hash can answer. A file can be byte for
+//! byte correct and still not start, because the tool that unpacked it dropped
+//! the execute bit, and somebody in that position has a folder that looks
+//! perfect and does nothing. That is what [`look_in`] and [`Program::runnable`]
+//! are for, and they are still asked after every hash has matched.
+//!
+//! Releases published before v0.1.15 carry no contents list, and for those the
+//! old report and the old caveat are exactly what is printed, because they were
+//! honest then and still are.
 //!
 //! # GnuPG
 //!
@@ -47,10 +54,11 @@
 //!
 //! Checks the folder you unzipped, as well as the zip.
 //!
-//! It will tell you the programs are there and that your system will run them.
-//! It will not tell you the folder came out of the zip it just checked, because
-//! nothing on your disk records that. If you want to be certain, unzip the
-//! checked file again and use what comes out.
+//! From v0.1.15 a release publishes a signed list of everything inside each
+//! archive, so every file in that folder is checked against it, and anything in
+//! there that was not part of the release is named. For older releases, which
+//! carry no such list, it can only tell you the programs are there and that
+//! your system will run them, and it says so rather than implying more.
 
 use std::path::{Path, PathBuf};
 
@@ -153,11 +161,12 @@ fn runnable(path: &Path) -> bool {
 
 /// The commands that check this release with somebody else's GnuPG.
 ///
-/// Marker 90 moved the body into [`veilvoice_check::gnupg_commands`] so the
-/// desktop application's verify tab prints the same commands. Re-exported here
-/// rather than called through at every site, which keeps this module the one
-/// place the verifier looks for anything about extracted releases and GnuPG.
-pub use veilvoice_check::{gnupg_commands, gnupg_on_path};
+/// Marker 90 moved the body out of this binary so the desktop application's
+/// verify tab prints the same commands; marker 97 moved it again, into
+/// `veilvoice-gnupg`, which also *runs* them. Re-exported here rather than
+/// called through at every site, which keeps this module the one place the
+/// verifier looks for anything about extracted releases and GnuPG.
+pub use veilvoice_gnupg::commands as gnupg_commands;
 
 #[cfg(test)]
 mod tests {

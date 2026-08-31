@@ -4940,6 +4940,10 @@ name = "veilvoice-failsafe"
 version = "0.1.15"
 
 [[package]]
+name = "veilvoice-gnupg"
+version = "0.1.15"
+
+[[package]]
 name = "veilvoice-guard"
 version = "0.1.15"
 dependencies = [
@@ -4962,6 +4966,7 @@ dependencies = [
  "veilvoice-core",
  "veilvoice-crypto",
  "veilvoice-failsafe",
+ "veilvoice-gnupg",
  "veilvoice-guard",
  "veilvoice-meta",
  "veilvoice-policy",
@@ -5032,6 +5037,7 @@ dependencies = [
  "sha2",
  "tempfile",
  "veilvoice-check",
+ "veilvoice-gnupg",
  "veilvoice-setup",
  "winresource",
 ]

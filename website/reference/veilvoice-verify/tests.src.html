@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 357 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 457 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -433,6 +433,116 @@
 <span class="ln" id="L355">        );</span>
 <span class="ln" id="L356">    }</span>
 <span class="ln" id="L357">}</span>
+</span>
+<span class="ln" id="L358"></span>
+<span class="src-item" id="fn-the_contents_list_is_verified_before_it_is_parsed">
+<span class="ln" id="L359"><span class="tok-com">/// **Marker 97.** The contents list decides which paths get read and what they</span></span>
+<span class="ln" id="L360"><span class="tok-com">/// are compared against, so it is checked against the signed hash list *before*</span></span>
+<span class="ln" id="L361"><span class="tok-com">/// it is parsed.</span></span>
+<span class="ln" id="L362"><span class="tok-com">///</span></span>
+<span class="ln" id="L363"><span class="tok-com">/// Written as a test over the source because the ordering is the whole</span></span>
+<span class="ln" id="L364"><span class="tok-com">/// property and it cannot be observed from outside: a version that parsed</span></span>
+<span class="ln" id="L365"><span class="tok-com">/// first and checked afterwards would give the same answers on every good</span></span>
+<span class="ln" id="L366"><span class="tok-com">/// release and would be doing what a downloaded text file told it to on a bad</span></span>
+<span class="ln" id="L367"><span class="tok-com">/// one.</span></span>
+<span class="ln" id="L368"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L369"><span class="tok-kw">fn</span> <span class="tok-fn">the_contents_list_is_verified_before_it_is_parsed</span>() {</span>
+<span class="ln" id="L370">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L371">    <span class="tok-kw">let</span> body = source</span>
+<span class="ln" id="L372">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn manifest(&quot;</span>)</span>
+<span class="ln" id="L373">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L374">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the manifest reader has to be findable&quot;</span>);</span>
+<span class="ln" id="L375">    <span class="tok-kw">let</span> body = body.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\nfn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L376">    <span class="tok-kw">let</span> checked = body</span>
+<span class="ln" id="L377">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;check_file&quot;</span>)</span>
+<span class="ln" id="L378">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the contents list must be checked against the signed hash list&quot;</span>);</span>
+<span class="ln" id="L379">    <span class="tok-kw">let</span> parsed = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;contents::parse&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;and then parsed&quot;</span>);</span>
+<span class="ln" id="L380">    assert!(</span>
+<span class="ln" id="L381">        checked &lt; parsed,</span>
+<span class="ln" id="L382">        <span class="tok-str">&quot;the contents list is parsed before it is verified&quot;</span></span>
+<span class="ln" id="L383">    );</span>
+<span class="ln" id="L384">}</span>
+</span>
+<span class="ln" id="L385"></span>
+<span class="src-item" id="fn-a_release_without_a_contents_list_is_not_a_failure">
+<span class="ln" id="L386"><span class="tok-com">/// A release that published no contents list is still checkable.</span></span>
+<span class="ln" id="L387"><span class="tok-com">///</span></span>
+<span class="ln" id="L388"><span class="tok-com">/// Everything before v0.1.15 is in that position, and a verifier that refused</span></span>
+<span class="ln" id="L389"><span class="tok-com">/// them would be refusing files it can check perfectly well. `None` is a state,</span></span>
+<span class="ln" id="L390"><span class="tok-com">/// not an error.</span></span>
+<span class="ln" id="L391"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L392"><span class="tok-kw">fn</span> <span class="tok-fn">a_release_without_a_contents_list_is_not_a_failure</span>() {</span>
+<span class="ln" id="L393">    <span class="tok-kw">let</span> found = discover::Found {</span>
+<span class="ln" id="L394">        directory: std::path::PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;.&quot;</span>),</span>
+<span class="ln" id="L395">        archives: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L396">        sums: None,</span>
+<span class="ln" id="L397">        signature: None,</span>
+<span class="ln" id="L398">        contents: None,</span>
+<span class="ln" id="L399">    };</span>
+<span class="ln" id="L400">    assert!(matches!(<span class="tok-fn">manifest</span>(&amp;found), Manifest::None));</span>
+<span class="ln" id="L401">}</span>
+</span>
+<span class="ln" id="L402"></span>
+<span class="src-item" id="fn-a_contents_list_with_nothing_to_check_it_against_is_unusable">
+<span class="ln" id="L403"><span class="tok-com">/// A contents list with no signed hash list beside it cannot be used, and</span></span>
+<span class="ln" id="L404"><span class="tok-com">/// &quot;cannot be used&quot; is reported rather than quietly skipped.</span></span>
+<span class="ln" id="L405"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L406"><span class="tok-kw">fn</span> <span class="tok-fn">a_contents_list_with_nothing_to_check_it_against_is_unusable</span>() {</span>
+<span class="ln" id="L407">    <span class="tok-kw">let</span> found = discover::Found {</span>
+<span class="ln" id="L408">        directory: std::path::PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;.&quot;</span>),</span>
+<span class="ln" id="L409">        archives: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L410">        sums: None,</span>
+<span class="ln" id="L411">        signature: None,</span>
+<span class="ln" id="L412">        contents: <span class="tok-fn">Some</span>(std::path::PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;CONTENTS.sha256&quot;</span>)),</span>
+<span class="ln" id="L413">    };</span>
+<span class="ln" id="L414">    <span class="tok-kw">match</span> <span class="tok-fn">manifest</span>(&amp;found) {</span>
+<span class="ln" id="L415">        Manifest::<span class="tok-fn">Unusable</span>(why) =&gt; assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;signed hash list&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>),</span>
+<span class="ln" id="L416">        other =&gt; panic!(<span class="tok-str">&quot;expected Unusable, got {}&quot;</span>, <span class="tok-fn">matches_name</span>(&amp;other)),</span>
+<span class="ln" id="L417">    }</span>
+<span class="ln" id="L418">}</span>
+</span>
+<span class="ln" id="L419"></span>
+<span class="src-item" id="fn-matches_name">
+<span class="ln" id="L420"><span class="tok-com">/// A name for a [`Manifest`], for a failing assertion to print.</span></span>
+<span class="ln" id="L421"><span class="tok-kw">fn</span> <span class="tok-fn">matches_name</span>(manifest: &amp;Manifest) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L422">    <span class="tok-kw">match</span> manifest {</span>
+<span class="ln" id="L423">        Manifest::None =&gt; <span class="tok-str">&quot;None&quot;</span>,</span>
+<span class="ln" id="L424">        Manifest::<span class="tok-fn">Unusable</span>(_) =&gt; <span class="tok-str">&quot;Unusable&quot;</span>,</span>
+<span class="ln" id="L425">        Manifest::<span class="tok-fn">Ready</span>(_) =&gt; <span class="tok-str">&quot;Ready&quot;</span>,</span>
+<span class="ln" id="L426">    }</span>
+<span class="ln" id="L427">}</span>
+</span>
+<span class="ln" id="L428"></span>
+<span class="src-item" id="fn-a_gnupg_that_cannot_run_is_never_counted_against_the_release">
+<span class="ln" id="L429"><span class="tok-com">/// **Marker 97.** GnuPG being unusable is not a statement about the download.</span></span>
+<span class="ln" id="L430"><span class="tok-com">///</span></span>
+<span class="ln" id="L431"><span class="tok-com">/// The distinction is the one a verifier is most tempted to get wrong: a</span></span>
+<span class="ln" id="L432"><span class="tok-com">/// missing keyring directory reads like a failure, and reporting it as one</span></span>
+<span class="ln" id="L433"><span class="tok-com">/// tells somebody not to run a release that is entirely sound. Only an answer</span></span>
+<span class="ln" id="L434"><span class="tok-com">/// from GnuPG counts, and only a bad answer counts against.</span></span>
+<span class="ln" id="L435"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L436"><span class="tok-kw">fn</span> <span class="tok-fn">a_gnupg_that_cannot_run_is_never_counted_against_the_release</span>() {</span>
+<span class="ln" id="L437">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L438">    <span class="tok-kw">let</span> body = source</span>
+<span class="ln" id="L439">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn report_gnupg(&quot;</span>)</span>
+<span class="ln" id="L440">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L441">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the GnuPG report has to be findable&quot;</span>);</span>
+<span class="ln" id="L442">    <span class="tok-kw">let</span> body = body.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\nfn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L443">    <span class="tok-kw">for</span> arm <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L444">        <span class="tok-str">&quot;the signing key could not be added to your keyring&quot;</span>,</span>
+<span class="ln" id="L445">        <span class="tok-str">&quot;GnuPG could not check the signature&quot;</span>,</span>
+<span class="ln" id="L446">    ] {</span>
+<span class="ln" id="L447">        <span class="tok-kw">let</span> at = body.<span class="tok-fn">find</span>(arm).<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{arm} is gone&quot;</span>));</span>
+<span class="ln" id="L448">        <span class="tok-com">// The next `problems += 1` must belong to a later arm, not this one.</span></span>
+<span class="ln" id="L449">        <span class="tok-kw">let</span> rest = &amp;body[at..];</span>
+<span class="ln" id="L450">        <span class="tok-kw">let</span> next_arm = rest.<span class="tok-fn">find</span>(<span class="tok-str">&quot;Nothing about the download changed&quot;</span>);</span>
+<span class="ln" id="L451">        <span class="tok-kw">let</span> next_count = rest.<span class="tok-fn">find</span>(<span class="tok-str">&quot;problems += 1&quot;</span>);</span>
+<span class="ln" id="L452">        assert!(</span>
+<span class="ln" id="L453">            next_arm.<span class="tok-fn">is_some</span>() &amp;&amp; next_arm &lt; next_count,</span>
+<span class="ln" id="L454">            <span class="tok-str">&quot;{arm} counts against the release&quot;</span></span>
+<span class="ln" id="L455">        );</span>
+<span class="ln" id="L456">    }</span>
+<span class="ln" id="L457">}</span>
 </span>
 </code></pre>
 </main>

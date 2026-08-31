@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/discover.svg" alt="discover.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/discover.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 353 lines &middot; <a href="discover.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 364 lines &middot; <a href="discover.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-exists">Why this exists</a>
@@ -67,18 +67,18 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>353 lines defining <strong>7 functions</strong> (7 public), <strong>1 type</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>364 lines defining <strong>7 functions</strong> (7 public), <strong>1 type</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Found</code> <span style="color:var(--muted)">line 59</span> &mdash; What was found in one directory.</li>
+<li><code>struct Found</code> <span style="color:var(--muted)">line 65</span> &mdash; What was found in one directory.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Found::is_complete</code> <span style="color:var(--muted)">line 72</span> &mdash; Whether this directory holds everything needed to verify offline.
+<li><code>Found::is_complete</code> <span style="color:var(--muted)">line 80</span> &mdash; Whether this directory holds everything needed to verify offline.
 </li>
-<li><code>Found::is_empty</code> <span style="color:var(--muted)">line 77</span> &mdash; Whether anything at all turned up.
+<li><code>Found::is_empty</code> <span style="color:var(--muted)">line 85</span> &mdash; Whether anything at all turned up.
 </li>
-<li><code>Found::missing</code> <span style="color:var(--muted)">line 82</span> &mdash; What is missing, in words, for a message to the user.
+<li><code>Found::missing</code> <span style="color:var(--muted)">line 90</span> &mdash; What is missing, in words, for a message to the user.
 </li>
-<li><code>search</code> <span style="color:var(--muted)">line 180</span> &mdash; Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.
+<li><code>search</code> <span style="color:var(--muted)">line 191</span> &mdash; Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>look_in</code>, <code>places</code>, <code>looks_like_archive</code></span>
 </li>
 </ul>
@@ -102,37 +102,37 @@
 <a href="discover.src.html#fn-found-is_complete">
 <rect x="34.8" y="20.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="121.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Found::is_complete</text>
-<text x="121.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 72</text>
+<text x="121.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 80</text>
 </a>
 <a href="discover.src.html#fn-found-is_empty">
 <rect x="233.9" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="308.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Found::is_empty</text>
-<text x="308.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 77</text>
+<text x="308.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 85</text>
 </a>
 <a href="discover.src.html#fn-found-missing">
 <rect x="408.8" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="479.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Found::missing</text>
-<text x="479.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 82</text>
+<text x="479.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
 </a>
 <a href="discover.src.html#fn-looks_like_archive">
 <rect x="28.0" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="114.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">looks_like_archive</text>
-<text x="114.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 100</text>
+<text x="114.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 108</text>
 </a>
 <a href="discover.src.html#fn-look_in">
 <rect x="227.1" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="273.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look_in</text>
-<text x="273.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 106</text>
+<text x="273.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 114</text>
 </a>
 <a href="discover.src.html#fn-places">
 <rect x="345.6" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="391.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">places</text>
-<text x="391.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 139</text>
+<text x="391.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
 </a>
 <a href="discover.src.html#fn-search">
 <rect x="464.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="510.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">search</text>
-<text x="510.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 180</text>
+<text x="510.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 191</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -149,23 +149,23 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_is_complete([&quot;Found::is_complete&lt;br/&gt;line 72&quot;])
-    n_is_empty([&quot;Found::is_empty&lt;br/&gt;line 77&quot;])
-    n_missing([&quot;Found::missing&lt;br/&gt;line 82&quot;])
-    n_looks_like_archive[&quot;looks_like_archive&lt;br/&gt;line 100&quot;]
-    n_look_in[&quot;look_in&lt;br/&gt;line 106&quot;]
-    n_places[&quot;places&lt;br/&gt;line 139&quot;]
-    n_search([&quot;search&lt;br/&gt;line 180&quot;])
+    n_is_complete([&quot;Found::is_complete&lt;br/&gt;line 80&quot;])
+    n_is_empty([&quot;Found::is_empty&lt;br/&gt;line 85&quot;])
+    n_missing([&quot;Found::missing&lt;br/&gt;line 90&quot;])
+    n_looks_like_archive[&quot;looks_like_archive&lt;br/&gt;line 108&quot;]
+    n_look_in[&quot;look_in&lt;br/&gt;line 114&quot;]
+    n_places[&quot;places&lt;br/&gt;line 150&quot;]
+    n_search([&quot;search&lt;br/&gt;line 191&quot;])
     n_look_in --&gt; n_looks_like_archive
     n_search --&gt; n_look_in
     n_search --&gt; n_places
-    click n_is_complete href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L72&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L77&quot; &quot;open the source&quot;
-    click n_missing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L82&quot; &quot;open the source&quot;
-    click n_looks_like_archive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L100&quot; &quot;open the source&quot;
-    click n_look_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L106&quot; &quot;open the source&quot;
-    click n_places href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L139&quot; &quot;open the source&quot;
-    click n_search href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L180&quot; &quot;open the source&quot;
+    click n_is_complete href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L80&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L85&quot; &quot;open the source&quot;
+    click n_missing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L90&quot; &quot;open the source&quot;
+    click n_looks_like_archive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L108&quot; &quot;open the source&quot;
+    click n_look_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L114&quot; &quot;open the source&quot;
+    click n_places href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L150&quot; &quot;open the source&quot;
+    click n_search href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs#L191&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_complete,n_is_empty,n_missing,n_search entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -179,14 +179,15 @@ flowchart TD
 <tr><td><code>ARCHIVES</code> <sub>const</sub></td><td><a href="discover.src.html#fn-archives">50</a></td><td>The extensions this project publishes releases as.</td></tr>
 <tr><td><code>SUMS</code> <sub>pub const</sub></td><td><a href="discover.src.html#fn-sums">53</a></td><td>The names of the two files a signed release carries beside its archives.</td></tr>
 <tr><td><code>SUMS_SIG</code> <sub>pub const</sub></td><td><a href="discover.src.html#fn-sums_sig">55</a></td><td>The detached signature over SUMS.</td></tr>
-<tr><td><code>Found</code> <sub>pub struct</sub></td><td><a href="discover.src.html#fn-found">59</a></td><td>What was found in one directory.</td></tr>
-<tr><td><code>Found::is_complete</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-found-is_complete">72</a></td><td>Whether this directory holds everything needed to verify offline.</td></tr>
-<tr><td><code>Found::is_empty</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-found-is_empty">77</a></td><td>Whether anything at all turned up.</td></tr>
-<tr><td><code>Found::missing</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-found-missing">82</a></td><td>What is missing, in words, for a message to the user.</td></tr>
-<tr><td><code>looks_like_archive</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-looks_like_archive">100</a></td><td>Whether a filename looks like one of this project&#x27;s release archives.</td></tr>
-<tr><td><code>look_in</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-look_in">106</a></td><td>Look in one directory, one level deep.</td></tr>
-<tr><td><code>places</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-places">139</a></td><td>Every place worth looking, in order, without duplicates.</td></tr>
-<tr><td><code>search</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-search">180</a></td><td>Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.</td></tr>
+<tr><td><code>CONTENTS</code> <sub>pub const</sub></td><td><a href="discover.src.html#fn-contents">61</a></td><td>The list of what is inside each archive, itself covered by SUMS.</td></tr>
+<tr><td><code>Found</code> <sub>pub struct</sub></td><td><a href="discover.src.html#fn-found">65</a></td><td>What was found in one directory.</td></tr>
+<tr><td><code>Found::is_complete</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-found-is_complete">80</a></td><td>Whether this directory holds everything needed to verify offline.</td></tr>
+<tr><td><code>Found::is_empty</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-found-is_empty">85</a></td><td>Whether anything at all turned up.</td></tr>
+<tr><td><code>Found::missing</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-found-missing">90</a></td><td>What is missing, in words, for a message to the user.</td></tr>
+<tr><td><code>looks_like_archive</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-looks_like_archive">108</a></td><td>Whether a filename looks like one of this project&#x27;s release archives.</td></tr>
+<tr><td><code>look_in</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-look_in">114</a></td><td>Look in one directory, one level deep.</td></tr>
+<tr><td><code>places</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-places">150</a></td><td>Every place worth looking, in order, without duplicates.</td></tr>
+<tr><td><code>search</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-search">191</a></td><td>Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.</td></tr>
 </tbody></table>
 </section>
 </div></div>

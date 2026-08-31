@@ -53,6 +53,12 @@ const ARCHIVES: &[&str] = &[".zip", ".tar.gz", ".tgz", ".tar.xz"];
 pub const SUMS: &str = "SHA256SUMS";
 /// The detached signature over [`SUMS`].
 pub const SUMS_SIG: &str = "SHA256SUMS.asc";
+/// The list of what is inside each archive, itself covered by [`SUMS`].
+///
+/// **Marker 97.** Optional, and its absence is not a failure: releases before
+/// v0.1.15 do not carry one, and a verifier that refused them would be refusing
+/// files it can check perfectly well.
+pub const CONTENTS: &str = veilvoice_check::contents::CONTENTS;
 
 /// What was found in one directory.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -65,6 +71,8 @@ pub struct Found {
     pub sums: Option<PathBuf>,
     /// The signature over the hash list, if it is there.
     pub signature: Option<PathBuf>,
+    /// The list of what is inside each archive, if the release published one.
+    pub contents: Option<PathBuf>,
 }
 
 impl Found {
@@ -109,6 +117,7 @@ pub fn look_in(directory: &Path) -> Found {
         archives: Vec::new(),
         sums: None,
         signature: None,
+        contents: None,
     };
     let Ok(entries) = std::fs::read_dir(directory) else {
         return found;
@@ -125,6 +134,8 @@ pub fn look_in(directory: &Path) -> Found {
             found.sums = Some(path);
         } else if name.eq_ignore_ascii_case(SUMS_SIG) {
             found.signature = Some(path);
+        } else if name.eq_ignore_ascii_case(CONTENTS) {
+            found.contents = Some(path);
         } else if looks_like_archive(name) {
             found.archives.push(path);
         }

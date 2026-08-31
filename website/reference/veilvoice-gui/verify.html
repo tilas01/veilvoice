@@ -39,11 +39,12 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/verify.svg" alt="verify.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/verify.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 767 lines &middot; <a href="verify.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1224 lines &middot; <a href="verify.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-exists-here-rather-than-in-the-verifier">Why this exists here rather than in the verifier</a>
   <a href="#three-files-and-the-tab-says-so-before-it-is-given-any">Three files, and the tab says so before it is given any</a>
+  <a href="#marker-97-one-press-three-answers">Marker 97: one press, three answers</a>
   <a href="#nothing-here-downloads-anything">Nothing here downloads anything</a>
   <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
@@ -58,37 +59,45 @@
 <p>The portable verifier is the one program in this project whose <em>smallness</em> is a feature &#8212; it is what somebody downloads before they trust anything else here, and a 1.5 MB single file is part of why it is checkable at all. Putting a GUI toolkit in it would have cost that for a convenience the desktop application was already the right place for. So the arithmetic moved to <code>veilvoice-check</code> and this is a second caller, not a second implementation.</p>
 <h2 id="three-files-and-the-tab-says-so-before-it-is-given-any">Three files, and the tab says so before it is given any</h2>
 <p>Verifying needs the download, the <code>SHA256SUMS</code> and the <code>SHA256SUMS.asc</code>. Dropping one file on a window and getting a verdict would be a lie, and an interface that discovers the other two are missing <em>after</em> the drop teaches people that verification is fiddly rather than that it needs three things. All three slots are visible from the start, and a drop fills whichever one the file&#x27;s name says it is.</p>
+<h2 id="marker-97-one-press-three-answers">Marker 97: one press, three answers</h2>
+<p>The tab used to answer one question, and it was not the question somebody actually has. &quot;Is this zip the published one&quot; is a step; &quot;is the program I am about to run the published one&quot; is the thing they want to know, and it was being left to the command line.</p>
+<p>So one press now checks the archive against the signed hash list, then every file extracted out of that archive against the signed contents list the release publishes beside it, and then runs the GnuPG on this machine over the same signature and shows what it said. Three answers, one button, and each one drawn separately so a pass on one is never mistaken for a pass on another.</p>
+<p>Two things are deliberately <strong>not</strong> failures. A release that published no contents list -- everything before v0.1.15 -- simply has no such row, rather than a warning about a file that was never meant to be there. And a GnuPG that cannot run on this machine is drawn in the quiet colour: it is a fact about the computer and says nothing whatever about the download.</p>
 <h2 id="nothing-here-downloads-anything">Nothing here downloads anything</h2>
 <p>Not even the key: it is compiled in, and its fingerprint is checked against a constant a reader can compare with the README. <code>veilvoice-verify</code> is still the tool for fetching a release, because it is the one that can be checked before it is run.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Drop a download on the window and be told whether it is genuine.</p>
 <p>It checks the signature over the list of hashes first, and only then compares your file against that list. That order matters: a list of hashes that has not been checked is just some numbers somebody sent you.</p>
 <p>Drop the downloaded archive and the hash list and signature sitting beside it are picked up on their own. Nothing is downloaded and nothing leaves the machine.</p>
+<p>One press checks the zip, then every file you unzipped out of it, and then asks your own GnuPG the same question and shows you its answer.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>767 lines defining <strong>15 functions</strong> (7 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1224 lines defining <strong>21 functions</strong> (7 public), <strong>5 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Slot</code> <span style="color:var(--muted)">line 54</span> &mdash; Which of the three files a dropped path is.</li>
-<li><code>struct Verify</code> <span style="color:var(--muted)">line 83</span> &mdash; The tab&#x27;s state.</li>
+<li><code>enum Slot</code> <span style="color:var(--muted)">line 77</span> &mdash; Which of the three files a dropped path is.</li>
+<li><code>struct Report</code> <span style="color:var(--muted)">line 112</span> &mdash; Everything one press of check found out.</li>
+<li><code>struct Contents</code> <span style="color:var(--muted)">line 125</span> &mdash; What the extracted folder turned out to hold.</li>
+<li><code>struct Gnupg</code> <span style="color:var(--muted)">line 140</span> &mdash; What this machine&#x27;s GnuPG said.</li>
+<li><code>struct Verify</code> <span style="color:var(--muted)">line 158</span> &mdash; The tab&#x27;s state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Verify::wants_repaint</code> <span style="color:var(--muted)">line 117</span> &mdash; Whether the window has to keep drawing for this panel&#x27;s sake.
+<li><code>Verify::wants_repaint</code> <span style="color:var(--muted)">line 192</span> &mdash; Whether the window has to keep drawing for this panel&#x27;s sake.
 </li>
-<li><code>Verify::drain</code> <span style="color:var(--muted)">line 122</span> &mdash; Take the worker&#x27;s answer if it has one.
+<li><code>Verify::drain</code> <span style="color:var(--muted)">line 197</span> &mdash; Take the worker&#x27;s answer if it has one.
 </li>
-<li><code>Verify::take_dropped</code> <span style="color:var(--muted)">line 211</span> &mdash; Read what the window was given this frame.
+<li><code>Verify::take_dropped</code> <span style="color:var(--muted)">line 289</span> &mdash; Read what the window was given this frame.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>accept</code>, <code>fill_from_beside</code>, <code>slot_for</code></span>
 </li>
-<li><code>Verify::tab</code> <span style="color:var(--muted)">line 229</span> &mdash; The whole tab.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>body</code>, <code>drop_target</code>, <code>found_beside</code>, <code>is_busy</code>, <code>slot_row</code>, <code>start</code>, <code>verdict</code>, <code>gnupg_section</code></span>
+<li><code>Verify::tab</code> <span style="color:var(--muted)">line 307</span> &mdash; The whole tab.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>body</code>, <code>drop_target</code>, <code>found_beside</code>, <code>is_busy</code>, <code>slot_row</code>, <code>start</code>, <code>verdict</code>, <code>gnupg_section</code>, <code>examine</code>, <code>archive_verdict</code>, <code>contents_verdict</code>, <code>gnupg_verdict</code></span>
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 579 831" width="579" height="831" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595 1031" width="595" height="1031" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -97,125 +106,167 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="579" height="831" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M261.3 174.0 C 261.3 194.0, 214.1 300.0, 214.1 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
-<path d="M331.7 147.0 C 353.7 147.0, 353.7 47.0, 139.7 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M413.2 374.0 C 413.2 394.0, 110.6 400.0, 110.6 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M475.6 347.0 C 568.9 347.0, 568.9 147.0, 549.9 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M475.6 347.0 C 497.6 347.0, 497.6 47.0, 314.6 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M413.2 374.0 C 413.2 394.0, 305.6 400.0, 305.6 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M413.2 374.0 C 413.2 394.0, 289.5 500.0, 289.5 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M413.2 374.0 C 413.2 394.0, 484.6 400.0, 484.6 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M305.6 474.0 C 305.6 494.0, 289.5 600.0, 289.5 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M397.1 274.0 C 397.1 294.0, 413.2 300.0, 413.2 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M312.8 247.0 C 353.7 247.0, 353.7 147.0, 334.7 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<rect x="0" y="0" width="595" height="1031" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M269.4 174.0 C 269.4 194.0, 222.2 300.0, 222.2 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M339.8 147.0 C 361.8 147.0, 361.8 47.0, 147.7 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M421.3 374.0 C 421.3 394.0, 118.6 400.0, 118.6 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M483.6 347.0 C 577.0 347.0, 577.0 147.0, 558.0 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M483.6 347.0 C 505.6 347.0, 505.6 47.0, 322.6 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M421.3 374.0 C 421.3 394.0, 313.7 400.0, 313.7 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M421.3 374.0 C 421.3 394.0, 297.6 500.0, 297.6 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M421.3 374.0 C 421.3 394.0, 492.6 400.0, 492.6 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M528.9 774.0 C 528.9 794.0, 218.2 800.0, 218.2 817.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M528.9 774.0 C 528.9 794.0, 389.0 800.0, 389.0 817.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M313.7 474.0 C 313.7 494.0, 173.8 600.0, 173.8 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M297.6 574.0 C 297.6 594.0, 528.9 700.0, 528.9 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M405.2 274.0 C 405.2 294.0, 421.3 300.0, 421.3 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M320.8 247.0 C 361.8 247.0, 361.8 147.0, 342.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M492.6 474.0 C 492.6 494.0, 350.0 700.0, 350.0 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M492.6 474.0 C 492.6 494.0, 409.2 600.0, 409.2 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M492.6 474.0 C 492.6 494.0, 118.6 700.0, 118.6 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <a href="verify.src.html#fn-slot_for">
-<rect x="44.2" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="90.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">slot_for</text>
-<text x="90.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
+<rect x="52.2" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="98.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">slot_for</text>
+<text x="98.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
 </a>
 <a href="verify.src.html#fn-verify-is_busy">
-<rect x="162.7" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="237.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::is_busy</text>
-<text x="237.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 107</text>
+<rect x="170.7" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="245.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::is_busy</text>
+<text x="245.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 182</text>
 </a>
 <a href="verify.src.html#fn-verify-wants_repaint">
-<rect x="337.6" y="20.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="436.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::wants_repaint</text>
-<text x="436.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 117</text>
+<rect x="345.6" y="20.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="444.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::wants_repaint</text>
+<text x="444.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
 </a>
 <a href="verify.src.html#fn-verify-drain">
-<rect x="32.1" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="98.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::drain</text>
-<text x="98.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
+<rect x="40.2" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="106.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::drain</text>
+<text x="106.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
 </a>
 <a href="verify.src.html#fn-verify-accept">
-<rect x="190.9" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="261.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::accept</text>
-<text x="261.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
+<rect x="198.9" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="269.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::accept</text>
+<text x="269.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 218</text>
 </a>
 <a href="verify.src.html#fn-verify-fill_from_beside">
-<rect x="103.4" y="320.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="214.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::fill_from_beside</text>
-<text x="214.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
+<rect x="111.5" y="320.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="222.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::fill_from_beside</text>
+<text x="222.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 248</text>
 </a>
 <a href="verify.src.html#fn-verify-found_beside">
-<rect x="357.7" y="120.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="452.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::found_beside</text>
-<text x="452.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
+<rect x="365.8" y="120.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="460.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::found_beside</text>
+<text x="460.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
 </a>
 <a href="verify.src.html#fn-verify-take_dropped">
-<rect x="123.6" y="220.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="218.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::take_dropped</text>
-<text x="218.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 211</text>
+<rect x="131.6" y="220.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="226.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::take_dropped</text>
+<text x="226.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
 </a>
 <a href="verify.src.html#fn-verify-tab">
-<rect x="338.8" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="397.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::tab</text>
-<text x="397.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 229</text>
+<rect x="346.8" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="405.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::tab</text>
+<text x="405.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 307</text>
 </a>
 <a href="verify.src.html#fn-verify-body">
-<rect x="350.9" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="413.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::body</text>
-<text x="413.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
+<rect x="358.9" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="421.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::body</text>
+<text x="421.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 313</text>
 </a>
 <a href="verify.src.html#fn-verify-drop_target">
-<rect x="20.0" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="110.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::drop_target</text>
-<text x="110.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 333</text>
+<rect x="28.1" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="118.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::drop_target</text>
+<text x="118.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 421</text>
 </a>
 <a href="verify.src.html#fn-verify-slot_row">
-<rect x="227.1" y="420.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="305.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::slot_row</text>
-<text x="305.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 355</text>
+<rect x="235.2" y="420.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="313.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::slot_row</text>
+<text x="313.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 443</text>
 </a>
 <a href="verify.src.html#fn-verify-gnupg_section">
-<rect x="190.9" y="620.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="289.5" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::gnupg_section</text>
-<text x="289.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 420</text>
+<rect x="75.2" y="620.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="173.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::gnupg_section</text>
+<text x="173.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 508</text>
 </a>
 <a href="verify.src.html#fn-verify-verdict">
-<rect x="410.1" y="420.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="484.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::verdict</text>
-<text x="484.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 482</text>
+<rect x="418.2" y="420.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="492.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::verdict</text>
+<text x="492.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 580</text>
+</a>
+<a href="verify.src.html#fn-verify-contents_verdict">
+<rect x="298.5" y="620.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="409.2" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::contents_verdict</text>
+<text x="409.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 591</text>
+</a>
+<a href="verify.src.html#fn-verify-gnupg_verdict">
+<rect x="20.0" y="720.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="118.6" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::gnupg_verdict</text>
+<text x="118.6" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 638</text>
+</a>
+<a href="verify.src.html#fn-verify-archive_verdict">
+<rect x="243.3" y="720.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="350.0" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::archive_verdict</text>
+<text x="350.0" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 676</text>
 </a>
 <a href="verify.src.html#fn-verify-start">
-<rect x="223.1" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="289.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::start</text>
-<text x="289.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 541</text>
+<rect x="231.2" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="297.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::start</text>
+<text x="297.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 735</text>
 </a>
-<rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="720.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
-<text x="35.0" y="729.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
-<rect x="20.0" y="736.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="745.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 756.5 L29.0 756.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="761.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="783.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading,</text>
-<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
+<a href="verify.src.html#fn-examine">
+<rect x="482.6" y="720.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="528.9" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">examine</text>
+<text x="528.9" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 758</text>
+</a>
+<a href="verify.src.html#fn-examine_contents">
+<rect x="139.7" y="820.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="218.2" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">examine_contents</text>
+<text x="218.2" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 792</text>
+</a>
+<a href="verify.src.html#fn-examine_gnupg">
+<rect x="322.7" y="820.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="389.0" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">examine_gnupg</text>
+<text x="389.0" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 876</text>
+</a>
+<rect x="20.0" y="904.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="920.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="929.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="936.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="945.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 956.5 L29.0 956.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="961.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="983.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="998.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading,</text>
+<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_slot_for[&quot;slot_for&lt;br/&gt;line 67&quot;]
-    n_is_busy[&quot;Verify::is_busy&lt;br/&gt;line 107&quot;]
-    n_wants_repaint([&quot;Verify::wants_repaint&lt;br/&gt;line 117&quot;])
-    n_drain([&quot;Verify::drain&lt;br/&gt;line 122&quot;])
-    n_accept[&quot;Verify::accept&lt;br/&gt;line 140&quot;]
-    n_fill_from_beside[&quot;Verify::fill_from_beside&lt;br/&gt;line 170&quot;]
-    n_found_beside[&quot;Verify::found_beside&lt;br/&gt;line 192&quot;]
-    n_take_dropped([&quot;Verify::take_dropped&lt;br/&gt;line 211&quot;])
-    n_tab([&quot;Verify::tab&lt;br/&gt;line 229&quot;])
-    n_body[&quot;Verify::body&lt;br/&gt;line 235&quot;]
-    n_drop_target[&quot;Verify::drop_target&lt;br/&gt;line 333&quot;]
-    n_slot_row[&quot;Verify::slot_row&lt;br/&gt;line 355&quot;]
-    n_gnupg_section[&quot;Verify::gnupg_section&lt;br/&gt;line 420&quot;]
-    n_verdict[&quot;Verify::verdict&lt;br/&gt;line 482&quot;]
-    n_start[&quot;Verify::start&lt;br/&gt;line 541&quot;]
+    n_slot_for[&quot;slot_for&lt;br/&gt;line 90&quot;]
+    n_is_busy[&quot;Verify::is_busy&lt;br/&gt;line 182&quot;]
+    n_wants_repaint([&quot;Verify::wants_repaint&lt;br/&gt;line 192&quot;])
+    n_drain([&quot;Verify::drain&lt;br/&gt;line 197&quot;])
+    n_accept[&quot;Verify::accept&lt;br/&gt;line 218&quot;]
+    n_fill_from_beside[&quot;Verify::fill_from_beside&lt;br/&gt;line 248&quot;]
+    n_found_beside[&quot;Verify::found_beside&lt;br/&gt;line 270&quot;]
+    n_take_dropped([&quot;Verify::take_dropped&lt;br/&gt;line 289&quot;])
+    n_tab([&quot;Verify::tab&lt;br/&gt;line 307&quot;])
+    n_body[&quot;Verify::body&lt;br/&gt;line 313&quot;]
+    n_drop_target[&quot;Verify::drop_target&lt;br/&gt;line 421&quot;]
+    n_slot_row[&quot;Verify::slot_row&lt;br/&gt;line 443&quot;]
+    n_gnupg_section[&quot;Verify::gnupg_section&lt;br/&gt;line 508&quot;]
+    n_verdict[&quot;Verify::verdict&lt;br/&gt;line 580&quot;]
+    n_contents_verdict[&quot;Verify::contents_verdict&lt;br/&gt;line 591&quot;]
+    n_gnupg_verdict[&quot;Verify::gnupg_verdict&lt;br/&gt;line 638&quot;]
+    n_archive_verdict[&quot;Verify::archive_verdict&lt;br/&gt;line 676&quot;]
+    n_start[&quot;Verify::start&lt;br/&gt;line 735&quot;]
+    n_examine[&quot;examine&lt;br/&gt;line 758&quot;]
+    n_examine_contents[&quot;examine_contents&lt;br/&gt;line 792&quot;]
+    n_examine_gnupg[&quot;examine_gnupg&lt;br/&gt;line 876&quot;]
     n_accept --&gt; n_fill_from_beside
     n_accept --&gt; n_slot_for
     n_body --&gt; n_drop_target
@@ -224,53 +275,74 @@ flowchart TD
     n_body --&gt; n_slot_row
     n_body --&gt; n_start
     n_body --&gt; n_verdict
+    n_examine --&gt; n_examine_contents
+    n_examine --&gt; n_examine_gnupg
     n_slot_row --&gt; n_gnupg_section
+    n_start --&gt; n_examine
     n_tab --&gt; n_body
     n_take_dropped --&gt; n_accept
-    click n_slot_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L67&quot; &quot;open the source&quot;
-    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L107&quot; &quot;open the source&quot;
-    click n_wants_repaint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L117&quot; &quot;open the source&quot;
-    click n_drain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L122&quot; &quot;open the source&quot;
-    click n_accept href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L140&quot; &quot;open the source&quot;
-    click n_fill_from_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L170&quot; &quot;open the source&quot;
-    click n_found_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L192&quot; &quot;open the source&quot;
-    click n_take_dropped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L211&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L229&quot; &quot;open the source&quot;
-    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L235&quot; &quot;open the source&quot;
-    click n_drop_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L333&quot; &quot;open the source&quot;
-    click n_slot_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L355&quot; &quot;open the source&quot;
-    click n_gnupg_section href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L420&quot; &quot;open the source&quot;
-    click n_verdict href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L482&quot; &quot;open the source&quot;
-    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L541&quot; &quot;open the source&quot;
+    n_verdict --&gt; n_archive_verdict
+    n_verdict --&gt; n_contents_verdict
+    n_verdict --&gt; n_gnupg_verdict
+    click n_slot_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L90&quot; &quot;open the source&quot;
+    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L182&quot; &quot;open the source&quot;
+    click n_wants_repaint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L192&quot; &quot;open the source&quot;
+    click n_drain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L197&quot; &quot;open the source&quot;
+    click n_accept href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L218&quot; &quot;open the source&quot;
+    click n_fill_from_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L248&quot; &quot;open the source&quot;
+    click n_found_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L270&quot; &quot;open the source&quot;
+    click n_take_dropped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L289&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L307&quot; &quot;open the source&quot;
+    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L313&quot; &quot;open the source&quot;
+    click n_drop_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L421&quot; &quot;open the source&quot;
+    click n_slot_row href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L443&quot; &quot;open the source&quot;
+    click n_gnupg_section href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L508&quot; &quot;open the source&quot;
+    click n_verdict href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L580&quot; &quot;open the source&quot;
+    click n_contents_verdict href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L591&quot; &quot;open the source&quot;
+    click n_gnupg_verdict href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L638&quot; &quot;open the source&quot;
+    click n_archive_verdict href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L676&quot; &quot;open the source&quot;
+    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L735&quot; &quot;open the source&quot;
+    click n_examine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L758&quot; &quot;open the source&quot;
+    click n_examine_contents href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L792&quot; &quot;open the source&quot;
+    click n_examine_gnupg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L876&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_wants_repaint,n_drain,n_take_dropped,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_is_busy,n_accept,n_found_beside api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_slot_for,n_fill_from_beside,n_body,n_drop_target,n_slot_row,n_gnupg_section,n_verdict,n_start helper</code></pre>
+    class n_slot_for,n_fill_from_beside,n_body,n_drop_target,n_slot_row,n_gnupg_section,n_verdict,n_contents_verdict,n_gnupg_verdict,n_archive_verdict,n_start,n_examine,n_examine_contents,n_examine_gnupg helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Slot</code> <sub>enum</sub></td><td><a href="verify.src.html#fn-slot">54</a></td><td>Which of the three files a dropped path is.</td></tr>
-<tr><td><code>slot_for</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-slot_for">67</a></td><td>Work out what a dropped file is from its name.</td></tr>
-<tr><td><code>Verify</code> <sub>pub struct</sub></td><td><a href="verify.src.html#fn-verify">83</a></td><td>The tab&#x27;s state.</td></tr>
-<tr><td><code>Verify::is_busy</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-is_busy">107</a></td><td>Whether a check is running, so the app keeps repainting.</td></tr>
-<tr><td><code>Verify::wants_repaint</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-wants_repaint">117</a></td><td>Whether the window has to keep drawing for this panel&#x27;s sake.</td></tr>
-<tr><td><code>Verify::drain</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-drain">122</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
-<tr><td><code>Verify::accept</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-accept">140</a></td><td>Put a dropped or chosen file into the slot its name says it belongs in.</td></tr>
-<tr><td><code>Verify::fill_from_beside</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-fill_from_beside">170</a></td><td>Fill the empty slots from the folder this file came from.</td></tr>
-<tr><td><code>Verify::found_beside</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-found_beside">192</a></td><td>Which slots were filled in by looking rather than by being chosen.</td></tr>
-<tr><td><code>Verify::take_dropped</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-take_dropped">211</a></td><td>Read what the window was given this frame.</td></tr>
-<tr><td><code>Verify::tab</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-tab">229</a></td><td>The whole tab.</td></tr>
-<tr><td><code>Verify::body</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-body">235</a></td><td></td></tr>
-<tr><td><code>Verify::drop_target</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-drop_target">333</a></td><td>The rectangle that lights up while files are over the window.</td></tr>
-<tr><td><code>Verify::slot_row</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-slot_row">355</a></td><td>One file slot: what it is, what is in it, and a way to change it.</td></tr>
-<tr><td><code>Verify::gnupg_section</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-gnupg_section">420</a></td><td>Marker 90.</td></tr>
-<tr><td><code>Verify::verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-verdict">482</a></td><td>The answer, in the colour it deserves.</td></tr>
-<tr><td><code>Verify::start</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-start">541</a></td><td>Run the check on a thread of its own.</td></tr>
+<tr><td><code>Slot</code> <sub>enum</sub></td><td><a href="verify.src.html#fn-slot">77</a></td><td>Which of the three files a dropped path is.</td></tr>
+<tr><td><code>slot_for</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-slot_for">90</a></td><td>Work out what a dropped file is from its name.</td></tr>
+<tr><td><code>Report</code> <sub>pub struct</sub></td><td><a href="verify.src.html#fn-report">112</a></td><td>Everything one press of check found out.</td></tr>
+<tr><td><code>Contents</code> <sub>pub struct</sub></td><td><a href="verify.src.html#fn-contents">125</a></td><td>What the extracted folder turned out to hold.</td></tr>
+<tr><td><code>Gnupg</code> <sub>pub struct</sub></td><td><a href="verify.src.html#fn-gnupg">140</a></td><td>What this machine&#x27;s GnuPG said.</td></tr>
+<tr><td><code>Verify</code> <sub>pub struct</sub></td><td><a href="verify.src.html#fn-verify">158</a></td><td>The tab&#x27;s state.</td></tr>
+<tr><td><code>Verify::is_busy</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-is_busy">182</a></td><td>Whether a check is running, so the app keeps repainting.</td></tr>
+<tr><td><code>Verify::wants_repaint</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-wants_repaint">192</a></td><td>Whether the window has to keep drawing for this panel&#x27;s sake.</td></tr>
+<tr><td><code>Verify::drain</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-drain">197</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
+<tr><td><code>Verify::accept</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-accept">218</a></td><td>Put a dropped or chosen file into the slot its name says it belongs in.</td></tr>
+<tr><td><code>Verify::fill_from_beside</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-fill_from_beside">248</a></td><td>Fill the empty slots from the folder this file came from.</td></tr>
+<tr><td><code>Verify::found_beside</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-found_beside">270</a></td><td>Which slots were filled in by looking rather than by being chosen.</td></tr>
+<tr><td><code>Verify::take_dropped</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-take_dropped">289</a></td><td>Read what the window was given this frame.</td></tr>
+<tr><td><code>Verify::tab</code> <sub>pub fn</sub></td><td><a href="verify.src.html#fn-verify-tab">307</a></td><td>The whole tab.</td></tr>
+<tr><td><code>Verify::body</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-body">313</a></td><td></td></tr>
+<tr><td><code>Verify::drop_target</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-drop_target">421</a></td><td>The rectangle that lights up while files are over the window.</td></tr>
+<tr><td><code>Verify::slot_row</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-slot_row">443</a></td><td>One file slot: what it is, what is in it, and a way to change it.</td></tr>
+<tr><td><code>Verify::gnupg_section</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-gnupg_section">508</a></td><td>Marker 90.</td></tr>
+<tr><td><code>Verify::verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-verdict">580</a></td><td>The answer, in the colour it deserves.</td></tr>
+<tr><td><code>Verify::contents_verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-contents_verdict">591</a></td><td>Marker 97.</td></tr>
+<tr><td><code>Verify::gnupg_verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-gnupg_verdict">638</a></td><td>Marker 97.</td></tr>
+<tr><td><code>Verify::archive_verdict</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-archive_verdict">676</a></td><td>The archive against the signed hash list.</td></tr>
+<tr><td><code>Verify::start</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-verify-start">735</a></td><td>Run the check on a thread of its own.</td></tr>
+<tr><td><code>examine</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-examine">758</a></td><td>The whole check, off the drawing thread.</td></tr>
+<tr><td><code>examine_contents</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-examine_contents">792</a></td><td>Marker 97.</td></tr>
+<tr><td><code>examine_gnupg</code> <sub>fn</sub></td><td><a href="verify.src.html#fn-examine_gnupg">876</a></td><td>Marker 97.</td></tr>
 </tbody></table>
 </section>
 </div></div>

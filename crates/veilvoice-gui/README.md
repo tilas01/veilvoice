@@ -115,7 +115,7 @@ flowchart TD
     n_storage["storage.rs<br/>659 lines"]
     n_theme["theme.rs<br/>783 lines"]
     n_updates["updates.rs<br/>246 lines"]
-    n_verify["verify.rs<br/>767 lines"]
+    n_verify["verify.rs<br/>1224 lines"]
     n_watchfeed["watchfeed.rs<br/>381 lines"]
     n_app --> n_crashlog
     n_app --> n_dialog
@@ -223,7 +223,7 @@ flowchart TD
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 783 | Colour schemes for the desktop app. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 246 | The manual update check, as the window shows it. |
-| [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 767 | The verify tab: drop a download on the window and be told what it is. |
+| [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 1224 | The verify tab: drop a download on the window and be told what it is. |
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 381 | The device monitor, moved off the thread that paints. |
 
 ## Public items
@@ -302,6 +302,9 @@ flowchart TD
 | `fn install_fonts` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Load JetBrains Mono if the system has it. |
 | `fn install` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | Apply the active theme's visuals and a monospace-everywhere type scale. |
 | `struct Updates` | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | The panel's state. |
+| `struct Report` | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | Everything one press of check found out. |
+| `struct Contents` | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | What the extracted folder turned out to hold. |
+| `struct Gnupg` | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | What this machine's GnuPG said. |
 | `struct Verify` | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | The tab's state. |
 | `struct Update` | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | One look at the machine. |
 | `struct WatchFeed` | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | The window's end of the monitor. |
