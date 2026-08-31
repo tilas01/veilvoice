@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-setup/src/volumes.rs`
 
-[`veilvoice-setup`](../../../crates/veilvoice-setup/README.md) &middot; 536 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs)
+[`veilvoice-setup`](../../../crates/veilvoice-setup/README.md) &middot; 580 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs)
 
 ## Contents
 
@@ -75,7 +75,7 @@ nothing can, which is why VeilVoice asks you instead of assuming.
 
 ## What this file contains
 
-536 lines defining **17 functions** (12 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+580 lines defining **18 functions** (13 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -97,6 +97,7 @@ nothing can, which is why VeilVoice asks you instead of assuming.
   - reaches: `candidates`, `on_path`
 - `mounted` (line 283) -- Every mounted volume either tool is currently offering.
   - reaches: `from_mount_directories`, `from_proc_mounts`, `found`, `recognise`, `unescape_mount`
+- `covers` (line 316) -- Whether path is inside one of mounts right now.
 
 ## What calls what
 
@@ -131,10 +132,11 @@ flowchart TD
     n_candidates["candidates<br/>line 235"]
     n_on_path["on_path<br/>line 263"]
     n_mounted(["mounted<br/>line 283"])
-    n_from_proc_mounts["from_proc_mounts<br/>line 301"]
-    n_recognise["recognise<br/>line 326"]
-    n_unescape_mount["unescape_mount<br/>line 343"]
-    n_from_mount_directories["from_mount_directories<br/>line 368"]
+    n_covers(["covers<br/>line 316"])
+    n_from_proc_mounts["from_proc_mounts<br/>line 326"]
+    n_recognise["recognise<br/>line 351"]
+    n_unescape_mount["unescape_mount<br/>line 368"]
+    n_from_mount_directories["from_mount_directories<br/>line 393"]
     n_from_mount_directories --> n_found
     n_from_proc_mounts --> n_found
     n_from_proc_mounts --> n_recognise
@@ -156,12 +158,13 @@ flowchart TD
     click n_candidates href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L235" "open the source"
     click n_on_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L263" "open the source"
     click n_mounted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L283" "open the source"
-    click n_from_proc_mounts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L301" "open the source"
-    click n_recognise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L326" "open the source"
-    click n_unescape_mount href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L343" "open the source"
-    click n_from_mount_directories href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L368" "open the source"
+    click n_covers href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L316" "open the source"
+    click n_from_proc_mounts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L326" "open the source"
+    click n_recognise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L351" "open the source"
+    click n_unescape_mount href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L368" "open the source"
+    click n_from_mount_directories href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L393" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_name,n_key,n_from_key,n_home_page,n_safe_to_write,n_refusal,n_ready,n_blocked,n_installed,n_mounted entry
+    class n_name,n_key,n_from_key,n_home_page,n_safe_to_write,n_refusal,n_ready,n_blocked,n_installed,n_mounted,n_covers entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_found,n_from_proc_mounts api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -192,10 +195,11 @@ flowchart TD
 | `candidates` <sub>fn</sub> | [235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L235) | Where each tool installs itself, per platform. |
 | `on_path` <sub>fn</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L263) | The tool's command on PATH, if it is there under its usual name. |
 | `mounted` <sub>pub fn</sub> | [283](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L283) | Every mounted volume either tool is currently offering. |
-| `from_proc_mounts` <sub>pub fn</sub> | [301](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L301) | Parse a Linux mount table into the volumes we recognise. |
-| `recognise` <sub>fn</sub> | [326](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L326) | Which tool a mount belongs to, judged by where it is mounted and what mounted it. |
-| `unescape_mount` <sub>fn</sub> | [343](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L343) | Undo the octal escaping /proc/mounts applies to a path. |
-| `from_mount_directories` <sub>fn</sub> | [368](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L368) | Volumes found by looking in the directories each platform mounts into. |
+| `covers` <sub>pub fn</sub> | [316](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L316) | Whether path is inside one of mounts right now. |
+| `from_proc_mounts` <sub>pub fn</sub> | [326](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L326) | Parse a Linux mount table into the volumes we recognise. |
+| `recognise` <sub>fn</sub> | [351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L351) | Which tool a mount belongs to, judged by where it is mounted and what mounted it. |
+| `unescape_mount` <sub>fn</sub> | [368](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L368) | Undo the octal escaping /proc/mounts applies to a path. |
+| `from_mount_directories` <sub>fn</sub> | [393](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs#L393) | Volumes found by looking in the directories each platform mounts into. |
 
 ---
 

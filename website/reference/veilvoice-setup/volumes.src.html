@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-setup/src/volumes.rs</code></h1>
-<p style="color:var(--muted)"><a href="volumes.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 536 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="volumes.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 580 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -373,254 +373,300 @@
 <span class="ln" id="L295">}</span>
 </span>
 <span class="ln" id="L296"></span>
-<span class="src-item" id="fn-from_proc_mounts">
-<span class="ln" id="L297"><span class="tok-com">/// Parse a Linux mount table into the volumes we recognise.</span></span>
+<span class="src-item" id="fn-covers">
+<span class="ln" id="L297"><span class="tok-com">/// Whether `path` is inside one of `mounts` right now.</span></span>
 <span class="ln" id="L298"><span class="tok-com">///</span></span>
-<span class="ln" id="L299"><span class="tok-com">/// Separated from the read so it can be tested against a fixed table rather</span></span>
-<span class="ln" id="L300"><span class="tok-com">/// than against whatever this machine happens to have mounted.</span></span>
-<span class="ln" id="L301"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">from_proc_mounts</span>(table: &amp;str) -&gt; Vec&lt;Volume&gt; {</span>
-<span class="ln" id="L302">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L303">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> table.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L304">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> fields = line.<span class="tok-fn">split_whitespace</span>();</span>
-<span class="ln" id="L305">        <span class="tok-kw">let</span> source = fields.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L306">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(target) = fields.<span class="tok-fn">next</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L307">            continue;</span>
-<span class="ln" id="L308">        };</span>
-<span class="ln" id="L309">        <span class="tok-com">// `/proc/mounts` escapes spaces and a few other characters as octal.</span></span>
-<span class="ln" id="L310">        <span class="tok-kw">let</span> target = <span class="tok-fn">unescape_mount</span>(target);</span>
-<span class="ln" id="L311">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(tool) = <span class="tok-fn">recognise</span>(source, &amp;target) {</span>
-<span class="ln" id="L312">            out.<span class="tok-fn">push</span>(Volume::<span class="tok-fn">found</span>(PathBuf::<span class="tok-fn">from</span>(target), tool));</span>
-<span class="ln" id="L313">        }</span>
-<span class="ln" id="L314">    }</span>
-<span class="ln" id="L315">    out.<span class="tok-fn">sort_by</span>(|a, b| a.path.<span class="tok-fn">cmp</span>(&amp;b.path));</span>
-<span class="ln" id="L316">    out.<span class="tok-fn">dedup_by</span>(|a, b| a.path == b.path);</span>
-<span class="ln" id="L317">    out</span>
-<span class="ln" id="L318">}</span>
+<span class="ln" id="L299"><span class="tok-com">/// # F-93, and why existence is not the question</span></span>
+<span class="ln" id="L300"><span class="tok-com">///</span></span>
+<span class="ln" id="L301"><span class="tok-com">/// The obvious check is whether the directory is still there, and it is wrong</span></span>
+<span class="ln" id="L302"><span class="tok-com">/// in the one direction that matters. A mount point is an ordinary directory</span></span>
+<span class="ln" id="L303"><span class="tok-com">/// with a filesystem grafted onto it, and unmounting takes the filesystem away</span></span>
+<span class="ln" id="L304"><span class="tok-com">/// and **leaves the directory**. `/media/veracrypt1` exists before the volume</span></span>
+<span class="ln" id="L305"><span class="tok-com">/// is mounted, while it is mounted, and after it is unmounted.</span></span>
+<span class="ln" id="L306"><span class="tok-com">///</span></span>
+<span class="ln" id="L307"><span class="tok-com">/// So a destination checked by existence still looks fine the moment its volume</span></span>
+<span class="ln" id="L308"><span class="tok-com">/// is locked, and VeilVoice would write a veiled recording onto the ordinary</span></span>
+<span class="ln" id="L309"><span class="tok-com">/// unencrypted disk while its owner believed it had gone into the vault. That</span></span>
+<span class="ln" id="L310"><span class="tok-com">/// is the exact failure the whole feature exists to prevent, arriving through</span></span>
+<span class="ln" id="L311"><span class="tok-com">/// the check that was supposed to catch it.</span></span>
+<span class="ln" id="L312"><span class="tok-com">///</span></span>
+<span class="ln" id="L313"><span class="tok-com">/// Equal to, or inside, so that a folder chosen within a vault counts: somebody</span></span>
+<span class="ln" id="L314"><span class="tok-com">/// who points at `~/Vault/recordings` has chosen a place inside the mounted</span></span>
+<span class="ln" id="L315"><span class="tok-com">/// vault, not a different thing.</span></span>
+<span class="ln" id="L316"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">covers</span>(mounts: &amp;[Volume], path: &amp;Path) -&gt; bool {</span>
+<span class="ln" id="L317">    mounts</span>
+<span class="ln" id="L318">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L319">        .<span class="tok-fn">any</span>(|volume| path == volume.path || path.<span class="tok-fn">starts_with</span>(&amp;volume.path))</span>
+<span class="ln" id="L320">}</span>
 </span>
-<span class="ln" id="L319"></span>
+<span class="ln" id="L321"></span>
+<span class="src-item" id="fn-from_proc_mounts">
+<span class="ln" id="L322"><span class="tok-com">/// Parse a Linux mount table into the volumes we recognise.</span></span>
+<span class="ln" id="L323"><span class="tok-com">///</span></span>
+<span class="ln" id="L324"><span class="tok-com">/// Separated from the read so it can be tested against a fixed table rather</span></span>
+<span class="ln" id="L325"><span class="tok-com">/// than against whatever this machine happens to have mounted.</span></span>
+<span class="ln" id="L326"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">from_proc_mounts</span>(table: &amp;str) -&gt; Vec&lt;Volume&gt; {</span>
+<span class="ln" id="L327">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L328">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> table.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L329">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> fields = line.<span class="tok-fn">split_whitespace</span>();</span>
+<span class="ln" id="L330">        <span class="tok-kw">let</span> source = fields.<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L331">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(target) = fields.<span class="tok-fn">next</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L332">            continue;</span>
+<span class="ln" id="L333">        };</span>
+<span class="ln" id="L334">        <span class="tok-com">// `/proc/mounts` escapes spaces and a few other characters as octal.</span></span>
+<span class="ln" id="L335">        <span class="tok-kw">let</span> target = <span class="tok-fn">unescape_mount</span>(target);</span>
+<span class="ln" id="L336">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(tool) = <span class="tok-fn">recognise</span>(source, &amp;target) {</span>
+<span class="ln" id="L337">            out.<span class="tok-fn">push</span>(Volume::<span class="tok-fn">found</span>(PathBuf::<span class="tok-fn">from</span>(target), tool));</span>
+<span class="ln" id="L338">        }</span>
+<span class="ln" id="L339">    }</span>
+<span class="ln" id="L340">    out.<span class="tok-fn">sort_by</span>(|a, b| a.path.<span class="tok-fn">cmp</span>(&amp;b.path));</span>
+<span class="ln" id="L341">    out.<span class="tok-fn">dedup_by</span>(|a, b| a.path == b.path);</span>
+<span class="ln" id="L342">    out</span>
+<span class="ln" id="L343">}</span>
+</span>
+<span class="ln" id="L344"></span>
 <span class="src-item" id="fn-recognise">
-<span class="ln" id="L320"><span class="tok-com">/// Which tool a mount belongs to, judged by where it is mounted and what</span></span>
-<span class="ln" id="L321"><span class="tok-com">/// mounted it.</span></span>
-<span class="ln" id="L322"><span class="tok-com">///</span></span>
-<span class="ln" id="L323"><span class="tok-com">/// Deliberately conservative. A directory that merely has &quot;vault&quot; in its name</span></span>
-<span class="ln" id="L324"><span class="tok-com">/// is not evidence of anything, and offering to write veiled recordings into a</span></span>
-<span class="ln" id="L325"><span class="tok-com">/// directory VeilVoice guessed at is worse than offering nothing.</span></span>
-<span class="ln" id="L326"><span class="tok-kw">fn</span> <span class="tok-fn">recognise</span>(source: &amp;str, target: &amp;str) -&gt; Option&lt;Tool&gt; {</span>
-<span class="ln" id="L327">    <span class="tok-com">// VeraCrypt mounts at /media/veracrypt&lt;N&gt; by default on Linux.</span></span>
-<span class="ln" id="L328">    <span class="tok-kw">if</span> target.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;/media/veracrypt&quot;</span>) {</span>
-<span class="ln" id="L329">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Tool::VeraCrypt);</span>
-<span class="ln" id="L330">    }</span>
-<span class="ln" id="L331">    <span class="tok-com">// Cryptomator&#x27;s FUSE mount names itself in the source field.</span></span>
-<span class="ln" id="L332">    <span class="tok-kw">let</span> source = source.<span class="tok-fn">to_ascii_lowercase</span>();</span>
-<span class="ln" id="L333">    <span class="tok-kw">if</span> source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cryptomator&quot;</span>) || target.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;/Cryptomator/mnt/&quot;</span>) {</span>
-<span class="ln" id="L334">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Tool::Cryptomator);</span>
-<span class="ln" id="L335">    }</span>
-<span class="ln" id="L336">    <span class="tok-kw">if</span> source.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;veracrypt&quot;</span>) {</span>
-<span class="ln" id="L337">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Tool::VeraCrypt);</span>
-<span class="ln" id="L338">    }</span>
-<span class="ln" id="L339">    None</span>
-<span class="ln" id="L340">}</span>
+<span class="ln" id="L345"><span class="tok-com">/// Which tool a mount belongs to, judged by where it is mounted and what</span></span>
+<span class="ln" id="L346"><span class="tok-com">/// mounted it.</span></span>
+<span class="ln" id="L347"><span class="tok-com">///</span></span>
+<span class="ln" id="L348"><span class="tok-com">/// Deliberately conservative. A directory that merely has &quot;vault&quot; in its name</span></span>
+<span class="ln" id="L349"><span class="tok-com">/// is not evidence of anything, and offering to write veiled recordings into a</span></span>
+<span class="ln" id="L350"><span class="tok-com">/// directory VeilVoice guessed at is worse than offering nothing.</span></span>
+<span class="ln" id="L351"><span class="tok-kw">fn</span> <span class="tok-fn">recognise</span>(source: &amp;str, target: &amp;str) -&gt; Option&lt;Tool&gt; {</span>
+<span class="ln" id="L352">    <span class="tok-com">// VeraCrypt mounts at /media/veracrypt&lt;N&gt; by default on Linux.</span></span>
+<span class="ln" id="L353">    <span class="tok-kw">if</span> target.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;/media/veracrypt&quot;</span>) {</span>
+<span class="ln" id="L354">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Tool::VeraCrypt);</span>
+<span class="ln" id="L355">    }</span>
+<span class="ln" id="L356">    <span class="tok-com">// Cryptomator&#x27;s FUSE mount names itself in the source field.</span></span>
+<span class="ln" id="L357">    <span class="tok-kw">let</span> source = source.<span class="tok-fn">to_ascii_lowercase</span>();</span>
+<span class="ln" id="L358">    <span class="tok-kw">if</span> source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cryptomator&quot;</span>) || target.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;/Cryptomator/mnt/&quot;</span>) {</span>
+<span class="ln" id="L359">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Tool::Cryptomator);</span>
+<span class="ln" id="L360">    }</span>
+<span class="ln" id="L361">    <span class="tok-kw">if</span> source.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;veracrypt&quot;</span>) {</span>
+<span class="ln" id="L362">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Tool::VeraCrypt);</span>
+<span class="ln" id="L363">    }</span>
+<span class="ln" id="L364">    None</span>
+<span class="ln" id="L365">}</span>
 </span>
-<span class="ln" id="L341"></span>
+<span class="ln" id="L366"></span>
 <span class="src-item" id="fn-unescape_mount">
-<span class="ln" id="L342"><span class="tok-com">/// Undo the octal escaping `/proc/mounts` applies to a path.</span></span>
-<span class="ln" id="L343"><span class="tok-kw">fn</span> <span class="tok-fn">unescape_mount</span>(raw: &amp;str) -&gt; String {</span>
-<span class="ln" id="L344">    <span class="tok-kw">let</span> bytes = raw.<span class="tok-fn">as_bytes</span>();</span>
-<span class="ln" id="L345">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">with_capacity</span>(raw.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L346">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> i = <span class="tok-num">0</span>;</span>
-<span class="ln" id="L347">    while i &lt; bytes.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L348">        <span class="tok-kw">if</span> bytes[i] == b<span class="tok-str">&#x27;\\&#x27;</span> &amp;&amp; i + <span class="tok-num">3</span> &lt; bytes.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L349">            <span class="tok-kw">let</span> digits = &amp;raw[i + <span class="tok-num">1</span>..i + <span class="tok-num">4</span>];</span>
-<span class="ln" id="L350">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(value) = u8::<span class="tok-fn">from_str_radix</span>(digits, <span class="tok-num">8</span>) {</span>
-<span class="ln" id="L351">                out.<span class="tok-fn">push</span>(value <span class="tok-kw">as</span> char);</span>
-<span class="ln" id="L352">                i += <span class="tok-num">4</span>;</span>
-<span class="ln" id="L353">                continue;</span>
-<span class="ln" id="L354">            }</span>
-<span class="ln" id="L355">        }</span>
-<span class="ln" id="L356">        out.<span class="tok-fn">push</span>(bytes[i] <span class="tok-kw">as</span> char);</span>
-<span class="ln" id="L357">        i += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L358">    }</span>
-<span class="ln" id="L359">    out</span>
-<span class="ln" id="L360">}</span>
+<span class="ln" id="L367"><span class="tok-com">/// Undo the octal escaping `/proc/mounts` applies to a path.</span></span>
+<span class="ln" id="L368"><span class="tok-kw">fn</span> <span class="tok-fn">unescape_mount</span>(raw: &amp;str) -&gt; String {</span>
+<span class="ln" id="L369">    <span class="tok-kw">let</span> bytes = raw.<span class="tok-fn">as_bytes</span>();</span>
+<span class="ln" id="L370">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = String::<span class="tok-fn">with_capacity</span>(raw.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L371">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> i = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L372">    while i &lt; bytes.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L373">        <span class="tok-kw">if</span> bytes[i] == b<span class="tok-str">&#x27;\\&#x27;</span> &amp;&amp; i + <span class="tok-num">3</span> &lt; bytes.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L374">            <span class="tok-kw">let</span> digits = &amp;raw[i + <span class="tok-num">1</span>..i + <span class="tok-num">4</span>];</span>
+<span class="ln" id="L375">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(value) = u8::<span class="tok-fn">from_str_radix</span>(digits, <span class="tok-num">8</span>) {</span>
+<span class="ln" id="L376">                out.<span class="tok-fn">push</span>(value <span class="tok-kw">as</span> char);</span>
+<span class="ln" id="L377">                i += <span class="tok-num">4</span>;</span>
+<span class="ln" id="L378">                continue;</span>
+<span class="ln" id="L379">            }</span>
+<span class="ln" id="L380">        }</span>
+<span class="ln" id="L381">        out.<span class="tok-fn">push</span>(bytes[i] <span class="tok-kw">as</span> char);</span>
+<span class="ln" id="L382">        i += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L383">    }</span>
+<span class="ln" id="L384">    out</span>
+<span class="ln" id="L385">}</span>
 </span>
-<span class="ln" id="L361"></span>
+<span class="ln" id="L386"></span>
 <span class="src-item" id="fn-from_mount_directories">
-<span class="ln" id="L362"><span class="tok-com">/// Volumes found by looking in the directories each platform mounts into.</span></span>
-<span class="ln" id="L363"><span class="tok-com">///</span></span>
-<span class="ln" id="L364"><span class="tok-com">/// The fallback for platforms with no `/proc/mounts`. Weaker than reading a</span></span>
-<span class="ln" id="L365"><span class="tok-com">/// mount table, and it says so by being a separate function rather than</span></span>
-<span class="ln" id="L366"><span class="tok-com">/// pretending to be the same probe.</span></span>
-<span class="ln" id="L367"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(target_os = <span class="tok-str">&quot;linux&quot;</span>))]</span>
-<span class="ln" id="L368"><span class="tok-kw">fn</span> <span class="tok-fn">from_mount_directories</span>() -&gt; Vec&lt;Volume&gt; {</span>
-<span class="ln" id="L369">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L370">    <span class="tok-kw">for</span> dir <span class="tok-kw">in</span> [<span class="tok-str">&quot;/Volumes&quot;</span>] {</span>
-<span class="ln" id="L371">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entries) = std::fs::<span class="tok-fn">read_dir</span>(dir) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L372">            continue;</span>
-<span class="ln" id="L373">        };</span>
-<span class="ln" id="L374">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
-<span class="ln" id="L375">            <span class="tok-kw">let</span> name = entry.<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_ascii_lowercase</span>();</span>
-<span class="ln" id="L376">            <span class="tok-kw">let</span> tool = <span class="tok-kw">if</span> name.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veracrypt&quot;</span>) {</span>
-<span class="ln" id="L377">                Tool::VeraCrypt</span>
-<span class="ln" id="L378">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> name.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cryptomator&quot;</span>) {</span>
-<span class="ln" id="L379">                Tool::Cryptomator</span>
-<span class="ln" id="L380">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L381">                continue;</span>
-<span class="ln" id="L382">            };</span>
-<span class="ln" id="L383">            out.<span class="tok-fn">push</span>(Volume::<span class="tok-fn">found</span>(entry.<span class="tok-fn">path</span>(), tool));</span>
-<span class="ln" id="L384">        }</span>
-<span class="ln" id="L385">    }</span>
-<span class="ln" id="L386">    out.<span class="tok-fn">sort_by</span>(|a, b| a.path.<span class="tok-fn">cmp</span>(&amp;b.path));</span>
-<span class="ln" id="L387">    out</span>
-<span class="ln" id="L388">}</span>
+<span class="ln" id="L387"><span class="tok-com">/// Volumes found by looking in the directories each platform mounts into.</span></span>
+<span class="ln" id="L388"><span class="tok-com">///</span></span>
+<span class="ln" id="L389"><span class="tok-com">/// The fallback for platforms with no `/proc/mounts`. Weaker than reading a</span></span>
+<span class="ln" id="L390"><span class="tok-com">/// mount table, and it says so by being a separate function rather than</span></span>
+<span class="ln" id="L391"><span class="tok-com">/// pretending to be the same probe.</span></span>
+<span class="ln" id="L392"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(target_os = <span class="tok-str">&quot;linux&quot;</span>))]</span>
+<span class="ln" id="L393"><span class="tok-kw">fn</span> <span class="tok-fn">from_mount_directories</span>() -&gt; Vec&lt;Volume&gt; {</span>
+<span class="ln" id="L394">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L395">    <span class="tok-kw">for</span> dir <span class="tok-kw">in</span> [<span class="tok-str">&quot;/Volumes&quot;</span>] {</span>
+<span class="ln" id="L396">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entries) = std::fs::<span class="tok-fn">read_dir</span>(dir) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L397">            continue;</span>
+<span class="ln" id="L398">        };</span>
+<span class="ln" id="L399">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
+<span class="ln" id="L400">            <span class="tok-kw">let</span> name = entry.<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_ascii_lowercase</span>();</span>
+<span class="ln" id="L401">            <span class="tok-kw">let</span> tool = <span class="tok-kw">if</span> name.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veracrypt&quot;</span>) {</span>
+<span class="ln" id="L402">                Tool::VeraCrypt</span>
+<span class="ln" id="L403">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> name.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;cryptomator&quot;</span>) {</span>
+<span class="ln" id="L404">                Tool::Cryptomator</span>
+<span class="ln" id="L405">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L406">                continue;</span>
+<span class="ln" id="L407">            };</span>
+<span class="ln" id="L408">            out.<span class="tok-fn">push</span>(Volume::<span class="tok-fn">found</span>(entry.<span class="tok-fn">path</span>(), tool));</span>
+<span class="ln" id="L409">        }</span>
+<span class="ln" id="L410">    }</span>
+<span class="ln" id="L411">    out.<span class="tok-fn">sort_by</span>(|a, b| a.path.<span class="tok-fn">cmp</span>(&amp;b.path));</span>
+<span class="ln" id="L412">    out</span>
+<span class="ln" id="L413">}</span>
 </span>
-<span class="ln" id="L389"></span>
-<span class="ln" id="L390"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L391"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L392">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L393"></span>
-<span class="ln" id="L394">    <span class="tok-kw">const</span> SAMPLE: &amp;str = <span class="tok-str">&quot;\</span></span>
-<span class="ln" id="L395"><span class="tok-str">proc /proc proc rw,nosuid 0 0</span></span>
-<span class="ln" id="L396"><span class="tok-str">/dev/sda1 / ext4 rw,relatime 0 0</span></span>
-<span class="ln" id="L397"><span class="tok-str">/dev/mapper/veracrypt1 /media/veracrypt1 ext4 rw,relatime 0 0</span></span>
-<span class="ln" id="L398"><span class="tok-str">cryptomator@ /home/someone/Vault fuse rw,nosuid,nodev 0 0</span></span>
-<span class="ln" id="L399"><span class="tok-str">tmpfs /run/user/1000 tmpfs rw,nosuid 0 0</span></span>
-<span class="ln" id="L400"><span class="tok-str">/dev/sdb1 /media/holiday\\040photos vfat rw 0 0</span></span>
-<span class="ln" id="L401"><span class="tok-str">&quot;</span>;</span>
-<span class="ln" id="L402"></span>
-<span class="ln" id="L403">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L404">    <span class="tok-kw">fn</span> <span class="tok-fn">a_mount_table_yields_the_volumes_and_nothing_else</span>() {</span>
-<span class="ln" id="L405">        <span class="tok-kw">let</span> found = <span class="tok-fn">from_proc_mounts</span>(SAMPLE);</span>
-<span class="ln" id="L406">        assert_eq!(found.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;found: {found:?}&quot;</span>);</span>
-<span class="ln" id="L407">        assert!(found</span>
-<span class="ln" id="L408">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L409">            .<span class="tok-fn">any</span>(|v| v.tool == Tool::VeraCrypt &amp;&amp; v.path == Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>)));</span>
-<span class="ln" id="L410">        assert!(found</span>
-<span class="ln" id="L411">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L412">            .<span class="tok-fn">any</span>(|v| v.tool == Tool::Cryptomator &amp;&amp; v.path == Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/someone/Vault&quot;</span>)));</span>
-<span class="ln" id="L413">    }</span>
 <span class="ln" id="L414"></span>
-<span class="ln" id="L415">    <span class="tok-com">/// The ordinary parts of a machine must not be offered as encrypted</span></span>
-<span class="ln" id="L416">    <span class="tok-com">/// storage. Offering `/` as a vault would be worse than offering nothing.</span></span>
-<span class="ln" id="L417">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L418">    <span class="tok-kw">fn</span> <span class="tok-fn">ordinary_mounts_are_not_mistaken_for_encrypted_ones</span>() {</span>
-<span class="ln" id="L419">        <span class="tok-kw">for</span> volume <span class="tok-kw">in</span> <span class="tok-fn">from_proc_mounts</span>(SAMPLE) {</span>
-<span class="ln" id="L420">            assert_ne!(volume.path, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/&quot;</span>));</span>
-<span class="ln" id="L421">            assert_ne!(volume.path, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/proc&quot;</span>));</span>
-<span class="ln" id="L422">            assert_ne!(volume.path, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/run/user/1000&quot;</span>));</span>
-<span class="ln" id="L423">        }</span>
-<span class="ln" id="L424">    }</span>
-<span class="ln" id="L425"></span>
-<span class="ln" id="L426">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L427">    <span class="tok-kw">fn</span> <span class="tok-fn">an_escaped_mount_point_is_read_back_whole</span>() {</span>
-<span class="ln" id="L428">        assert_eq!(</span>
-<span class="ln" id="L429">            <span class="tok-fn">unescape_mount</span>(<span class="tok-str">&quot;/media/holiday\\040photos&quot;</span>),</span>
-<span class="ln" id="L430">            <span class="tok-str">&quot;/media/holiday photos&quot;</span></span>
-<span class="ln" id="L431">        );</span>
-<span class="ln" id="L432">        assert_eq!(<span class="tok-fn">unescape_mount</span>(<span class="tok-str">&quot;/media/plain&quot;</span>), <span class="tok-str">&quot;/media/plain&quot;</span>);</span>
-<span class="ln" id="L433">    }</span>
-<span class="ln" id="L434"></span>
-<span class="ln" id="L435">    <span class="tok-com">/// The whole point of `Hidden`. A found volume starts unanswered, and an</span></span>
-<span class="ln" id="L436">    <span class="tok-com">/// unanswered volume is not writable.</span></span>
-<span class="ln" id="L437">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L438">    <span class="tok-kw">fn</span> <span class="tok-fn">a_freshly_found_veracrypt_volume_may_not_be_written_to</span>() {</span>
-<span class="ln" id="L439">        <span class="tok-kw">let</span> volume = Volume::<span class="tok-fn">found</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>), Tool::VeraCrypt);</span>
-<span class="ln" id="L440">        assert_eq!(volume.hidden, Hidden::Unanswered);</span>
-<span class="ln" id="L441">        assert!(!volume.<span class="tok-fn">ready</span>(), <span class="tok-str">&quot;an unanswered question is not a yes&quot;</span>);</span>
-<span class="ln" id="L442">        assert!(volume.<span class="tok-fn">blocked</span>().<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L443">    }</span>
-<span class="ln" id="L444"></span>
-<span class="ln" id="L445">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L446">    <span class="tok-kw">fn</span> <span class="tok-fn">the_outer_volume_of_a_hidden_pair_is_refused</span>() {</span>
-<span class="ln" id="L447">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> volume = Volume::<span class="tok-fn">found</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>), Tool::VeraCrypt);</span>
-<span class="ln" id="L448">        volume.hidden = Hidden::OuterVolumeOfAHiddenPair;</span>
-<span class="ln" id="L449">        assert!(!volume.<span class="tok-fn">ready</span>());</span>
-<span class="ln" id="L450">        assert!(volume</span>
-<span class="ln" id="L451">            .<span class="tok-fn">blocked</span>()</span>
-<span class="ln" id="L452">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a refusal has to say why&quot;</span>)</span>
-<span class="ln" id="L453">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;destroy&quot;</span>));</span>
-<span class="ln" id="L454"></span>
-<span class="ln" id="L455">        volume.hidden = Hidden::NoHiddenVolume;</span>
-<span class="ln" id="L456">        assert!(volume.<span class="tok-fn">ready</span>());</span>
-<span class="ln" id="L457">        volume.hidden = Hidden::IsTheHiddenVolume;</span>
-<span class="ln" id="L458">        assert!(</span>
-<span class="ln" id="L459">            volume.<span class="tok-fn">ready</span>(),</span>
-<span class="ln" id="L460">            <span class="tok-str">&quot;writing inside the hidden volume is the safe case&quot;</span></span>
-<span class="ln" id="L461">        );</span>
-<span class="ln" id="L462">    }</span>
-<span class="ln" id="L463"></span>
-<span class="ln" id="L464">    <span class="tok-com">/// Cryptomator has no hidden-volume concept, so asking would be a question</span></span>
-<span class="ln" id="L465">    <span class="tok-com">/// with no meaning and a user trained to click through questions.</span></span>
-<span class="ln" id="L466">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L467">    <span class="tok-kw">fn</span> <span class="tok-fn">a_cryptomator_vault_is_not_asked_the_veracrypt_question</span>() {</span>
-<span class="ln" id="L468">        <span class="tok-kw">let</span> volume = Volume::<span class="tok-fn">found</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/home/someone/Vault&quot;</span>), Tool::Cryptomator);</span>
-<span class="ln" id="L469">        assert!(volume.<span class="tok-fn">ready</span>());</span>
-<span class="ln" id="L470">        assert!(volume.<span class="tok-fn">blocked</span>().<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L471">    }</span>
-<span class="ln" id="L472"></span>
-<span class="ln" id="L473">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L474">    <span class="tok-kw">fn</span> <span class="tok-fn">every_tool_round_trips_through_its_key</span>() {</span>
-<span class="ln" id="L475">        <span class="tok-kw">for</span> tool <span class="tok-kw">in</span> Tool::ALL {</span>
-<span class="ln" id="L476">            assert_eq!(Tool::<span class="tok-fn">from_key</span>(tool.<span class="tok-fn">key</span>()), <span class="tok-fn">Some</span>(*tool));</span>
-<span class="ln" id="L477">            assert!(!tool.<span class="tok-fn">name</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L478">            assert!(tool.<span class="tok-fn">home_page</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>));</span>
-<span class="ln" id="L479">        }</span>
-<span class="ln" id="L480">        assert_eq!(Tool::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;bitlocker&quot;</span>), None);</span>
-<span class="ln" id="L481">    }</span>
-<span class="ln" id="L482"></span>
-<span class="ln" id="L483">    <span class="tok-com">/// The advice about the disk underneath must keep naming the platforms it</span></span>
-<span class="ln" id="L484">    <span class="tok-com">/// claims to cover, and must not quietly become a boast about vaults.</span></span>
-<span class="ln" id="L485">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L486">    <span class="tok-kw">fn</span> <span class="tok-fn">the_disk_advice_names_every_platform_and_claims_nothing_extra</span>() {</span>
-<span class="ln" id="L487">        <span class="tok-kw">let</span> advice = DISK_ADVICE.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L488">        <span class="tok-kw">for</span> platform <span class="tok-kw">in</span> [<span class="tok-str">&quot;bitlocker&quot;</span>, <span class="tok-str">&quot;filevault&quot;</span>, <span class="tok-str">&quot;luks&quot;</span>, <span class="tok-str">&quot;openbsd&quot;</span>, <span class="tok-str">&quot;freebsd&quot;</span>] {</span>
-<span class="ln" id="L489">            assert!(</span>
-<span class="ln" id="L490">                advice.<span class="tok-fn">contains</span>(platform),</span>
-<span class="ln" id="L491">                <span class="tok-str">&quot;the advice does not mention {platform}&quot;</span></span>
-<span class="ln" id="L492">            );</span>
-<span class="ln" id="L493">        }</span>
-<span class="ln" id="L494">        assert!(</span>
-<span class="ln" id="L495">            advice.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not protect&quot;</span>),</span>
-<span class="ln" id="L496">            <span class="tok-str">&quot;the limit has to be stated&quot;</span></span>
-<span class="ln" id="L497">        );</span>
-<span class="ln" id="L498">        <span class="tok-kw">for</span> boast <span class="tok-kw">in</span> [<span class="tok-str">&quot;unbreakable&quot;</span>, <span class="tok-str">&quot;guarantee&quot;</span>, <span class="tok-str">&quot;completely secure&quot;</span>] {</span>
-<span class="ln" id="L499">            assert!(!advice.<span class="tok-fn">contains</span>(boast), <span class="tok-str">&quot;overclaim: {boast}&quot;</span>);</span>
-<span class="ln" id="L500">        }</span>
-<span class="ln" id="L501">    }</span>
-<span class="ln" id="L502"></span>
-<span class="ln" id="L503">    <span class="tok-com">/// Detection must never be reported as a certainty it is not. The probe</span></span>
-<span class="ln" id="L504">    <span class="tok-com">/// answers about the places it looked.</span></span>
-<span class="ln" id="L505">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L506">    <span class="tok-kw">fn</span> <span class="tok-fn">a_probe_that_finds_nothing_says_so_about_the_probe</span>() {</span>
-<span class="ln" id="L507">        <span class="tok-kw">for</span> tool <span class="tok-kw">in</span> Tool::ALL {</span>
-<span class="ln" id="L508">            <span class="tok-kw">let</span> presence = <span class="tok-fn">installed</span>(*tool);</span>
-<span class="ln" id="L509">            assert!(!presence.<span class="tok-fn">describe</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L510">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Presence::<span class="tok-fn">Present</span>(evidence) = &amp;presence {</span>
-<span class="ln" id="L511">                assert!(</span>
-<span class="ln" id="L512">                    !evidence.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L513">                    <span class="tok-str">&quot;evidence has to be a path a user can check&quot;</span></span>
-<span class="ln" id="L514">                );</span>
-<span class="ln" id="L515">            }</span>
-<span class="ln" id="L516">        }</span>
-<span class="ln" id="L517">    }</span>
-<span class="ln" id="L518"></span>
-<span class="ln" id="L519">    <span class="tok-com">/// Nothing in this module may start a process. Detection reads.</span></span>
-<span class="ln" id="L520">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L521">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_launches_either_program</span>() {</span>
-<span class="ln" id="L522">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;volumes.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L523">        <span class="tok-kw">let</span> shipped = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L524">        <span class="tok-kw">let</span> body: String = shipped</span>
-<span class="ln" id="L525">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L526">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
-<span class="ln" id="L527">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L528">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L529">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;Command::new&quot;</span>, <span class="tok-str">&quot;process::Command&quot;</span>, <span class="tok-str">&quot;spawn(&quot;</span>] {</span>
-<span class="ln" id="L530">            assert!(</span>
-<span class="ln" id="L531">                !body.<span class="tok-fn">contains</span>(forbidden),</span>
-<span class="ln" id="L532">                <span class="tok-str">&quot;this module calls {forbidden:?}: detection reads, it does not drive&quot;</span></span>
-<span class="ln" id="L533">            );</span>
-<span class="ln" id="L534">        }</span>
-<span class="ln" id="L535">    }</span>
-<span class="ln" id="L536">}</span>
+<span class="ln" id="L415"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L416"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L417">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L418"></span>
+<span class="ln" id="L419">    <span class="tok-kw">const</span> SAMPLE: &amp;str = <span class="tok-str">&quot;\</span></span>
+<span class="ln" id="L420"><span class="tok-str">proc /proc proc rw,nosuid 0 0</span></span>
+<span class="ln" id="L421"><span class="tok-str">/dev/sda1 / ext4 rw,relatime 0 0</span></span>
+<span class="ln" id="L422"><span class="tok-str">/dev/mapper/veracrypt1 /media/veracrypt1 ext4 rw,relatime 0 0</span></span>
+<span class="ln" id="L423"><span class="tok-str">cryptomator@ /home/someone/Vault fuse rw,nosuid,nodev 0 0</span></span>
+<span class="ln" id="L424"><span class="tok-str">tmpfs /run/user/1000 tmpfs rw,nosuid 0 0</span></span>
+<span class="ln" id="L425"><span class="tok-str">/dev/sdb1 /media/holiday\\040photos vfat rw 0 0</span></span>
+<span class="ln" id="L426"><span class="tok-str">&quot;</span>;</span>
+<span class="ln" id="L427"></span>
+<span class="ln" id="L428">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L429">    <span class="tok-kw">fn</span> <span class="tok-fn">a_mount_table_yields_the_volumes_and_nothing_else</span>() {</span>
+<span class="ln" id="L430">        <span class="tok-kw">let</span> found = <span class="tok-fn">from_proc_mounts</span>(SAMPLE);</span>
+<span class="ln" id="L431">        assert_eq!(found.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;found: {found:?}&quot;</span>);</span>
+<span class="ln" id="L432">        assert!(found</span>
+<span class="ln" id="L433">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L434">            .<span class="tok-fn">any</span>(|v| v.tool == Tool::VeraCrypt &amp;&amp; v.path == Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>)));</span>
+<span class="ln" id="L435">        assert!(found</span>
+<span class="ln" id="L436">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L437">            .<span class="tok-fn">any</span>(|v| v.tool == Tool::Cryptomator &amp;&amp; v.path == Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/someone/Vault&quot;</span>)));</span>
+<span class="ln" id="L438">    }</span>
+<span class="ln" id="L439"></span>
+<span class="ln" id="L440">    <span class="tok-com">/// The ordinary parts of a machine must not be offered as encrypted</span></span>
+<span class="ln" id="L441">    <span class="tok-com">/// storage. Offering `/` as a vault would be worse than offering nothing.</span></span>
+<span class="ln" id="L442">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L443">    <span class="tok-kw">fn</span> <span class="tok-fn">ordinary_mounts_are_not_mistaken_for_encrypted_ones</span>() {</span>
+<span class="ln" id="L444">        <span class="tok-kw">for</span> volume <span class="tok-kw">in</span> <span class="tok-fn">from_proc_mounts</span>(SAMPLE) {</span>
+<span class="ln" id="L445">            assert_ne!(volume.path, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/&quot;</span>));</span>
+<span class="ln" id="L446">            assert_ne!(volume.path, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/proc&quot;</span>));</span>
+<span class="ln" id="L447">            assert_ne!(volume.path, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/run/user/1000&quot;</span>));</span>
+<span class="ln" id="L448">        }</span>
+<span class="ln" id="L449">    }</span>
+<span class="ln" id="L450"></span>
+<span class="ln" id="L451">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L452">    <span class="tok-kw">fn</span> <span class="tok-fn">an_escaped_mount_point_is_read_back_whole</span>() {</span>
+<span class="ln" id="L453">        assert_eq!(</span>
+<span class="ln" id="L454">            <span class="tok-fn">unescape_mount</span>(<span class="tok-str">&quot;/media/holiday\\040photos&quot;</span>),</span>
+<span class="ln" id="L455">            <span class="tok-str">&quot;/media/holiday photos&quot;</span></span>
+<span class="ln" id="L456">        );</span>
+<span class="ln" id="L457">        assert_eq!(<span class="tok-fn">unescape_mount</span>(<span class="tok-str">&quot;/media/plain&quot;</span>), <span class="tok-str">&quot;/media/plain&quot;</span>);</span>
+<span class="ln" id="L458">    }</span>
+<span class="ln" id="L459"></span>
+<span class="ln" id="L460">    <span class="tok-com">/// The whole point of `Hidden`. A found volume starts unanswered, and an</span></span>
+<span class="ln" id="L461">    <span class="tok-com">/// unanswered volume is not writable.</span></span>
+<span class="ln" id="L462">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L463">    <span class="tok-kw">fn</span> <span class="tok-fn">a_freshly_found_veracrypt_volume_may_not_be_written_to</span>() {</span>
+<span class="ln" id="L464">        <span class="tok-kw">let</span> volume = Volume::<span class="tok-fn">found</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>), Tool::VeraCrypt);</span>
+<span class="ln" id="L465">        assert_eq!(volume.hidden, Hidden::Unanswered);</span>
+<span class="ln" id="L466">        assert!(!volume.<span class="tok-fn">ready</span>(), <span class="tok-str">&quot;an unanswered question is not a yes&quot;</span>);</span>
+<span class="ln" id="L467">        assert!(volume.<span class="tok-fn">blocked</span>().<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L468">    }</span>
+<span class="ln" id="L469"></span>
+<span class="ln" id="L470">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">the_outer_volume_of_a_hidden_pair_is_refused</span>() {</span>
+<span class="ln" id="L472">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> volume = Volume::<span class="tok-fn">found</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>), Tool::VeraCrypt);</span>
+<span class="ln" id="L473">        volume.hidden = Hidden::OuterVolumeOfAHiddenPair;</span>
+<span class="ln" id="L474">        assert!(!volume.<span class="tok-fn">ready</span>());</span>
+<span class="ln" id="L475">        assert!(volume</span>
+<span class="ln" id="L476">            .<span class="tok-fn">blocked</span>()</span>
+<span class="ln" id="L477">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a refusal has to say why&quot;</span>)</span>
+<span class="ln" id="L478">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;destroy&quot;</span>));</span>
+<span class="ln" id="L479"></span>
+<span class="ln" id="L480">        volume.hidden = Hidden::NoHiddenVolume;</span>
+<span class="ln" id="L481">        assert!(volume.<span class="tok-fn">ready</span>());</span>
+<span class="ln" id="L482">        volume.hidden = Hidden::IsTheHiddenVolume;</span>
+<span class="ln" id="L483">        assert!(</span>
+<span class="ln" id="L484">            volume.<span class="tok-fn">ready</span>(),</span>
+<span class="ln" id="L485">            <span class="tok-str">&quot;writing inside the hidden volume is the safe case&quot;</span></span>
+<span class="ln" id="L486">        );</span>
+<span class="ln" id="L487">    }</span>
+<span class="ln" id="L488"></span>
+<span class="ln" id="L489">    <span class="tok-com">/// Cryptomator has no hidden-volume concept, so asking would be a question</span></span>
+<span class="ln" id="L490">    <span class="tok-com">/// with no meaning and a user trained to click through questions.</span></span>
+<span class="ln" id="L491">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L492">    <span class="tok-kw">fn</span> <span class="tok-fn">a_cryptomator_vault_is_not_asked_the_veracrypt_question</span>() {</span>
+<span class="ln" id="L493">        <span class="tok-kw">let</span> volume = Volume::<span class="tok-fn">found</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/home/someone/Vault&quot;</span>), Tool::Cryptomator);</span>
+<span class="ln" id="L494">        assert!(volume.<span class="tok-fn">ready</span>());</span>
+<span class="ln" id="L495">        assert!(volume.<span class="tok-fn">blocked</span>().<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L496">    }</span>
+<span class="ln" id="L497"></span>
+<span class="ln" id="L498">    <span class="tok-com">/// F-93. Existence is not the question, because unmounting leaves the</span></span>
+<span class="ln" id="L499">    <span class="tok-com">/// directory behind.</span></span>
+<span class="ln" id="L500">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L501">    <span class="tok-kw">fn</span> <span class="tok-fn">a_mount_point_that_is_no_longer_mounted_is_not_covered</span>() {</span>
+<span class="ln" id="L502">        <span class="tok-kw">let</span> mounts = <span class="tok-fn">from_proc_mounts</span>(SAMPLE);</span>
+<span class="ln" id="L503">        assert!(<span class="tok-fn">covers</span>(&amp;mounts, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>)));</span>
+<span class="ln" id="L504">        assert!(</span>
+<span class="ln" id="L505">            <span class="tok-fn">covers</span>(&amp;mounts, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/media/veracrypt1/recordings&quot;</span>)),</span>
+<span class="ln" id="L506">            <span class="tok-str">&quot;a folder inside a mounted volume is inside it&quot;</span></span>
+<span class="ln" id="L507">        );</span>
+<span class="ln" id="L508">        assert!(<span class="tok-fn">covers</span>(&amp;mounts, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/someone/Vault&quot;</span>)));</span>
+<span class="ln" id="L509"></span>
+<span class="ln" id="L510">        <span class="tok-com">// The same paths, with nothing mounted: the directories can still be</span></span>
+<span class="ln" id="L511">        <span class="tok-com">// there and are covered by nothing.</span></span>
+<span class="ln" id="L512">        assert!(!<span class="tok-fn">covers</span>(&amp;[], Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>)));</span>
+<span class="ln" id="L513">        assert!(!<span class="tok-fn">covers</span>(&amp;mounts, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/someone/Elsewhere&quot;</span>)));</span>
+<span class="ln" id="L514">        assert!(!<span class="tok-fn">covers</span>(&amp;mounts, Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp&quot;</span>)));</span>
+<span class="ln" id="L515">    }</span>
+<span class="ln" id="L516"></span>
+<span class="ln" id="L517">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L518">    <span class="tok-kw">fn</span> <span class="tok-fn">every_tool_round_trips_through_its_key</span>() {</span>
+<span class="ln" id="L519">        <span class="tok-kw">for</span> tool <span class="tok-kw">in</span> Tool::ALL {</span>
+<span class="ln" id="L520">            assert_eq!(Tool::<span class="tok-fn">from_key</span>(tool.<span class="tok-fn">key</span>()), <span class="tok-fn">Some</span>(*tool));</span>
+<span class="ln" id="L521">            assert!(!tool.<span class="tok-fn">name</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L522">            assert!(tool.<span class="tok-fn">home_page</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>));</span>
+<span class="ln" id="L523">        }</span>
+<span class="ln" id="L524">        assert_eq!(Tool::<span class="tok-fn">from_key</span>(<span class="tok-str">&quot;bitlocker&quot;</span>), None);</span>
+<span class="ln" id="L525">    }</span>
+<span class="ln" id="L526"></span>
+<span class="ln" id="L527">    <span class="tok-com">/// The advice about the disk underneath must keep naming the platforms it</span></span>
+<span class="ln" id="L528">    <span class="tok-com">/// claims to cover, and must not quietly become a boast about vaults.</span></span>
+<span class="ln" id="L529">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L530">    <span class="tok-kw">fn</span> <span class="tok-fn">the_disk_advice_names_every_platform_and_claims_nothing_extra</span>() {</span>
+<span class="ln" id="L531">        <span class="tok-kw">let</span> advice = DISK_ADVICE.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L532">        <span class="tok-kw">for</span> platform <span class="tok-kw">in</span> [<span class="tok-str">&quot;bitlocker&quot;</span>, <span class="tok-str">&quot;filevault&quot;</span>, <span class="tok-str">&quot;luks&quot;</span>, <span class="tok-str">&quot;openbsd&quot;</span>, <span class="tok-str">&quot;freebsd&quot;</span>] {</span>
+<span class="ln" id="L533">            assert!(</span>
+<span class="ln" id="L534">                advice.<span class="tok-fn">contains</span>(platform),</span>
+<span class="ln" id="L535">                <span class="tok-str">&quot;the advice does not mention {platform}&quot;</span></span>
+<span class="ln" id="L536">            );</span>
+<span class="ln" id="L537">        }</span>
+<span class="ln" id="L538">        assert!(</span>
+<span class="ln" id="L539">            advice.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not protect&quot;</span>),</span>
+<span class="ln" id="L540">            <span class="tok-str">&quot;the limit has to be stated&quot;</span></span>
+<span class="ln" id="L541">        );</span>
+<span class="ln" id="L542">        <span class="tok-kw">for</span> boast <span class="tok-kw">in</span> [<span class="tok-str">&quot;unbreakable&quot;</span>, <span class="tok-str">&quot;guarantee&quot;</span>, <span class="tok-str">&quot;completely secure&quot;</span>] {</span>
+<span class="ln" id="L543">            assert!(!advice.<span class="tok-fn">contains</span>(boast), <span class="tok-str">&quot;overclaim: {boast}&quot;</span>);</span>
+<span class="ln" id="L544">        }</span>
+<span class="ln" id="L545">    }</span>
+<span class="ln" id="L546"></span>
+<span class="ln" id="L547">    <span class="tok-com">/// Detection must never be reported as a certainty it is not. The probe</span></span>
+<span class="ln" id="L548">    <span class="tok-com">/// answers about the places it looked.</span></span>
+<span class="ln" id="L549">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L550">    <span class="tok-kw">fn</span> <span class="tok-fn">a_probe_that_finds_nothing_says_so_about_the_probe</span>() {</span>
+<span class="ln" id="L551">        <span class="tok-kw">for</span> tool <span class="tok-kw">in</span> Tool::ALL {</span>
+<span class="ln" id="L552">            <span class="tok-kw">let</span> presence = <span class="tok-fn">installed</span>(*tool);</span>
+<span class="ln" id="L553">            assert!(!presence.<span class="tok-fn">describe</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L554">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Presence::<span class="tok-fn">Present</span>(evidence) = &amp;presence {</span>
+<span class="ln" id="L555">                assert!(</span>
+<span class="ln" id="L556">                    !evidence.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L557">                    <span class="tok-str">&quot;evidence has to be a path a user can check&quot;</span></span>
+<span class="ln" id="L558">                );</span>
+<span class="ln" id="L559">            }</span>
+<span class="ln" id="L560">        }</span>
+<span class="ln" id="L561">    }</span>
+<span class="ln" id="L562"></span>
+<span class="ln" id="L563">    <span class="tok-com">/// Nothing in this module may start a process. Detection reads.</span></span>
+<span class="ln" id="L564">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L565">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_launches_either_program</span>() {</span>
+<span class="ln" id="L566">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;volumes.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L567">        <span class="tok-kw">let</span> shipped = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L568">        <span class="tok-kw">let</span> body: String = shipped</span>
+<span class="ln" id="L569">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L570">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
+<span class="ln" id="L571">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L572">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L573">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;Command::new&quot;</span>, <span class="tok-str">&quot;process::Command&quot;</span>, <span class="tok-str">&quot;spawn(&quot;</span>] {</span>
+<span class="ln" id="L574">            assert!(</span>
+<span class="ln" id="L575">                !body.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L576">                <span class="tok-str">&quot;this module calls {forbidden:?}: detection reads, it does not drive&quot;</span></span>
+<span class="ln" id="L577">            );</span>
+<span class="ln" id="L578">        }</span>
+<span class="ln" id="L579">    }</span>
+<span class="ln" id="L580">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

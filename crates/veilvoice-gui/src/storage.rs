@@ -121,16 +121,19 @@ impl Destination {
         }
     }
 
-    /// Whether the volume still exists, which is how a closed vault shows up.
+    /// Whether the volume is still mounted, judged against `mounts`.
     ///
-    /// A user who locks their vault and then veils a recording would otherwise
-    /// have it written into a directory that is no longer encrypted, or into a
-    /// mount point that is now an ordinary empty folder. Same failure as the
-    /// silent fallback, arriving later.
-    pub fn still_there(&self) -> bool {
+    /// **F-93.** The first version of this asked whether the directory existed,
+    /// which is the wrong question in the one direction that matters:
+    /// unmounting a volume leaves its mount point behind as an ordinary empty
+    /// directory. A locked vault therefore looked fine, and VeilVoice would
+    /// have written a veiled recording onto the unencrypted disk while its
+    /// owner believed it had gone inside. See
+    /// [`veilvoice_setup::volumes::covers`].
+    pub fn still_mounted(&self, mounts: &[Volume]) -> bool {
         self.volume
             .as_ref()
-            .is_none_or(|v| v.path.try_exists().unwrap_or(false))
+            .is_none_or(|v| volumes::covers(mounts, &v.path))
     }
 }
 
@@ -172,12 +175,11 @@ pub struct Storage {
     hand_picked_tool: Tool,
     /// Whether the chosen folder was there at the last refresh.
     ///
-    /// Cached rather than asked each frame. `still_there` is a stat syscall,
-    /// and one per frame at sixty frames a second is sixty a second for an
-    /// answer that changes when somebody unlocks a volume. That is the shape of
-    /// stutter the draw path already refuses in `app.rs`, and writing it into a
-    /// new module would have been the same defect in a place the guard test
-    /// does not look.
+    /// Cached rather than recomputed each frame. Deciding it means reading the
+    /// mount table, and doing that sixty times a second for an answer that
+    /// changes when somebody unlocks a volume is the shape of stutter the draw
+    /// path already refuses in `app.rs`. Writing it into a new module would
+    /// have been the same defect in a place that guard test does not look.
     present: bool,
 }
 
@@ -202,7 +204,7 @@ impl Storage {
     /// does none. See the guard test in `app.rs`.
     pub fn refresh(&mut self) {
         self.found = volumes::mounted();
-        self.present = self.destination.still_there();
+        self.present = self.destination.still_mounted(&self.found);
         self.presence = volumes::Tool::ALL
             .iter()
             .map(|tool| {
@@ -234,7 +236,7 @@ impl Storage {
             self.destination = Destination {
                 volume: Some(Volume::found(path, self.hand_picked_tool)),
             };
-            self.present = self.destination.still_there();
+            self.present = self.destination.still_mounted(&self.found);
         }
     }
 
@@ -249,7 +251,7 @@ impl Storage {
         self.destination = Destination {
             volume: Some(volume),
         };
-        self.present = self.destination.still_there();
+        self.present = self.destination.still_mounted(&self.found);
     }
 
     /// Go back to writing beside the source file.
@@ -451,8 +453,9 @@ mod tests {
     }
 
     /// The panel draws every frame, so nothing in it may touch the disk.
-    /// `still_there` is a stat syscall and the first version of this module
-    /// called it from the panel, which is sixty of them a second for an answer
+    /// Deciding whether the vault is mounted means reading the mount table, and
+    /// the first version of this module did it from the panel: sixty reads a
+    /// second for an answer
     /// that changes when somebody unlocks a volume. `app.rs` already refuses
     /// this in its own draw path; a new module is where that guard does not
     /// look, which is exactly why it is worth repeating here.
@@ -470,7 +473,7 @@ mod tests {
             .collect::<Vec<_>>()
             .join("\n");
         for forbidden in [
-            "still_there()",
+            "still_mounted(",
             "try_exists",
             ".exists()",
             "read_to_string",
@@ -565,20 +568,44 @@ mod tests {
 
     /// A vault that has been locked since it was chosen is a directory that is
     /// no longer encrypted, or is gone.
+    /// F-93. A locked vault leaves its mount point behind as an ordinary
+    /// directory, so existence says yes when the honest answer is no.
     #[test]
     fn a_vault_that_is_no_longer_mounted_is_noticed() {
         let d = vault(Tool::VeraCrypt, Hidden::NoHiddenVolume);
-        assert!(!d.still_there(), "/media/veracrypt1 does not exist here");
+        let mounted = vec![Volume::found(
+            PathBuf::from("/media/veracrypt1"),
+            Tool::VeraCrypt,
+        )];
+        assert!(d.still_mounted(&mounted));
 
-        let dir = tempfile::tempdir().unwrap();
-        let present = Destination {
+        // The directory can still be there. Nothing is mounted on it.
+        let empty: Vec<Volume> = Vec::new();
+        assert!(
+            !d.still_mounted(&empty),
+            "an unmounted volume must not read as present just because its \
+             mount point is still a directory"
+        );
+
+        // No destination is always fine: writing beside the source needs no
+        // volume at all.
+        assert!(Destination::default().still_mounted(&empty));
+    }
+
+    /// A folder chosen inside a mounted vault is inside it.
+    #[test]
+    fn a_folder_within_a_mounted_vault_counts_as_mounted() {
+        let inside = Destination {
             volume: Some(Volume {
-                path: dir.path().to_path_buf(),
+                path: PathBuf::from("/home/u/Vault/recordings"),
                 tool: Tool::Cryptomator,
                 hidden: Hidden::Unanswered,
             }),
         };
-        assert!(present.still_there());
-        assert!(Destination::default().still_there());
+        let mounted = vec![Volume::found(
+            PathBuf::from("/home/u/Vault"),
+            Tool::Cryptomator,
+        )];
+        assert!(inside.still_mounted(&mounted));
     }
 }
