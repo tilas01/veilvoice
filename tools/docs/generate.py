@@ -65,6 +65,7 @@ Pure standard library. No build step, no dependencies.
 import hashlib
 import html as html_mod
 import io
+import math
 import os
 import re
 import subprocess
@@ -1645,7 +1646,18 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None):
         if line:
             lines.append(line)
 
-    line_widths = [sum(box[n["id"]][0] for n in line) + gap_x * (len(line) - 1)
+    # `math.fsum` rather than `sum`, and the reason is a build that passed here
+    # and failed on CI with no change to the source. CPython 3.12 gave `sum`
+    # compensated summation over floats, so the same widths added up to a value
+    # a fraction different from the one 3.11 produced. Everything downstream is
+    # a centring calculation, and one box landed at x=40.1 on one interpreter
+    # and x=40.2 on the other, which is enough for a committed drawing to stop
+    # matching its generator.
+    #
+    # `fsum` is exactly rounded, so it returns the same value on every version
+    # and on every platform. A generated file checked byte for byte in CI has
+    # no business depending on which Python is installed.
+    line_widths = [math.fsum(box[n["id"]][0] for n in line) + gap_x * (len(line) - 1)
                    for line in lines]
 
     def lay_out(canvas_w):
