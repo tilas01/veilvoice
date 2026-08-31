@@ -24,6 +24,26 @@
 //! All three slots are visible from the start, and a drop fills whichever one
 //! the file's name says it is.
 //!
+//! # Marker 97: one press, three answers
+//!
+//! The tab used to answer one question, and it was not the question somebody
+//! actually has. "Is this zip the published one" is a step; "is the program I
+//! am about to run the published one" is the thing they want to know, and it
+//! was being left to the command line.
+//!
+//! So one press now checks the archive against the signed hash list, then every
+//! file extracted out of that archive against the signed contents list the
+//! release publishes beside it, and then runs the GnuPG on this machine over
+//! the same signature and shows what it said. Three answers, one button, and
+//! each one drawn separately so a pass on one is never mistaken for a pass on
+//! another.
+//!
+//! Two things are deliberately **not** failures. A release that published no
+//! contents list -- everything before v0.1.15 -- simply has no such row, rather
+//! than a warning about a file that was never meant to be there. And a GnuPG
+//! that cannot run on this machine is drawn in the quiet colour: it is a fact
+//! about the computer and says nothing whatever about the download.
+//!
 //! # Nothing here downloads anything
 //!
 //! Not even the key: it is compiled in, and its fingerprint is checked against
@@ -42,6 +62,9 @@
 //! Drop the downloaded archive and the hash list and signature sitting beside it
 //! are picked up on their own. Nothing is downloaded and nothing leaves the
 //! machine.
+//!
+//! One press checks the zip, then every file you unzipped out of it, and then
+//! asks your own GnuPG the same question and shows you its answer.
 
 use crate::theme::palette as p;
 use eframe::egui::{self, RichText, Ui};
@@ -78,6 +101,58 @@ fn slot_for(path: &Path) -> Slot {
     }
 }
 
+/// Everything one press of **check** found out.
+///
+/// **Marker 97.** The tab used to answer one question -- is this archive the
+/// published one -- and it now answers three, because the other two are what
+/// somebody actually wants to know and both were being left to the command
+/// line. The extra work is done on the same worker thread and reported in the
+/// same place, so there is still one button.
+#[derive(Debug, Default)]
+pub struct Report {
+    /// The archive against the signed hash list. The question this tab has
+    /// always answered.
+    pub file: Option<Result<Checked, Error>>,
+    /// Every file extracted out of that archive, against the signed contents
+    /// list, where the release published one.
+    pub contents: Option<Contents>,
+    /// The same signature, through the GnuPG on this machine.
+    pub gnupg: Option<Gnupg>,
+}
+
+/// What the extracted folder turned out to hold.
+#[derive(Debug, Default)]
+pub struct Contents {
+    /// The folder that was looked at.
+    pub folder: String,
+    /// How many files the release published for this archive.
+    pub total: usize,
+    /// How many of them are on disk, unchanged.
+    pub good: usize,
+    /// Everything wrong, one line each, ready to draw.
+    pub problems: Vec<String>,
+    /// Why nothing could be checked, when that is the answer.
+    pub unusable: Option<String>,
+}
+
+/// What this machine's GnuPG said.
+#[derive(Debug, Default)]
+pub struct Gnupg {
+    /// Where GnuPG was found, or why it was not asked.
+    pub found: String,
+    /// What was done to the keyring and how to undo it.
+    pub note: Vec<String>,
+    /// GnuPG's answer in one line.
+    pub verdict: String,
+    /// Whether that answer agrees with this program's own.
+    pub agrees: bool,
+    /// Whether GnuPG gave an answer at all. A GnuPG that could not run says
+    /// nothing about the download and must not be drawn as a failure.
+    pub answered: bool,
+    /// What GnuPG printed, for when the answer needs its evidence.
+    pub said: Vec<String>,
+}
+
 /// The tab's state.
 #[derive(Default)]
 pub struct Verify {
@@ -88,8 +163,8 @@ pub struct Verify {
     /// The detached signature over that list.
     pub signature: Option<PathBuf>,
 
-    job: Option<mpsc::Receiver<Result<Checked, Error>>>,
-    report: Option<Result<Checked, Error>>,
+    job: Option<mpsc::Receiver<Report>>,
+    report: Option<Report>,
     /// Set while files are over the window, so the drop target can light up.
     hovering: bool,
     /// The file picker, while it is open.
@@ -128,9 +203,12 @@ impl Verify {
             }
             Err(mpsc::TryRecvError::Empty) => {}
             Err(mpsc::TryRecvError::Disconnected) => {
-                self.report = Some(Err(Error::Io(
-                    "the check stopped without answering".to_string(),
-                )));
+                self.report = Some(Report {
+                    file: Some(Err(Error::Io(
+                        "the check stopped without answering".to_string(),
+                    ))),
+                    ..Report::default()
+                });
                 self.job = None;
             }
         }
@@ -242,6 +320,16 @@ impl Verify {
                  downloaded and nothing leaves this machine.",
             )
             .color(p::muted()),
+        );
+        ui.add_space(4.0);
+        ui.label(
+            RichText::new(
+                "One press checks the signature, the archive, every file you \
+                 extracted out of it, and then all of it again through your own \
+                 GnuPG if you have one.",
+            )
+            .color(p::muted())
+            .small(),
         );
 
         // What was filled in without being asked for. Shown rather than left to
@@ -414,16 +502,26 @@ impl Verify {
     /// already asking "is this download genuine", and the honest answer to that
     /// question includes "and here is how to ask something other than me".
     ///
-    /// The commands come from [`veilvoice_check::gnupg_commands`], which the
+    /// The commands come from [`veilvoice_gnupg::commands`], which the
     /// portable verifier also uses, so the window and the command line cannot
     /// drift into printing two different recipes.
     fn gnupg_section(&mut self, ui: &mut Ui) {
         ui.add_space(16.0);
         ui.separator();
         ui.label(
-            RichText::new("Check it again with your own GnuPG")
+            RichText::new("The same check, typed by you")
                 .color(p::blue())
                 .small(),
+        );
+        ui.label(
+            RichText::new(
+                "Pressing check above already runs your GnuPG and shows what it said. \
+                 These are the same commands for you to run yourself, which is the part \
+                 no program can do for you: the one telling you a download is genuine \
+                 came out of that download.",
+            )
+            .color(p::muted())
+            .small(),
         );
 
         let (Some(sums), Some(signature)) = (self.sums.clone(), self.signature.clone()) else {
@@ -437,7 +535,7 @@ impl Verify {
             return;
         };
 
-        match veilvoice_check::gnupg_on_path() {
+        match veilvoice_gnupg::on_path() {
             Some(gpg) => ui.label(
                 RichText::new(format!("GnuPG found at {}", gpg.display()))
                     .color(p::green())
@@ -455,7 +553,7 @@ impl Verify {
         // The signing key beside the hash list, when the release shipped one.
         let key = sums.with_file_name("veilvoice-signing-key.asc");
         let key = key.is_file().then_some(key);
-        let commands = veilvoice_check::gnupg_commands(&sums, &signature, key.as_deref());
+        let commands = veilvoice_gnupg::commands(&sums, &signature, key.as_deref());
         let script = commands.join("\n");
 
         ui.add_space(4.0);
@@ -480,7 +578,103 @@ impl Verify {
 
     /// The answer, in the colour it deserves.
     fn verdict(&self, ui: &mut Ui) {
-        match &self.report {
+        let Some(report) = &self.report else {
+            ui.label(RichText::new("Not checked.").color(p::muted()).small());
+            return;
+        };
+        self.archive_verdict(ui, report);
+        self.contents_verdict(ui, report);
+        self.gnupg_verdict(ui, report);
+    }
+
+    /// Marker 97. Every extracted file against the signed contents list.
+    fn contents_verdict(&self, ui: &mut Ui, report: &Report) {
+        let Some(contents) = &report.contents else {
+            return;
+        };
+        ui.add_space(10.0);
+        ui.label(
+            RichText::new(format!("Everything in {}", contents.folder))
+                .color(p::blue())
+                .small(),
+        );
+        if let Some(why) = &contents.unusable {
+            ui.label(RichText::new(why.clone()).color(p::red()));
+            ui.label(
+                RichText::new(
+                    "Nothing in that folder was checked. Do not treat what is in it as \
+                     verified.",
+                )
+                .color(p::muted())
+                .small(),
+            );
+            return;
+        }
+        for line in &contents.problems {
+            ui.label(RichText::new(line.clone()).color(p::red()).monospace());
+        }
+        if contents.problems.is_empty() {
+            ui.label(
+                RichText::new(format!(
+                    "all {} files match the signed list, and there is nothing else in \
+                     the folder",
+                    contents.total
+                ))
+                .color(p::green()),
+            );
+        } else {
+            ui.label(
+                RichText::new(format!(
+                    "{} of {} files are as published. Extract the checked archive again \
+                     and use what comes out of it.",
+                    contents.good, contents.total
+                ))
+                .color(p::red()),
+            );
+        }
+    }
+
+    /// Marker 97. What this machine's own GnuPG made of the same signature.
+    fn gnupg_verdict(&self, ui: &mut Ui, report: &Report) {
+        let Some(gnupg) = &report.gnupg else {
+            return;
+        };
+        ui.add_space(10.0);
+        ui.label(
+            RichText::new("Checked again with your own GnuPG")
+                .color(p::blue())
+                .small(),
+        );
+        ui.label(RichText::new(gnupg.found.clone()).color(p::muted()).small());
+        for line in &gnupg.note {
+            ui.label(RichText::new(line.clone()).color(p::muted()).small());
+        }
+        if !gnupg.verdict.is_empty() {
+            // A GnuPG that could not run is drawn in the quiet colour, never
+            // the loud one. It is a fact about this machine and says nothing
+            // whatever about the download.
+            let colour = if !gnupg.answered {
+                p::muted()
+            } else if gnupg.agrees {
+                p::green()
+            } else {
+                p::red()
+            };
+            ui.label(RichText::new(gnupg.verdict.clone()).color(colour));
+        }
+        for line in &gnupg.said {
+            ui.label(
+                RichText::new(line.clone())
+                    .color(p::muted())
+                    .small()
+                    .monospace(),
+            );
+        }
+    }
+
+    /// The archive against the signed hash list.
+    fn archive_verdict(&self, ui: &mut Ui, report: &Report) {
+        match &report.file {
             None => {
                 ui.label(RichText::new("Not checked.").color(p::muted()).small());
             }
@@ -550,16 +744,170 @@ impl Verify {
         self.job = Some(rx);
         self.report = None;
         std::thread::spawn(move || {
-            let answer = (|| {
-                let sums = std::fs::read_to_string(&sums)
-                    .map_err(|e| Error::Io(format!("cannot read {}: {e}", sums.display())))?;
-                let signature = std::fs::read_to_string(&signature)
-                    .map_err(|e| Error::Io(format!("cannot read {}: {e}", signature.display())))?;
-                veilvoice_check::check_file(&download, &sums, &signature)
-            })();
-            let _ = tx.send(answer);
+            let _ = tx.send(examine(&download, &sums, &signature));
         });
     }
+}
+
+/// The whole check, off the drawing thread.
+///
+/// A free function rather than a method so it cannot reach the tab's state:
+/// everything it needs is in its three arguments and everything it found is in
+/// what it returns, which is the only shape that is safe to run on a thread
+/// while the window carries on drawing.
+fn examine(download: &Path, sums_path: &Path, signature_path: &Path) -> Report {
+    let read = |path: &Path| {
+        std::fs::read_to_string(path)
+            .map_err(|e| Error::Io(format!("cannot read {}: {e}", path.display())))
+    };
+    let (sums, signature) = match (read(sums_path), read(signature_path)) {
+        (Ok(sums), Ok(signature)) => (sums, signature),
+        (Err(why), _) | (_, Err(why)) => {
+            return Report {
+                file: Some(Err(why)),
+                ..Report::default()
+            }
+        }
+    };
+
+    let file = veilvoice_check::check_file(download, &sums, &signature);
+    // The rest only when the archive itself is the published one. Reporting on
+    // an extracted folder after the archive failed would be answering a
+    // question nobody should still be asking.
+    let go_on = matches!(&file, Ok(checked) if checked.matched);
+    Report {
+        contents: go_on
+            .then(|| examine_contents(download, sums_path, &sums, &signature))
+            .flatten(),
+        gnupg: Some(examine_gnupg(sums_path, signature_path)),
+        file: Some(file),
+    }
+}
+
+/// Marker 97. Every file in the extracted folder, against the signed list.
+///
+/// The order is the one the whole project keeps: `CONTENTS.sha256` is checked
+/// against the signed hash list **before** it is parsed, because it decides
+/// which paths get read and what they are compared against.
+fn examine_contents(
+    download: &Path,
+    sums_path: &Path,
+    sums: &str,
+    signature: &str,
+) -> Option<Contents> {
+    use veilvoice_check::contents;
+
+    let list = sums_path.with_file_name(contents::CONTENTS);
+    if !list.is_file() {
+        // Every release before v0.1.15 is in this position, and it is not a
+        // failure. Nothing is drawn rather than a row saying so, because a
+        // panel that reports the absence of an optional file teaches people to
+        // worry about it.
+        return None;
+    }
+    let folder = download
+        .file_stem()
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let unusable = |why: String| {
+        Some(Contents {
+            folder: folder.clone(),
+            unusable: Some(why),
+            ..Contents::default()
+        })
+    };
+
+    match veilvoice_check::check_file(&list, sums, signature) {
+        Err(why) => return unusable(format!("{why}")),
+        Ok(checked) if !checked.matched => {
+            return unusable(
+                "CONTENTS.sha256 is not the list this release signed: the hashes do not \
+                 agree."
+                    .to_string(),
+            )
+        }
+        Ok(_) => {}
+    }
+    let text = match std::fs::read_to_string(&list) {
+        Ok(text) => text,
+        Err(e) => return unusable(format!("cannot read {}: {e}", list.display())),
+    };
+    let all = match contents::parse(&text) {
+        Ok(all) => all,
+        Err(why) => return unusable(format!("{why}")),
+    };
+    let name = download.file_name()?.to_string_lossy().into_owned();
+    let section = contents::for_archive(&all, &name)?;
+
+    let root = download.parent().unwrap_or(Path::new("."));
+    let outcomes = contents::check(root, section);
+    let extras = contents::extras(root, section);
+    let good = outcomes.iter().filter(|o| o.is_good()).count();
+
+    let mut problems = Vec::new();
+    for outcome in &outcomes {
+        match &outcome.verdict {
+            contents::Verdict::Matches => {}
+            contents::Verdict::Differs { .. } => {
+                problems.push(format!("CHANGED  {}", outcome.path))
+            }
+            contents::Verdict::Missing => problems.push(format!("MISSING  {}", outcome.path)),
+            contents::Verdict::Unreadable(why) => {
+                problems.push(format!("UNREADABLE  {}: {why}", outcome.path))
+            }
+        }
+    }
+    for extra in &extras {
+        problems.push(format!(
+            "NOT PART OF THE RELEASE  {}",
+            extra.strip_prefix(root).unwrap_or(extra).display()
+        ));
+    }
+    Some(Contents {
+        folder: section.roots().into_iter().next().unwrap_or(folder),
+        total: outcomes.len(),
+        good,
+        problems,
+        unusable: None,
+    })
+}
+
+/// Marker 97. The same signature, through the GnuPG this machine already has.
+fn examine_gnupg(sums: &Path, signature: &Path) -> Gnupg {
+    let gpg = match veilvoice_gnupg::Gnupg::found() {
+        Err(why) => {
+            return Gnupg {
+                found: format!("{why}. The commands below are what to run if you install it."),
+                ..Gnupg::default()
+            }
+        }
+        Ok(gpg) => gpg,
+    };
+    let mut report = Gnupg {
+        found: format!("GnuPG found at {}", gpg.program().display()),
+        ..Gnupg::default()
+    };
+    match gpg.import(veilvoice_check::PUBLIC_KEY, veilvoice_check::FINGERPRINT) {
+        // Not drawn as a failure. GnuPG being unusable on this machine says
+        // nothing about the download.
+        Err(why) => {
+            report.verdict = format!("GnuPG could not be asked: {why}");
+            return report;
+        }
+        Ok(import) => report.note = import.note(),
+    }
+    match gpg.verify(signature, sums, veilvoice_check::FINGERPRINT) {
+        Err(why) => report.verdict = format!("GnuPG could not be asked: {why}"),
+        Ok(run) => {
+            report.answered = true;
+            report.agrees = run.outcome.is_good();
+            report.verdict = run.outcome.plainly();
+            if !report.agrees {
+                report.said = run.said.lines().map(str::to_string).collect();
+            }
+        }
+    }
+    report
 }
 
 #[cfg(test)]
@@ -673,7 +1021,10 @@ mod tests {
     #[test]
     fn a_new_file_clears_the_previous_answer() {
         let mut verify = Verify {
-            report: Some(Err(Error::BadSignature)),
+            report: Some(Report {
+                file: Some(Err(Error::BadSignature)),
+                ..Report::default()
+            }),
             ..Verify::default()
         };
         verify.accept(PathBuf::from("veilvoice.zip"));
@@ -714,8 +1065,8 @@ mod tests {
         };
         verify.drain();
         assert!(!verify.is_busy());
-        match verify.report {
-            Some(Err(Error::Io(ref why))) => assert!(why.contains("without answering"), "{why}"),
+        match verify.report.as_ref().and_then(|r| r.file.as_ref()) {
+            Some(Err(Error::Io(why))) => assert!(why.contains("without answering"), "{why}"),
             other => panic!("expected a reported failure, got {other:?}"),
         }
     }
@@ -735,7 +1086,7 @@ mod tests {
             .unwrap_or(source.len());
         let body = &source[start..end];
         assert!(
-            body.contains("veilvoice_check::gnupg_commands"),
+            body.contains("veilvoice_gnupg::commands"),
             "the window builds its own commands, which will drift from the \
              verifier's"
         );
@@ -763,5 +1114,111 @@ mod tests {
         let error = veilvoice_check::check_file(&file, &sums, "not a signature")
             .expect_err("a bad signature must stop the check");
         assert!(matches!(error, Error::Malformed(_)), "{error:?}");
+    }
+
+    /// **Marker 97.** A release with no contents list produces no row about
+    /// one. Everything published before v0.1.15 is in that position, and a
+    /// panel that reported the absence of an optional file would teach people
+    /// to worry about it.
+    #[test]
+    fn a_release_without_a_contents_list_draws_nothing_about_one() {
+        let room = std::env::temp_dir().join(format!(
+            "veilvoice-verify-tab-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&room).unwrap();
+        let sums = room.join("SHA256SUMS");
+        std::fs::write(&sums, b"nothing\n").unwrap();
+        assert!(
+            examine_contents(
+                &room.join("veilvoice-v0.1.15-linux-x86_64.tar.gz"),
+                &sums,
+                "",
+                ""
+            )
+            .is_none(),
+            "no CONTENTS.sha256 beside it means no contents row"
+        );
+        std::fs::remove_dir_all(&room).ok();
+    }
+
+    /// **Marker 97.** A contents list that is not the signed one is refused,
+    /// and nothing in the folder is reported on. Parsing it first and checking
+    /// afterwards would be letting a downloaded text file choose which paths
+    /// get read.
+    #[test]
+    fn a_contents_list_that_is_not_the_signed_one_checks_nothing() {
+        let room = std::env::temp_dir().join(format!(
+            "veilvoice-verify-tab-bad-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&room).unwrap();
+        let sums = room.join("SHA256SUMS");
+        std::fs::write(&sums, b"nothing\n").unwrap();
+        std::fs::write(room.join("CONTENTS.sha256"), b"# a.tar.gz\n").unwrap();
+
+        let report = examine_contents(
+            &room.join("veilvoice-v0.1.15-linux-x86_64.tar.gz"),
+            &sums,
+            "nothing\n",
+            "not a signature",
+        )
+        .expect("a list that is there is reported on");
+        assert!(report.unusable.is_some(), "{report:?}");
+        assert_eq!(report.total, 0, "nothing was checked");
+        std::fs::remove_dir_all(&room).ok();
+    }
+
+    /// **Marker 97.** A GnuPG that cannot run is never drawn as a failure of
+    /// the download. The distinction is the one this is most tempted to get
+    /// wrong, and getting it wrong tells somebody not to run a sound release.
+    #[test]
+    fn a_gnupg_that_gave_no_answer_is_not_a_disagreement() {
+        let quiet = Gnupg {
+            found: "GnuPG is not on your PATH.".to_string(),
+            ..Gnupg::default()
+        };
+        assert!(!quiet.answered, "nothing was asked");
+        assert!(!quiet.agrees, "and nothing agreed");
+
+        // The panel colours on `answered` first, so a GnuPG that said nothing
+        // is muted rather than red. Asserted here because the drawing itself
+        // needs a window and this is the decision inside it.
+        let source = include_str!("verify.rs");
+        let body = source
+            .split("fn gnupg_verdict(")
+            .nth(1)
+            .expect("the GnuPG row has to be findable");
+        let body = body.split("\n    /// ").next().unwrap();
+        let muted = body.find("!gnupg.answered").expect("answered is checked");
+        let red = body.find("p::red()").expect("red exists");
+        assert!(muted < red, "the not-answered case must be decided first");
+    }
+
+    /// **Marker 97.** The extracted folder is only looked at once the archive
+    /// itself has passed. Reporting on a folder after the archive failed would
+    /// be answering a question nobody should still be asking.
+    #[test]
+    fn nothing_is_reported_about_a_folder_when_the_archive_failed() {
+        let source = include_str!("verify.rs");
+        let body = source
+            .split("fn examine(")
+            .nth(1)
+            .expect("the worker has to be findable");
+        let body = body.split("\nfn ").next().unwrap();
+        assert!(
+            body.contains("let go_on = matches!(&file, Ok(checked) if checked.matched)"),
+            "the contents check must be gated on the archive passing"
+        );
+        assert!(
+            body.contains("go_on\n            .then("),
+            "and the gate must be the thing that decides whether it runs"
+        );
     }
 }

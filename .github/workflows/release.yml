@@ -498,6 +498,50 @@ jobs:
           path: staging
           merge-multiple: true
 
+      # **Marker 97.** A signed list of what is inside every archive.
+      #
+      # `SHA256SUMS` covers the archives. That proves a download is the one
+      # that was published and says nothing whatever about the folder somebody
+      # unzipped it into, which is the copy they actually run. Nothing on disk
+      # records which archive a directory came from, so a verifier could only
+      # report the two separately and tell people to extract it again.
+      #
+      # This closes that gap with arithmetic rather than advice. Every archive
+      # is unpacked here and every file inside it is hashed, and the result is
+      # staged **before** `SHA256SUMS` is computed, so the hash list covers this
+      # file too and the signature therefore covers it as well. The chain a
+      # verifier can then follow is complete and every link is checkable:
+      #
+      #   SHA256SUMS.asc -> SHA256SUMS -> CONTENTS.sha256 -> each file on disk
+      #
+      # Paths are written exactly as they sit inside the archive, which for
+      # this project means the release directory name and then the file, so a
+      # verifier can join them onto the directory beside the archive with no
+      # guessing.
+      - name: List what is inside each archive
+        run: |
+          cd staging
+          : > CONTENTS.sha256
+          for archive in *.zip *.tar.gz; do
+            [ -f "$archive" ] || continue
+            room="$(mktemp -d)"
+            case "$archive" in
+              *.zip)    unzip -q -d "$room" "$archive" ;;
+              *.tar.gz) tar -C "$room" -xzf "$archive" ;;
+            esac
+            {
+              echo "# $archive"
+              # LC_ALL=C so the order is the same on every machine, and a
+              # subshell so the paths come out relative to the archive root.
+              ( cd "$room" && find . -type f | LC_ALL=C sort | while read -r file; do
+                  printf '%s  %s\n' "$(sha256sum "$file" | cut -d" " -f1)" "${file#./}"
+                done )
+              echo
+            } >> CONTENTS.sha256
+            rm -rf "$room"
+          done
+          wc -l CONTENTS.sha256
+
       - name: Checksums
         run: |
           cd staging

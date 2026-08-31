@@ -19,6 +19,7 @@ members = [
     "crates/veilvoice-appctl",
     "crates/veilvoice-audio",
     "crates/veilvoice-meta",
+    "crates/veilvoice-gnupg",
     "crates/veilvoice-gui",
     "crates/veilvoice-cli",
     "crates/veilvoice-video",

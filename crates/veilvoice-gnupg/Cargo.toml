@@ -1,0 +1,14 @@
+[package]
+name = "veilvoice-gnupg"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Run the GnuPG already on this machine: import the VeilVoice signing key and check a detached signature, reading GnuPG's machine-readable status rather than its translated prose."
+
+# No dependencies, deliberately. This runs a program and reads what it printed;
+# everything it needs is in the standard library, and the portable verifier that
+# links it is the one binary in this project whose size is a feature.
+[dependencies]

@@ -202,7 +202,52 @@ removed on exit, and nothing is copied anywhere until every check has passed.
 
 `veilvoice-verify` ships in every release archive. It is one binary that does
 the same checks as GnuPG, with **nothing else installed** -- the signing key and
-its fingerprint are compiled into it. It downloads nothing and writes nothing.
+its fingerprint are compiled into it. It downloads nothing.
+
+### The short way
+
+Put it in the folder you downloaded to and run it. That is the whole
+instruction.
+
+```bash
+veilvoice-verify
+```
+
+It finds the release near it and checks all of it, in this order, each step
+only if the one before it passed:
+
+1. the signature over `SHA256SUMS`;
+2. every archive, against `SHA256SUMS`;
+3. `CONTENTS.sha256`, against `SHA256SUMS`;
+4. **every file you extracted**, against `CONTENTS.sha256`, naming anything in
+   that folder the release never published;
+5. all of it again through the GnuPG on your machine, if you have one.
+
+Step 4 is the one worth having and it is new in v0.1.15. A hash over the
+archive tells you the *zip* is genuine. This tells you the *program you are
+about to run* is, which is the question anybody actually has. Nothing on disk
+records which archive a folder was extracted from, so a release now publishes
+`CONTENTS.sha256` listing every file inside every archive with its SHA-256,
+staged before `SHA256SUMS` is computed so the signature covers it too:
+
+```text
+SHA256SUMS.asc -> SHA256SUMS -> CONTENTS.sha256 -> each file on disk
+```
+
+Releases before v0.1.15 carry no contents list and are checked as far as step
+2, which the tool says at the time rather than implying more.
+
+Step 5 adds the VeilVoice public key to your keyring, tells you it did and how
+to remove it in one command, and runs `gpg --verify`. The signature is then
+checked by two independent implementations and the run fails if they disagree.
+A GnuPG that cannot run on your machine is **not** counted against the
+download: that is a fact about the computer and says nothing about the file.
+
+The commands in section 2 above are still printed every time, because running
+GnuPG from inside the program you are checking makes the *implementation*
+independent and only you typing them makes the *invocation* independent.
+
+### The long way, one file at a time
 
 ```bash
 veilvoice-verify key

@@ -11,11 +11,11 @@
 
 # `crates/veilvoice-verify/src/extracted.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 303 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 312 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs)
 
 ## Contents
 
-- [The honest limit on checking an extracted copy](#the-honest-limit-on-checking-an-extracted-copy)
+- [This used to be the honest limit, and it is not the limit any more](#this-used-to-be-the-honest-limit-and-it-is-not-the-limit-any-more)
 - [GnuPG](#gnupg)
 - [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
@@ -28,31 +28,38 @@ What came out of the archive, and the GnuPG somebody already has.
 well as the archive, and offer the check through GnuPG for anybody who would
 rather trust their own tools than this binary.
 
-# The honest limit on checking an extracted copy
+# This used to be the honest limit, and it is not the limit any more
 
-This is the part worth reading before the code. A release signs
-`SHA256SUMS`, and `SHA256SUMS` covers the **archives**. It says nothing
-about a directory somebody unzipped last week.
+Worth reading before the code, because the module changed shape around it.
 
-So verifying `veilvoice-0.1.14-linux-x86_64.zip` proves that archive is the
-one that was signed. It does **not** prove that the folder sitting beside it
-came out of that archive. The folder may predate the download, may have been
-extracted from a different copy, may have been edited since. Nothing on disk
-records which archive an extracted directory came from, and no amount of
-hashing the loose files can invent that link, because there is no signed
-list of what those files should be.
+A release signs `SHA256SUMS`, and `SHA256SUMS` covers the **archives**. So
+verifying `veilvoice-0.1.14-linux-x86_64.zip` proved that archive was the
+one that was signed, and proved nothing at all about the folder sitting
+beside it. The folder may predate the download, may have come out of a
+different copy, may have been edited since. Nothing on disk records which
+archive a directory was extracted from.
 
-A verifier that reported "archive good, extracted files present" as one
-green result would be telling somebody their installed copy is verified when
-it is not. So this reports the two separately, in those words, and says the
-one thing that does resolve it: extract the archive that was just checked,
-now, and use that.
+That was written here as a limit that could not be lifted, and it could not
+be lifted **from this side**. It was lifted from the other one. A release
+now also publishes `CONTENTS.sha256`, listing every file inside every
+archive with its SHA-256, staged before `SHA256SUMS` is computed so that the
+signature covers it too. `veilvoice_check::contents` reads it and `main.rs`
+checks the extracted folder against it, file by file, and reports anything
+in that folder the release never published.
 
-What it can honestly say about the extracted copy is whether the programs
-are there and whether the operating system will run them, which is the other
-half of what was asked and is a real thing to get wrong: an archive
-extracted by a tool that drops the executable bit leaves somebody with files
-that look right and will not start.
+The lesson is worth keeping beside the code: "no signed list covers loose
+files" was a true statement about the release format, and it was being
+treated as a fact about the world. Publishing one more file changed it.
+
+What is left here is the part no hash can answer. A file can be byte for
+byte correct and still not start, because the tool that unpacked it dropped
+the execute bit, and somebody in that position has a folder that looks
+perfect and does nothing. That is what `look_in` and `Program::runnable`
+are for, and they are still asked after every hash has matched.
+
+Releases published before v0.1.15 carry no contents list, and for those the
+old report and the old caveat are exactly what is printed, because they were
+honest then and still are.
 
 # GnuPG
 
@@ -70,26 +77,27 @@ independent check has it, spelled out, with nothing to work out.
 
 Checks the folder you unzipped, as well as the zip.
 
-It will tell you the programs are there and that your system will run them.
-It will not tell you the folder came out of the zip it just checked, because
-nothing on your disk records that. If you want to be certain, unzip the
-checked file again and use what comes out.
+From v0.1.15 a release publishes a signed list of everything inside each
+archive, so every file in that folder is checked against it, and anything in
+there that was not part of the release is named. For older releases, which
+carry no such list, it can only tell you the programs are there and that
+your system will run them, and it says so rather than implying more.
 
 ## What this file contains
 
-303 lines defining **5 functions** (4 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+312 lines defining **5 functions** (4 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Program` (line 62) -- One program found in an extracted directory.
-- `struct Extracted` (line 75) -- What an extracted directory turned out to hold.
+- `struct Program` (line 70) -- One program found in an extracted directory.
+- `struct Extracted` (line 83) -- What an extracted directory turned out to hold.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Extracted::is_empty` (line 84) -- Whether anything was found at all.
-- `Extracted::not_runnable` (line 89) -- The programs the operating system will not run.
-- `directory_for` (line 99) -- The directory an archive would extract into, by this project's naming.
-- `look_in` (line 111) -- Look in directory for the programs a release carries.
+- `Extracted::is_empty` (line 92) -- Whether anything was found at all.
+- `Extracted::not_runnable` (line 97) -- The programs the operating system will not run.
+- `directory_for` (line 107) -- The directory an archive would extract into, by this project's naming.
+- `look_in` (line 119) -- Look in directory for the programs a release carries.
   - reaches: `runnable`
 
 ## What calls what
@@ -112,17 +120,17 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_is_empty(["Extracted::is_empty<br/>line 84"])
-    n_not_runnable(["Extracted::not_runnable<br/>line 89"])
-    n_directory_for(["directory_for<br/>line 99"])
-    n_look_in(["look_in<br/>line 111"])
-    n_runnable["runnable<br/>line 132"]
+    n_is_empty(["Extracted::is_empty<br/>line 92"])
+    n_not_runnable(["Extracted::not_runnable<br/>line 97"])
+    n_directory_for(["directory_for<br/>line 107"])
+    n_look_in(["look_in<br/>line 119"])
+    n_runnable["runnable<br/>line 140"]
     n_look_in --> n_runnable
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L84" "open the source"
-    click n_not_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L89" "open the source"
-    click n_directory_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L99" "open the source"
-    click n_look_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L111" "open the source"
-    click n_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L132" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L92" "open the source"
+    click n_not_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L97" "open the source"
+    click n_directory_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L107" "open the source"
+    click n_look_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L119" "open the source"
+    click n_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L140" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_empty,n_not_runnable,n_directory_for,n_look_in entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -135,14 +143,14 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `PROGRAMS` <sub>pub const</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L58) | The programs a release archive carries. |
-| `Program` <sub>pub struct</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L62) | One program found in an extracted directory. |
-| `Extracted` <sub>pub struct</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L75) | What an extracted directory turned out to hold. |
-| `Extracted::is_empty` <sub>pub fn</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L84) | Whether anything was found at all. |
-| `Extracted::not_runnable` <sub>pub fn</sub> | [89](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L89) | The programs the operating system will not run. |
-| `directory_for` <sub>pub fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L99) | The directory an archive would extract into, by this project's naming. |
-| `look_in` <sub>pub fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L111) | Look in directory for the programs a release carries. |
-| `runnable` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L132) | Whether the operating system will run this file. |
+| `PROGRAMS` <sub>pub const</sub> | [66](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L66) | The programs a release archive carries. |
+| `Program` <sub>pub struct</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L70) | One program found in an extracted directory. |
+| `Extracted` <sub>pub struct</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L83) | What an extracted directory turned out to hold. |
+| `Extracted::is_empty` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L92) | Whether anything was found at all. |
+| `Extracted::not_runnable` <sub>pub fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L97) | The programs the operating system will not run. |
+| `directory_for` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L107) | The directory an archive would extract into, by this project's naming. |
+| `look_in` <sub>pub fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L119) | Look in directory for the programs a release carries. |
+| `runnable` <sub>fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L140) | Whether the operating system will run this file. |
 
 ---
 

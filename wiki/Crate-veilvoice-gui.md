@@ -102,7 +102,7 @@ flowchart TD
     n_storage["storage.rs<br/>659 lines"]
     n_theme["theme.rs<br/>783 lines"]
     n_updates["updates.rs<br/>246 lines"]
-    n_verify["verify.rs<br/>767 lines"]
+    n_verify["verify.rs<br/>1224 lines"]
     n_watchfeed["watchfeed.rs<br/>381 lines"]
     n_app --> n_crashlog
     n_app --> n_dialog
@@ -210,5 +210,5 @@ flowchart TD
 | [[`storage.rs`|File-veilvoice-gui-storage]] | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [[`theme.rs`|File-veilvoice-gui-theme]] | 783 | Colour schemes for the desktop app. |
 | [[`updates.rs`|File-veilvoice-gui-updates]] | 246 | The manual update check, as the window shows it. |
-| [[`verify.rs`|File-veilvoice-gui-verify]] | 767 | The verify tab: drop a download on the window and be told what it is. |
+| [[`verify.rs`|File-veilvoice-gui-verify]] | 1224 | The verify tab: drop a download on the window and be told what it is. |
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 381 | The device monitor, moved off the thread that paints. |

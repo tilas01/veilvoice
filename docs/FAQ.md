@@ -84,17 +84,33 @@ rather than describing them as future work.
 
 ## How do I know the download is the one that was published?
 
-Three checks, in this order, and the order is the point:
+Put `veilvoice-verify` in the folder you downloaded to and run it, or drop the
+archive on the desktop application's verify tab. That is the whole instruction,
+and it does every check below in the right order.
+
+The checks, and the order is the point:
 
 1. The signing key's **fingerprint**, compared against the one published in the
    README, on the website and in every release's notes.
 2. The **signature** over `SHA256SUMS`, verified with that key.
 3. The **archive's hash**, compared against the now trusted list.
+4. **Every file you extracted**, compared against `CONTENTS.sha256`, which the
+   release publishes and `SHA256SUMS` covers. This is the one that tells you
+   the program you are about to run is the published one, rather than only that
+   the zip was.
 
 Checking the hash first and the signature afterwards proves only that the file
 matches a list that might itself have been replaced. `veilvoice-verify` does it
 in the right order, needs no GnuPG installed, and has no flag that skips a
 step, because a verification with a skip switch is decorative.
+
+If you do have GnuPG it uses that too: it adds the key to your keyring, tells
+you it did and how to remove it, runs `gpg --verify`, and fails if the two
+implementations disagree. It also prints the commands so you can run them
+yourself, which is the part no program can do for you.
+
+Releases before v0.1.15 carry no `CONTENTS.sha256` and stop at check 3, which
+the tool says at the time.
 
 You can also build the repository yourself and compare what comes out against
 the published hashes for your platform.

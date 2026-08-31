@@ -17,7 +17,7 @@ F-77 in `docs/AUDIT.md`.
 
 | What | Measured |
 |---|---:|
-| Tests, measured by running them | 1093 |
-| Crates in the workspace | 26 |
+| Tests, measured by running them | 1119 |
+| Crates in the workspace | 27 |
 | Website suites | 14 |
 | Measured on | `x86_64-unknown-linux-gnu` |
