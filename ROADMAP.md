@@ -230,8 +230,8 @@ it can honestly be made rather than to keep apologising for it.
 | 91 | **`veilvoice-verify` finds the release itself** — GnuPG arguments where wanted, and an `auto` that looks in Downloads, checks the archive, and checks what came out of it | **done** | — |
 | 92 | **An autolock timeout** — off by default, and when on, from five minutes to forty eight hours, chosen from a list or typed, with the range itself adjustable | **done** | — |
 | 93 | **Group mode explained where it is used** — how to build a plan, what each field does, and what happens without one | **planned** | 2 d |
-| 94 | **Release notes people can actually read** — every release listed newest first, its notes opening in place, and every file one click away | **planned** | 2 d |
-| 95 | **One version per release, in order, enforced** — the tag, the workspace and every package definition checked against each other before a release can go out | **planned** | 1 d |
+| 94 | **Release notes people can actually read** — every release listed newest first, its notes opening in place, and every file one click away | **done** | — |
+| 95 | **One version per release, in order, enforced** — the tag, the workspace and every package definition checked against each other before a release can go out | **done** | — |
 | 96 | **v0.1.15 released** — the audit run over everything since v0.1.14, CI green, and the release published | **planned** | 1–2 d |
 
 ---

@@ -124,6 +124,55 @@ function run() {
     pass(`all ${claims.length} version claims in packaging/ are at ${version}`);
   }
 
+  // ---- one version per release, in order, with no gaps --------------------
+  //
+  // Marker 95. The version claims above only check that everything agrees with
+  // the workspace. They say nothing about whether the workspace number is the
+  // right *next* one, and a release that skips 0.1.15 or repeats 0.1.14 is a
+  // release nobody can reason about afterwards: a user asking "have I got the
+  // one with the lock fix" is asking a question about ordering.
+  const changelog = read("CHANGELOG.md");
+  const released = [...changelog.matchAll(/^## v(\d+)\.(\d+)\.(\d+)\s*$/gm)]
+    .map((m) => [Number(m[1]), Number(m[2]), Number(m[3])]);
+
+  if (released.length < 2) {
+    fail("CHANGELOG.md lists fewer than two releases, so nothing can be ordered");
+  } else {
+    // Newest first is how the file is written and how anybody reads it.
+    let outOfOrder = 0;
+    for (let i = 1; i < released.length; i++) {
+      const [aMaj, aMin, aPat] = released[i - 1];
+      const [bMaj, bMin, bPat] = released[i];
+      const newer = aMaj > bMaj
+        || (aMaj === bMaj && aMin > bMin)
+        || (aMaj === bMaj && aMin === bMin && aPat > bPat);
+      if (!newer) {
+        fail(`CHANGELOG.md has v${aMaj}.${aMin}.${aPat} above ` +
+             `v${bMaj}.${bMin}.${bPat}; releases are listed newest first`);
+        outOfOrder++;
+      }
+    }
+    if (outOfOrder === 0) {
+      pass(`${released.length} releases in CHANGELOG.md are in order, newest first`);
+    }
+
+    // The workspace is either the newest release, or exactly one patch past
+    // it while that release is still being prepared under Unreleased.
+    const [maj, min, pat] = version.split(".").map(Number);
+    const [nMaj, nMin, nPat] = released[0];
+    const isReleased = maj === nMaj && min === nMin && pat === nPat;
+    const isNextPatch = maj === nMaj && min === nMin && pat === nPat + 1;
+    const isNextMinor = maj === nMaj && min === nMin + 1 && pat === 0;
+    const isNextMajor = maj === nMaj + 1 && min === 0 && pat === 0;
+    if (isReleased || isNextPatch || isNextMinor || isNextMajor) {
+      pass(`the workspace at ${version} follows v${nMaj}.${nMin}.${nPat} without a gap`);
+    } else {
+      fail(`the workspace is at ${version} and the newest release is ` +
+           `v${nMaj}.${nMin}.${nPat}. A release goes up by one: ` +
+           `${nMaj}.${nMin}.${nPat + 1}, ${nMaj}.${nMin + 1}.0 or ${nMaj + 1}.0.0.`);
+    }
+  }
+
   // ---- the two things dpkg-buildpackage needs before it will start --------
   const index = execFileSync("git", ["ls-files", "-s", "packaging/debian/"], {
     cwd: ROOT, encoding: "utf8", maxBuffer: 16 * 1024 * 1024
