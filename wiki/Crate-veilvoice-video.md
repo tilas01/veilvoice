@@ -78,7 +78,7 @@ none -- so it prints the command that would do it with `ffmpeg`, if you have
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>140 lines"])
-    n_ffmpeg["ffmpeg.rs<br/>316 lines"]
+    n_ffmpeg["ffmpeg.rs<br/>491 lines"]
     n_page["page.rs<br/>1029 lines"]
     n_palette["palette.rs<br/>747 lines"]
     n_waveform["waveform.rs<br/>259 lines"]
@@ -97,7 +97,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 316 | The video file, which needs a codec this project does not ship. |
+| [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 491 | The video file, which needs a codec this project does not ship. |
 | [[`lib.rs`|File-veilvoice-video-lib]] | 140 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
 | [[`page.rs`|File-veilvoice-video-page]] | 1029 | The picture: one still for a preview, and one page that plays. |
 | [[`palette.rs`|File-veilvoice-video-palette]] | 747 | Colours: the site's own tokens, and one per speaker. |
