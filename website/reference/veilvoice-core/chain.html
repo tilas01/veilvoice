@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-core/chain.svg" alt="chain.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-core/src/chain.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1581 lines &middot; <a href="chain.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1621 lines &middot; <a href="chain.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-signal-path">The signal path</a>
@@ -90,7 +90,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1581 lines defining <strong>23 functions</strong> (17 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1621 lines defining <strong>23 functions</strong> (17 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct DeidConfig</code> <span style="color:var(--muted)">line 142</span> &mdash; User-facing configuration for the de-identifier.</li>
 <li><code>enum RangeError</code> <span style="color:var(--muted)">line 256</span> &mdash; Why a ratchet range typed by a person was not accepted.</li>
@@ -384,7 +384,7 @@ flowchart TD
 <tr><td><code>Deidentifier::accent_stats</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-accent_stats">787</a></td><td>Live accent-neutralisation read-out (detected f0, applied ratios).</td></tr>
 <tr><td><code>Deidentifier::process</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-process">793</a></td><td>Process input into output (equal length).</td></tr>
 <tr><td><code>Deidentifier::process_vec</code> <sub>pub fn</sub></td><td><a href="chain.src.html#fn-deidentifier-process_vec">865</a></td><td>Convenience: process a whole buffer and return a new Vec.</td></tr>
-<tr><td><code>reseed_range_tests</code> <sub>mod</sub></td><td><a href="chain.src.html#fn-reseed_range_tests">1418</a></td><td></td></tr>
+<tr><td><code>reseed_range_tests</code> <sub>mod</sub></td><td><a href="chain.src.html#fn-reseed_range_tests">1458</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -38,6 +38,79 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirteenth round: the three ways the release would not compile
+
+The twelfth round read the code. This one read the build machines, because
+v0.1.15 was cut, merged, and then refused by continuous integration on four
+jobs at once. Three of those were real and none of them was in the shipped
+program: two were tests asserting something that is not true of every machine,
+one was a constant that only one platform reads, and the fourth was a generated
+file committed a few minutes before the file it is generated from changed.
+
+**One defect found and fixed (F-96)**, and two test defects and one process
+failure written down beside it, because a test that fails on somebody else's
+machine costs exactly as much as a bug until it is understood.
+
+### F-96 -- a just-started program is not yet wearing its own name
+
+`veilvoice-failsafe/src/act.rs`.
+
+`still_named` answers "does this process id still belong to this program", and
+the failsafe asks it immediately before closing anything. Its tests start a
+`sleep` of their own and act on it in the next few microseconds, and one CI run
+reported `sleep is no longer process 7030` about a `sleep` that was still
+running when the job cleaned up after it.
+
+Measured rather than guessed: four thousand spawns of `/bin/sleep`, each one
+followed on the next line by a read of `/proc/<pid>/comm`. One of them came back
+with the name of the *parent*. The kernel releases a `vfork`ed parent when the
+child's address space goes, which happens inside `begin_new_exec` and before the
+line that gives the new program its name, so there is a window in which the id
+is live, belongs to the program that is starting, and answers with somebody
+else's name.
+
+The shipped code is right as it stands: it refuses during that window, and
+refusing is the direction that closes nothing on a doubtful answer. A scan never
+sees the window either, because a program holding a microphone has been running
+for rather longer than a microsecond. The tests are the only callers that can
+reach it, and they now wait for the child to appear under its own name before
+they assert anything about it, which is the precondition they always assumed.
+
+### Two tests that were measuring the machine
+
+**The real-time headroom test.** `stays_comfortably_realtime_with_accent_on`
+asserted an absolute real-time factor below 0.5. On the armv7 job, where the
+test binaries run under emulation, it measured 0.557 and failed, while the same
+commit passed on every native target. There is no single number that is generous
+enough under an emulator and tight enough to catch anything on a real machine,
+so the number was the wrong shape of assertion.
+
+The claim worth defending never needed one. Accent tracking is an addition to
+the spectral work rather than a multiple of it, and the regression the test
+exists to catch, a pitch search that stopped being decimated, is an order of
+magnitude. So the same audio is now run twice on the same machine in the same
+test, once with the neutraliser bypassed, and the two are compared. Measured
+under armv7 emulation: 0.352 seconds bypassed against 0.469 with accent
+tracking, a ratio of 1.3 against a bound of 4.
+
+**The dead constant.** `veilvoice-gui`'s `USAGE` is read only by the `--help`
+path, which is Unix only and says why: a Windows release build declares the
+windowed subsystem and has no console to print to. A constant nothing reads is
+dead code, `-D warnings` is on, and the Windows job was the only one that could
+see it. It is declared where it is read now. The test that checks the help text
+against the tab names reads the file rather than the constant, so it still runs
+on every platform.
+
+### The process failure, which is the one worth remembering
+
+The fourth job failed because `website/search-index.json` did not match its
+generator. The difference was seven bytes in one file: `ROADMAP.md` was edited
+*after* `tools/verify.py` had regenerated everything from it, and the commit
+carried the older index. Every generated artefact in this repository has a
+`--check` wired into CI precisely so that this is caught rather than shipped,
+and it was caught. The rule it enforces is that `verify.py` is the last thing
+run before a commit and not merely a thing run before a commit.
+
 ## The twelfth round: v0.1.15, and one defect that had already been fixed once
 
 Everything built after the eleventh round, read before the release: the
@@ -2930,7 +3003,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Ninety-five defects found and fixed across twelve audit rounds (F-1 to F-95):**
+**Ninety-six defects found and fixed across thirteen audit rounds (F-1 to F-96):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

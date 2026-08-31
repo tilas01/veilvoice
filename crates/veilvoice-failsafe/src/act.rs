@@ -315,6 +315,40 @@ mod tests {
         assert!(body.contains("-TERM"), "and elsewhere it asks first");
     }
 
+    /// Wait until a just-started child is wearing its own name.
+    ///
+    /// **F-96.** `Command::spawn` returns before the program it started is
+    /// visible under its own name. Measured on Linux, once in about four
+    /// thousand spawns: `/bin/sleep` is started and `/proc/<pid>/comm`, read on
+    /// the next line, still says the name of the program that started it. The
+    /// kernel releases the parent when the child's address space goes, which
+    /// happens inside `begin_new_exec` and before the line that sets the new
+    /// name, so there is a short window where the id is live and belongs to the
+    /// program that is starting while still answering with somebody else's
+    /// name.
+    ///
+    /// [`still_named`] refuses during that window, which is the safe direction
+    /// and is what this program wants: a doubtful answer closes nothing. The
+    /// tests below are the ones that have to care, because they start a child
+    /// and act on it in the next few microseconds, which no scan ever does.
+    /// Without this wait they fail rarely and misleadingly: one CI run reported
+    /// "sleep is no longer process 7030" about a `sleep` that was still running
+    /// when the job cleaned up after it.
+    ///
+    /// Waiting on the function under test is deliberate. The precondition these
+    /// tests need is exactly "this id now belongs to this program", which is
+    /// what it answers, and a child that never arrives fails here with that
+    /// said plainly rather than inside an assertion about something else.
+    fn wearing_its_own_name(name: &str, pid: u32) -> bool {
+        for _ in 0..200 {
+            if still_named(name, pid) {
+                return true;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+        false
+    }
+
     /// A name that does not match the process is refused, which is F-74's
     /// whole purpose: the id alone is not enough to know what will be closed.
     #[test]
@@ -333,13 +367,17 @@ mod tests {
             return;
         };
         let pid = child.id();
+        let name = if cfg!(windows) { "ping.exe" } else { "sleep" };
+        assert!(
+            wearing_its_own_name(name, pid),
+            "the child never appeared as {name}, so there is nothing to test"
+        );
 
         // Somebody else's program, wearing this one's number.
         let refused = close("not-what-is-running.exe", Some(pid));
         assert!(refused.is_err(), "{refused:?}");
 
         // And it really is still running.
-        let name = if cfg!(windows) { "ping.exe" } else { "sleep" };
         close(name, Some(pid)).expect("the right name still closes it");
         let _ = child.wait();
     }
@@ -403,6 +441,10 @@ mod tests {
             return;
         };
         let pid = child.id();
+        assert!(
+            wearing_its_own_name("sleep", pid),
+            "the child never appeared as sleep, so there is nothing to test"
+        );
         let told = close("sleep", Some(pid));
         assert!(
             told.is_ok(),
@@ -454,6 +496,10 @@ mod tests {
         // full thirty seconds while taskkill refused and the process outlived
         // it.
         let name = if cfg!(windows) { "ping.exe" } else { "sleep" };
+        assert!(
+            wearing_its_own_name(name, pid),
+            "the child never appeared as {name}, so there is nothing to test"
+        );
         let told = close(name, Some(pid));
         assert!(told.is_ok(), "{told:?}");
         assert!(told.unwrap().contains(&pid.to_string()));
