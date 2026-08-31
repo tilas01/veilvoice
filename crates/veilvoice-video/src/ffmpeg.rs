@@ -160,6 +160,111 @@ pub fn command(
     ]
 }
 
+/// The command that turns a veiled recording into a video with a black frame.
+///
+/// **Marker 87.** Somewhere that accepts only video is a common place to need
+/// to put a recording: a message that will not take an audio file, a platform
+/// that wants something to show. The picture is not the point and does not need
+/// to be, so this is a black frame for the length of the audio and nothing
+/// else.
+///
+/// No frame sequence, which is what makes this different from [`command`].
+/// ffmpeg can synthesise a colour source, so there is nothing to render, no
+/// temporary directory holding thousands of PNGs, and no wait proportional to
+/// the length of the recording beyond the encode itself.
+///
+/// `720p` because it is the smallest size every platform accepts without
+/// re-encoding it again, and a larger frame of solid black costs bytes and buys
+/// nothing.
+pub fn black_command(audio: &Path, output: &Path, encoding: Encoding) -> Vec<String> {
+    vec![
+        "ffmpeg".to_string(),
+        "-n".to_string(),
+        // A synthesised source rather than a file. `-f lavfi` is ffmpeg's own
+        // filter input; nothing on disk is read for the picture.
+        "-f".to_string(),
+        "lavfi".to_string(),
+        "-i".to_string(),
+        format!("color=c=black:s=1280x720:r={}", encoding.fps),
+        "-i".to_string(),
+        audio.display().to_string(),
+        "-c:v".to_string(),
+        encoding
+            .encoder
+            .clone()
+            .unwrap_or_else(|| "libx264".to_string()),
+        if encoding.encoder.is_some() {
+            "-cq".to_string()
+        } else {
+            "-crf".to_string()
+        },
+        encoding.crf.to_string(),
+        "-pix_fmt".to_string(),
+        "yuv420p".to_string(),
+        "-c:a".to_string(),
+        "aac".to_string(),
+        "-b:a".to_string(),
+        "192k".to_string(),
+        // Without this the synthesised colour source never ends and ffmpeg
+        // encodes black for ever. `-shortest` stops at the audio, which is the
+        // only thing here with a length.
+        "-shortest".to_string(),
+        output.display().to_string(),
+    ]
+}
+
+/// The command that takes the sound out of a recording made somewhere else.
+///
+/// **Marker 88.** OBS writes `.mkv`, `.mp4`, `.mov`, `.flv` and `.ts`, and
+/// VeilVoice reads none of them: they are containers holding a video stream and
+/// an audio stream, and demuxing one means a demuxer this project does not
+/// ship, for the same reason it ships no encoder.
+///
+/// So this prepares the one command that produces something VeilVoice can read:
+/// a WAV, at the sample rate and depth the engine works in, with the video
+/// discarded. From there it is an ordinary input file.
+///
+/// `-vn` rather than a stream selector, so a file with two video tracks and one
+/// audio track does the obvious thing instead of failing on a mapping the user
+/// never wrote.
+pub fn extract_command(source: &Path, output: &Path) -> Vec<String> {
+    vec![
+        "ffmpeg".to_string(),
+        "-n".to_string(),
+        "-i".to_string(),
+        source.display().to_string(),
+        // No video at all, whatever the container holds.
+        "-vn".to_string(),
+        // Signed 16-bit little-endian, 48 kHz. What the engine works in, so
+        // nothing is resampled twice.
+        "-acodec".to_string(),
+        "pcm_s16le".to_string(),
+        "-ar".to_string(),
+        "48000".to_string(),
+        output.display().to_string(),
+    ]
+}
+
+/// Containers OBS writes, which [`extract_command`] can take the sound out of.
+///
+/// Named rather than "any file ffmpeg reads", which is true and useless: a
+/// person wants to know whether their recording will work, and the answer is a
+/// list they can check their own file against. Anything else ffmpeg supports
+/// still works; this is what is promised.
+pub const OBS_CONTAINERS: &[&str] = &[
+    "mkv", "mp4", "mov", "flv", "ts", "m4a", "webm", "avi", "wav", "mp3", "aac", "flac", "ogg",
+    "opus",
+];
+
+/// Whether a file looks like something [`extract_command`] should be offered
+/// for.
+pub fn is_container(path: &Path) -> bool {
+    path.extension()
+        .and_then(|e| e.to_str())
+        .map(|e| e.to_ascii_lowercase())
+        .is_some_and(|e| OBS_CONTAINERS.contains(&e.as_str()))
+}
+
 /// The command as one line, for printing.
 ///
 /// Quoted where a part contains a space. For a person to read and paste, not
@@ -195,6 +300,76 @@ pub fn describe() -> String {
 
 #[cfg(test)]
 mod tests {
+
+    /// Marker 87. A synthesised colour source never ends, so without
+    /// `-shortest` ffmpeg encodes black for ever and the only thing that stops
+    /// it is the disk filling up.
+    #[test]
+    fn the_black_video_stops_when_the_audio_does() {
+        let argv = black_command(
+            Path::new("talk.veiled.wav"),
+            Path::new("talk.mp4"),
+            Encoding::default(),
+        );
+        assert!(argv.contains(&"-shortest".to_string()));
+        assert!(argv.iter().any(|a| a.starts_with("color=c=black")));
+        assert!(argv.contains(&"lavfi".to_string()));
+        assert!(argv.contains(&"-n".to_string()), "never overwrite silently");
+        assert_eq!(argv.last().unwrap(), "talk.mp4");
+        assert!(
+            argv.contains(&"yuv420p".to_string()),
+            "without this a great many devices refuse to play the result"
+        );
+    }
+
+    /// Marker 88. Taking the sound out has to discard every video stream, not
+    /// the first one: an OBS recording with a camera and a screen capture has
+    /// two, and a stream selector written for one fails on the other.
+    #[test]
+    fn extracting_audio_discards_the_picture_and_keeps_the_rate() {
+        let argv = extract_command(Path::new("stream.mkv"), Path::new("stream.wav"));
+        assert!(
+            argv.contains(&"-vn".to_string()),
+            "-vn drops every video stream"
+        );
+        assert!(argv.contains(&"pcm_s16le".to_string()));
+        assert!(argv.contains(&"48000".to_string()));
+        assert!(argv.contains(&"-n".to_string()));
+        assert_eq!(argv.last().unwrap(), "stream.wav");
+    }
+
+    #[test]
+    fn every_container_obs_writes_is_recognised() {
+        for name in ["a.mkv", "a.MP4", "a.mov", "a.flv", "a.ts", "a.webm"] {
+            assert!(is_container(Path::new(name)), "{name}");
+        }
+        for name in ["a.txt", "a.png", "a", "a.veil"] {
+            assert!(!is_container(Path::new(name)), "{name}");
+        }
+    }
+
+    /// The two commands must not be confusable: one makes a video from audio,
+    /// the other takes audio out of a video, and swapping them silently would
+    /// produce a file with no sound.
+    #[test]
+    fn the_two_commands_point_in_opposite_directions() {
+        let make = black_command(
+            Path::new("in.wav"),
+            Path::new("out.mp4"),
+            Encoding::default(),
+        );
+        let take = extract_command(Path::new("in.mkv"), Path::new("out.wav"));
+        assert!(
+            make.contains(&"-c:a".to_string()),
+            "the video carries audio"
+        );
+        assert!(
+            take.contains(&"-vn".to_string()),
+            "the extract carries none"
+        );
+        assert!(!make.contains(&"-vn".to_string()));
+        assert!(!take.iter().any(|a| a.starts_with("color=")));
+    }
     use super::*;
 
     fn argv() -> Vec<String> {

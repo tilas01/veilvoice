@@ -223,13 +223,13 @@ it can honestly be made rather than to keep apologising for it.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 87 | **A video of a veiled recording** — a black frame and the audio, so a recording can be posted where only video is accepted | **planned** | 2–3 d |
-| 88 | **Import from every format OBS writes** — bring in a recording made elsewhere, video or audio, and take the sound out of it | **planned** | 2 d |
-| 89 | **Veil the other person afterwards** — the interviewee given their own voice in post, through the group plan that already exists | **planned** | 2–3 d |
+| 87 | **A video of a veiled recording** — a black frame and the audio, so a recording can be posted where only video is accepted | **done** | — |
+| 88 | **Import from every format OBS writes** — bring in a recording made elsewhere, video or audio, and take the sound out of it | **done** | — |
+| 89 | **Veil the other person afterwards** — the interviewee given their own voice in post, through the group plan that already exists | **done** | — |
 | 90 | **GnuPG verification inside the window** — in the verify tab, beside the hash check, using the GnuPG somebody already has | **done** | — |
 | 91 | **`veilvoice-verify` finds the release itself** — GnuPG arguments where wanted, and an `auto` that looks in Downloads, checks the archive, and checks what came out of it | **done** | — |
 | 92 | **An autolock timeout** — off by default, and when on, from five minutes to forty eight hours, chosen from a list or typed, with the range itself adjustable | **done** | — |
-| 93 | **Group mode explained where it is used** — how to build a plan, what each field does, and what happens without one | **planned** | 2 d |
+| 93 | **Group mode explained where it is used** — how to build a plan, what each field does, and what happens without one | **done** | — |
 | 94 | **Release notes people can actually read** — every release listed newest first, its notes opening in place, and every file one click away | **done** | — |
 | 95 | **One version per release, in order, enforced** — the tag, the workspace and every package definition checked against each other before a release can go out | **done** | — |
 | 96 | **v0.1.15 released** — the audit run over everything since v0.1.14, CI green, and the release published | **planned** | 1–2 d |
@@ -599,6 +599,39 @@ encrypted with its own cryptography, and nothing here replaces or weakens that.
 A veiled recording written into a Cryptomator vault is encrypted twice, by two
 independent tools, and the useful property of that is not extra strength but
 independence: a defect in one is not a defect in both.
+
+**Markers 87, 88, 89 and 93 turned out to be one thing: an interview, start to
+finish, and most of it already existed.**
+
+Marker 89 asked for the interviewee to be veiled in post through the group plan.
+`veilvoice conversation render` has done exactly that for several releases: a
+voice per speaker, every voiceprint destroyed, subtitles and a player beside it.
+Nothing needed building. What was missing was that nobody could find it, which
+is marker 93, and the two are answered by the same page rather than by two.
+
+So `USER_GUIDE.md` section 5.9 is the whole sequence in the order it happens:
+take the sound out of the OBS recording, write a plan, check the plan, render
+it, make a video of it. Each step names the one before it. A person who has
+just finished recording an interview now has a path to follow instead of five
+commands to discover separately.
+
+*Markers 87 and 88 are two ffmpeg commands, and the shape is the one this
+project already settled on for video.* VeilVoice ships no codec and no demuxer,
+for the reason `veilvoice-video` has always given, so both prepare the exact
+command and run it when ffmpeg is there, print it when it is not, and never
+offer to install anything.
+
+The video is a synthesised black source rather than a rendered frame sequence,
+so there is no temporary directory holding thousands of images and no wait
+beyond the encode. That has one trap, held by a test: a synthesised colour
+source never ends, so without `-shortest` ffmpeg encodes black until the disk
+fills.
+
+*Not verified on this machine.* Both commands are correct by construction and
+tested against what they emit, and no video has been produced here, because
+`ffmpeg` will not install in this environment. The no-ffmpeg path was exercised
+and reports honestly. Somebody with ffmpeg should run both once before the next
+release.
 
 **Marker 90 puts the GnuPG commands where the question is already being asked.**
 The verify tab is where somebody is working out whether a download is genuine,

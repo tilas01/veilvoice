@@ -91,7 +91,7 @@ file is written.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>140 lines"])
-    n_ffmpeg["ffmpeg.rs<br/>316 lines"]
+    n_ffmpeg["ffmpeg.rs<br/>491 lines"]
     n_page["page.rs<br/>1029 lines"]
     n_palette["palette.rs<br/>747 lines"]
     n_waveform["waveform.rs<br/>259 lines"]
@@ -110,7 +110,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 316 | The video file, which needs a codec this project does not ship. |
+| [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 491 | The video file, which needs a codec this project does not ship. |
 | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 140 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
 | [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1029 | The picture: one still for a preview, and one page that plays. |
 | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 747 | Colours: the site's own tokens, and one per speaker. |
@@ -123,6 +123,10 @@ flowchart TD
 | `fn found` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | Where ffmpeg is, if this machine has one. |
 | `struct Encoding` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | How to render the file. |
 | `fn command` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | The command that turns a directory of numbered frames and a WAV into a video file. |
+| `fn black_command` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | The command that turns a veiled recording into a video with a black frame. |
+| `fn extract_command` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | The command that takes the sound out of a recording made somewhere else. |
+| `const OBS_CONTAINERS` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | Containers OBS writes, which extract_command can take the sound out of. |
+| `fn is_container` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | Whether a file looks like something extract_command should be offered for. |
 | `fn command_line` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | The command as one line, for printing. |
 | `fn describe` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | What to tell the user about their machine's ffmpeg. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | Crate version string, surfaced in the About panel. |
