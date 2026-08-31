@@ -107,6 +107,10 @@ Every release, newest first. Open one to read what changed in it and to reach it
 <p><strong>Your own GnuPG, run for you.</strong> If <code>gpg</code> is on the machine, VeilVoice adds the signing key to your keyring, tells you it did and how to remove it in one command, runs <code>gpg --verify</code>, and reports the answer. The signature is then checked by two independent implementations, and where they disagree the run fails. GnuPG&#x27;s machine-readable status channel is what is read, never its prose, so a GnuPG in any language gives the same answer. A good signature by some <em>other</em> key is a failure rather than a pass, which is the check the instructions have always asked people to remember to make.</p>
 <p>A GnuPG that cannot run on your machine is not counted against the download, and is not drawn in red: that is a fact about the computer, and reporting it as a refusal would tell somebody not to run a release that is perfectly sound.</p>
 <p>The commands are still printed every time. Running GnuPG from inside the program under suspicion makes the <em>implementation</em> independent; only you typing them makes the <em>invocation</em> independent.</p>
+<h4 id="smaller-things">Smaller things</h4>
+<ul>
+<li>The release workflow&#x27;s <code>tag</code> input was declared and ignored. A dry run started from a branch named every archive after that branch and would have tried to publish a release called <code>main</code>. It now checks out the tag it was given, names everything after it, and publishes nothing at all on a manual run, which is what &quot;dry run&quot; was always supposed to mean.</li>
+</ul>
 <h4 id="the-thirteenth-audit-round-run-on-what-ci-refused">The thirteenth audit round, run on what CI refused</h4>
 <ul>
 <li><strong>F-96</strong> A program that has just been started is not yet wearing its own name. The failsafe checks that a process id still belongs to the program it means to close, and its own tests start a <code>sleep</code> and act on it microseconds later. Measured, once in four thousand spawns: the kernel hands the parent back before it sets the new name, so the check reads the name of the process that did the starting. The shipped code already refuses on that answer, which is the direction that closes nothing when unsure; the tests now wait for the child to appear under its own name first.</li>
@@ -933,7 +937,7 @@ veilvoice gui              # open the desktop application</code></pre>
 <p>Drop a <code>.palette</code> file beside your preferences and it appears in the theme picker with the nine built-in schemes. All twelve tokens are required, every colour must be a full <code>#rrggbb</code>, and every problem is reported rather than the first -- nothing is quietly filled in from the default theme.</p>
 <p><strong>Contrast is computed, not trusted.</strong> A palette whose text fails the WCAG ratio against its own background is refused, with the measured ratio in the message so you know how far off it is. <code>docs/example.palette</code> is a worked example that passes.</p>
 <p>Pointing that same check at this project&#x27;s own themes found that the default theme&#x27;s secondary text was below the accessibility floor -- on the site, in the app, in the terminal and inside the banner image. Fixed, using each palette&#x27;s own upstream colour.</p>
-<h4 id="smaller-things">Smaller things</h4>
+<h4 id="smaller-things-1">Smaller things</h4>
 <ul>
 <li>The front page carries a slowly cycling line of things that are true about this project, several of which are limits rather than boasts. CSS rather than an image, so it follows your theme, needs no script, and can be selected and read aloud.</li>
 <li>The banner&#x27;s waveform is summed from three harmonics rather than one sinusoid, so it reads as audio rather than as a test tone.</li>
