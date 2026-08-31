@@ -169,14 +169,26 @@ jobs:
   # The generated artwork is committed, so it must match what the generator
   # produces. Otherwise the two drift and the "verifiable from source" claim
   # quietly stops being true.
+  #
+  # **Two interpreters, and the reason is F-97.** A drawing generated here
+  # matched on 3.11 and differed on 3.12, with no change to the source: 3.12
+  # gave `sum` compensated summation over floats, one box centred a tenth of a
+  # pixel further along, and a file committed from one machine stopped matching
+  # the generator run on another. A generated file compared byte for byte must
+  # not depend on which Python is installed, and the only way to know that is to
+  # run it on more than one.
   assets:
-    name: generated assets are current
+    name: generated assets are current (python ${{ matrix.python }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.13']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python }}
       # Compares decoded pixels, not compressed bytes: zlib's output differs
       # between Python builds, so a byte-for-byte diff would fail spuriously
       # while telling us nothing about whether the artwork actually changed.
