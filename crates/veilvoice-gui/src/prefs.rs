@@ -97,6 +97,18 @@ pub struct Prefs {
     /// The answer to the hidden-volume question. Anything unrecognised, or
     /// missing, reads as unanswered and blocks writing.
     pub vault_hidden: String,
+    /// Whether the window locks itself after a period of no use.
+    ///
+    /// **Marker 92.** Off by default, and the reason is in
+    /// [`crate::autolock`]: a lock that engages part way through a recording is
+    /// a lock somebody removes.
+    pub autolock: bool,
+    /// How long that period is, in seconds.
+    pub autolock_after: u64,
+    /// The bottom of the range the interface offers, in seconds.
+    pub autolock_floor: u64,
+    /// The top of it.
+    pub autolock_ceiling: u64,
     /// How notifications are shown: `overlay`, `alert` or `off`.
     ///
     /// Stored as its key rather than as a number, so a settings file stays
@@ -138,6 +150,10 @@ impl Default for Prefs {
             vault_dir: String::new(),
             vault_tool: String::new(),
             vault_hidden: String::new(),
+            autolock: false,
+            autolock_after: 15 * 60,
+            autolock_floor: crate::autolock::FLOOR_SECS,
+            autolock_ceiling: crate::autolock::CEILING_SECS,
             notify_style: crate::notify::Style::default().key().to_string(),
             // On, and docked. Live scramble is the mode where what is being
             // protected is happening now, and the two questions a person has
@@ -270,6 +286,30 @@ impl Prefs {
                     prefs.vault_hidden = value.to_string();
                     understood += 1;
                 }
+                "autolock" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.autolock = on;
+                        understood += 1;
+                    }
+                }
+                "autolock_after" => {
+                    if let Ok(secs) = value.parse() {
+                        prefs.autolock_after = secs;
+                        understood += 1;
+                    }
+                }
+                "autolock_floor" => {
+                    if let Ok(secs) = value.parse() {
+                        prefs.autolock_floor = secs;
+                        understood += 1;
+                    }
+                }
+                "autolock_ceiling" => {
+                    if let Ok(secs) = value.parse() {
+                        prefs.autolock_ceiling = secs;
+                        understood += 1;
+                    }
+                }
                 _ => {}
             }
         }
@@ -298,6 +338,10 @@ impl Prefs {
         out.push_str(&format!("vault_dir = {}\n", self.vault_dir));
         out.push_str(&format!("vault_tool = {}\n", self.vault_tool));
         out.push_str(&format!("vault_hidden = {}\n", self.vault_hidden));
+        out.push_str(&format!("autolock = {}\n", self.autolock));
+        out.push_str(&format!("autolock_after = {}\n", self.autolock_after));
+        out.push_str(&format!("autolock_floor = {}\n", self.autolock_floor));
+        out.push_str(&format!("autolock_ceiling = {}\n", self.autolock_ceiling));
         out.push_str(&format!("notify_style = {}\n", self.notify_style));
         out.push_str(&format!("live_monitor = {}\n", self.live_monitor));
         out.push_str(&format!("failsafe = {}\n", self.failsafe));
@@ -405,6 +449,10 @@ mod tests {
             vault_dir: String::new(),
             vault_tool: String::new(),
             vault_hidden: String::new(),
+            autolock: true,
+            autolock_after: 8 * 3_600,
+            autolock_floor: 30,
+            autolock_ceiling: 7 * 86_400,
             notify_style: "alert".to_string(),
             failsafe: "warn".to_string(),
             live_monitor: "toolbar".to_string(),
@@ -499,6 +547,10 @@ mod tests {
             vault_dir: "/media/veracrypt1".into(),
             vault_tool: "veracrypt".into(),
             vault_hidden: "none".into(),
+            autolock: true,
+            autolock_after: 3_600,
+            autolock_floor: 60,
+            autolock_ceiling: 7 * 86_400,
             recovered_from_corrupt_file: false,
         };
         prefs.save(&path).unwrap();
