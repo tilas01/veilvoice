@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/extracted.svg" alt="extracted.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/extracted.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 333 lines &middot; <a href="extracted.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 303 lines &middot; <a href="extracted.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-honest-limit-on-checking-an-extracted-copy">The honest limit on checking an extracted copy</a>
@@ -67,7 +67,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>333 lines defining <strong>7 functions</strong> (6 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>303 lines defining <strong>5 functions</strong> (4 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Program</code> <span style="color:var(--muted)">line 62</span> &mdash; One program found in an extracted directory.</li>
 <li><code>struct Extracted</code> <span style="color:var(--muted)">line 75</span> &mdash; What an extracted directory turned out to hold.</li>
@@ -81,10 +81,6 @@
 </li>
 <li><code>look_in</code> <span style="color:var(--muted)">line 111</span> &mdash; Look in directory for the programs a release carries.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>runnable</code></span>
-</li>
-<li><code>gnupg_commands</code> <span style="color:var(--muted)">line 161</span> &mdash; The commands that check this release with somebody else&#x27;s GnuPG.
-</li>
-<li><code>gnupg_on_path</code> <span style="color:var(--muted)">line 179</span> &mdash; Whether GnuPG appears to be installed, and where.
 </li>
 </ul>
 </section>
@@ -101,7 +97,7 @@
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
 <rect x="0" y="0" width="619" height="415" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M146.8 174.0 C 146.8 194.0, 309.7 200.0, 309.7 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M309.7 174.0 C 309.7 194.0, 309.7 200.0, 309.7 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <a href="extracted.src.html#fn-extracted-is_empty">
 <rect x="20.0" y="20.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="110.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Extracted::is_empty</text>
@@ -118,24 +114,14 @@
 <text x="532.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 99</text>
 </a>
 <a href="extracted.src.html#fn-look_in">
-<rect x="100.6" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="146.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look_in</text>
-<text x="146.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
+<rect x="263.4" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="309.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look_in</text>
+<text x="309.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
 </a>
 <a href="extracted.src.html#fn-runnable">
 <rect x="263.4" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="309.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">runnable</text>
 <text x="309.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
-</a>
-<a href="extracted.src.html#fn-gnupg_commands">
-<rect x="219.1" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="289.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">gnupg_commands</text>
-<text x="289.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
-</a>
-<a href="extracted.src.html#fn-gnupg_on_path">
-<rect x="385.9" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="452.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">gnupg_on_path</text>
-<text x="452.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -157,18 +143,14 @@ flowchart TD
     n_directory_for([&quot;directory_for&lt;br/&gt;line 99&quot;])
     n_look_in([&quot;look_in&lt;br/&gt;line 111&quot;])
     n_runnable[&quot;runnable&lt;br/&gt;line 132&quot;]
-    n_gnupg_commands([&quot;gnupg_commands&lt;br/&gt;line 161&quot;])
-    n_gnupg_on_path([&quot;gnupg_on_path&lt;br/&gt;line 179&quot;])
     n_look_in --&gt; n_runnable
     click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L84&quot; &quot;open the source&quot;
     click n_not_runnable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L89&quot; &quot;open the source&quot;
     click n_directory_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L99&quot; &quot;open the source&quot;
     click n_look_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L111&quot; &quot;open the source&quot;
     click n_runnable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L132&quot; &quot;open the source&quot;
-    click n_gnupg_commands href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L161&quot; &quot;open the source&quot;
-    click n_gnupg_on_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L179&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_is_empty,n_not_runnable,n_directory_for,n_look_in,n_gnupg_commands,n_gnupg_on_path entry
+    class n_is_empty,n_not_runnable,n_directory_for,n_look_in entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_runnable helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -185,8 +167,6 @@ flowchart TD
 <tr><td><code>directory_for</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-directory_for">99</a></td><td>The directory an archive would extract into, by this project&#x27;s naming.</td></tr>
 <tr><td><code>look_in</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-look_in">111</a></td><td>Look in directory for the programs a release carries.</td></tr>
 <tr><td><code>runnable</code> <sub>fn</sub></td><td><a href="extracted.src.html#fn-runnable">132</a></td><td>Whether the operating system will run this file.</td></tr>
-<tr><td><code>gnupg_commands</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-gnupg_commands">161</a></td><td>The commands that check this release with somebody else&#x27;s GnuPG.</td></tr>
-<tr><td><code>gnupg_on_path</code> <sub>pub fn</sub></td><td><a href="extracted.src.html#fn-gnupg_on_path">179</a></td><td>Whether GnuPG appears to be installed, and where.</td></tr>
 </tbody></table>
 </section>
 </div></div>

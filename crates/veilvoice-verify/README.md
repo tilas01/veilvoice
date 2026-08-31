@@ -97,7 +97,7 @@ flowchart TD
     n_builder["builder.rs<br/>1148 lines"]
     n_deps["deps.rs<br/>650 lines"]
     n_discover["discover.rs<br/>353 lines"]
-    n_extracted["extracted.rs<br/>333 lines"]
+    n_extracted["extracted.rs<br/>303 lines"]
     n_fetch["fetch.rs<br/>329 lines"]
     n_report["report.rs<br/>385 lines"]
     n_tests["tests.rs<br/>357 lines"]
@@ -123,7 +123,7 @@ flowchart TD
 | [`builder.rs`](../../docs/files/veilvoice-verify/builder.md) | 1148 | Build VeilVoice here, and compare what came out against what was published. |
 | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 650 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 353 | Finding a release to check, without being told where it is. |
-| [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 333 | What came out of the archive, and the GnuPG somebody already has. |
+| [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 303 | What came out of the archive, and the GnuPG somebody already has. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 329 | Download a release, without putting an HTTP client in the dependency graph. |
 | [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 1515 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
@@ -172,8 +172,6 @@ flowchart TD
 | `struct Extracted` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | What an extracted directory turned out to hold. |
 | `fn directory_for` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | The directory an archive would extract into, by this project's naming. |
 | `fn look_in` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | Look in directory for the programs a release carries. |
-| `fn gnupg_commands` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | The commands that check this release with somebody else's GnuPG. |
-| `fn gnupg_on_path` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | Whether GnuPG appears to be installed, and where. |
 | `const HOST` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The only host this will ever talk to. |
 | `const REPO` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The repository releases are fetched from. |
 | `const MAX_BYTES` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The largest file this will accept. |
