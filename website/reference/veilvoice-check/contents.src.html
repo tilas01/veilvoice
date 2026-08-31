@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-check/src/contents.rs</code></h1>
-<p style="color:var(--muted)"><a href="contents.html">what this file is for</a> &middot; <a href="../veilvoice-check.html">veilvoice-check</a> &middot; 438 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="contents.html">what this file is for</a> &middot; <a href="../veilvoice-check.html">veilvoice-check</a> &middot; 623 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/contents.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -164,349 +164,538 @@
 <span class="ln" id="L112">    Missing,</span>
 <span class="ln" id="L113">    <span class="tok-com">/// The file is there and could not be read.</span></span>
 <span class="ln" id="L114">    <span class="tok-fn">Unreadable</span>(String),</span>
-<span class="ln" id="L115">}</span>
+<span class="ln" id="L115">    <span class="tok-com">/// Something is there under that name and it is not an ordinary file.</span></span>
+<span class="ln" id="L116">    <span class="tok-com">///</span></span>
+<span class="ln" id="L117">    <span class="tok-com">/// **F-99.** A symbolic link at a published path used to hash whatever it</span></span>
+<span class="ln" id="L118">    <span class="tok-com">/// pointed at and report `Matches`, which is wrong twice over. The release</span></span>
+<span class="ln" id="L119">    <span class="tok-com">/// published a file, not a link; and a link is a name that somebody else</span></span>
+<span class="ln" id="L120">    <span class="tok-com">/// may be able to repoint after this has looked, which is the one</span></span>
+<span class="ln" id="L121">    <span class="tok-com">/// substitution a hash check cannot notice. The sweep for extra files</span></span>
+<span class="ln" id="L122">    <span class="tok-com">/// already refuses to walk through links, so accepting one here was the</span></span>
+<span class="ln" id="L123">    <span class="tok-com">/// two halves of this module disagreeing about what a link is.</span></span>
+<span class="ln" id="L124">    <span class="tok-fn">NotAFile</span>(String),</span>
+<span class="ln" id="L125">}</span>
 </span>
-<span class="ln" id="L116"></span>
+<span class="ln" id="L126"></span>
 <span class="src-item" id="fn-outcome">
-<span class="ln" id="L117"><span class="tok-com">/// One published file, checked against the disk.</span></span>
-<span class="ln" id="L118"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
-<span class="ln" id="L119"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Outcome {</span>
-<span class="ln" id="L120">    <span class="tok-com">/// The path as the manifest gives it.</span></span>
-<span class="ln" id="L121">    <span class="tok-kw">pub</span> path: String,</span>
-<span class="ln" id="L122">    <span class="tok-com">/// What was found.</span></span>
-<span class="ln" id="L123">    <span class="tok-kw">pub</span> verdict: Verdict,</span>
-<span class="ln" id="L124">}</span>
+<span class="ln" id="L127"><span class="tok-com">/// One published file, checked against the disk.</span></span>
+<span class="ln" id="L128"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
+<span class="ln" id="L129"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Outcome {</span>
+<span class="ln" id="L130">    <span class="tok-com">/// The path as the manifest gives it.</span></span>
+<span class="ln" id="L131">    <span class="tok-kw">pub</span> path: String,</span>
+<span class="ln" id="L132">    <span class="tok-com">/// What was found.</span></span>
+<span class="ln" id="L133">    <span class="tok-kw">pub</span> verdict: Verdict,</span>
+<span class="ln" id="L134">}</span>
 </span>
-<span class="ln" id="L125"></span>
-<span class="ln" id="L126"><span class="tok-kw">impl</span> Outcome {</span>
+<span class="ln" id="L135"></span>
+<span class="ln" id="L136"><span class="tok-kw">impl</span> Outcome {</span>
 <span class="src-item" id="fn-outcome-is_good">
-<span class="ln" id="L127">    <span class="tok-com">/// Whether this one is as published.</span></span>
-<span class="ln" id="L128">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_good</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L129">        <span class="tok-kw">self</span>.verdict == Verdict::Matches</span>
-<span class="ln" id="L130">    }</span>
-</span>
-<span class="ln" id="L131">}</span>
-<span class="ln" id="L132"></span>
-<span class="src-item" id="fn-safe">
-<span class="ln" id="L133"><span class="tok-com">/// Whether a path from the manifest is safe to join onto a directory.</span></span>
-<span class="ln" id="L134"><span class="tok-com">///</span></span>
-<span class="ln" id="L135"><span class="tok-com">/// See the module note. Empty, absolute, `..`, a drive letter and a backslash</span></span>
-<span class="ln" id="L136"><span class="tok-com">/// are all refused; everything else is an ordinary relative path.</span></span>
-<span class="ln" id="L137"><span class="tok-kw">fn</span> <span class="tok-fn">safe</span>(path: &amp;str) -&gt; bool {</span>
-<span class="ln" id="L138">    <span class="tok-kw">if</span> path.<span class="tok-fn">is_empty</span>() || path.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;/&#x27;</span>) || path.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\\&#x27;</span>) {</span>
-<span class="ln" id="L139">        <span class="tok-kw">return</span> false;</span>
+<span class="ln" id="L137">    <span class="tok-com">/// Whether this one is as published.</span></span>
+<span class="ln" id="L138">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_good</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L139">        <span class="tok-kw">self</span>.verdict == Verdict::Matches</span>
 <span class="ln" id="L140">    }</span>
-<span class="ln" id="L141">    <span class="tok-com">// `C:` and the like. Checked on the whole string rather than per component,</span></span>
-<span class="ln" id="L142">    <span class="tok-com">// because a drive letter can only lead.</span></span>
-<span class="ln" id="L143">    <span class="tok-kw">let</span> bytes = path.<span class="tok-fn">as_bytes</span>();</span>
-<span class="ln" id="L144">    <span class="tok-kw">if</span> bytes.<span class="tok-fn">len</span>() &gt;= <span class="tok-num">2</span> &amp;&amp; bytes[<span class="tok-num">1</span>] == b<span class="tok-str">&#x27;:&#x27;</span> {</span>
-<span class="ln" id="L145">        <span class="tok-kw">return</span> false;</span>
-<span class="ln" id="L146">    }</span>
-<span class="ln" id="L147">    path.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;/&#x27;</span>).<span class="tok-fn">all</span>(|part| part != <span class="tok-str">&quot;..&quot;</span> &amp;&amp; part != <span class="tok-str">&quot;.&quot;</span>)</span>
-<span class="ln" id="L148">}</span>
 </span>
-<span class="ln" id="L149"></span>
+<span class="ln" id="L141">}</span>
+<span class="ln" id="L142"></span>
+<span class="src-item" id="fn-safe">
+<span class="ln" id="L143"><span class="tok-com">/// Whether a path from the manifest is safe to join onto a directory.</span></span>
+<span class="ln" id="L144"><span class="tok-com">///</span></span>
+<span class="ln" id="L145"><span class="tok-com">/// See the module note. Empty, absolute, `..`, a drive letter and a backslash</span></span>
+<span class="ln" id="L146"><span class="tok-com">/// are all refused; everything else is an ordinary relative path.</span></span>
+<span class="ln" id="L147"><span class="tok-kw">fn</span> <span class="tok-fn">safe</span>(path: &amp;str) -&gt; bool {</span>
+<span class="ln" id="L148">    <span class="tok-kw">if</span> path.<span class="tok-fn">is_empty</span>() || path.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;/&#x27;</span>) || path.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\\&#x27;</span>) {</span>
+<span class="ln" id="L149">        <span class="tok-kw">return</span> false;</span>
+<span class="ln" id="L150">    }</span>
+<span class="ln" id="L151">    <span class="tok-com">// `C:` and the like. Checked on the whole string rather than per component,</span></span>
+<span class="ln" id="L152">    <span class="tok-com">// because a drive letter can only lead.</span></span>
+<span class="ln" id="L153">    <span class="tok-kw">let</span> bytes = path.<span class="tok-fn">as_bytes</span>();</span>
+<span class="ln" id="L154">    <span class="tok-kw">if</span> bytes.<span class="tok-fn">len</span>() &gt;= <span class="tok-num">2</span> &amp;&amp; bytes[<span class="tok-num">1</span>] == b<span class="tok-str">&#x27;:&#x27;</span> {</span>
+<span class="ln" id="L155">        <span class="tok-kw">return</span> false;</span>
+<span class="ln" id="L156">    }</span>
+<span class="ln" id="L157">    path.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;/&#x27;</span>).<span class="tok-fn">all</span>(|part| part != <span class="tok-str">&quot;..&quot;</span> &amp;&amp; part != <span class="tok-str">&quot;.&quot;</span>)</span>
+<span class="ln" id="L158">}</span>
+</span>
+<span class="ln" id="L159"></span>
 <span class="src-item" id="fn-looks_like_a_digest">
-<span class="ln" id="L150"><span class="tok-com">/// Whether a string is 64 lowercase hex characters.</span></span>
-<span class="ln" id="L151"><span class="tok-kw">fn</span> <span class="tok-fn">looks_like_a_digest</span>(text: &amp;str) -&gt; bool {</span>
-<span class="ln" id="L152">    text.<span class="tok-fn">len</span>() == <span class="tok-num">64</span> &amp;&amp; text.<span class="tok-fn">bytes</span>().<span class="tok-fn">all</span>(|b| b.<span class="tok-fn">is_ascii_hexdigit</span>())</span>
-<span class="ln" id="L153">}</span>
+<span class="ln" id="L160"><span class="tok-com">/// Whether a string is 64 lowercase hex characters.</span></span>
+<span class="ln" id="L161"><span class="tok-kw">fn</span> <span class="tok-fn">looks_like_a_digest</span>(text: &amp;str) -&gt; bool {</span>
+<span class="ln" id="L162">    text.<span class="tok-fn">len</span>() == <span class="tok-num">64</span> &amp;&amp; text.<span class="tok-fn">bytes</span>().<span class="tok-fn">all</span>(|b| b.<span class="tok-fn">is_ascii_hexdigit</span>())</span>
+<span class="ln" id="L163">}</span>
 </span>
-<span class="ln" id="L154"></span>
+<span class="ln" id="L164"></span>
 <span class="src-item" id="fn-parse">
-<span class="ln" id="L155"><span class="tok-com">/// Read a `CONTENTS.sha256`.</span></span>
-<span class="ln" id="L156"><span class="tok-com">///</span></span>
-<span class="ln" id="L157"><span class="tok-com">/// **Verify the signature over `SHA256SUMS`, and this file against</span></span>
-<span class="ln" id="L158"><span class="tok-com">/// `SHA256SUMS`, before calling this.** Parsing an unverified manifest and</span></span>
-<span class="ln" id="L159"><span class="tok-com">/// reporting on it would be checking a download against a list that came with</span></span>
-<span class="ln" id="L160"><span class="tok-com">/// it, which proves nothing.</span></span>
-<span class="ln" id="L161"><span class="tok-com">///</span></span>
-<span class="ln" id="L162"><span class="tok-com">/// Strict on purpose. A line this cannot make sense of fails the whole file</span></span>
-<span class="ln" id="L163"><span class="tok-com">/// rather than being skipped: a signed manifest is either the one the release</span></span>
-<span class="ln" id="L164"><span class="tok-com">/// job wrote or it is not, and half-understanding one is how a verifier reports</span></span>
-<span class="ln" id="L165"><span class="tok-com">/// a pass over files it never looked at.</span></span>
-<span class="ln" id="L166"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(text: &amp;str) -&gt; Result&lt;Vec&lt;ArchiveContents&gt;, Error&gt; {</span>
-<span class="ln" id="L167">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> all: Vec&lt;ArchiveContents&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L168">    <span class="tok-kw">for</span> (number, raw) <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L169">        <span class="tok-kw">let</span> line = raw.<span class="tok-fn">trim_end_matches</span>([<span class="tok-str">&#x27;\r&#x27;</span>, <span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&#x27;\t&#x27;</span>]);</span>
-<span class="ln" id="L170">        <span class="tok-kw">if</span> line.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L171">            continue;</span>
-<span class="ln" id="L172">        }</span>
-<span class="ln" id="L173">        <span class="tok-kw">let</span> at = number + <span class="tok-num">1</span>;</span>
-<span class="ln" id="L174">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(name) = line.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;# &quot;</span>) {</span>
-<span class="ln" id="L175">            <span class="tok-kw">let</span> name = name.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L176">            <span class="tok-kw">if</span> name.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L177">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
-<span class="ln" id="L178">                    <span class="tok-str">&quot;line {at} of the contents list names no archive&quot;</span></span>
-<span class="ln" id="L179">                )));</span>
-<span class="ln" id="L180">            }</span>
-<span class="ln" id="L181">            all.<span class="tok-fn">push</span>(ArchiveContents {</span>
-<span class="ln" id="L182">                archive: name.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L183">                members: Vec::<span class="tok-fn">new</span>(),</span>
-<span class="ln" id="L184">            });</span>
-<span class="ln" id="L185">            continue;</span>
-<span class="ln" id="L186">        }</span>
-<span class="ln" id="L187">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((digest, path)) = line.<span class="tok-fn">split_once</span>(<span class="tok-str">&quot;  &quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L188">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
-<span class="ln" id="L189">                <span class="tok-str">&quot;line {at} of the contents list is not a hash and a path&quot;</span></span>
-<span class="ln" id="L190">            )));</span>
-<span class="ln" id="L191">        };</span>
-<span class="ln" id="L192">        <span class="tok-kw">if</span> !<span class="tok-fn">looks_like_a_digest</span>(digest) {</span>
-<span class="ln" id="L193">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
-<span class="ln" id="L194">                <span class="tok-str">&quot;line {at} of the contents list does not begin with a SHA-256&quot;</span></span>
-<span class="ln" id="L195">            )));</span>
+<span class="ln" id="L165"><span class="tok-com">/// Read a `CONTENTS.sha256`.</span></span>
+<span class="ln" id="L166"><span class="tok-com">///</span></span>
+<span class="ln" id="L167"><span class="tok-com">/// **Verify the signature over `SHA256SUMS`, and this file against</span></span>
+<span class="ln" id="L168"><span class="tok-com">/// `SHA256SUMS`, before calling this.** Parsing an unverified manifest and</span></span>
+<span class="ln" id="L169"><span class="tok-com">/// reporting on it would be checking a download against a list that came with</span></span>
+<span class="ln" id="L170"><span class="tok-com">/// it, which proves nothing.</span></span>
+<span class="ln" id="L171"><span class="tok-com">///</span></span>
+<span class="ln" id="L172"><span class="tok-com">/// Strict on purpose. A line this cannot make sense of fails the whole file</span></span>
+<span class="ln" id="L173"><span class="tok-com">/// rather than being skipped: a signed manifest is either the one the release</span></span>
+<span class="ln" id="L174"><span class="tok-com">/// job wrote or it is not, and half-understanding one is how a verifier reports</span></span>
+<span class="ln" id="L175"><span class="tok-com">/// a pass over files it never looked at.</span></span>
+<span class="ln" id="L176"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(text: &amp;str) -&gt; Result&lt;Vec&lt;ArchiveContents&gt;, Error&gt; {</span>
+<span class="ln" id="L177">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> all: Vec&lt;ArchiveContents&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L178">    <span class="tok-kw">for</span> (number, raw) <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L179">        <span class="tok-kw">let</span> line = raw.<span class="tok-fn">trim_end_matches</span>([<span class="tok-str">&#x27;\r&#x27;</span>, <span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&#x27;\t&#x27;</span>]);</span>
+<span class="ln" id="L180">        <span class="tok-kw">if</span> line.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L181">            continue;</span>
+<span class="ln" id="L182">        }</span>
+<span class="ln" id="L183">        <span class="tok-kw">let</span> at = number + <span class="tok-num">1</span>;</span>
+<span class="ln" id="L184">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(name) = line.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;# &quot;</span>) {</span>
+<span class="ln" id="L185">            <span class="tok-kw">let</span> name = name.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L186">            <span class="tok-kw">if</span> name.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L187">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L188">                    <span class="tok-str">&quot;line {at} of the contents list names no archive&quot;</span></span>
+<span class="ln" id="L189">                )));</span>
+<span class="ln" id="L190">            }</span>
+<span class="ln" id="L191">            all.<span class="tok-fn">push</span>(ArchiveContents {</span>
+<span class="ln" id="L192">                archive: name.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L193">                members: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L194">            });</span>
+<span class="ln" id="L195">            continue;</span>
 <span class="ln" id="L196">        }</span>
-<span class="ln" id="L197">        <span class="tok-kw">let</span> path = path.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L198">        <span class="tok-kw">if</span> !<span class="tok-fn">safe</span>(path) {</span>
-<span class="ln" id="L199">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
-<span class="ln" id="L200">                <span class="tok-str">&quot;line {at} of the contents list names a path outside the release: {path}&quot;</span></span>
-<span class="ln" id="L201">            )));</span>
-<span class="ln" id="L202">        }</span>
-<span class="ln" id="L203">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(current) = all.<span class="tok-fn">last_mut</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L204">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
-<span class="ln" id="L205">                <span class="tok-str">&quot;line {at} of the contents list comes before any archive is named&quot;</span></span>
-<span class="ln" id="L206">            )));</span>
-<span class="ln" id="L207">        };</span>
-<span class="ln" id="L208">        current.members.<span class="tok-fn">push</span>(Member {</span>
-<span class="ln" id="L209">            path: path.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L210">            digest: digest.<span class="tok-fn">to_ascii_lowercase</span>(),</span>
-<span class="ln" id="L211">        });</span>
-<span class="ln" id="L212">    }</span>
-<span class="ln" id="L213">    <span class="tok-fn">Ok</span>(all)</span>
-<span class="ln" id="L214">}</span>
+<span class="ln" id="L197">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((digest, path)) = line.<span class="tok-fn">split_once</span>(<span class="tok-str">&quot;  &quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L198">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L199">                <span class="tok-str">&quot;line {at} of the contents list is not a hash and a path&quot;</span></span>
+<span class="ln" id="L200">            )));</span>
+<span class="ln" id="L201">        };</span>
+<span class="ln" id="L202">        <span class="tok-kw">if</span> !<span class="tok-fn">looks_like_a_digest</span>(digest) {</span>
+<span class="ln" id="L203">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L204">                <span class="tok-str">&quot;line {at} of the contents list does not begin with a SHA-256&quot;</span></span>
+<span class="ln" id="L205">            )));</span>
+<span class="ln" id="L206">        }</span>
+<span class="ln" id="L207">        <span class="tok-kw">let</span> path = path.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L208">        <span class="tok-kw">if</span> !<span class="tok-fn">safe</span>(path) {</span>
+<span class="ln" id="L209">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L210">                <span class="tok-str">&quot;line {at} of the contents list names a path outside the release: {path}&quot;</span></span>
+<span class="ln" id="L211">            )));</span>
+<span class="ln" id="L212">        }</span>
+<span class="ln" id="L213">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(current) = all.<span class="tok-fn">last_mut</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L214">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L215">                <span class="tok-str">&quot;line {at} of the contents list comes before any archive is named&quot;</span></span>
+<span class="ln" id="L216">            )));</span>
+<span class="ln" id="L217">        };</span>
+<span class="ln" id="L218">        current.members.<span class="tok-fn">push</span>(Member {</span>
+<span class="ln" id="L219">            path: path.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L220">            digest: digest.<span class="tok-fn">to_ascii_lowercase</span>(),</span>
+<span class="ln" id="L221">        });</span>
+<span class="ln" id="L222">    }</span>
+<span class="ln" id="L223">    <span class="tok-fn">Ok</span>(all)</span>
+<span class="ln" id="L224">}</span>
 </span>
-<span class="ln" id="L215"></span>
+<span class="ln" id="L225"></span>
 <span class="src-item" id="fn-for_archive">
-<span class="ln" id="L216"><span class="tok-com">/// The section of a manifest covering one archive.</span></span>
-<span class="ln" id="L217"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> for_archive&lt;<span class="tok-str">&#x27;a&gt;(all: &amp;&#x27;</span>a [ArchiveContents], archive: &amp;str) -&gt; Option&lt;&amp;&#x27;a ArchiveContents&gt; {</span>
-<span class="ln" id="L218">    all.<span class="tok-fn">iter</span>().<span class="tok-fn">find</span>(|entry| entry.archive == archive)</span>
-<span class="ln" id="L219">}</span>
+<span class="ln" id="L226"><span class="tok-com">/// The section of a manifest covering one archive.</span></span>
+<span class="ln" id="L227"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> for_archive&lt;<span class="tok-str">&#x27;a&gt;(all: &amp;&#x27;</span>a [ArchiveContents], archive: &amp;str) -&gt; Option&lt;&amp;&#x27;a ArchiveContents&gt; {</span>
+<span class="ln" id="L228">    all.<span class="tok-fn">iter</span>().<span class="tok-fn">find</span>(|entry| entry.archive == archive)</span>
+<span class="ln" id="L229">}</span>
 </span>
-<span class="ln" id="L220"></span>
+<span class="ln" id="L230"></span>
 <span class="src-item" id="fn-check">
-<span class="ln" id="L221"><span class="tok-com">/// Check every file the archive published, against `root`.</span></span>
-<span class="ln" id="L222"><span class="tok-com">///</span></span>
-<span class="ln" id="L223"><span class="tok-com">/// `root` is the directory the archive sits in, because the manifest&#x27;s paths</span></span>
-<span class="ln" id="L224"><span class="tok-com">/// already carry the release directory name. So an archive and the folder it</span></span>
-<span class="ln" id="L225"><span class="tok-com">/// was extracted into, side by side in a downloads folder, need no argument</span></span>
-<span class="ln" id="L226"><span class="tok-com">/// beyond the folder itself.</span></span>
-<span class="ln" id="L227"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">check</span>(root: &amp;Path, archive: &amp;ArchiveContents) -&gt; Vec&lt;Outcome&gt; {</span>
-<span class="ln" id="L228">    archive</span>
-<span class="ln" id="L229">        .members</span>
-<span class="ln" id="L230">        .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L231">        .<span class="tok-fn">map</span>(|member| {</span>
-<span class="ln" id="L232">            <span class="tok-kw">let</span> path = root.<span class="tok-fn">join</span>(&amp;member.path);</span>
-<span class="ln" id="L233">            <span class="tok-kw">let</span> verdict = <span class="tok-kw">if</span> !path.<span class="tok-fn">exists</span>() {</span>
-<span class="ln" id="L234">                Verdict::Missing</span>
-<span class="ln" id="L235">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L236">                <span class="tok-kw">match</span> <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_file</span>(&amp;path) {</span>
-<span class="ln" id="L237">                    <span class="tok-fn">Err</span>(why) =&gt; Verdict::<span class="tok-fn">Unreadable</span>(why.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L238">                    <span class="tok-fn">Ok</span>(found) <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::<span class="tok-fn">digests_match</span>(&amp;found, &amp;member.digest) =&gt; Verdict::Matches,</span>
-<span class="ln" id="L239">                    <span class="tok-fn">Ok</span>(found) =&gt; Verdict::Differs { found },</span>
-<span class="ln" id="L240">                }</span>
-<span class="ln" id="L241">            };</span>
-<span class="ln" id="L242">            Outcome {</span>
-<span class="ln" id="L243">                path: member.path.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L244">                verdict,</span>
-<span class="ln" id="L245">            }</span>
-<span class="ln" id="L246">        })</span>
-<span class="ln" id="L247">        .<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L248">}</span>
+<span class="ln" id="L231"><span class="tok-com">/// Check every file the archive published, against `root`.</span></span>
+<span class="ln" id="L232"><span class="tok-com">///</span></span>
+<span class="ln" id="L233"><span class="tok-com">/// `root` is the directory the archive sits in, because the manifest&#x27;s paths</span></span>
+<span class="ln" id="L234"><span class="tok-com">/// already carry the release directory name. So an archive and the folder it</span></span>
+<span class="ln" id="L235"><span class="tok-com">/// was extracted into, side by side in a downloads folder, need no argument</span></span>
+<span class="ln" id="L236"><span class="tok-com">/// beyond the folder itself.</span></span>
+<span class="ln" id="L237"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">check</span>(root: &amp;Path, archive: &amp;ArchiveContents) -&gt; Vec&lt;Outcome&gt; {</span>
+<span class="ln" id="L238">    archive</span>
+<span class="ln" id="L239">        .members</span>
+<span class="ln" id="L240">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L241">        .<span class="tok-fn">map</span>(|member| {</span>
+<span class="ln" id="L242">            <span class="tok-kw">let</span> path = root.<span class="tok-fn">join</span>(&amp;member.path);</span>
+<span class="ln" id="L243">            <span class="tok-com">// `symlink_metadata`, not `metadata`: the question is what is at</span></span>
+<span class="ln" id="L244">            <span class="tok-com">// this name, not what it leads to. See `Verdict::NotAFile`.</span></span>
+<span class="ln" id="L245">            <span class="tok-kw">let</span> verdict = <span class="tok-kw">match</span> std::fs::<span class="tok-fn">symlink_metadata</span>(&amp;path) {</span>
+<span class="ln" id="L246">                <span class="tok-fn">Err</span>(_) =&gt; Verdict::Missing,</span>
+<span class="ln" id="L247">                <span class="tok-fn">Ok</span>(meta) <span class="tok-kw">if</span> meta.<span class="tok-fn">file_type</span>().<span class="tok-fn">is_symlink</span>() =&gt; {</span>
+<span class="ln" id="L248">                    Verdict::<span class="tok-fn">NotAFile</span>(<span class="tok-str">&quot;a symbolic link&quot;</span>.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L249">                }</span>
+<span class="ln" id="L250">                <span class="tok-fn">Ok</span>(meta) <span class="tok-kw">if</span> meta.<span class="tok-fn">is_dir</span>() =&gt; Verdict::<span class="tok-fn">NotAFile</span>(<span class="tok-str">&quot;a directory&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L251">                <span class="tok-fn">Ok</span>(meta) <span class="tok-kw">if</span> !meta.<span class="tok-fn">is_file</span>() =&gt; {</span>
+<span class="ln" id="L252">                    Verdict::<span class="tok-fn">NotAFile</span>(<span class="tok-str">&quot;not an ordinary file&quot;</span>.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L253">                }</span>
+<span class="ln" id="L254">                <span class="tok-fn">Ok</span>(_) =&gt; <span class="tok-kw">match</span> <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_file</span>(&amp;path) {</span>
+<span class="ln" id="L255">                    <span class="tok-fn">Err</span>(why) =&gt; Verdict::<span class="tok-fn">Unreadable</span>(why.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L256">                    <span class="tok-fn">Ok</span>(found) <span class="tok-kw">if</span> <span class="tok-kw">crate</span>::<span class="tok-fn">digests_match</span>(&amp;found, &amp;member.digest) =&gt; Verdict::Matches,</span>
+<span class="ln" id="L257">                    <span class="tok-fn">Ok</span>(found) =&gt; Verdict::Differs { found },</span>
+<span class="ln" id="L258">                },</span>
+<span class="ln" id="L259">            };</span>
+<span class="ln" id="L260">            Outcome {</span>
+<span class="ln" id="L261">                path: member.path.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L262">                verdict,</span>
+<span class="ln" id="L263">            }</span>
+<span class="ln" id="L264">        })</span>
+<span class="ln" id="L265">        .<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L266">}</span>
 </span>
-<span class="ln" id="L249"></span>
-<span class="src-item" id="fn-extras">
-<span class="ln" id="L250"><span class="tok-com">/// Files sitting in the extracted directory that the release never published.</span></span>
-<span class="ln" id="L251"><span class="tok-com">///</span></span>
-<span class="ln" id="L252"><span class="tok-com">/// Reported rather than ignored. Everything else here answers &quot;is what should</span></span>
-<span class="ln" id="L253"><span class="tok-com">/// be there, there&quot;; this answers the other half, and the other half is the one</span></span>
-<span class="ln" id="L254"><span class="tok-com">/// an attacker uses. A directory holding every published file, unmodified, plus</span></span>
-<span class="ln" id="L255"><span class="tok-com">/// one extra program, passes every check above and is not the release.</span></span>
-<span class="ln" id="L256"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">extras</span>(root: &amp;Path, archive: &amp;ArchiveContents) -&gt; Vec&lt;PathBuf&gt; {</span>
-<span class="ln" id="L257">    <span class="tok-kw">let</span> published: BTreeSet&lt;PathBuf&gt; = archive</span>
-<span class="ln" id="L258">        .members</span>
-<span class="ln" id="L259">        .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L260">        .<span class="tok-fn">map</span>(|member| root.<span class="tok-fn">join</span>(&amp;member.path))</span>
-<span class="ln" id="L261">        .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L262">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L263">    <span class="tok-kw">for</span> directory <span class="tok-kw">in</span> archive.<span class="tok-fn">roots</span>() {</span>
-<span class="ln" id="L264">        <span class="tok-fn">walk</span>(&amp;root.<span class="tok-fn">join</span>(directory), &amp;published, &amp;<span class="tok-kw">mut</span> found);</span>
-<span class="ln" id="L265">    }</span>
-<span class="ln" id="L266">    found.<span class="tok-fn">sort</span>();</span>
-<span class="ln" id="L267">    found</span>
-<span class="ln" id="L268">}</span>
+<span class="ln" id="L267"></span>
+<span class="src-item" id="fn-sweep">
+<span class="ln" id="L268"><span class="tok-com">/// What a sweep of the extracted directory found.</span></span>
+<span class="ln" id="L269"><span class="tok-attr">#[derive</span>(Debug, Clone, Default, PartialEq, Eq)]</span>
+<span class="ln" id="L270"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Sweep {</span>
+<span class="ln" id="L271">    <span class="tok-com">/// Files that are there and were never published.</span></span>
+<span class="ln" id="L272">    <span class="tok-kw">pub</span> extras: Vec&lt;PathBuf&gt;,</span>
+<span class="ln" id="L273">    <span class="tok-com">/// Directories the sweep could not read, and so could not clear.</span></span>
+<span class="ln" id="L274">    <span class="tok-com">///</span></span>
+<span class="ln" id="L275">    <span class="tok-com">/// **F-98.** This used to be nothing: an unreadable directory ended the</span></span>
+<span class="ln" id="L276">    <span class="tok-com">/// walk and the caller was handed an empty list, which reads as &quot;there is</span></span>
+<span class="ln" id="L277">    <span class="tok-com">/// nothing else in the folder&quot; and means &quot;I could not look&quot;. Measured: a</span></span>
+<span class="ln" id="L278">    <span class="tok-com">/// directory tree deep enough that its absolute path passes `PATH_MAX`</span></span>
+<span class="ln" id="L279">    <span class="tok-com">/// stops `read_dir` at about 1988 levels on Linux, and a file below that</span></span>
+<span class="ln" id="L280">    <span class="tok-com">/// point was reported as absent rather than as unreachable. Permissions do</span></span>
+<span class="ln" id="L281">    <span class="tok-com">/// the same thing far more easily.</span></span>
+<span class="ln" id="L282">    <span class="tok-com">///</span></span>
+<span class="ln" id="L283">    <span class="tok-com">/// That is the failure this project has now made in several places and</span></span>
+<span class="ln" id="L284">    <span class="tok-com">/// named each time: a check that cannot see must not answer &quot;clear&quot;. The</span></span>
+<span class="ln" id="L285">    <span class="tok-com">/// callers treat a non-empty list here as a reason to withhold the pass.</span></span>
+<span class="ln" id="L286">    <span class="tok-kw">pub</span> unreadable: Vec&lt;PathBuf&gt;,</span>
+<span class="ln" id="L287">}</span>
 </span>
-<span class="ln" id="L269"></span>
-<span class="src-item" id="fn-walk">
-<span class="ln" id="L270"><span class="tok-com">/// Every file under `directory` that is not in `published`.</span></span>
-<span class="ln" id="L271"><span class="tok-com">///</span></span>
-<span class="ln" id="L272"><span class="tok-com">/// Depth is bounded by the tree on disk rather than by a counter, and the walk</span></span>
-<span class="ln" id="L273"><span class="tok-com">/// never follows a symbolic link into a directory: an extracted release with a</span></span>
-<span class="ln" id="L274"><span class="tok-com">/// link back to `/` in it would otherwise walk the whole filesystem, which is a</span></span>
-<span class="ln" id="L275"><span class="tok-com">/// denial of service written by the person being checked.</span></span>
-<span class="ln" id="L276"><span class="tok-kw">fn</span> <span class="tok-fn">walk</span>(directory: &amp;Path, published: &amp;BTreeSet&lt;PathBuf&gt;, found: &amp;<span class="tok-kw">mut</span> Vec&lt;PathBuf&gt;) {</span>
-<span class="ln" id="L277">    <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entries) = std::fs::<span class="tok-fn">read_dir</span>(directory) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L278">        <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L279">    };</span>
-<span class="ln" id="L280">    <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
-<span class="ln" id="L281">        <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
-<span class="ln" id="L282">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(kind) = entry.<span class="tok-fn">file_type</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L283">            continue;</span>
-<span class="ln" id="L284">        };</span>
-<span class="ln" id="L285">        <span class="tok-kw">if</span> kind.<span class="tok-fn">is_symlink</span>() {</span>
-<span class="ln" id="L286">            <span class="tok-com">// A link is neither walked nor hashed through. It is not a file the</span></span>
-<span class="ln" id="L287">            <span class="tok-com">// release published, so it is reported as an extra and left alone.</span></span>
-<span class="ln" id="L288">            <span class="tok-kw">if</span> !published.<span class="tok-fn">contains</span>(&amp;path) {</span>
-<span class="ln" id="L289">                found.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L290">            }</span>
-<span class="ln" id="L291">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> kind.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L292">            <span class="tok-fn">walk</span>(&amp;path, published, found);</span>
-<span class="ln" id="L293">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> !published.<span class="tok-fn">contains</span>(&amp;path) {</span>
-<span class="ln" id="L294">            found.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L295">        }</span>
+<span class="ln" id="L288"></span>
+<span class="ln" id="L289"><span class="tok-kw">impl</span> Sweep {</span>
+<span class="src-item" id="fn-sweep-is_clean">
+<span class="ln" id="L290">    <span class="tok-com">/// Whether the folder is exactly what the release published.</span></span>
+<span class="ln" id="L291">    <span class="tok-com">///</span></span>
+<span class="ln" id="L292">    <span class="tok-com">/// False when anything extra was found **and** false when anything could</span></span>
+<span class="ln" id="L293">    <span class="tok-com">/// not be read, which is the distinction F-98 was about.</span></span>
+<span class="ln" id="L294">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_clean</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L295">        <span class="tok-kw">self</span>.extras.<span class="tok-fn">is_empty</span>() &amp;&amp; <span class="tok-kw">self</span>.unreadable.<span class="tok-fn">is_empty</span>()</span>
 <span class="ln" id="L296">    }</span>
-<span class="ln" id="L297">}</span>
 </span>
+<span class="ln" id="L297">}</span>
 <span class="ln" id="L298"></span>
-<span class="ln" id="L299"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L300"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L301">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L302"></span>
-<span class="ln" id="L303">    <span class="tok-kw">const</span> SAMPLE: &amp;str = <span class="tok-str">&quot;\</span></span>
-<span class="ln" id="L304"><span class="tok-str"># veilvoice-v0.1.15-linux-x86_64.tar.gz</span></span>
-<span class="ln" id="L305"><span class="tok-str">0000000000000000000000000000000000000000000000000000000000000001  veilvoice-v0.1.15-linux-x86_64/veilvoice</span></span>
-<span class="ln" id="L306"><span class="tok-str">0000000000000000000000000000000000000000000000000000000000000002  veilvoice-v0.1.15-linux-x86_64/docs/A.md</span></span>
-<span class="ln" id="L307"></span>
-<span class="ln" id="L308"><span class="tok-str"># veilvoice-v0.1.15-windows-x86_64.zip</span></span>
-<span class="ln" id="L309"><span class="tok-str">0000000000000000000000000000000000000000000000000000000000000003  veilvoice-v0.1.15-windows-x86_64/veilvoice.exe</span></span>
-<span class="ln" id="L310"><span class="tok-str">&quot;</span>;</span>
-<span class="ln" id="L311"></span>
-<span class="ln" id="L312">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L313">    <span class="tok-kw">fn</span> <span class="tok-fn">a_manifest_reads_back_as_its_archives_and_their_files</span>() {</span>
-<span class="ln" id="L314">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(SAMPLE).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the sample parses&quot;</span>);</span>
-<span class="ln" id="L315">        assert_eq!(all.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L316">        assert_eq!(all[<span class="tok-num">0</span>].archive, <span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64.tar.gz&quot;</span>);</span>
-<span class="ln" id="L317">        assert_eq!(all[<span class="tok-num">0</span>].members.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L318">        assert_eq!(</span>
-<span class="ln" id="L319">            all[<span class="tok-num">1</span>].members[<span class="tok-num">0</span>].path,</span>
-<span class="ln" id="L320">            <span class="tok-str">&quot;veilvoice-v0.1.15-windows-x86_64/veilvoice.exe&quot;</span></span>
-<span class="ln" id="L321">        );</span>
-<span class="ln" id="L322">        assert_eq!(</span>
-<span class="ln" id="L323">            all[<span class="tok-num">0</span>].<span class="tok-fn">roots</span>().<span class="tok-fn">into_iter</span>().collect::&lt;Vec&lt;_&gt;&gt;(),</span>
-<span class="ln" id="L324">            vec![<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>.<span class="tok-fn">to_string</span>()]</span>
-<span class="ln" id="L325">        );</span>
-<span class="ln" id="L326">    }</span>
-<span class="ln" id="L327"></span>
-<span class="ln" id="L328">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L329">    <span class="tok-kw">fn</span> <span class="tok-fn">an_archive_is_found_by_its_published_name</span>() {</span>
-<span class="ln" id="L330">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(SAMPLE).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L331">        assert!(<span class="tok-fn">for_archive</span>(&amp;all, <span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64.tar.gz&quot;</span>).<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L332">        assert!(<span class="tok-fn">for_archive</span>(&amp;all, <span class="tok-str">&quot;veilvoice-v0.1.15-linux-aarch64.tar.gz&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L333">    }</span>
-<span class="ln" id="L334"></span>
-<span class="ln" id="L335">    <span class="tok-com">/// A line that is not a hash and a path fails the file. See [`parse`].</span></span>
-<span class="ln" id="L336">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L337">    <span class="tok-kw">fn</span> <span class="tok-fn">a_line_that_makes_no_sense_fails_the_whole_manifest</span>() {</span>
-<span class="ln" id="L338">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L339">            <span class="tok-str">&quot;# a.tar.gz\nnot a hash at all\n&quot;</span>,</span>
-<span class="ln" id="L340">            <span class="tok-str">&quot;# a.tar.gz\nbeef  x\n&quot;</span>,</span>
-<span class="ln" id="L341">            <span class="tok-str">&quot;0000000000000000000000000000000000000000000000000000000000000001  x\n&quot;</span>,</span>
-<span class="ln" id="L342">            <span class="tok-str">&quot;# \n&quot;</span>,</span>
-<span class="ln" id="L343">        ] {</span>
-<span class="ln" id="L344">            assert!(<span class="tok-fn">parse</span>(bad).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{bad:?} should not parse&quot;</span>);</span>
-<span class="ln" id="L345">        }</span>
-<span class="ln" id="L346">    }</span>
-<span class="ln" id="L347"></span>
-<span class="ln" id="L348">    <span class="tok-com">/// The paths this will later read are refused before they are used, not</span></span>
-<span class="ln" id="L349">    <span class="tok-com">/// after. See the module note.</span></span>
-<span class="ln" id="L350">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L351">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_that_leaves_the_release_is_refused</span>() {</span>
-<span class="ln" id="L352">        <span class="tok-kw">for</span> escape <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L353">            <span class="tok-str">&quot;veilvoice/../../../etc/shadow&quot;</span>,</span>
-<span class="ln" id="L354">            <span class="tok-str">&quot;/etc/shadow&quot;</span>,</span>
-<span class="ln" id="L355">            <span class="tok-str">&quot;C:/Windows/System32/config/SAM&quot;</span>,</span>
-<span class="ln" id="L356">            <span class="tok-str">&quot;veilvoice\\..\\..\\secrets&quot;</span>,</span>
-<span class="ln" id="L357">            <span class="tok-str">&quot;./veilvoice&quot;</span>,</span>
-<span class="ln" id="L358">        ] {</span>
-<span class="ln" id="L359">            <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;# a.tar.gz\n{}  {escape}\n&quot;</span>, <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>));</span>
-<span class="ln" id="L360">            <span class="tok-kw">let</span> refused = <span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap_err</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L361">            assert!(</span>
-<span class="ln" id="L362">                refused.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;outside the release&quot;</span>),</span>
-<span class="ln" id="L363">                <span class="tok-str">&quot;{escape}: {refused}&quot;</span></span>
-<span class="ln" id="L364">            );</span>
-<span class="ln" id="L365">        }</span>
-<span class="ln" id="L366">    }</span>
-<span class="ln" id="L367"></span>
-<span class="ln" id="L368">    <span class="tok-com">/// The hash is compared, not the presence of the file.</span></span>
-<span class="ln" id="L369">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L370">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_that_is_there_and_wrong_is_not_a_pass</span>() {</span>
-<span class="ln" id="L371">        <span class="tok-kw">let</span> room = <span class="tok-fn">tempdir</span>();</span>
-<span class="ln" id="L372">        <span class="tok-kw">let</span> release = room.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>);</span>
-<span class="ln" id="L373">        std::fs::<span class="tok-fn">create_dir_all</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L374">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;the real one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L375">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs/A.md&quot;</span>), b<span class="tok-str">&quot;tampered&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L376"></span>
-<span class="ln" id="L377">        <span class="tok-kw">let</span> real = <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;the real one&quot;</span>);</span>
-<span class="ln" id="L378">        <span class="tok-kw">let</span> published = <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;the published one&quot;</span>);</span>
-<span class="ln" id="L379">        <span class="tok-kw">let</span> text = format!(</span>
-<span class="ln" id="L380">            <span class="tok-str">&quot;# a.tar.gz\n{real}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n\</span></span>
-<span class="ln" id="L381"><span class="tok-str">             {published}  veilvoice-v0.1.15-linux-x86_64/docs/A.md\n\</span></span>
-<span class="ln" id="L382"><span class="tok-str">             {published}  veilvoice-v0.1.15-linux-x86_64/gone\n&quot;</span></span>
-<span class="ln" id="L383">        );</span>
-<span class="ln" id="L384">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L385">        <span class="tok-kw">let</span> outcomes = <span class="tok-fn">check</span>(&amp;room, &amp;all[<span class="tok-num">0</span>]);</span>
-<span class="ln" id="L386">        assert_eq!(outcomes[<span class="tok-num">0</span>].verdict, Verdict::Matches);</span>
-<span class="ln" id="L387">        assert!(matches!(outcomes[<span class="tok-num">1</span>].verdict, Verdict::Differs { .. }));</span>
-<span class="ln" id="L388">        assert_eq!(outcomes[<span class="tok-num">2</span>].verdict, Verdict::Missing);</span>
-<span class="ln" id="L389">        assert!(outcomes[<span class="tok-num">0</span>].<span class="tok-fn">is_good</span>() &amp;&amp; !outcomes[<span class="tok-num">1</span>].<span class="tok-fn">is_good</span>());</span>
-<span class="ln" id="L390">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;room).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L391">    }</span>
-<span class="ln" id="L392"></span>
-<span class="ln" id="L393">    <span class="tok-com">/// A directory holding every published file plus one more is not the</span></span>
-<span class="ln" id="L394">    <span class="tok-com">/// release, and saying so is the whole reason [`extras`] exists.</span></span>
-<span class="ln" id="L395">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L396">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_nobody_published_is_reported</span>() {</span>
-<span class="ln" id="L397">        <span class="tok-kw">let</span> room = <span class="tok-fn">tempdir</span>();</span>
-<span class="ln" id="L398">        <span class="tok-kw">let</span> release = room.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>);</span>
-<span class="ln" id="L399">        std::fs::<span class="tok-fn">create_dir_all</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L400">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;the real one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L401">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;helper.sh&quot;</span>), b<span class="tok-str">&quot;#!/bin/sh\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L402">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs/extra.md&quot;</span>), b<span class="tok-str">&quot;hello&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L403"></span>
-<span class="ln" id="L404">        <span class="tok-kw">let</span> real = <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;the real one&quot;</span>);</span>
-<span class="ln" id="L405">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;# a.tar.gz\n{real}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n&quot;</span>);</span>
-<span class="ln" id="L406">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L407">        <span class="tok-kw">let</span> extra = <span class="tok-fn">extras</span>(&amp;room, &amp;all[<span class="tok-num">0</span>]);</span>
-<span class="ln" id="L408">        <span class="tok-kw">let</span> names: Vec&lt;String&gt; = extra</span>
-<span class="ln" id="L409">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L410">            .<span class="tok-fn">map</span>(|p| p.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L411">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L412">        assert_eq!(names, vec![<span class="tok-str">&quot;extra.md&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;helper.sh&quot;</span>.<span class="tok-fn">to_string</span>()]);</span>
-<span class="ln" id="L413">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;room).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L414">    }</span>
-<span class="ln" id="L415"></span>
-<span class="ln" id="L416">    <span class="tok-com">/// An empty manifest is not an error and is not a pass either: it lists no</span></span>
-<span class="ln" id="L417">    <span class="tok-com">/// archives, so no caller can find theirs in it.</span></span>
-<span class="ln" id="L418">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L419">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_manifest_lists_nothing</span>() {</span>
-<span class="ln" id="L420">        assert!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L421">        assert!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;\n\n&quot;</span>).<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L422">    }</span>
-<span class="ln" id="L423"></span>
-<span class="ln" id="L424">    <span class="tok-com">/// Somewhere to put files, without a dependency for it.</span></span>
-<span class="ln" id="L425">    <span class="tok-kw">fn</span> <span class="tok-fn">tempdir</span>() -&gt; PathBuf {</span>
-<span class="ln" id="L426">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> path = std::env::<span class="tok-fn">temp_dir</span>();</span>
-<span class="ln" id="L427">        <span class="tok-kw">let</span> stamp = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
-<span class="ln" id="L428">            .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
-<span class="ln" id="L429">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
-<span class="ln" id="L430">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L431">        path.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L432">            <span class="tok-str">&quot;veilvoice-contents-{stamp}-{:?}&quot;</span>,</span>
-<span class="ln" id="L433">            std::thread::<span class="tok-fn">current</span>().<span class="tok-fn">id</span>()</span>
-<span class="ln" id="L434">        ));</span>
-<span class="ln" id="L435">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L436">        path</span>
-<span class="ln" id="L437">    }</span>
-<span class="ln" id="L438">}</span>
+<span class="src-item" id="fn-extras">
+<span class="ln" id="L299"><span class="tok-com">/// Files sitting in the extracted directory that the release never published.</span></span>
+<span class="ln" id="L300"><span class="tok-com">///</span></span>
+<span class="ln" id="L301"><span class="tok-com">/// Reported rather than ignored. Everything else here answers &quot;is what should</span></span>
+<span class="ln" id="L302"><span class="tok-com">/// be there, there&quot;; this answers the other half, and the other half is the one</span></span>
+<span class="ln" id="L303"><span class="tok-com">/// an attacker uses. A directory holding every published file, unmodified, plus</span></span>
+<span class="ln" id="L304"><span class="tok-com">/// one extra program, passes every check above and is not the release.</span></span>
+<span class="ln" id="L305"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">extras</span>(root: &amp;Path, archive: &amp;ArchiveContents) -&gt; Sweep {</span>
+<span class="ln" id="L306">    <span class="tok-kw">let</span> published: BTreeSet&lt;PathBuf&gt; = archive</span>
+<span class="ln" id="L307">        .members</span>
+<span class="ln" id="L308">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L309">        .<span class="tok-fn">map</span>(|member| root.<span class="tok-fn">join</span>(&amp;member.path))</span>
+<span class="ln" id="L310">        .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L311">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sweep = Sweep::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L312">    <span class="tok-kw">for</span> directory <span class="tok-kw">in</span> archive.<span class="tok-fn">roots</span>() {</span>
+<span class="ln" id="L313">        <span class="tok-fn">walk</span>(&amp;root.<span class="tok-fn">join</span>(directory), &amp;published, &amp;<span class="tok-kw">mut</span> sweep);</span>
+<span class="ln" id="L314">    }</span>
+<span class="ln" id="L315">    sweep.extras.<span class="tok-fn">sort</span>();</span>
+<span class="ln" id="L316">    sweep.unreadable.<span class="tok-fn">sort</span>();</span>
+<span class="ln" id="L317">    sweep</span>
+<span class="ln" id="L318">}</span>
+</span>
+<span class="ln" id="L319"></span>
+<span class="src-item" id="fn-walk">
+<span class="ln" id="L320"><span class="tok-com">/// Every file under `directory` that is not in `published`.</span></span>
+<span class="ln" id="L321"><span class="tok-com">///</span></span>
+<span class="ln" id="L322"><span class="tok-com">/// Iterative rather than recursive. Measured on Linux, the deepest directory</span></span>
+<span class="ln" id="L323"><span class="tok-com">/// an absolute path can name is about 1988 levels, so the recursion this</span></span>
+<span class="ln" id="L324"><span class="tok-com">/// replaced would not in fact have overflowed a stack -- but the bound came</span></span>
+<span class="ln" id="L325"><span class="tok-com">/// from `PATH_MAX` rather than from this code, and a bound nobody here chose is</span></span>
+<span class="ln" id="L326"><span class="tok-com">/// not a bound this code can rely on. An explicit stack has one.</span></span>
+<span class="ln" id="L327"><span class="tok-com">///</span></span>
+<span class="ln" id="L328"><span class="tok-com">/// A symbolic link is never walked into and never hashed through. An extracted</span></span>
+<span class="ln" id="L329"><span class="tok-com">/// release with a link back to `/` in it would otherwise walk the whole</span></span>
+<span class="ln" id="L330"><span class="tok-com">/// filesystem, which is a denial of service written by the person being</span></span>
+<span class="ln" id="L331"><span class="tok-com">/// checked. The link is reported as an extra, because it is not a file the</span></span>
+<span class="ln" id="L332"><span class="tok-com">/// release published.</span></span>
+<span class="ln" id="L333"><span class="tok-kw">fn</span> <span class="tok-fn">walk</span>(start: &amp;Path, published: &amp;BTreeSet&lt;PathBuf&gt;, sweep: &amp;<span class="tok-kw">mut</span> Sweep) {</span>
+<span class="ln" id="L334">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![start.<span class="tok-fn">to_path_buf</span>()];</span>
+<span class="ln" id="L335">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
+<span class="ln" id="L336">        <span class="tok-kw">let</span> entries = <span class="tok-kw">match</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory) {</span>
+<span class="ln" id="L337">            <span class="tok-fn">Ok</span>(entries) =&gt; entries,</span>
+<span class="ln" id="L338">            <span class="tok-com">// F-98. Recorded rather than skipped. A directory that could not be</span></span>
+<span class="ln" id="L339">            <span class="tok-com">// opened is a directory whose contents are unknown, and unknown is</span></span>
+<span class="ln" id="L340">            <span class="tok-com">// not the same as empty.</span></span>
+<span class="ln" id="L341">            <span class="tok-fn">Err</span>(_) =&gt; {</span>
+<span class="ln" id="L342">                sweep.unreadable.<span class="tok-fn">push</span>(directory);</span>
+<span class="ln" id="L343">                continue;</span>
+<span class="ln" id="L344">            }</span>
+<span class="ln" id="L345">        };</span>
+<span class="ln" id="L346">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries {</span>
+<span class="ln" id="L347">            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entry) = entry <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L348">                <span class="tok-com">// The listing itself failed part way through, so what is left</span></span>
+<span class="ln" id="L349">                <span class="tok-com">// in this directory is unknown for the same reason.</span></span>
+<span class="ln" id="L350">                sweep.unreadable.<span class="tok-fn">push</span>(directory.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L351">                continue;</span>
+<span class="ln" id="L352">            };</span>
+<span class="ln" id="L353">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L354">            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(kind) = entry.<span class="tok-fn">file_type</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L355">                sweep.unreadable.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L356">                continue;</span>
+<span class="ln" id="L357">            };</span>
+<span class="ln" id="L358">            <span class="tok-kw">if</span> kind.<span class="tok-fn">is_symlink</span>() {</span>
+<span class="ln" id="L359">                <span class="tok-kw">if</span> !published.<span class="tok-fn">contains</span>(&amp;path) {</span>
+<span class="ln" id="L360">                    sweep.extras.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L361">                }</span>
+<span class="ln" id="L362">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> kind.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L363">                pending.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L364">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> !published.<span class="tok-fn">contains</span>(&amp;path) {</span>
+<span class="ln" id="L365">                sweep.extras.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L366">            }</span>
+<span class="ln" id="L367">        }</span>
+<span class="ln" id="L368">    }</span>
+<span class="ln" id="L369">}</span>
+</span>
+<span class="ln" id="L370"></span>
+<span class="ln" id="L371"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L372"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L373">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L374"></span>
+<span class="ln" id="L375">    <span class="tok-kw">const</span> SAMPLE: &amp;str = <span class="tok-str">&quot;\</span></span>
+<span class="ln" id="L376"><span class="tok-str"># veilvoice-v0.1.15-linux-x86_64.tar.gz</span></span>
+<span class="ln" id="L377"><span class="tok-str">0000000000000000000000000000000000000000000000000000000000000001  veilvoice-v0.1.15-linux-x86_64/veilvoice</span></span>
+<span class="ln" id="L378"><span class="tok-str">0000000000000000000000000000000000000000000000000000000000000002  veilvoice-v0.1.15-linux-x86_64/docs/A.md</span></span>
+<span class="ln" id="L379"></span>
+<span class="ln" id="L380"><span class="tok-str"># veilvoice-v0.1.15-windows-x86_64.zip</span></span>
+<span class="ln" id="L381"><span class="tok-str">0000000000000000000000000000000000000000000000000000000000000003  veilvoice-v0.1.15-windows-x86_64/veilvoice.exe</span></span>
+<span class="ln" id="L382"><span class="tok-str">&quot;</span>;</span>
+<span class="ln" id="L383"></span>
+<span class="ln" id="L384">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L385">    <span class="tok-kw">fn</span> <span class="tok-fn">a_manifest_reads_back_as_its_archives_and_their_files</span>() {</span>
+<span class="ln" id="L386">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(SAMPLE).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the sample parses&quot;</span>);</span>
+<span class="ln" id="L387">        assert_eq!(all.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L388">        assert_eq!(all[<span class="tok-num">0</span>].archive, <span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64.tar.gz&quot;</span>);</span>
+<span class="ln" id="L389">        assert_eq!(all[<span class="tok-num">0</span>].members.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L390">        assert_eq!(</span>
+<span class="ln" id="L391">            all[<span class="tok-num">1</span>].members[<span class="tok-num">0</span>].path,</span>
+<span class="ln" id="L392">            <span class="tok-str">&quot;veilvoice-v0.1.15-windows-x86_64/veilvoice.exe&quot;</span></span>
+<span class="ln" id="L393">        );</span>
+<span class="ln" id="L394">        assert_eq!(</span>
+<span class="ln" id="L395">            all[<span class="tok-num">0</span>].<span class="tok-fn">roots</span>().<span class="tok-fn">into_iter</span>().collect::&lt;Vec&lt;_&gt;&gt;(),</span>
+<span class="ln" id="L396">            vec![<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>.<span class="tok-fn">to_string</span>()]</span>
+<span class="ln" id="L397">        );</span>
+<span class="ln" id="L398">    }</span>
+<span class="ln" id="L399"></span>
+<span class="ln" id="L400">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L401">    <span class="tok-kw">fn</span> <span class="tok-fn">an_archive_is_found_by_its_published_name</span>() {</span>
+<span class="ln" id="L402">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(SAMPLE).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L403">        assert!(<span class="tok-fn">for_archive</span>(&amp;all, <span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64.tar.gz&quot;</span>).<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L404">        assert!(<span class="tok-fn">for_archive</span>(&amp;all, <span class="tok-str">&quot;veilvoice-v0.1.15-linux-aarch64.tar.gz&quot;</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L405">    }</span>
+<span class="ln" id="L406"></span>
+<span class="ln" id="L407">    <span class="tok-com">/// A line that is not a hash and a path fails the file. See [`parse`].</span></span>
+<span class="ln" id="L408">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L409">    <span class="tok-kw">fn</span> <span class="tok-fn">a_line_that_makes_no_sense_fails_the_whole_manifest</span>() {</span>
+<span class="ln" id="L410">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L411">            <span class="tok-str">&quot;# a.tar.gz\nnot a hash at all\n&quot;</span>,</span>
+<span class="ln" id="L412">            <span class="tok-str">&quot;# a.tar.gz\nbeef  x\n&quot;</span>,</span>
+<span class="ln" id="L413">            <span class="tok-str">&quot;0000000000000000000000000000000000000000000000000000000000000001  x\n&quot;</span>,</span>
+<span class="ln" id="L414">            <span class="tok-str">&quot;# \n&quot;</span>,</span>
+<span class="ln" id="L415">        ] {</span>
+<span class="ln" id="L416">            assert!(<span class="tok-fn">parse</span>(bad).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{bad:?} should not parse&quot;</span>);</span>
+<span class="ln" id="L417">        }</span>
+<span class="ln" id="L418">    }</span>
+<span class="ln" id="L419"></span>
+<span class="ln" id="L420">    <span class="tok-com">/// The paths this will later read are refused before they are used, not</span></span>
+<span class="ln" id="L421">    <span class="tok-com">/// after. See the module note.</span></span>
+<span class="ln" id="L422">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L423">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_that_leaves_the_release_is_refused</span>() {</span>
+<span class="ln" id="L424">        <span class="tok-kw">for</span> escape <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L425">            <span class="tok-str">&quot;veilvoice/../../../etc/shadow&quot;</span>,</span>
+<span class="ln" id="L426">            <span class="tok-str">&quot;/etc/shadow&quot;</span>,</span>
+<span class="ln" id="L427">            <span class="tok-str">&quot;C:/Windows/System32/config/SAM&quot;</span>,</span>
+<span class="ln" id="L428">            <span class="tok-str">&quot;veilvoice\\..\\..\\secrets&quot;</span>,</span>
+<span class="ln" id="L429">            <span class="tok-str">&quot;./veilvoice&quot;</span>,</span>
+<span class="ln" id="L430">        ] {</span>
+<span class="ln" id="L431">            <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;# a.tar.gz\n{}  {escape}\n&quot;</span>, <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>));</span>
+<span class="ln" id="L432">            <span class="tok-kw">let</span> refused = <span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap_err</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L433">            assert!(</span>
+<span class="ln" id="L434">                refused.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;outside the release&quot;</span>),</span>
+<span class="ln" id="L435">                <span class="tok-str">&quot;{escape}: {refused}&quot;</span></span>
+<span class="ln" id="L436">            );</span>
+<span class="ln" id="L437">        }</span>
+<span class="ln" id="L438">    }</span>
+<span class="ln" id="L439"></span>
+<span class="ln" id="L440">    <span class="tok-com">/// The hash is compared, not the presence of the file.</span></span>
+<span class="ln" id="L441">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L442">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_that_is_there_and_wrong_is_not_a_pass</span>() {</span>
+<span class="ln" id="L443">        <span class="tok-kw">let</span> room = <span class="tok-fn">tempdir</span>();</span>
+<span class="ln" id="L444">        <span class="tok-kw">let</span> release = room.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>);</span>
+<span class="ln" id="L445">        std::fs::<span class="tok-fn">create_dir_all</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L446">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;the real one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L447">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs/A.md&quot;</span>), b<span class="tok-str">&quot;tampered&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L448"></span>
+<span class="ln" id="L449">        <span class="tok-kw">let</span> real = <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L450">        <span class="tok-kw">let</span> published = <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;the published one&quot;</span>);</span>
+<span class="ln" id="L451">        <span class="tok-kw">let</span> text = format!(</span>
+<span class="ln" id="L452">            <span class="tok-str">&quot;# a.tar.gz\n{real}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n\</span></span>
+<span class="ln" id="L453"><span class="tok-str">             {published}  veilvoice-v0.1.15-linux-x86_64/docs/A.md\n\</span></span>
+<span class="ln" id="L454"><span class="tok-str">             {published}  veilvoice-v0.1.15-linux-x86_64/gone\n&quot;</span></span>
+<span class="ln" id="L455">        );</span>
+<span class="ln" id="L456">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L457">        <span class="tok-kw">let</span> outcomes = <span class="tok-fn">check</span>(&amp;room, &amp;all[<span class="tok-num">0</span>]);</span>
+<span class="ln" id="L458">        assert_eq!(outcomes[<span class="tok-num">0</span>].verdict, Verdict::Matches);</span>
+<span class="ln" id="L459">        assert!(matches!(outcomes[<span class="tok-num">1</span>].verdict, Verdict::Differs { .. }));</span>
+<span class="ln" id="L460">        assert_eq!(outcomes[<span class="tok-num">2</span>].verdict, Verdict::Missing);</span>
+<span class="ln" id="L461">        assert!(outcomes[<span class="tok-num">0</span>].<span class="tok-fn">is_good</span>() &amp;&amp; !outcomes[<span class="tok-num">1</span>].<span class="tok-fn">is_good</span>());</span>
+<span class="ln" id="L462">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;room).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L463">    }</span>
+<span class="ln" id="L464"></span>
+<span class="ln" id="L465">    <span class="tok-com">/// A directory holding every published file plus one more is not the</span></span>
+<span class="ln" id="L466">    <span class="tok-com">/// release, and saying so is the whole reason [`extras`] exists.</span></span>
+<span class="ln" id="L467">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L468">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_nobody_published_is_reported</span>() {</span>
+<span class="ln" id="L469">        <span class="tok-kw">let</span> room = <span class="tok-fn">tempdir</span>();</span>
+<span class="ln" id="L470">        <span class="tok-kw">let</span> release = room.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>);</span>
+<span class="ln" id="L471">        std::fs::<span class="tok-fn">create_dir_all</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L472">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;the real one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L473">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;helper.sh&quot;</span>), b<span class="tok-str">&quot;#!/bin/sh\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L474">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs/extra.md&quot;</span>), b<span class="tok-str">&quot;hello&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L475"></span>
+<span class="ln" id="L476">        <span class="tok-kw">let</span> real = <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L477">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;# a.tar.gz\n{real}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n&quot;</span>);</span>
+<span class="ln" id="L478">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L479">        <span class="tok-kw">let</span> sweep = <span class="tok-fn">extras</span>(&amp;room, &amp;all[<span class="tok-num">0</span>]);</span>
+<span class="ln" id="L480">        <span class="tok-kw">let</span> names: Vec&lt;String&gt; = sweep</span>
+<span class="ln" id="L481">            .extras</span>
+<span class="ln" id="L482">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L483">            .<span class="tok-fn">map</span>(|p| p.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L484">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L485">        assert_eq!(names, vec![<span class="tok-str">&quot;extra.md&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;helper.sh&quot;</span>.<span class="tok-fn">to_string</span>()]);</span>
+<span class="ln" id="L486">        assert!(sweep.unreadable.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{sweep:?}&quot;</span>);</span>
+<span class="ln" id="L487">        assert!(!sweep.<span class="tok-fn">is_clean</span>(), <span class="tok-str">&quot;a folder with extras in it is not clean&quot;</span>);</span>
+<span class="ln" id="L488">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;room).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L489">    }</span>
+<span class="ln" id="L490"></span>
+<span class="ln" id="L491">    <span class="tok-com">/// **F-99.** A link where a file should be is not the published file, even</span></span>
+<span class="ln" id="L492">    <span class="tok-com">/// when what it points at hashes correctly.</span></span>
+<span class="ln" id="L493">    <span class="tok-com">///</span></span>
+<span class="ln" id="L494">    <span class="tok-com">/// The release published a file. A link is a name somebody else may be</span></span>
+<span class="ln" id="L495">    <span class="tok-com">/// able to repoint after this has looked, which is the one substitution a</span></span>
+<span class="ln" id="L496">    <span class="tok-com">/// hash check cannot notice, and the sweep for extra files already refuses</span></span>
+<span class="ln" id="L497">    <span class="tok-com">/// to walk through links: accepting one here was the two halves of this</span></span>
+<span class="ln" id="L498">    <span class="tok-com">/// module disagreeing about what a link is.</span></span>
+<span class="ln" id="L499">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L500">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L501">    <span class="tok-kw">fn</span> <span class="tok-fn">a_link_pointing_at_the_right_bytes_is_still_not_the_published_file</span>() {</span>
+<span class="ln" id="L502">        <span class="tok-kw">let</span> room = <span class="tok-fn">tempdir</span>();</span>
+<span class="ln" id="L503">        <span class="tok-kw">let</span> release = room.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>);</span>
+<span class="ln" id="L504">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;release).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L505">        <span class="tok-com">// The genuine bytes, somewhere else entirely, with a link to them</span></span>
+<span class="ln" id="L506">        <span class="tok-com">// standing where the program should be.</span></span>
+<span class="ln" id="L507">        <span class="tok-kw">let</span> elsewhere = room.<span class="tok-fn">join</span>(<span class="tok-str">&quot;elsewhere&quot;</span>);</span>
+<span class="ln" id="L508">        std::fs::<span class="tok-fn">write</span>(&amp;elsewhere, b<span class="tok-str">&quot;the real one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L509">        std::os::unix::fs::<span class="tok-fn">symlink</span>(&amp;elsewhere, release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L510"></span>
+<span class="ln" id="L511">        <span class="tok-kw">let</span> real = <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L512">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;# a.tar.gz\n{real}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n&quot;</span>);</span>
+<span class="ln" id="L513">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L514">        <span class="tok-kw">let</span> outcomes = <span class="tok-fn">check</span>(&amp;room, &amp;all[<span class="tok-num">0</span>]);</span>
+<span class="ln" id="L515">        assert!(</span>
+<span class="ln" id="L516">            matches!(outcomes[<span class="tok-num">0</span>].verdict, Verdict::<span class="tok-fn">NotAFile</span>(_)),</span>
+<span class="ln" id="L517">            <span class="tok-str">&quot;a link hashing to the right value is still not the file: {:?}&quot;</span>,</span>
+<span class="ln" id="L518">            outcomes[<span class="tok-num">0</span>].verdict</span>
+<span class="ln" id="L519">        );</span>
+<span class="ln" id="L520">        assert!(!outcomes[<span class="tok-num">0</span>].<span class="tok-fn">is_good</span>());</span>
+<span class="ln" id="L521">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;room).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L522">    }</span>
+<span class="ln" id="L523"></span>
+<span class="ln" id="L524">    <span class="tok-com">/// A directory standing where a file should be is refused for the same</span></span>
+<span class="ln" id="L525">    <span class="tok-com">/// reason, and without hashing anything.</span></span>
+<span class="ln" id="L526">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L527">    <span class="tok-kw">fn</span> <span class="tok-fn">a_directory_where_a_file_should_be_is_not_the_published_file</span>() {</span>
+<span class="ln" id="L528">        <span class="tok-kw">let</span> room = <span class="tok-fn">tempdir</span>();</span>
+<span class="ln" id="L529">        <span class="tok-kw">let</span> release = room.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>);</span>
+<span class="ln" id="L530">        std::fs::<span class="tok-fn">create_dir_all</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L531">        <span class="tok-kw">let</span> text = format!(</span>
+<span class="ln" id="L532">            <span class="tok-str">&quot;# a.tar.gz\n{}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n&quot;</span>,</span>
+<span class="ln" id="L533">            <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">64</span>)</span>
+<span class="ln" id="L534">        );</span>
+<span class="ln" id="L535">        <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L536">        <span class="tok-kw">let</span> outcomes = <span class="tok-fn">check</span>(&amp;room, &amp;all[<span class="tok-num">0</span>]);</span>
+<span class="ln" id="L537">        assert!(</span>
+<span class="ln" id="L538">            matches!(outcomes[<span class="tok-num">0</span>].verdict, Verdict::<span class="tok-fn">NotAFile</span>(_)),</span>
+<span class="ln" id="L539">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
+<span class="ln" id="L540">            outcomes[<span class="tok-num">0</span>].verdict</span>
+<span class="ln" id="L541">        );</span>
+<span class="ln" id="L542">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;room).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L543">    }</span>
+<span class="ln" id="L544"></span>
+<span class="ln" id="L545">    <span class="tok-com">/// **F-98.** A directory that cannot be read is reported, never treated as</span></span>
+<span class="ln" id="L546">    <span class="tok-com">/// empty.</span></span>
+<span class="ln" id="L547">    <span class="tok-com">///</span></span>
+<span class="ln" id="L548">    <span class="tok-com">/// Measured with a permission bit here, because it is the way this happens</span></span>
+<span class="ln" id="L549">    <span class="tok-com">/// to ordinary people: a folder extracted by another account, or one whose</span></span>
+<span class="ln" id="L550">    <span class="tok-com">/// mode came out of the archive wrong. The deep-tree case that found it is</span></span>
+<span class="ln" id="L551">    <span class="tok-com">/// the same failure with a different cause.</span></span>
+<span class="ln" id="L552">    <span class="tok-com">///</span></span>
+<span class="ln" id="L553">    <span class="tok-com">/// Skipped where the test can read anything regardless, which is what</span></span>
+<span class="ln" id="L554">    <span class="tok-com">/// running as root means, since the case cannot be created there.</span></span>
+<span class="ln" id="L555">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L556">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L557">    <span class="tok-kw">fn</span> <span class="tok-fn">a_directory_that_cannot_be_read_is_not_reported_as_empty</span>() {</span>
+<span class="ln" id="L558">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt <span class="tok-kw">as</span> _;</span>
+<span class="ln" id="L559"></span>
+<span class="ln" id="L560">        <span class="tok-kw">let</span> room = <span class="tok-fn">tempdir</span>();</span>
+<span class="ln" id="L561">        <span class="tok-kw">let</span> release = room.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>);</span>
+<span class="ln" id="L562">        <span class="tok-kw">let</span> shut = release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;shut&quot;</span>);</span>
+<span class="ln" id="L563">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;shut).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L564">        std::fs::<span class="tok-fn">write</span>(shut.<span class="tok-fn">join</span>(<span class="tok-str">&quot;something&quot;</span>), b<span class="tok-str">&quot;hidden&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L565">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;the real one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L566">        std::fs::<span class="tok-fn">set_permissions</span>(&amp;shut, std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o000)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L567"></span>
+<span class="ln" id="L568">        <span class="tok-kw">let</span> readable = std::fs::<span class="tok-fn">read_dir</span>(&amp;shut).<span class="tok-fn">is_ok</span>();</span>
+<span class="ln" id="L569">        <span class="tok-kw">if</span> !readable {</span>
+<span class="ln" id="L570">            <span class="tok-kw">let</span> real = <span class="tok-kw">crate</span>::<span class="tok-fn">sha256_bytes</span>(b<span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L571">            <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;# a.tar.gz\n{real}  veilvoice-v0.1.15-linux-x86_64/veilvoice\n&quot;</span>);</span>
+<span class="ln" id="L572">            <span class="tok-kw">let</span> all = <span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L573">            <span class="tok-kw">let</span> sweep = <span class="tok-fn">extras</span>(&amp;room, &amp;all[<span class="tok-num">0</span>]);</span>
+<span class="ln" id="L574">            assert_eq!(</span>
+<span class="ln" id="L575">                sweep.unreadable.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L576">                <span class="tok-num">1</span>,</span>
+<span class="ln" id="L577">                <span class="tok-str">&quot;the shut directory must be reported: {sweep:?}&quot;</span></span>
+<span class="ln" id="L578">            );</span>
+<span class="ln" id="L579">            assert!(</span>
+<span class="ln" id="L580">                !sweep.<span class="tok-fn">is_clean</span>(),</span>
+<span class="ln" id="L581">                <span class="tok-str">&quot;a folder with a door this could not open is not clean&quot;</span></span>
+<span class="ln" id="L582">            );</span>
+<span class="ln" id="L583">        }</span>
+<span class="ln" id="L584">        std::fs::<span class="tok-fn">set_permissions</span>(&amp;shut, std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o700)).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L585">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;room).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L586">    }</span>
+<span class="ln" id="L587"></span>
+<span class="ln" id="L588">    <span class="tok-com">/// The walk keeps its own stack, so its depth is not the call stack&#x27;s.</span></span>
+<span class="ln" id="L589">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L590">    <span class="tok-kw">fn</span> <span class="tok-fn">the_sweep_does_not_recurse</span>() {</span>
+<span class="ln" id="L591">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;contents.rs&quot;</span>);</span>
+<span class="ln" id="L592">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L593">        <span class="tok-kw">let</span> walk = body.<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn walk(&quot;</span>).<span class="tok-fn">nth</span>(<span class="tok-num">1</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L594">        assert!(</span>
+<span class="ln" id="L595">            !walk.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;walk(&quot;</span>),</span>
+<span class="ln" id="L596">            <span class="tok-str">&quot;the sweep calls itself, so its depth is the call stack&#x27;s&quot;</span></span>
+<span class="ln" id="L597">        );</span>
+<span class="ln" id="L598">        assert!(walk.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;while let Some(&quot;</span>), <span class="tok-str">&quot;and it must have its own&quot;</span>);</span>
+<span class="ln" id="L599">    }</span>
+<span class="ln" id="L600"></span>
+<span class="ln" id="L601">    <span class="tok-com">/// An empty manifest is not an error and is not a pass either: it lists no</span></span>
+<span class="ln" id="L602">    <span class="tok-com">/// archives, so no caller can find theirs in it.</span></span>
+<span class="ln" id="L603">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L604">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_manifest_lists_nothing</span>() {</span>
+<span class="ln" id="L605">        assert!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L606">        assert!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;\n\n&quot;</span>).<span class="tok-fn">unwrap</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L607">    }</span>
+<span class="ln" id="L608"></span>
+<span class="ln" id="L609">    <span class="tok-com">/// Somewhere to put files, without a dependency for it.</span></span>
+<span class="ln" id="L610">    <span class="tok-kw">fn</span> <span class="tok-fn">tempdir</span>() -&gt; PathBuf {</span>
+<span class="ln" id="L611">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> path = std::env::<span class="tok-fn">temp_dir</span>();</span>
+<span class="ln" id="L612">        <span class="tok-kw">let</span> stamp = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
+<span class="ln" id="L613">            .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
+<span class="ln" id="L614">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
+<span class="ln" id="L615">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L616">        path.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L617">            <span class="tok-str">&quot;veilvoice-contents-{stamp}-{:?}&quot;</span>,</span>
+<span class="ln" id="L618">            std::thread::<span class="tok-fn">current</span>().<span class="tok-fn">id</span>()</span>
+<span class="ln" id="L619">        ));</span>
+<span class="ln" id="L620">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L621">        path</span>
+<span class="ln" id="L622">    }</span>
+<span class="ln" id="L623">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

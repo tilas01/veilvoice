@@ -949,7 +949,7 @@ fn report_against_manifest(
     use veilvoice_check::contents::Verdict;
 
     let outcomes = veilvoice_check::contents::check(root, section);
-    let extras = veilvoice_check::contents::extras(root, section);
+    let sweep = veilvoice_check::contents::extras(root, section);
     let as_published = outcomes.iter().filter(|o| o.is_good()).count();
 
     for outcome in &outcomes {
@@ -965,16 +965,30 @@ fn report_against_manifest(
             }
             Verdict::Missing => verdict!("  MISSING  {}", outcome.path),
             Verdict::Unreadable(why) => verdict!("  UNREADABLE  {}: {why}", outcome.path),
+            // F-99. Not hashed, and not a pass whatever it points at.
+            Verdict::NotAFile(what) => {
+                verdict!("  {what} WHERE A FILE SHOULD BE  {}", outcome.path)
+            }
         }
     }
-    for extra in &extras {
+    for extra in &sweep.extras {
         verdict!(
             "  NOT PART OF THE RELEASE  {}",
             extra.strip_prefix(root).unwrap_or(extra).display()
         );
     }
+    // F-98. A directory that could not be opened is a directory whose contents
+    // are unknown, and unknown is not empty. Saying "there is nothing else in
+    // the folder" after failing to look in part of it is the false assurance
+    // this whole program exists to avoid giving.
+    for shut in &sweep.unreadable {
+        verdict!(
+            "  COULD NOT LOOK INSIDE  {}",
+            shut.strip_prefix(root).unwrap_or(shut).display()
+        );
+    }
 
-    let wrong = outcomes.len() - as_published + extras.len();
+    let wrong = outcomes.len() - as_published + sweep.extras.len() + sweep.unreadable.len();
     if wrong == 0 {
         good(&format!(
             "all {} files match the signed list, and there is nothing else in the folder",
@@ -991,6 +1005,12 @@ fn report_against_manifest(
         out!("  A file that has changed, gone missing, or arrived from somewhere");
         out!("  else is not what was signed. Extract the checked archive again and");
         out!("  use what comes out of it.");
+        if !sweep.unreadable.is_empty() {
+            out!();
+            out!("  A folder listed above could not be opened, so what is in it is");
+            out!("  unknown rather than absent. Check its permissions and run this");
+            out!("  again.");
+        }
     }
     wrong
 }
