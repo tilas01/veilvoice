@@ -1266,21 +1266,61 @@ mod tests {
         assert!(a.speaker_centroid_hz > 0.0);
     }
 
-    /// Accent tracking must not cost the real-time budget. Release builds are
-    /// far faster; this only guards against an accidental order-of-magnitude
-    /// regression such as un-decimated pitch search.
+    /// Accent tracking must not cost the real-time budget: it is an addition to
+    /// the spectral work, not a multiple of it.
+    ///
+    /// # Why this is a ratio and not a number
+    ///
+    /// This asserted an absolute real-time factor under 0.5 until it failed,
+    /// and what it was measuring was the machine. A debug build under QEMU on
+    /// the armv7 job reported 0.557 while the same commit passed on every
+    /// native target: an emulated 32-bit target is far slower than the runner
+    /// hosting it, and there is no single number that is generous enough there
+    /// and tight enough to catch anything here.
+    ///
+    /// The claim worth defending does not depend on the machine. The regression
+    /// this exists to catch, an un-decimated pitch search, is an order of
+    /// magnitude, and an order of magnitude is still an order of magnitude on a
+    /// slow processor. So the same audio is run twice on the same machine in
+    /// the same test, once with the neutraliser bypassed, and the two are
+    /// compared. Both runs are preceded by an unmeasured pass so that neither
+    /// is paying for a cold cache.
+    ///
+    /// The bound is deliberately loose. This is a timing measurement on a
+    /// shared build machine, and a test that fails when somebody else's job
+    /// gets busy teaches people to re-run it rather than read it.
     #[test]
-    fn stays_comfortably_realtime_with_accent_on() {
-        let mut d = Deidentifier::from_seed(DeidConfig::default(), [8u8; 32]).unwrap();
+    fn accent_tracking_is_a_small_part_of_what_the_chain_costs() {
         let input = speaker(150.0, 1.0, 1.0);
-        for block in input.chunks(1024) {
-            d.process(block, &mut vec![0.0; block.len()]);
-        }
-        let rtf = d.stats().last_realtime_factor();
-        println!("realtime factor with accent tracking on: {rtf:.4}");
+        let cost = |enabled: bool| {
+            let config = DeidConfig {
+                accent: AccentConfig {
+                    enabled,
+                    ..AccentConfig::default()
+                },
+                ..DeidConfig::default()
+            };
+            let mut d = Deidentifier::from_seed(config, [8u8; 32]).unwrap();
+            let mut out = vec![0.0; 1024];
+            let mut run = |d: &mut Deidentifier| {
+                for block in input.chunks(1024) {
+                    d.process(block, &mut out[..block.len()]);
+                }
+            };
+            run(&mut d);
+            let start = std::time::Instant::now();
+            run(&mut d);
+            start.elapsed().as_secs_f64()
+        };
+        let off = cost(false);
+        let on = cost(true);
+        println!("one second of audio: {off:.4}s bypassed, {on:.4}s with accent tracking");
+        assert!(off > 0.0, "the bypassed run took no measurable time");
         assert!(
-            rtf < 0.5,
-            "realtime factor {rtf:.3} leaves too little headroom"
+            on < off * 4.0,
+            "accent tracking cost {:.1} times the rest of the chain ({on:.4}s against {off:.4}s), \
+             which is the shape of a search that stopped being decimated",
+            on / off
         );
     }
 

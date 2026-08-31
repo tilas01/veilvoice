@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-core/src/chain.rs</code></h1>
-<p style="color:var(--muted)"><a href="chain.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1581 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="chain.html">what this file is for</a> &middot; <a href="../veilvoice-core.html">veilvoice-core</a> &middot; 1621 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1371,320 +1371,360 @@
 <span class="ln" id="L1266">        assert!(a.speaker_centroid_hz &gt; <span class="tok-num">0.0</span>);</span>
 <span class="ln" id="L1267">    }</span>
 <span class="ln" id="L1268"></span>
-<span class="ln" id="L1269">    <span class="tok-com">/// Accent tracking must not cost the real-time budget. Release builds are</span></span>
-<span class="ln" id="L1270">    <span class="tok-com">/// far faster; this only guards against an accidental order-of-magnitude</span></span>
-<span class="ln" id="L1271">    <span class="tok-com">/// regression such as un-decimated pitch search.</span></span>
-<span class="ln" id="L1272">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1273">    <span class="tok-kw">fn</span> <span class="tok-fn">stays_comfortably_realtime_with_accent_on</span>() {</span>
-<span class="ln" id="L1274">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> d = Deidentifier::<span class="tok-fn">from_seed</span>(DeidConfig::<span class="tok-fn">default</span>(), [8u8; <span class="tok-num">32</span>]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1275">        <span class="tok-kw">let</span> input = <span class="tok-fn">speaker</span>(<span class="tok-num">150.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L1276">        <span class="tok-kw">for</span> block <span class="tok-kw">in</span> input.<span class="tok-fn">chunks</span>(<span class="tok-num">1024</span>) {</span>
-<span class="ln" id="L1277">            d.<span class="tok-fn">process</span>(block, &amp;<span class="tok-kw">mut</span> vec![<span class="tok-num">0.0</span>; block.<span class="tok-fn">len</span>()]);</span>
-<span class="ln" id="L1278">        }</span>
-<span class="ln" id="L1279">        <span class="tok-kw">let</span> rtf = d.<span class="tok-fn">stats</span>().<span class="tok-fn">last_realtime_factor</span>();</span>
-<span class="ln" id="L1280">        println!(<span class="tok-str">&quot;realtime factor with accent tracking on: {rtf:.4}&quot;</span>);</span>
-<span class="ln" id="L1281">        assert!(</span>
-<span class="ln" id="L1282">            rtf &lt; <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L1283">            <span class="tok-str">&quot;realtime factor {rtf:.3} leaves too little headroom&quot;</span></span>
-<span class="ln" id="L1284">        );</span>
-<span class="ln" id="L1285">    }</span>
-<span class="ln" id="L1286"></span>
-<span class="ln" id="L1287">    <span class="tok-com">/// The property that makes rolling usable at all: it must be inaudible.</span></span>
-<span class="ln" id="L1288">    <span class="tok-com">/// A discontinuity in the phase offsets would show up as a sample-to-sample</span></span>
-<span class="ln" id="L1289">    <span class="tok-com">/// jump far larger than the signal ever produces on its own.</span></span>
-<span class="ln" id="L1290">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1291">    <span class="tok-kw">fn</span> <span class="tok-fn">rolling_the_seed_introduces_no_clicks</span>() {</span>
-<span class="ln" id="L1292">        <span class="tok-kw">let</span> input = <span class="tok-fn">speaker</span>(<span class="tok-num">150.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L1293">        <span class="tok-kw">let</span> worst_jump = |cfg: DeidConfig| {</span>
-<span class="ln" id="L1294">            <span class="tok-kw">let</span> out = Deidentifier::<span class="tok-fn">from_seed</span>(cfg, [21u8; <span class="tok-num">32</span>])</span>
-<span class="ln" id="L1295">                .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1296">                .<span class="tok-fn">process_vec</span>(&amp;input);</span>
-<span class="ln" id="L1297">            out.<span class="tok-fn">windows</span>(<span class="tok-num">2</span>)</span>
-<span class="ln" id="L1298">                .<span class="tok-fn">skip</span>(<span class="tok-num">4_800</span>) <span class="tok-com">// past the engine&#x27;s warm-up</span></span>
-<span class="ln" id="L1299">                .<span class="tok-fn">fold</span>(<span class="tok-num">0</span>.0f32, |m, w| m.<span class="tok-fn">max</span>((w[<span class="tok-num">1</span>] - w[<span class="tok-num">0</span>]).<span class="tok-fn">abs</span>()))</span>
-<span class="ln" id="L1300">        };</span>
-<span class="ln" id="L1301"></span>
-<span class="ln" id="L1302">        <span class="tok-kw">let</span> steady = <span class="tok-fn">worst_jump</span>(DeidConfig {</span>
-<span class="ln" id="L1303">            reseed_secs: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L1304">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1305">        });</span>
-<span class="ln" id="L1306">        <span class="tok-com">// Fast enough to roll several times inside the test signal.</span></span>
-<span class="ln" id="L1307">        <span class="tok-kw">let</span> rolling = <span class="tok-fn">worst_jump</span>(DeidConfig {</span>
-<span class="ln" id="L1308">            reseed_secs: <span class="tok-num">0.25</span>,</span>
-<span class="ln" id="L1309">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1310">        });</span>
-<span class="ln" id="L1311"></span>
-<span class="ln" id="L1312">        assert!(</span>
-<span class="ln" id="L1313">            rolling &lt;= steady * <span class="tok-num">1.5</span> + 1e-<span class="tok-num">3</span>,</span>
-<span class="ln" id="L1314">            <span class="tok-str">&quot;rolling produced a discontinuity: worst jump {rolling:.4} vs {steady:.4} without&quot;</span></span>
-<span class="ln" id="L1315">        );</span>
-<span class="ln" id="L1316">    }</span>
-<span class="ln" id="L1317"></span>
-<span class="ln" id="L1318">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1319">    <span class="tok-kw">fn</span> <span class="tok-fn">rolling_changes_the_audio_but_keeps_it_sane</span>() {</span>
-<span class="ln" id="L1320">        <span class="tok-kw">let</span> input = <span class="tok-fn">speaker</span>(<span class="tok-num">150.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">5.0</span>);</span>
-<span class="ln" id="L1321">        <span class="tok-kw">let</span> steady = Deidentifier::<span class="tok-fn">from_seed</span>(</span>
-<span class="ln" id="L1322">            DeidConfig {</span>
-<span class="ln" id="L1323">                reseed_secs: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L1324">                ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1325">            },</span>
-<span class="ln" id="L1326">            [4u8; <span class="tok-num">32</span>],</span>
-<span class="ln" id="L1327">        )</span>
-<span class="ln" id="L1328">        .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1329">        .<span class="tok-fn">process_vec</span>(&amp;input);</span>
-<span class="ln" id="L1330">        <span class="tok-kw">let</span> rolling = Deidentifier::<span class="tok-fn">from_seed</span>(</span>
-<span class="ln" id="L1331">            DeidConfig {</span>
-<span class="ln" id="L1332">                reseed_secs: <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L1333">                ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1334">            },</span>
-<span class="ln" id="L1335">            [4u8; <span class="tok-num">32</span>],</span>
-<span class="ln" id="L1336">        )</span>
-<span class="ln" id="L1337">        .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1338">        .<span class="tok-fn">process_vec</span>(&amp;input);</span>
-<span class="ln" id="L1339"></span>
-<span class="ln" id="L1340">        assert!(rolling.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
-<span class="ln" id="L1341">        <span class="tok-kw">let</span> diff: f32 = steady</span>
-<span class="ln" id="L1342">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L1343">            .<span class="tok-fn">zip</span>(&amp;rolling)</span>
-<span class="ln" id="L1344">            .<span class="tok-fn">map</span>(|(a, b)| (a - b).<span class="tok-fn">abs</span>())</span>
-<span class="ln" id="L1345">            .<span class="tok-fn">sum</span>();</span>
-<span class="ln" id="L1346">        assert!(</span>
-<span class="ln" id="L1347">            diff &gt; <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L1348">            <span class="tok-str">&quot;rolling should change the modulation (diff={diff})&quot;</span></span>
-<span class="ln" id="L1349">        );</span>
-<span class="ln" id="L1350"></span>
-<span class="ln" id="L1351">        <span class="tok-kw">let</span> rms = |x: &amp;[f32]| (x.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| v * v).sum::&lt;f32&gt;() / x.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32).<span class="tok-fn">sqrt</span>();</span>
-<span class="ln" id="L1352">        <span class="tok-kw">let</span> ratio = <span class="tok-fn">rms</span>(&amp;rolling) / <span class="tok-fn">rms</span>(&amp;steady);</span>
-<span class="ln" id="L1353">        assert!(</span>
-<span class="ln" id="L1354">            (<span class="tok-num">0.5</span>..<span class="tok-num">2.0</span>).<span class="tok-fn">contains</span>(&amp;ratio),</span>
-<span class="ln" id="L1355">            <span class="tok-str">&quot;rolling should not change the level ({ratio:.2}x)&quot;</span></span>
-<span class="ln" id="L1356">        );</span>
-<span class="ln" id="L1357">    }</span>
-<span class="ln" id="L1358"></span>
-<span class="ln" id="L1359">    <span class="tok-com">/// Rolling must not cost determinism &#8212; reproducible builds and the whole</span></span>
-<span class="ln" id="L1360">    <span class="tok-com">/// test suite depend on `from_seed` being repeatable.</span></span>
-<span class="ln" id="L1361">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1362">    <span class="tok-kw">fn</span> <span class="tok-fn">rolling_stays_deterministic_for_a_given_seed</span>() {</span>
-<span class="ln" id="L1363">        <span class="tok-kw">let</span> input = <span class="tok-fn">speaker</span>(<span class="tok-num">180.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">3.0</span>);</span>
-<span class="ln" id="L1364">        <span class="tok-kw">let</span> cfg = DeidConfig {</span>
-<span class="ln" id="L1365">            reseed_secs: <span class="tok-num">0.3</span>,</span>
-<span class="ln" id="L1366">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1367">        };</span>
-<span class="ln" id="L1368">        <span class="tok-kw">let</span> a = Deidentifier::<span class="tok-fn">from_seed</span>(cfg, [77u8; <span class="tok-num">32</span>])</span>
-<span class="ln" id="L1369">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1370">            .<span class="tok-fn">process_vec</span>(&amp;input);</span>
-<span class="ln" id="L1371">        <span class="tok-kw">let</span> b = Deidentifier::<span class="tok-fn">from_seed</span>(cfg, [77u8; <span class="tok-num">32</span>])</span>
-<span class="ln" id="L1372">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1373">            .<span class="tok-fn">process_vec</span>(&amp;input);</span>
-<span class="ln" id="L1374">        assert_eq!(a, b, <span class="tok-str">&quot;same seed must give the same audio, rolling or not&quot;</span>);</span>
-<span class="ln" id="L1375">    }</span>
-<span class="ln" id="L1376"></span>
-<span class="ln" id="L1377">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1378">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_interval_is_validated</span>() {</span>
-<span class="ln" id="L1379">        assert!(DeidConfig {</span>
-<span class="ln" id="L1380">            reseed_secs: -<span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L1381">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1382">        }</span>
-<span class="ln" id="L1383">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L1384">        .<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L1385">        assert!(DeidConfig {</span>
-<span class="ln" id="L1386">            reseed_secs: f32::NAN,</span>
-<span class="ln" id="L1387">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1388">        }</span>
-<span class="ln" id="L1389">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L1390">        .<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L1391">        assert!(DeidConfig {</span>
-<span class="ln" id="L1392">            reseed_secs: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L1393">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1394">        }</span>
-<span class="ln" id="L1395">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L1396">        .<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L1397">        assert!(DeidConfig {</span>
-<span class="ln" id="L1398">            reseed_secs: <span class="tok-num">2.0</span>,</span>
-<span class="ln" id="L1399">            ..Default::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1400">        }</span>
-<span class="ln" id="L1401">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L1402">        .<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L1403">    }</span>
-<span class="ln" id="L1404"></span>
-<span class="ln" id="L1405">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1406">    <span class="tok-kw">fn</span> <span class="tok-fn">stats_are_populated</span>() {</span>
-<span class="ln" id="L1407">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> d = Deidentifier::<span class="tok-fn">from_seed</span>(DeidConfig::<span class="tok-fn">default</span>(), [9u8; <span class="tok-num">32</span>]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1408">        <span class="tok-kw">let</span> input = vec![<span class="tok-num">0</span>.1f32; <span class="tok-num">8192</span>];</span>
-<span class="ln" id="L1409">        d.<span class="tok-fn">process</span>(&amp;input, &amp;<span class="tok-kw">mut</span> vec![<span class="tok-num">0.0</span>; <span class="tok-num">8192</span>]);</span>
-<span class="ln" id="L1410">        <span class="tok-kw">let</span> s = d.<span class="tok-fn">stats</span>();</span>
-<span class="ln" id="L1411">        assert_eq!(s.blocks, <span class="tok-num">1</span>);</span>
-<span class="ln" id="L1412">        assert!(s.last_block_us &gt; <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L1413">        assert!(s.algorithmic_latency_ms &gt; <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L1414">    }</span>
-<span class="ln" id="L1415">}</span>
+<span class="ln" id="L1269">    <span class="tok-com">/// Accent tracking must not cost the real-time budget: it is an addition to</span></span>
+<span class="ln" id="L1270">    <span class="tok-com">/// the spectral work, not a multiple of it.</span></span>
+<span class="ln" id="L1271">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1272">    <span class="tok-com">/// # Why this is a ratio and not a number</span></span>
+<span class="ln" id="L1273">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1274">    <span class="tok-com">/// This asserted an absolute real-time factor under 0.5 until it failed,</span></span>
+<span class="ln" id="L1275">    <span class="tok-com">/// and what it was measuring was the machine. A debug build under QEMU on</span></span>
+<span class="ln" id="L1276">    <span class="tok-com">/// the armv7 job reported 0.557 while the same commit passed on every</span></span>
+<span class="ln" id="L1277">    <span class="tok-com">/// native target: an emulated 32-bit target is far slower than the runner</span></span>
+<span class="ln" id="L1278">    <span class="tok-com">/// hosting it, and there is no single number that is generous enough there</span></span>
+<span class="ln" id="L1279">    <span class="tok-com">/// and tight enough to catch anything here.</span></span>
+<span class="ln" id="L1280">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1281">    <span class="tok-com">/// The claim worth defending does not depend on the machine. The regression</span></span>
+<span class="ln" id="L1282">    <span class="tok-com">/// this exists to catch, an un-decimated pitch search, is an order of</span></span>
+<span class="ln" id="L1283">    <span class="tok-com">/// magnitude, and an order of magnitude is still an order of magnitude on a</span></span>
+<span class="ln" id="L1284">    <span class="tok-com">/// slow processor. So the same audio is run twice on the same machine in</span></span>
+<span class="ln" id="L1285">    <span class="tok-com">/// the same test, once with the neutraliser bypassed, and the two are</span></span>
+<span class="ln" id="L1286">    <span class="tok-com">/// compared. Both runs are preceded by an unmeasured pass so that neither</span></span>
+<span class="ln" id="L1287">    <span class="tok-com">/// is paying for a cold cache.</span></span>
+<span class="ln" id="L1288">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1289">    <span class="tok-com">/// The bound is deliberately loose. This is a timing measurement on a</span></span>
+<span class="ln" id="L1290">    <span class="tok-com">/// shared build machine, and a test that fails when somebody else&#x27;s job</span></span>
+<span class="ln" id="L1291">    <span class="tok-com">/// gets busy teaches people to re-run it rather than read it.</span></span>
+<span class="ln" id="L1292">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1293">    <span class="tok-kw">fn</span> <span class="tok-fn">accent_tracking_is_a_small_part_of_what_the_chain_costs</span>() {</span>
+<span class="ln" id="L1294">        <span class="tok-kw">let</span> input = <span class="tok-fn">speaker</span>(<span class="tok-num">150.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L1295">        <span class="tok-kw">let</span> cost = |enabled: bool| {</span>
+<span class="ln" id="L1296">            <span class="tok-kw">let</span> config = DeidConfig {</span>
+<span class="ln" id="L1297">                accent: AccentConfig {</span>
+<span class="ln" id="L1298">                    enabled,</span>
+<span class="ln" id="L1299">                    ..AccentConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1300">                },</span>
+<span class="ln" id="L1301">                ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1302">            };</span>
+<span class="ln" id="L1303">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> d = Deidentifier::<span class="tok-fn">from_seed</span>(config, [8u8; <span class="tok-num">32</span>]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1304">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = vec![<span class="tok-num">0.0</span>; <span class="tok-num">1024</span>];</span>
+<span class="ln" id="L1305">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> run = |d: &amp;<span class="tok-kw">mut</span> Deidentifier| {</span>
+<span class="ln" id="L1306">                <span class="tok-kw">for</span> block <span class="tok-kw">in</span> input.<span class="tok-fn">chunks</span>(<span class="tok-num">1024</span>) {</span>
+<span class="ln" id="L1307">                    d.<span class="tok-fn">process</span>(block, &amp;<span class="tok-kw">mut</span> out[..block.<span class="tok-fn">len</span>()]);</span>
+<span class="ln" id="L1308">                }</span>
+<span class="ln" id="L1309">            };</span>
+<span class="ln" id="L1310">            <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> d);</span>
+<span class="ln" id="L1311">            <span class="tok-kw">let</span> start = std::time::Instant::<span class="tok-fn">now</span>();</span>
+<span class="ln" id="L1312">            <span class="tok-fn">run</span>(&amp;<span class="tok-kw">mut</span> d);</span>
+<span class="ln" id="L1313">            start.<span class="tok-fn">elapsed</span>().<span class="tok-fn">as_secs_f64</span>()</span>
+<span class="ln" id="L1314">        };</span>
+<span class="ln" id="L1315">        <span class="tok-kw">let</span> off = <span class="tok-fn">cost</span>(false);</span>
+<span class="ln" id="L1316">        <span class="tok-kw">let</span> on = <span class="tok-fn">cost</span>(true);</span>
+<span class="ln" id="L1317">        println!(<span class="tok-str">&quot;one second of audio: {off:.4}s bypassed, {on:.4}s with accent tracking&quot;</span>);</span>
+<span class="ln" id="L1318">        assert!(off &gt; <span class="tok-num">0.0</span>, <span class="tok-str">&quot;the bypassed run took no measurable time&quot;</span>);</span>
+<span class="ln" id="L1319">        assert!(</span>
+<span class="ln" id="L1320">            on &lt; off * <span class="tok-num">4.0</span>,</span>
+<span class="ln" id="L1321">            <span class="tok-str">&quot;accent tracking cost {:.1} times the rest of the chain ({on:.4}s against {off:.4}s), \</span></span>
+<span class="ln" id="L1322"><span class="tok-str">             which is the shape of a search that stopped being decimated&quot;</span>,</span>
+<span class="ln" id="L1323">            on / off</span>
+<span class="ln" id="L1324">        );</span>
+<span class="ln" id="L1325">    }</span>
+<span class="ln" id="L1326"></span>
+<span class="ln" id="L1327">    <span class="tok-com">/// The property that makes rolling usable at all: it must be inaudible.</span></span>
+<span class="ln" id="L1328">    <span class="tok-com">/// A discontinuity in the phase offsets would show up as a sample-to-sample</span></span>
+<span class="ln" id="L1329">    <span class="tok-com">/// jump far larger than the signal ever produces on its own.</span></span>
+<span class="ln" id="L1330">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1331">    <span class="tok-kw">fn</span> <span class="tok-fn">rolling_the_seed_introduces_no_clicks</span>() {</span>
+<span class="ln" id="L1332">        <span class="tok-kw">let</span> input = <span class="tok-fn">speaker</span>(<span class="tok-num">150.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L1333">        <span class="tok-kw">let</span> worst_jump = |cfg: DeidConfig| {</span>
+<span class="ln" id="L1334">            <span class="tok-kw">let</span> out = Deidentifier::<span class="tok-fn">from_seed</span>(cfg, [21u8; <span class="tok-num">32</span>])</span>
+<span class="ln" id="L1335">                .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1336">                .<span class="tok-fn">process_vec</span>(&amp;input);</span>
+<span class="ln" id="L1337">            out.<span class="tok-fn">windows</span>(<span class="tok-num">2</span>)</span>
+<span class="ln" id="L1338">                .<span class="tok-fn">skip</span>(<span class="tok-num">4_800</span>) <span class="tok-com">// past the engine&#x27;s warm-up</span></span>
+<span class="ln" id="L1339">                .<span class="tok-fn">fold</span>(<span class="tok-num">0</span>.0f32, |m, w| m.<span class="tok-fn">max</span>((w[<span class="tok-num">1</span>] - w[<span class="tok-num">0</span>]).<span class="tok-fn">abs</span>()))</span>
+<span class="ln" id="L1340">        };</span>
+<span class="ln" id="L1341"></span>
+<span class="ln" id="L1342">        <span class="tok-kw">let</span> steady = <span class="tok-fn">worst_jump</span>(DeidConfig {</span>
+<span class="ln" id="L1343">            reseed_secs: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L1344">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1345">        });</span>
+<span class="ln" id="L1346">        <span class="tok-com">// Fast enough to roll several times inside the test signal.</span></span>
+<span class="ln" id="L1347">        <span class="tok-kw">let</span> rolling = <span class="tok-fn">worst_jump</span>(DeidConfig {</span>
+<span class="ln" id="L1348">            reseed_secs: <span class="tok-num">0.25</span>,</span>
+<span class="ln" id="L1349">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1350">        });</span>
+<span class="ln" id="L1351"></span>
+<span class="ln" id="L1352">        assert!(</span>
+<span class="ln" id="L1353">            rolling &lt;= steady * <span class="tok-num">1.5</span> + 1e-<span class="tok-num">3</span>,</span>
+<span class="ln" id="L1354">            <span class="tok-str">&quot;rolling produced a discontinuity: worst jump {rolling:.4} vs {steady:.4} without&quot;</span></span>
+<span class="ln" id="L1355">        );</span>
+<span class="ln" id="L1356">    }</span>
+<span class="ln" id="L1357"></span>
+<span class="ln" id="L1358">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1359">    <span class="tok-kw">fn</span> <span class="tok-fn">rolling_changes_the_audio_but_keeps_it_sane</span>() {</span>
+<span class="ln" id="L1360">        <span class="tok-kw">let</span> input = <span class="tok-fn">speaker</span>(<span class="tok-num">150.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">5.0</span>);</span>
+<span class="ln" id="L1361">        <span class="tok-kw">let</span> steady = Deidentifier::<span class="tok-fn">from_seed</span>(</span>
+<span class="ln" id="L1362">            DeidConfig {</span>
+<span class="ln" id="L1363">                reseed_secs: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L1364">                ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1365">            },</span>
+<span class="ln" id="L1366">            [4u8; <span class="tok-num">32</span>],</span>
+<span class="ln" id="L1367">        )</span>
+<span class="ln" id="L1368">        .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1369">        .<span class="tok-fn">process_vec</span>(&amp;input);</span>
+<span class="ln" id="L1370">        <span class="tok-kw">let</span> rolling = Deidentifier::<span class="tok-fn">from_seed</span>(</span>
+<span class="ln" id="L1371">            DeidConfig {</span>
+<span class="ln" id="L1372">                reseed_secs: <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L1373">                ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1374">            },</span>
+<span class="ln" id="L1375">            [4u8; <span class="tok-num">32</span>],</span>
+<span class="ln" id="L1376">        )</span>
+<span class="ln" id="L1377">        .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1378">        .<span class="tok-fn">process_vec</span>(&amp;input);</span>
+<span class="ln" id="L1379"></span>
+<span class="ln" id="L1380">        assert!(rolling.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|v| v.<span class="tok-fn">is_finite</span>()));</span>
+<span class="ln" id="L1381">        <span class="tok-kw">let</span> diff: f32 = steady</span>
+<span class="ln" id="L1382">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L1383">            .<span class="tok-fn">zip</span>(&amp;rolling)</span>
+<span class="ln" id="L1384">            .<span class="tok-fn">map</span>(|(a, b)| (a - b).<span class="tok-fn">abs</span>())</span>
+<span class="ln" id="L1385">            .<span class="tok-fn">sum</span>();</span>
+<span class="ln" id="L1386">        assert!(</span>
+<span class="ln" id="L1387">            diff &gt; <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L1388">            <span class="tok-str">&quot;rolling should change the modulation (diff={diff})&quot;</span></span>
+<span class="ln" id="L1389">        );</span>
+<span class="ln" id="L1390"></span>
+<span class="ln" id="L1391">        <span class="tok-kw">let</span> rms = |x: &amp;[f32]| (x.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|v| v * v).sum::&lt;f32&gt;() / x.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> f32).<span class="tok-fn">sqrt</span>();</span>
+<span class="ln" id="L1392">        <span class="tok-kw">let</span> ratio = <span class="tok-fn">rms</span>(&amp;rolling) / <span class="tok-fn">rms</span>(&amp;steady);</span>
+<span class="ln" id="L1393">        assert!(</span>
+<span class="ln" id="L1394">            (<span class="tok-num">0.5</span>..<span class="tok-num">2.0</span>).<span class="tok-fn">contains</span>(&amp;ratio),</span>
+<span class="ln" id="L1395">            <span class="tok-str">&quot;rolling should not change the level ({ratio:.2}x)&quot;</span></span>
+<span class="ln" id="L1396">        );</span>
+<span class="ln" id="L1397">    }</span>
+<span class="ln" id="L1398"></span>
+<span class="ln" id="L1399">    <span class="tok-com">/// Rolling must not cost determinism &#8212; reproducible builds and the whole</span></span>
+<span class="ln" id="L1400">    <span class="tok-com">/// test suite depend on `from_seed` being repeatable.</span></span>
+<span class="ln" id="L1401">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1402">    <span class="tok-kw">fn</span> <span class="tok-fn">rolling_stays_deterministic_for_a_given_seed</span>() {</span>
+<span class="ln" id="L1403">        <span class="tok-kw">let</span> input = <span class="tok-fn">speaker</span>(<span class="tok-num">180.0</span>, <span class="tok-num">1.0</span>, <span class="tok-num">3.0</span>);</span>
+<span class="ln" id="L1404">        <span class="tok-kw">let</span> cfg = DeidConfig {</span>
+<span class="ln" id="L1405">            reseed_secs: <span class="tok-num">0.3</span>,</span>
+<span class="ln" id="L1406">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1407">        };</span>
+<span class="ln" id="L1408">        <span class="tok-kw">let</span> a = Deidentifier::<span class="tok-fn">from_seed</span>(cfg, [77u8; <span class="tok-num">32</span>])</span>
+<span class="ln" id="L1409">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1410">            .<span class="tok-fn">process_vec</span>(&amp;input);</span>
+<span class="ln" id="L1411">        <span class="tok-kw">let</span> b = Deidentifier::<span class="tok-fn">from_seed</span>(cfg, [77u8; <span class="tok-num">32</span>])</span>
+<span class="ln" id="L1412">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1413">            .<span class="tok-fn">process_vec</span>(&amp;input);</span>
+<span class="ln" id="L1414">        assert_eq!(a, b, <span class="tok-str">&quot;same seed must give the same audio, rolling or not&quot;</span>);</span>
+<span class="ln" id="L1415">    }</span>
 <span class="ln" id="L1416"></span>
+<span class="ln" id="L1417">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1418">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_interval_is_validated</span>() {</span>
+<span class="ln" id="L1419">        assert!(DeidConfig {</span>
+<span class="ln" id="L1420">            reseed_secs: -<span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L1421">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1422">        }</span>
+<span class="ln" id="L1423">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L1424">        .<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L1425">        assert!(DeidConfig {</span>
+<span class="ln" id="L1426">            reseed_secs: f32::NAN,</span>
+<span class="ln" id="L1427">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1428">        }</span>
+<span class="ln" id="L1429">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L1430">        .<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L1431">        assert!(DeidConfig {</span>
+<span class="ln" id="L1432">            reseed_secs: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L1433">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1434">        }</span>
+<span class="ln" id="L1435">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L1436">        .<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L1437">        assert!(DeidConfig {</span>
+<span class="ln" id="L1438">            reseed_secs: <span class="tok-num">2.0</span>,</span>
+<span class="ln" id="L1439">            ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1440">        }</span>
+<span class="ln" id="L1441">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L1442">        .<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L1443">    }</span>
+<span class="ln" id="L1444"></span>
+<span class="ln" id="L1445">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1446">    <span class="tok-kw">fn</span> <span class="tok-fn">stats_are_populated</span>() {</span>
+<span class="ln" id="L1447">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> d = Deidentifier::<span class="tok-fn">from_seed</span>(DeidConfig::<span class="tok-fn">default</span>(), [9u8; <span class="tok-num">32</span>]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1448">        <span class="tok-kw">let</span> input = vec![<span class="tok-num">0</span>.1f32; <span class="tok-num">8192</span>];</span>
+<span class="ln" id="L1449">        d.<span class="tok-fn">process</span>(&amp;input, &amp;<span class="tok-kw">mut</span> vec![<span class="tok-num">0.0</span>; <span class="tok-num">8192</span>]);</span>
+<span class="ln" id="L1450">        <span class="tok-kw">let</span> s = d.<span class="tok-fn">stats</span>();</span>
+<span class="ln" id="L1451">        assert_eq!(s.blocks, <span class="tok-num">1</span>);</span>
+<span class="ln" id="L1452">        assert!(s.last_block_us &gt; <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L1453">        assert!(s.algorithmic_latency_ms &gt; <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L1454">    }</span>
+<span class="ln" id="L1455">}</span>
+<span class="ln" id="L1456"></span>
 <span class="src-item" id="fn-reseed_range_tests">
-<span class="ln" id="L1417"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L1418"><span class="tok-kw">mod</span> reseed_range_tests {</span>
-<span class="ln" id="L1419">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L1420"></span>
-<span class="ln" id="L1421">    <span class="tok-com">/// **F-73.** The front ends must actually draw a range at launch.</span></span>
-<span class="ln" id="L1422">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1423">    <span class="tok-com">/// [`DeidConfig::reseed_range_ms`]&#x27;s own documentation said &quot;the front ends</span></span>
-<span class="ln" id="L1424">    <span class="tok-com">/// call [`DeidConfig::with_random_reseed_range`] at launch, which is what</span></span>
-<span class="ln" id="L1425">    <span class="tok-com">/// makes the shipped interval something other than a number compiled in&quot;.</span></span>
-<span class="ln" id="L1426">    <span class="tok-com">/// Nothing called it. It was written, documented, tested in isolation, and</span></span>
-<span class="ln" id="L1427">    <span class="tok-com">/// reached by no code path for two releases, so every shipped copy rolled</span></span>
-<span class="ln" id="L1428">    <span class="tok-com">/// on the same fixed two-second period -- exactly the thing the sentence</span></span>
-<span class="ln" id="L1429">    <span class="tok-com">/// said was not happening.</span></span>
-<span class="ln" id="L1430">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1431">    <span class="tok-com">/// A comment cannot be tested, so this tests the code the comment is about.</span></span>
-<span class="ln" id="L1432">    <span class="tok-com">/// It reads both front ends and fails the build if the call is gone.</span></span>
-<span class="ln" id="L1433">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1434">    <span class="tok-kw">fn</span> <span class="tok-fn">both_front_ends_draw_a_random_range_at_launch</span>() {</span>
-<span class="ln" id="L1435">        <span class="tok-kw">let</span> here = std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>));</span>
-<span class="ln" id="L1436">        <span class="tok-kw">let</span> crates = here.<span class="tok-fn">parent</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;crates/&quot;</span>);</span>
-<span class="ln" id="L1437">        <span class="tok-kw">for</span> (crate_name, file) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1438">            (<span class="tok-str">&quot;veilvoice-cli&quot;</span>, <span class="tok-str">&quot;src/main.rs&quot;</span>),</span>
-<span class="ln" id="L1439">            (<span class="tok-str">&quot;veilvoice-gui&quot;</span>, <span class="tok-str">&quot;src/app.rs&quot;</span>),</span>
-<span class="ln" id="L1440">        ] {</span>
-<span class="ln" id="L1441">            <span class="tok-kw">let</span> path = crates.<span class="tok-fn">join</span>(crate_name).<span class="tok-fn">join</span>(file);</span>
-<span class="ln" id="L1442">            <span class="tok-kw">let</span> source = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path)</span>
-<span class="ln" id="L1443">                .<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{}: {e}&quot;</span>, path.<span class="tok-fn">display</span>()))</span>
-<span class="ln" id="L1444">                .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1445">            <span class="tok-kw">let</span> code: String = source</span>
-<span class="ln" id="L1446">                .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L1447">                .<span class="tok-fn">filter</span>(|line| {</span>
-<span class="ln" id="L1448">                    <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L1449">                    !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>)</span>
-<span class="ln" id="L1450">                })</span>
-<span class="ln" id="L1451">                .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L1452">                .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1453">            assert!(</span>
-<span class="ln" id="L1454">                code.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;with_random_reseed_range()&quot;</span>),</span>
-<span class="ln" id="L1455">                <span class="tok-str">&quot;{crate_name} does not draw a ratchet range at launch, so every copy \</span></span>
-<span class="ln" id="L1456"><span class="tok-str">                 of it ships the same fixed period&quot;</span></span>
-<span class="ln" id="L1457">            );</span>
-<span class="ln" id="L1458">        }</span>
-<span class="ln" id="L1459">    }</span>
+<span class="ln" id="L1457"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L1458"><span class="tok-kw">mod</span> reseed_range_tests {</span>
+<span class="ln" id="L1459">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L1460"></span>
-<span class="ln" id="L1461">    <span class="tok-com">/// A drawn range is different from run to run. If it were not, it would be</span></span>
-<span class="ln" id="L1462">    <span class="tok-com">/// a compiled-in number wearing a random-looking coat.</span></span>
-<span class="ln" id="L1463">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1464">    <span class="tok-kw">fn</span> <span class="tok-fn">a_drawn_range_is_not_the_same_twice</span>() {</span>
-<span class="ln" id="L1465">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = std::collections::BTreeSet::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1466">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">8</span> {</span>
-<span class="ln" id="L1467">            <span class="tok-kw">let</span> range = DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1468">                .<span class="tok-fn">with_random_reseed_range</span>()</span>
-<span class="ln" id="L1469">                .reseed_range_ms</span>
-<span class="ln" id="L1470">                .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
-<span class="ln" id="L1471">            seen.<span class="tok-fn">insert</span>(format!(<span class="tok-str">&quot;{:.3},{:.3}&quot;</span>, range.<span class="tok-num">0</span>, range.<span class="tok-num">1</span>));</span>
-<span class="ln" id="L1472">        }</span>
-<span class="ln" id="L1473">        assert!(seen.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>, <span class="tok-str">&quot;eight draws produced one range: {seen:?}&quot;</span>);</span>
-<span class="ln" id="L1474">    }</span>
-<span class="ln" id="L1475"></span>
-<span class="ln" id="L1476">    <span class="tok-com">/// A drawn range is usable: the right way round, inside the bounds, and</span></span>
-<span class="ln" id="L1477">    <span class="tok-com">/// wide enough to survive quantisation.</span></span>
-<span class="ln" id="L1478">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1479">    <span class="tok-kw">fn</span> <span class="tok-fn">a_drawn_range_is_always_valid</span>() {</span>
-<span class="ln" id="L1480">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">64</span> {</span>
-<span class="ln" id="L1481">            <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>().<span class="tok-fn">with_random_reseed_range</span>();</span>
-<span class="ln" id="L1482">            <span class="tok-kw">let</span> (lo, hi) = config.reseed_range_ms.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
-<span class="ln" id="L1483">            assert!(lo &lt; hi, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
-<span class="ln" id="L1484">            assert!(lo &gt;= MIN_RESEED_MS, <span class="tok-str">&quot;{lo}&quot;</span>);</span>
-<span class="ln" id="L1485">            assert!(hi &lt;= MAX_RESEED_MS, <span class="tok-str">&quot;{hi}&quot;</span>);</span>
-<span class="ln" id="L1486">            assert!(config.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
-<span class="ln" id="L1487">        }</span>
-<span class="ln" id="L1488">    }</span>
-<span class="ln" id="L1489"></span>
-<span class="ln" id="L1490">    <span class="tok-com">/// Everything a person can type that is not a range is **refused**, and</span></span>
-<span class="ln" id="L1491">    <span class="tok-com">/// the refusal says which thing was wrong. Nothing is adjusted to fit:</span></span>
-<span class="ln" id="L1492">    <span class="tok-com">/// that is the whole of marker 28&#x27;s wording.</span></span>
-<span class="ln" id="L1493">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1494">    <span class="tok-kw">fn</span> <span class="tok-fn">bad_input_is_refused_with_a_reason_and_never_corrected</span>() {</span>
-<span class="ln" id="L1495">        <span class="tok-kw">use</span> RangeError::*;</span>
-<span class="ln" id="L1496">        <span class="tok-kw">for</span> (text, expected) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1497">            (<span class="tok-str">&quot;&quot;</span>, <span class="tok-fn">NotTwoNumbers</span>(String::<span class="tok-fn">new</span>())),</span>
-<span class="ln" id="L1498">            (<span class="tok-str">&quot;5&quot;</span>, <span class="tok-fn">NotTwoNumbers</span>(<span class="tok-str">&quot;5&quot;</span>.<span class="tok-fn">into</span>())),</span>
-<span class="ln" id="L1499">            (<span class="tok-str">&quot;abc,def&quot;</span>, <span class="tok-fn">NotANumber</span>(<span class="tok-str">&quot;abc&quot;</span>.<span class="tok-fn">into</span>())),</span>
-<span class="ln" id="L1500">            (<span class="tok-str">&quot;100,zzz&quot;</span>, <span class="tok-fn">NotANumber</span>(<span class="tok-str">&quot;zzz&quot;</span>.<span class="tok-fn">into</span>())),</span>
-<span class="ln" id="L1501">            (<span class="tok-str">&quot;0,100&quot;</span>, <span class="tok-fn">NotPositive</span>(<span class="tok-num">0.0</span>)),</span>
-<span class="ln" id="L1502">            (<span class="tok-str">&quot;-5,100&quot;</span>, <span class="tok-fn">NotPositive</span>(-<span class="tok-num">5.0</span>)),</span>
-<span class="ln" id="L1503">            (</span>
-<span class="ln" id="L1504">                <span class="tok-str">&quot;1800,250&quot;</span>,</span>
-<span class="ln" id="L1505">                Backwards {</span>
-<span class="ln" id="L1506">                    lo: <span class="tok-num">1800.0</span>,</span>
-<span class="ln" id="L1507">                    hi: <span class="tok-num">250.0</span>,</span>
-<span class="ln" id="L1508">                },</span>
-<span class="ln" id="L1509">            ),</span>
-<span class="ln" id="L1510">            (</span>
-<span class="ln" id="L1511">                <span class="tok-str">&quot;100,100&quot;</span>,</span>
-<span class="ln" id="L1512">                Backwards {</span>
-<span class="ln" id="L1513">                    lo: <span class="tok-num">100.0</span>,</span>
-<span class="ln" id="L1514">                    hi: <span class="tok-num">100.0</span>,</span>
-<span class="ln" id="L1515">                },</span>
-<span class="ln" id="L1516">            ),</span>
-<span class="ln" id="L1517">            (</span>
-<span class="ln" id="L1518">                <span class="tok-str">&quot;0.001,100&quot;</span>,</span>
-<span class="ln" id="L1519">                TooShort {</span>
-<span class="ln" id="L1520">                    lo: <span class="tok-num">0.001</span>,</span>
-<span class="ln" id="L1521">                    least: MIN_RESEED_MS,</span>
-<span class="ln" id="L1522">                },</span>
-<span class="ln" id="L1523">            ),</span>
-<span class="ln" id="L1524">            (</span>
-<span class="ln" id="L1525">                <span class="tok-str">&quot;100,900000&quot;</span>,</span>
-<span class="ln" id="L1526">                TooLong {</span>
-<span class="ln" id="L1527">                    hi: <span class="tok-num">900_000.0</span>,</span>
-<span class="ln" id="L1528">                    most: MAX_RESEED_MS,</span>
-<span class="ln" id="L1529">                },</span>
-<span class="ln" id="L1530">            ),</span>
-<span class="ln" id="L1531">        ] {</span>
-<span class="ln" id="L1532">            <span class="tok-kw">let</span> got =</span>
-<span class="ln" id="L1533">                <span class="tok-fn">parse_reseed_range</span>(text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a value that is not a range must be refused&quot;</span>);</span>
-<span class="ln" id="L1534">            assert_eq!(</span>
-<span class="ln" id="L1535">                std::mem::<span class="tok-fn">discriminant</span>(&amp;got),</span>
-<span class="ln" id="L1536">                std::mem::<span class="tok-fn">discriminant</span>(&amp;expected),</span>
-<span class="ln" id="L1537">                <span class="tok-str">&quot;{text:?} gave {got:?}&quot;</span></span>
-<span class="ln" id="L1538">            );</span>
-<span class="ln" id="L1539">            <span class="tok-com">// Every refusal has to be a sentence somebody can act on.</span></span>
-<span class="ln" id="L1540">            <span class="tok-kw">let</span> words = got.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L1541">            assert!(words.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>, <span class="tok-str">&quot;{text:?}: {words}&quot;</span>);</span>
-<span class="ln" id="L1542">        }</span>
-<span class="ln" id="L1543">    }</span>
-<span class="ln" id="L1544"></span>
-<span class="ln" id="L1545">    <span class="tok-com">/// The shapes people actually type are accepted, and accepted exactly --</span></span>
-<span class="ln" id="L1546">    <span class="tok-com">/// the numbers that come back are the numbers that went in.</span></span>
-<span class="ln" id="L1547">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1548">    <span class="tok-kw">fn</span> <span class="tok-fn">a_usable_range_survives_unchanged</span>() {</span>
-<span class="ln" id="L1549">        <span class="tok-kw">for</span> (text, want) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1550">            (<span class="tok-str">&quot;250,1800&quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
-<span class="ln" id="L1551">            (<span class="tok-str">&quot; 250 , 1800 &quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
-<span class="ln" id="L1552">            (<span class="tok-str">&quot;250-1800&quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
-<span class="ln" id="L1553">            (<span class="tok-str">&quot;0.5,2&quot;</span>, (<span class="tok-num">0.5</span>, <span class="tok-num">2.0</span>)),</span>
-<span class="ln" id="L1554">        ] {</span>
-<span class="ln" id="L1555">            <span class="tok-kw">let</span> got = <span class="tok-fn">parse_reseed_range</span>(text).<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{text:?}: {e}&quot;</span>));</span>
-<span class="ln" id="L1556">            assert_eq!(got, want, <span class="tok-str">&quot;{text:?}&quot;</span>);</span>
-<span class="ln" id="L1557">        }</span>
-<span class="ln" id="L1558">    }</span>
-<span class="ln" id="L1559"></span>
-<span class="ln" id="L1560">    <span class="tok-com">/// What an interface shows is what the engine will do, not what was asked</span></span>
-<span class="ln" id="L1561">    <span class="tok-com">/// for. The ratchet only fires on a frame boundary, so a range is</span></span>
-<span class="ln" id="L1562">    <span class="tok-com">/// quantised, and displaying the request would describe a spread that does</span></span>
-<span class="ln" id="L1563">    <span class="tok-com">/// not exist.</span></span>
-<span class="ln" id="L1564">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1565">    <span class="tok-kw">fn</span> <span class="tok-fn">the_effective_range_is_quantised_to_whole_frames</span>() {</span>
-<span class="ln" id="L1566">        <span class="tok-kw">let</span> config = DeidConfig {</span>
-<span class="ln" id="L1567">            reseed_range_ms: <span class="tok-fn">Some</span>((<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
-<span class="ln" id="L1568">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1569">        };</span>
-<span class="ln" id="L1570">        <span class="tok-kw">let</span> (lo, hi) = config.<span class="tok-fn">effective_reseed_range_ms</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
-<span class="ln" id="L1571">        <span class="tok-kw">let</span> frame = config.<span class="tok-fn">frame_ms</span>();</span>
-<span class="ln" id="L1572">        <span class="tok-kw">for</span> value <span class="tok-kw">in</span> [lo, hi] {</span>
-<span class="ln" id="L1573">            <span class="tok-kw">let</span> frames = value / frame;</span>
-<span class="ln" id="L1574">            assert!(</span>
-<span class="ln" id="L1575">                (frames - frames.<span class="tok-fn">round</span>()).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">3</span>,</span>
-<span class="ln" id="L1576">                <span class="tok-str">&quot;{value} ms is not a whole number of {frame} ms frames&quot;</span></span>
-<span class="ln" id="L1577">            );</span>
-<span class="ln" id="L1578">        }</span>
-<span class="ln" id="L1579">        assert!(lo &gt;= <span class="tok-num">250.0</span> - frame &amp;&amp; hi &gt;= <span class="tok-num">1800.0</span> - frame, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
-<span class="ln" id="L1580">    }</span>
-<span class="ln" id="L1581">}</span>
+<span class="ln" id="L1461">    <span class="tok-com">/// **F-73.** The front ends must actually draw a range at launch.</span></span>
+<span class="ln" id="L1462">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1463">    <span class="tok-com">/// [`DeidConfig::reseed_range_ms`]&#x27;s own documentation said &quot;the front ends</span></span>
+<span class="ln" id="L1464">    <span class="tok-com">/// call [`DeidConfig::with_random_reseed_range`] at launch, which is what</span></span>
+<span class="ln" id="L1465">    <span class="tok-com">/// makes the shipped interval something other than a number compiled in&quot;.</span></span>
+<span class="ln" id="L1466">    <span class="tok-com">/// Nothing called it. It was written, documented, tested in isolation, and</span></span>
+<span class="ln" id="L1467">    <span class="tok-com">/// reached by no code path for two releases, so every shipped copy rolled</span></span>
+<span class="ln" id="L1468">    <span class="tok-com">/// on the same fixed two-second period -- exactly the thing the sentence</span></span>
+<span class="ln" id="L1469">    <span class="tok-com">/// said was not happening.</span></span>
+<span class="ln" id="L1470">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1471">    <span class="tok-com">/// A comment cannot be tested, so this tests the code the comment is about.</span></span>
+<span class="ln" id="L1472">    <span class="tok-com">/// It reads both front ends and fails the build if the call is gone.</span></span>
+<span class="ln" id="L1473">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1474">    <span class="tok-kw">fn</span> <span class="tok-fn">both_front_ends_draw_a_random_range_at_launch</span>() {</span>
+<span class="ln" id="L1475">        <span class="tok-kw">let</span> here = std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>));</span>
+<span class="ln" id="L1476">        <span class="tok-kw">let</span> crates = here.<span class="tok-fn">parent</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;crates/&quot;</span>);</span>
+<span class="ln" id="L1477">        <span class="tok-kw">for</span> (crate_name, file) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1478">            (<span class="tok-str">&quot;veilvoice-cli&quot;</span>, <span class="tok-str">&quot;src/main.rs&quot;</span>),</span>
+<span class="ln" id="L1479">            (<span class="tok-str">&quot;veilvoice-gui&quot;</span>, <span class="tok-str">&quot;src/app.rs&quot;</span>),</span>
+<span class="ln" id="L1480">        ] {</span>
+<span class="ln" id="L1481">            <span class="tok-kw">let</span> path = crates.<span class="tok-fn">join</span>(crate_name).<span class="tok-fn">join</span>(file);</span>
+<span class="ln" id="L1482">            <span class="tok-kw">let</span> source = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path)</span>
+<span class="ln" id="L1483">                .<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{}: {e}&quot;</span>, path.<span class="tok-fn">display</span>()))</span>
+<span class="ln" id="L1484">                .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1485">            <span class="tok-kw">let</span> code: String = source</span>
+<span class="ln" id="L1486">                .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L1487">                .<span class="tok-fn">filter</span>(|line| {</span>
+<span class="ln" id="L1488">                    <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1489">                    !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>)</span>
+<span class="ln" id="L1490">                })</span>
+<span class="ln" id="L1491">                .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L1492">                .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1493">            assert!(</span>
+<span class="ln" id="L1494">                code.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;with_random_reseed_range()&quot;</span>),</span>
+<span class="ln" id="L1495">                <span class="tok-str">&quot;{crate_name} does not draw a ratchet range at launch, so every copy \</span></span>
+<span class="ln" id="L1496"><span class="tok-str">                 of it ships the same fixed period&quot;</span></span>
+<span class="ln" id="L1497">            );</span>
+<span class="ln" id="L1498">        }</span>
+<span class="ln" id="L1499">    }</span>
+<span class="ln" id="L1500"></span>
+<span class="ln" id="L1501">    <span class="tok-com">/// A drawn range is different from run to run. If it were not, it would be</span></span>
+<span class="ln" id="L1502">    <span class="tok-com">/// a compiled-in number wearing a random-looking coat.</span></span>
+<span class="ln" id="L1503">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1504">    <span class="tok-kw">fn</span> <span class="tok-fn">a_drawn_range_is_not_the_same_twice</span>() {</span>
+<span class="ln" id="L1505">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = std::collections::BTreeSet::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1506">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">8</span> {</span>
+<span class="ln" id="L1507">            <span class="tok-kw">let</span> range = DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1508">                .<span class="tok-fn">with_random_reseed_range</span>()</span>
+<span class="ln" id="L1509">                .reseed_range_ms</span>
+<span class="ln" id="L1510">                .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
+<span class="ln" id="L1511">            seen.<span class="tok-fn">insert</span>(format!(<span class="tok-str">&quot;{:.3},{:.3}&quot;</span>, range.<span class="tok-num">0</span>, range.<span class="tok-num">1</span>));</span>
+<span class="ln" id="L1512">        }</span>
+<span class="ln" id="L1513">        assert!(seen.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span>, <span class="tok-str">&quot;eight draws produced one range: {seen:?}&quot;</span>);</span>
+<span class="ln" id="L1514">    }</span>
+<span class="ln" id="L1515"></span>
+<span class="ln" id="L1516">    <span class="tok-com">/// A drawn range is usable: the right way round, inside the bounds, and</span></span>
+<span class="ln" id="L1517">    <span class="tok-com">/// wide enough to survive quantisation.</span></span>
+<span class="ln" id="L1518">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1519">    <span class="tok-kw">fn</span> <span class="tok-fn">a_drawn_range_is_always_valid</span>() {</span>
+<span class="ln" id="L1520">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">64</span> {</span>
+<span class="ln" id="L1521">            <span class="tok-kw">let</span> config = DeidConfig::<span class="tok-fn">default</span>().<span class="tok-fn">with_random_reseed_range</span>();</span>
+<span class="ln" id="L1522">            <span class="tok-kw">let</span> (lo, hi) = config.reseed_range_ms.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
+<span class="ln" id="L1523">            assert!(lo &lt; hi, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
+<span class="ln" id="L1524">            assert!(lo &gt;= MIN_RESEED_MS, <span class="tok-str">&quot;{lo}&quot;</span>);</span>
+<span class="ln" id="L1525">            assert!(hi &lt;= MAX_RESEED_MS, <span class="tok-str">&quot;{hi}&quot;</span>);</span>
+<span class="ln" id="L1526">            assert!(config.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
+<span class="ln" id="L1527">        }</span>
+<span class="ln" id="L1528">    }</span>
+<span class="ln" id="L1529"></span>
+<span class="ln" id="L1530">    <span class="tok-com">/// Everything a person can type that is not a range is **refused**, and</span></span>
+<span class="ln" id="L1531">    <span class="tok-com">/// the refusal says which thing was wrong. Nothing is adjusted to fit:</span></span>
+<span class="ln" id="L1532">    <span class="tok-com">/// that is the whole of marker 28&#x27;s wording.</span></span>
+<span class="ln" id="L1533">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1534">    <span class="tok-kw">fn</span> <span class="tok-fn">bad_input_is_refused_with_a_reason_and_never_corrected</span>() {</span>
+<span class="ln" id="L1535">        <span class="tok-kw">use</span> RangeError::*;</span>
+<span class="ln" id="L1536">        <span class="tok-kw">for</span> (text, expected) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1537">            (<span class="tok-str">&quot;&quot;</span>, <span class="tok-fn">NotTwoNumbers</span>(String::<span class="tok-fn">new</span>())),</span>
+<span class="ln" id="L1538">            (<span class="tok-str">&quot;5&quot;</span>, <span class="tok-fn">NotTwoNumbers</span>(<span class="tok-str">&quot;5&quot;</span>.<span class="tok-fn">into</span>())),</span>
+<span class="ln" id="L1539">            (<span class="tok-str">&quot;abc,def&quot;</span>, <span class="tok-fn">NotANumber</span>(<span class="tok-str">&quot;abc&quot;</span>.<span class="tok-fn">into</span>())),</span>
+<span class="ln" id="L1540">            (<span class="tok-str">&quot;100,zzz&quot;</span>, <span class="tok-fn">NotANumber</span>(<span class="tok-str">&quot;zzz&quot;</span>.<span class="tok-fn">into</span>())),</span>
+<span class="ln" id="L1541">            (<span class="tok-str">&quot;0,100&quot;</span>, <span class="tok-fn">NotPositive</span>(<span class="tok-num">0.0</span>)),</span>
+<span class="ln" id="L1542">            (<span class="tok-str">&quot;-5,100&quot;</span>, <span class="tok-fn">NotPositive</span>(-<span class="tok-num">5.0</span>)),</span>
+<span class="ln" id="L1543">            (</span>
+<span class="ln" id="L1544">                <span class="tok-str">&quot;1800,250&quot;</span>,</span>
+<span class="ln" id="L1545">                Backwards {</span>
+<span class="ln" id="L1546">                    lo: <span class="tok-num">1800.0</span>,</span>
+<span class="ln" id="L1547">                    hi: <span class="tok-num">250.0</span>,</span>
+<span class="ln" id="L1548">                },</span>
+<span class="ln" id="L1549">            ),</span>
+<span class="ln" id="L1550">            (</span>
+<span class="ln" id="L1551">                <span class="tok-str">&quot;100,100&quot;</span>,</span>
+<span class="ln" id="L1552">                Backwards {</span>
+<span class="ln" id="L1553">                    lo: <span class="tok-num">100.0</span>,</span>
+<span class="ln" id="L1554">                    hi: <span class="tok-num">100.0</span>,</span>
+<span class="ln" id="L1555">                },</span>
+<span class="ln" id="L1556">            ),</span>
+<span class="ln" id="L1557">            (</span>
+<span class="ln" id="L1558">                <span class="tok-str">&quot;0.001,100&quot;</span>,</span>
+<span class="ln" id="L1559">                TooShort {</span>
+<span class="ln" id="L1560">                    lo: <span class="tok-num">0.001</span>,</span>
+<span class="ln" id="L1561">                    least: MIN_RESEED_MS,</span>
+<span class="ln" id="L1562">                },</span>
+<span class="ln" id="L1563">            ),</span>
+<span class="ln" id="L1564">            (</span>
+<span class="ln" id="L1565">                <span class="tok-str">&quot;100,900000&quot;</span>,</span>
+<span class="ln" id="L1566">                TooLong {</span>
+<span class="ln" id="L1567">                    hi: <span class="tok-num">900_000.0</span>,</span>
+<span class="ln" id="L1568">                    most: MAX_RESEED_MS,</span>
+<span class="ln" id="L1569">                },</span>
+<span class="ln" id="L1570">            ),</span>
+<span class="ln" id="L1571">        ] {</span>
+<span class="ln" id="L1572">            <span class="tok-kw">let</span> got =</span>
+<span class="ln" id="L1573">                <span class="tok-fn">parse_reseed_range</span>(text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a value that is not a range must be refused&quot;</span>);</span>
+<span class="ln" id="L1574">            assert_eq!(</span>
+<span class="ln" id="L1575">                std::mem::<span class="tok-fn">discriminant</span>(&amp;got),</span>
+<span class="ln" id="L1576">                std::mem::<span class="tok-fn">discriminant</span>(&amp;expected),</span>
+<span class="ln" id="L1577">                <span class="tok-str">&quot;{text:?} gave {got:?}&quot;</span></span>
+<span class="ln" id="L1578">            );</span>
+<span class="ln" id="L1579">            <span class="tok-com">// Every refusal has to be a sentence somebody can act on.</span></span>
+<span class="ln" id="L1580">            <span class="tok-kw">let</span> words = got.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1581">            assert!(words.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>, <span class="tok-str">&quot;{text:?}: {words}&quot;</span>);</span>
+<span class="ln" id="L1582">        }</span>
+<span class="ln" id="L1583">    }</span>
+<span class="ln" id="L1584"></span>
+<span class="ln" id="L1585">    <span class="tok-com">/// The shapes people actually type are accepted, and accepted exactly --</span></span>
+<span class="ln" id="L1586">    <span class="tok-com">/// the numbers that come back are the numbers that went in.</span></span>
+<span class="ln" id="L1587">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1588">    <span class="tok-kw">fn</span> <span class="tok-fn">a_usable_range_survives_unchanged</span>() {</span>
+<span class="ln" id="L1589">        <span class="tok-kw">for</span> (text, want) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1590">            (<span class="tok-str">&quot;250,1800&quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
+<span class="ln" id="L1591">            (<span class="tok-str">&quot; 250 , 1800 &quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
+<span class="ln" id="L1592">            (<span class="tok-str">&quot;250-1800&quot;</span>, (<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
+<span class="ln" id="L1593">            (<span class="tok-str">&quot;0.5,2&quot;</span>, (<span class="tok-num">0.5</span>, <span class="tok-num">2.0</span>)),</span>
+<span class="ln" id="L1594">        ] {</span>
+<span class="ln" id="L1595">            <span class="tok-kw">let</span> got = <span class="tok-fn">parse_reseed_range</span>(text).<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{text:?}: {e}&quot;</span>));</span>
+<span class="ln" id="L1596">            assert_eq!(got, want, <span class="tok-str">&quot;{text:?}&quot;</span>);</span>
+<span class="ln" id="L1597">        }</span>
+<span class="ln" id="L1598">    }</span>
+<span class="ln" id="L1599"></span>
+<span class="ln" id="L1600">    <span class="tok-com">/// What an interface shows is what the engine will do, not what was asked</span></span>
+<span class="ln" id="L1601">    <span class="tok-com">/// for. The ratchet only fires on a frame boundary, so a range is</span></span>
+<span class="ln" id="L1602">    <span class="tok-com">/// quantised, and displaying the request would describe a spread that does</span></span>
+<span class="ln" id="L1603">    <span class="tok-com">/// not exist.</span></span>
+<span class="ln" id="L1604">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1605">    <span class="tok-kw">fn</span> <span class="tok-fn">the_effective_range_is_quantised_to_whole_frames</span>() {</span>
+<span class="ln" id="L1606">        <span class="tok-kw">let</span> config = DeidConfig {</span>
+<span class="ln" id="L1607">            reseed_range_ms: <span class="tok-fn">Some</span>((<span class="tok-num">250.0</span>, <span class="tok-num">1800.0</span>)),</span>
+<span class="ln" id="L1608">            ..DeidConfig::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1609">        };</span>
+<span class="ln" id="L1610">        <span class="tok-kw">let</span> (lo, hi) = config.<span class="tok-fn">effective_reseed_range_ms</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a range&quot;</span>);</span>
+<span class="ln" id="L1611">        <span class="tok-kw">let</span> frame = config.<span class="tok-fn">frame_ms</span>();</span>
+<span class="ln" id="L1612">        <span class="tok-kw">for</span> value <span class="tok-kw">in</span> [lo, hi] {</span>
+<span class="ln" id="L1613">            <span class="tok-kw">let</span> frames = value / frame;</span>
+<span class="ln" id="L1614">            assert!(</span>
+<span class="ln" id="L1615">                (frames - frames.<span class="tok-fn">round</span>()).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">3</span>,</span>
+<span class="ln" id="L1616">                <span class="tok-str">&quot;{value} ms is not a whole number of {frame} ms frames&quot;</span></span>
+<span class="ln" id="L1617">            );</span>
+<span class="ln" id="L1618">        }</span>
+<span class="ln" id="L1619">        assert!(lo &gt;= <span class="tok-num">250.0</span> - frame &amp;&amp; hi &gt;= <span class="tok-num">1800.0</span> - frame, <span class="tok-str">&quot;{lo} {hi}&quot;</span>);</span>
+<span class="ln" id="L1620">    }</span>
+<span class="ln" id="L1621">}</span>
 </span>
 </code></pre>
 </main>
