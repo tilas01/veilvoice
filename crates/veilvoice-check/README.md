@@ -93,7 +93,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>463 lines"])
+    n_lib(["lib.rs<br/>510 lines"])
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs" "open the source"
 ```
 
@@ -103,7 +103,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | 463 | Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list. |
+| [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | 510 | Check a VeilVoice release: a file's SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list. |
 
 ## Public items
 
@@ -113,6 +113,8 @@ flowchart TD
 | `const FINGERPRINT` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | The fingerprint, written out rather than derived. |
 | `const SCOPE` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | What a passing check is worth, in the words a user should be shown. |
 | `enum Error` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | Something that went wrong, in words a person can act on. |
+| `fn gnupg_commands` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | The embedded key, with its fingerprint checked. |
+| `fn gnupg_on_path` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | Where GnuPG is, if it is on PATH. |
 | `fn key` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | The embedded key, with its fingerprint checked. |
 | `fn fingerprint_of` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | A key's fingerprint, uppercase hex, no spaces. |
 | `fn sha256_file` | [`lib.rs`](../../docs/files/veilvoice-check/lib.md) | SHA-256 of a file, read in chunks. |

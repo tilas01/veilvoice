@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/extracted.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 333 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 303 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs)
 
 ## Contents
 
@@ -68,7 +68,7 @@ checked file again and use what comes out.
 
 ## What this file contains
 
-333 lines defining **7 functions** (6 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+303 lines defining **5 functions** (4 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -82,8 +82,6 @@ checked file again and use what comes out.
 - `directory_for` (line 99) -- The directory an archive would extract into, by this project's naming.
 - `look_in` (line 111) -- Look in directory for the programs a release carries.
   - reaches: `runnable`
-- `gnupg_commands` (line 161) -- The commands that check this release with somebody else's GnuPG.
-- `gnupg_on_path` (line 179) -- Whether GnuPG appears to be installed, and where.
 
 ## What calls what
 
@@ -104,18 +102,14 @@ flowchart TD
     n_directory_for(["directory_for<br/>line 99"])
     n_look_in(["look_in<br/>line 111"])
     n_runnable["runnable<br/>line 132"]
-    n_gnupg_commands(["gnupg_commands<br/>line 161"])
-    n_gnupg_on_path(["gnupg_on_path<br/>line 179"])
     n_look_in --> n_runnable
     click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L84" "open the source"
     click n_not_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L89" "open the source"
     click n_directory_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L99" "open the source"
     click n_look_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L111" "open the source"
     click n_runnable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L132" "open the source"
-    click n_gnupg_commands href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L161" "open the source"
-    click n_gnupg_on_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L179" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_is_empty,n_not_runnable,n_directory_for,n_look_in,n_gnupg_commands,n_gnupg_on_path entry
+    class n_is_empty,n_not_runnable,n_directory_for,n_look_in entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_runnable helper
 ```
@@ -134,5 +128,3 @@ flowchart TD
 | `directory_for` <sub>pub fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L99) | The directory an archive would extract into, by this project's naming. |
 | `look_in` <sub>pub fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L111) | Look in directory for the programs a release carries. |
 | `runnable` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L132) | Whether the operating system will run this file. |
-| `gnupg_commands` <sub>pub fn</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L161) | The commands that check this release with somebody else's GnuPG. |
-| `gnupg_on_path` <sub>pub fn</sub> | [179](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs#L179) | Whether GnuPG appears to be installed, and where. |
