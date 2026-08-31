@@ -84,7 +84,7 @@ flowchart TD
     n_builder["builder.rs<br/>1148 lines"]
     n_deps["deps.rs<br/>650 lines"]
     n_discover["discover.rs<br/>353 lines"]
-    n_extracted["extracted.rs<br/>333 lines"]
+    n_extracted["extracted.rs<br/>303 lines"]
     n_fetch["fetch.rs<br/>329 lines"]
     n_report["report.rs<br/>385 lines"]
     n_tests["tests.rs<br/>357 lines"]
@@ -110,7 +110,7 @@ flowchart TD
 | [[`builder.rs`|File-veilvoice-verify-builder]] | 1148 | Build VeilVoice here, and compare what came out against what was published. |
 | [[`deps.rs`|File-veilvoice-verify-deps]] | 650 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [[`discover.rs`|File-veilvoice-verify-discover]] | 353 | Finding a release to check, without being told where it is. |
-| [[`extracted.rs`|File-veilvoice-verify-extracted]] | 333 | What came out of the archive, and the GnuPG somebody already has. |
+| [[`extracted.rs`|File-veilvoice-verify-extracted]] | 303 | What came out of the archive, and the GnuPG somebody already has. |
 | [[`fetch.rs`|File-veilvoice-verify-fetch]] | 329 | Download a release, without putting an HTTP client in the dependency graph. |
 | [[`main.rs`|File-veilvoice-verify-main]] | 1515 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [[`report.rs`|File-veilvoice-verify-report]] | 385 | How much this program says, and what it returns when it says nothing. |

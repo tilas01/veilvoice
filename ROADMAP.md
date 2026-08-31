@@ -226,7 +226,7 @@ it can honestly be made rather than to keep apologising for it.
 | 87 | **A video of a veiled recording** — a black frame and the audio, so a recording can be posted where only video is accepted | **planned** | 2–3 d |
 | 88 | **Import from every format OBS writes** — bring in a recording made elsewhere, video or audio, and take the sound out of it | **planned** | 2 d |
 | 89 | **Veil the other person afterwards** — the interviewee given their own voice in post, through the group plan that already exists | **planned** | 2–3 d |
-| 90 | **GnuPG verification inside the window** — in the verify tab, beside the hash check, using the GnuPG somebody already has | **planned** | 2 d |
+| 90 | **GnuPG verification inside the window** — in the verify tab, beside the hash check, using the GnuPG somebody already has | **done** | — |
 | 91 | **`veilvoice-verify` finds the release itself** — GnuPG arguments where wanted, and an `auto` that looks in Downloads, checks the archive, and checks what came out of it | **done** | — |
 | 92 | **An autolock timeout** — off by default, and when on, from five minutes to forty eight hours, chosen from a list or typed, with the range itself adjustable | **done** | — |
 | 93 | **Group mode explained where it is used** — how to build a plan, what each field does, and what happens without one | **planned** | 2 d |
@@ -599,6 +599,18 @@ encrypted with its own cryptography, and nothing here replaces or weakens that.
 A veiled recording written into a Cryptomator vault is encrypted twice, by two
 independent tools, and the useful property of that is not extra strength but
 independence: a defect in one is not a defect in both.
+
+**Marker 90 puts the GnuPG commands where the question is already being asked.**
+The verify tab is where somebody is working out whether a download is genuine,
+and the honest answer to that question includes "and here is how to ask
+something other than me". The commands are copyable and they are not run: this
+project checks signatures with a key compiled into itself, which is a
+convenience with an obvious circularity, and a window that shelled out to `gpg`
+and reported what it said would not have escaped it.
+
+The body of the recipe moved into `veilvoice-check`, which the portable verifier
+and the window already share for the checking itself, so the two cannot drift
+into printing different commands. A test holds that.
 
 **Marker 91 reports the archive and the extracted folder separately, and that
 separation is the whole of the thinking.**

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-check/src/lib.rs`
 
-[[veilvoice-check|Crate-veilvoice-check]] &middot; 463 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs)
+[[veilvoice-check|Crate-veilvoice-check]] &middot; 510 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs)
 
 ## Contents
 
@@ -68,19 +68,21 @@ built the same thing and got the same answer.
 
 ## What this file contains
 
-463 lines defining **11 functions** (9 public), **2 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+510 lines defining **13 functions** (11 public), **2 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Error` (line 94) -- Something that went wrong, in words a person can act on.
-- `struct Checked` (line 276) -- What a full check found.
+- `struct Checked` (line 323) -- What a full check found.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `sha256_bytes` (line 171) -- SHA-256 of bytes already in memory.
+- `gnupg_commands` (line 141) -- The embedded key, with its fingerprint checked.
+- `gnupg_on_path` (line 158) -- Where GnuPG is, if it is on PATH.
+- `sha256_bytes` (line 218) -- SHA-256 of bytes already in memory.
   - reaches: `hex`
-- `names_in_sums` (line 237) -- Every name a SHA256SUMS lists, in order.
-- `check_file` (line 299) -- The whole check: signature first, then the hash.
+- `names_in_sums` (line 284) -- Every name a SHA256SUMS lists, in order.
+- `check_file` (line 346) -- The whole check: signature first, then the hash.
   - reaches: `digest_from_sums`, `digests_match`, `fingerprint_of`, `key`, `sha256_file`, `verify_detached`, `hex`
 
 ## What calls what
@@ -98,16 +100,18 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_fmt["Error::fmt<br/>line 110"]
-    n_key["key<br/>line 125"]
-    n_fingerprint_of["fingerprint_of<br/>line 138"]
-    n_sha256_file["sha256_file<br/>line 151"]
-    n_sha256_bytes(["sha256_bytes<br/>line 171"])
-    n_hex["hex<br/>line 177"]
-    n_digests_match["digests_match<br/>line 190"]
-    n_digest_from_sums["digest_from_sums<br/>line 200"]
-    n_names_in_sums(["names_in_sums<br/>line 237"])
-    n_verify_detached["verify_detached<br/>line 255"]
-    n_check_file(["check_file<br/>line 299"])
+    n_gnupg_commands(["gnupg_commands<br/>line 141"])
+    n_gnupg_on_path(["gnupg_on_path<br/>line 158"])
+    n_key["key<br/>line 172"]
+    n_fingerprint_of["fingerprint_of<br/>line 185"]
+    n_sha256_file["sha256_file<br/>line 198"]
+    n_sha256_bytes(["sha256_bytes<br/>line 218"])
+    n_hex["hex<br/>line 224"]
+    n_digests_match["digests_match<br/>line 237"]
+    n_digest_from_sums["digest_from_sums<br/>line 247"]
+    n_names_in_sums(["names_in_sums<br/>line 284"])
+    n_verify_detached["verify_detached<br/>line 302"]
+    n_check_file(["check_file<br/>line 346"])
     n_check_file --> n_digest_from_sums
     n_check_file --> n_digests_match
     n_check_file --> n_fingerprint_of
@@ -118,18 +122,20 @@ flowchart TD
     n_sha256_bytes --> n_hex
     n_sha256_file --> n_hex
     click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L110" "open the source"
-    click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L125" "open the source"
-    click n_fingerprint_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L138" "open the source"
-    click n_sha256_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L151" "open the source"
-    click n_sha256_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L171" "open the source"
-    click n_hex href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L177" "open the source"
-    click n_digests_match href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L190" "open the source"
-    click n_digest_from_sums href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L200" "open the source"
-    click n_names_in_sums href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L237" "open the source"
-    click n_verify_detached href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L255" "open the source"
-    click n_check_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L299" "open the source"
+    click n_gnupg_commands href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L141" "open the source"
+    click n_gnupg_on_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L158" "open the source"
+    click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L172" "open the source"
+    click n_fingerprint_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L185" "open the source"
+    click n_sha256_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L198" "open the source"
+    click n_sha256_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L218" "open the source"
+    click n_hex href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L224" "open the source"
+    click n_digests_match href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L237" "open the source"
+    click n_digest_from_sums href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L247" "open the source"
+    click n_names_in_sums href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L284" "open the source"
+    click n_verify_detached href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L302" "open the source"
+    click n_check_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L346" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_sha256_bytes,n_names_in_sums,n_check_file entry
+    class n_gnupg_commands,n_gnupg_on_path,n_sha256_bytes,n_names_in_sums,n_check_file entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_key,n_fingerprint_of,n_sha256_file,n_digests_match,n_digest_from_sums,n_verify_detached api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -147,14 +153,16 @@ flowchart TD
 | `SCOPE` <sub>pub const</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L84) | What a passing check is worth, in the words a user should be shown. |
 | `Error` <sub>pub enum</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L94) | Something that went wrong, in words a person can act on. |
 | `Error::fmt` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L110) |  |
-| `key` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L125) | The embedded key, with its fingerprint checked. |
-| `fingerprint_of` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L138) | A key's fingerprint, uppercase hex, no spaces. |
-| `sha256_file` <sub>pub fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L151) | SHA-256 of a file, read in chunks. |
-| `sha256_bytes` <sub>pub fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L171) | SHA-256 of bytes already in memory. |
-| `hex` <sub>fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L177) |  |
-| `digests_match` <sub>pub fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L190) | Compare two hex digests without caring about case or stray whitespace. |
-| `digest_from_sums` <sub>pub fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L200) | Find a file's line in a sha256sum-format list. |
-| `names_in_sums` <sub>pub fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L237) | Every name a SHA256SUMS lists, in order. |
-| `verify_detached` <sub>pub fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L255) | Verify a detached signature over data using key. |
-| `Checked` <sub>pub struct</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L276) | What a full check found. |
-| `check_file` <sub>pub fn</sub> | [299](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L299) | The whole check: signature first, then the hash. |
+| `gnupg_commands` <sub>pub fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L141) | The embedded key, with its fingerprint checked. |
+| `gnupg_on_path` <sub>pub fn</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L158) | Where GnuPG is, if it is on PATH. |
+| `key` <sub>pub fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L172) | The embedded key, with its fingerprint checked. |
+| `fingerprint_of` <sub>pub fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L185) | A key's fingerprint, uppercase hex, no spaces. |
+| `sha256_file` <sub>pub fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L198) | SHA-256 of a file, read in chunks. |
+| `sha256_bytes` <sub>pub fn</sub> | [218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L218) | SHA-256 of bytes already in memory. |
+| `hex` <sub>fn</sub> | [224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L224) |  |
+| `digests_match` <sub>pub fn</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L237) | Compare two hex digests without caring about case or stray whitespace. |
+| `digest_from_sums` <sub>pub fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L247) | Find a file's line in a sha256sum-format list. |
+| `names_in_sums` <sub>pub fn</sub> | [284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L284) | Every name a SHA256SUMS lists, in order. |
+| `verify_detached` <sub>pub fn</sub> | [302](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L302) | Verify a detached signature over data using key. |
+| `Checked` <sub>pub struct</sub> | [323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L323) | What a full check found. |
+| `check_file` <sub>pub fn</sub> | [346](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-check/src/lib.rs#L346) | The whole check: signature first, then the hash. |

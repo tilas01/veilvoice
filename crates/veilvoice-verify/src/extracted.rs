@@ -153,41 +153,11 @@ fn runnable(path: &Path) -> bool {
 
 /// The commands that check this release with somebody else's GnuPG.
 ///
-/// Returned rather than run. This program does not shell out to `gpg` on
-/// somebody's behalf and then report what it says, because a verifier reporting
-/// on a subprocess it launched has not escaped the circularity it exists to
-/// escape: the honest article is the commands themselves, run by the person who
-/// wants the answer.
-pub fn gnupg_commands(sums: &Path, signature: &Path, key: Option<&Path>) -> Vec<String> {
-    let mut out = Vec::new();
-    if let Some(key) = key {
-        out.push(format!("gpg --import {}", key.display()));
-    }
-    out.push(format!(
-        "gpg --verify {} {}",
-        signature.display(),
-        sums.display()
-    ));
-    out.push("sha256sum -c SHA256SUMS --ignore-missing".to_string());
-    out
-}
-
-/// Whether GnuPG appears to be installed, and where.
-///
-/// A `PATH` lookup and nothing else, in the same shape as every other probe in
-/// this project: it never runs the program to find out.
-pub fn gnupg_on_path() -> Option<PathBuf> {
-    let path = std::env::var_os("PATH")?;
-    for dir in std::env::split_paths(&path) {
-        for name in ["gpg", "gpg2", "gpg.exe"] {
-            let candidate = dir.join(name);
-            if candidate.is_file() {
-                return Some(candidate);
-            }
-        }
-    }
-    None
-}
+/// Marker 90 moved the body into [`veilvoice_check::gnupg_commands`] so the
+/// desktop application's verify tab prints the same commands. Re-exported here
+/// rather than called through at every site, which keeps this module the one
+/// place the verifier looks for anything about extracted releases and GnuPG.
+pub use veilvoice_check::{gnupg_commands, gnupg_on_path};
 
 #[cfg(test)]
 mod tests {
