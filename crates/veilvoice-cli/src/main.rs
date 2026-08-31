@@ -527,6 +527,43 @@ enum Command {
         #[arg(long, value_name = "NAME")]
         install: Option<String>,
     },
+    /// Turn a veiled recording into a video with a black picture
+    ///
+    /// For posting somewhere that will not accept an audio file. The picture is
+    /// black for the length of the recording and is not the point.
+    ///
+    /// Needs `ffmpeg`, which VeilVoice does not ship and will not install: it
+    /// prints the exact command when the tool is not there.
+    Video {
+        /// The veiled recording to put in it.
+        audio: PathBuf,
+        /// Where to write the video. Defaults to the recording's name with
+        /// `.mp4`.
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// Print the command rather than running it.
+        #[arg(long)]
+        dry_run: bool,
+    },
+
+    /// Take the sound out of a recording made somewhere else
+    ///
+    /// OBS and everything like it write containers holding a video stream and
+    /// an audio stream. VeilVoice reads audio, so this pulls the audio out into
+    /// a WAV that `veilvoice anonymise` can take.
+    ///
+    /// Needs `ffmpeg`, for the same reason and with the same behaviour.
+    Import {
+        /// The recording to take the sound out of.
+        source: PathBuf,
+        /// Where to write the WAV. Defaults to the source's name with `.wav`.
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// Print the command rather than running it.
+        #[arg(long)]
+        dry_run: bool,
+    },
+
     /// Encrypted volumes this machine has: Cryptomator and VeraCrypt
     ///
     /// Reports what is installed and what is mounted right now. It never opens,
@@ -1281,7 +1318,98 @@ fn run(command: Command) -> Result<(), String> {
             list_volumes();
             Ok(())
         }
+
+        Command::Video {
+            audio,
+            output,
+            dry_run,
+        } => {
+            let out = output.unwrap_or_else(|| audio.with_extension("mp4"));
+            let argv = veilvoice_video::ffmpeg::black_command(
+                &audio,
+                &out,
+                veilvoice_video::ffmpeg::Encoding::default(),
+            );
+            run_ffmpeg("Video", &argv, &out, dry_run)
+        }
+
+        Command::Import {
+            source,
+            output,
+            dry_run,
+        } => {
+            if !veilvoice_video::ffmpeg::is_container(&source) {
+                println!(
+                    "{}",
+                    warn(&format!(
+                        "{} is not a container VeilVoice knows how to open; trying anyway",
+                        source.display()
+                    ))
+                );
+            }
+            let out = output.unwrap_or_else(|| source.with_extension("wav"));
+            let argv = veilvoice_video::ffmpeg::extract_command(&source, &out);
+            run_ffmpeg("Import", &argv, &out, dry_run)
+        }
     }
+}
+
+/// Markers 87 and 88. Run an ffmpeg command, or print it when there is no
+/// ffmpeg to run.
+///
+/// The same bargain the rest of this project makes about other people's
+/// software: VeilVoice does not ship a codec, does not install one, and does
+/// not fail silently when one is missing. It says what it would have run, so
+/// somebody can run it themselves or install the tool and try again.
+///
+/// The command is printed either way, before it runs. A tool that shells out
+/// and shows only the result leaves nobody able to check what it did.
+fn run_ffmpeg(
+    what: &str,
+    argv: &[String],
+    output: &std::path::Path,
+    dry_run: bool,
+) -> Result<(), String> {
+    println!("{}", heading(what));
+    println!("{}", field("Writing", &output.display().to_string()));
+    println!();
+    println!(
+        "{}",
+        paint(
+            colour::MUTED,
+            &format!("  {}", veilvoice_video::ffmpeg::command_line(argv))
+        )
+    );
+    println!();
+
+    if dry_run {
+        println!("{}", ok("printed, not run"));
+        return Ok(());
+    }
+
+    let Some(ffmpeg) = veilvoice_video::ffmpeg::found() else {
+        println!(
+            "{}",
+            warn("ffmpeg is not on this machine, so nothing was run")
+        );
+        println!();
+        for line in veilvoice_video::ffmpeg::describe().lines() {
+            println!("{}", paint(colour::MUTED, &format!("  {line}")));
+        }
+        return Ok(());
+    };
+
+    let status = std::process::Command::new(&ffmpeg)
+        .args(&argv[1..])
+        .status()
+        .map_err(|e| format!("could not start {}: {e}", ffmpeg.display()))?;
+    if !status.success() {
+        return Err(format!(
+            "ffmpeg stopped with {status}. The command above is what it was asked to do."
+        ));
+    }
+    println!("{}", ok(&format!("wrote {}", output.display())));
+    Ok(())
 }
 
 /// Report the encrypted volumes this machine is offering.
