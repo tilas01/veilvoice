@@ -33,6 +33,15 @@ and an interview from an OBS recording through to a video.
 - `veilvoice-gui`'s help text is read only on the platforms that have a console
   to print it to, and was declared on all of them, so the Windows build failed
   on a constant nothing reads.
+- **F-97** Six committed drawings depended on which Python was installed.
+  CPython 3.12 gave `sum` compensated summation over floats, so the same box
+  widths added up a fraction differently, one box centred a tenth of a pixel
+  further along, and files generated on one machine stopped matching the
+  generator run on another. Everything generated here is committed and compared
+  byte for byte so that "generated from the source" can be checked rather than
+  asserted, and a check whose answer depends on the interpreter is not one. The
+  sum is exactly rounded now, verified identical across four Python versions,
+  and the job that checks it runs under two of them instead of one.
 - The committed search index was seven bytes behind `ROADMAP.md`, which was
   edited after the generators had run. The check that exists for this caught
   it.
