@@ -38,6 +38,57 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twelfth round: v0.1.15, and one defect that had already been fixed once
+
+Everything built after the eleventh round, read before the release: the
+encrypted-volume work, the app lock as a key, the autolock, the releases page,
+the GnuPG commands and the ffmpeg pair.
+
+**One defect found and fixed (F-95), and it is the same defect as F-93 in the
+place that actually matters.**
+
+### F-95 -- a vault locked after it was chosen still received the file
+
+`veilvoice-gui/src/storage.rs` and `app.rs`.
+
+F-93, found and fixed in this same cycle, was that the storage panel asked
+whether the destination folder *existed* when the question is whether anything
+is *mounted* on it: unmounting a volume leaves its mount point behind as an
+ordinary empty directory. That was fixed, tested, and written up.
+
+It was fixed in the panel. The panel draws a warning. The file is written
+somewhere else, by `Destination::place`, and `place` never asked either
+question: it checked `ready`, which is about whether the hidden-volume question
+has been answered, and nothing else.
+
+So the sequence that fails is the ordinary one. Somebody opens their VeraCrypt
+volume, chooses it, answers the hidden-volume question. Later they lock the
+volume. Nothing about the destination changes, because nothing about it has
+changed: the answer is still given, so `ready` is still true. The next veiled
+recording is written into the bare mount point, on the ordinary unencrypted
+disk, while its owner believes it went into the vault.
+
+That is precisely the failure the whole feature exists to prevent, and it
+survived the fix aimed at it.
+
+`place` now takes the mount list and consults it, and `start_job` reads that
+list at the moment of writing rather than using what the panel last saw. A job
+whose destination is no longer mounted is refused with a message naming the
+remedy, rather than quietly falling back to writing beside the source, which
+would leave the recording unencrypted somewhere else instead.
+
+**The lesson is the one already recorded twice, now three times.** F-91 was
+written up as being about the app-lock file when it was about any file the
+program opens without being asked, and F-92 was the two other places. F-93 was
+written up as being about `still_there` when it was about *every* place that
+decides whether a vault is usable, and F-95 is the one that was missed. Fixing
+the instance in front of you and moving on is this project's most reliable
+source of second defects.
+
+What would have caught it earlier: asking, for each fix, "where else is this
+decision made", and in particular "where is the value actually used", rather
+than "where was the symptom seen".
+
 ## The eleventh round: the code written after the tenth round
 
 The tenth round was run last on purpose, on the grounds that an audit of code
@@ -1287,7 +1338,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1092 tests across 26 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1093 tests across 26 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -2879,7 +2930,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Ninety-two defects found and fixed across eleven audit rounds (F-1 to F-92):**
+**Ninety-five defects found and fixed across twelve audit rounds (F-1 to F-95):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 

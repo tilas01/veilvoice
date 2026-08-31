@@ -110,8 +110,31 @@ impl Destination {
     /// untouched when nothing is chosen, and also when the destination is not
     /// ready: a caller that ignores [`Destination::ready`] must not be handed a
     /// vault path it was never cleared to use.
-    pub fn place(&self, default: &Path) -> PathBuf {
-        let Some(volume) = self.volume.as_ref().filter(|v| v.ready()) else {
+    ///
+    /// # F-95, and why `mounts` is an argument rather than a cached flag
+    ///
+    /// F-93 fixed the *panel*, which had asked whether the folder existed when
+    /// the question is whether anything is mounted on it. It did not fix this,
+    /// and this is where the file is actually written.
+    ///
+    /// A destination is chosen while the vault is open and answered for. Some
+    /// time later the vault is locked, which leaves its mount point behind as
+    /// an empty directory, and nothing about the destination changes: the
+    /// hidden-volume answer is still given, so `ready` is still true. Veiling a
+    /// recording then wrote it into a bare directory on the ordinary disk while
+    /// its owner believed it had gone into the vault.
+    ///
+    /// That is F-93's failure arriving through a different door, which is the
+    /// pattern this project has now recorded three times: a fix applied to the
+    /// instance that was found rather than to the class. The mount list is
+    /// therefore passed in and consulted here, at the moment of writing, rather
+    /// than read once and remembered.
+    pub fn place(&self, default: &Path, mounts: &[Volume]) -> PathBuf {
+        let Some(volume) = self
+            .volume
+            .as_ref()
+            .filter(|v| v.ready() && self.still_mounted(mounts))
+        else {
             return default.to_path_buf();
         };
         match default.file_name() {
@@ -442,6 +465,14 @@ pub fn panel(storage: &mut Storage, ui: &mut egui::Ui) -> bool {
 mod tests {
     use super::*;
 
+    /// The mount list that holds the volume `vault` builds.
+    fn mounted() -> Vec<Volume> {
+        vec![Volume::found(
+            PathBuf::from("/media/veracrypt1"),
+            Tool::VeraCrypt,
+        )]
+    }
+
     fn vault(tool: Tool, hidden: Hidden) -> Destination {
         Destination {
             volume: Some(Volume {
@@ -492,7 +523,7 @@ mod tests {
         assert!(d.ready(), "the ordinary path needs no permission");
         assert!(d.blocked().is_none());
         assert_eq!(
-            d.place(Path::new("/home/u/talk.veiled.wav")),
+            d.place(Path::new("/home/u/talk.veiled.wav"), &[]),
             Path::new("/home/u/talk.veiled.wav")
         );
     }
@@ -501,8 +532,25 @@ mod tests {
     fn a_chosen_vault_keeps_the_file_name_and_replaces_the_folder() {
         let d = vault(Tool::VeraCrypt, Hidden::NoHiddenVolume);
         assert_eq!(
-            d.place(Path::new("/home/u/talk.veiled.wav")),
+            d.place(Path::new("/home/u/talk.veiled.wav"), &mounted()),
             Path::new("/media/veracrypt1/talk.veiled.wav")
+        );
+    }
+
+    /// F-95. F-93 fixed the panel; this is where the file is written.
+    ///
+    /// A vault chosen and answered for, then locked, leaves its mount point
+    /// behind as an empty directory and nothing about the destination changes.
+    /// Writing there puts a veiled recording on the ordinary disk while its
+    /// owner believes it went inside.
+    #[test]
+    fn a_vault_locked_since_it_was_chosen_never_receives_a_file() {
+        let d = vault(Tool::VeraCrypt, Hidden::NoHiddenVolume);
+        assert!(d.ready(), "the hidden question is answered, so it is ready");
+        assert_eq!(
+            d.place(Path::new("/home/u/talk.veiled.wav"), &[]),
+            Path::new("/home/u/talk.veiled.wav"),
+            "an answered destination that is no longer mounted must not be used"
         );
     }
 
@@ -514,7 +562,7 @@ mod tests {
         assert!(!d.ready());
         assert!(d.blocked().is_some());
         assert_eq!(
-            d.place(Path::new("/home/u/talk.veiled.wav")),
+            d.place(Path::new("/home/u/talk.veiled.wav"), &mounted()),
             Path::new("/home/u/talk.veiled.wav"),
             "an unanswered destination must not place a file inside it"
         );
@@ -532,7 +580,7 @@ mod tests {
         let d = vault(Tool::Cryptomator, Hidden::Unanswered);
         assert!(d.ready());
         assert_eq!(
-            d.place(Path::new("/home/u/talk.veiled.wav")),
+            d.place(Path::new("/home/u/talk.veiled.wav"), &mounted()),
             Path::new("/media/veracrypt1/talk.veiled.wav")
         );
     }

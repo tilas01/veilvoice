@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/storage.svg" alt="storage.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/storage.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 611 lines &middot; <a href="storage.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 659 lines &middot; <a href="storage.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#a-destination-not-a-mode">A destination, not a mode</a>
@@ -67,10 +67,10 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>611 lines defining <strong>21 functions</strong> (18 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>659 lines defining <strong>21 functions</strong> (18 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Destination</code> <span style="color:var(--muted)">line 55</span> &mdash; The chosen place for veiled output, if there is one.</li>
-<li><code>struct Storage</code> <span style="color:var(--muted)">line 165</span> &mdash; Everything the window shows about encrypted storage.</li>
+<li><code>struct Storage</code> <span style="color:var(--muted)">line 188</span> &mdash; Everything the window shows about encrypted storage.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Destination::from_prefs</code> <span style="color:var(--muted)">line 66</span> &mdash; Rebuild a destination from what was written to the settings file.
@@ -83,40 +83,39 @@
 </li>
 <li><code>Destination::blocked</code> <span style="color:var(--muted)">line 103</span> &mdash; Why a job may not start, for the button&#x27;s tooltip.
 </li>
-<li><code>Destination::place</code> <span style="color:var(--muted)">line 113</span> &mdash; Where a recording should be written, given where it would have gone.
+<li><code>Destination::place</code> <span style="color:var(--muted)">line 132</span> &mdash; Where a recording should be written, given where it would have gone.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>still_mounted</code></span>
 </li>
-<li><code>Destination::still_mounted</code> <span style="color:var(--muted)">line 133</span> &mdash; Whether the volume is still mounted, judged against mounts.
+<li><code>Storage::refresh</code> <span style="color:var(--muted)">line 228</span> &mdash; Look again at what is installed and mounted.
 </li>
-<li><code>Storage::refresh</code> <span style="color:var(--muted)">line 205</span> &mdash; Look again at what is installed and mounted.
+<li><code>Storage::found</code> <span style="color:var(--muted)">line 241</span> &mdash; What was found at the last refresh.
 </li>
-<li><code>Storage::found</code> <span style="color:var(--muted)">line 218</span> &mdash; What was found at the last refresh.
+<li><code>Storage::found_nothing</code> <span style="color:var(--muted)">line 247</span> &mdash; Whether anything was found at all, which decides whether marker 84&#x27;s guided path is the main offer or the fallback.
 </li>
-<li><code>Storage::found_nothing</code> <span style="color:var(--muted)">line 224</span> &mdash; Whether anything was found at all, which decides whether marker 84&#x27;s guided path is the main offer or the fallback.
+<li><code>Storage::present</code> <span style="color:var(--muted)">line 252</span> &mdash; Whether the chosen folder was there when this was last refreshed.
 </li>
-<li><code>Storage::present</code> <span style="color:var(--muted)">line 229</span> &mdash; Whether the chosen folder was there when this was last refreshed.
+<li><code>Storage::take_hand_picked</code> <span style="color:var(--muted)">line 257</span> &mdash; Take a folder the user picked by hand, if the picker has answered.
 </li>
-<li><code>Storage::take_hand_picked</code> <span style="color:var(--muted)">line 234</span> &mdash; Take a folder the user picked by hand, if the picker has answered.
+<li><code>Storage::pick_by_hand</code> <span style="color:var(--muted)">line 267</span> &mdash; Start the folder picker for marker 84&#x27;s guided path.
 </li>
-<li><code>Storage::pick_by_hand</code> <span style="color:var(--muted)">line 244</span> &mdash; Start the folder picker for marker 84&#x27;s guided path.
+<li><code>Storage::choose</code> <span style="color:var(--muted)">line 273</span> &mdash; Choose one of the detected volumes.
 </li>
-<li><code>Storage::choose</code> <span style="color:var(--muted)">line 250</span> &mdash; Choose one of the detected volumes.
+<li><code>Storage::clear</code> <span style="color:var(--muted)">line 281</span> &mdash; Go back to writing beside the source file.
 </li>
-<li><code>Storage::clear</code> <span style="color:var(--muted)">line 258</span> &mdash; Go back to writing beside the source file.
+<li><code>Storage::answer_hidden</code> <span style="color:var(--muted)">line 287</span> &mdash; Answer the hidden-volume question for the chosen destination.
 </li>
-<li><code>Storage::answer_hidden</code> <span style="color:var(--muted)">line 264</span> &mdash; Answer the hidden-volume question for the chosen destination.
+<li><code>Storage::hand_picked_tool</code> <span style="color:var(--muted)">line 294</span> &mdash; Which tool a hand-picked folder is being declared as.
 </li>
-<li><code>Storage::hand_picked_tool</code> <span style="color:var(--muted)">line 271</span> &mdash; Which tool a hand-picked folder is being declared as.
+<li><code>Storage::presence</code> <span style="color:var(--muted)">line 299</span> &mdash; Whether either tool was detected, for the guided text.
 </li>
-<li><code>Storage::presence</code> <span style="color:var(--muted)">line 276</span> &mdash; Whether either tool was detected, for the guided text.
-</li>
-<li><code>panel</code> <span style="color:var(--muted)">line 285</span> &mdash; The encrypted-storage panel, drawn on the security tab.
+<li><code>panel</code> <span style="color:var(--muted)">line 308</span> &mdash; The encrypted-storage panel, drawn on the security tab.
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 627 915" width="627" height="915" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 627 1031" width="627" height="1031" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -125,10 +124,11 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="627" height="915" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M202.1 74.0 C 202.1 94.0, 468.4 700.0, 468.4 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M202.1 74.0 C 202.1 94.0, 289.5 700.0, 289.5 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M433.4 74.0 C 433.4 94.0, 134.8 700.0, 134.8 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<rect x="0" y="0" width="627" height="1031" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M202.1 74.0 C 202.1 94.0, 313.7 800.0, 313.7 817.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M202.1 74.0 C 202.1 94.0, 512.8 700.0, 512.8 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M520.8 174.0 C 520.8 194.0, 158.9 700.0, 158.9 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M433.4 74.0 C 433.4 94.0, 358.0 700.0, 358.0 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <a href="storage.src.html#fn-destination-from_prefs">
 <rect x="95.4" y="20.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="202.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Destination::from_prefs</text>
@@ -152,97 +152,99 @@
 <a href="storage.src.html#fn-destination-place">
 <rect x="434.3" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="520.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Destination::place</text>
-<text x="520.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 113</text>
+<text x="520.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 132</text>
 </a>
 <a href="storage.src.html#fn-destination-still_mounted">
-<rect x="20.0" y="220.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="138.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Destination::still_mounted</text>
-<text x="138.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+<rect x="40.1" y="720.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="158.9" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Destination::still_mounted</text>
+<text x="158.9" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 156</text>
 </a>
 <a href="storage.src.html#fn-hidden_key">
-<rect x="80.4" y="720.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="134.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hidden_key</text>
-<text x="134.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 141</text>
+<rect x="303.7" y="720.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="358.0" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hidden_key</text>
+<text x="358.0" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 164</text>
 </a>
 <a href="storage.src.html#fn-hidden_from_key">
-<rect x="215.1" y="720.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="289.5" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hidden_from_key</text>
-<text x="289.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 155</text>
+<rect x="438.3" y="720.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="512.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hidden_from_key</text>
+<text x="512.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 178</text>
 </a>
 <a href="storage.src.html#fn-storage-default">
-<rect x="390.0" y="720.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="468.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::default</text>
-<text x="468.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 187</text>
+<rect x="235.2" y="820.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="313.7" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::default</text>
+<text x="313.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 210</text>
 </a>
 <a href="storage.src.html#fn-storage-refresh">
-<rect x="283.6" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="362.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::refresh</text>
-<text x="362.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 205</text>
+<rect x="36.1" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="114.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::refresh</text>
+<text x="114.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
 </a>
 <a href="storage.src.html#fn-storage-found">
-<rect x="466.5" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="536.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::found</text>
-<text x="536.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 218</text>
+<rect x="219.1" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="289.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::found</text>
+<text x="289.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 241</text>
 </a>
 <a href="storage.src.html#fn-storage-found_nothing">
-<rect x="119.5" y="320.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="222.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::found_nothing</text>
-<text x="222.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 224</text>
+<rect x="385.9" y="220.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="488.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::found_nothing</text>
+<text x="488.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 247</text>
 </a>
 <a href="storage.src.html#fn-storage-present">
-<rect x="350.9" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="429.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::present</text>
-<text x="429.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 229</text>
+<rect x="107.4" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="185.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::present</text>
+<text x="185.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 252</text>
 </a>
 <a href="storage.src.html#fn-storage-take_hand_picked">
-<rect x="87.3" y="420.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="202.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::take_hand_picked</text>
-<text x="202.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 234</text>
+<rect x="290.4" y="320.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="405.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::take_hand_picked</text>
+<text x="405.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
 </a>
 <a href="storage.src.html#fn-storage-pick_by_hand">
-<rect x="342.8" y="420.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="441.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::pick_by_hand</text>
-<text x="441.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 244</text>
+<rect x="44.2" y="420.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="142.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::pick_by_hand</text>
+<text x="142.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 267</text>
 </a>
 <a href="storage.src.html#fn-storage-choose">
-<rect x="40.1" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="114.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::choose</text>
-<text x="114.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 250</text>
+<rect x="267.4" y="420.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="341.9" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::choose</text>
+<text x="341.9" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 273</text>
 </a>
 <a href="storage.src.html#fn-storage-clear">
-<rect x="215.0" y="520.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="285.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::clear</text>
-<text x="285.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 258</text>
+<rect x="442.3" y="420.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="512.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::clear</text>
+<text x="512.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 281</text>
 </a>
 <a href="storage.src.html#fn-storage-answer_hidden">
-<rect x="381.9" y="520.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="484.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::answer_hidden</text>
-<text x="484.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 264</text>
+<rect x="83.3" y="520.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="185.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::answer_hidden</text>
+<text x="185.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
 </a>
 <a href="storage.src.html#fn-storage-hand_picked_tool">
-<rect x="44.2" y="620.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="158.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::hand_picked_tool</text>
-<text x="158.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 271</text>
+<rect x="314.6" y="520.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="429.3" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::hand_picked_tool</text>
+<text x="429.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 294</text>
 </a>
 <a href="storage.src.html#fn-storage-presence">
-<rect x="299.7" y="620.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="382.2" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::presence</text>
-<text x="382.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 276</text>
+<rect x="171.9" y="620.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="254.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Storage::presence</text>
+<text x="254.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 299</text>
 </a>
 <a href="storage.src.html#fn-panel">
-<rect x="490.7" y="620.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="536.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">panel</text>
-<text x="536.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 285</text>
+<rect x="363.0" y="620.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="409.2" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">panel</text>
+<text x="409.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
 </a>
-<rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="820.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="829.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 840.5 L29.0 840.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="845.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="867.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="882.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
-<text x="20.0" y="897.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<rect x="20.0" y="904.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="920.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="929.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="936.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="945.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 956.5 L29.0 956.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="961.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="983.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="998.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
+<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
@@ -253,49 +255,52 @@ flowchart TD
     n_to_prefs([&quot;Destination::to_prefs&lt;br/&gt;line 83&quot;])
     n_ready([&quot;Destination::ready&lt;br/&gt;line 98&quot;])
     n_blocked([&quot;Destination::blocked&lt;br/&gt;line 103&quot;])
-    n_place([&quot;Destination::place&lt;br/&gt;line 113&quot;])
-    n_still_mounted([&quot;Destination::still_mounted&lt;br/&gt;line 133&quot;])
-    n_hidden_key[&quot;hidden_key&lt;br/&gt;line 141&quot;]
-    n_hidden_from_key[&quot;hidden_from_key&lt;br/&gt;line 155&quot;]
-    n_default[&quot;Storage::default&lt;br/&gt;line 187&quot;]
-    n_refresh([&quot;Storage::refresh&lt;br/&gt;line 205&quot;])
-    n_found([&quot;Storage::found&lt;br/&gt;line 218&quot;])
-    n_found_nothing([&quot;Storage::found_nothing&lt;br/&gt;line 224&quot;])
-    n_present([&quot;Storage::present&lt;br/&gt;line 229&quot;])
-    n_take_hand_picked([&quot;Storage::take_hand_picked&lt;br/&gt;line 234&quot;])
-    n_pick_by_hand([&quot;Storage::pick_by_hand&lt;br/&gt;line 244&quot;])
-    n_choose([&quot;Storage::choose&lt;br/&gt;line 250&quot;])
-    n_clear([&quot;Storage::clear&lt;br/&gt;line 258&quot;])
-    n_answer_hidden([&quot;Storage::answer_hidden&lt;br/&gt;line 264&quot;])
-    n_hand_picked_tool([&quot;Storage::hand_picked_tool&lt;br/&gt;line 271&quot;])
-    n_presence([&quot;Storage::presence&lt;br/&gt;line 276&quot;])
-    n_panel([&quot;panel&lt;br/&gt;line 285&quot;])
+    n_place([&quot;Destination::place&lt;br/&gt;line 132&quot;])
+    n_still_mounted[&quot;Destination::still_mounted&lt;br/&gt;line 156&quot;]
+    n_hidden_key[&quot;hidden_key&lt;br/&gt;line 164&quot;]
+    n_hidden_from_key[&quot;hidden_from_key&lt;br/&gt;line 178&quot;]
+    n_default[&quot;Storage::default&lt;br/&gt;line 210&quot;]
+    n_refresh([&quot;Storage::refresh&lt;br/&gt;line 228&quot;])
+    n_found([&quot;Storage::found&lt;br/&gt;line 241&quot;])
+    n_found_nothing([&quot;Storage::found_nothing&lt;br/&gt;line 247&quot;])
+    n_present([&quot;Storage::present&lt;br/&gt;line 252&quot;])
+    n_take_hand_picked([&quot;Storage::take_hand_picked&lt;br/&gt;line 257&quot;])
+    n_pick_by_hand([&quot;Storage::pick_by_hand&lt;br/&gt;line 267&quot;])
+    n_choose([&quot;Storage::choose&lt;br/&gt;line 273&quot;])
+    n_clear([&quot;Storage::clear&lt;br/&gt;line 281&quot;])
+    n_answer_hidden([&quot;Storage::answer_hidden&lt;br/&gt;line 287&quot;])
+    n_hand_picked_tool([&quot;Storage::hand_picked_tool&lt;br/&gt;line 294&quot;])
+    n_presence([&quot;Storage::presence&lt;br/&gt;line 299&quot;])
+    n_panel([&quot;panel&lt;br/&gt;line 308&quot;])
     n_from_prefs --&gt; n_default
     n_from_prefs --&gt; n_hidden_from_key
+    n_place --&gt; n_still_mounted
     n_to_prefs --&gt; n_hidden_key
     click n_from_prefs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L66&quot; &quot;open the source&quot;
     click n_to_prefs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L83&quot; &quot;open the source&quot;
     click n_ready href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L98&quot; &quot;open the source&quot;
     click n_blocked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L103&quot; &quot;open the source&quot;
-    click n_place href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L113&quot; &quot;open the source&quot;
-    click n_still_mounted href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L133&quot; &quot;open the source&quot;
-    click n_hidden_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L141&quot; &quot;open the source&quot;
-    click n_hidden_from_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L155&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L187&quot; &quot;open the source&quot;
-    click n_refresh href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L205&quot; &quot;open the source&quot;
-    click n_found href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L218&quot; &quot;open the source&quot;
-    click n_found_nothing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L224&quot; &quot;open the source&quot;
-    click n_present href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L229&quot; &quot;open the source&quot;
-    click n_take_hand_picked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L234&quot; &quot;open the source&quot;
-    click n_pick_by_hand href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L244&quot; &quot;open the source&quot;
-    click n_choose href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L250&quot; &quot;open the source&quot;
-    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L258&quot; &quot;open the source&quot;
-    click n_answer_hidden href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L264&quot; &quot;open the source&quot;
-    click n_hand_picked_tool href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L271&quot; &quot;open the source&quot;
-    click n_presence href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L276&quot; &quot;open the source&quot;
-    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L285&quot; &quot;open the source&quot;
+    click n_place href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L132&quot; &quot;open the source&quot;
+    click n_still_mounted href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L156&quot; &quot;open the source&quot;
+    click n_hidden_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L164&quot; &quot;open the source&quot;
+    click n_hidden_from_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L178&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L210&quot; &quot;open the source&quot;
+    click n_refresh href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L228&quot; &quot;open the source&quot;
+    click n_found href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L241&quot; &quot;open the source&quot;
+    click n_found_nothing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L247&quot; &quot;open the source&quot;
+    click n_present href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L252&quot; &quot;open the source&quot;
+    click n_take_hand_picked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L257&quot; &quot;open the source&quot;
+    click n_pick_by_hand href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L267&quot; &quot;open the source&quot;
+    click n_choose href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L273&quot; &quot;open the source&quot;
+    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L281&quot; &quot;open the source&quot;
+    click n_answer_hidden href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L287&quot; &quot;open the source&quot;
+    click n_hand_picked_tool href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L294&quot; &quot;open the source&quot;
+    click n_presence href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L299&quot; &quot;open the source&quot;
+    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs#L308&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_from_prefs,n_to_prefs,n_ready,n_blocked,n_place,n_still_mounted,n_refresh,n_found,n_found_nothing,n_present,n_take_hand_picked,n_pick_by_hand,n_choose,n_clear,n_answer_hidden,n_hand_picked_tool,n_presence,n_panel entry
+    class n_from_prefs,n_to_prefs,n_ready,n_blocked,n_place,n_refresh,n_found,n_found_nothing,n_present,n_take_hand_picked,n_pick_by_hand,n_choose,n_clear,n_answer_hidden,n_hand_picked_tool,n_presence,n_panel entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_still_mounted api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_hidden_key,n_hidden_from_key,n_default helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -309,24 +314,24 @@ flowchart TD
 <tr><td><code>Destination::to_prefs</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-destination-to_prefs">83</a></td><td>The three strings the settings file keeps.</td></tr>
 <tr><td><code>Destination::ready</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-destination-ready">98</a></td><td>Whether a job may start.</td></tr>
 <tr><td><code>Destination::blocked</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-destination-blocked">103</a></td><td>Why a job may not start, for the button&#x27;s tooltip.</td></tr>
-<tr><td><code>Destination::place</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-destination-place">113</a></td><td>Where a recording should be written, given where it would have gone.</td></tr>
-<tr><td><code>Destination::still_mounted</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-destination-still_mounted">133</a></td><td>Whether the volume is still mounted, judged against mounts.</td></tr>
-<tr><td><code>hidden_key</code> <sub>fn</sub></td><td><a href="storage.src.html#fn-hidden_key">141</a></td><td>Stable settings-file spellings for Hidden.</td></tr>
-<tr><td><code>hidden_from_key</code> <sub>fn</sub></td><td><a href="storage.src.html#fn-hidden_from_key">155</a></td><td>The reverse, defaulting to unanswered.</td></tr>
-<tr><td><code>Storage</code> <sub>pub struct</sub></td><td><a href="storage.src.html#fn-storage">165</a></td><td>Everything the window shows about encrypted storage.</td></tr>
-<tr><td><code>Storage::default</code> <sub>fn</sub></td><td><a href="storage.src.html#fn-storage-default">187</a></td><td></td></tr>
-<tr><td><code>Storage::refresh</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-refresh">205</a></td><td>Look again at what is installed and mounted.</td></tr>
-<tr><td><code>Storage::found</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-found">218</a></td><td>What was found at the last refresh.</td></tr>
-<tr><td><code>Storage::found_nothing</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-found_nothing">224</a></td><td>Whether anything was found at all, which decides whether marker 84&#x27;s guided path is the main offer or the fallback.</td></tr>
-<tr><td><code>Storage::present</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-present">229</a></td><td>Whether the chosen folder was there when this was last refreshed.</td></tr>
-<tr><td><code>Storage::take_hand_picked</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-take_hand_picked">234</a></td><td>Take a folder the user picked by hand, if the picker has answered.</td></tr>
-<tr><td><code>Storage::pick_by_hand</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-pick_by_hand">244</a></td><td>Start the folder picker for marker 84&#x27;s guided path.</td></tr>
-<tr><td><code>Storage::choose</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-choose">250</a></td><td>Choose one of the detected volumes.</td></tr>
-<tr><td><code>Storage::clear</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-clear">258</a></td><td>Go back to writing beside the source file.</td></tr>
-<tr><td><code>Storage::answer_hidden</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-answer_hidden">264</a></td><td>Answer the hidden-volume question for the chosen destination.</td></tr>
-<tr><td><code>Storage::hand_picked_tool</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-hand_picked_tool">271</a></td><td>Which tool a hand-picked folder is being declared as.</td></tr>
-<tr><td><code>Storage::presence</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-presence">276</a></td><td>Whether either tool was detected, for the guided text.</td></tr>
-<tr><td><code>panel</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-panel">285</a></td><td>The encrypted-storage panel, drawn on the security tab.</td></tr>
+<tr><td><code>Destination::place</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-destination-place">132</a></td><td>Where a recording should be written, given where it would have gone.</td></tr>
+<tr><td><code>Destination::still_mounted</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-destination-still_mounted">156</a></td><td>Whether the volume is still mounted, judged against mounts.</td></tr>
+<tr><td><code>hidden_key</code> <sub>fn</sub></td><td><a href="storage.src.html#fn-hidden_key">164</a></td><td>Stable settings-file spellings for Hidden.</td></tr>
+<tr><td><code>hidden_from_key</code> <sub>fn</sub></td><td><a href="storage.src.html#fn-hidden_from_key">178</a></td><td>The reverse, defaulting to unanswered.</td></tr>
+<tr><td><code>Storage</code> <sub>pub struct</sub></td><td><a href="storage.src.html#fn-storage">188</a></td><td>Everything the window shows about encrypted storage.</td></tr>
+<tr><td><code>Storage::default</code> <sub>fn</sub></td><td><a href="storage.src.html#fn-storage-default">210</a></td><td></td></tr>
+<tr><td><code>Storage::refresh</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-refresh">228</a></td><td>Look again at what is installed and mounted.</td></tr>
+<tr><td><code>Storage::found</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-found">241</a></td><td>What was found at the last refresh.</td></tr>
+<tr><td><code>Storage::found_nothing</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-found_nothing">247</a></td><td>Whether anything was found at all, which decides whether marker 84&#x27;s guided path is the main offer or the fallback.</td></tr>
+<tr><td><code>Storage::present</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-present">252</a></td><td>Whether the chosen folder was there when this was last refreshed.</td></tr>
+<tr><td><code>Storage::take_hand_picked</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-take_hand_picked">257</a></td><td>Take a folder the user picked by hand, if the picker has answered.</td></tr>
+<tr><td><code>Storage::pick_by_hand</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-pick_by_hand">267</a></td><td>Start the folder picker for marker 84&#x27;s guided path.</td></tr>
+<tr><td><code>Storage::choose</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-choose">273</a></td><td>Choose one of the detected volumes.</td></tr>
+<tr><td><code>Storage::clear</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-clear">281</a></td><td>Go back to writing beside the source file.</td></tr>
+<tr><td><code>Storage::answer_hidden</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-answer_hidden">287</a></td><td>Answer the hidden-volume question for the chosen destination.</td></tr>
+<tr><td><code>Storage::hand_picked_tool</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-hand_picked_tool">294</a></td><td>Which tool a hand-picked folder is being declared as.</td></tr>
+<tr><td><code>Storage::presence</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-storage-presence">299</a></td><td>Whether either tool was detected, for the guided text.</td></tr>
+<tr><td><code>panel</code> <sub>pub fn</sub></td><td><a href="storage.src.html#fn-panel">308</a></td><td>The encrypted-storage panel, drawn on the security tab.</td></tr>
 </tbody></table>
 </section>
 </div></div>
