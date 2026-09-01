@@ -247,6 +247,32 @@ function windowCaptureChecks(fail, pass) {
     pass("window captures are taken with PrintWindow, so no pointer can be in them");
   }
 
+  // The corners are in the alpha channel, so the stylesheet must not draw
+  // them a second time.
+  //
+  // `border-radius` on an `img` clips the content box. The gallery shows these
+  // at roughly a third of their captured width, so the file's 14-pixel radius
+  // arrives as about five, and a fixed radius here larger than that cuts into
+  // the picture past the corner the file already rounded. A `background` is
+  // worse: it shows through the transparent corners as a wedge of colour in
+  // each one. Both looked like a bug in the screenshot rather than in the page.
+  const css = fs.readFileSync(path.join(ROOT, "website/css/main.css"), "utf8");
+  const rule = /([^{}]+)\{([^{}]*)\}/g;
+  let m;
+  while ((m = rule.exec(css)) !== null) {
+    const selector = m[1].replace(/\/\*[\s\S]*?\*\//g, "").trim();
+    if (!/(^|,|\s)\.(shot|viewer)\s+img\b/.test(selector)) { continue; }
+    for (const property of ["border-radius", "background"]) {
+      if (new RegExp(`(^|;|\\s)${property}\\s*:`).test(m[2])) {
+        fail(`\`${selector}\` sets \`${property}\`. The window captures carry ` +
+             "their own rounded corners in the alpha channel, so the page " +
+             "must not round or fill them again: a radius here clips the " +
+             "picture past its own corner, and a background shows through " +
+             "the corners the file made transparent.");
+      }
+    }
+  }
+
   for (const forbidden of ["CopyFromScreen", "BitBlt", "CAPTUREBLT"]) {
     if (new RegExp(`${forbidden}\\s*\\(`).test(code)) {
       fail(`${script} calls ${forbidden}, which copies the screen rather than ` +
