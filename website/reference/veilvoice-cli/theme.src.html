@@ -85,25 +85,25 @@
 <span class="ln" id="L41"><span class="tok-com">/// Tokyo Night, as 24-bit foreground escape sequences.</span></span>
 <span class="ln" id="L42"><span class="tok-com">///</span></span>
 <span class="ln" id="L43"><span class="tok-com">/// The whole palette is defined even though a given build may not use every</span></span>
-<span class="ln" id="L44"><span class="tok-com">/// entry &#8212; the device listing is behind the `live` feature, so its colour goes</span></span>
+<span class="ln" id="L44"><span class="tok-com">/// entry, because the device listing is behind the `live` feature, so its colour goes</span></span>
 <span class="ln" id="L45"><span class="tok-com">/// unused on platforms without an audio backend. Keeping the set complete means</span></span>
 <span class="ln" id="L46"><span class="tok-com">/// it stays a straight mirror of the GUI&#x27;s palette and of `css/themes.css`,</span></span>
 <span class="ln" id="L47"><span class="tok-com">/// which is what makes the three front-ends look like one program.</span></span>
 <span class="ln" id="L48"><span class="tok-attr">#[allow</span>(dead_code)]</span>
 <span class="ln" id="L49"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> colour {</span>
-<span class="ln" id="L50">    <span class="tok-com">/// Muted comment grey &#8212; secondary text.</span></span>
+<span class="ln" id="L50">    <span class="tok-com">/// Muted comment grey, for secondary text.</span></span>
 <span class="ln" id="L51">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> MUTED: &amp;str = <span class="tok-str">&quot;\x1b[38;2;115;122;162m&quot;</span>;</span>
-<span class="ln" id="L52">    <span class="tok-com">/// Foreground blue &#8212; headings and prompts.</span></span>
+<span class="ln" id="L52">    <span class="tok-com">/// Foreground blue, for headings and prompts.</span></span>
 <span class="ln" id="L53">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> BLUE: &amp;str = <span class="tok-str">&quot;\x1b[38;2;122;162;247m&quot;</span>;</span>
-<span class="ln" id="L54">    <span class="tok-com">/// Cyan &#8212; values and figures.</span></span>
+<span class="ln" id="L54">    <span class="tok-com">/// Cyan, for values and figures.</span></span>
 <span class="ln" id="L55">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> CYAN: &amp;str = <span class="tok-str">&quot;\x1b[38;2;125;207;255m&quot;</span>;</span>
-<span class="ln" id="L56">    <span class="tok-com">/// Green &#8212; success.</span></span>
+<span class="ln" id="L56">    <span class="tok-com">/// Green, for success.</span></span>
 <span class="ln" id="L57">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> GREEN: &amp;str = <span class="tok-str">&quot;\x1b[38;2;158;206;106m&quot;</span>;</span>
-<span class="ln" id="L58">    <span class="tok-com">/// Yellow &#8212; warnings.</span></span>
+<span class="ln" id="L58">    <span class="tok-com">/// Yellow, for warnings.</span></span>
 <span class="ln" id="L59">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> YELLOW: &amp;str = <span class="tok-str">&quot;\x1b[38;2;224;175;104m&quot;</span>;</span>
-<span class="ln" id="L60">    <span class="tok-com">/// Red &#8212; errors.</span></span>
+<span class="ln" id="L60">    <span class="tok-com">/// Red, for errors.</span></span>
 <span class="ln" id="L61">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> RED: &amp;str = <span class="tok-str">&quot;\x1b[38;2;247;118;142m&quot;</span>;</span>
-<span class="ln" id="L62">    <span class="tok-com">/// Purple &#8212; accents.</span></span>
+<span class="ln" id="L62">    <span class="tok-com">/// Purple, for accents.</span></span>
 <span class="ln" id="L63">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> PURPLE: &amp;str = <span class="tok-str">&quot;\x1b[38;2;187;154;247m&quot;</span>;</span>
 <span class="ln" id="L64">    <span class="tok-com">/// Reset to the terminal default.</span></span>
 <span class="ln" id="L65">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> RESET: &amp;str = <span class="tok-str">&quot;\x1b[0m&quot;</span>;</span>
@@ -179,7 +179,7 @@
 <span class="ln" id="L120"><span class="tok-kw">mod</span> tests {</span>
 <span class="ln" id="L121">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L122"></span>
-<span class="ln" id="L123">    <span class="tok-com">/// Tests capture stdout, so colour is off and `paint` must be a no-op &#8212;</span></span>
+<span class="ln" id="L123">    <span class="tok-com">/// Tests capture stdout, so colour is off and `paint` must be a no-op,</span></span>
 <span class="ln" id="L124">    <span class="tok-com">/// which is exactly the property that keeps escape codes out of pipes.</span></span>
 <span class="ln" id="L125">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L126">    <span class="tok-kw">fn</span> <span class="tok-fn">colour_is_disabled_when_not_a_terminal</span>() {</span>

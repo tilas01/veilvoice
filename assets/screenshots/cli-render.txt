@@ -2,7 +2,7 @@ Render a recording according to a plan.
 
 Writes the audio and both subtitle formats. Audio that no turn claims is **silenced**, never passed through -- it has not been veiled, and a gap in a plan must not put a real voice into the result. How much went is printed.
 
-Usage: veilvoice.exe conversation render [OPTIONS] <PLAN> <INPUT>
+Usage: veilvoice conversation render [OPTIONS] <PLAN> <INPUT>
 
 Arguments:
   <PLAN>
@@ -27,6 +27,15 @@ Options:
           Seconds between modulation seed rolls; 0 keeps one stream
           
           [default: 2]
+
+      --reseed-range <RESEED_RANGE>
+          Draw each gap from a range instead, in milliseconds: `250,1800`.
+          
+          A fixed interval is a fixed thing to observe. With a range, the gap before every roll is drawn fresh from the modulation stream, so the ratchet has no period at all.
+          
+          Without this, the range is **drawn from the operating system's random source at launch**, so it is a property of this run rather than a number compiled into every copy of VeilVoice. Pass `--reseed-range fixed` to use `--reseed-secs` instead.
+          
+          A value that is not a usable range is **refused with the reason**, never adjusted to fit.
 
       --page
           Also write a self-contained HTML player beside the audio.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! `veilvoice` — the command-line interface.
+//! `veilvoice`, the command-line interface.
 //!
 //! Everything VeilVoice does, available without a desktop: it runs over SSH, in
 //! a container, and on machines that have no GUI toolkit at all. The same
@@ -107,9 +107,9 @@ use veilvoice_setup::{companions, install};
 #[command(
     name = "veilvoice",
     version,
-    about = "Irreversible voice de-identification — fully offline.",
-    long_about = "VeilVoice destroys the biometric voiceprint of a speaker — pitch, \
-formants, timbre and the melody of an accent — while keeping the words clean and \
+    about = "Irreversible voice de-identification, fully offline.",
+    long_about = "VeilVoice destroys the biometric voiceprint of a speaker: the \
+pitch, the formants, the timbre and the melody of an accent. It keeps the words clean and \
 transcribable. This command line talks to no servers, ever: the one thing in VeilVoice that reaches the network is the desktop app's check-for-updates button, and it is not here."
 )]
 struct Cli {
@@ -1672,7 +1672,7 @@ fn describe_reseed_range(config: &DeidConfig) -> String {
 /// How the seed-rolling setting reads in the output.
 fn describe_reseed(secs: f32) -> String {
     if secs <= 0.0 {
-        "off — one stream for the whole session".to_string()
+        "off, so one stream for the whole session".to_string()
     } else {
         format!("every {secs}s")
     }
@@ -1748,7 +1748,7 @@ fn anonymise(
     } else {
         atrest::confirm_plaintext(at_rest.yes)?;
         // An unencrypted recording is still a recording of everything that was
-        // said — the warning just above says exactly that — so at minimum it is
+        // said, which the warning just above says exactly, so at minimum it is
         // not left readable by every other account on the machine. A file
         // permission is a much weaker thing than the encryption being declined
         // here, and the summary below says so rather than letting it read as a
@@ -1797,7 +1797,7 @@ fn anonymise(
     println!();
     println!(
         "{}",
-        ok("done — the voiceprint in this file is not recoverable")
+        ok("done, and the voiceprint in this file is not recoverable")
     );
     if at_rest.encrypt {
         println!(
@@ -1936,7 +1936,7 @@ fn live(
     if out_name.is_none() && !preview {
         println!(
             "{}",
-            warn("no virtual audio cable found — routing to the default output")
+            warn("no virtual audio cable found, so routing to the default output")
         );
         println!(
             "{}",
@@ -2168,13 +2168,13 @@ fn load_secret_key(path: &std::path::Path) -> Result<hybrid::SecretKey, String> 
 fn keygen(public: PathBuf, secret: PathBuf) -> Result<(), String> {
     // Reported early so the user is not asked for a passphrase before being
     // told the file is in the way. The *refusal* that matters is not this one
-    // though — it is `write_owner_only_new` below, which asks the kernel to
+    // though. It is `write_owner_only_new` below, which asks the kernel to
     // fail if anything is already there. Checking `exists()` and then writing
     // is a race, and it follows a symbolic link planted at the path.
     for path in [&public, &secret] {
         if path.exists() {
             return Err(format!(
-                "{} already exists — refusing to overwrite a key file",
+                "{} already exists, so refusing to overwrite a key file",
                 path.display()
             ));
         }
@@ -2355,7 +2355,7 @@ fn shred(file: PathBuf, passes: u8, yes: bool) -> Result<(), String> {
             colour::MUTED,
             "  On an SSD, SD card or USB stick, wear levelling may leave the
                original blocks in flash where no software can reach them.
-               Full-disk encryption is the reliable answer — destroy the key
+               Full-disk encryption is the reliable answer. Destroy the key
                and the data goes with it, wherever the drive put it."
         )
     );
@@ -2370,7 +2370,7 @@ fn shred(file: PathBuf, passes: u8, yes: bool) -> Result<(), String> {
             .read_line(&mut answer)
             .map_err(|e| e.to_string())?;
         if answer.trim() != "DESTROY" {
-            return Err("cancelled — nothing was touched".into());
+            return Err("cancelled, and nothing was touched".into());
         }
     }
 

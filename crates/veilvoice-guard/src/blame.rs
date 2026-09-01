@@ -287,7 +287,7 @@ mod windows {
         if target.contains('\'') {
             return Blame::Unknown {
                 why: "this path contains an apostrophe, which the Windows event-log query \
-                      language cannot express — so the Security log cannot be searched for it"
+                      language cannot express, so the Security log cannot be searched for it"
                     .to_string(),
                 remedy: "read Security event 4663 for this path directly in Event Viewer",
             };

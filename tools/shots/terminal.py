@@ -440,6 +440,55 @@ def mirror_captures(check):
     return problems
 
 
+def check_captures_are_current():
+    """**F-103.** Do the committed captures still say what the program says?
+
+    Nothing asked this. `--check` compared each drawing against the text file
+    beside it, and the text file against nothing at all: it is written by
+    `--capture`, which is a separate command nobody runs by accident. So a
+    string could be rewritten in `veilvoice-cli` and every check in this
+    repository would pass while `assets/screenshots/` went on showing the old
+    wording, on the website, in the README and in the gallery.
+
+    That is not hypothetical. It happened during the sweep that took the em
+    dashes out of the interface text: the code changed, the whole of
+    `tools/verify.py` passed, and `cli-help.txt` still contained a dash the
+    program no longer prints. The audit had recorded the re-capture as a manual
+    step and this is the half that was missing, which is that nothing said when
+    the manual step was due.
+
+    Every command captured here is a `--help` screen, so its output is a
+    function of the binary and not of the machine: two people with the same
+    commit get the same bytes. That is what makes this checkable at all, and it
+    is why the list stays help screens. A capture of something that reads the
+    machine -- what is installed, what is plugged in -- could not be checked
+    this way and would have to be marked as such.
+
+    Skipped where there is no build, which is the state of the CI job that runs
+    the other checks here. It is not skipped where it matters: `verify.py` runs
+    after `cargo build`, on the machine where the strings were just edited.
+    """
+    exe = binary()
+    if exe is None:
+        return [], False
+    problems = []
+    for name, argv, _ in COMMANDS:
+        path = os.path.join(OUT, "cli-%s.txt" % name)
+        if not os.path.exists(path):
+            continue
+        done = subprocess.run([exe] + argv, capture_output=True, cwd=ROOT, check=False)
+        raw = done.stdout or done.stderr
+        live = raw.decode("utf-8", "replace").replace("\r\n", "\n")
+        with io.open(path, encoding="utf-8") as handle:
+            saved = handle.read()
+        if live.strip() != saved.strip():
+            problems.append(
+                "assets/screenshots/cli-%s.txt is not what `veilvoice %s` prints"
+                % (name, " ".join(argv))
+            )
+    return problems, True
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--capture", action="store_true",
@@ -458,7 +507,8 @@ def main():
         return 1
 
     if args.check:
-        problems = mirror_captures(check=True) + check_declared_sizes()
+        stale, ran = check_captures_are_current()
+        problems = mirror_captures(check=True) + check_declared_sizes() + stale
         for rel, text in sorted(files.items()):
             path = os.path.join(ROOT, rel.replace("/", os.sep))
             try:
@@ -471,11 +521,20 @@ def main():
             for line in problems:
                 print("  MISMATCH %s" % line)
             print()
-            print("  Run 'python tools/shots/terminal.py' and commit the result.")
+            if stale:
+                print("  Run 'python tools/shots/terminal.py --capture', then")
+                print("  'python tools/shots/terminal.py', and commit the result.")
+            else:
+                print("  Run 'python tools/shots/terminal.py' and commit the result.")
             return 1
         print(
             "  %d terminal drawings match their captured text, and %d window "
             "captures match their copies" % (len(files), len(window_captures()))
+        )
+        print(
+            "  and the captures %s"
+            % ("are what the built program prints" if ran
+               else "were not compared against a build: there is none here")
         )
         return 0
 

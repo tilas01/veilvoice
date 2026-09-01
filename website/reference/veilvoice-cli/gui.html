@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-cli/src/gui.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="veilvoice gui &#8212; open the desktop application from the command line.">
+<meta name="description" content="veilvoice gui opens the desktop application from the command line.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -51,7 +51,7 @@
 </nav>
 <div>
 <section id="s-about">
-<p><code>veilvoice gui</code> &#8212; open the desktop application from the command line.</p>
+<p><code>veilvoice gui</code> opens the desktop application from the command line.</p>
 <h2 id="why-this-is-not-simply-commandnewveilvoice-gui">Why this is not simply <code>Command::new(&quot;veilvoice-gui&quot;)</code></h2>
 <p>A bare name is resolved through <code>PATH</code>, and on Windows the <strong>current directory is searched first</strong>. So <code>veilvoice gui</code>, run inside a downloads folder that happens to contain something called <code>veilvoice-gui.exe</code>, would start that instead. This is the one command whose whole job is to launch another program, which makes it a poor place to be relaxed about which.</p>
 <p>So the search is explicit and in a stated order:</p>
@@ -61,7 +61,7 @@
 <p>The window is started and the command returns. A terminal held open for as long as a desktop application runs is a terminal somebody cannot use, and closing it would then close the window.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Type <code>veilvoice gui</code> (or <code>veilvoice g</code>) and the VeilVoice window opens. The terminal is yours again immediately; closing it will not close the window.</p>
-<p>It looks for the application next to the command first, then where an install would have put it, then on your system path &#8212; and if it cannot find it anywhere, it tells you exactly where it looked.</p>
+<p>It looks for the application next to the command first, then where an install would have put it, then on your system path. If it cannot find it anywhere, it tells you exactly where it looked.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>

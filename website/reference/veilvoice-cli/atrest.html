@@ -54,7 +54,7 @@
 <p>Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.</p>
 <h2 id="why-this-is-the-default">Why this is the default</h2>
 <p>De-identification and confidentiality are different problems, and VeilVoice only solves the first: the words survive on purpose, so a veiled recording sitting on disk is still a recording of everything that was said. Writing it in the clear by default would quietly leave the second problem unsolved for everyone who did not think to ask.</p>
-<p>So the result is sealed into a <code>container</code> &#8212; Argon2id or the X25519 + ML-KEM-768 hybrid &#8212; unless the user asks for plaintext, and asking for plaintext prints <code>PLAINTEXT_WARNING</code> and, on a terminal, waits for an answer.</p>
+<p>So the result is sealed into a <code>container</code>, with Argon2id or the X25519 plus ML-KEM-768 hybrid, unless the user asks for plaintext, and asking for plaintext prints <code>PLAINTEXT_WARNING</code> and, on a terminal, waits for an answer.</p>
 <h2 id="never-through-a-plaintext-file">Never through a plaintext file</h2>
 <p>The WAV is encoded in memory and sealed there. It is never written to disk and then encrypted, because a plaintext file that is created and deleted is precisely what <code>veilvoice_crypto::shred</code> explains cannot be reliably taken back on flash storage.</p>
 <h2 id="in-plain-words">In plain words</h2>

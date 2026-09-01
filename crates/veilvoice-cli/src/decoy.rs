@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! `veilvoice decoy` — what a second passphrase is worth, and what it is not.
+//! `veilvoice decoy`, and what a second passphrase is worth and what it is not.
 //!
 //! # In plain words
 //!

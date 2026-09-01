@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! `veilvoice privilege` — what VeilVoice is running with, and what it can see.
+//! `veilvoice privilege` shows what VeilVoice runs with, and what it can see.
 //!
 //! # In plain words
 //!
 //! Most of VeilVoice needs no special permissions. The parts that watch your
 //! machine see more when it is run as an administrator, and this says which of
-//! those you are getting. It will not raise its own privileges for you — it
+//! those you are getting. It will not raise its own privileges for you, and it
 //! prints the command and you decide.
 
 use crate::theme::{colour, field, heading, paint};

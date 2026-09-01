@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! `veilvoice gui` — open the desktop application from the command line.
+//! `veilvoice gui` opens the desktop application from the command line.
 //!
 //! # Why this is not simply `Command::new("veilvoice-gui")`
 //!
@@ -32,7 +32,7 @@
 //! terminal is yours again immediately; closing it will not close the window.
 //!
 //! It looks for the application next to the command first, then where an
-//! install would have put it, then on your system path — and if it cannot find
+//! install would have put it, then on your system path. If it cannot find
 //! it anywhere, it tells you exactly where it looked.
 
 use crate::theme::{colour, field, heading, paint};

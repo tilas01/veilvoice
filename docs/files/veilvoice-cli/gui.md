@@ -22,7 +22,7 @@
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
-`veilvoice gui` — open the desktop application from the command line.
+`veilvoice gui` opens the desktop application from the command line.
 
 # Why this is not simply `Command::new("veilvoice-gui")`
 
@@ -55,7 +55,7 @@ Type `veilvoice gui` (or `veilvoice g`) and the VeilVoice window opens. The
 terminal is yours again immediately; closing it will not close the window.
 
 It looks for the application next to the command first, then where an
-install would have put it, then on your system path — and if it cannot find
+install would have put it, then on your system path. If it cannot find
 it anywhere, it tells you exactly where it looked.
 
 ## What this file contains

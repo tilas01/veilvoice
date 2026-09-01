@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! `veilvoice accel` — the graphics hardware here, and what it is good for.
+//! `veilvoice accel` reports the graphics hardware here, and what it is good for.
 //!
 //! # In plain words
 //!
