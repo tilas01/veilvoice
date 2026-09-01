@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-setup/src/volumes.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-setup/src/volumes.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Encrypted volumes this machine already has: Cryptomator and VeraCrypt.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -69,34 +69,34 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>580 lines defining <strong>18 functions</strong> (13 public), <strong>3 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Tool</code> <span style="color:var(--muted)">line 68</span> &mdash; One of the two tools this module knows about.</li>
-<li><code>enum Hidden</code> <span style="color:var(--muted)">line 131</span> &mdash; Whether a destination is, or might be, a VeraCrypt hidden volume.</li>
-<li><code>struct Volume</code> <span style="color:var(--muted)">line 173</span> &mdash; A mounted volume VeilVoice could write into.</li>
+<li><code>enum Tool</code> <span style="color:var(--muted)">line 68</span> &middot; One of the two tools this module knows about.</li>
+<li><code>enum Hidden</code> <span style="color:var(--muted)">line 131</span> &middot; Whether a destination is, or might be, a VeraCrypt hidden volume.</li>
+<li><code>struct Volume</code> <span style="color:var(--muted)">line 173</span> &middot; A mounted volume VeilVoice could write into.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Tool::name</code> <span style="color:var(--muted)">line 80</span> &mdash; The name to print.
+<li><code>Tool::name</code> <span style="color:var(--muted)">line 80</span> &middot; The name to print.
 </li>
-<li><code>Tool::key</code> <span style="color:var(--muted)">line 88</span> &mdash; A stable identifier, for a settings file.
+<li><code>Tool::key</code> <span style="color:var(--muted)">line 88</span> &middot; A stable identifier, for a settings file.
 </li>
-<li><code>Tool::from_key</code> <span style="color:var(--muted)">line 96</span> &mdash; The tool with this key, if it is one.
+<li><code>Tool::from_key</code> <span style="color:var(--muted)">line 96</span> &middot; The tool with this key, if it is one.
 </li>
-<li><code>Tool::home_page</code> <span style="color:var(--muted)">line 101</span> &mdash; Where to read about it, for a user who has neither installed.
+<li><code>Tool::home_page</code> <span style="color:var(--muted)">line 101</span> &middot; Where to read about it, for a user who has neither installed.
 </li>
-<li><code>Hidden::safe_to_write</code> <span style="color:var(--muted)">line 152</span> &mdash; Whether VeilVoice may write here.
+<li><code>Hidden::safe_to_write</code> <span style="color:var(--muted)">line 152</span> &middot; Whether VeilVoice may write here.
 </li>
-<li><code>Hidden::refusal</code> <span style="color:var(--muted)">line 157</span> &mdash; Why writing is refused, in the words a user reads.
+<li><code>Hidden::refusal</code> <span style="color:var(--muted)">line 157</span> &middot; Why writing is refused, in the words a user reads.
 </li>
-<li><code>Volume::ready</code> <span style="color:var(--muted)">line 198</span> &mdash; Whether VeilVoice may write here right now.
+<li><code>Volume::ready</code> <span style="color:var(--muted)">line 198</span> &middot; Whether VeilVoice may write here right now.
 </li>
-<li><code>Volume::blocked</code> <span style="color:var(--muted)">line 206</span> &mdash; Why it is not ready, if it is not.
+<li><code>Volume::blocked</code> <span style="color:var(--muted)">line 206</span> &middot; Why it is not ready, if it is not.
 </li>
-<li><code>installed</code> <span style="color:var(--muted)">line 219</span> &mdash; Whether tool looks installed on this machine.
+<li><code>installed</code> <span style="color:var(--muted)">line 219</span> &middot; Whether tool looks installed on this machine.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>candidates</code>, <code>on_path</code></span>
 </li>
-<li><code>mounted</code> <span style="color:var(--muted)">line 283</span> &mdash; Every mounted volume either tool is currently offering.
+<li><code>mounted</code> <span style="color:var(--muted)">line 283</span> &middot; Every mounted volume either tool is currently offering.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>from_mount_directories</code>, <code>from_proc_mounts</code>, <code>found</code>, <code>recognise</code>, <code>unescape_mount</code></span>
 </li>
-<li><code>covers</code> <span style="color:var(--muted)">line 316</span> &mdash; Whether path is inside one of mounts right now.
+<li><code>covers</code> <span style="color:var(--muted)">line 316</span> &middot; Whether path is inside one of mounts right now.
 </li>
 </ul>
 </section>
@@ -220,11 +220,11 @@
 <path d="M20.0 756.5 L29.0 756.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="761.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="783.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
-<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

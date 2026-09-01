@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-core/src/pitch.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-core/src/pitch.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Monophonic fundamental-frequency tracker (decimated YIN).">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -66,15 +66,15 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>286 lines defining <strong>4 functions</strong> (3 public), <strong>2 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct PitchEstimate</code> <span style="color:var(--muted)">line 53</span> &mdash; One f0 measurement.</li>
-<li><code>struct PitchTracker</code> <span style="color:var(--muted)">line 63</span> &mdash; Rolling, allocation-free f0 tracker.</li>
+<li><code>struct PitchEstimate</code> <span style="color:var(--muted)">line 53</span> &middot; One f0 measurement.</li>
+<li><code>struct PitchTracker</code> <span style="color:var(--muted)">line 63</span> &middot; Rolling, allocation-free f0 tracker.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>PitchTracker::new</code> <span style="color:var(--muted)">line 81</span> &mdash; Build a tracker for input at sample_rate hertz.
+<li><code>PitchTracker::new</code> <span style="color:var(--muted)">line 81</span> &middot; Build a tracker for input at sample_rate hertz.
 </li>
-<li><code>PitchTracker::push</code> <span style="color:var(--muted)">line 103</span> &mdash; Feed new input samples (anti-aliased and decimated internally).
+<li><code>PitchTracker::push</code> <span style="color:var(--muted)">line 103</span> &middot; Feed new input samples (anti-aliased and decimated internally).
 </li>
-<li><code>PitchTracker::estimate</code> <span style="color:var(--muted)">line 123</span> &mdash; Estimate f0 over the newest history.
+<li><code>PitchTracker::estimate</code> <span style="color:var(--muted)">line 123</span> &middot; Estimate f0 over the newest history.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parabolic</code></span>
 </li>
 </ul>
@@ -120,11 +120,11 @@
 <path d="M20.0 240.5 L29.0 240.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="245.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="267.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
-<text x="20.0" y="282.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
+<text x="20.0" y="282.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
 <text x="20.0" y="297.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

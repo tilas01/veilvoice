@@ -109,7 +109,7 @@ def page(parts, section_id, title, description, body, relink_body=True):
     calling.
     """
     head = parts["head"]
-    head = re.sub(r"<title>.*?</title>", "<title>%s &mdash; VeilVoice</title>" % title,
+    head = re.sub(r"<title>.*?</title>", "<title>%s &middot; VeilVoice</title>" % title,
                   head, count=1, flags=re.S)
     head = re.sub(r'<meta name="description" content="[^"]*">',
                   '<meta name="description" content="%s">' % description,

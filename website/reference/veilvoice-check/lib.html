@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-check/src/lib.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-check/src/lib.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Check a VeilVoice release: a file&#x27;s SHA-256, its line in a SHA256SUMS, and the detached OpenPGP signature over that list.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -74,16 +74,16 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>471 lines defining <strong>11 functions</strong> (9 public), <strong>2 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 96</span> &mdash; Something that went wrong, in words a person can act on.</li>
-<li><code>struct Checked</code> <span style="color:var(--muted)">line 284</span> &mdash; What a full check found.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 96</span> &middot; Something that went wrong, in words a person can act on.</li>
+<li><code>struct Checked</code> <span style="color:var(--muted)">line 284</span> &middot; What a full check found.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>sha256_bytes</code> <span style="color:var(--muted)">line 179</span> &mdash; SHA-256 of bytes already in memory.
+<li><code>sha256_bytes</code> <span style="color:var(--muted)">line 179</span> &middot; SHA-256 of bytes already in memory.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>hex</code></span>
 </li>
-<li><code>names_in_sums</code> <span style="color:var(--muted)">line 245</span> &mdash; Every name a SHA256SUMS lists, in order.
+<li><code>names_in_sums</code> <span style="color:var(--muted)">line 245</span> &middot; Every name a SHA256SUMS lists, in order.
 </li>
-<li><code>check_file</code> <span style="color:var(--muted)">line 307</span> &mdash; The whole check: signature first, then the hash.
+<li><code>check_file</code> <span style="color:var(--muted)">line 307</span> &middot; The whole check: signature first, then the hash.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>digest_from_sums</code>, <code>digests_match</code>, <code>fingerprint_of</code>, <code>key</code>, <code>sha256_file</code>, <code>verify_detached</code>, <code>hex</code></span>
 </li>
 </ul>
@@ -174,11 +174,11 @@
 <path d="M20.0 456.5 L29.0 456.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="461.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="483.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
-<text x="20.0" y="498.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic</text>
-<text x="20.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
+<text x="20.0" y="498.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
+<text x="20.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

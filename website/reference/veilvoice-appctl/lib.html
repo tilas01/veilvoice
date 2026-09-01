@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-appctl/src/lib.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-appctl/src/lib.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Learn what normally runs on this machine, then notice what does not.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -73,60 +73,60 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>800 lines defining <strong>28 functions</strong> (22 public), <strong>5 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Grant</code> <span style="color:var(--muted)">line 71</span> &mdash; How long a grant lasts.</li>
-<li><code>enum Verdict</code> <span style="color:var(--muted)">line 138</span> &mdash; What a baseline says about one program.</li>
-<li><code>struct Entry</code> <span style="color:var(--muted)">line 174</span> &mdash; One line of the decision log.</li>
-<li><code>struct Baseline</code> <span style="color:var(--muted)">line 187</span> &mdash; What normally runs here, what has been allowed, and what has been decided.</li>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 483</span> &mdash; Why something was refused.</li>
+<li><code>enum Grant</code> <span style="color:var(--muted)">line 71</span> &middot; How long a grant lasts.</li>
+<li><code>enum Verdict</code> <span style="color:var(--muted)">line 138</span> &middot; What a baseline says about one program.</li>
+<li><code>struct Entry</code> <span style="color:var(--muted)">line 174</span> &middot; One line of the decision log.</li>
+<li><code>struct Baseline</code> <span style="color:var(--muted)">line 187</span> &middot; What normally runs here, what has been allowed, and what has been decided.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 483</span> &middot; Why something was refused.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Grant::for_duration</code> <span style="color:var(--muted)">line 90</span> &mdash; A grant lasting how_long from now.
+<li><code>Grant::for_duration</code> <span style="color:var(--muted)">line 90</span> &middot; A grant lasting how_long from now.
 </li>
-<li><code>Grant::forever</code> <span style="color:var(--muted)">line 95</span> &mdash; A permanent grant.
+<li><code>Grant::forever</code> <span style="color:var(--muted)">line 95</span> &middot; A permanent grant.
 </li>
-<li><code>Grant::covers</code> <span style="color:var(--muted)">line 100</span> &mdash; Whether this grant still covers now.
+<li><code>Grant::covers</code> <span style="color:var(--muted)">line 100</span> &middot; Whether this grant still covers now.
 </li>
-<li><code>Grant::describe</code> <span style="color:var(--muted)">line 108</span> &mdash; How this reads in a report.
+<li><code>Grant::describe</code> <span style="color:var(--muted)">line 108</span> &middot; How this reads in a report.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>plain_duration</code></span>
 </li>
-<li><code>Verdict::phrasing</code> <span style="color:var(--muted)">line 159</span> &mdash; The wording a front end should use.
+<li><code>Verdict::phrasing</code> <span style="color:var(--muted)">line 159</span> &middot; The wording a front end should use.
 </li>
-<li><code>Baseline::learning</code> <span style="color:var(--muted)">line 205</span> &mdash; A baseline in its learning phase.
+<li><code>Baseline::learning</code> <span style="color:var(--muted)">line 205</span> &middot; A baseline in its learning phase.
 </li>
-<li><code>Baseline::is_learning</code> <span style="color:var(--muted)">line 213</span> &mdash; Whether the learning phase is open.
+<li><code>Baseline::is_learning</code> <span style="color:var(--muted)">line 213</span> &middot; Whether the learning phase is open.
 </li>
-<li><code>Baseline::freeze</code> <span style="color:var(--muted)">line 223</span> &mdash; Close the learning phase.
+<li><code>Baseline::freeze</code> <span style="color:var(--muted)">line 223</span> &middot; Close the learning phase.
 </li>
-<li><code>Baseline::len</code> <span style="color:var(--muted)">line 235</span> &mdash; How many programs the baseline holds.
+<li><code>Baseline::len</code> <span style="color:var(--muted)">line 235</span> &middot; How many programs the baseline holds.
 </li>
-<li><code>Baseline::is_empty</code> <span style="color:var(--muted)">line 240</span> &mdash; Whether the baseline holds nothing.
+<li><code>Baseline::is_empty</code> <span style="color:var(--muted)">line 240</span> &middot; Whether the baseline holds nothing.
 </li>
-<li><code>Baseline::programs</code> <span style="color:var(--muted)">line 245</span> &mdash; Every program in the baseline, in order.
+<li><code>Baseline::programs</code> <span style="color:var(--muted)">line 245</span> &middot; Every program in the baseline, in order.
 </li>
-<li><code>Baseline::allow</code> <span style="color:var(--muted)">line 254</span> &mdash; Allow a program until a moment, or for good.
+<li><code>Baseline::allow</code> <span style="color:var(--muted)">line 254</span> &middot; Allow a program until a moment, or for good.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>normalise</code></span>
 </li>
-<li><code>Baseline::revoke</code> <span style="color:var(--muted)">line 267</span> &mdash; Withdraw a grant.
+<li><code>Baseline::revoke</code> <span style="color:var(--muted)">line 267</span> &middot; Withdraw a grant.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>normalise</code></span>
 </li>
-<li><code>Baseline::grant</code> <span style="color:var(--muted)">line 272</span> &mdash; The grant covering a program, expired or not.
+<li><code>Baseline::grant</code> <span style="color:var(--muted)">line 272</span> &middot; The grant covering a program, expired or not.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>normalise</code></span>
 </li>
-<li><code>Baseline::allowed</code> <span style="color:var(--muted)">line 277</span> &mdash; Whether this program is allowed to be running, as of now.
+<li><code>Baseline::allowed</code> <span style="color:var(--muted)">line 277</span> &middot; Whether this program is allowed to be running, as of now.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>verdict</code>, <code>normalise</code></span>
 </li>
-<li><code>Baseline::observe</code> <span style="color:var(--muted)">line 306</span> &mdash; Record what is running now, and return what was decided.
+<li><code>Baseline::observe</code> <span style="color:var(--muted)">line 306</span> &middot; Record what is running now, and return what was decided.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>normalise</code>, <code>verdict</code></span>
 </li>
-<li><code>Baseline::log</code> <span style="color:var(--muted)">line 339</span> &mdash; The decision log, oldest first.
+<li><code>Baseline::log</code> <span style="color:var(--muted)">line 339</span> &middot; The decision log, oldest first.
 </li>
-<li><code>Baseline::unknown</code> <span style="color:var(--muted)">line 344</span> &mdash; Everything running that is neither known nor granted.
+<li><code>Baseline::unknown</code> <span style="color:var(--muted)">line 344</span> &middot; Everything running that is neither known nor granted.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>normalise</code>, <code>verdict</code></span>
 </li>
-<li><code>Baseline::to_text</code> <span style="color:var(--muted)">line 361</span> &mdash; Write the baseline as text.
+<li><code>Baseline::to_text</code> <span style="color:var(--muted)">line 361</span> &middot; Write the baseline as text.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>verdict_key</code></span>
 </li>
-<li><code>Baseline::parse</code> <span style="color:var(--muted)">line 397</span> &mdash; Read a baseline back.
+<li><code>Baseline::parse</code> <span style="color:var(--muted)">line 397</span> &middot; Read a baseline back.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>new</code>, <code>normalise</code>, <code>take_token</code>, <code>verdict_from_key</code></span>
 </li>
 </ul>
@@ -278,12 +278,12 @@
 <path d="M20.0 956.5 L29.0 956.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="961.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="983.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="998.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not</text>
-<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">a type-resolved one. 22 of 28 functions are drawn; the diagram is bounded at 22 so</text>
-<text x="20.0" y="1028.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">it stays readable.</text>
+<text x="20.0" y="998.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 28 functions are drawn; the diagram is</text>
+<text x="20.0" y="1028.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 28 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 28 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

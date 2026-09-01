@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-accel/src/lib.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-accel/src/lib.rs &#183; VeilVoice reference</title>
 <meta name="description" content="What hardware this machine has, and the one place VeilVoice can use it.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -69,30 +69,30 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>589 lines defining <strong>16 functions</strong> (11 public), <strong>3 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Vendor</code> <span style="color:var(--muted)">line 60</span> &mdash; Who made a graphics device.</li>
-<li><code>struct Adapter</code> <span style="color:var(--muted)">line 118</span> &mdash; One graphics device.</li>
-<li><code>struct Found</code> <span style="color:var(--muted)">line 171</span> &mdash; Everything found, and anything that went wrong looking.</li>
+<li><code>enum Vendor</code> <span style="color:var(--muted)">line 60</span> &middot; Who made a graphics device.</li>
+<li><code>struct Adapter</code> <span style="color:var(--muted)">line 118</span> &middot; One graphics device.</li>
+<li><code>struct Found</code> <span style="color:var(--muted)">line 171</span> &middot; Everything found, and anything that went wrong looking.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Vendor::encoder</code> <span style="color:var(--muted)">line 94</span> &mdash; The ffmpeg encoder this vendor&#x27;s hardware provides, if any.
+<li><code>Vendor::encoder</code> <span style="color:var(--muted)">line 94</span> &middot; The ffmpeg encoder this vendor&#x27;s hardware provides, if any.
 </li>
-<li><code>Vendor::encoder_name</code> <span style="color:var(--muted)">line 105</span> &mdash; What to call the encoder in front of a person.
+<li><code>Vendor::encoder_name</code> <span style="color:var(--muted)">line 105</span> &middot; What to call the encoder in front of a person.
 </li>
-<li><code>Adapter::encoder</code> <span style="color:var(--muted)">line 134</span> &mdash; The encoder to ask ffmpeg for, if this device has one.
+<li><code>Adapter::encoder</code> <span style="color:var(--muted)">line 134</span> &middot; The encoder to ask ffmpeg for, if this device has one.
 </li>
-<li><code>Adapter::caveat</code> <span style="color:var(--muted)">line 139</span> &mdash; What finding this device does and does not establish.
+<li><code>Adapter::caveat</code> <span style="color:var(--muted)">line 139</span> &middot; What finding this device does and does not establish.
 </li>
-<li><code>Adapter::describe</code> <span style="color:var(--muted)">line 147</span> &mdash; One line, for a list.
+<li><code>Adapter::describe</code> <span style="color:var(--muted)">line 147</span> &middot; One line, for a list.
 </li>
-<li><code>Found::is_answerable</code> <span style="color:var(--muted)">line 183</span> &mdash; Whether anything could be established at all.
+<li><code>Found::is_answerable</code> <span style="color:var(--muted)">line 183</span> &middot; Whether anything could be established at all.
 </li>
-<li><code>Found::why_recommended</code> <span style="color:var(--muted)">line 208</span> &mdash; Why that one, in the words to show.
+<li><code>Found::why_recommended</code> <span style="color:var(--muted)">line 208</span> &middot; Why that one, in the words to show.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>recommended</code></span>
 </li>
-<li><code>look</code> <span style="color:var(--muted)">line 234</span> &mdash; Look for graphics hardware.
+<li><code>look</code> <span style="color:var(--muted)">line 234</span> &middot; Look for graphics hardware.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>linux_adapters</code>, <code>macos_adapters</code>, <code>windows_adapters</code>, <code>adapter</code>, <code>parse_pairs</code>, <code>of</code></span>
 </li>
-<li><code>usable_threads</code> <span style="color:var(--muted)">line 405</span> &mdash; How many threads this machine can usefully run at once.
+<li><code>usable_threads</code> <span style="color:var(--muted)">line 405</span> &middot; How many threads this machine can usefully run at once.
 </li>
 </ul>
 </section>
@@ -207,11 +207,11 @@
 <path d="M20.0 756.5 L29.0 756.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="761.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="783.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
-<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic</text>
-<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
+<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
+<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

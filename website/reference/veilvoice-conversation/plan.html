@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-conversation/src/plan.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-conversation/src/plan.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Who is in the recording, and who is speaking when.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -78,46 +78,46 @@ turn  4.100  9.050  1</code></pre>
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>947 lines defining <strong>21 functions</strong> (21 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Speaker</code> <span style="color:var(--muted)">line 71</span> &mdash; One person in the recording.</li>
-<li><code>struct Turn</code> <span style="color:var(--muted)">line 97</span> &mdash; A span of the recording belonging to one speaker.</li>
-<li><code>struct Conversation</code> <span style="color:var(--muted)">line 121</span> &mdash; The whole plan: who is in the recording, and when each of them speaks.</li>
+<li><code>struct Speaker</code> <span style="color:var(--muted)">line 71</span> &middot; One person in the recording.</li>
+<li><code>struct Turn</code> <span style="color:var(--muted)">line 97</span> &middot; A span of the recording belonging to one speaker.</li>
+<li><code>struct Conversation</code> <span style="color:var(--muted)">line 121</span> &middot; The whole plan: who is in the recording, and when each of them speaks.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Turn::duration</code> <span style="color:var(--muted)">line 114</span> &mdash; How long this turn lasts, in seconds.
+<li><code>Turn::duration</code> <span style="color:var(--muted)">line 114</span> &middot; How long this turn lasts, in seconds.
 </li>
-<li><code>Conversation::add_speaker</code> <span style="color:var(--muted)">line 147</span> &mdash; Add a speaker, and return the index they were given.
+<li><code>Conversation::add_speaker</code> <span style="color:var(--muted)">line 147</span> &middot; Add a speaker, and return the index they were given.
 </li>
-<li><code>Conversation::add_turn</code> <span style="color:var(--muted)">line 169</span> &mdash; Add a turn.
+<li><code>Conversation::add_turn</code> <span style="color:var(--muted)">line 169</span> &middot; Add a turn.
 </li>
-<li><code>Conversation::rename_speakers</code> <span style="color:var(--muted)">line 235</span> &mdash; Rename everybody, in slot order, keeping every turn where it is.
+<li><code>Conversation::rename_speakers</code> <span style="color:var(--muted)">line 235</span> &middot; Rename everybody, in slot order, keeping every turn where it is.
 </li>
-<li><code>Conversation::speakers</code> <span style="color:var(--muted)">line 265</span> &mdash; The speakers, in the order they were added.
+<li><code>Conversation::speakers</code> <span style="color:var(--muted)">line 265</span> &middot; The speakers, in the order they were added.
 </li>
-<li><code>Conversation::turns</code> <span style="color:var(--muted)">line 270</span> &mdash; The turns, in time order.
+<li><code>Conversation::turns</code> <span style="color:var(--muted)">line 270</span> &middot; The turns, in time order.
 </li>
-<li><code>Conversation::len</code> <span style="color:var(--muted)">line 275</span> &mdash; How many speakers there are.
+<li><code>Conversation::len</code> <span style="color:var(--muted)">line 275</span> &middot; How many speakers there are.
 </li>
-<li><code>Conversation::is_empty</code> <span style="color:var(--muted)">line 280</span> &mdash; Whether there is nobody in the plan.
+<li><code>Conversation::is_empty</code> <span style="color:var(--muted)">line 280</span> &middot; Whether there is nobody in the plan.
 </li>
-<li><code>Conversation::voice</code> <span style="color:var(--muted)">line 285</span> &mdash; The destination voice for a speaker.
+<li><code>Conversation::voice</code> <span style="color:var(--muted)">line 285</span> &middot; The destination voice for a speaker.
 </li>
-<li><code>Conversation::mode</code> <span style="color:var(--muted)">line 296</span> &mdash; Whether every speaker gets their own voice, or one between them.
+<li><code>Conversation::mode</code> <span style="color:var(--muted)">line 296</span> &middot; Whether every speaker gets their own voice, or one between them.
 </li>
-<li><code>Conversation::set_mode</code> <span style="color:var(--muted)">line 305</span> &mdash; Render every speaker as the same voice, or as their own.
+<li><code>Conversation::set_mode</code> <span style="color:var(--muted)">line 305</span> &middot; Render every speaker as the same voice, or as their own.
 </li>
-<li><code>Conversation::duration</code> <span style="color:var(--muted)">line 316</span> &mdash; When the last turn ends, in seconds.
+<li><code>Conversation::duration</code> <span style="color:var(--muted)">line 316</span> &middot; When the last turn ends, in seconds.
 </li>
-<li><code>Conversation::overlaps</code> <span style="color:var(--muted)">line 325</span> &mdash; Turns where two people are speaking at once.
+<li><code>Conversation::overlaps</code> <span style="color:var(--muted)">line 325</span> &middot; Turns where two people are speaking at once.
 </li>
-<li><code>Conversation::self_overlaps</code> <span style="color:var(--muted)">line 346</span> &mdash; Spans where a speaker&#x27;s turns overlap their own other turns.
+<li><code>Conversation::self_overlaps</code> <span style="color:var(--muted)">line 346</span> &middot; Spans where a speaker&#x27;s turns overlap their own other turns.
 </li>
-<li><code>Conversation::from_channels</code> <span style="color:var(--muted)">line 368</span> &mdash; A plan for a recording with one microphone per person.
+<li><code>Conversation::from_channels</code> <span style="color:var(--muted)">line 368</span> &middot; A plan for a recording with one microphone per person.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>named</code>, <code>new</code></span>
 </li>
-<li><code>Conversation::save</code> <span style="color:var(--muted)">line 525</span> &mdash; Write the plan to path.
+<li><code>Conversation::save</code> <span style="color:var(--muted)">line 525</span> &middot; Write the plan to path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Conversation::load</code> <span style="color:var(--muted)">line 536</span> &mdash; Read a plan written by Conversation::save.
+<li><code>Conversation::load</code> <span style="color:var(--muted)">line 536</span> &middot; Read a plan written by Conversation::save.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>new</code></span>
 </li>
 </ul>
@@ -252,11 +252,11 @@ turn  4.100  9.050  1</code></pre>
 <path d="M20.0 1040.5 L29.0 1040.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="1045.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="1067.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="1082.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
-<text x="20.0" y="1097.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<text x="20.0" y="1082.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="1097.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

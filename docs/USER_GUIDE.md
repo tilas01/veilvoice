@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
-# VeilVoice — user guide
+# VeilVoice: user guide
 
 For people using VeilVoice, rather than reading its source. If you want the
 argument for *why* any of this works, that is
@@ -14,8 +14,8 @@ There is a web version of this material at
 
 ## 1. What VeilVoice is for, in one paragraph
 
-It destroys the **biometric voiceprint** of a speaker — pitch, formants, timbre,
-micro-timing and the melody of an accent — so that neither software nor a human
+It destroys the **biometric voiceprint** of a speaker, meaning pitch, formants,
+timbre, micro-timing and the melody of an accent, so that neither software nor a human
 listener can re-identify them, **while the words stay clean and transcribable**.
 The words surviving is the point, not a compromise: a scrambler you cannot
 understand is useless. It follows that de-identification alone does not keep the
@@ -26,7 +26,7 @@ understand is useless. It follows that de-identification alone does not keep the
 ## 2. Installing
 
 Download an archive from
-[Releases](https://github.com/tilas01/veilvoice/releases), or build it — a fresh
+[Releases](https://github.com/tilas01/veilvoice/releases), or build it, since a fresh
 clone needs no secrets:
 
 ```bash
@@ -53,7 +53,7 @@ Choose a recording, press **anonymise**.
 
 | Control | Effect |
 |---|---|
-| **intensity** | How far pitch and formants move from the original, 0.0–1.0. Default 1.0 — full normalisation. |
+| **intensity** | How far pitch and formants move from the original, 0.0–1.0. Default 1.0, full normalisation. |
 | **neutralise accent and intonation** | On by default. Collapses every speaker onto one canonical register and vocal tract. Turning it off is weaker de-identification. |
 | **seed roll (s)** | How often the modulation stream ratchets forward. Default 2 s; 0 keeps one stream for the session. Inaudible by construction. |
 | **strip metadata from the result** | On by default. |
@@ -64,9 +64,9 @@ Choose a recording, press **anonymise**.
 The result is **sealed as it is written**, so a file you name `clean.wav` lands
 as `clean.wav.veil`. Two ways to seal it:
 
-- **passphrase** — Argon2id at 256 MiB. Set once and held for the session;
+- **passphrase**: Argon2id at 256 MiB. Set once and held for the session;
   **change** clears it, and locking the app clears it too.
-- **public key** — X25519 + ML-KEM-768 hybrid, to a `.pub` file from
+- **public key**: X25519 + ML-KEM-768 hybrid, to a `.pub` file from
   `veilvoice keygen`. Nothing to type and nothing to forget; only the matching
   private key opens it.
 
@@ -76,7 +76,7 @@ make the default worthless.
 
 Unticking the box opens a dialogue that must be answered first. The result is
 still a recording of every word that was said, and on flash storage deleting it
-afterwards is not a reliable fix — so the question is asked once, plainly.
+afterwards is not a reliable fix, so the question is asked once, plainly.
 
 ### live scramble
 
@@ -133,7 +133,7 @@ interview are:
 
 Which applications are holding your microphone and camera, with a log of starts
 and stops, and an indicator in the header on every tab. On a platform that
-cannot see this — macOS exposes no public interface — the tab says so. An empty
+cannot see this, because macOS exposes no public interface, the tab says so. An empty
 list from a blind monitor is a false reassurance and is never shown as good
 news.
 
@@ -232,10 +232,10 @@ which, because two of the four things below are speed bumps and two are not.
 
 **Real, and the reason the lock exists:**
 
-- It stops **casual access** — the person who sits down at your unlocked
+- It stops **casual access**, meaning the person who sits down at your unlocked
   session. That is a common threat, and a genuine one.
-- Three attempts are free, then the wait doubles — 5 s, 10 s, 20 s, up to
-  fifteen minutes — and the count is **written to disk**, so killing the app
+- Three attempts are free, then the wait doubles: 5 s, 10 s, 20 s, up to
+  fifteen minutes, and the count is **written to disk**, so killing the app
   does not reset it. Somebody who edits the file directly still defeats this;
   see §5.3.
 - Argon2id at 256 MiB makes each offline guess expensive. That helps a good
@@ -590,11 +590,11 @@ Read this twice. Misunderstanding it is the only way this software gets someone
 hurt.
 
 - **It does not hide what you said.** The words are preserved on purpose and can
-  be transcribed. Encrypt the file — which is now the default — if the content
+  be transcribed. Encrypt the file, which is now the default, if the content
   must stay secret.
 - **It does not fully remove a strong accent.** Its melody and colour go; which
   phonemes you actually produced cannot be changed by any filter.
-- **It does not sanitise the background** — room acoustics, other voices, a
+- **It does not sanitise the background.** Room acoustics, other voices, a
   passing siren.
 - **It does not hide your speaking rate** or rhythm. A weak biometric, but a
   real one.
@@ -622,5 +622,5 @@ cargo run -p veilvoice-core --example spectrum_report
 The code has been **audited by tilas01**, who wrote it. That is a maintainer
 audit and is worth what a maintainer audit is worth: it catches what the author
 can see. **No external firm or independent researcher has reviewed this code.**
-Until one has, the strongest verification available to you is the source — which
+Until one has, the strongest verification available to you is the source, which
 is written to be read.
