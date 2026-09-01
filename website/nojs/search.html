@@ -5481,7 +5481,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/layout.rs</code> <span class="meta">&middot; veilvoice-gui, 243 lines, 20 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/layout.rs</code> <span class="meta">&middot; veilvoice-gui, 248 lines, 20 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs">open layout.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">Centring a row of widgets, which egui does not do by nesting. # The defect this exists to fix The unlock screen drew its mark, its name and the word &quot;locked&quot; inside [`egui::Ui::vertical_centered`], and then drew the password field, the</span></li>
@@ -5495,15 +5495,15 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">measuring that way would risk spawning the work twice from one press. A row of widgets is not worth a double unlock, so the width comes from the last frame instead. The cost is that the first frame a row appears on is drawn left-aligned,</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">for as long as it takes to ask for another frame, which is done here immediately. Nobody sees a single frame at sixty of them a second; and if it were ever visible, being briefly left-aligned is what the defect looked like permanently.</span></li>
 <li><span class="sec">fn centred_row</span> <span class="meta">line 60</span><br><span class="x">Draw a row of widgets centred in the width available. A drop-in replacement for [`egui::Ui::horizontal`] wherever a row belongs under centred headings. The returned response covers the row itself, not the padding in front of it.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 113</span><br><span class="x"></span></li>
-<li><span class="sec">fn input</span> <span class="meta">line 124</span><br><span class="x">Lay the same content out twice through one `Ui`, so the second call sees what the first remembered. Returns where the row starts each time. A context whose window really is `width` across. `Ui::set_width` does not do this: it sets a</span></li>
-<li><span class="sec">fn input</span> <span class="meta">line 124</span><br><span class="x">minimum, and the panel goes on offering the whole screen, which in a default test context is nearly ten thousand points. Centring inside that is centring inside the wrong number, so the screen itself is sized here.</span></li>
-<li><span class="sec">fn twice</span> <span class="meta">line 134</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_centred_row_is_centred_and_a_plain_row_is_not</span> <span class="meta">line 158</span><br><span class="x">The row lands in the middle once its width is known. Both halves matter. Asserting only that the centred row is centred would pass just as happily if egui had been centring rows all along, and the helper would be dead weight nobody could</span></li>
-<li><span class="sec">fn a_centred_row_is_centred_and_a_plain_row_is_not</span> <span class="meta">line 158</span><br><span class="x">tell was dead. So the same content is drawn as a plain row too, and the two must differ.</span></li>
-<li><span class="sec">fn a_row_wider_than_the_window_is_not_pushed_off_both_edges</span> <span class="meta">line 211</span><br><span class="x">A row too wide for the window starts at the left, not off both edges.</span></li>
-<li><span class="sec">fn the_row_body_runs_exactly_once_per_frame</span> <span class="meta">line 227</span><br><span class="x">The body runs once per frame, however many times the row is measured. This is the constraint the whole design exists for: the unlock row spawns a key derivation when its button reports a click, and a helper that ran its closure twice could</span></li>
-<li><span class="sec">fn the_row_body_runs_exactly_once_per_frame</span> <span class="meta">line 227</span><br><span class="x">spawn it twice from one press.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 118</span><br><span class="x"></span></li>
+<li><span class="sec">fn input</span> <span class="meta">line 129</span><br><span class="x">Lay the same content out twice through one `Ui`, so the second call sees what the first remembered. Returns where the row starts each time. A context whose window really is `width` across. `Ui::set_width` does not do this: it sets a</span></li>
+<li><span class="sec">fn input</span> <span class="meta">line 129</span><br><span class="x">minimum, and the panel goes on offering the whole screen, which in a default test context is nearly ten thousand points. Centring inside that is centring inside the wrong number, so the screen itself is sized here.</span></li>
+<li><span class="sec">fn twice</span> <span class="meta">line 139</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_centred_row_is_centred_and_a_plain_row_is_not</span> <span class="meta">line 163</span><br><span class="x">The row lands in the middle once its width is known. Both halves matter. Asserting only that the centred row is centred would pass just as happily if egui had been centring rows all along, and the helper would be dead weight nobody could</span></li>
+<li><span class="sec">fn a_centred_row_is_centred_and_a_plain_row_is_not</span> <span class="meta">line 163</span><br><span class="x">tell was dead. So the same content is drawn as a plain row too, and the two must differ.</span></li>
+<li><span class="sec">fn a_row_wider_than_the_window_is_not_pushed_off_both_edges</span> <span class="meta">line 216</span><br><span class="x">A row too wide for the window starts at the left, not off both edges.</span></li>
+<li><span class="sec">fn the_row_body_runs_exactly_once_per_frame</span> <span class="meta">line 232</span><br><span class="x">The body runs once per frame, however many times the row is measured. This is the constraint the whole design exists for: the unlock row spawns a key derivation when its button reports a click, and a helper that ran its closure twice could</span></li>
+<li><span class="sec">fn the_row_body_runs_exactly_once_per_frame</span> <span class="meta">line 232</span><br><span class="x">spawn it twice from one press.</span></li>
 </ul>
 </details>
 <details open>

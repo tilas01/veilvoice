@@ -98,7 +98,12 @@ pub fn centred_row<R>(ui: &mut Ui, add: impl FnOnce(&mut Ui) -> R) -> InnerRespo
         egui::pos2(end.max(start), band.bottom()),
     );
 
-    let measured = end - start;
+    // The cursor sits one item-spacing past the last widget, because egui has
+    // already made room for whatever might come next. Including that would
+    // centre the row plus a trailing gap, which puts the visible row half a
+    // spacing left of centre: measured at 4px on an 8px spacing, in a capture
+    // of the running window.
+    let measured = (end - start - ui.spacing().item_spacing.x).max(0.0);
     if remembered != Some(measured) {
         ui.ctx().memory_mut(|m| m.data.insert_temp(id, measured));
         // Draw again straight away, so the corrected position is on screen on
