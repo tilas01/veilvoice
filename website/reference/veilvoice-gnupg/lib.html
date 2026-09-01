@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gnupg/lib.svg" alt="lib.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gnupg/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 740 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 816 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-does-not-fix">What this does not fix</a>
@@ -74,7 +74,7 @@ import:    [GNUPG:] IMPORT_OK &lt;flags&gt; &lt;fingerprint&gt;       exit 0</co
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>740 lines defining <strong>17 functions</strong> (11 public), <strong>6 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>816 lines defining <strong>17 functions</strong> (11 public), <strong>6 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Error</code> <span style="color:var(--muted)">line 75</span> &mdash; Something that stopped GnuPG being asked at all.</li>
 <li><code>enum Outcome</code> <span style="color:var(--muted)">line 111</span> &mdash; What GnuPG made of a signature.</li>
@@ -105,7 +105,7 @@ import:    [GNUPG:] IMPORT_OK &lt;flags&gt; &lt;fingerprint&gt;       exit 0</co
 <li><code>Gnupg::verify</code> <span style="color:var(--muted)">line 341</span> &mdash; Check a detached signature with this machine&#x27;s GnuPG.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>base</code>, <code>field</code>, <code>fields</code>, <code>same_fingerprint</code>, <code>status_lines</code></span>
 </li>
-<li><code>commands</code> <span style="color:var(--muted)">line 452</span> &mdash; The commands a reader can type to get this answer without VeilVoice.
+<li><code>commands</code> <span style="color:var(--muted)">line 478</span> &mdash; The commands a reader can type to get this answer without VeilVoice.
 </li>
 </ul>
 </section>
@@ -196,27 +196,27 @@ import:    [GNUPG:] IMPORT_OK &lt;flags&gt; &lt;fingerprint&gt;       exit 0</co
 <a href="lib.src.html#fn-status_lines">
 <rect x="99.4" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="161.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status_lines</text>
-<text x="161.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 393</text>
+<text x="161.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 419</text>
 </a>
 <a href="lib.src.html#fn-field">
 <rect x="250.1" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="296.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
-<text x="296.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 406</text>
+<text x="296.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 432</text>
 </a>
 <a href="lib.src.html#fn-fields">
 <rect x="266.2" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="312.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fields</text>
-<text x="312.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 423</text>
+<text x="312.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 449</text>
 </a>
 <a href="lib.src.html#fn-same_fingerprint">
 <rect x="368.6" y="420.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="447.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">same_fingerprint</text>
-<text x="447.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 436</text>
+<text x="447.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 462</text>
 </a>
 <a href="lib.src.html#fn-commands">
 <rect x="345.6" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="391.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">commands</text>
-<text x="391.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 452</text>
+<text x="391.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 478</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -247,11 +247,11 @@ flowchart TD
     n_base[&quot;Gnupg::base&lt;br/&gt;line 267&quot;]
     n_import([&quot;Gnupg::import&lt;br/&gt;line 289&quot;])
     n_verify([&quot;Gnupg::verify&lt;br/&gt;line 341&quot;])
-    n_status_lines[&quot;status_lines&lt;br/&gt;line 393&quot;]
-    n_field[&quot;field&lt;br/&gt;line 406&quot;]
-    n_fields[&quot;fields&lt;br/&gt;line 423&quot;]
-    n_same_fingerprint[&quot;same_fingerprint&lt;br/&gt;line 436&quot;]
-    n_commands([&quot;commands&lt;br/&gt;line 452&quot;])
+    n_status_lines[&quot;status_lines&lt;br/&gt;line 419&quot;]
+    n_field[&quot;field&lt;br/&gt;line 432&quot;]
+    n_fields[&quot;fields&lt;br/&gt;line 449&quot;]
+    n_same_fingerprint[&quot;same_fingerprint&lt;br/&gt;line 462&quot;]
+    n_commands([&quot;commands&lt;br/&gt;line 478&quot;])
     n_field --&gt; n_fields
     n_found --&gt; n_on_path
     n_import --&gt; n_base
@@ -275,11 +275,11 @@ flowchart TD
     click n_base href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L267&quot; &quot;open the source&quot;
     click n_import href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L289&quot; &quot;open the source&quot;
     click n_verify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L341&quot; &quot;open the source&quot;
-    click n_status_lines href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L393&quot; &quot;open the source&quot;
-    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L406&quot; &quot;open the source&quot;
-    click n_fields href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L423&quot; &quot;open the source&quot;
-    click n_same_fingerprint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L436&quot; &quot;open the source&quot;
-    click n_commands href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L452&quot; &quot;open the source&quot;
+    click n_status_lines href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L419&quot; &quot;open the source&quot;
+    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L432&quot; &quot;open the source&quot;
+    click n_fields href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L449&quot; &quot;open the source&quot;
+    click n_same_fingerprint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L462&quot; &quot;open the source&quot;
+    click n_commands href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L478&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_good,n_plainly,n_note,n_found,n_at,n_in_home,n_program,n_import,n_verify,n_commands entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -310,11 +310,11 @@ flowchart TD
 <tr><td><code>Gnupg::base</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-gnupg-base">267</a></td><td>The arguments every call here shares.</td></tr>
 <tr><td><code>Gnupg::import</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-gnupg-import">289</a></td><td>Put a key into the keyring this GnuPG is using.</td></tr>
 <tr><td><code>Gnupg::verify</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-gnupg-verify">341</a></td><td>Check a detached signature with this machine&#x27;s GnuPG.</td></tr>
-<tr><td><code>status_lines</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-status_lines">393</a></td><td>The GNUPG: lines out of what GnuPG printed, prefix removed.</td></tr>
-<tr><td><code>field</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-field">406</a></td><td>The rest of the first status line whose first word is keyword.</td></tr>
-<tr><td><code>fields</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-fields">423</a></td><td>Every status line whose first word is keyword.</td></tr>
-<tr><td><code>same_fingerprint</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-same_fingerprint">436</a></td><td>Whether two fingerprints are the same, ignoring case and spacing.</td></tr>
-<tr><td><code>commands</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-commands">452</a></td><td>The commands a reader can type to get this answer without VeilVoice.</td></tr>
+<tr><td><code>status_lines</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-status_lines">419</a></td><td>The GNUPG: lines out of what GnuPG printed, prefix removed.</td></tr>
+<tr><td><code>field</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-field">432</a></td><td>The rest of the first status line whose first word is keyword.</td></tr>
+<tr><td><code>fields</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-fields">449</a></td><td>Every status line whose first word is keyword.</td></tr>
+<tr><td><code>same_fingerprint</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-same_fingerprint">462</a></td><td>Whether two fingerprints are the same, ignoring case and spacing.</td></tr>
+<tr><td><code>commands</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-commands">478</a></td><td>The commands a reader can type to get this answer without VeilVoice.</td></tr>
 </tbody></table>
 </section>
 </div></div>

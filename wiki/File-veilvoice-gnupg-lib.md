@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gnupg/src/lib.rs`
 
-[[veilvoice-gnupg|Crate-veilvoice-gnupg]] &middot; 740 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs)
+[[veilvoice-gnupg|Crate-veilvoice-gnupg]] &middot; 816 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs)
 
 ## Contents
 
@@ -82,7 +82,7 @@ part that is easiest to skip.
 
 ## What this file contains
 
-740 lines defining **17 functions** (11 public), **6 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+816 lines defining **17 functions** (11 public), **6 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -107,7 +107,7 @@ part that is easiest to skip.
   - reaches: `base`, `field`, `same_fingerprint`, `status_lines`, `fields`
 - `Gnupg::verify` (line 341) -- Check a detached signature with this machine's GnuPG.
   - reaches: `base`, `field`, `fields`, `same_fingerprint`, `status_lines`
-- `commands` (line 452) -- The commands a reader can type to get this answer without VeilVoice.
+- `commands` (line 478) -- The commands a reader can type to get this answer without VeilVoice.
 
 ## What calls what
 
@@ -135,11 +135,11 @@ flowchart TD
     n_base["Gnupg::base<br/>line 267"]
     n_import(["Gnupg::import<br/>line 289"])
     n_verify(["Gnupg::verify<br/>line 341"])
-    n_status_lines["status_lines<br/>line 393"]
-    n_field["field<br/>line 406"]
-    n_fields["fields<br/>line 423"]
-    n_same_fingerprint["same_fingerprint<br/>line 436"]
-    n_commands(["commands<br/>line 452"])
+    n_status_lines["status_lines<br/>line 419"]
+    n_field["field<br/>line 432"]
+    n_fields["fields<br/>line 449"]
+    n_same_fingerprint["same_fingerprint<br/>line 462"]
+    n_commands(["commands<br/>line 478"])
     n_field --> n_fields
     n_found --> n_on_path
     n_import --> n_base
@@ -163,11 +163,11 @@ flowchart TD
     click n_base href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L267" "open the source"
     click n_import href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L289" "open the source"
     click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L341" "open the source"
-    click n_status_lines href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L393" "open the source"
-    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L406" "open the source"
-    click n_fields href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L423" "open the source"
-    click n_same_fingerprint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L436" "open the source"
-    click n_commands href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L452" "open the source"
+    click n_status_lines href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L419" "open the source"
+    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L432" "open the source"
+    click n_fields href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L449" "open the source"
+    click n_same_fingerprint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L462" "open the source"
+    click n_commands href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L478" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_good,n_plainly,n_note,n_found,n_at,n_in_home,n_program,n_import,n_verify,n_commands entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -200,8 +200,8 @@ flowchart TD
 | `Gnupg::base` <sub>fn</sub> | [267](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L267) | The arguments every call here shares. |
 | `Gnupg::import` <sub>pub fn</sub> | [289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L289) | Put a key into the keyring this GnuPG is using. |
 | `Gnupg::verify` <sub>pub fn</sub> | [341](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L341) | Check a detached signature with this machine's GnuPG. |
-| `status_lines` <sub>fn</sub> | [393](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L393) | The GNUPG: lines out of what GnuPG printed, prefix removed. |
-| `field` <sub>fn</sub> | [406](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L406) | The rest of the first status line whose first word is keyword. |
-| `fields` <sub>fn</sub> | [423](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L423) | Every status line whose first word is keyword. |
-| `same_fingerprint` <sub>fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L436) | Whether two fingerprints are the same, ignoring case and spacing. |
-| `commands` <sub>pub fn</sub> | [452](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L452) | The commands a reader can type to get this answer without VeilVoice. |
+| `status_lines` <sub>fn</sub> | [419](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L419) | The GNUPG: lines out of what GnuPG printed, prefix removed. |
+| `field` <sub>fn</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L432) | The rest of the first status line whose first word is keyword. |
+| `fields` <sub>fn</sub> | [449](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L449) | Every status line whose first word is keyword. |
+| `same_fingerprint` <sub>fn</sub> | [462](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L462) | Whether two fingerprints are the same, ignoring case and spacing. |
+| `commands` <sub>pub fn</sub> | [478](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L478) | The commands a reader can type to get this answer without VeilVoice. |

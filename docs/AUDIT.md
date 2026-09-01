@@ -38,6 +38,65 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The eighteenth round: running the verifier against a real release
+
+v0.1.15 was published, downloaded, extracted and checked with the verifier that
+ships inside it. Not a fixture, not a synthetic release: the artefacts on the
+release page.
+
+**One defect found and fixed (F-104)**, and it would have reached every reader
+who has GnuPG installed.
+
+### F-104 -- a genuine release, called unverified, in the loudest words available
+
+`veilvoice-gnupg/src/lib.rs`.
+
+The GnuPG half reported:
+
+```text
+your GnuPG found a good signature by 83ABD67A93772B3FA15D2642BD752A144704C231,
+which is NOT the VeilVoice key. Treat this download as unverified.
+```
+
+while GnuPG's own output, printed directly underneath it, said:
+
+```text
+Primary key fingerprint: 8101 FB3B B28D 02FB 239E  0CDF 9CC1 C7E7 A9B5 833A
+     Subkey fingerprint: 83AB D67A 9377 2B3F A15D  2642 BD75 2A14 4704 C231
+```
+
+The signature was made by the signing **subkey** of the VeilVoice key, which is
+how this project's release key has always signed, and how most signing keys
+work. `VALIDSIG` names the signing key in its first field and the primary key
+in its last, and only the first was read.
+
+**Why the tests could not see it.** The key this was measured against while it
+was written was made with `--quick-generate-key`, which signs with the primary
+key itself, so the two fingerprints were the same string and the mistake was
+invisible in every assertion. The fixture was not wrong; it was the wrong
+shape, and no amount of testing against it would have said so.
+
+The failure mode is the second worst a verifier has. Not a false accept, but a
+**false refusal on a correct release**, stated in the strongest language the
+program owns, to every reader with GnuPG on their machine. Somebody following
+the instructions exactly would have been told their genuine download was not
+genuine, and the reasonable response to that is to distrust the verifier.
+
+Both fingerprints a `VALIDSIG` names are compared now, and the test carries the
+line GnuPG actually printed for v0.1.15 rather than one written by hand.
+
+**The lesson is the one this document keeps recording, in a new place.** Every
+other round of it has been about fixing the instance rather than the class.
+This one is about *measuring the wrong specimen*: the code was checked against
+something built to be convenient rather than against the thing it exists to
+handle, and the difference between the two was the whole defect. The remedy was
+not more tests. It was downloading the release and running it.
+
+What the same run proved, which is worth recording beside the defect: the
+signed contents list works. All **341 files** in the extracted directory were
+checked against `CONTENTS.sha256`, all matched, and nothing else was in the
+folder.
+
 ## The seventeenth round: what nothing was checking about the screenshots
 
 Prompted by a sweep rather than by reading: taking the em dashes out of the
@@ -1669,7 +1728,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1125 tests across 27 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1126 tests across 27 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -3267,7 +3326,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and three defects found and fixed across seventeen audit rounds (F-1 to F-103):**
+**One hundred and four defects found and fixed across eighteen audit rounds (F-1 to F-104):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
