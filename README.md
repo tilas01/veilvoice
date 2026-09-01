@@ -398,8 +398,8 @@ Artwork is **generated, not committed as opaque blobs**:
 
 **v0.1.16: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1,127 tests across 27
-crates plus doctests, and 15 website suites, clippy clean, no `unsafe`), with
+destinations, CLI and GUI are implemented and tested (1,134 tests across 27
+crates plus doctests, and 16 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for nine
 targets and verified bit-for-bit reproducible on eight of them; the FreeBSD
