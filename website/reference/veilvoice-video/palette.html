@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-video/src/palette.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-video/src/palette.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Colours: the site&#x27;s own tokens, and one per speaker.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -72,21 +72,21 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>747 lines defining <strong>9 functions</strong> (9 public), <strong>1 type</strong> and <strong>8 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Palette</code> <span style="color:var(--muted)">line 78</span> &mdash; One complete colour scheme, matching one data-theme block in website/css/themes.css and one entry in veilvoice-gui&#x27;s theme table.</li>
+<li><code>struct Palette</code> <span style="color:var(--muted)">line 78</span> &middot; One complete colour scheme, matching one data-theme block in website/css/themes.css and one entry in veilvoice-gui&#x27;s theme table.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>by_id</code> <span style="color:var(--muted)">line 279</span> &mdash; The palette with this identifier.
+<li><code>by_id</code> <span style="color:var(--muted)">line 279</span> &middot; The palette with this identifier.
 </li>
-<li><code>default_palette</code> <span style="color:var(--muted)">line 285</span> &mdash; The default palette.
+<li><code>default_palette</code> <span style="color:var(--muted)">line 285</span> &middot; The default palette.
 </li>
-<li><code>ids</code> <span style="color:var(--muted)">line 290</span> &mdash; Every identifier, for an error message or a picker.
+<li><code>ids</code> <span style="color:var(--muted)">line 290</span> &middot; Every identifier, for an error message or a picker.
 </li>
-<li><code>speaker</code> <span style="color:var(--muted)">line 333</span> &mdash; The colour for a speaker slot.
+<li><code>speaker</code> <span style="color:var(--muted)">line 333</span> &middot; The colour for a speaker slot.
 </li>
-<li><code>distance</code> <span style="color:var(--muted)">line 346</span> &mdash; How far apart two colours look, by the &quot;redmean&quot; approximation.
+<li><code>distance</code> <span style="color:var(--muted)">line 346</span> &middot; How far apart two colours look, by the &quot;redmean&quot; approximation.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>rgb</code></span>
 </li>
-<li><code>ink_on</code> <span style="color:var(--muted)">line 408</span> &mdash; Black or white, whichever is readable on background.
+<li><code>ink_on</code> <span style="color:var(--muted)">line 408</span> &middot; Black or white, whichever is readable on background.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>contrast</code>, <code>luminance</code>, <code>rgb</code></span>
 </li>
 </ul>
@@ -160,11 +160,11 @@
 <path d="M20.0 340.5 L29.0 340.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="345.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="367.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge</text>
-<text x="20.0" y="382.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">means the callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a</text>
-<text x="20.0" y="397.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
+<text x="20.0" y="382.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">means the callee&#x27;s name appears, called, inside the caller&#x27;s body. This</text>
+<text x="20.0" y="397.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">is a syntactic reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

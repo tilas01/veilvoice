@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-core/src/voices.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-core/src/voices.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Destination voices: several canonical registers instead of one.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -90,25 +90,25 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>867 lines defining <strong>11 functions</strong> (11 public), <strong>1 type</strong> and <strong>11 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Voice</code> <span style="color:var(--muted)">line 134</span> &mdash; One destination voice: the canonical values every speaker in this slot is mapped onto.</li>
+<li><code>struct Voice</code> <span style="color:var(--muted)">line 134</span> &middot; One destination voice: the canonical values every speaker in this slot is mapped onto.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Voice::applied_to</code> <span style="color:var(--muted)">line 156</span> &mdash; Apply this voice to an AccentConfig.
+<li><code>Voice::applied_to</code> <span style="color:var(--muted)">line 156</span> &middot; Apply this voice to an AccentConfig.
 </li>
-<li><code>Voice::checked</code> <span style="color:var(--muted)">line 183</span> &mdash; Whether this voice is inside the range the engine can render usefully.
+<li><code>Voice::checked</code> <span style="color:var(--muted)">line 183</span> &middot; Whether this voice is inside the range the engine can render usefully.
 </li>
-<li><code>Voice::describe</code> <span style="color:var(--muted)">line 227</span> &mdash; A short label for an interface: &quot;low register, narrow tract&quot;.
+<li><code>Voice::describe</code> <span style="color:var(--muted)">line 227</span> &middot; A short label for an interface: &quot;low register, narrow tract&quot;.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>rendered_f0_hz</code>, <code>bin_hz</code></span>
 </li>
-<li><code>voice</code> <span style="color:var(--muted)">line 326</span> &mdash; The destination voice for slot index.
+<li><code>voice</code> <span style="color:var(--muted)">line 326</span> &middot; The destination voice for slot index.
 </li>
-<li><code>clear_voices</code> <span style="color:var(--muted)">line 407</span> &mdash; How many voices can be handed out before two of them are too alike.
+<li><code>clear_voices</code> <span style="color:var(--muted)">line 407</span> &middot; How many voices can be handed out before two of them are too alike.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code>, <code>separation</code></span>
 </li>
-<li><code>closest_pair</code> <span style="color:var(--muted)">line 427</span> &mdash; The closest pair among the first count voices, as a ratio.
+<li><code>closest_pair</code> <span style="color:var(--muted)">line 427</span> &middot; The closest pair among the first count voices, as a ratio.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code>, <code>separation</code></span>
 </li>
-<li><code>distinct_voices</code> <span style="color:var(--muted)">line 453</span> &mdash; How many of the ten are still distinguishable under config.
+<li><code>distinct_voices</code> <span style="color:var(--muted)">line 453</span> &middot; How many of the ten are still distinguishable under config.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>all</code></span>
 </li>
 </ul>
@@ -195,11 +195,11 @@
 <path d="M20.0 440.5 L29.0 440.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="445.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="467.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="482.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading,</text>
-<text x="20.0" y="497.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
+<text x="20.0" y="482.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="497.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

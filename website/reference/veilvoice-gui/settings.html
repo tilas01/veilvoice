@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-gui/src/settings.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-gui/src/settings.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The settings panel: a menu of pages, each a titled group of choices.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -68,42 +68,42 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>1245 lines defining <strong>34 functions</strong> (24 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Page</code> <span style="color:var(--muted)">line 46</span> &mdash; Which page of the settings menu is showing.</li>
-<li><code>struct Settings</code> <span style="color:var(--muted)">line 71</span> &mdash; The settings tab&#x27;s own state.</li>
+<li><code>enum Page</code> <span style="color:var(--muted)">line 46</span> &middot; Which page of the settings menu is showing.</li>
+<li><code>struct Settings</code> <span style="color:var(--muted)">line 71</span> &middot; The settings tab&#x27;s own state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Settings::load</code> <span style="color:var(--muted)">line 121</span> &mdash; Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.
+<li><code>Settings::load</code> <span style="color:var(--muted)">line 121</span> &middot; Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.
 </li>
-<li><code>Settings::needs_first_run</code> <span style="color:var(--muted)">line 154</span> &mdash; Whether the first-run choice has still to be made.
+<li><code>Settings::needs_first_run</code> <span style="color:var(--muted)">line 154</span> &middot; Whether the first-run choice has still to be made.
 </li>
-<li><code>Settings::save_error</code> <span style="color:var(--muted)">line 179</span> &mdash; Whether the app should open in group mode, and a way to change it.
+<li><code>Settings::save_error</code> <span style="color:var(--muted)">line 179</span> &middot; Whether the app should open in group mode, and a way to change it.
 </li>
-<li><code>Settings::show_install_tab</code> <span style="color:var(--muted)">line 190</span> &mdash; Whether the install tab should be offered at all.
+<li><code>Settings::show_install_tab</code> <span style="color:var(--muted)">line 190</span> &middot; Whether the install tab should be offered at all.
 </li>
-<li><code>Settings::hide_install_tab</code> <span style="color:var(--muted)">line 195</span> &mdash; Whether the install tab is hidden by preference.
+<li><code>Settings::hide_install_tab</code> <span style="color:var(--muted)">line 195</span> &middot; Whether the install tab is hidden by preference.
 </li>
-<li><code>Settings::always_group</code> <span style="color:var(--muted)">line 209</span> &mdash; Whether the app should open in group mode.
+<li><code>Settings::always_group</code> <span style="color:var(--muted)">line 209</span> &middot; Whether the app should open in group mode.
 </li>
-<li><code>Settings::seal_with_app_lock</code> <span style="color:var(--muted)">line 238</span> &mdash; Whether every recording is sealed with the app-lock passphrase.
+<li><code>Settings::seal_with_app_lock</code> <span style="color:var(--muted)">line 238</span> &middot; Whether every recording is sealed with the app-lock passphrase.
 </li>
-<li><code>Settings::destination</code> <span style="color:var(--muted)">line 243</span> &mdash; The remembered encrypted destination, rebuilt from the settings file.
+<li><code>Settings::destination</code> <span style="color:var(--muted)">line 243</span> &middot; The remembered encrypted destination, rebuilt from the settings file.
 </li>
-<li><code>Settings::set_destination</code> <span style="color:var(--muted)">line 252</span> &mdash; Remember a destination, including the answer to the hidden question.
+<li><code>Settings::set_destination</code> <span style="color:var(--muted)">line 252</span> &middot; Remember a destination, including the answer to the hidden question.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::set_always_group</code> <span style="color:var(--muted)">line 311</span> &mdash; Record whether the app should open in group mode.
+<li><code>Settings::set_always_group</code> <span style="color:var(--muted)">line 311</span> &middot; Record whether the app should open in group mode.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::set_seal_with_app_lock</code> <span style="color:var(--muted)">line 325</span> &mdash; Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.
+<li><code>Settings::set_seal_with_app_lock</code> <span style="color:var(--muted)">line 325</span> &middot; Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::first_run_panel</code> <span style="color:var(--muted)">line 500</span> &mdash; The first-run panel: offered once, with animation already on.
+<li><code>Settings::first_run_panel</code> <span style="color:var(--muted)">line 500</span> &middot; The first-run panel: offered once, with animation already on.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::tab</code> <span style="color:var(--muted)">line 560</span> &mdash; The settings tab.
+<li><code>Settings::tab</code> <span style="color:var(--muted)">line 560</span> &middot; The settings tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>appearance_page</code>, <code>interface_page</code>, <code>motion_page</code>, <code>security_page</code>, <code>storage_page</code>, <code>custom_palette_help</code>, <code>persist</code>, <code>section</code>, <code>swatches</code>, <code>failsafe</code>, <code>live_monitor</code>, <code>notify_style</code></span>
 </li>
-<li><code>Settings::theme_picker</code> <span style="color:var(--muted)">line 685</span> &mdash; The colour scheme, as a compact control for the window header.
+<li><code>Settings::theme_picker</code> <span style="color:var(--muted)">line 685</span> &middot; The colour scheme, as a compact control for the window header.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
 </ul>
@@ -272,12 +272,12 @@
 <path d="M20.0 1273.5 L29.0 1273.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="1278.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="1300.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge</text>
-<text x="20.0" y="1315.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">means the callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a</text>
-<text x="20.0" y="1330.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one. 22 of 34 functions are</text>
+<text x="20.0" y="1315.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">means the callee&#x27;s name appears, called, inside the caller&#x27;s body. This</text>
+<text x="20.0" y="1330.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">is a syntactic reading, not a type-resolved one. 22 of 34 functions are</text>
 <text x="20.0" y="1345.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">drawn; the diagram is bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

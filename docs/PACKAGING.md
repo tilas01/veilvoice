@@ -94,8 +94,8 @@ all. The second was that every definition here still named v0.1.9 while the
 workspace was at v0.1.15, and nothing was watching:
 `tools/site-tests/packaging.test.js` is watching now.
 
-The install scripts and the portable verifier are tested — see
-[INSTALL.md](INSTALL.md) — and they are the supported route until the rest of
+The install scripts and the portable verifier are tested, as
+[INSTALL.md](INSTALL.md) records, and they are the supported route until the rest of
 this table changes. If you build one of these and it works, or does not, saying
 so in an issue is the most useful thing you could contribute.
 
@@ -121,7 +121,7 @@ expresses it differently:
 
 Every definition here compiles the tagged source on the machine that will run
 it, rather than repackaging a published binary. For a project whose argument is
-that you can check it yourself, that is the more honest default — and each one
+that you can check it yourself, that is the more honest default, and each one
 passes `--locked`, so it builds the dependency versions the project actually
 tested rather than whatever resolves on the day. A package that silently drifts
 from the tested graph is not the software that was audited.
@@ -157,7 +157,7 @@ flatpak info --show-permissions io.github.tilas01.VeilVoice
 | Artefact | Signed? |
 |---|---|
 | `SHA256SUMS` in each release | **yes**, detached OpenPGP, key `8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A` |
-| The release archives themselves | no — see below |
+| The release archives themselves | no, see below |
 | The MSI (Authenticode) | no, and cannot be |
 | The macOS binaries (notarisation) | no, and cannot be |
 
@@ -240,9 +240,9 @@ wrong; v0.1.11 is the first release to carry an OpenBSD archive.
 | Linux x86_64 (gnu, musl) | yes | yes |
 | Linux arm64 (gnu, musl) | yes | yes |
 | Linux armv7 (Raspberry Pi) | yes | yes |
-| FreeBSD x86_64 | yes | **no** — built once in a VM |
+| FreeBSD x86_64 | yes | **no**, built once in a VM |
 | OpenBSD x86_64 | yes, since v0.1.11 | not-verified (built once, in a VM) |
-| NetBSD x86_64 | yes | **no** — built once in a VM |
+| NetBSD x86_64 | yes | **no**, built once in a VM |
 
 Windows 10 and 11 share one executable. They are not split, and will not be
 unless a measurement says they should be: shipping two identical binaries under
@@ -274,5 +274,5 @@ The three BSD builds run in emulated VMs on a Linux runner, are the most
 fragile jobs in the workflow, and are allowed to fail without blocking a
 release. When one fails the release simply ships without that archive. Each is
 marked `not-verified` in its reproducibility report, because it is built once
-rather than twice — that is a statement about what was checked, not a suspicion
+rather than twice. That is a statement about what was checked, not a suspicion
 about the binary.

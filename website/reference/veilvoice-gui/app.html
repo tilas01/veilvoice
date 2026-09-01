@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-gui/src/app.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-gui/src/app.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The VeilVoice desktop application: seven tabs, one window, no menus.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -87,14 +87,14 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>2458 lines defining <strong>28 functions</strong> (3 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Tab</code> <span style="color:var(--muted)">line 130</span> &mdash; The things VeilVoice does.</li>
-<li><code>enum JobDone</code> <span style="color:var(--muted)">line 193</span> &mdash; Result of a background file job.</li>
-<li><code>struct VeilVoiceApp</code> <span style="color:var(--muted)">line 204</span> &mdash; Application state.</li>
+<li><code>enum Tab</code> <span style="color:var(--muted)">line 130</span> &middot; The things VeilVoice does.</li>
+<li><code>enum JobDone</code> <span style="color:var(--muted)">line 193</span> &middot; Result of a background file job.</li>
+<li><code>struct VeilVoiceApp</code> <span style="color:var(--muted)">line 204</span> &middot; Application state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Tab::key</code> <span style="color:var(--muted)">line 158</span> &mdash; The name this tab answers to on the command line.
+<li><code>Tab::key</code> <span style="color:var(--muted)">line 158</span> &middot; The name this tab answers to on the command line.
 </li>
-<li><code>VeilVoiceApp::new</code> <span style="color:var(--muted)">line 541</span> &mdash; Build the application, ready for its first frame.
+<li><code>VeilVoiceApp::new</code> <span style="color:var(--muted)">line 541</span> &middot; Build the application, ready for its first frame.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>tab_from_arguments</code>, <code>from_key</code></span>
 </li>
 </ul>
@@ -258,12 +258,12 @@
 <path d="M20.0 1290.5 L29.0 1290.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="1295.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="1317.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="1332.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading,</text>
-<text x="20.0" y="1347.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one. 22 of 28 functions are drawn; the diagram is bounded</text>
-<text x="20.0" y="1362.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">at 22 so it stays readable.</text>
+<text x="20.0" y="1332.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="1347.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 28 functions are drawn; the diagram is</text>
+<text x="20.0" y="1362.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 28 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 28 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

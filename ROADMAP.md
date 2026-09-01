@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
-# VeilVoice — roadmap
+# VeilVoice: roadmap
 
 **What is built, what is coming, and roughly when.** One marker is one feature:
 written, tested, documented and merged. A marker is not ticked because the code

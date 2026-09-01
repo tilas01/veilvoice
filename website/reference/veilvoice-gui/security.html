@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-gui/src/security.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-gui/src/security.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The application lock, and the at-rest encryption of what VeilVoice writes.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -80,45 +80,45 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>1608 lines defining <strong>30 functions</strong> (17 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Sealing</code> <span style="color:var(--muted)">line 80</span> &mdash; How the recording that comes out of a job is protected.</li>
-<li><code>enum Op</code> <span style="color:var(--muted)">line 105</span> &mdash; What a background lock operation was trying to do.</li>
-<li><code>struct Security</code> <span style="color:var(--muted)">line 119</span> &mdash; Everything about locking the app and sealing its output.</li>
-<li><code>enum Plan</code> <span style="color:var(--muted)">line 1096</span> &mdash; What a finished job should do with its bytes.</li>
+<li><code>enum Sealing</code> <span style="color:var(--muted)">line 80</span> &middot; How the recording that comes out of a job is protected.</li>
+<li><code>enum Op</code> <span style="color:var(--muted)">line 105</span> &middot; What a background lock operation was trying to do.</li>
+<li><code>struct Security</code> <span style="color:var(--muted)">line 119</span> &middot; Everything about locking the app and sealing its output.</li>
+<li><code>enum Plan</code> <span style="color:var(--muted)">line 1096</span> &middot; What a finished job should do with its bytes.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Security::load</code> <span style="color:var(--muted)">line 237</span> &mdash; Read the lock file for this machine and start locked if one is set.
+<li><code>Security::load</code> <span style="color:var(--muted)">line 237</span> &middot; Read the lock file for this machine and start locked if one is set.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default</code></span>
 </li>
-<li><code>Security::take_unlock_passphrase</code> <span style="color:var(--muted)">line 280</span> &mdash; Take the passphrase that just opened the lock, once.
+<li><code>Security::take_unlock_passphrase</code> <span style="color:var(--muted)">line 280</span> &middot; Take the passphrase that just opened the lock, once.
 </li>
-<li><code>Security::prefer_app_lock_sealing</code> <span style="color:var(--muted)">line 289</span> &mdash; Start in Sealing::AppLock, because the user asked for that last time.
+<li><code>Security::prefer_app_lock_sealing</code> <span style="color:var(--muted)">line 289</span> &middot; Start in Sealing::AppLock, because the user asked for that last time.
 </li>
-<li><code>Security::seals_with_app_lock</code> <span style="color:var(--muted)">line 297</span> &mdash; Whether the app-lock sealing mode is currently chosen, so the window can have the choice remembered.
+<li><code>Security::seals_with_app_lock</code> <span style="color:var(--muted)">line 297</span> &middot; Whether the app-lock sealing mode is currently chosen, so the window can have the choice remembered.
 </li>
-<li><code>Security::tampered</code> <span style="color:var(--muted)">line 305</span> &mdash; Whether the lock reported having been interfered with.
+<li><code>Security::tampered</code> <span style="color:var(--muted)">line 305</span> &middot; Whether the lock reported having been interfered with.
 </li>
-<li><code>Security::is_locked</code> <span style="color:var(--muted)">line 310</span> &mdash; Whether the unlock screen should be shown instead of the app.
+<li><code>Security::is_locked</code> <span style="color:var(--muted)">line 310</span> &middot; Whether the unlock screen should be shown instead of the app.
 </li>
-<li><code>Security::blocked_reason</code> <span style="color:var(--muted)">line 367</span> &mdash; Why a job cannot start yet, for the button&#x27;s tooltip.
+<li><code>Security::blocked_reason</code> <span style="color:var(--muted)">line 367</span> &middot; Why a job cannot start yet, for the button&#x27;s tooltip.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>ready_to_write</code></span>
 </li>
-<li><code>Security::plan</code> <span style="color:var(--muted)">line 385</span> &mdash; How the next job should protect its output.
+<li><code>Security::plan</code> <span style="color:var(--muted)">line 385</span> &middot; How the next job should protect its output.
 </li>
-<li><code>Security::is_busy</code> <span style="color:var(--muted)">line 525</span> &mdash; Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.
+<li><code>Security::is_busy</code> <span style="color:var(--muted)">line 525</span> &middot; Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code></span>
 </li>
-<li><code>Security::unlock_screen</code> <span style="color:var(--muted)">line 530</span> &mdash; The full-window unlock screen.
+<li><code>Security::unlock_screen</code> <span style="color:var(--muted)">line 530</span> &middot; The full-window unlock screen.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>poll</code>, <code>spawn</code>, <code>into_secret</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
 </li>
-<li><code>Security::tab</code> <span style="color:var(--muted)">line 703</span> &mdash; The security tab: manage the lock, and see what it is worth.
+<li><code>Security::tab</code> <span style="color:var(--muted)">line 703</span> &middot; The security tab: manage the lock, and see what it is worth.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>has_lock</code>, <code>interference_banner</code>, <code>lock_now</code>, <code>password_row</code>, <code>poll</code>, <code>spawn</code>, <code>wipe_secrets</code>, <code>into_secret</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
 </li>
-<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 874</span> &mdash; The at-rest controls that sit inside the file tab.
+<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 874</span> &middot; The at-rest controls that sit inside the file tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>into_secret</code>, <code>password_row</code></span>
 </li>
-<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 1044</span> &mdash; The dialogue shown when the user turns at-rest encryption off.
+<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 1044</span> &middot; The dialogue shown when the user turns at-rest encryption off.
 </li>
-<li><code>Plan::write</code> <span style="color:var(--muted)">line 1121</span> &mdash; Seal wav if the plan says to, and write it.
+<li><code>Plan::write</code> <span style="color:var(--muted)">line 1121</span> &middot; Seal wav if the plan says to, and write it.
 </li>
 </ul>
 </section>
@@ -279,12 +279,12 @@
 <path d="M20.0 1073.5 L29.0 1073.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="1078.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="1100.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="1115.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
-<text x="20.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 30 functions are drawn; the diagram is bounded at 22 so it</text>
-<text x="20.0" y="1145.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">stays readable.</text>
+<text x="20.0" y="1115.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
+<text x="20.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one. 22 of 30 functions are drawn; the diagram is bounded at 22 so</text>
+<text x="20.0" y="1145.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 30 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 30 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

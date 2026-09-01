@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-workspace/src/lib.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-workspace/src/lib.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Named profiles and saved projects.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -75,23 +75,23 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>785 lines defining <strong>13 functions</strong> (9 public), <strong>4 types</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 72</span> &mdash; Something that could not be read.</li>
-<li><code>struct Profile</code> <span style="color:var(--muted)">line 98</span> &mdash; A named way of working.</li>
-<li><code>struct Member</code> <span style="color:var(--muted)">line 211</span> &mdash; One person in a saved project.</li>
-<li><code>struct Workspace</code> <span style="color:var(--muted)">line 220</span> &mdash; One piece of work, saved.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 72</span> &middot; Something that could not be read.</li>
+<li><code>struct Profile</code> <span style="color:var(--muted)">line 98</span> &middot; A named way of working.</li>
+<li><code>struct Member</code> <span style="color:var(--muted)">line 211</span> &middot; One person in a saved project.</li>
+<li><code>struct Workspace</code> <span style="color:var(--muted)">line 220</span> &middot; One piece of work, saved.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Profile::applied_to</code> <span style="color:var(--muted)">line 127</span> &mdash; The engine settings this profile asks for, over a starting point.
+<li><code>Profile::applied_to</code> <span style="color:var(--muted)">line 127</span> &middot; The engine settings this profile asks for, over a starting point.
 </li>
-<li><code>profile</code> <span style="color:var(--muted)">line 200</span> &mdash; The profile with this identifier.
+<li><code>profile</code> <span style="color:var(--muted)">line 200</span> &middot; The profile with this identifier.
 </li>
-<li><code>Workspace::load</code> <span style="color:var(--muted)">line 414</span> &mdash; Read a project file.
+<li><code>Workspace::load</code> <span style="color:var(--muted)">line 414</span> &middot; Read a project file.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>new</code>, <code>take_token</code>, <code>default_profile</code></span>
 </li>
-<li><code>Workspace::save</code> <span style="color:var(--muted)">line 421</span> &mdash; Write a project file, creating the directory if needed.
+<li><code>Workspace::save</code> <span style="color:var(--muted)">line 421</span> &middot; Write a project file, creating the directory if needed.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code>, <code>one_line</code></span>
 </li>
-<li><code>Workspace::profile</code> <span style="color:var(--muted)">line 433</span> &mdash; The profile this project names, if this build has it.
+<li><code>Workspace::profile</code> <span style="color:var(--muted)">line 433</span> &middot; The profile this project names, if this build has it.
 </li>
 </ul>
 </section>
@@ -189,11 +189,11 @@
 <path d="M20.0 556.5 L29.0 556.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="561.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="583.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
-<text x="20.0" y="598.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic</text>
-<text x="20.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
+<text x="20.0" y="598.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
+<text x="20.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

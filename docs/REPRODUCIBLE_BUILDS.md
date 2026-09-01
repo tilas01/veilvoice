@@ -42,7 +42,7 @@ build reproducible only for them, which is the opposite of the point.
 The release workflow sets `SOURCE_DATE_EPOCH` from the tagged commit and passes
 `--remap-path-prefix` for both the workspace and `CARGO_HOME`. It then builds
 each target twice, in different directories, and fails if the two binaries
-differ — so a regression in reproducibility is caught before release, not after
+differ, so a regression in reproducibility is caught before release, not after
 somebody reports it.
 
 ## Known limits
@@ -62,7 +62,7 @@ somebody reports it.
 ## Release signing
 
 Release artefacts ship with `SHA256SUMS` and a detached OpenPGP signature over
-it. **The private signing key is not in this repository and never will be** —
+it. **The private signing key is not in this repository and never will be**,
 only the maintainer holds it, and CI reads it from a repository secret that is
 absent on forks. A fresh clone builds with **no secrets at all**; signing is
 strictly a release-time step layered on top.

@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-gui/src/integrity.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-gui/src/integrity.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The integrity record, taken and checked by the window rather than by hand.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -72,20 +72,20 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>386 lines defining <strong>11 functions</strong> (6 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum State</code> <span style="color:var(--muted)">line 57</span> &mdash; What the record has to say, as far as this window knows.</li>
-<li><code>struct Integrity</code> <span style="color:var(--muted)">line 81</span> &mdash; The integrity record as the window drives it.</li>
+<li><code>enum State</code> <span style="color:var(--muted)">line 57</span> &middot; What the record has to say, as far as this window knows.</li>
+<li><code>struct Integrity</code> <span style="color:var(--muted)">line 81</span> &middot; The integrity record as the window drives it.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Integrity::state</code> <span style="color:var(--muted)">line 97</span> &mdash; What the last completed check found.
+<li><code>Integrity::state</code> <span style="color:var(--muted)">line 97</span> &middot; What the last completed check found.
 </li>
-<li><code>Integrity::is_busy</code> <span style="color:var(--muted)">line 102</span> &mdash; Whether a check is running, so the window keeps repainting while it is.
+<li><code>Integrity::is_busy</code> <span style="color:var(--muted)">line 102</span> &middot; Whether a check is running, so the window keeps repainting while it is.
 </li>
-<li><code>Integrity::changed</code> <span style="color:var(--muted)">line 107</span> &mdash; Whether the record found a difference worth showing the user.
+<li><code>Integrity::changed</code> <span style="color:var(--muted)">line 107</span> &middot; Whether the record found a difference worth showing the user.
 </li>
-<li><code>Integrity::start</code> <span style="color:var(--muted)">line 120</span> &mdash; Take or check the record, off the drawing thread.
+<li><code>Integrity::start</code> <span style="color:var(--muted)">line 120</span> &middot; Take or check the record, off the drawing thread.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>run</code>, <code>record_path</code>, <code>sealed_path</code>, <code>targets</code>, <code>write_private</code></span>
 </li>
-<li><code>Integrity::poll</code> <span style="color:var(--muted)">line 142</span> &mdash; Collect a finished check.
+<li><code>Integrity::poll</code> <span style="color:var(--muted)">line 142</span> &middot; Collect a finished check.
 </li>
 </ul>
 </section>
@@ -171,11 +171,11 @@
 <path d="M20.0 556.5 L29.0 556.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="561.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="583.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="598.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading,</text>
-<text x="20.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
+<text x="20.0" y="598.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
