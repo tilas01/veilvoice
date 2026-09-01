@@ -1,4 +1,4 @@
-# VeilVoice — cryptographically-modulated, irreversible voice de-identification.
+# VeilVoice: cryptographically-modulated, irreversible voice de-identification.
 #
 # Workspace root. Every member crate is buildable by anyone with the pinned
 # stable toolchain (see rust-toolchain.toml) and NO secrets: `cargo build`

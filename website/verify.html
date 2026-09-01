@@ -10,7 +10,7 @@
 <title>Verify a download &middot; VeilVoice</title>
 <meta name="description" content="Check that what you downloaded is what was published, in your browser or with the portable verifier.">
 <link rel="icon" href="assets/icon-32.png" type="image/png">
-<meta property="og:title" content="VeilVoice — irreversible voice de-identification">
+<meta property="og:title" content="VeilVoice: irreversible voice de-identification">
 <meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
 <meta property="og:image" content="assets/banner.png">
 <!-- Declarative, so it costs no script and works with JavaScript off.
@@ -78,7 +78,7 @@
     
     <p class="lede">
       Drop the file you downloaded here. It is hashed <strong>locally, in your
-      browser</strong>, using the built-in WebCrypto API — there is no upload
+      browser</strong>, using the built-in WebCrypto API, so there is no upload
       and no server that could receive it. Read
       <a href="js/verify.js">js/verify.js</a>; that file is the whole
       implementation.
@@ -108,12 +108,12 @@
 gpg --verify SHA256SUMS.asc SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing</code></pre>
     <p class="lede">
-      Signing key fingerprint — check that <code>gpg --verify</code> names this
+      Signing key fingerprint. Check that <code>gpg --verify</code> names this
       exact key, not merely “a good signature”:
     </p>
     <div class="hash fp">8101 FB3B B28D 02FB 239E&nbsp; 0CDF 9CC1 C7E7 A9B5 833A</div>
     <p class="lede" style="margin-top:10px">
-      <a href="assets/veilvoice-signing-key.asc" download>download the public key</a> —
+      <a href="assets/veilvoice-signing-key.asc" download>download the public key</a>,
       user ID is exactly <code>tilas01</code>, with no e-mail address attached.
     </p>
 
@@ -129,7 +129,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
       <li>the archive, against <code>SHA256SUMS</code>;</li>
       <li><code>CONTENTS.sha256</code>, against <code>SHA256SUMS</code>;</li>
       <li><strong>every file you extracted</strong>, against
-        <code>CONTENTS.sha256</code> — and it names anything in that folder the
+        <code>CONTENTS.sha256</code>, and it names anything in that folder the
         release never published.</li>
     </ol>
     <p class="lede">
@@ -143,7 +143,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
       keyring, <code>gpg --verify</code> is run, and what GnuPG said is shown.
       The signature is then checked by two independent implementations. The
       commands above are still printed for you to run yourself, because a
-      program telling you a download is genuine came out of that download —
+      program telling you a download is genuine came out of that download,
       only you typing them makes the answer independent of it.
     </p>
   </div>
@@ -152,7 +152,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <footer>
   <div class="wrap">
     <p>
-      VeilVoice — GPL-3.0-or-later ·
+      VeilVoice &middot; GPL-3.0-or-later ·
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
       <a href="wiki.html">wiki</a> ·
       <a href="user-agreements/LEGAL-WAIVER.txt">legal</a> ·
@@ -163,7 +163,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
     </p>
     <p>
       Virtual audio routing on Windows is usually provided by VB-CABLE, which is
-      proprietary donationware and is not bundled — install it separately if you
+      proprietary donationware and is not bundled: install it separately if you
       want it.
     </p>
   </div>

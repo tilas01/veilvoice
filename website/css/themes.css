@@ -5,7 +5,7 @@
  * of adding one block here.
  *
  * Tokyo Night is the default and is declared on :root so the page has correct
- * colours before any JavaScript runs — including for readers who block it
+ * colours before any JavaScript runs, including for readers who block it
  * entirely. The others are opt-in via [data-theme] on <html>.
  *
  * Each block also declares `color-scheme`, beside the colours it has to agree

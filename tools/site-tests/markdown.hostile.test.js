@@ -11,8 +11,8 @@
 // as *asserted but not tested*. This file is the test.
 //
 // The threat is not hypothetical hand-waving. The README is fetched from
-// raw.githubusercontent.com; anyone who could alter it — a compromised token, a
-// bad merge, a mistaken commit — would be writing directly into the page unless
+// raw.githubusercontent.com; anyone who could alter it, whether a compromised
+// token, a bad merge or a mistaken commit, would be writing directly into the page unless
 // the renderer holds.
 //
 // Two kinds of check:
@@ -58,8 +58,8 @@ const ALLOWED_TAGS = new Set([
 const ALLOWED_ATTRS = new Set(["href", "src", "alt", "class", "rel"]);
 
 // The check has to parse the way a browser parses, or it reports things that
-// are not true. `&lt;script&gt;` in the output is *text* — the renderer doing
-// its job — and `src="a&quot;onerror=x"` is a single attribute whose value
+// are not true. `&lt;script&gt;` in the output is *text*, which is the renderer
+// doing its job, and `src="a&quot;onerror=x"` is a single attribute whose value
 // happens to contain a quote character, because entity references are decoded
 // *after* the value has been delimited. A naive scan of the raw string calls
 // both of those attacks and hides the real bug in the noise.
@@ -101,7 +101,7 @@ function findViolations(html) {
   const bad = [];
 
   // No internal machinery may reach the page. Placeholders are private-use
-  // characters, which browsers draw as nothing at all — so one escaping is not
+  // characters, which browsers draw as nothing at all, so one escaping is not
   // a visible glitch, it is content that silently disappears. Exactly that
   // shipped: every README link whose label was inline code rendered empty,
   // because the un-parking pass did not recurse into its own output.

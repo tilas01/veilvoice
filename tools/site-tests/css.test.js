@@ -497,7 +497,7 @@ function run() {
      "a drawing wider than its column must scroll inside itself"]
   ];
   for (const [pattern, why] of mobile) {
-    if (!pattern.test(main)) fail(`${why} — the rule for it is gone`);
+    if (!pattern.test(main)) fail(`${why}: the rule for it is gone`);
   }
   if (mobile.every(([pattern]) => pattern.test(main))) {
     pass(`${mobile.length} measured horizontal-overflow fixes are still in place`);
@@ -518,7 +518,7 @@ function run() {
     fail(`the tooltip is only pinned below ${pinned[1]}px; a tablet at 768 was ` +
          `still 75px over, so this has to reach 900`);
   } else if (!/position:\s*fixed/.test(pinned[2])) {
-    fail("the pinned tooltip must be position:fixed — an absolute box still " +
+    fail("the pinned tooltip must be position:fixed, because an absolute box still " +
          "counts toward the page's scrollable width");
   } else {
     pass(`tooltips are pinned to the viewport below ${pinned[1]}px`);

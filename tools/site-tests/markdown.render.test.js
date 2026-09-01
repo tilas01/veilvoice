@@ -25,7 +25,7 @@ const CASES = [
   // --- the placeholder regression -----------------------------------------
   // Finished markup is parked while later passes run. The placeholder used to
   // be a NUL-delimited *decimal index*, which the number highlighter (\b\d+\b)
-  // then wrapped in a span — after which the un-parking pass no longer
+  // then wrapped in a span, after which the un-parking pass no longer
   // recognised it and the parked content was dropped entirely. Every string
   // literal in every code block on the site rendered as a stray digit.
   {
@@ -93,7 +93,7 @@ const CASES = [
     source: 'See [`docs/AUDIT.md`](docs/AUDIT.md).',
     want: ['<a href="docs/AUDIT.md"><code>docs/AUDIT.md</code></a>'],
     // The broken output was `<a href="docs/AUDIT.md"></a>`, so the quote has to
-    // be part of the pattern — `></a>` alone also matches `</code></a>`.
+    // be part of the pattern, because `></a>` alone also matches `</code></a>`.
     reject: ['"></a>']
   },
   {

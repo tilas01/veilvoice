@@ -11,8 +11,8 @@ description = "Real-time capture and playback (cpal), lock-free ring buffers, vi
 [features]
 default = ["live"]
 # Live capture and playback. Optional because `cpal` has no backend for the
-# BSDs, and everything else this crate does — decoding, encoding, and running
-# the engine over a buffer — is pure Rust and builds anywhere. Turning this off
+# BSDs, and everything else this crate does, meaning decoding, encoding and
+# running the engine over a buffer, is pure Rust and builds anywhere. Turning this off
 # keeps file processing available on platforms that cannot do live audio.
 live = ["dep:cpal", "dep:ringbuf"]
 

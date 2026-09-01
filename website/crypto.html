@@ -10,7 +10,7 @@
 <title>Security and cryptography &middot; VeilVoice</title>
 <meta name="description" content="The primitives, the threat model, and what the app lock is and is not.">
 <link rel="icon" href="assets/icon-32.png" type="image/png">
-<meta property="og:title" content="VeilVoice — irreversible voice de-identification">
+<meta property="og:title" content="VeilVoice: irreversible voice de-identification">
 <meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
 <meta property="og:image" content="assets/banner.png">
 <!-- Declarative, so it costs no script and works with JavaScript off.
@@ -85,7 +85,7 @@
         <tr><td>Phase discard</td><td>Every frame's measured phase is thrown away and a synthetic one generated. Phase encodes the exact waveform and the speaker's micro-timing. It is never stored, and infinitely many waveforms share any given magnitude spectrogram.</td></tr>
         <tr><td>Many-to-one normalisation</td><td>Pitch register, vocal-tract length and long-term spectral tilt are each collapsed onto a single canonical value. A whole population of speakers maps to the same output, so there is nothing to invert.</td></tr>
         <tr><td>CSPRNG modulation</td><td>The residual transform changes every frame from a ChaCha20 stream whose seed comes from the OS CSPRNG, lives only in page-locked RAM, and is zeroized on drop. There is no fixed transform to undo.</td></tr>
-        <tr><td>Rolling seed</td><td>Every two seconds by default the stream draws a fresh seed from its own output and restarts. ChaCha20 does not run backwards, so each roll permanently seals off the audio before it — a long recording is a chain of short streams, not one. Configurable, and inaudible: parameters glide across a roll and phase offsets ease over half a second.</td></tr>
+        <tr><td>Rolling seed</td><td>Every two seconds by default the stream draws a fresh seed from its own output and restarts. ChaCha20 does not run backwards, so each roll permanently seals off the audio before it: a long recording is a chain of short streams, not one. Configurable, and inaudible: parameters glide across a roll and phase offsets ease over half a second.</td></tr>
       </tbody>
     </table>
 
@@ -96,7 +96,7 @@
         <tr><td>Password → key</td><td>Argon2id (RFC 9106)</td><td>Memory-hard, so GPU and ASIC cracking gains little. Cost parameters travel with the file so old files still open.</td></tr>
         <tr><td>Public-key</td><td>X25519 + ML-KEM-768 hybrid</td><td>An attacker must break <em>both</em>. Guards against harvest-now-decrypt-later: a recording stored today may be attacked decades from now.</td></tr>
         <tr><td>Payload</td><td>XChaCha20-Poly1305</td><td>192-bit random nonces remove the counter-management failure mode entirely.</td></tr>
-        <tr><td>Header</td><td>Authenticated as associated data</td><td>An attacker cannot downgrade the stored KDF cost to make cracking cheap — tampering makes decryption fail.</td></tr>
+        <tr><td>Header</td><td>Authenticated as associated data</td><td>An attacker cannot downgrade the stored KDF cost to make cracking cheap, because tampering makes decryption fail.</td></tr>
         <tr><td>Keys in memory</td><td>Page-locked, zeroized, constant-time</td><td>Keys stay out of the swap file and are wiped on drop. Comparison leaks no timing.</td></tr>
       </tbody>
     </table>
@@ -115,7 +115,7 @@
 
     <h3>The app lock, and exactly what it is worth</h3>
     <p>
-      VeilVoice can sit behind a password of its own — separate from the one that
+      VeilVoice can sit behind a password of its own, separate from the one that
       encrypts recordings, so that opening the app is not the same act as
       unsealing everything it has written.
     </p>
@@ -132,7 +132,7 @@
       has nowhere to hide a secret from the machine it runs on. Anyone who can
       write to your files can delete the lock; anyone holding the disk can edit
       the attempt counter, move the clock, or attack the stored hash offline.
-      This protects against <em>casual access</em> — the person who sits down at
+      This protects against <em>casual access</em>, meaning the person who sits down at
       your unlocked session. If the disk is the threat, the answers are full-volume
       encryption and the at-rest encryption above, not this.</p>
     </div>
@@ -148,7 +148,7 @@
     </ul>
 
     <div class="note bad">
-      <p><strong>Audited by tilas01</strong> — the author, who wrote and
+      <p><strong>Audited by tilas01</strong>, the author, who wrote and
       reviewed it. Be clear about what that is worth: a maintainer audit catches
       what the author can see, and <strong>no external firm or independent
       researcher has reviewed this code</strong>. The cryptography uses standard,
@@ -163,7 +163,7 @@
 <footer>
   <div class="wrap">
     <p>
-      VeilVoice — GPL-3.0-or-later ·
+      VeilVoice &middot; GPL-3.0-or-later ·
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
       <a href="wiki.html">wiki</a> ·
       <a href="user-agreements/LEGAL-WAIVER.txt">legal</a> ·
@@ -174,7 +174,7 @@
     </p>
     <p>
       Virtual audio routing on Windows is usually provided by VB-CABLE, which is
-      proprietary donationware and is not bundled — install it separately if you
+      proprietary donationware and is not bundled: install it separately if you
       want it.
     </p>
   </div>

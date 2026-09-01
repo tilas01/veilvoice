@@ -4,10 +4,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VeilVoice — irreversible voice de-identification</title>
-<meta name="description" content="VeilVoice destroys the biometric voiceprint — pitch, formants, timbre, accent — while keeping speech transcribable. Fully offline, no unsafe code, reproducible builds, GPL-3.0.">
+<title>VeilVoice: irreversible voice de-identification</title>
+<meta name="description" content="VeilVoice destroys the biometric voiceprint, meaning pitch, formants, timbre and accent, while keeping speech transcribable. Fully offline, no unsafe code, reproducible builds, GPL-3.0.">
 <link rel="icon" href="assets/icon-32.png" type="image/png">
-<meta property="og:title" content="VeilVoice — irreversible voice de-identification">
+<meta property="og:title" content="VeilVoice: irreversible voice de-identification">
 <meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
 <meta property="og:image" content="assets/banner.png">
 <!-- Declarative, so it costs no script and works with JavaScript off.
@@ -102,18 +102,18 @@
   </div>
   <noscript>
     <img class="bn-fallback" src="assets/banner.gif"
-         alt="VeilVoice — irreversible voice de-identification">
+         alt="VeilVoice: irreversible voice de-identification">
   </noscript>
   <!-- The page had no h1 at all: the banner is an image, and an image is not a
        heading. A screen reader's outline began at "WHAT IT ACTUALLY DOES", and
        the document's own subject was never stated in text anywhere. Visually
        hidden because the banner already says it far better in pixels; present
        because a heading is for the reader who is not looking at pixels. -->
-  <h1 class="visually-hidden">VeilVoice — irreversible voice de-identification</h1>
+  <h1 class="visually-hidden">VeilVoice: irreversible voice de-identification</h1>
 
   <p class="tagline" style="--i:1">
-    VeilVoice destroys the <strong>biometric voiceprint</strong> of a speaker —
-    pitch, formants, timbre, micro-timing and the melody of an accent — so that
+    VeilVoice destroys the <strong>biometric voiceprint</strong> of a speaker,
+    meaning pitch, formants, timbre, micro-timing and the melody of an accent, so that
     neither software nor a human can re-identify them or reconstruct the
     original voice, <strong>while the words stay clean and transcribable</strong>.
   </p>
@@ -160,7 +160,7 @@
     <span class="fact" style="--f:11;--c:var(--ok)">Recordings are encrypted at rest by default</span>
     <span class="fact" style="--f:12;--c:var(--accent)">X25519 + ML-KEM-768: hybrid, post-quantum</span>
     <span class="fact" style="--f:13;--c:var(--accent)">XChaCha20-Poly1305, and Argon2id</span>
-    <span class="fact" style="--f:14;--c:var(--warn)">The app lock is a verifier &mdash; not disk encryption</span>
+    <span class="fact" style="--f:14;--c:var(--warn)">The app lock is a verifier, not disk encryption</span>
     <span class="fact" style="--f:15;--c:var(--warn)">Tamper detection detects; it does not prevent</span>
     <span class="fact" style="--f:16;--c:var(--warn)">Secure erase is unreliable on flash, and the docs say so</span>
     <span class="fact" style="--f:17;--c:var(--warn)">Accent removal is partial, and that limit is documented</span>
@@ -272,7 +272,7 @@
       <strong>What this picture does not show is the limit.</strong> The
       voiceprint goes; <em>what you said</em> stays, because the output is
       meant to be listened to and transcribed. If the words themselves identify
-      you — a name, a place, a story only you could tell — VeilVoice has not
+      you: a name, a place, a story only you could tell. VeilVoice has not
       touched that and does not claim to. Segmental accent cues, which phonemes
       you actually produced, survive for the same reason. See
       <a href="#crypto">security and cryptography</a> for the full scope.
@@ -287,15 +287,15 @@
     <div class="grid">
       <div class="card">
         <h3>Anonymise a recording</h3>
-        <p>wav, mp3, flac, ogg, m4a in — a clean WAV out, with metadata stripped. Roughly 90× faster than real time.</p>
+        <p>wav, mp3, flac, ogg, m4a in, a clean WAV out, with metadata stripped. Roughly 90× faster than real time.</p>
       </div>
       <div class="card">
         <h3>Scramble a microphone live</h3>
-        <p>Route the veiled voice into a virtual audio cable and every application on the machine — calls, streams, recorders — receives it instead of you.</p>
+        <p>Route the veiled voice into a virtual audio cable and every application on the machine, whether calls, streams or recorders, receives it instead of you.</p>
       </div>
       <div class="card">
         <h3>Encrypt at rest, by default</h3>
-        <p>Every recording is sealed as it is written — <span class="tip-right" data-tip="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard." aria-label="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard.">X25519 + ML-KEM-768 hybrid</span>, so one captured today is not readable by a quantum adversary tomorrow. Turning that off makes you read why first.</p>
+        <p>Every recording is sealed as it is written, using <span class="tip-right" data-tip="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard." aria-label="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard.">X25519 + ML-KEM-768 hybrid</span>, so one captured today is not readable by a quantum adversary tomorrow. Turning that off makes you read why first.</p>
       </div>
       <div class="card">
         <h3>Lock the app</h3>
@@ -319,7 +319,7 @@
       </div>
       <div class="card">
         <h3>Detect tampering with its own files</h3>
-        <p>A signed manifest of what VeilVoice should be, and a check that reports what changed. Where the system's own auditing allows it, it names the program responsible — and says plainly when it cannot see, rather than implying nothing happened.</p>
+        <p>A signed manifest of what VeilVoice should be, and a check that reports what changed. Where the system's own auditing allows it, it names the program responsible, and says plainly when it cannot see, rather than implying nothing happened.</p>
       </div>
       <div class="card">
         <h3>Erase a recording</h3>
@@ -333,14 +333,14 @@
 
     <div class="note">
       <p><strong>Honest scope.</strong> “Fill the spectrogram with noise” and
-      “stay understandable” are mutually exclusive — noise that covers the voice
+      “stay understandable” are mutually exclusive, because noise that covers the voice
       covers the words. VeilVoice targets the achievable goal: irreversible
       speaker de-identification with intelligibility preserved <em>on purpose</em>.
       If the <em>message</em> must also be secret, encrypt it; that is a separate
       problem with a separate answer.</p>
       <p>The same applies to <strong>accent</strong>. Its melody and colour do not
       survive. What no signal-level transform can change is <em>which phonemes you
-      produced</em> — at that level the accent and the words are the same thing, so
+      produced</em>, and at that level the accent and the words are the same thing, so
       a strong regional accent may still be audible.</p>
     </div>
   </div>
@@ -378,12 +378,12 @@
 
 <section id="guide">
   <div class="wrap">
-    <h2 class="reveal">SO YOU HAVE DOWNLOADED IT — NOW WHAT</h2>
+    <h2 class="reveal">SO YOU HAVE DOWNLOADED IT, NOW WHAT</h2>
     <p class="lede reveal" style="--i:1">
       There are two programs in the archive: <code>veilvoice-gui</code>, the
       desktop app, and <code>veilvoice</code>, the command line. They share one
       engine, so anything one can do the other can. Nothing installs a service,
-      writes to a registry, or phones home — delete the folder and it is gone.
+      writes to a registry, or phones home. Delete the folder and it is gone.
     </p>
 
     <ol class="steps">
@@ -403,7 +403,7 @@
         <p>
           Each frame's measured phase is thrown away and resynthesised, and
           pitch register, vocal-tract length and spectral tilt are each
-          collapsed onto one canonical value — so a whole population of speakers
+          collapsed onto one canonical value, so a whole population of speakers
           lands on the same output and there is nothing left to invert. What
           comes out is understandable, transcribable, and belongs to nobody.
         </p>
@@ -445,7 +445,7 @@
           The result is sealed into a <code>.veil</code> container as it is
           written, so <code>-o clean.wav</code> produces
           <code>clean.wav.veil</code>. The WAV is built in memory and encrypted
-          there — the plaintext never exists on disk, not even for a moment,
+          there, so the plaintext never exists on disk, not even for a moment,
           because a file that is written and then deleted cannot be reliably
           taken back on flash storage.
         </p>
@@ -456,8 +456,8 @@
         <h3>Or scramble your microphone as you speak</h3>
         <p>
           The <b>live scramble</b> tab routes your veiled voice into a virtual
-          audio cable. Every application on the machine — a call, a stream, a
-          recorder — then receives that instead of you, with no per-app setup.
+          audio cable. Every application on the machine, whether a call, a stream or a
+          recorder, then receives that instead of you, with no per-app setup.
         </p>
       </li>
 
@@ -495,7 +495,7 @@
     <p class="lede reveal">
       They are deliberately different secrets. If one password did both, then
       opening the app would be the same act as unsealing everything it had ever
-      written — the opposite of what a lock is for. VeilVoice keeps the two
+      written, which is the opposite of what a lock is for. VeilVoice keeps the two
       derivations domain-separated, so typing the same passphrase in both places
       still does not produce two copies of one value. Use two anyway: one guess
       that opens both defeats the point regardless of the maths.
@@ -506,8 +506,8 @@
       program running on your computer has nowhere to hide a secret from that
       computer: anyone who can write to your files can delete the lock, and
       anyone holding the disk can attack the stored password hash offline. It
-      protects against <em>casual access</em> — the person who sits down at your
-      unlocked session — which is a real and common threat, and is exactly what
+      protects against <em>casual access</em>, meaning the person who sits down at your
+      unlocked session, which is a real and common threat, and is exactly what
       the unlock screen says it is for. If someone taking your disk is the
       threat, encrypt the whole volume.</p>
     </div>
@@ -541,7 +541,7 @@
     Every picture here is of the current build. The window captures are taken by
     a script that drives the release build and photographs each tab, and the
     terminal drawings are generated from the command output committed beside
-    them &mdash; so a picture that disagrees with the program fails the build
+    them, so a picture that disagrees with the program fails the build
     rather than sitting here saying something untrue.
   </p>
 
@@ -674,7 +674,7 @@
       <p><strong>The bars marked &ldquo;normal voice&rdquo; are in step with one
       another.</strong> That
       shared phase relationship is most of what makes a voice recognisable as
-      <em>yours</em> — the precise waveform, the micro-timing, the way your
+      <em>yours</em>: the precise waveform, the micro-timing, the way your
       vocal tract shapes every harmonic.</p>
 
       <p><strong>The bars marked &ldquo;anonymised voice&rdquo; carry the same
@@ -725,7 +725,7 @@
     <h2>VERIFY A DOWNLOAD</h2>
     <p class="lede">
       Drop the file you downloaded here. It is hashed <strong>locally, in your
-      browser</strong>, using the built-in WebCrypto API — there is no upload
+      browser</strong>, using the built-in WebCrypto API, so there is no upload
       and no server that could receive it. Read
       <a href="js/verify.js">js/verify.js</a>; that file is the whole
       implementation.
@@ -755,12 +755,12 @@
 gpg --verify SHA256SUMS.asc SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing</code></pre>
     <p class="lede">
-      Signing key fingerprint — check that <code>gpg --verify</code> names this
+      Signing key fingerprint. Check that <code>gpg --verify</code> names this
       exact key, not merely “a good signature”:
     </p>
     <div class="hash fp">8101 FB3B B28D 02FB 239E&nbsp; 0CDF 9CC1 C7E7 A9B5 833A</div>
     <p class="lede" style="margin-top:10px">
-      <a href="assets/veilvoice-signing-key.asc" download>download the public key</a> —
+      <a href="assets/veilvoice-signing-key.asc" download>download the public key</a>,
       user ID is exactly <code>tilas01</code>, with no e-mail address attached.
     </p>
 
@@ -776,7 +776,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
       <li>the archive, against <code>SHA256SUMS</code>;</li>
       <li><code>CONTENTS.sha256</code>, against <code>SHA256SUMS</code>;</li>
       <li><strong>every file you extracted</strong>, against
-        <code>CONTENTS.sha256</code> — and it names anything in that folder the
+        <code>CONTENTS.sha256</code>, and it names anything in that folder the
         release never published.</li>
     </ol>
     <p class="lede">
@@ -790,7 +790,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
       keyring, <code>gpg --verify</code> is run, and what GnuPG said is shown.
       The signature is then checked by two independent implementations. The
       commands above are still printed for you to run yourself, because a
-      program telling you a download is genuine came out of that download —
+      program telling you a download is genuine came out of that download,
       only you typing them makes the answer independent of it.
     </p>
   </div>
@@ -808,7 +808,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
         <tr><td>Phase discard</td><td>Every frame's measured phase is thrown away and a synthetic one generated. Phase encodes the exact waveform and the speaker's micro-timing. It is never stored, and infinitely many waveforms share any given magnitude spectrogram.</td></tr>
         <tr><td>Many-to-one normalisation</td><td>Pitch register, vocal-tract length and long-term spectral tilt are each collapsed onto a single canonical value. A whole population of speakers maps to the same output, so there is nothing to invert.</td></tr>
         <tr><td>CSPRNG modulation</td><td>The residual transform changes every frame from a ChaCha20 stream whose seed comes from the OS CSPRNG, lives only in page-locked RAM, and is zeroized on drop. There is no fixed transform to undo.</td></tr>
-        <tr><td>Rolling seed</td><td>Every two seconds by default the stream draws a fresh seed from its own output and restarts. ChaCha20 does not run backwards, so each roll permanently seals off the audio before it — a long recording is a chain of short streams, not one. Configurable, and inaudible: parameters glide across a roll and phase offsets ease over half a second.</td></tr>
+        <tr><td>Rolling seed</td><td>Every two seconds by default the stream draws a fresh seed from its own output and restarts. ChaCha20 does not run backwards, so each roll permanently seals off the audio before it: a long recording is a chain of short streams, not one. Configurable, and inaudible: parameters glide across a roll and phase offsets ease over half a second.</td></tr>
       </tbody>
     </table>
 
@@ -819,7 +819,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
         <tr><td>Password → key</td><td>Argon2id (RFC 9106)</td><td>Memory-hard, so GPU and ASIC cracking gains little. Cost parameters travel with the file so old files still open.</td></tr>
         <tr><td>Public-key</td><td>X25519 + ML-KEM-768 hybrid</td><td>An attacker must break <em>both</em>. Guards against harvest-now-decrypt-later: a recording stored today may be attacked decades from now.</td></tr>
         <tr><td>Payload</td><td>XChaCha20-Poly1305</td><td>192-bit random nonces remove the counter-management failure mode entirely.</td></tr>
-        <tr><td>Header</td><td>Authenticated as associated data</td><td>An attacker cannot downgrade the stored KDF cost to make cracking cheap — tampering makes decryption fail.</td></tr>
+        <tr><td>Header</td><td>Authenticated as associated data</td><td>An attacker cannot downgrade the stored KDF cost to make cracking cheap, because tampering makes decryption fail.</td></tr>
         <tr><td>Keys in memory</td><td>Page-locked, zeroized, constant-time</td><td>Keys stay out of the swap file and are wiped on drop. Comparison leaks no timing.</td></tr>
       </tbody>
     </table>
@@ -838,7 +838,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 
     <h3>The app lock, and exactly what it is worth</h3>
     <p>
-      VeilVoice can sit behind a password of its own — separate from the one that
+      VeilVoice can sit behind a password of its own, separate from the one that
       encrypts recordings, so that opening the app is not the same act as
       unsealing everything it has written.
     </p>
@@ -855,7 +855,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
       has nowhere to hide a secret from the machine it runs on. Anyone who can
       write to your files can delete the lock; anyone holding the disk can edit
       the attempt counter, move the clock, or attack the stored hash offline.
-      This protects against <em>casual access</em> — the person who sits down at
+      This protects against <em>casual access</em>, meaning the person who sits down at
       your unlocked session. If the disk is the threat, the answers are full-volume
       encryption and the at-rest encryption above, not this.</p>
     </div>
@@ -871,7 +871,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
     </ul>
 
     <div class="note bad">
-      <p><strong>Audited by tilas01</strong> — the author, who wrote and
+      <p><strong>Audited by tilas01</strong>, the author, who wrote and
       reviewed it. Be clear about what that is worth: a maintainer audit catches
       what the author can see, and <strong>no external firm or independent
       researcher has reviewed this code</strong>. The cryptography uses standard,
@@ -889,15 +889,15 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
     <p class="lede">
       This panel fetches from <code>api.github.com</code>, which learns your IP
       address. GitHub already serves this page, so for most visitors that
-      changes nothing — but it is your call, so nothing loads until you ask.
+      changes nothing, but it is your call, so nothing loads until you ask.
     </p>
     <button class="btn" id="load-repo">load live repository data</button>
     <p class="lede" id="repo-status" style="min-height:1.2em"></p>
 
     <div class="stats">
-      <div class="stat"><b id="stars">—</b><span>stars</span></div>
-      <div class="stat"><b id="forks">—</b><span>forks</span></div>
-      <div class="stat"><b id="issues">—</b><span>open issues</span></div>
+      <div class="stat"><b id="stars">&hellip;</b><span>stars</span></div>
+      <div class="stat"><b id="forks">&hellip;</b><span>forks</span></div>
+      <div class="stat"><b id="issues">&hellip;</b><span>open issues</span></div>
       <div class="stat"><b id="repo-license">GPL-3.0</b><span>licence</span></div>
     </div>
     <p id="repo-desc" class="lede"></p>
@@ -913,7 +913,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <footer>
   <div class="wrap">
     <p>
-      VeilVoice — GPL-3.0-or-later ·
+      VeilVoice &middot; GPL-3.0-or-later ·
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
       <a href="wiki.html">wiki</a> ·
       <a href="user-agreements/LEGAL-WAIVER.txt">legal</a> ·
@@ -924,7 +924,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
     </p>
     <p>
       Virtual audio routing on Windows is usually provided by VB-CABLE, which is
-      proprietary donationware and is not bundled — install it separately if you
+      proprietary donationware and is not bundled: install it separately if you
       want it.
     </p>
   </div>
