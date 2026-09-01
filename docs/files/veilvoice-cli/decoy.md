@@ -20,7 +20,7 @@
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
-`veilvoice decoy` — what a second passphrase is worth, and what it is not.
+`veilvoice decoy`, and what a second passphrase is worth and what it is not.
 
 # In plain words
 

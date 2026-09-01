@@ -11,7 +11,7 @@
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
-`veilvoice accel` — the graphics hardware here, and what it is good for.
+`veilvoice accel` reports the graphics hardware here, and what it is good for.
 
 # In plain words
 

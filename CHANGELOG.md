@@ -66,6 +66,31 @@ them makes the *invocation* independent.
   given, names everything after it, and publishes nothing at all on a manual
   run, which is what "dry run" was always supposed to mean.
 
+### The interface text no longer uses dashes
+
+Fifty em dashes in `veilvoice-cli` and four elsewhere that reach a user are
+gone, from `--help` output, warnings, errors and printed results. Every
+sentence was rewritten rather than having its punctuation swapped, and the ten
+committed CLI screenshots were re-captured from the built binary, so the
+gallery shows what the program prints.
+
+349 remain in `//!` and `///` doc comments, which the rule covers and which
+nobody sees while using VeilVoice. That is a stated remainder, not a claim of
+completion.
+
+### The seventeenth audit round, run on the screenshots
+
+- **F-103** Nothing said when a committed screenshot had gone stale. The check
+  compared each drawing against the text file beside it and compared that file
+  against nothing: it is written by a separate `--capture` command that the
+  verification run does not call, so a string could be rewritten and every
+  check in the repository would pass while the website went on showing the old
+  wording. Found the only way this kind of thing is: the interface text was
+  rewritten, everything passed, and the help screenshot still contained a dash
+  the program no longer prints. The check now runs the commands and compares
+  what they print against what is committed. Every capture is a `--help`
+  screen, so its output depends on the binary and not on the machine.
+
 ### The sixteenth audit round, run on the manifest generator
 
 - **F-102** The generator normalised archive member paths with

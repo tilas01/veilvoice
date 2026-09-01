@@ -30,6 +30,6 @@
 <rect x="346.0" y="46.3" width="7.0" height="57.4" rx="3" fill="#bb9af7" opacity="0.83"/>
 <rect x="359.0" y="62.9" width="7.0" height="24.1" rx="3" fill="#bb9af7" opacity="0.67"/>
 <text x="396.0" y="63.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#c0caf5" letter-spacing="0.5">priv_mode.rs</text>
-<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">veilvoice privilege &#8212; what VeilVoice is running with, and what it can see.</text>
+<text x="396.0" y="89.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#737aa2">veilvoice privilege shows what VeilVoice runs with, and what it can see.</text>
 <text x="1176" y="30" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#2f3549" text-anchor="end" letter-spacing="1.5">CLI</text>
 </svg>

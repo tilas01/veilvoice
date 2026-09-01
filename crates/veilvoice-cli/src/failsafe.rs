@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! `veilvoice failsafe` — the safety catch, and what it can and cannot do.
+//! `veilvoice failsafe` is the safety catch. What it can and cannot do.
 //!
 //! # In plain words
 //!

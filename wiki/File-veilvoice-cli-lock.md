@@ -11,7 +11,7 @@
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
-`veilvoice lock` — manage the application lock from the command line.
+`veilvoice lock` manages the application lock from the command line.
 
 The lock guards the desktop app: with one set, VeilVoice asks for a password
 before it will show anything or start a live scramble. Managing it from here

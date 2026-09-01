@@ -53,8 +53,8 @@
 <span class="ln" id="L10"><span class="tok-com">//! in the clear by default would quietly leave the second problem unsolved for</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! everyone who did not think to ask.</span></span>
 <span class="ln" id="L12"><span class="tok-com">//!</span></span>
-<span class="ln" id="L13"><span class="tok-com">//! So the result is sealed into a [`container`] &#8212; Argon2id or the X25519 +</span></span>
-<span class="ln" id="L14"><span class="tok-com">//! ML-KEM-768 hybrid &#8212; unless the user asks for plaintext, and asking for</span></span>
+<span class="ln" id="L13"><span class="tok-com">//! So the result is sealed into a [`container`], with Argon2id or the X25519</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! plus ML-KEM-768 hybrid, unless the user asks for plaintext, and asking for</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! plaintext prints [`PLAINTEXT_WARNING`] and, on a terminal, waits for an</span></span>
 <span class="ln" id="L16"><span class="tok-com">//! answer.</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!</span></span>
@@ -91,15 +91,15 @@
 <span class="ln" id="L47">    <span class="tok-str">&quot;The de-identified recording will be written to disk unencrypted.&quot;</span>,</span>
 <span class="ln" id="L48">    <span class="tok-str">&quot;&quot;</span>,</span>
 <span class="ln" id="L49">    <span class="tok-str">&quot;VeilVoice destroys the voiceprint, not the words. Anyone who can read&quot;</span>,</span>
-<span class="ln" id="L50">    <span class="tok-str">&quot;this file &#8212; another user, a backup, a sync client, anyone who later&quot;</span>,</span>
-<span class="ln" id="L51">    <span class="tok-str">&quot;gets the disk &#8212; can still hear everything that was said.&quot;</span>,</span>
+<span class="ln" id="L50">    <span class="tok-str">&quot;this file can still hear everything that was said: another user, a&quot;</span>,</span>
+<span class="ln" id="L51">    <span class="tok-str">&quot;backup, a sync client, anyone who later gets the disk.&quot;</span>,</span>
 <span class="ln" id="L52">    <span class="tok-str">&quot;&quot;</span>,</span>
 <span class="ln" id="L53">    <span class="tok-str">&quot;Deleting it afterwards is not a fix: on an SSD, SD card or USB stick&quot;</span>,</span>
 <span class="ln" id="L54">    <span class="tok-str">&quot;the original blocks can survive every overwrite. That is why at-rest&quot;</span>,</span>
 <span class="ln" id="L55">    <span class="tok-str">&quot;encryption is the default rather than an option you have to find.&quot;</span>,</span>
 <span class="ln" id="L56">    <span class="tok-str">&quot;&quot;</span>,</span>
 <span class="ln" id="L57">    <span class="tok-str">&quot;The file will be created readable only by your account. That is a file&quot;</span>,</span>
-<span class="ln" id="L58">    <span class="tok-str">&quot;permission and nothing more &#8212; it does not survive a copy, a backup, or&quot;</span>,</span>
+<span class="ln" id="L58">    <span class="tok-str">&quot;permission and nothing more. It does not survive a copy, a backup, or&quot;</span>,</span>
 <span class="ln" id="L59">    <span class="tok-str">&quot;anyone who has the disk.&quot;</span>,</span>
 <span class="ln" id="L60">];</span>
 </span>
@@ -166,7 +166,7 @@
 <span class="ln" id="L116"><span class="tok-com">/// Print the plaintext warning and, on an interactive terminal, require an</span></span>
 <span class="ln" id="L117"><span class="tok-com">/// explicit answer before continuing.</span></span>
 <span class="ln" id="L118"><span class="tok-com">///</span></span>
-<span class="ln" id="L119"><span class="tok-com">/// Non-interactive callers &#8212; scripts, pipelines, CI &#8212; still see the warning on</span></span>
+<span class="ln" id="L119"><span class="tok-com">/// Non-interactive callers, meaning scripts, pipelines and CI, still see it on</span></span>
 <span class="ln" id="L120"><span class="tok-com">/// stderr but are not blocked on a prompt nobody is there to answer. They asked</span></span>
 <span class="ln" id="L121"><span class="tok-com">/// for plaintext on the command line, which is as explicit as it gets.</span></span>
 <span class="ln" id="L122"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">confirm_plaintext</span>(assume_yes: bool) -&gt; Result&lt;(), String&gt; {</span>
@@ -193,7 +193,7 @@
 <span class="ln" id="L143">        .<span class="tok-fn">read_line</span>(&amp;<span class="tok-kw">mut</span> answer)</span>
 <span class="ln" id="L144">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
 <span class="ln" id="L145">    <span class="tok-kw">if</span> answer.<span class="tok-fn">trim</span>() != <span class="tok-str">&quot;UNENCRYPTED&quot;</span> {</span>
-<span class="ln" id="L146">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;cancelled &#8212; nothing was written&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L146">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;cancelled, and nothing was written&quot;</span>.<span class="tok-fn">into</span>());</span>
 <span class="ln" id="L147">    }</span>
 <span class="ln" id="L148">    <span class="tok-fn">Ok</span>(())</span>
 <span class="ln" id="L149">}</span>
@@ -205,8 +205,8 @@
 <span class="ln" id="L153"><span class="tok-com">///</span></span>
 <span class="ln" id="L154"><span class="tok-com">/// `rpassword` hands back an ordinary `String`, which is an ordinary heap</span></span>
 <span class="ln" id="L155"><span class="tok-com">/// allocation that can be paged out and is not wiped when it is dropped. That</span></span>
-<span class="ln" id="L156"><span class="tok-com">/// is a window this crate cannot remove &#8212; something has to receive the</span></span>
-<span class="ln" id="L157"><span class="tok-com">/// keystrokes &#8212; but it can be made as short as possible, which is what this</span></span>
+<span class="ln" id="L156"><span class="tok-com">/// is a window this crate cannot remove, because something has to receive the</span></span>
+<span class="ln" id="L157"><span class="tok-com">/// keystrokes. It can be made as short as possible, which is what this</span></span>
 <span class="ln" id="L158"><span class="tok-com">/// does: copy into a [`Secret`], wipe the copy, wipe the original, and hand</span></span>
 <span class="ln" id="L159"><span class="tok-com">/// back the only remaining version.</span></span>
 <span class="ln" id="L160"><span class="tok-com">///</span></span>

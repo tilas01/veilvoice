@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! `veilvoice lock` — manage the application lock from the command line.
+//! `veilvoice lock` manages the application lock from the command line.
 //!
 //! The lock guards the desktop app: with one set, VeilVoice asks for a password
 //! before it will show anything or start a live scramble. Managing it from here
@@ -59,7 +59,7 @@ impl Site {
             None => {
                 lock::default_dir().ok_or_else(|| {
                     "cannot work out where this platform keeps configuration \
-                     (no APPDATA, XDG_CONFIG_HOME or HOME) — pass --path"
+                     (no APPDATA, XDG_CONFIG_HOME or HOME), so pass --path"
                         .to_string()
                 })?;
                 Ok(Self::Default)
@@ -161,7 +161,7 @@ fn status(site: &Site) -> Result<(), String> {
                 Some(wait) => println!(
                     "{}",
                     warn(&format!(
-                        "rate limited — {} s before the next attempt",
+                        "rate limited, {} s before the next attempt",
                         wait.as_secs()
                     ))
                 ),
@@ -193,7 +193,7 @@ fn status(site: &Site) -> Result<(), String> {
 
 fn set(site: &Site) -> Result<(), String> {
     if site.open()?.0.is_some() {
-        return Err("a lock is already set here — use `veilvoice lock change`".into());
+        return Err("a lock is already set here, so use `veilvoice lock change`".into());
     }
     println!();
     print_scope();
@@ -209,7 +209,7 @@ fn set(site: &Site) -> Result<(), String> {
         "{}",
         paint(
             colour::MUTED,
-            "  use for encrypted recordings — they are deliberately separate,"
+            "  use for encrypted recordings. They are deliberately separate,"
         )
     );
     println!(
@@ -251,7 +251,7 @@ fn remove(site: &Site) -> Result<(), String> {
     store.remove(current.expose()).map_err(|e| e.to_string())?;
     println!(
         "{}",
-        ok("app lock removed — VeilVoice will open freely again")
+        ok("app lock removed, and VeilVoice will open freely again")
     );
     Ok(())
 }
@@ -259,7 +259,7 @@ fn remove(site: &Site) -> Result<(), String> {
 fn open_or_explain(site: &Site) -> Result<LockStore, String> {
     site.open()?
         .0
-        .ok_or_else(|| "no lock is set here — use `veilvoice lock set`".to_string())
+        .ok_or_else(|| "no lock is set here, so use `veilvoice lock set`".to_string())
 }
 
 #[cfg(test)]

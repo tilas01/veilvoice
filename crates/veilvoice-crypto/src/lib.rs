@@ -179,12 +179,12 @@ impl std::fmt::Display for Error {
             Self::WrongMode => "container is locked with a different method",
             Self::Shred => "could not securely erase the file",
             Self::ShredSymlink => {
-                "that path is a symbolic link — erasing it would destroy whatever it points at \
-                 and delete only the link; name the real file instead"
+                "that path is a symbolic link, so erasing it would destroy whatever it \
+                 points at and delete only the link; name the real file instead"
             }
             Self::AppLockRejected => "wrong app-lock password",
             Self::AppLockCooldown(secs) => {
-                return write!(f, "too many attempts — wait {secs}s before trying again")
+                return write!(f, "too many attempts, so wait {secs}s before trying again")
             }
             Self::AppLockStore => "could not read or write the app-lock file",
             Self::AppLockSpareStale => {

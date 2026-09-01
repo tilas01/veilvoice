@@ -6,7 +6,7 @@ Run an interview through `anonymise` and both people come out as the same voice 
 
 **What a conversation keeps** is the shape of the conversation: how many people, who spoke when, and for how long. That is kept on purpose -- it is what makes the result worth listening to -- and it is information about the conversation.
 
-Usage: veilvoice.exe conversation <COMMAND>
+Usage: veilvoice conversation <COMMAND>
 
 Commands:
   inspect  Describe a plan: who is in it, which voice each gets, and any overlaps

@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-cli/src/lock.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="veilvoice lock &#8212; manage the application lock from the command line.">
+<meta name="description" content="veilvoice lock manages the application lock from the command line.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -49,7 +49,7 @@
 </nav>
 <div>
 <section id="s-about">
-<p><code>veilvoice lock</code> &#8212; manage the application lock from the command line.</p>
+<p><code>veilvoice lock</code> manages the application lock from the command line.</p>
 <p>The lock guards the desktop app: with one set, VeilVoice asks for a password before it will show anything or start a live scramble. Managing it from here exists because a headless machine still has a config directory, and because anything the GUI can do to a file on disk should be inspectable without the GUI.</p>
 <p>Every path through this module prints <code>veilvoice_crypto::lock::SCOPE</code>, for one reason: a lock the user believes is stronger than it is has made them <em>less</em> safe, not more.</p>
 <h2 id="in-plain-words">In plain words</h2>

@@ -4,7 +4,7 @@ Nothing here is part of VeilVoice and nothing here is needed to run it. A virtua
 
 With no arguments this only *reports*. `--install NAME` is the explicit yes, one named program at a time, and even then VeilVoice will not run somebody else's installer: for proprietary software it prints the vendor's page, and for anything needing root it prints the command rather than asking for a password.
 
-Usage: veilvoice.exe companions [OPTIONS]
+Usage: veilvoice companions [OPTIONS]
 
 Options:
       --install <NAME>

@@ -54,21 +54,21 @@ Check a VeilVoice release: the SHA-256 of a file, its line in a signed SHA256SUM
 
 Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings.
 
-- [[`accel.rs`|File-veilvoice-cli-accel]] &mdash; veilvoice accel — the graphics hardware here, and what it is good for.
-- [[`appctl.rs`|File-veilvoice-cli-appctl]] &mdash; veilvoice appctl — learn what normally runs, then notice what does not.
+- [[`accel.rs`|File-veilvoice-cli-accel]] &mdash; veilvoice accel reports the graphics hardware here, and what it is good for.
+- [[`appctl.rs`|File-veilvoice-cli-appctl]] &mdash; veilvoice appctl learns what normally runs, so it can notice what does not.
 - [[`atrest.rs`|File-veilvoice-cli-atrest]] &mdash; Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it.
 - [[`capture.rs`|File-veilvoice-cli-capture]] &mdash; veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run.
 - [[`conversation.rs`|File-veilvoice-cli-conversation]] &mdash; veilvoice conversation -- several speakers, a voice each, and subtitles.
-- [[`decoy.rs`|File-veilvoice-cli-decoy]] &mdash; veilvoice decoy — what a second passphrase is worth, and what it is not.
-- [[`failsafe.rs`|File-veilvoice-cli-failsafe]] &mdash; veilvoice failsafe — the safety catch, and what it can and cannot do.
+- [[`decoy.rs`|File-veilvoice-cli-decoy]] &mdash; veilvoice decoy, and what a second passphrase is worth and what it is not.
+- [[`failsafe.rs`|File-veilvoice-cli-failsafe]] &mdash; veilvoice failsafe is the safety catch.
 - [[`guard.rs`|File-veilvoice-cli-guard]] &mdash; veilvoice guard -- record what VeilVoice's files should be, and check them.
-- [[`gui.rs`|File-veilvoice-cli-gui]] &mdash; veilvoice gui — open the desktop application from the command line.
-- [[`input.rs`|File-veilvoice-cli-input]] &mdash; veilvoice input — what running programs can see your keyboard and mouse.
-- [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock — manage the application lock from the command line.
-- [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice — the command-line interface.
+- [[`gui.rs`|File-veilvoice-cli-gui]] &mdash; veilvoice gui opens the desktop application from the command line.
+- [[`input.rs`|File-veilvoice-cli-input]] &mdash; veilvoice input shows which running programs can see your keyboard and mouse.
+- [[`lock.rs`|File-veilvoice-cli-lock]] &mdash; veilvoice lock manages the application lock from the command line.
+- [[`main.rs`|File-veilvoice-cli-main]] &mdash; veilvoice, the command-line interface.
 - [[`meter.rs`|File-veilvoice-cli-meter]] &mdash; Level meters for veilvoice live, on a scale that means something.
 - [[`policy.rs`|File-veilvoice-cli-policy]] &mdash; veilvoice policy -- settings that can only be tightened.
-- [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] &mdash; veilvoice privilege — what VeilVoice is running with, and what it can see.
+- [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] &mdash; veilvoice privilege shows what VeilVoice runs with, and what it can see.
 - [[`sentry.rs`|File-veilvoice-cli-sentry]] &mdash; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &mdash; Tokyo Night colouring for the terminal.
 

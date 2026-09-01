@@ -38,6 +38,49 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The seventeenth round: what nothing was checking about the screenshots
+
+Prompted by a sweep rather than by reading: taking the em dashes out of the
+interface text meant editing strings that ten committed screenshots show.
+
+**One defect found and fixed (F-103)**, and it is the one that had been sitting
+underneath a "still open" entry for several rounds without being seen as a
+defect in its own right.
+
+### F-103 -- nothing said when a committed screenshot had gone stale
+
+`tools/shots/terminal.py`.
+
+`--check` compared each drawing against the text file beside it. It compared
+that text file against nothing at all. The file is written by `--capture`,
+which is a separate command that `tools/verify.py` does not run and nobody runs
+by accident, so a string could be rewritten in `veilvoice-cli` and **every
+check in this repository would pass** while `assets/screenshots/` went on
+showing the old wording, on the website, in the README and in the gallery.
+
+Not hypothetical, and found the only way this kind of thing is found. The
+interface text was rewritten, the whole of `verify.py` passed, and
+`cli-help.txt` still contained an em dash the program no longer prints.
+
+The audit had recorded the re-capture as a manual step. That was accurate and
+it was half the picture: the missing half is that nothing said when the manual
+step was **due**. A manual step nobody is told to take is not a step in the
+process, it is a hope.
+
+`--check` now also runs the commands and compares what they print against what
+is committed, and every capture here is a `--help` screen, so its output is a
+function of the binary rather than of the machine and two people on the same
+commit get the same bytes. That is what makes it checkable, and it is why the
+list stays help screens: a capture of what is installed or what is plugged in
+could not be checked this way. It skips where there is no build, which is the
+CI job that runs the other checks in this file, and it does not skip in
+`verify.py`, which runs after `cargo build` on the machine where the strings
+were just edited.
+
+Proved rather than assumed: a capture was edited by hand, the drawing
+regenerated from it so the existing check would pass, and the new one reported
+`cli-clean.txt is not what veilvoice clean --help prints` and failed the run.
+
 ## The sixteenth round: the manifest generator, an hour after writing it
 
 The same rule as the fourteenth round, applied to the other half of marker 97.
@@ -3204,21 +3247,27 @@ the top of this document now says.
     through a different `man` implementation, and `mandoc -Tlint` has not been
     run.
 
-11. **VeilVoice's own interface text uses em dashes, against the project's own
-    rule.** Fifty occurrences across thirteen files in `veilvoice-cli` alone,
-    in `--help` output, in warnings and in printed results. The rule is that a
-    dash does not appear in prose, comments, documentation or interface text.
+11. **The interface text is clean; the doc comments are not.** The fifty em
+    dashes in `veilvoice-cli` are gone, and so are the four elsewhere in the
+    workspace that reach a user: two error messages in `veilvoice-crypto`, one
+    in `veilvoice-guard` and one test assertion. Every sentence was rewritten
+    rather than having its punctuation swapped, and the ten committed CLI
+    drawings were re-captured from the built binary, so what the gallery shows
+    is what the program prints.
 
-    It is recorded rather than fixed, because fixing it is not a small change:
-    the committed CLI drawings in `assets/screenshots/` are checked against the
-    text those commands print, so rewriting the strings invalidates every one
-    of them and the re-capture is the manual step that needs a build, a machine
-    and somebody deciding the new output is right. That is a maintainer's pass,
-    not something to slip in beside a packaging change.
+    **349 remain, all of them in `//!` and `///` doc comments.** The rule
+    covers those too, and they are not user-facing text: they are read on the
+    generated documentation pages and by anybody in the source. This is a
+    stated remainder rather than a claim of completion, and the number is
+    measured rather than estimated.
+
+    The entry used to say the re-capture was a manual pass needing a build, a
+    machine and somebody deciding the new output is right. That was true, and
+    it was also the whole problem: see F-103.
 
 ## 6. Verdict
 
-**One hundred and two defects found and fixed across sixteen audit rounds (F-1 to F-102):**
+**One hundred and three defects found and fixed across seventeen audit rounds (F-1 to F-103):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
