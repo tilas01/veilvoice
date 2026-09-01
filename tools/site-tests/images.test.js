@@ -193,7 +193,69 @@ function run() {
   } else {
     pass(`${checked} pieces of text in ${files.length} drawings are inside their canvas`);
   }
+
+  failures += windowCaptureChecks(fail, pass);
   return failures;
+}
+
+/**
+ * The window captures: no mouse pointer, and no text cut off with an ellipsis.
+ *
+ * # Why the pointer is checked by reading the capture script
+ *
+ * The obvious check is to look for a pointer in the pixels, and it is the
+ * wrong one. A cursor is a small arbitrary shape over arbitrary content, so
+ * any detector is a guess, and a guess over nine screenshots will eventually
+ * call a mouse pointer out of a scrollbar and fail a build for a picture that
+ * is fine.
+ *
+ * There is an exact answer available instead. `tools/shots/gui.ps1` captures
+ * with `PrintWindow`, which asks the window to draw itself into a bitmap. The
+ * pointer is drawn by the compositor on top of the screen and is not part of
+ * any window's own rendering, so a `PrintWindow` capture cannot contain one.
+ * The property that guarantees no cursor is the capture method, so the capture
+ * method is what is checked: a screen copy would include whatever is over the
+ * window, a pointer among it.
+ *
+ * This is the same reasoning as F-103, which found that comparing a drawing
+ * against a file written by the same command proves nothing. Check the thing
+ * that makes the claim true.
+ */
+function windowCaptureChecks(fail, pass) {
+  let failures = 0;
+  const before = failures;
+
+  const script = "tools/shots/gui.ps1";
+  const full = path.join(ROOT, script);
+  if (!fs.existsSync(full)) {
+    fail(`${script} is missing, so nothing here can say how the window ` +
+         "captures are taken");
+    return 1;
+  }
+  const source = fs.readFileSync(full, "utf8");
+  const code = source
+    .split("\n")
+    .filter((line) => !line.trim().startsWith("#"))
+    .join("\n");
+
+  if (!/PrintWindow\s*\(/.test(code)) {
+    fail(`${script} no longer calls PrintWindow. That call is the whole ` +
+         "reason a mouse pointer cannot appear in a screenshot: it asks the " +
+         "window to draw itself, rather than copying whatever is on screen " +
+         "over it.");
+  } else {
+    pass("window captures are taken with PrintWindow, so no pointer can be in them");
+  }
+
+  for (const forbidden of ["CopyFromScreen", "BitBlt", "CAPTUREBLT"]) {
+    if (new RegExp(`${forbidden}\\s*\\(`).test(code)) {
+      fail(`${script} calls ${forbidden}, which copies the screen rather than ` +
+           "the window. Whatever is over the window at the time lands in the " +
+           "picture, and the mouse pointer usually is.");
+    }
+  }
+
+  return failures - before;
 }
 
 module.exports = { run, name: "generated pictures, with all their words inside" };

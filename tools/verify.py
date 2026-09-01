@@ -95,6 +95,9 @@ GENERATORS = [
     # and record their sizes: a crop after that copy would leave the two out of
     # step, and the size check in `terminal.py --check` is what would notice.
     ("screenshot borders", [sys.executable, "tools/shots/crop.py"]),
+    # After the crop, never before it: rounding the corners of a picture that
+    # still has a capture border rounds the border.
+    ("screenshot corners", [sys.executable, "tools/shots/round.py"]),
     ("terminal drawings", [sys.executable, "tools/shots/terminal.py"]),
     ("documentation", [sys.executable, "tools/docs/generate.py"]),
     # The website's own source, which `generate.py` does not cover: it reads
@@ -119,6 +122,8 @@ CHECKS = [
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
     ("no screenshot has a capture border",
      [sys.executable, "tools/shots/crop.py", "--check"]),
+    ("screenshots have rounded corners",
+     [sys.executable, "tools/shots/round.py", "--check"]),
     ("terminal drawings match their output",
      [sys.executable, "tools/shots/terminal.py", "--check"]),
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),
