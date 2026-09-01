@@ -27,7 +27,8 @@ const SUITES = [
   require("./source.test.js"),
   require("./packaging.test.js"),
   require("./images.test.js"),
-  require("./audit.test.js")
+  require("./audit.test.js"),
+  require("./alignment.test.js")
 ];
 
 // `run` may be synchronous or return a promise: the repository-panel suite

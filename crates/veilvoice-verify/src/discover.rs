@@ -40,8 +40,8 @@
 //! Looks for a downloaded release to check, so you can double-click the verifier
 //! and have it work.
 //!
-//! It looks in the folder it is in, the current folder, and your Downloads and
-//! Desktop. If it finds nothing it says exactly where it looked, rather than
+//! It looks in the folder it is in, the current folder, one level up from each
+//! of those, and your Downloads and Desktop. If it finds nothing it says exactly where it looked, rather than
 //! reporting a failure that leaves you guessing.
 
 use std::path::{Path, PathBuf};
@@ -157,14 +157,46 @@ pub fn places(explicit: Option<&Path>) -> Vec<PathBuf> {
         }
     };
 
-    add(explicit.map(Path::to_path_buf));
-    add(std::env::current_dir().ok());
+    let here = std::env::current_dir().ok();
     // Where somebody who unpacked the archive and ran the verifier inside it
     // will be. `current_exe` can fail on a deleted or moved binary, which is
     // not worth an error -- it simply means one fewer place to look.
-    add(std::env::current_exe()
+    let beside_the_program = std::env::current_exe()
         .ok()
-        .and_then(|exe| exe.parent().map(Path::to_path_buf)));
+        .and_then(|exe| exe.parent().map(Path::to_path_buf));
+
+    add(explicit.map(Path::to_path_buf));
+    add(here.clone());
+    add(beside_the_program.clone());
+
+    // F-107. One level up from each of those, which is where the download
+    // actually is.
+    //
+    // Every archive tool unpacks `veilvoice-vX.Y.Z-linux-x86_64.tar.gz` into a
+    // folder of that name, beside the archive. So somebody who downloads a
+    // release, extracts it, opens the new folder and runs the program in it is
+    // standing in a directory that holds the binaries and none of the things
+    // they are checked against: `SHA256SUMS`, its signature and the archive are
+    // all one level above. That is the single most likely way this program is
+    // ever run, and it was the one arrangement that reported "no VeilVoice
+    // release was found to check".
+    //
+    // One level only. Two would start reading directories that have nothing to
+    // do with the download, and a verifier that goes wandering through a
+    // stranger's filesystem looking for something to check is a worse thing
+    // than one that asks for a directory.
+    // The directory named on the command line gets the same treatment as the
+    // one we are standing in. Somebody who types the extracted folder's name
+    // means the same thing as somebody who walks into it.
+    add(explicit.and_then(Path::parent).map(Path::to_path_buf));
+    add(here
+        .as_deref()
+        .and_then(Path::parent)
+        .map(Path::to_path_buf));
+    add(beside_the_program
+        .as_deref()
+        .and_then(Path::parent)
+        .map(Path::to_path_buf));
 
     for home in [
         std::env::var_os("USERPROFILE").map(PathBuf::from),
@@ -212,6 +244,70 @@ mod tests {
         let path = dir.join(name);
         std::fs::write(&path, b"x").unwrap();
         path
+    }
+
+    /// F-107. The download is one level up from the folder you extracted.
+    ///
+    /// Reproduces the arrangement every archive tool produces and every user
+    /// therefore has: the archive, `SHA256SUMS` and its signature in one
+    /// directory, and the unpacked folder beside them. Standing in that folder
+    /// and asking for a check has to find the release, because it is the most
+    /// likely way this program is ever run, and it was the one arrangement
+    /// that answered "no VeilVoice release was found to check".
+    #[test]
+    fn a_release_one_level_up_from_the_extracted_folder_is_found() {
+        let download = tempfile::tempdir().unwrap();
+        touch(download.path(), "veilvoice-v0.1.15-linux-x86_64.tar.gz");
+        touch(download.path(), SUMS);
+        touch(download.path(), SUMS_SIG);
+
+        // What `tar` leaves behind: a folder named after the archive, holding
+        // the binaries and none of the things they are checked against.
+        let extracted = download.path().join("veilvoice-v0.1.15-linux-x86_64");
+        std::fs::create_dir(&extracted).unwrap();
+        touch(&extracted, "veilvoice");
+        touch(&extracted, "veilvoice-verify");
+
+        // Asked about the extracted folder, which is where the user is.
+        let places = places(Some(&extracted));
+        assert!(
+            places.iter().any(|p| p == download.path()),
+            "the download directory {:?} is not searched from inside {:?}; \
+             searched: {places:?}",
+            download.path(),
+            extracted
+        );
+
+        let (complete, _) = search(Some(&extracted));
+        let complete = complete.expect(
+            "a complete set sits one level up, and standing in the extracted \
+             folder is how this program is normally run",
+        );
+        assert_eq!(complete.directory, download.path());
+    }
+
+    /// The search stops one level up, and does not go wandering.
+    ///
+    /// A verifier that climbed until it found something to check would read
+    /// directories that have nothing to do with the download. One level is the
+    /// extract-into-a-subfolder case; anything past it is somebody else's
+    /// filesystem.
+    #[test]
+    fn the_search_does_not_climb_past_one_level() {
+        let root = tempfile::tempdir().unwrap();
+        touch(root.path(), "veilvoice-v0.1.15-linux-x86_64.tar.gz");
+        touch(root.path(), SUMS);
+        touch(root.path(), SUMS_SIG);
+
+        let deep = root.path().join("one").join("two");
+        std::fs::create_dir_all(&deep).unwrap();
+
+        let places = places(Some(&deep));
+        assert!(
+            !places.iter().any(|p| p == root.path()),
+            "the search reached {:?} from two levels down; searched: {places:?}",
+            root.path()
+        );
     }
 
     #[test]
