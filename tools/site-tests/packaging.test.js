@@ -173,6 +173,43 @@ function run() {
     }
   }
 
+  // ---- every archive the release builds is linked on the releases page ----
+  //
+  // **F-101.** The page hand-listed five archives and the workflow built
+  // eleven. Two of the five names had never existed -- `macos-aarch64` and
+  // `linux-aarch64`, where the workflow says `arm64` -- so every release entry
+  // carried two dead links, and six published platforms had no link at all.
+  //
+  // `tools/site/releases.py` derives the list from the workflow now, which is
+  // the fix. This is the check that the derivation still works: a workflow
+  // rewritten into a shape the generator cannot read would produce a page with
+  // fewer downloads on it and nothing else would notice, because a missing
+  // link looks exactly like a platform that was never built.
+  const workflow = read(".github/workflows/release.yml");
+  const releasesPage = read("website/releases.html");
+  const labels = new Set();
+  for (const match of workflow.matchAll(/^\s*label:\s*(\S+)\s*$/gm)) {
+    labels.add(match[1]);
+  }
+  for (const match of workflow.matchAll(/out="veilvoice-\$\{\{[^}]*\}\}-(\S+?)"/g)) {
+    labels.add(match[1]);
+  }
+  if (labels.size < 5) {
+    fail(`only ${labels.size} archive labels could be read out of ` +
+         "release.yml, so this check is not checking anything");
+  } else {
+    const missing = [...labels].filter(
+      (label) => !releasesPage.includes(`-${label}.`)
+    );
+    if (missing.length) {
+      fail(`the releases page links no file for ${missing.join(", ")}, ` +
+           "which the release workflow builds");
+    } else {
+      pass(`all ${labels.size} archives the workflow builds are linked on ` +
+           "the releases page");
+    }
+  }
+
   // ---- the two things dpkg-buildpackage needs before it will start --------
   const index = execFileSync("git", ["ls-files", "-s", "packaging/debian/"], {
     cwd: ROOT, encoding: "utf8", maxBuffer: 16 * 1024 * 1024

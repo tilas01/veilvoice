@@ -66,6 +66,30 @@ them makes the *invocation* independent.
   given, names everything after it, and publishes nothing at all on a manual
   run, which is what "dry run" was always supposed to mean.
 
+### The releases page, and what it was not telling you
+
+**Every version is on it now.** The backlog began at v0.1.6, because
+`CHANGELOG.md` keeps one combined section for v0.1.5 and earlier: six published
+releases with no entry, no summary and no download links. They are listed, each
+pointing at its own release page for its notes.
+
+**The files are at the end of each release rather than the top**, so opening one
+shows what changed in it. A short summary sits beside every version while it is
+closed, so the list stays readable at a glance; the detail is inside.
+
+### The fifteenth audit round, run on that page
+
+- **F-101** The page listed five archives per release and the release workflow
+  builds eleven. Two of the five names had never existed: it said
+  `macos-aarch64` and `linux-aarch64` where every release has published
+  `macos-arm64` and `linux-arm64`. So every entry carried two links that answer
+  with a not-found, and six published platforms -- the Raspberry Pi build, the
+  two static builds, FreeBSD, OpenBSD and NetBSD -- had no link at all.
+  Measured against the assets GitHub actually holds for v0.1.14 rather than
+  argued. The list is derived from the release workflow now, so a platform
+  added there appears here and a label renamed there cannot leave a dead link;
+  CI checks that every archive the workflow builds is linked.
+
 ### The fourteenth audit round, run on the verifier written an hour earlier
 
 New code in the one program whose entire job is not to be fooled is exactly the
