@@ -2,7 +2,7 @@
 //
 // Structural checks on the published pages.
 //
-// These catch the mistakes hand-edited HTML actually makes — an unclosed
+// These catch the mistakes hand-edited HTML actually makes, such as an unclosed
 // section that silently swallows the rest of the page, a navigation link
 // pointing at an anchor that no longer exists, an id used twice so the browser
 // jumps to the wrong one. None of them are security problems; all of them ship
@@ -47,7 +47,7 @@ function discoverPages(dir = SITE, found = []) {
 
 const PAGES = discoverPages();
 
-// Hosts the site is allowed to link to. Not fetch from — link to. Nothing on
+// Hosts the site is allowed to link to. Not fetch from, link to. Nothing on
 // these pages may *load* from anywhere but the same origin.
 const ALLOWED_LINK_HOSTS = [
   "github.com", "raw.githubusercontent.com", "api.github.com",

@@ -163,8 +163,8 @@ an otherwise optimised profile. This is not an oversight and must not be
 "tidied up" to match the workspace release profile, which sets
 `overflow-checks = false`.
 
-Two of the defects this project has shipped — F-2 (an Argon2 parallelism
-overflow) and F-4 (a 32-bit RIFF overflow) — were *arithmetic overflows*. With
+Two of the defects this project has shipped, F-2 (an Argon2 parallelism
+overflow) and F-4 (a 32-bit RIFF overflow), were *arithmetic overflows*. With
 overflow checks off they wrap silently, so a fuzzer running under the release
 profile would have explored those exact inputs and reported nothing. A campaign
 that cannot see the class of bug you have already shipped twice is not a
@@ -177,7 +177,7 @@ campaign.
   x86-64 host, whatever it does. Building the targets for `i686` or `armv7`
   under emulation would help; reading the code is what actually found both.
 - **The decoders themselves.** `symphonia`, `lofty` and `img-parts` parse
-  untrusted input and are not fuzzed here — they have their own suites, and
+  untrusted input and are not fuzzed here, because they have their own suites, and
   duplicating them badly would be worse than pointing at them. `wav_preflight`
   covers the one place VeilVoice stands in front of a decoder crash it cannot
   otherwise survive.
@@ -190,7 +190,7 @@ campaign.
 `crates/veilvoice-crypto/tests/parser_fuzz.rs` and
 `crates/veilvoice-meta/tests/wav_fuzz.rs` are a *different* thing and both are
 kept. They are seeded, deterministic, need no nightly, and run on every commit
-in CI on every platform — so they are the check that actually gets run. This
+in CI on every platform, so they are the check that actually gets run. This
 directory explores by feedback rather than by construction, and is the deeper
 but less frequent pass.
 

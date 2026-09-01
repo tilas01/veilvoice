@@ -3,7 +3,7 @@
 # IMPORTANT: nothing machine-specific or user-identifying is committed here.
 # Reproducibility depends on path remapping performed by the build ENVIRONMENT
 # (CI sets --remap-path-prefix from $GITHUB_WORKSPACE and $CARGO_HOME, plus
-# SOURCE_DATE_EPOCH), never on any one contributor's absolute paths — see
+# SOURCE_DATE_EPOCH), never on any one contributor's absolute paths. See
 # docs/REPRODUCIBLE_BUILDS.md.
 #
 # Local developers who build inside a cloud-synced folder (OneDrive/Dropbox)

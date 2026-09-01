@@ -10,7 +10,7 @@
 <title>How to use VeilVoice &middot; VeilVoice</title>
 <meta name="description" content="A walkthrough: anonymise a file, scramble a microphone, verify a download.">
 <link rel="icon" href="assets/icon-32.png" type="image/png">
-<meta property="og:title" content="VeilVoice — irreversible voice de-identification">
+<meta property="og:title" content="VeilVoice: irreversible voice de-identification">
 <meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
 <meta property="og:image" content="assets/banner.png">
 <!-- Declarative, so it costs no script and works with JavaScript off.
@@ -80,7 +80,7 @@
       There are two programs in the archive: <code>veilvoice-gui</code>, the
       desktop app, and <code>veilvoice</code>, the command line. They share one
       engine, so anything one can do the other can. Nothing installs a service,
-      writes to a registry, or phones home — delete the folder and it is gone.
+      writes to a registry, or phones home. Delete the folder and it is gone.
     </p>
 
     <ol class="steps">
@@ -100,7 +100,7 @@
         <p>
           Each frame's measured phase is thrown away and resynthesised, and
           pitch register, vocal-tract length and spectral tilt are each
-          collapsed onto one canonical value — so a whole population of speakers
+          collapsed onto one canonical value, so a whole population of speakers
           lands on the same output and there is nothing left to invert. What
           comes out is understandable, transcribable, and belongs to nobody.
         </p>
@@ -142,7 +142,7 @@
           The result is sealed into a <code>.veil</code> container as it is
           written, so <code>-o clean.wav</code> produces
           <code>clean.wav.veil</code>. The WAV is built in memory and encrypted
-          there — the plaintext never exists on disk, not even for a moment,
+          there, so the plaintext never exists on disk, not even for a moment,
           because a file that is written and then deleted cannot be reliably
           taken back on flash storage.
         </p>
@@ -153,8 +153,8 @@
         <h3>Or scramble your microphone as you speak</h3>
         <p>
           The <b>live scramble</b> tab routes your veiled voice into a virtual
-          audio cable. Every application on the machine — a call, a stream, a
-          recorder — then receives that instead of you, with no per-app setup.
+          audio cable. Every application on the machine, whether a call, a stream or a
+          recorder, then receives that instead of you, with no per-app setup.
         </p>
       </li>
 
@@ -192,7 +192,7 @@
     <p class="lede reveal">
       They are deliberately different secrets. If one password did both, then
       opening the app would be the same act as unsealing everything it had ever
-      written — the opposite of what a lock is for. VeilVoice keeps the two
+      written, which is the opposite of what a lock is for. VeilVoice keeps the two
       derivations domain-separated, so typing the same passphrase in both places
       still does not produce two copies of one value. Use two anyway: one guess
       that opens both defeats the point regardless of the maths.
@@ -203,8 +203,8 @@
       program running on your computer has nowhere to hide a secret from that
       computer: anyone who can write to your files can delete the lock, and
       anyone holding the disk can attack the stored password hash offline. It
-      protects against <em>casual access</em> — the person who sits down at your
-      unlocked session — which is a real and common threat, and is exactly what
+      protects against <em>casual access</em>, meaning the person who sits down at your
+      unlocked session, which is a real and common threat, and is exactly what
       the unlock screen says it is for. If someone taking your disk is the
       threat, encrypt the whole volume.</p>
     </div>
@@ -220,7 +220,7 @@
 <footer>
   <div class="wrap">
     <p>
-      VeilVoice — GPL-3.0-or-later ·
+      VeilVoice &middot; GPL-3.0-or-later ·
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
       <a href="wiki.html">wiki</a> ·
       <a href="user-agreements/LEGAL-WAIVER.txt">legal</a> ·
@@ -231,7 +231,7 @@
     </p>
     <p>
       Virtual audio routing on Windows is usually provided by VB-CABLE, which is
-      proprietary donationware and is not bundled — install it separately if you
+      proprietary donationware and is not bundled: install it separately if you
       want it.
     </p>
   </div>

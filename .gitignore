@@ -1,5 +1,5 @@
 # Build output (also commonly redirected out of the source tree via
-# CARGO_TARGET_DIR — see .cargo/config.toml).
+# CARGO_TARGET_DIR; see .cargo/config.toml).
 /target
 target/
 **/*.rs.bk

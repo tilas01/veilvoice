@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Runs every site test. No framework, no dependencies, no package.json — the
+// Runs every site test. No framework, no dependencies, no package.json, because the
 // same rule the site itself follows, for the same reason: a test suite that
 // pulls a hundred packages off a registry is a supply chain nobody has read.
 //
