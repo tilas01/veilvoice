@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-crypto/src/lock.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-crypto/src/lock.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The application lock: an Argon2id password verifier with a rate limit.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -83,68 +83,68 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>1437 lines defining <strong>39 functions</strong> (29 public), <strong>3 types</strong> and <strong>13 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct AppLock</code> <span style="color:var(--muted)">line 181</span> &mdash; A password verifier plus its attempt history.</li>
-<li><code>struct LockStore</code> <span style="color:var(--muted)">line 607</span> &mdash; An AppLock bound to a file, which is persisted after every attempt.</li>
-<li><code>enum Backing</code> <span style="color:var(--muted)">line 623</span> &mdash; Where a LockStore keeps its record.</li>
+<li><code>struct AppLock</code> <span style="color:var(--muted)">line 181</span> &middot; A password verifier plus its attempt history.</li>
+<li><code>struct LockStore</code> <span style="color:var(--muted)">line 607</span> &middot; An AppLock bound to a file, which is persisted after every attempt.</li>
+<li><code>enum Backing</code> <span style="color:var(--muted)">line 623</span> &middot; Where a LockStore keeps its record.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>AppLock::create</code> <span style="color:var(--muted)">line 213</span> &mdash; Create a lock for password.
+<li><code>AppLock::create</code> <span style="color:var(--muted)">line 213</span> &middot; Create a lock for password.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>derive_pair</code></span>
 </li>
-<li><code>AppLock::same_secret_as</code> <span style="color:var(--muted)">line 281</span> &mdash; Whether two records hold the same stored password.
+<li><code>AppLock::same_secret_as</code> <span style="color:var(--muted)">line 281</span> &middot; Whether two records hold the same stored password.
 </li>
-<li><code>AppLock::tampered</code> <span style="color:var(--muted)">line 293</span> &mdash; Whether a record has been found edited by somebody without the passphrase, at any point since this was last cleared.
+<li><code>AppLock::tampered</code> <span style="color:var(--muted)">line 293</span> &middot; Whether a record has been found edited by somebody without the passphrase, at any point since this was last cleared.
 </li>
-<li><code>AppLock::acknowledge</code> <span style="color:var(--muted)">line 301</span> &mdash; Clear the tamper report, after proving the passphrase.
+<li><code>AppLock::acknowledge</code> <span style="color:var(--muted)">line 301</span> &middot; Clear the tamper report, after proving the passphrase.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>verify</code>, <code>unix_now</code>, <code>verify_at</code>, <code>cooldown_at</code>, <code>derive_pair</code>, <code>tag_matches</code>, <code>delay_secs</code>, <code>tag</code>, <code>body</code></span>
 </li>
-<li><code>AppLock::needs_upgrade</code> <span style="color:var(--muted)">line 309</span> &mdash; True when this record predates the authentication tag and should be rewritten once the passphrase is in hand.
+<li><code>AppLock::needs_upgrade</code> <span style="color:var(--muted)">line 309</span> &middot; True when this record predates the authentication tag and should be rewritten once the passphrase is in hand.
 </li>
-<li><code>AppLock::cooldown</code> <span style="color:var(--muted)">line 341</span> &mdash; Seconds still to wait before another attempt is accepted.
+<li><code>AppLock::cooldown</code> <span style="color:var(--muted)">line 341</span> &middot; Seconds still to wait before another attempt is accepted.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>cooldown_at</code>, <code>unix_now</code>, <code>delay_secs</code></span>
 </li>
-<li><code>AppLock::failures</code> <span style="color:var(--muted)">line 358</span> &mdash; Consecutive failed attempts recorded so far.
+<li><code>AppLock::failures</code> <span style="color:var(--muted)">line 358</span> &middot; Consecutive failed attempts recorded so far.
 </li>
-<li><code>AppLock::params</code> <span style="color:var(--muted)">line 363</span> &mdash; The Argon2id cost this lock was created with.
+<li><code>AppLock::params</code> <span style="color:var(--muted)">line 363</span> &middot; The Argon2id cost this lock was created with.
 </li>
-<li><code>AppLock::retag</code> <span style="color:var(--muted)">line 401</span> &mdash; Draw a fresh nonce and re-tag the record under password.
+<li><code>AppLock::retag</code> <span style="color:var(--muted)">line 401</span> &middot; Draw a fresh nonce and re-tag the record under password.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>derive_pair</code>, <code>tag</code>, <code>body</code></span>
 </li>
-<li><code>AppLock::to_bytes</code> <span style="color:var(--muted)">line 432</span> &mdash; Serialise exactly as it appears on disk.
+<li><code>AppLock::to_bytes</code> <span style="color:var(--muted)">line 432</span> &middot; Serialise exactly as it appears on disk.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>body</code></span>
 </li>
-<li><code>LockStore::open</code> <span style="color:var(--muted)">line 643</span> &mdash; Load the lock at path, or Ok(None) if no lock is configured there.
+<li><code>LockStore::open</code> <span style="color:var(--muted)">line 643</span> &middot; Load the lock at path, or Ok(None) if no lock is configured there.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code></span>
 </li>
-<li><code>LockStore::create</code> <span style="color:var(--muted)">line 665</span> &mdash; Create a lock at path, refusing to overwrite one already there.
+<li><code>LockStore::create</code> <span style="color:var(--muted)">line 665</span> &middot; Create a lock at path, refusing to overwrite one already there.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>derive_pair</code></span>
 </li>
-<li><code>LockStore::tampered</code> <span style="color:var(--muted)">line 706</span> &mdash; Whether the stored record has been found edited by somebody without the passphrase.
+<li><code>LockStore::tampered</code> <span style="color:var(--muted)">line 706</span> &middot; Whether the stored record has been found edited by somebody without the passphrase.
 </li>
-<li><code>LockStore::acknowledge</code> <span style="color:var(--muted)">line 718</span> &mdash; Clear the tamper report, after proving the passphrase, and persist that.
+<li><code>LockStore::acknowledge</code> <span style="color:var(--muted)">line 718</span> &middot; Clear the tamper report, after proving the passphrase, and persist that.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>verify</code>, <code>unix_now</code>, <code>verify_at</code>, <code>cooldown_at</code>, <code>derive_pair</code>, <code>tag_matches</code>, <code>delay_secs</code>, <code>tag</code>, <code>body</code></span>
 </li>
-<li><code>LockStore::report_tamper</code> <span style="color:var(--muted)">line 733</span> &mdash; Raise the tamper report from outside, and persist it if the passphrase allows.
+<li><code>LockStore::report_tamper</code> <span style="color:var(--muted)">line 733</span> &middot; Raise the tamper report from outside, and persist it if the passphrase allows.
 </li>
-<li><code>LockStore::change_password</code> <span style="color:var(--muted)">line 738</span> &mdash; Replace the password, after proving the current one.
+<li><code>LockStore::change_password</code> <span style="color:var(--muted)">line 738</span> &middot; Replace the password, after proving the current one.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>save</code>, <code>unlock</code>, <code>write_private</code></span>
 </li>
-<li><code>LockStore::remove</code> <span style="color:var(--muted)">line 762</span> &mdash; Remove the lock, after proving the password.
+<li><code>LockStore::remove</code> <span style="color:var(--muted)">line 762</span> &middot; Remove the lock, after proving the password.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>unlock</code>, <code>save</code>, <code>write_private</code></span>
 </li>
-<li><code>LockStore::cooldown</code> <span style="color:var(--muted)">line 771</span> &mdash; Seconds still to wait before another attempt is accepted.
+<li><code>LockStore::cooldown</code> <span style="color:var(--muted)">line 771</span> &middot; Seconds still to wait before another attempt is accepted.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>cooldown_at</code>, <code>unix_now</code>, <code>delay_secs</code></span>
 </li>
-<li><code>LockStore::failures</code> <span style="color:var(--muted)">line 776</span> &mdash; Consecutive failed attempts recorded so far.
+<li><code>LockStore::failures</code> <span style="color:var(--muted)">line 776</span> &middot; Consecutive failed attempts recorded so far.
 </li>
-<li><code>LockStore::path</code> <span style="color:var(--muted)">line 782</span> &mdash; Where this lock is stored.
+<li><code>LockStore::path</code> <span style="color:var(--muted)">line 782</span> &middot; Where this lock is stored.
 </li>
-<li><code>LockStore::every_copy_current</code> <span style="color:var(--muted)">line 809</span> &mdash; Whether the last write reached every copy.
+<li><code>LockStore::every_copy_current</code> <span style="color:var(--muted)">line 809</span> &middot; Whether the last write reached every copy.
 </li>
-<li><code>open_default</code> <span style="color:var(--muted)">line 826</span> &mdash; Open the lock at the default location, wherever this platform keeps it.
+<li><code>open_default</code> <span style="color:var(--muted)">line 826</span> &middot; Open the lock at the default location, wherever this platform keeps it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default_dir</code>, <code>default_path</code></span>
 </li>
-<li><code>create_default</code> <span style="color:var(--muted)">line 848</span> &mdash; Create a lock at the default location, refusing to replace one already there.
+<li><code>create_default</code> <span style="color:var(--muted)">line 848</span> &middot; Create a lock at the default location, refusing to replace one already there.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default_dir</code>, <code>default_path</code></span>
 </li>
 </ul>
@@ -152,7 +152,7 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 649 931" width="649" height="931" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 649 946" width="649" height="946" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -161,7 +161,7 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="649" height="931" fill="var(--bg-inset, #16161e)" rx="8"/>
+<rect x="0" y="0" width="649" height="946" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M618.2 347.0 C 643.0 347.0, 643.0 47.0, 624.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M347.8 447.0 C 408.9 447.0, 408.9 347.0, 389.9 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M256.3 547.0 C 278.3 547.0, 278.3 47.0, 258.1 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
@@ -292,11 +292,12 @@
 <path d="M20.0 856.5 L29.0 856.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="861.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="883.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
-<text x="20.0" y="898.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a type-resolved</text>
-<text x="20.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it stays readable.</text>
+<text x="20.0" y="898.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
+<text x="20.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it stays</text>
+<text x="20.0" y="928.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-guard/src/manifest.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-guard/src/manifest.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The integrity manifest: what the files were, and what they are now.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -66,43 +66,43 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>730 lines defining <strong>18 functions</strong> (15 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Entry</code> <span style="color:var(--muted)">line 43</span> &mdash; One recorded file.</li>
-<li><code>enum Change</code> <span style="color:var(--muted)">line 52</span> &mdash; How a file differs from its record.</li>
-<li><code>struct Report</code> <span style="color:var(--muted)">line 110</span> &mdash; The result of checking a manifest against the disk.</li>
-<li><code>struct Manifest</code> <span style="color:var(--muted)">line 126</span> &mdash; A record of a set of files.</li>
+<li><code>struct Entry</code> <span style="color:var(--muted)">line 43</span> &middot; One recorded file.</li>
+<li><code>enum Change</code> <span style="color:var(--muted)">line 52</span> &middot; How a file differs from its record.</li>
+<li><code>struct Report</code> <span style="color:var(--muted)">line 110</span> &middot; The result of checking a manifest against the disk.</li>
+<li><code>struct Manifest</code> <span style="color:var(--muted)">line 126</span> &middot; A record of a set of files.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Change::path</code> <span style="color:var(--muted)">line 84</span> &mdash; The path this change concerns.
+<li><code>Change::path</code> <span style="color:var(--muted)">line 84</span> &middot; The path this change concerns.
 </li>
-<li><code>Change::describe</code> <span style="color:var(--muted)">line 94</span> &mdash; A single line for a terminal or a log.
+<li><code>Change::describe</code> <span style="color:var(--muted)">line 94</span> &middot; A single line for a terminal or a log.
 </li>
-<li><code>Report::is_clean</code> <span style="color:var(--muted)">line 119</span> &mdash; Whether anything at all differs.
+<li><code>Report::is_clean</code> <span style="color:var(--muted)">line 119</span> &middot; Whether anything at all differs.
 </li>
-<li><code>Manifest::of</code> <span style="color:var(--muted)">line 190</span> &mdash; Record every readable file in paths.
+<li><code>Manifest::of</code> <span style="color:var(--muted)">line 190</span> &middot; Record every readable file in paths.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>digest_of</code>, <code>normalise</code>, <code>unrecordable</code></span>
 </li>
-<li><code>Manifest::len</code> <span style="color:var(--muted)">line 215</span> &mdash; How many files are recorded.
+<li><code>Manifest::len</code> <span style="color:var(--muted)">line 215</span> &middot; How many files are recorded.
 </li>
-<li><code>Manifest::is_empty</code> <span style="color:var(--muted)">line 220</span> &mdash; Whether nothing is recorded.
+<li><code>Manifest::is_empty</code> <span style="color:var(--muted)">line 220</span> &middot; Whether nothing is recorded.
 </li>
-<li><code>Manifest::paths</code> <span style="color:var(--muted)">line 225</span> &mdash; The recorded paths, in order.
+<li><code>Manifest::paths</code> <span style="color:var(--muted)">line 225</span> &middot; The recorded paths, in order.
 </li>
-<li><code>Manifest::check</code> <span style="color:var(--muted)">line 234</span> &mdash; Compare the record against what is on disk now.
+<li><code>Manifest::check</code> <span style="color:var(--muted)">line 234</span> &middot; Compare the record against what is on disk now.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>digest_of</code>, <code>normalise</code></span>
 </li>
-<li><code>Manifest::save</code> <span style="color:var(--muted)">line 370</span> &mdash; Write the manifest to path in the clear.
+<li><code>Manifest::save</code> <span style="color:var(--muted)">line 370</span> &middot; Write the manifest to path in the clear.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Manifest::load</code> <span style="color:var(--muted)">line 381</span> &mdash; Read a manifest written by Manifest::save.
+<li><code>Manifest::load</code> <span style="color:var(--muted)">line 381</span> &middot; Read a manifest written by Manifest::save.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>unrecordable</code></span>
 </li>
-<li><code>Manifest::seal</code> <span style="color:var(--muted)">line 395</span> &mdash; Seal the manifest under a passphrase.
+<li><code>Manifest::seal</code> <span style="color:var(--muted)">line 395</span> &middot; Seal the manifest under a passphrase.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Manifest::open_sealed</code> <span style="color:var(--muted)">line 424</span> &mdash; Open a manifest sealed by Manifest::seal.
+<li><code>Manifest::open_sealed</code> <span style="color:var(--muted)">line 424</span> &middot; Open a manifest sealed by Manifest::seal.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code>, <code>unrecordable</code></span>
 </li>
-<li><code>files_in</code> <span style="color:var(--muted)">line 441</span> &mdash; Every file directly inside dir, for use as check&#x27;s extra argument.
+<li><code>files_in</code> <span style="color:var(--muted)">line 441</span> &middot; Every file directly inside dir, for use as check&#x27;s extra argument.
 </li>
 </ul>
 </section>
@@ -228,11 +228,11 @@
 <path d="M20.0 656.5 L29.0 656.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="661.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="683.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="698.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading,</text>
-<text x="20.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
+<text x="20.0" y="698.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

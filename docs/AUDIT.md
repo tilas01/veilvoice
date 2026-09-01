@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
-# VeilVoice — internal audit
+# VeilVoice: internal audit
 
 **Auditor:** tilas01 (maintainer). **Date:** 2026-08-19. **Version:** 0.1.10
 (unreleased), covering the whole tree.
@@ -28,7 +28,7 @@ rather than about who looked at it:
 > same standard as a security boundary in its own right.
 
 Each of those classes has a section below saying what was examined and what was
-found, including the ones that found nothing — "we looked and there was
+found, including the ones that found nothing, because "we looked and there was
 nothing" is a result, and it is not the same as not looking.
 
 **What has not changed:** no external firm or independent researcher has
@@ -478,6 +478,63 @@ source of second defects.
 What would have caught it earlier: asking, for each fix, "where else is this
 decision made", and in particular "where is the value actually used", rather
 than "where was the symptom seen".
+
+## The round between: the code written an hour earlier
+
+Two defects (F-93 and F-94), both found by re-reading the eleventh round's own
+output before it was released, and both in code that had been written, tested
+and documented that same afternoon.
+
+This round is written up late. Both defects were found and fixed in their own
+commit, and both were described there in full, but neither was ever given an
+entry here. The audit is supposed to be the record of every finding, and for
+two of them the commit message was the only record. That is its own small
+finding, and it is why the twelfth round's account of F-95 refers back to an
+F-93 that this document never described.
+
+### F-93 -- an unmounted vault is still a directory
+
+`veilvoice-setup/src/volumes.rs` and `veilvoice-gui/src/storage.rs`.
+
+`Destination::still_there` asked whether the destination folder existed. A
+mount point is an ordinary directory with a filesystem grafted onto it, so
+unmounting takes the filesystem away and leaves the directory exactly where it
+was. A locked vault therefore looked fine.
+
+The consequence is the one the feature exists to prevent: VeilVoice would have
+written a veiled recording onto the ordinary unencrypted disk while its owner
+believed it had gone inside an encrypted volume, and said nothing. The check
+that was meant to catch that failure was the thing that let it through.
+
+It now asks whether the path is covered by something currently mounted, equal
+to or inside, so a folder chosen within a vault counts and a bare mount point
+does not.
+
+F-95, in the next round, is this same defect in the place that actually writes
+the file. Fixing the panel did not fix the write.
+
+### F-94 -- a changed password did not change what was sealing new recordings
+
+`veilvoice-gui/src/security.rs`.
+
+Changing the app-lock password left the old passphrase sealing new recordings.
+The session copy taken at unlock is what encrypts each file, and changing the
+password replaced the verifier without replacing that copy. Somebody who
+changed their password and kept working would have produced a run of files that
+open only with the password they had just replaced, and been told nothing about
+it.
+
+The session copy is now dropped on a change, and the message says both halves:
+lock and unlock to seal with the new password, and recordings already written
+still open with the old one. Saying only the first half is worse than saying
+nothing, because somebody who has been told their new password is now in use
+deletes the old one.
+
+**The lesson is about when to read rather than what to read.** Both of these
+were in code written that same afternoon, by the same person, who had just
+finished testing it. Neither needed a tool, a campaign or a fresh pair of eyes:
+they needed the code to be read once more after the satisfaction of finishing
+had worn off.
 
 ## The eleventh round: the code written after the tenth round
 
@@ -1745,43 +1802,43 @@ Kept in full rather than summarised. A finding with the details filed off is
 not a finding, and several of these are the reason a later one was looked for
 at all.
 
-**F-1 — Duplicate seeding path that panicked (`veilvoice-core`).**
+**F-1: Duplicate seeding path that panicked (`veilvoice-core`).**
 `Modulator::from_os_rng` read the OS CSPRNG and `.expect()`-ed on failure. It
 was public API, never called, and duplicated `Deidentifier::new`, which does the
 same thing and returns a `Result`. Two paths for one job where the unused one
 aborts the process is a footgun in a security crate. **Removed.**
 
-**F-2 — Argon2 parallelism overflow, reachable from any hostile file
+**F-2: Argon2 parallelism overflow, reachable from any hostile file
 (`veilvoice-crypto`). Denial of service.**
 `argon2` 0.5.3 validates in the wrong order: `Params::new` evaluates
 `m_cost < p_cost * 8` *before* it checks `p_cost > MAX_P_COST`. A `p_cost` above
 `u32::MAX / 8` therefore overflows the multiplication. `p_cost` is read verbatim
-from a `.veil` header — and from the app-lock file, which is parsed **before
+from a `.veil` header, and from the app-lock file, which is parsed **before
 anyone has authenticated**. With overflow checks on (every debug build, and any
 project consuming these crates as libraries, which the README explicitly invites)
 that is a panic on attacker-controlled input.
 
 VeilVoice's own release profile sets `overflow-checks = false`, where the
-multiplication wraps and the ceiling test then rejects it — so shipped binaries
+multiplication wraps and the ceiling test then rejects it, so shipped binaries
 were not affected. "Our release profile happens to make the panic unreachable"
 is not a property to rely on and is not true for anyone building against these
 crates. **Fixed** by validating in `KdfParams::checked()`, the single funnel
 every derivation passes through, in arithmetic that cannot overflow. Found by
 `tests/parser_fuzz.rs` within seconds of the campaign first running.
 
-**F-3 — Unbounded Argon2 memory cost (`veilvoice-crypto`). Denial of service,
+**F-3: Unbounded Argon2 memory cost (`veilvoice-crypto`). Denial of service,
 release builds included.**
 `m_cost` is also read verbatim, and Argon2 allocates that many KiB before doing
 anything else. A header claiming `u32::MAX` asks for **4 TiB**; the allocation
 fails, and a failed allocation in Rust aborts the process. Merely *attempting to
 open* a hostile container killed the program, in debug and release alike. For the
-app lock it is worse — anything able to write that file could stop VeilVoice
+app lock it is worse, because anything able to write that file could stop VeilVoice
 from starting at all.
 
 **Fixed** with a documented ceiling of 4 GiB (`KdfParams::MAX_M_COST`), chosen to
 sit above RFC 9106's largest recommended profile (2 GiB) and this crate's own
 default (256 MiB) while refusing absurd values. Found by the same campaign,
-immediately after F-2 was fixed — which is the argument for running a fuzzer to
+immediately after F-2 was fixed, which is the argument for running a fuzzer to
 exhaustion rather than until the first green run.
 
 **Residual, stated rather than fixed:** a container may still declare a
@@ -1790,9 +1847,9 @@ That is inherent to shipping the cost with the file, which is what lets old file
 open after defaults rise. Slow is not crashing, the user chose to open that file,
 and they can stop waiting.
 
-**F-4 — 32-bit overflow in the RIFF chunk walker (`veilvoice-meta`).**
+**F-4: 32-bit overflow in the RIFF chunk walker (`veilvoice-meta`).**
 `clean_wav_bytes` computed `declared + 8` where `declared` is a `u32` widened to
-`usize`. On a 64-bit host that cannot overflow — which is why no amount of
+`usize`. On a 64-bit host that cannot overflow, which is why no amount of
 fuzzing on this machine would ever have found it. **VeilVoice ships an ARMv7
 build**, where `u32::MAX + 8` overflows `usize` and panics under overflow checks.
 **Fixed** with `saturating_add`, which is also the correct semantics since the
@@ -1800,12 +1857,12 @@ value is clamped to the real length on the next line. Found by reading, and
 recorded here as the counter-example to "the fuzzer is green, therefore the
 parser is fine".
 
-**F-5 — One NaN sample permanently destroyed the engine (`veilvoice-core`).
+**F-5: One NaN sample permanently destroyed the engine (`veilvoice-core`).
 Silent, total, and reachable from an input file.**
 The accent neutraliser's long-term spectrum is an exponential moving average, so
 anything folded into it never washes out. A single non-finite input sample
 reached it, and from then on **every output sample was NaN for the rest of the
-session** — with nothing reported to the user. Measured: after one NaN, 0 of
+session**, with nothing reported to the user. Measured: after one NaN, 0 of
 48,000 subsequent samples were finite.
 
 A 32-bit-float WAV can legally contain NaN, and `symphonia` decodes it
@@ -1814,7 +1871,7 @@ somebody sends you a recording and you veil it before passing it on. The failure
 is silent, so the first sign is a recording that turned out to be silence.
 
 **Fixed** at the single gate every sample passes through (`StftEngine::process`):
-non-finite samples become zero, and magnitudes are bounded at ±1e6 — six orders
+non-finite samples become zero, and magnitudes are bounded at ±1e6, six orders
 of magnitude above real audio, low enough that squaring and summing cannot reach
 the float ceiling and produce a NaN by the other door.
 
@@ -1823,17 +1880,17 @@ it failed in the safe direction. It was still a total loss of function with no
 error, and `tests/hostile_audio.rs` now covers it along with infinities,
 full-scale DC, square waves, impulse trains and digital silence.
 
-**F-6 — The site's Markdown renderer emitted unfiltered image URLs
+**F-6: The site's Markdown renderer emitted unfiltered image URLs
 (`website/js/markdown.js`).**
 Links went through a scheme allowlist; images did not, so
 `![x](javascript:...)` produced `<img src="javascript:...">`. `js/repo.js`
 assigns the rendered README straight to `innerHTML`, so this was on the path from
 a fetched file into the live page. No current browser executes a `javascript:`
-image source, which is why it survived unnoticed — but "no browser we tested
+image source, which is why it survived unnoticed, but "no browser we tested
 still honours this" is not a security argument. **Fixed**: one `safeUrl` helper,
 applied in both places.
 
-**F-7 — The renderer silently deleted every string literal on the page
+**F-7: The renderer silently deleted every string literal on the page
 (`website/js/markdown.js`).**
 Finished markup is parked while later passes run, and the placeholder was a
 NUL-delimited decimal index. The number highlighter (`\b\d+\b`) matched the index
@@ -1848,9 +1905,9 @@ and read the source", and it was displaying source that was not the source.
 **Fixed** with single-character private-use placeholders, which no pass matches
 and which `escapeHtml` strips from the input so they cannot be forged.
 
-**F-8 — The URL allowlist rejected ordinary relative links (same file).**
+**F-8: The URL allowlist rejected ordinary relative links (same file).**
 The scheme test was `^(?:https?:|[./#])`, so any target not beginning with `.`,
-`/` or `#` was refused — which is most Markdown links. Every
+`/` or `#` was refused, which is most Markdown links. Every
 `[whitepaper](docs/WHITEPAPER.md)` in the README rendered as plain text on the
 site, and `js/repo.js`'s rewriting of repo-relative links could never fire.
 Safe, wrong, and quietly wrong. **Fixed**: a scheme is required to be http(s);
@@ -2805,26 +2862,26 @@ result and is recorded as one.
 
 ### 2.8 Accepted, with reasoning
 
-**A-1 — Remaining `expect()` sites (6).** Each was reviewed:
+**A-1: Remaining `expect()` sites (6).** Each was reviewed:
 
 | Site | Assessment |
 |---|---|
-| `stft.rs` ×2 — FFT `expect` | Infallible given correct buffer sizes, which the engine owns and asserts on construction. A failure here is a programming error, not a runtime condition. |
-| `hybrid.rs` — `OsRng::fill_bytes` | `rand_core::RngCore::fill_bytes` has no error return. Panicking on CSPRNG failure is the only option and is what every RustCrypto consumer does. Continuing with weak randomness would be far worse. |
-| `hybrid.rs` — `NonZeroU32::new(1).unwrap()` | Compile-time constant, cannot fail. |
-| `wav.rs` ×2 — `try_into().expect("4 bytes")` | Slices of statically known length 4, guarded by an explicit `pos + 8 <= end` bounds check immediately above. |
+| `stft.rs` ×2, FFT `expect` | Infallible given correct buffer sizes, which the engine owns and asserts on construction. A failure here is a programming error, not a runtime condition. |
+| `hybrid.rs`, `OsRng::fill_bytes` | `rand_core::RngCore::fill_bytes` has no error return. Panicking on CSPRNG failure is the only option and is what every RustCrypto consumer does. Continuing with weak randomness would be far worse. |
+| `hybrid.rs`, `NonZeroU32::new(1).unwrap()` | Compile-time constant, cannot fail. |
+| `wav.rs` ×2, `try_into().expect("4 bytes")` | Slices of statically known length 4, guarded by an explicit `pos + 8 <= end` bounds check immediately above. |
 
-**A-2 — `paste` and `ttf-parser` unmaintained advisories.** Neither is a
+**A-2: `paste` and `ttf-parser` unmaintained advisories.** Neither is a
 vulnerability. `paste` is a compile-time proc macro that emits no runtime code.
 `ttf-parser` does parse untrusted input, but the only fonts loaded are egui's
 own embedded face and, optionally, a JetBrains Mono the user already installed
-system-wide — no attacker-supplied font reaches it. Reviewed each release.
+system-wide, so no attacker-supplied font reaches it. Reviewed each release.
 
-**A-3 — FreeBSD builds are not reproducibility-verified.** Built once in a VM
+**A-3: FreeBSD builds are not reproducibility-verified.** Built once in a VM
 rather than twice in separate directories. Reported as `not-verified` in the
 release notes rather than claimed.
 
-**A-4 — `veilvoice-watch` on Linux sees only your own processes.** `/proc/<pid>/fd`
+**A-4: `veilvoice-watch` on Linux sees only your own processes.** `/proc/<pid>/fd`
 is readable by the owner and root. This is a kernel permission boundary, and
 `support()` states it rather than letting an empty list imply an empty machine.
 
@@ -2924,7 +2981,7 @@ failure. The harvest-now-decrypt-later threat is real for recordings, which is
 precisely why this is not deferred.
 
 **Honest gap:** the *signature* on releases is RSA-4096, which is **not**
-post-quantum. This is deliberate and low-risk — a signature only needs to resist
+post-quantum. This is deliberate and low-risk, because a signature only needs to resist
 forgery until the release is superseded, and no PQ signature scheme has the
 verifier tooling to make it practical today. It is recorded here so nobody
 mistakes "post-quantum encryption" for "post-quantum everything".
@@ -2932,14 +2989,14 @@ mistakes "post-quantum encryption" for "post-quantum everything".
 ### 3.5 Key handling
 
 Page-locked out of swap, zeroized on drop, constant-time comparison, `Debug`
-redacted. Each `Secret` owns whole pages exclusively — a bug found and fixed
+redacted. Each `Secret` owns whole pages exclusively, a bug found and fixed
 earlier, where two secrets sharing a page meant dropping one unlocked the
 other's memory.
 
 `Secret::is_locked()` reports whether locking actually succeeded rather than
 assuming. Locking does not survive hibernation, which is stated in the docs.
 
-**A-5 — Typed passphrases exist as ordinary bytes while being typed.**
+**A-5: Typed passphrases exist as ordinary bytes while being typed.**
 *Narrowed since first recorded; the residue is accepted.*
 
 An egui text field owns a `String` and `rpassword` returns one, so a passphrase
@@ -2956,7 +3013,7 @@ closes" to "while the user is typing".
 
 The remainder is accepted and stated rather than papered over: for those
 moments the bytes are swappable, and none of this helps against an attacker who
-can read the process's memory — who has already won, as `WHITEPAPER.md` §7
+can read the process's memory, who has already won, as `WHITEPAPER.md` §7
 says.
 
 ---
@@ -2966,12 +3023,12 @@ says.
 The previous revision listed five items. Four are now done; the fifth cannot be
 done from inside the project.
 
-### 4.1 Adversarial read of `spectral.rs` and `accent.rs` — **done**
+### 4.1 Adversarial read of `spectral.rs` and `accent.rs`: **done**
 
 Read end to end against the irreversibility claim.
 
 **The central claim holds.** `transform` reads `c.norm()` and nothing else from
-the incoming spectrum, and every bin of `spec` is overwritten before it returns —
+the incoming spectrum, and every bin of `spec` is overwritten before it returns,
 zeroed then rewritten on the comb path, assigned outright on the channel-vocoder
 path. There is no branch on which measured phase survives, and none on which a
 bin retains a previous frame's value.
@@ -2994,21 +3051,21 @@ Checked in detail, and correct:
 One defect found: **F-5**, above. Two observations kept rather than fixed:
 
 - `resample_linear` silently substitutes a ratio of 1.0 for a non-finite one,
-  which would pass the envelope through unwarped — a *weaker* transform arriving
+  which would pass the envelope through unwarped, a *weaker* transform arriving
   quietly. With F-5 fixed and the accent ratios clamped, no input can reach it,
   so it is now defence in depth rather than a live path. Left as it is, and
   written down here so it is a known belt rather than a forgotten one.
 - With accent neutralisation switched off, voiced frames take the
-  channel-vocoder path and pitch is *randomised* rather than *normalised* —
+  channel-vocoder path and pitch is *randomised* rather than *normalised*,
   strictly weaker, as `WHITEPAPER.md` §3.2 already says. Consistent, not a
   defect.
 
-### 4.2 Parser campaigns — **done**, and they found F-2, F-3 and F-4
+### 4.2 Parser campaigns: **done**, and they found F-2, F-3 and F-4
 
 `crates/veilvoice-crypto/tests/parser_fuzz.rs` and
 `crates/veilvoice-meta/tests/wav_fuzz.rs`. Deterministic seeded PRNG with
-structure-aware mutation — bit flips, truncation, splices, and 32-bit fields
-replaced with `u32::MAX`, `i32::MAX`, 0 and 1 — plus every length around each
+structure-aware mutation, meaning bit flips, truncation, splices, and 32-bit
+fields replaced with `u32::MAX`, `i32::MAX`, 0 and 1, plus every length around each
 boundary walked exhaustively.
 
 Properties asserted, not just "it did not crash": a parsed header must
@@ -3016,7 +3073,7 @@ re-serialise to exactly the bytes it came from, reported offsets must lie inside
 the buffer, and a cleaned WAV must itself be a valid WAV whose size field matches
 what was written.
 
-Run at **1,000,000 rounds per target in debug** (overflow checks *on* — the
+Run at **1,000,000 rounds per target in debug** (overflow checks *on*, which is the
 release profile disables them, and an overflow was one of the bugs) and
 2,000,000 in release. Clean after the fixes. CI runs 1,000,000 per target.
 
@@ -3024,14 +3081,14 @@ release profile disables them, and an overflow was one of the bugs) and
 coverage-guided, so it explores by construction rather than by feedback. It was
 chosen because `cargo fuzz` needs nightly and libFuzzer, and a check that only
 one person can run is a check that stops being run. A coverage-guided campaign
-remains worth doing — see §5.
+remains worth doing. See §5.
 
-### 4.3 Timing analysis — **done**, no leak found
+### 4.3 Timing analysis: **done**, no leak found
 
 `crates/veilvoice-crypto/tests/timing.rs`, `#[ignore]`d by default because a
 timing test on a shared runner measures the neighbours. Measured on an idle
 Windows desktop, release build, 2,000 samples per case, reporting the
-**minimum** — timing noise is one-sided, so the fastest sample is the closest
+**minimum**, because timing noise is one-sided, so the fastest sample is the closest
 estimate of the work actually done.
 
 | Comparison | Ratio |
@@ -3047,7 +3104,7 @@ oracle and would show as a large factor, not a fraction of a percent.
 
 The rate-limited path is a deliberate exception. It returns before touching the
 KDF and is therefore **at least 23,600× cheaper** than a real attempt. That is
-the point of a rate limit — refusing to spend the CPU — and it leaks only the
+the point of a rate limit, which is refusing to spend the CPU, and it leaks only the
 state the unlock screen displays on its face anyway.
 
 *(A first pass reported a 1.49 ratio for wrong-vs-right. That was the harness,
@@ -3055,7 +3112,7 @@ not the code: it used medians on a noisy machine and, for the app lock, timed
 two derivations against one. Recorded because a timing result that is not
 reproducible is not a result.)*
 
-### 4.4 Website JavaScript review — **done**, and it found F-6, F-7 and F-8
+### 4.4 Website JavaScript review: **done**, and it found F-6, F-7 and F-8
 
 `js/repo.js` fetches README.md over the network and assigns the rendered output
 to `innerHTML`. Everything on that path rests on one claim in `js/markdown.js`:
@@ -3063,8 +3120,8 @@ escape first, emit only your own tags.
 
 `tools/site-tests/` now tests it: 39 hand-written hostile documents, each aimed
 at a specific escape route, plus a randomised campaign run to **200,000
-generated documents**. The check is an **allowlist** — output may contain only
-tags and attributes the renderer is supposed to produce — because a blocklist of
+generated documents**. The check is an **allowlist**, so output may contain only
+tags and attributes the renderer is supposed to produce, because a blocklist of
 "no `<script>`" passes anything that finds another door.
 
 The check parses attributes the way a browser does. An early version did not,
@@ -3369,6 +3426,16 @@ person relying on this would care about:
   somebody runs precisely because they suspect their machine.
 - **Three left secrets readable by other local accounts** (F-14, F-15), or
   unwiped in freed memory (F-18).
+- **Two wrote a recording outside the encrypted volume its owner had chosen**
+  (F-93, F-95). This is the closest any finding has come to the line above, and
+  it is worth being exact about which side of it these fall on. Nothing read a
+  sealed file or broke a password: the recording was voice-de-identified as
+  promised, and no attacker was given anything they could not already reach on
+  that disk. What failed is the disposition. A person who had opened a vault,
+  chosen it, and locked it again would have gone on producing files that landed
+  on the ordinary unencrypted disk, believing each one had gone inside. The
+  at-rest promise was not broken cryptographically; it was simply not applied,
+  silently, to files its owner had asked it to cover.
 - **On the website, two froze the reader's tab** for seconds at a time on text
   fetched over the network (F-22, F-23), and three made the page unusable on
   engines a great many people are still running -- including a legal gate that

@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-policy/src/policy.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-policy/src/policy.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The policy itself: what can be required, and what requiring it does.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -73,43 +73,43 @@ require  minimum-intensity  80</code></pre>
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>922 lines defining <strong>25 functions</strong> (23 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Requirement</code> <span style="color:var(--muted)">line 69</span> &mdash; One thing a policy can insist on.</li>
-<li><code>struct Posture</code> <span style="color:var(--muted)">line 137</span> &mdash; The settings a policy can reach, as a front end holds them.</li>
-<li><code>struct Policy</code> <span style="color:var(--muted)">line 194</span> &mdash; A set of requirements, and an optional note from whoever wrote them.</li>
-<li><code>enum Verification</code> <span style="color:var(--muted)">line 473</span> &mdash; What is known about the seal on a policy.</li>
+<li><code>enum Requirement</code> <span style="color:var(--muted)">line 69</span> &middot; One thing a policy can insist on.</li>
+<li><code>struct Posture</code> <span style="color:var(--muted)">line 137</span> &middot; The settings a policy can reach, as a front end holds them.</li>
+<li><code>struct Policy</code> <span style="color:var(--muted)">line 194</span> &middot; A set of requirements, and an optional note from whoever wrote them.</li>
+<li><code>enum Verification</code> <span style="color:var(--muted)">line 473</span> &middot; What is known about the seal on a policy.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Requirement::keyword</code> <span style="color:var(--muted)">line 88</span> &mdash; The keyword this is written as.
+<li><code>Requirement::keyword</code> <span style="color:var(--muted)">line 88</span> &middot; The keyword this is written as.
 </li>
-<li><code>Requirement::describe</code> <span style="color:var(--muted)">line 103</span> &mdash; What this means, in the words a front end should show beside the control it has taken away.
+<li><code>Requirement::describe</code> <span style="color:var(--muted)">line 103</span> &middot; What this means, in the words a front end should show beside the control it has taken away.
 </li>
-<li><code>Posture::most_permissive</code> <span style="color:var(--muted)">line 169</span> &mdash; The most permissive arrangement the controls can reach.
+<li><code>Posture::most_permissive</code> <span style="color:var(--muted)">line 169</span> &middot; The most permissive arrangement the controls can reach.
 </li>
-<li><code>Posture::is_at_least_as_strict_as</code> <span style="color:var(--muted)">line 183</span> &mdash; Whether self is at least as strict as other in every dimension.
+<li><code>Posture::is_at_least_as_strict_as</code> <span style="color:var(--muted)">line 183</span> &middot; Whether self is at least as strict as other in every dimension.
 </li>
-<li><code>Policy::require</code> <span style="color:var(--muted)">line 209</span> &mdash; Add a requirement.
+<li><code>Policy::require</code> <span style="color:var(--muted)">line 209</span> &middot; Add a requirement.
 </li>
-<li><code>Policy::with_note</code> <span style="color:var(--muted)">line 226</span> &mdash; Set the note shown beside every control the policy has fixed.
+<li><code>Policy::with_note</code> <span style="color:var(--muted)">line 226</span> &middot; Set the note shown beside every control the policy has fixed.
 </li>
-<li><code>Policy::note</code> <span style="color:var(--muted)">line 243</span> &mdash; The note, if there is one.
+<li><code>Policy::note</code> <span style="color:var(--muted)">line 243</span> &middot; The note, if there is one.
 </li>
-<li><code>Policy::is_empty</code> <span style="color:var(--muted)">line 248</span> &mdash; Whether anything at all is required.
+<li><code>Policy::is_empty</code> <span style="color:var(--muted)">line 248</span> &middot; Whether anything at all is required.
 </li>
-<li><code>Policy::len</code> <span style="color:var(--muted)">line 253</span> &mdash; How many requirements there are.
+<li><code>Policy::len</code> <span style="color:var(--muted)">line 253</span> &middot; How many requirements there are.
 </li>
-<li><code>Policy::requirements</code> <span style="color:var(--muted)">line 258</span> &mdash; The requirements, in a stable order.
+<li><code>Policy::requirements</code> <span style="color:var(--muted)">line 258</span> &middot; The requirements, in a stable order.
 </li>
-<li><code>Policy::constrain</code> <span style="color:var(--muted)">line 283</span> &mdash; Apply the policy to a posture.
+<li><code>Policy::constrain</code> <span style="color:var(--muted)">line 283</span> &middot; Apply the policy to a posture.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>minimum_intensity</code>, <code>requires</code></span>
 </li>
-<li><code>Policy::save</code> <span style="color:var(--muted)">line 415</span> &mdash; Write the plain policy into dir, and the sealed copy beside it.
+<li><code>Policy::save</code> <span style="color:var(--muted)">line 415</span> &middot; Write the plain policy into dir, and the sealed copy beside it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>seal</code>, <code>to_text</code></span>
 </li>
-<li><code>Verification::describe</code> <span style="color:var(--muted)">line 493</span> &mdash; One line for a front end.
+<li><code>Verification::describe</code> <span style="color:var(--muted)">line 493</span> &middot; One line for a front end.
 </li>
-<li><code>Verification::wants_attention</code> <span style="color:var(--muted)">line 518</span> &mdash; Whether this is a state somebody should look at.
+<li><code>Verification::wants_attention</code> <span style="color:var(--muted)">line 518</span> &middot; Whether this is a state somebody should look at.
 </li>
-<li><code>verify</code> <span style="color:var(--muted)">line 530</span> &mdash; Check the plain policy in dir against its sealed copy.
+<li><code>verify</code> <span style="color:var(--muted)">line 530</span> &middot; Check the plain policy in dir against its sealed copy.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load</code>, <code>open_sealed</code>, <code>parse</code>, <code>new</code>, <code>requirement_from</code>, <code>default</code></span>
 </li>
 </ul>
@@ -117,7 +117,7 @@ require  minimum-intensity  80</code></pre>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 651 1048" width="651" height="1048" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 651 1063" width="651" height="1063" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -126,7 +126,7 @@ require  minimum-intensity  80</code></pre>
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="651" height="1048" fill="var(--bg-inset, #16161e)" rx="8"/>
+<rect x="0" y="0" width="651" height="1063" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M241.4 564.0 C 553.9 564.0, 553.9 464.0, 534.9 464.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M241.4 564.0 C 298.4 564.0, 298.4 464.0, 279.4 464.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M328.8 764.0 C 597.1 764.0, 597.1 564.0, 578.1 564.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
@@ -259,11 +259,12 @@ require  minimum-intensity  80</code></pre>
 <path d="M20.0 973.5 L29.0 973.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="978.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="1000.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
-<text x="20.0" y="1015.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a type-resolved</text>
-<text x="20.0" y="1030.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">one. 22 of 24 functions are drawn; the diagram is bounded at 22 so it stays readable.</text>
+<text x="20.0" y="1015.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
+<text x="20.0" y="1030.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 24 functions are drawn; the diagram is bounded at 22 so it stays</text>
+<text x="20.0" y="1045.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one. 22 of 24 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 24 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-cli/src/theme.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-cli/src/theme.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Tokyo Night colouring for the terminal.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -66,19 +66,19 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>144 lines defining <strong>7 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>ok</code> <span style="color:var(--muted)">line 91</span> &mdash; A success line.
+<li><code>ok</code> <span style="color:var(--muted)">line 91</span> &middot; A success line.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
-<li><code>warn</code> <span style="color:var(--muted)">line 96</span> &mdash; A warning line.
+<li><code>warn</code> <span style="color:var(--muted)">line 96</span> &middot; A warning line.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
-<li><code>err</code> <span style="color:var(--muted)">line 101</span> &mdash; An error line.
+<li><code>err</code> <span style="color:var(--muted)">line 101</span> &middot; An error line.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
-<li><code>heading</code> <span style="color:var(--muted)">line 106</span> &mdash; A section heading.
+<li><code>heading</code> <span style="color:var(--muted)">line 106</span> &middot; A section heading.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
-<li><code>field</code> <span style="color:var(--muted)">line 111</span> &mdash; A label: value line with the value highlighted.
+<li><code>field</code> <span style="color:var(--muted)">line 111</span> &middot; A label: value line with the value highlighted.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>paint</code>, <code>enabled</code></span>
 </li>
 </ul>
@@ -146,11 +146,11 @@
 <path d="M20.0 256.5 L29.0 256.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="261.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="283.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="298.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading,</text>
-<text x="20.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
+<text x="20.0" y="298.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

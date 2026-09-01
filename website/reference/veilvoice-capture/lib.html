@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-capture/src/lib.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-capture/src/lib.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Which screen-recording programs are running, an allowlist for the ones you meant to run, and a plain account of the two things this cannot do.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -74,39 +74,39 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>575 lines defining <strong>19 functions</strong> (16 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Allowlist</code> <span style="color:var(--muted)">line 107</span> &mdash; Programs the user has said they meant to run.</li>
-<li><code>struct Sighting</code> <span style="color:var(--muted)">line 237</span> &mdash; One capture-capable program found running.</li>
-<li><code>struct Report</code> <span style="color:var(--muted)">line 264</span> &mdash; What is running, and anything that got in the way of finding out.</li>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 331</span> &mdash; Everything that can go wrong in this crate.</li>
+<li><code>struct Allowlist</code> <span style="color:var(--muted)">line 107</span> &middot; Programs the user has said they meant to run.</li>
+<li><code>struct Sighting</code> <span style="color:var(--muted)">line 237</span> &middot; One capture-capable program found running.</li>
+<li><code>struct Report</code> <span style="color:var(--muted)">line 264</span> &middot; What is running, and anything that got in the way of finding out.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 331</span> &middot; Everything that can go wrong in this crate.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Allowlist::allow</code> <span style="color:var(--muted)">line 125</span> &mdash; Stop notifying about this program.
+<li><code>Allowlist::allow</code> <span style="color:var(--muted)">line 125</span> &middot; Stop notifying about this program.
 </li>
-<li><code>Allowlist::deny</code> <span style="color:var(--muted)">line 135</span> &mdash; Start notifying about this program again.
+<li><code>Allowlist::deny</code> <span style="color:var(--muted)">line 135</span> &middot; Start notifying about this program again.
 </li>
-<li><code>Allowlist::allows</code> <span style="color:var(--muted)">line 140</span> &mdash; Whether this program is allowed.
+<li><code>Allowlist::allows</code> <span style="color:var(--muted)">line 140</span> &middot; Whether this program is allowed.
 </li>
-<li><code>Allowlist::keys</code> <span style="color:var(--muted)">line 145</span> &mdash; The allowed keys, in a stable order.
+<li><code>Allowlist::keys</code> <span style="color:var(--muted)">line 145</span> &middot; The allowed keys, in a stable order.
 </li>
-<li><code>Allowlist::len</code> <span style="color:var(--muted)">line 150</span> &mdash; How many programs are allowed.
+<li><code>Allowlist::len</code> <span style="color:var(--muted)">line 150</span> &middot; How many programs are allowed.
 </li>
-<li><code>Allowlist::is_empty</code> <span style="color:var(--muted)">line 155</span> &mdash; Whether nothing is allowed.
+<li><code>Allowlist::is_empty</code> <span style="color:var(--muted)">line 155</span> &middot; Whether nothing is allowed.
 </li>
-<li><code>Allowlist::save</code> <span style="color:var(--muted)">line 209</span> &mdash; Write the allowlist to path.
+<li><code>Allowlist::save</code> <span style="color:var(--muted)">line 209</span> &middot; Write the allowlist to path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Allowlist::load</code> <span style="color:var(--muted)">line 226</span> &mdash; Read an allowlist written by Allowlist::save, treating a missing file as &quot;nothing is allowed&quot;.
+<li><code>Allowlist::load</code> <span style="color:var(--muted)">line 226</span> &middot; Read an allowlist written by Allowlist::save, treating a missing file as &quot;nothing is allowed&quot;.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>new</code>, <code>parse</code></span>
 </li>
-<li><code>Sighting::describe</code> <span style="color:var(--muted)">line 253</span> &mdash; One line for a terminal, a log or a notification.
+<li><code>Sighting::describe</code> <span style="color:var(--muted)">line 253</span> &middot; One line for a terminal, a log or a notification.
 </li>
-<li><code>Report::take</code> <span style="color:var(--muted)">line 274</span> &mdash; Look at what is running now.
+<li><code>Report::take</code> <span style="color:var(--muted)">line 274</span> &middot; Look at what is running now.
 </li>
-<li><code>Report::all</code> <span style="color:var(--muted)">line 308</span> &mdash; Everything found, allowed or not.
+<li><code>Report::all</code> <span style="color:var(--muted)">line 308</span> &middot; Everything found, allowed or not.
 </li>
-<li><code>Report::worth_saying</code> <span style="color:var(--muted)">line 315</span> &mdash; The sightings a notification should raise: the ones not allowed.
+<li><code>Report::worth_saying</code> <span style="color:var(--muted)">line 315</span> &middot; The sightings a notification should raise: the ones not allowed.
 </li>
-<li><code>Report::is_empty</code> <span style="color:var(--muted)">line 323</span> &mdash; Whether anything at all was found, allowed or not.
+<li><code>Report::is_empty</code> <span style="color:var(--muted)">line 323</span> &middot; Whether anything at all was found, allowed or not.
 </li>
 </ul>
 </section>
@@ -231,11 +231,11 @@
 <path d="M20.0 656.5 L29.0 656.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="661.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="683.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="698.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
-<text x="20.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<text x="20.0" y="698.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
+<text x="20.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

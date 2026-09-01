@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-video/src/ffmpeg.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-video/src/ffmpeg.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The video file, which needs a codec this project does not ship.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -68,20 +68,20 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>491 lines defining <strong>8 functions</strong> (7 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Encoding</code> <span style="color:var(--muted)">line 68</span> &mdash; How to render the file.</li>
+<li><code>struct Encoding</code> <span style="color:var(--muted)">line 68</span> &middot; How to render the file.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>command</code> <span style="color:var(--muted)">line 112</span> &mdash; The command that turns a directory of numbered frames and a WAV into a video file.
+<li><code>command</code> <span style="color:var(--muted)">line 112</span> &middot; The command that turns a directory of numbered frames and a WAV into a video file.
 </li>
-<li><code>black_command</code> <span style="color:var(--muted)">line 179</span> &mdash; The command that turns a veiled recording into a video with a black frame.
+<li><code>black_command</code> <span style="color:var(--muted)">line 179</span> &middot; The command that turns a veiled recording into a video with a black frame.
 </li>
-<li><code>extract_command</code> <span style="color:var(--muted)">line 230</span> &mdash; The command that takes the sound out of a recording made somewhere else.
+<li><code>extract_command</code> <span style="color:var(--muted)">line 230</span> &middot; The command that takes the sound out of a recording made somewhere else.
 </li>
-<li><code>is_container</code> <span style="color:var(--muted)">line 261</span> &mdash; Whether a file looks like something extract_command should be offered for.
+<li><code>is_container</code> <span style="color:var(--muted)">line 261</span> &middot; Whether a file looks like something extract_command should be offered for.
 </li>
-<li><code>command_line</code> <span style="color:var(--muted)">line 272</span> &mdash; The command as one line, for printing.
+<li><code>command_line</code> <span style="color:var(--muted)">line 272</span> &middot; The command as one line, for printing.
 </li>
-<li><code>describe</code> <span style="color:var(--muted)">line 286</span> &mdash; What to tell the user about their machine&#x27;s ffmpeg.
+<li><code>describe</code> <span style="color:var(--muted)">line 286</span> &middot; What to tell the user about their machine&#x27;s ffmpeg.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>found</code></span>
 </li>
 </ul>
@@ -149,11 +149,11 @@
 <path d="M20.0 256.5 L29.0 256.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="261.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="283.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="298.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
-<text x="20.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<text x="20.0" y="298.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
+<text x="20.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-check/src/contents.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-check/src/contents.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The signed list of what is inside each release archive.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -72,27 +72,27 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>623 lines defining <strong>10 functions</strong> (7 public), <strong>5 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Member</code> <span style="color:var(--muted)">line 69</span> &mdash; One file inside a release archive, and the hash published for it.</li>
-<li><code>struct ArchiveContents</code> <span style="color:var(--muted)">line 78</span> &mdash; Everything one archive carries.</li>
-<li><code>enum Verdict</code> <span style="color:var(--muted)">line 103</span> &mdash; What checking one published file against the disk found.</li>
-<li><code>struct Outcome</code> <span style="color:var(--muted)">line 129</span> &mdash; One published file, checked against the disk.</li>
-<li><code>struct Sweep</code> <span style="color:var(--muted)">line 270</span> &mdash; What a sweep of the extracted directory found.</li>
+<li><code>struct Member</code> <span style="color:var(--muted)">line 69</span> &middot; One file inside a release archive, and the hash published for it.</li>
+<li><code>struct ArchiveContents</code> <span style="color:var(--muted)">line 78</span> &middot; Everything one archive carries.</li>
+<li><code>enum Verdict</code> <span style="color:var(--muted)">line 103</span> &middot; What checking one published file against the disk found.</li>
+<li><code>struct Outcome</code> <span style="color:var(--muted)">line 129</span> &middot; One published file, checked against the disk.</li>
+<li><code>struct Sweep</code> <span style="color:var(--muted)">line 270</span> &middot; What a sweep of the extracted directory found.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>ArchiveContents::roots</code> <span style="color:var(--muted)">line 91</span> &mdash; The top-level directories the archive extracts into.
+<li><code>ArchiveContents::roots</code> <span style="color:var(--muted)">line 91</span> &middot; The top-level directories the archive extracts into.
 </li>
-<li><code>Outcome::is_good</code> <span style="color:var(--muted)">line 138</span> &mdash; Whether this one is as published.
+<li><code>Outcome::is_good</code> <span style="color:var(--muted)">line 138</span> &middot; Whether this one is as published.
 </li>
-<li><code>parse</code> <span style="color:var(--muted)">line 176</span> &mdash; Read a CONTENTS.sha256.
+<li><code>parse</code> <span style="color:var(--muted)">line 176</span> &middot; Read a CONTENTS.sha256.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>looks_like_a_digest</code>, <code>safe</code></span>
 </li>
-<li><code>for_archive</code> <span style="color:var(--muted)">line 227</span> &mdash; The section of a manifest covering one archive.
+<li><code>for_archive</code> <span style="color:var(--muted)">line 227</span> &middot; The section of a manifest covering one archive.
 </li>
-<li><code>check</code> <span style="color:var(--muted)">line 237</span> &mdash; Check every file the archive published, against root.
+<li><code>check</code> <span style="color:var(--muted)">line 237</span> &middot; Check every file the archive published, against root.
 </li>
-<li><code>Sweep::is_clean</code> <span style="color:var(--muted)">line 294</span> &mdash; Whether the folder is exactly what the release published.
+<li><code>Sweep::is_clean</code> <span style="color:var(--muted)">line 294</span> &middot; Whether the folder is exactly what the release published.
 </li>
-<li><code>extras</code> <span style="color:var(--muted)">line 305</span> &mdash; Files sitting in the extracted directory that the release never published.
+<li><code>extras</code> <span style="color:var(--muted)">line 305</span> &middot; Files sitting in the extracted directory that the release never published.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>walk</code></span>
 </li>
 </ul>
@@ -170,11 +170,11 @@
 <path d="M20.0 440.5 L29.0 440.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="445.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="467.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="482.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not</text>
-<text x="20.0" y="497.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">a type-resolved one.</text>
+<text x="20.0" y="482.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="497.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-gui/src/watchfeed.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-gui/src/watchfeed.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The device monitor, moved off the thread that paints.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -71,28 +71,28 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>381 lines defining <strong>11 functions</strong> (10 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Update</code> <span style="color:var(--muted)">line 63</span> &mdash; One look at the machine.</li>
-<li><code>struct WatchFeed</code> <span style="color:var(--muted)">line 73</span> &mdash; The window&#x27;s end of the monitor.</li>
+<li><code>struct Update</code> <span style="color:var(--muted)">line 63</span> &middot; One look at the machine.</li>
+<li><code>struct WatchFeed</code> <span style="color:var(--muted)">line 73</span> &middot; The window&#x27;s end of the monitor.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>WatchFeed::start</code> <span style="color:var(--muted)">line 115</span> &mdash; Start watching, on a thread of its own.
+<li><code>WatchFeed::start</code> <span style="color:var(--muted)">line 115</span> &middot; Start watching, on a thread of its own.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>idle</code></span>
 </li>
-<li><code>WatchFeed::unseen</code> <span style="color:var(--muted)">line 163</span> &mdash; Alerts that have arrived and not yet been shown as a notification.
+<li><code>WatchFeed::unseen</code> <span style="color:var(--muted)">line 163</span> &middot; Alerts that have arrived and not yet been shown as a notification.
 </li>
-<li><code>WatchFeed::has_unseen</code> <span style="color:var(--muted)">line 168</span> &mdash; Whether anything is waiting to be shown.
+<li><code>WatchFeed::has_unseen</code> <span style="color:var(--muted)">line 168</span> &middot; Whether anything is waiting to be shown.
 </li>
-<li><code>WatchFeed::drain</code> <span style="color:var(--muted)">line 176</span> &mdash; Take whatever has arrived.
+<li><code>WatchFeed::drain</code> <span style="color:var(--muted)">line 176</span> &middot; Take whatever has arrived.
 </li>
-<li><code>WatchFeed::active</code> <span style="color:var(--muted)">line 221</span> &mdash; What is holding a device right now.
+<li><code>WatchFeed::active</code> <span style="color:var(--muted)">line 221</span> &middot; What is holding a device right now.
 </li>
-<li><code>WatchFeed::log</code> <span style="color:var(--muted)">line 226</span> &mdash; What has started and stopped, oldest first.
+<li><code>WatchFeed::log</code> <span style="color:var(--muted)">line 226</span> &middot; What has started and stopped, oldest first.
 </li>
-<li><code>WatchFeed::error</code> <span style="color:var(--muted)">line 231</span> &mdash; Why the monitor is not answering, if it is not.
+<li><code>WatchFeed::error</code> <span style="color:var(--muted)">line 231</span> &middot; Why the monitor is not answering, if it is not.
 </li>
-<li><code>WatchFeed::support</code> <span style="color:var(--muted)">line 236</span> &mdash; What this platform can detect at all.
+<li><code>WatchFeed::support</code> <span style="color:var(--muted)">line 236</span> &middot; What this platform can detect at all.
 </li>
-<li><code>WatchFeed::is_watching</code> <span style="color:var(--muted)">line 241</span> &mdash; Whether there is a worker running.
+<li><code>WatchFeed::is_watching</code> <span style="color:var(--muted)">line 241</span> &middot; Whether there is a worker running.
 </li>
 </ul>
 </section>
@@ -175,11 +175,11 @@
 <path d="M20.0 556.5 L29.0 556.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="561.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="583.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="598.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not</text>
-<text x="20.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">a type-resolved one.</text>
+<text x="20.0" y="598.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

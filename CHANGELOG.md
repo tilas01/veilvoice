@@ -1035,7 +1035,7 @@ not the feature.
 **Found by running the suite on Linux**, where it failed two tests that pass on
 Windows, whose process table drops a terminated process at once.
 
-### F-74 — Failsafe could close the wrong program, and said so either way
+### F-74: Failsafe could close the wrong program, and said so either way
 
 Two defects in one path, and the second is the worse of them.
 
@@ -1064,7 +1064,7 @@ question cannot be answered, the answer is **no**: not closing something is
 recoverable and closing the wrong thing is not. Afterwards the process is
 looked for again, and a kill that did not kill now reports so.
 
-### F-75 — the application baseline was written world-readable
+### F-75: the application baseline was written world-readable
 
 `veilvoice appctl` records what normally runs on this machine, with
 `std::fs::write` and its default permissions.
@@ -1304,7 +1304,7 @@ printing anything.
 `veilvoice install` already copied all three programs and added them to
 `PATH`; that has not changed.
 
-### Failsafe — on by default, because this accident is silent
+### Failsafe: on by default, because this accident is silent
 
 ```
 veilvoice failsafe
@@ -1384,7 +1384,7 @@ Cancelling is reported as an answer rather than as silence, and a picker thread
 that dies without answering is treated as a cancel — otherwise the button
 that opened it stays disabled with no way back.
 
-### `veilvoice privilege` — what it is running with, and what that lets it see
+### `veilvoice privilege`: what it is running with, and what that lets it see
 
 Marker 39. Most of VeilVoice needs no special permissions — changing a
 voice is something any program can do with your own account. The parts that
@@ -1424,7 +1424,7 @@ console wraps it so it looks like two rows, and reading it that way would call
 every administrator account elevated. Verified on a machine in exactly that
 state, which reports `your own account`.
 
-### `veilvoice appctl` — learn what normally runs, then notice what does not
+### `veilvoice appctl`: learn what normally runs, then notice what does not
 
 ```
 veilvoice appctl learn            # for a few days, while you work normally
@@ -1470,7 +1470,7 @@ features rather than two. `veilvoice-appctl` has no dependencies at all: the
 caller supplies the names, so the crate is arithmetic over a list and its tests
 need no machine to run on.
 
-### Notifications: a card, an alert, or nothing — with the contrast measured
+### Notifications: a card, an alert, or nothing: with the contrast measured
 
 Marker 41. Three ways for the application to tell you something, chosen in
 Settings under *interface*:
@@ -1543,7 +1543,7 @@ what was asked for — the ratchet can only fire on a frame boundary, and
 showing the request would describe a spread that does not exist. Asking for
 `250,1800` reports `251-1803 ms`.
 
-### F-73 — the randomised ratchet was written, documented, and never called
+### F-73: the randomised ratchet was written, documented, and never called
 
 **This one had shipped.** `reseed_range_ms` and `with_random_reseed_range` were
 implemented and tested, and the field's documentation said "the front ends call
@@ -1578,7 +1578,7 @@ Seed rolls    773-1963 ms, drawn fresh before every roll -- no period to observe
 Seed rolls    1088-1120 ms, drawn fresh before every roll -- no period to observe
 ```
 
-### What can see your keyboard and mouse — and why a clean result proves nothing
+### What can see your keyboard and mouse: and why a clean result proves nothing
 
 ```
 veilvoice input
@@ -1614,7 +1614,7 @@ the crate's own source and fails if `SetWindowsHookEx`, `GetAsyncKeyState`,
 carry different summaries, because reporting the first as the second is the one
 mistake here that costs somebody something.
 
-### `veilvoice-proc` — one process listing, not two
+### `veilvoice-proc`: one process listing, not two
 
 Screen-capture detection and input-monitor detection need the same answer:
 which programs are running. It was private to `veilvoice-capture`. Depending on
@@ -1694,7 +1694,7 @@ the hash list may be for another platform. A hash list naming nothing that was
 built would otherwise report success by vacuum, which is the failure mode this
 whole exercise is most exposed to.
 
-### F-72 — three tests passed here and failed on the same platform
+### F-72: three tests passed here and failed on the same platform
 
 Several tests read this project's own source with `include_str!` and find a
 function's end by searching for `"\n}\n"`. They passed locally and failed on
@@ -1722,7 +1722,7 @@ The failure mode is now a test of its own — a search for `"\n}\n"`
 is asserted to succeed against LF and to fail against CRLF — so it is
 on record as reachable rather than as a story about it.
 
-### F-71 — the guard against stale claims compared one copy to another
+### F-71: the guard against stale claims compared one copy to another
 
 The front page said **354 tests** and "no unsafe code, in any of the **nine**
 crates". The tree holds 890 tests across 19 crates, and the website runs 11
@@ -1752,7 +1752,7 @@ Three things that would have let it happen again:
 The guard was checked by breaking it, then restoring it. A control nobody has
 watched fail is a control nobody has tested.
 
-### F-70 — the reproducibility checker would have said no to everybody
+### F-70: the reproducibility checker would have said no to everybody
 
 The new `reproduce` command ran `cargo build --release` and nothing else: no
 `--remap-path-prefix`, no `SOURCE_DATE_EPOCH`, no per-linker determinism flag,
@@ -1803,7 +1803,7 @@ Measured on this machine, two builds in two separate target directories:
 A test compares the flags against `release.yml` itself, so changing one without
 the other fails the build.
 
-### F-69 — the build succeeded, and then looked for it in the wrong place
+### F-69: the build succeeded, and then looked for it in the wrong place
 
 Found by running `build` on this machine. After a release build that took
 several minutes and worked, the tool hashed `root/target/release` — a path it
@@ -1830,7 +1830,7 @@ a default configuration rather than the one in force, F-68 from a program that
 shared a name with the right one, F-69 from a path that is usually correct.
 None was a logic error, and none would have been found by reading the code.
 
-### F-68 — the linker check found Git's hardlink tool and called it a linker
+### F-68: the linker check found Git's hardlink tool and called it a linker
 
 Found by running `deps` on this machine. The Windows probe looked for `link` on
 `PATH` and reported whatever came back, which was
@@ -1893,7 +1893,7 @@ error. A quiet mode is only as good as the last line nobody remembered to gate,
 and that omission is invisible: every other test still passes and the default
 output is still correct.
 
-### F-67 — the group panel rendered with the default settings, not yours
+### F-67: the group panel rendered with the default settings, not yours
 
 The eighth audit round, over the voice limit, saved projects and profiles, and
 the table of communication programs. Two defects, neither shipped.
@@ -1919,7 +1919,7 @@ anything is painted. The regression test moves the frame size to something that
 genuinely lowers the count, and checks that the number shown *and* the number
 enforced both follow.
 
-### F-66 — a saved project could come back different from how it went out
+### F-66: a saved project could come back different from how it went out
 
 A value that trimmed away to nothing was written as a key with an empty value:
 `Some("   ")` went out as `title  ` and came back as `Some("")` — neither what
@@ -1975,7 +1975,7 @@ not the same as being on a call, and treating the two alike is how a monitor
 becomes noise nobody reads.
 
 
-### Profiles and projects — `veilvoice-workspace`
+### Profiles and projects: `veilvoice-workspace`
 
 Two things that sound alike and are not.
 
@@ -2041,7 +2041,7 @@ afterwards. A screenshot script that leaves a preference changed is one that
 edits somebody's configuration to take a picture.
 
 
-### Eight voices, not ten — measured, and the group is capped at it
+### Eight voices, not ten: measured, and the group is capped at it
 
 The engine holds ten destination voices and all ten are *different*. Only
 **eight** are far enough apart that somebody following a conversation can tell
@@ -2134,7 +2134,7 @@ for a crate that has not got one, with the crate named — the same rule
 heading. "We should document that" does not survive a busy week; a build that
 stops does.
 
-### F-65 — two crates were invisible rather than uncovered
+### F-65: two crates were invisible rather than uncovered
 
 `veilvoice-check` and `veilvoice-update` were added to the workspace this cycle
 and to neither of the documentation generator's crate lists. So they had no
@@ -2152,7 +2152,7 @@ manifest in both directions, and a mismatch stops the run with the names in it.
 Both crates are documented: 751 files for 19 crates, up from 721 for 17.
 
 
-### Seventh audit round — four defects, and one encoder proved sound
+### Seventh audit round: four defects, and one encoder proved sound
 
 Four found and fixed, **F-61 to F-64**, all in code written this cycle. `main`
 has not been released since v0.1.12, so "none had shipped" and "all were

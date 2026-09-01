@@ -13,7 +13,7 @@ same treatment for them.
 # Two explanations, and only one of them can be generated
 
 Every page here says what a file does **technically**, and then says the same
-thing **in plain words**. The technical half is derived — the functions, what
+thing **in plain words**. The technical half is derived: the functions, what
 calls what, how long it is. The plain half cannot be: a generator that wrote
 "this file handles theme switching" from a filename would be padding, and a
 reader can tell.
@@ -30,7 +30,7 @@ Functions are found by their declarations and edges by looking for a callee's
 name inside a caller's body. That is a *reading* of the text, not a resolved
 call graph: a call made through a variable, or built at run time, will not
 appear. `generate.py` documents the same limit for Rust and for the same
-reason — a diagram derived from source is worth having precisely because
+reason, because a diagram derived from source is worth having precisely because
 nobody hand-maintained it, and worth doubting for exactly this.
 
 CSS has no functions. Its chart is the file's own section comments, in order,
@@ -400,7 +400,7 @@ def html_page(colours, rel, text, fingerprint):
     return docs.html_page(
         colours,
         2,
-        "%s — VeilVoice" % rel,
+        "%s · VeilVoice" % rel,
         "What %s does, and the same thing in plain words." % rel,
         # A list of lines, not a joined string. `html_page` does `out.extend`,
         # so a string is extended one character at a time -- the page rendered
@@ -550,7 +550,7 @@ def index_html(colours, files, fingerprint):
     return docs.html_page(
         colours,
         2,
-        "The website's source — VeilVoice",
+        "The website's source · VeilVoice",
         "Every file the website is made of, explained twice.",
         # A list of lines, not a joined string. `html_page` does `out.extend`,
         # so a string is extended one character at a time -- the page rendered

@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-gui/src/storage.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-gui/src/storage.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Where veiled recordings are written, and the encrypted volume that may hold them.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -69,46 +69,46 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>659 lines defining <strong>21 functions</strong> (18 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Destination</code> <span style="color:var(--muted)">line 55</span> &mdash; The chosen place for veiled output, if there is one.</li>
-<li><code>struct Storage</code> <span style="color:var(--muted)">line 188</span> &mdash; Everything the window shows about encrypted storage.</li>
+<li><code>struct Destination</code> <span style="color:var(--muted)">line 55</span> &middot; The chosen place for veiled output, if there is one.</li>
+<li><code>struct Storage</code> <span style="color:var(--muted)">line 188</span> &middot; Everything the window shows about encrypted storage.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Destination::from_prefs</code> <span style="color:var(--muted)">line 66</span> &mdash; Rebuild a destination from what was written to the settings file.
+<li><code>Destination::from_prefs</code> <span style="color:var(--muted)">line 66</span> &middot; Rebuild a destination from what was written to the settings file.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default</code>, <code>hidden_from_key</code></span>
 </li>
-<li><code>Destination::to_prefs</code> <span style="color:var(--muted)">line 83</span> &mdash; The three strings the settings file keeps.
+<li><code>Destination::to_prefs</code> <span style="color:var(--muted)">line 83</span> &middot; The three strings the settings file keeps.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>hidden_key</code></span>
 </li>
-<li><code>Destination::ready</code> <span style="color:var(--muted)">line 98</span> &mdash; Whether a job may start.
+<li><code>Destination::ready</code> <span style="color:var(--muted)">line 98</span> &middot; Whether a job may start.
 </li>
-<li><code>Destination::blocked</code> <span style="color:var(--muted)">line 103</span> &mdash; Why a job may not start, for the button&#x27;s tooltip.
+<li><code>Destination::blocked</code> <span style="color:var(--muted)">line 103</span> &middot; Why a job may not start, for the button&#x27;s tooltip.
 </li>
-<li><code>Destination::place</code> <span style="color:var(--muted)">line 132</span> &mdash; Where a recording should be written, given where it would have gone.
+<li><code>Destination::place</code> <span style="color:var(--muted)">line 132</span> &middot; Where a recording should be written, given where it would have gone.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>still_mounted</code></span>
 </li>
-<li><code>Storage::refresh</code> <span style="color:var(--muted)">line 228</span> &mdash; Look again at what is installed and mounted.
+<li><code>Storage::refresh</code> <span style="color:var(--muted)">line 228</span> &middot; Look again at what is installed and mounted.
 </li>
-<li><code>Storage::found</code> <span style="color:var(--muted)">line 241</span> &mdash; What was found at the last refresh.
+<li><code>Storage::found</code> <span style="color:var(--muted)">line 241</span> &middot; What was found at the last refresh.
 </li>
-<li><code>Storage::found_nothing</code> <span style="color:var(--muted)">line 247</span> &mdash; Whether anything was found at all, which decides whether marker 84&#x27;s guided path is the main offer or the fallback.
+<li><code>Storage::found_nothing</code> <span style="color:var(--muted)">line 247</span> &middot; Whether anything was found at all, which decides whether marker 84&#x27;s guided path is the main offer or the fallback.
 </li>
-<li><code>Storage::present</code> <span style="color:var(--muted)">line 252</span> &mdash; Whether the chosen folder was there when this was last refreshed.
+<li><code>Storage::present</code> <span style="color:var(--muted)">line 252</span> &middot; Whether the chosen folder was there when this was last refreshed.
 </li>
-<li><code>Storage::take_hand_picked</code> <span style="color:var(--muted)">line 257</span> &mdash; Take a folder the user picked by hand, if the picker has answered.
+<li><code>Storage::take_hand_picked</code> <span style="color:var(--muted)">line 257</span> &middot; Take a folder the user picked by hand, if the picker has answered.
 </li>
-<li><code>Storage::pick_by_hand</code> <span style="color:var(--muted)">line 267</span> &mdash; Start the folder picker for marker 84&#x27;s guided path.
+<li><code>Storage::pick_by_hand</code> <span style="color:var(--muted)">line 267</span> &middot; Start the folder picker for marker 84&#x27;s guided path.
 </li>
-<li><code>Storage::choose</code> <span style="color:var(--muted)">line 273</span> &mdash; Choose one of the detected volumes.
+<li><code>Storage::choose</code> <span style="color:var(--muted)">line 273</span> &middot; Choose one of the detected volumes.
 </li>
-<li><code>Storage::clear</code> <span style="color:var(--muted)">line 281</span> &mdash; Go back to writing beside the source file.
+<li><code>Storage::clear</code> <span style="color:var(--muted)">line 281</span> &middot; Go back to writing beside the source file.
 </li>
-<li><code>Storage::answer_hidden</code> <span style="color:var(--muted)">line 287</span> &mdash; Answer the hidden-volume question for the chosen destination.
+<li><code>Storage::answer_hidden</code> <span style="color:var(--muted)">line 287</span> &middot; Answer the hidden-volume question for the chosen destination.
 </li>
-<li><code>Storage::hand_picked_tool</code> <span style="color:var(--muted)">line 294</span> &mdash; Which tool a hand-picked folder is being declared as.
+<li><code>Storage::hand_picked_tool</code> <span style="color:var(--muted)">line 294</span> &middot; Which tool a hand-picked folder is being declared as.
 </li>
-<li><code>Storage::presence</code> <span style="color:var(--muted)">line 299</span> &mdash; Whether either tool was detected, for the guided text.
+<li><code>Storage::presence</code> <span style="color:var(--muted)">line 299</span> &middot; Whether either tool was detected, for the guided text.
 </li>
-<li><code>panel</code> <span style="color:var(--muted)">line 308</span> &mdash; The encrypted-storage panel, drawn on the security tab.
+<li><code>panel</code> <span style="color:var(--muted)">line 308</span> &middot; The encrypted-storage panel, drawn on the security tab.
 </li>
 </ul>
 </section>
@@ -243,11 +243,11 @@
 <path d="M20.0 956.5 L29.0 956.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="961.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="983.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="998.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
-<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<text x="20.0" y="998.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
+<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
