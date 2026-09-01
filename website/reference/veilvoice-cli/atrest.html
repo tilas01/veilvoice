@@ -39,7 +39,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/atrest.svg" alt="atrest.rs" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/atrest.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 414 lines &middot; <a href="atrest.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 456 lines &middot; <a href="atrest.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-the-default">Why this is the default</a>
@@ -64,7 +64,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>414 lines defining <strong>7 functions</strong> (4 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>456 lines defining <strong>7 functions</strong> (4 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Recipient</code> <span style="color:var(--muted)">line 63</span> &middot; How a recording is to be sealed.</li>
 </ul>
@@ -74,7 +74,7 @@
 </li>
 <li><code>confirm_plaintext</code> <span style="color:var(--muted)">line 122</span> &middot; Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.
 </li>
-<li><code>prompt_secret</code> <span style="color:var(--muted)">line 228</span> &middot; Prompt once, without echoing, and keep the answer in a Secret.
+<li><code>prompt_secret</code> <span style="color:var(--muted)">line 243</span> &middot; Prompt once, without echoing, and keep the answer in a Secret.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>can_prompt</code>, <code>into_secret</code>, <code>no_terminal</code></span>
 </li>
 </ul>
@@ -122,17 +122,17 @@
 <a href="atrest.src.html#fn-can_prompt">
 <rect x="194.8" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="249.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">can_prompt</text>
-<text x="249.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 223</text>
+<text x="249.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 238</text>
 </a>
 <a href="atrest.src.html#fn-prompt_secret">
 <rect x="329.4" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="395.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">prompt_secret</text>
-<text x="395.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
+<text x="395.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 243</text>
 </a>
 <a href="atrest.src.html#fn-read_new_password">
 <rect x="174.7" y="220.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="257.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_new_password</text>
-<text x="257.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 237</text>
+<text x="257.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 252</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -155,9 +155,9 @@ flowchart TD
     n_confirm_plaintext([&quot;confirm_plaintext&lt;br/&gt;line 122&quot;])
     n_into_secret[&quot;into_secret&lt;br/&gt;line 165&quot;]
     n_no_terminal[&quot;no_terminal&lt;br/&gt;line 192&quot;]
-    n_can_prompt[&quot;can_prompt&lt;br/&gt;line 223&quot;]
-    n_prompt_secret([&quot;prompt_secret&lt;br/&gt;line 228&quot;])
-    n_read_new_password[&quot;read_new_password&lt;br/&gt;line 237&quot;]
+    n_can_prompt[&quot;can_prompt&lt;br/&gt;line 238&quot;]
+    n_prompt_secret([&quot;prompt_secret&lt;br/&gt;line 243&quot;])
+    n_read_new_password[&quot;read_new_password&lt;br/&gt;line 252&quot;]
     n_prompt_secret --&gt; n_can_prompt
     n_prompt_secret --&gt; n_into_secret
     n_prompt_secret --&gt; n_no_terminal
@@ -169,9 +169,9 @@ flowchart TD
     click n_confirm_plaintext href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L122&quot; &quot;open the source&quot;
     click n_into_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L165&quot; &quot;open the source&quot;
     click n_no_terminal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L192&quot; &quot;open the source&quot;
-    click n_can_prompt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L223&quot; &quot;open the source&quot;
-    click n_prompt_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L228&quot; &quot;open the source&quot;
-    click n_read_new_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L237&quot; &quot;open the source&quot;
+    click n_can_prompt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L238&quot; &quot;open the source&quot;
+    click n_prompt_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L243&quot; &quot;open the source&quot;
+    click n_read_new_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/atrest.rs#L252&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_seal_to_disk,n_confirm_plaintext,n_prompt_secret entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -190,10 +190,10 @@ flowchart TD
 <tr><td><code>confirm_plaintext</code> <sub>pub fn</sub></td><td><a href="atrest.src.html#fn-confirm_plaintext">122</a></td><td>Print the plaintext warning and, on an interactive terminal, require an explicit answer before continuing.</td></tr>
 <tr><td><code>into_secret</code> <sub>fn</sub></td><td><a href="atrest.src.html#fn-into_secret">165</a></td><td>Move a typed password into page-locked, zeroizing storage, wiping the String it arrived in.</td></tr>
 <tr><td><code>no_terminal</code> <sub>fn</sub></td><td><a href="atrest.src.html#fn-no_terminal">192</a></td><td>What to say when there is no terminal to ask on.</td></tr>
-<tr><td><code>can_prompt</code> <sub>fn</sub></td><td><a href="atrest.src.html#fn-can_prompt">223</a></td><td>Whether a passphrase can be asked for at all.</td></tr>
-<tr><td><code>prompt_secret</code> <sub>pub fn</sub></td><td><a href="atrest.src.html#fn-prompt_secret">228</a></td><td>Prompt once, without echoing, and keep the answer in a Secret.</td></tr>
-<tr><td><code>read_new_password</code> <sub>pub fn</sub></td><td><a href="atrest.src.html#fn-read_new_password">237</a></td><td>Read a password twice, without echoing it, and check the two agree.</td></tr>
-<tr><td><code>no_terminal_tests</code> <sub>mod</sub></td><td><a href="atrest.src.html#fn-no_terminal_tests">350</a></td><td></td></tr>
+<tr><td><code>can_prompt</code> <sub>fn</sub></td><td><a href="atrest.src.html#fn-can_prompt">238</a></td><td>Whether a passphrase can be asked for at all.</td></tr>
+<tr><td><code>prompt_secret</code> <sub>pub fn</sub></td><td><a href="atrest.src.html#fn-prompt_secret">243</a></td><td>Prompt once, without echoing, and keep the answer in a Secret.</td></tr>
+<tr><td><code>read_new_password</code> <sub>pub fn</sub></td><td><a href="atrest.src.html#fn-read_new_password">252</a></td><td>Read a password twice, without echoing it, and check the two agree.</td></tr>
+<tr><td><code>no_terminal_tests</code> <sub>mod</sub></td><td><a href="atrest.src.html#fn-no_terminal_tests">365</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

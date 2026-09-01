@@ -171,12 +171,33 @@ one that works in a script; a terminal, if somebody is there; and
 Checking before rather than mapping the failure afterwards keeps the message
 the same on every platform.
 
-**The remedies were run rather than written down.** With stdin closed,
-`--encrypt false --yes` wrote a plain WAV, and `--encrypt-to me.pub` wrote a
-sealed one at 84x realtime; the key it used was made with `veilvoice keygen`
-under a pseudo-terminal, because `keygen` prompts too. That last part changed
-the wording: the message now says the key is made once, in a terminal, rather
-than implying `--encrypt-to` is available to somebody who has never had one.
+**The remedies were run rather than written down, and running them corrected
+the message twice.** With stdin closed, `--encrypt false --yes` wrote a plain
+WAV and `--encrypt-to me.pub` wrote a sealed one at 84x realtime; the key came
+from `veilvoice keygen` under a pseudo-terminal, because `keygen` prompts too,
+so the wording now says the key is made once in a terminal rather than implying
+`--encrypt-to` is there for somebody who has never had one.
+
+The second correction was a defect in the fix. Running `veilvoice encrypt`
+with no terminal produced the new message offering `--encrypt-to` and
+`--encrypt false --yes`, and `encrypt` has neither: it spells the same idea
+`--to`, and has no `--encrypt` at all. A dozen callers share these two prompts,
+among them `lock`, `guard` and `policy`, which have none of those flags. The
+message had been written while looking at one command and was then shown to
+all of them.
+
+Every flag is now named beside the command that has it, all five were checked
+against `--help`, and `veilvoice encrypt --to me.pub` was run with stdin closed
+to confirm the second remedy works as well as the first. The test asserts the
+attribution rather than the mere presence of each flag, because presence is
+what was already true when it was wrong.
+
+**Worth naming for what it is: the fix reproduced the defect it was fixing.**
+F-109 is a message that was right where it was written and wrong where it was
+read. The first repair was a message that was right for `anonymise` and wrong
+for `encrypt`, for the same reason, inside the hour. It was caught the same way
+the original was, by running the other command rather than re-reading the
+patch.
 
 ### The campaign, at twenty minutes a target
 

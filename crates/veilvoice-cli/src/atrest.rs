@@ -192,19 +192,34 @@ fn into_secret(mut typed: String) -> Secret {
 fn no_terminal(asked_for: &str) -> String {
     // Built line by line rather than as one continued literal, so the
     // indentation in this file is not the indentation on the reader's screen.
+    //
+    // Every flag named here is attributed to the command that has it, and that
+    // is not tidiness. The first version of this message offered
+    // `--encrypt-to` and `--encrypt false --yes` to everybody, because it was
+    // written while fixing `anonymise`. `veilvoice encrypt` spells the same
+    // idea `--to` and has no `--encrypt` at all, and `lock`, `guard` and
+    // `policy` have none of them: a dozen callers share these prompts, and a
+    // message that names flags the command in front of the reader does not
+    // have is worse than one that names none. Caught by running `veilvoice
+    // encrypt` with no terminal and reading what it suggested.
     let lines = [
         "",
         "  This is what happens in a script, a scheduled job, or anything with",
-        "  its input redirected. Three ways on, in the order they are usually",
-        "  wanted:",
+        "  its input redirected.",
         "",
-        "    --encrypt-to <PUBKEY>   seal to a public key. Nothing is typed, so",
-        "                            this is the one that works in a script.",
-        "                            Make the key once, in a terminal, with",
-        "                            veilvoice keygen",
-        "    run it in a terminal    if a person is there to type",
-        "    --encrypt false --yes   write it unencrypted, which is a recording",
-        "                            of every word that was said",
+        "  Run it in a terminal, if somebody is there to type.",
+        "",
+        "  Or, for the two commands that write a recording, seal it to a public",
+        "  key instead, which types nothing and is what works in a script:",
+        "",
+        "    veilvoice anonymise <FILE> --encrypt-to <PUBKEY>",
+        "    veilvoice encrypt   <FILE> --to <PUBKEY>",
+        "",
+        "  Make the key once, in a terminal, with veilvoice keygen.",
+        "",
+        "  veilvoice anonymise can also write a recording with no encryption at",
+        "  all, using --encrypt false --yes. That leaves every word that was",
+        "  said readable by anyone who gets the file.",
         "",
         "  Nothing was written.",
     ];
@@ -367,15 +382,42 @@ mod no_terminal_tests {
             "the first line has to say what could not be asked for: {message}"
         );
 
-        // Every remedy the message offers, and each one is real: the first
-        // and third were run end to end against a two-second recording with
-        // stdin closed, and both wrote a file.
-        for remedy in ["--encrypt-to", "veilvoice keygen", "--encrypt false --yes"] {
+        // Every flag is named beside the command that has it.
+        //
+        // The first version of this message offered `--encrypt-to` and
+        // `--encrypt false --yes` to every caller, because it was written
+        // while fixing `anonymise`. `veilvoice encrypt` spells that `--to`
+        // and has no `--encrypt`; `lock`, `guard` and `policy` have none of
+        // them. A dozen callers share these prompts, so an unattributed flag
+        // is a flag the reader's command probably does not have.
+        for (flag, command) in [
+            ("--encrypt-to", "veilvoice anonymise"),
+            ("--encrypt false --yes", "veilvoice anonymise"),
+            ("--to <PUBKEY>", "veilvoice encrypt"),
+        ] {
+            let at = message
+                .find(flag)
+                .unwrap_or_else(|| panic!("the message no longer mentions {flag}: {message}"));
+            let before = &message[..at];
+            let line_start = before.rfind('\n').map(|n| n + 1).unwrap_or(0);
+            let context = &message[line_start..];
+            let context = &context[..context.find('\n').unwrap_or(context.len())];
             assert!(
-                message.contains(remedy),
-                "the message no longer mentions {remedy}: {message}"
+                context.contains(command)
+                    || before.rfind(command).is_some_and(|c| {
+                        // Named earlier in the same paragraph is fine; named
+                        // nowhere is not.
+                        message[c..at].matches("\n\n").count() == 0
+                    }),
+                "{flag} is offered without saying it belongs to {command}, and \
+                 most callers of this message are not that command: {message}"
             );
         }
+
+        assert!(
+            message.contains("veilvoice keygen"),
+            "the message has to say where the public key comes from: {message}"
+        );
 
         assert!(
             message.contains("Nothing was written."),
