@@ -38,6 +38,51 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The fifteenth round: the page that says where to get it
+
+The releases page, read after the verifier rather than before it, because a
+download nobody can reach is not made safer by a checker.
+
+**One defect found and fixed (F-101)**, and it is the oldest shape in this
+document: two hand-kept lists compared against each other and against nothing
+else.
+
+### F-101 -- the download page linked two files that had never existed
+
+`tools/site/releases.py`.
+
+The page listed five archives per release. The release workflow builds
+**eleven**. Two of the five names were wrong: the page said `macos-aarch64` and
+`linux-aarch64` where every release has ever published `macos-arm64` and
+`linux-arm64`. So every release entry on the page carried two links that answer
+with a not-found, and six published platforms -- the Raspberry Pi build, the
+two static musl builds, FreeBSD, OpenBSD and NetBSD -- had no link at all.
+
+Measured against a published release rather than argued: the names the page
+constructs for v0.1.14 were compared against the assets GitHub actually holds
+for that tag. Two linked and absent, six present and unlinked.
+
+This is F-71's shape, which this document has already described once: two
+hand-typed things kept beside each other by attention, each only ever compared
+against the other. Correcting the five names would have restored the same
+arrangement with the same future.
+
+`release.yml` is the file that decides what is built and what each archive is
+called, so the page reads it. A platform added to that matrix now appears on the
+page; a label renamed there cannot leave a dead link here. The generator refuses
+to write a page at all if it can read fewer than five archives out of the
+workflow, because a page with no downloads on it looks like a release that
+built nothing rather than like a broken generator, and `packaging.test.js`
+checks in CI that every label the workflow builds is linked.
+
+Two smaller things went with it. The page's backlog began at v0.1.6, because
+`CHANGELOG.md` keeps one combined section for v0.1.5 and earlier and the parser
+matched `## vX.Y.Z` only: six published releases with no entry, no summary and
+no files. They are listed now, each pointing at its own release page for notes,
+which is where those notes genuinely are. And the files moved to the end of each
+release's notes rather than the top, so opening a release shows what changed in
+it rather than a wall of links.
+
 ## The fourteenth round: reading the verifier written an hour earlier
 
 Marker 97 rewrote what `veilvoice-verify` and the desktop verify tab do: a
@@ -1530,7 +1575,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1124 tests across 27 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1125 tests across 27 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -3122,7 +3167,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred defects found and fixed across fourteen audit rounds (F-1 to F-100):**
+**One hundred and one defects found and fixed across fifteen audit rounds (F-1 to F-101):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
