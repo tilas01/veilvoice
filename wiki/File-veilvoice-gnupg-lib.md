@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gnupg/src/lib.rs`
 
-[[veilvoice-gnupg|Crate-veilvoice-gnupg]] &middot; 816 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs)
+[[veilvoice-gnupg|Crate-veilvoice-gnupg]] &middot; 860 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs)
 
 ## Contents
 
@@ -82,7 +82,7 @@ part that is easiest to skip.
 
 ## What this file contains
 
-816 lines defining **17 functions** (11 public), **6 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+860 lines defining **17 functions** (11 public), **6 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

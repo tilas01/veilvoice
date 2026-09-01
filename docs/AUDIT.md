@@ -38,6 +38,62 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The twentieth round: a test that deleted another test's fixture
+
+One defect (F-106), found by CI failing on macOS on a commit that changed
+no Rust at all.
+
+### F-106 -- two tests, one scratch directory, and whichever finished first won
+
+`crates/veilvoice-gnupg/src/lib.rs`.
+
+`the_real_key_imports_into_a_real_gnupg_and_says_so_the_second_time` failed on
+the macOS runner with GnuPG reporting that the keyring it had just written did
+not exist:
+
+    gpg: keyblock resource '/var/folders/.../T/vvg18d138f9134babc0/pubring.kbx':
+         No such file or directory
+    gpg: no writable keyring found: Not found
+
+The first import had succeeded. Between it and the second, the directory
+holding the keyring was deleted.
+
+Two tests in this file take a scratch GnuPG home, and each deletes it when it
+finishes. The helper named that directory after the clock and nothing else, and
+created it with `create_dir_all`. Cargo runs the two tests on threads at the
+same moment, so when both calls land in the same clock tick they are handed the
+same path, `create_dir_all` reports success for the second because the
+directory is already there, and the two tests then share one keyring. The
+faster test finished, removed the directory, and the slower one's second import
+found nothing.
+
+**It could not happen on Linux and it can on macOS**, which is why it took
+until now. `SystemTime::now()` gives distinct nanoseconds on the Linux runners
+every time; the macOS clock is coarser, and two threads starting together get
+the same reading. The failing job is a commit that touched only Markdown,
+Python and JavaScript, which is the honest signature of a defect that was
+always there and needed a scheduling accident to show.
+
+Two changes, because there were two faults. The name now carries a counter
+that is unique within the process whatever the clock does, so the clock only
+separates one run from the next. And `create_dir_all` is now `create_dir`,
+which fails when the directory exists: the collision could not be seen
+precisely because the call that should have objected to it was the one chosen
+for not objecting to anything.
+
+`scratch_homes_are_never_the_same_directory_twice` asks for a hundred of them
+in a loop and fails if any path repeats. It was checked against the defect
+rather than assumed to cover it: with the old keying and the clock rounded to
+microseconds, as macOS has, it fails with `"/tmp/vvg18d1393384078c00" was
+handed out twice`.
+
+**The lesson is about what "flaky" is allowed to mean.** A test that fails on
+one platform, on a commit that changed nothing it touches, is the most
+inviting possible candidate for a re-run, and a re-run would have passed. The
+failure was a real defect in the test suite: two tests sharing mutable state
+through the filesystem, which would have gone on failing at random on the
+platform where the clock is coarse, and would have been re-run each time.
+
 ## The nineteenth round: the summary that stopped keeping up
 
 One defect (F-105), in the paragraph a reader is most likely to quote.
@@ -1851,7 +1907,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1126 tests across 27 crates, plus doctests and 15 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1127 tests across 27 crates, plus doctests and 15 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -3460,7 +3516,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and five defects found and fixed (F-1 to F-105), across nineteen
+**One hundred and six defects found and fixed (F-1 to F-106), across twenty
 rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

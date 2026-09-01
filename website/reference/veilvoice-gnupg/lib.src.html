@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gnupg/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 816 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gnupg.html">veilvoice-gnupg</a> &middot; 860 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -816,93 +816,137 @@
 <span class="ln" id="L727">    }</span>
 <span class="ln" id="L728"></span>
 <span class="ln" id="L729">    <span class="tok-com">/// Somewhere for a keyring that is nobody&#x27;s real one.</span></span>
-<span class="ln" id="L730">    <span class="tok-kw">fn</span> <span class="tok-fn">scratch_home</span>() -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L731">        <span class="tok-kw">let</span> stamp = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
-<span class="ln" id="L732">            .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
-<span class="ln" id="L733">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
-<span class="ln" id="L734">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L735">        <span class="tok-com">// Short, and not under a long temporary path: GnuPG puts an agent</span></span>
-<span class="ln" id="L736">        <span class="tok-com">// socket in here and a long directory name overflows the sockaddr,</span></span>
-<span class="ln" id="L737">        <span class="tok-com">// which fails as &quot;error running gpg-agent&quot; and looks like a bug in</span></span>
-<span class="ln" id="L738">        <span class="tok-com">// this code. Measured while writing this test.</span></span>
-<span class="ln" id="L739">        <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;vvg{stamp:x}&quot;</span>));</span>
-<span class="ln" id="L740">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;path).<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L741">        <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L742">        {</span>
-<span class="ln" id="L743">            <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt <span class="tok-kw">as</span> _;</span>
-<span class="ln" id="L744">            std::fs::<span class="tok-fn">set_permissions</span>(&amp;path, std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o700)).<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L745">        }</span>
-<span class="ln" id="L746">        <span class="tok-fn">Some</span>(path)</span>
-<span class="ln" id="L747">    }</span>
-<span class="ln" id="L748"></span>
-<span class="ln" id="L749">    <span class="tok-com">/// The real key, into a real GnuPG, twice.</span></span>
-<span class="ln" id="L750">    <span class="tok-com">///</span></span>
-<span class="ln" id="L751">    <span class="tok-com">/// Skipped where GnuPG is not installed, because that is a fact about the</span></span>
-<span class="ln" id="L752">    <span class="tok-com">/// machine rather than a failure of this code, and the whole crate already</span></span>
-<span class="ln" id="L753">    <span class="tok-com">/// reports [`Error::NotInstalled`] for it.</span></span>
-<span class="ln" id="L754">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L755">    <span class="tok-kw">fn</span> <span class="tok-fn">the_real_key_imports_into_a_real_gnupg_and_says_so_the_second_time</span>() {</span>
-<span class="ln" id="L756">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(gpg) = Gnupg::<span class="tok-fn">found</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L757">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L758">        };</span>
-<span class="ln" id="L759">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L760">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L761">        };</span>
-<span class="ln" id="L762">        <span class="tok-kw">let</span> gpg = gpg.<span class="tok-fn">in_home</span>(home.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L763"></span>
-<span class="ln" id="L764">        <span class="tok-kw">let</span> first = gpg.<span class="tok-fn">import</span>(KEY, FINGERPRINT);</span>
-<span class="ln" id="L765">        <span class="tok-com">// A GnuPG that cannot start its agent cannot import either, and that</span></span>
-<span class="ln" id="L766">        <span class="tok-com">// is the machine rather than this code. Anything it does report has to</span></span>
-<span class="ln" id="L767">        <span class="tok-com">// be the right key.</span></span>
-<span class="ln" id="L768">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(first) = first {</span>
-<span class="ln" id="L769">            assert_eq!(first.what, Imported::Added, <span class="tok-str">&quot;the first import adds it&quot;</span>);</span>
-<span class="ln" id="L770">            assert!(<span class="tok-fn">same_fingerprint</span>(&amp;first.fingerprint, FINGERPRINT));</span>
-<span class="ln" id="L771"></span>
-<span class="ln" id="L772">            <span class="tok-kw">let</span> again = gpg.<span class="tok-fn">import</span>(KEY, FINGERPRINT).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a second import&quot;</span>);</span>
-<span class="ln" id="L773">            assert_eq!(</span>
-<span class="ln" id="L774">                again.what,</span>
-<span class="ln" id="L775">                Imported::AlreadyThere,</span>
-<span class="ln" id="L776">                <span class="tok-str">&quot;the second import changes nothing&quot;</span></span>
-<span class="ln" id="L777">            );</span>
-<span class="ln" id="L778"></span>
-<span class="ln" id="L779">            <span class="tok-com">// And it is refused when the caller expects a different key.</span></span>
-<span class="ln" id="L780">            <span class="tok-kw">let</span> wrong = gpg.<span class="tok-fn">import</span>(KEY, &amp;<span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">40</span>));</span>
-<span class="ln" id="L781">            assert!(wrong.<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{wrong:?}&quot;</span>);</span>
-<span class="ln" id="L782">        }</span>
-<span class="ln" id="L783">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L784">    }</span>
-<span class="ln" id="L785"></span>
-<span class="ln" id="L786">    <span class="tok-com">/// A signature nobody can check is `NoKey`, not a pass.</span></span>
-<span class="ln" id="L787">    <span class="tok-com">///</span></span>
-<span class="ln" id="L788">    <span class="tok-com">/// Run against an empty keyring, so the answer cannot come from a key that</span></span>
-<span class="ln" id="L789">    <span class="tok-com">/// happens to be on the machine running the tests.</span></span>
-<span class="ln" id="L790">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L791">    <span class="tok-kw">fn</span> <span class="tok-fn">a_signature_with_no_key_to_check_it_is_never_a_pass</span>() {</span>
-<span class="ln" id="L792">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(gpg) = Gnupg::<span class="tok-fn">found</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L793">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L794">        };</span>
-<span class="ln" id="L795">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L796">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L797">        };</span>
-<span class="ln" id="L798">        <span class="tok-kw">let</span> data = home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>);</span>
-<span class="ln" id="L799">        <span class="tok-kw">let</span> signature = home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>);</span>
-<span class="ln" id="L800">        std::fs::<span class="tok-fn">write</span>(&amp;data, b<span class="tok-str">&quot;a hash  a file\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L801">        std::fs::<span class="tok-fn">write</span>(</span>
-<span class="ln" id="L802">            &amp;signature,</span>
-<span class="ln" id="L803">            b<span class="tok-str">&quot;-----BEGIN PGP SIGNATURE-----\n\nbm90IGEgc2lnbmF0dXJl\n=aaaa\n\</span></span>
-<span class="ln" id="L804"><span class="tok-str">              -----END PGP SIGNATURE-----\n&quot;</span>,</span>
-<span class="ln" id="L805">        )</span>
-<span class="ln" id="L806">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L730">    <span class="tok-com">///</span></span>
+<span class="ln" id="L731">    <span class="tok-com">/// # Unique per call, not per instant</span></span>
+<span class="ln" id="L732">    <span class="tok-com">///</span></span>
+<span class="ln" id="L733">    <span class="tok-com">/// F-106. This used to name the directory after the clock alone, and every</span></span>
+<span class="ln" id="L734">    <span class="tok-com">/// test that takes one deletes it when it finishes. Cargo runs these tests</span></span>
+<span class="ln" id="L735">    <span class="tok-com">/// on threads at the same moment, so two calls landing in the same tick</span></span>
+<span class="ln" id="L736">    <span class="tok-com">/// share a directory, and the first test to finish deletes the second</span></span>
+<span class="ln" id="L737">    <span class="tok-com">/// test&#x27;s keyring out from under it. On Linux the nanoseconds always</span></span>
+<span class="ln" id="L738">    <span class="tok-com">/// differed and it never happened; on macOS the clock is coarser and it</span></span>
+<span class="ln" id="L739">    <span class="tok-com">/// did, as a keyring that existed for the first import and was gone for</span></span>
+<span class="ln" id="L740">    <span class="tok-com">/// the second.</span></span>
+<span class="ln" id="L741">    <span class="tok-com">///</span></span>
+<span class="ln" id="L742">    <span class="tok-com">/// So the name carries a counter that is unique within the process</span></span>
+<span class="ln" id="L743">    <span class="tok-com">/// whatever the clock does, and the clock only separates one run from the</span></span>
+<span class="ln" id="L744">    <span class="tok-com">/// next. `create_dir` rather than `create_dir_all` is the other half:</span></span>
+<span class="ln" id="L745">    <span class="tok-com">/// `create_dir_all` treats &quot;it is already there&quot; as success, which is</span></span>
+<span class="ln" id="L746">    <span class="tok-com">/// exactly the case that must not be silent.</span></span>
+<span class="ln" id="L747">    <span class="tok-kw">fn</span> <span class="tok-fn">scratch_home</span>() -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L748">        <span class="tok-kw">use</span> std::sync::atomic::{AtomicU64, Ordering};</span>
+<span class="ln" id="L749">        <span class="tok-kw">static</span> NEXT: AtomicU64 = AtomicU64::<span class="tok-fn">new</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L750"></span>
+<span class="ln" id="L751">        <span class="tok-kw">let</span> stamp = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
+<span class="ln" id="L752">            .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
+<span class="ln" id="L753">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
+<span class="ln" id="L754">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L755">        <span class="tok-kw">let</span> seat = NEXT.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::Relaxed);</span>
+<span class="ln" id="L756">        <span class="tok-com">// Short, and not under a long temporary path: GnuPG puts an agent</span></span>
+<span class="ln" id="L757">        <span class="tok-com">// socket in here and a long directory name overflows the sockaddr,</span></span>
+<span class="ln" id="L758">        <span class="tok-com">// which fails as &quot;error running gpg-agent&quot; and looks like a bug in</span></span>
+<span class="ln" id="L759">        <span class="tok-com">// this code. Measured while writing this test.</span></span>
+<span class="ln" id="L760">        <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;vvg{:x}{seat:x}&quot;</span>, stamp <span class="tok-kw">as</span> u64));</span>
+<span class="ln" id="L761">        std::fs::<span class="tok-fn">create_dir</span>(&amp;path).<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L762">        <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L763">        {</span>
+<span class="ln" id="L764">            <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt <span class="tok-kw">as</span> _;</span>
+<span class="ln" id="L765">            std::fs::<span class="tok-fn">set_permissions</span>(&amp;path, std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o700)).<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L766">        }</span>
+<span class="ln" id="L767">        <span class="tok-fn">Some</span>(path)</span>
+<span class="ln" id="L768">    }</span>
+<span class="ln" id="L769"></span>
+<span class="ln" id="L770">    <span class="tok-com">/// Two scratch homes are two directories, however close together they are</span></span>
+<span class="ln" id="L771">    <span class="tok-com">/// asked for.</span></span>
+<span class="ln" id="L772">    <span class="tok-com">///</span></span>
+<span class="ln" id="L773">    <span class="tok-com">/// The defect this exists to stop coming back is F-106, and it was</span></span>
+<span class="ln" id="L774">    <span class="tok-com">/// invisible precisely because it needed two calls in one clock tick.</span></span>
+<span class="ln" id="L775">    <span class="tok-com">/// Asking for a hundred in a loop is the cheapest way to make that</span></span>
+<span class="ln" id="L776">    <span class="tok-com">/// certain: with the clock alone as the key, a run of these collides on</span></span>
+<span class="ln" id="L777">    <span class="tok-com">/// any machine whose clock is coarser than the loop is fast.</span></span>
+<span class="ln" id="L778">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L779">    <span class="tok-kw">fn</span> <span class="tok-fn">scratch_homes_are_never_the_same_directory_twice</span>() {</span>
+<span class="ln" id="L780">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> made = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L781">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">100</span> {</span>
+<span class="ln" id="L782">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() {</span>
+<span class="ln" id="L783">                assert!(!made.<span class="tok-fn">contains</span>(&amp;home), <span class="tok-str">&quot;{home:?} was handed out twice&quot;</span>);</span>
+<span class="ln" id="L784">                made.<span class="tok-fn">push</span>(home);</span>
+<span class="ln" id="L785">            }</span>
+<span class="ln" id="L786">        }</span>
+<span class="ln" id="L787">        assert!(!made.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;no scratch home could be made at all&quot;</span>);</span>
+<span class="ln" id="L788">        <span class="tok-kw">for</span> home <span class="tok-kw">in</span> made {</span>
+<span class="ln" id="L789">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L790">        }</span>
+<span class="ln" id="L791">    }</span>
+<span class="ln" id="L792"></span>
+<span class="ln" id="L793">    <span class="tok-com">/// The real key, into a real GnuPG, twice.</span></span>
+<span class="ln" id="L794">    <span class="tok-com">///</span></span>
+<span class="ln" id="L795">    <span class="tok-com">/// Skipped where GnuPG is not installed, because that is a fact about the</span></span>
+<span class="ln" id="L796">    <span class="tok-com">/// machine rather than a failure of this code, and the whole crate already</span></span>
+<span class="ln" id="L797">    <span class="tok-com">/// reports [`Error::NotInstalled`] for it.</span></span>
+<span class="ln" id="L798">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L799">    <span class="tok-kw">fn</span> <span class="tok-fn">the_real_key_imports_into_a_real_gnupg_and_says_so_the_second_time</span>() {</span>
+<span class="ln" id="L800">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(gpg) = Gnupg::<span class="tok-fn">found</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L801">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L802">        };</span>
+<span class="ln" id="L803">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L804">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L805">        };</span>
+<span class="ln" id="L806">        <span class="tok-kw">let</span> gpg = gpg.<span class="tok-fn">in_home</span>(home.<span class="tok-fn">clone</span>());</span>
 <span class="ln" id="L807"></span>
-<span class="ln" id="L808">        <span class="tok-kw">let</span> run = gpg</span>
-<span class="ln" id="L809">            .<span class="tok-fn">in_home</span>(home.<span class="tok-fn">clone</span>())</span>
-<span class="ln" id="L810">            .<span class="tok-fn">verify</span>(&amp;signature, &amp;data, FINGERPRINT)</span>
-<span class="ln" id="L811">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;gpg runs&quot;</span>);</span>
-<span class="ln" id="L812">        assert!(!run.outcome.<span class="tok-fn">is_good</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, run.outcome);</span>
-<span class="ln" id="L813">        assert!(run.command.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--verify&quot;</span>));</span>
-<span class="ln" id="L814">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L815">    }</span>
-<span class="ln" id="L816">}</span>
+<span class="ln" id="L808">        <span class="tok-kw">let</span> first = gpg.<span class="tok-fn">import</span>(KEY, FINGERPRINT);</span>
+<span class="ln" id="L809">        <span class="tok-com">// A GnuPG that cannot start its agent cannot import either, and that</span></span>
+<span class="ln" id="L810">        <span class="tok-com">// is the machine rather than this code. Anything it does report has to</span></span>
+<span class="ln" id="L811">        <span class="tok-com">// be the right key.</span></span>
+<span class="ln" id="L812">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(first) = first {</span>
+<span class="ln" id="L813">            assert_eq!(first.what, Imported::Added, <span class="tok-str">&quot;the first import adds it&quot;</span>);</span>
+<span class="ln" id="L814">            assert!(<span class="tok-fn">same_fingerprint</span>(&amp;first.fingerprint, FINGERPRINT));</span>
+<span class="ln" id="L815"></span>
+<span class="ln" id="L816">            <span class="tok-kw">let</span> again = gpg.<span class="tok-fn">import</span>(KEY, FINGERPRINT).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a second import&quot;</span>);</span>
+<span class="ln" id="L817">            assert_eq!(</span>
+<span class="ln" id="L818">                again.what,</span>
+<span class="ln" id="L819">                Imported::AlreadyThere,</span>
+<span class="ln" id="L820">                <span class="tok-str">&quot;the second import changes nothing&quot;</span></span>
+<span class="ln" id="L821">            );</span>
+<span class="ln" id="L822"></span>
+<span class="ln" id="L823">            <span class="tok-com">// And it is refused when the caller expects a different key.</span></span>
+<span class="ln" id="L824">            <span class="tok-kw">let</span> wrong = gpg.<span class="tok-fn">import</span>(KEY, &amp;<span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">40</span>));</span>
+<span class="ln" id="L825">            assert!(wrong.<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;{wrong:?}&quot;</span>);</span>
+<span class="ln" id="L826">        }</span>
+<span class="ln" id="L827">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L828">    }</span>
+<span class="ln" id="L829"></span>
+<span class="ln" id="L830">    <span class="tok-com">/// A signature nobody can check is `NoKey`, not a pass.</span></span>
+<span class="ln" id="L831">    <span class="tok-com">///</span></span>
+<span class="ln" id="L832">    <span class="tok-com">/// Run against an empty keyring, so the answer cannot come from a key that</span></span>
+<span class="ln" id="L833">    <span class="tok-com">/// happens to be on the machine running the tests.</span></span>
+<span class="ln" id="L834">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L835">    <span class="tok-kw">fn</span> <span class="tok-fn">a_signature_with_no_key_to_check_it_is_never_a_pass</span>() {</span>
+<span class="ln" id="L836">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(gpg) = Gnupg::<span class="tok-fn">found</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L837">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L838">        };</span>
+<span class="ln" id="L839">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(home) = <span class="tok-fn">scratch_home</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L840">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L841">        };</span>
+<span class="ln" id="L842">        <span class="tok-kw">let</span> data = home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS&quot;</span>);</span>
+<span class="ln" id="L843">        <span class="tok-kw">let</span> signature = home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>);</span>
+<span class="ln" id="L844">        std::fs::<span class="tok-fn">write</span>(&amp;data, b<span class="tok-str">&quot;a hash  a file\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L845">        std::fs::<span class="tok-fn">write</span>(</span>
+<span class="ln" id="L846">            &amp;signature,</span>
+<span class="ln" id="L847">            b<span class="tok-str">&quot;-----BEGIN PGP SIGNATURE-----\n\nbm90IGEgc2lnbmF0dXJl\n=aaaa\n\</span></span>
+<span class="ln" id="L848"><span class="tok-str">              -----END PGP SIGNATURE-----\n&quot;</span>,</span>
+<span class="ln" id="L849">        )</span>
+<span class="ln" id="L850">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L851"></span>
+<span class="ln" id="L852">        <span class="tok-kw">let</span> run = gpg</span>
+<span class="ln" id="L853">            .<span class="tok-fn">in_home</span>(home.<span class="tok-fn">clone</span>())</span>
+<span class="ln" id="L854">            .<span class="tok-fn">verify</span>(&amp;signature, &amp;data, FINGERPRINT)</span>
+<span class="ln" id="L855">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;gpg runs&quot;</span>);</span>
+<span class="ln" id="L856">        assert!(!run.outcome.<span class="tok-fn">is_good</span>(), <span class="tok-str">&quot;{:?}&quot;</span>, run.outcome);</span>
+<span class="ln" id="L857">        assert!(run.command.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--verify&quot;</span>));</span>
+<span class="ln" id="L858">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;home).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L859">    }</span>
+<span class="ln" id="L860">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
