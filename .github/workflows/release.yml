@@ -171,7 +171,7 @@ jobs:
         run: |
           if [ "${{ matrix.cli_only }}" = "true" ]; then
             # No live audio on these. cpal needs ALSA headers built for the
-            # target architecture, which a cross or musl build does not have —
+            # target architecture, which a cross or musl build does not have,
             # and a statically linked binary cannot dlopen the system ALSA
             # anyway. File processing, encryption and metadata cleaning are
             # pure Rust and work fine, so the feature is switched off rather
@@ -269,7 +269,7 @@ jobs:
               echo "microphone scrambling."
               echo
               echo "The desktop app needs the GTK and OpenGL stack for this"
-              echo "architecture, and live capture needs ALSA headers for it — neither"
+              echo "architecture, and live capture needs ALSA headers for it, and neither"
               echo "is available to a cross or statically linked build. Everything"
               echo "else works: anonymise, clean, encrypt, decrypt, keygen, shred."
               echo
@@ -325,8 +325,8 @@ jobs:
   # FreeBSD has no GitHub runner, so this builds inside a VM on a Linux one.
   #
   # It is CLI-only and deliberately so: `cpal` has no backend for the BSDs, so
-  # live capture cannot work there. Everything else — file de-identification,
-  # encryption, metadata cleaning — is pure Rust and runs fine, which is why the
+  # live capture cannot work there. Everything else, meaning file
+  # de-identification, encryption and metadata cleaning, is pure Rust and runs fine, which is why the
   # `live` feature exists to be turned off rather than the whole build failing.
   #
   # Marked continue-on-error: a third-party VM action failing should not hold up
@@ -365,7 +365,7 @@ jobs:
           cp -r assets/linux "dist/$out/desktop"
           {
             echo "This FreeBSD build has no live microphone scrambling: cpal, the"
-            echo "audio device library, has no BSD backend. Everything else works —"
+            echo "audio device library, has no BSD backend. Everything else works,"
             echo "anonymise, clean, encrypt, decrypt, keygen."
             echo
             echo "Run 'veilvoice info' to confirm what this binary supports."
@@ -418,7 +418,7 @@ jobs:
           cp -r assets/linux "dist/$out/desktop"
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
-            echo "device library, has no BSD backend. Everything else works —"
+            echo "device library, has no BSD backend. Everything else works,"
             echo "anonymise, clean, encrypt, decrypt, keygen, shred."
             echo
             echo "OpenBSD's pledge/unveil are not used: VeilVoice opens files the user names, and a sandbox it configures for itself would be a claim this project has not tested."
@@ -475,7 +475,7 @@ jobs:
           cp -r assets/linux "dist/$out/desktop"
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
-            echo "device library, has no BSD backend. Everything else works —"
+            echo "device library, has no BSD backend. Everything else works,"
             echo "anonymise, clean, encrypt, decrypt, keygen, shred."
             echo
             echo "Built against pkgsrc's Rust, which may lag the pinned toolchain; that is why this archive is marked not-verified for reproducibility."
@@ -503,7 +503,7 @@ jobs:
     runs-on: ubuntu-latest
     # Evaluated at job level on purpose. A step's own `env:` block is not in
     # scope for that step's `if:`, so gating on it there silently disables the
-    # step forever — which is exactly what v0.1.0 and v0.1.1 did.
+    # step forever, which is exactly what v0.1.0 and v0.1.1 did.
     env:
       HAS_SIGNING_KEY: ${{ secrets.GPG_PRIVATE_KEY != '' }}
     steps:
@@ -632,7 +632,7 @@ jobs:
               echo '```'
               echo
               echo "**2. Check the fingerprint is exactly this.** A \"Good signature\" from"
-              echo "some other key proves nothing — the fingerprint is the part that matters:"
+              echo "some other key proves nothing. The fingerprint is the part that matters:"
               echo
               echo '```'
               echo "$fpr"
@@ -647,13 +647,13 @@ jobs:
               echo
               echo "Expect \`Good signature from \"tilas01\"\`. The key carries no e-mail"
               echo "address by design. GnuPG will also warn that the key is not certified"
-              echo "with a trusted signature — that is normal and simply means you have not"
+              echo "with a trusted signature. That is normal and simply means you have not"
               echo "personally signed it; the fingerprint check above is what establishes"
               echo "that it is the right key."
               echo
               echo "On macOS use \`shasum -a 256 -c SHA256SUMS --ignore-missing\`."
             else
-              echo "> This build is **unsigned** — no signing key is configured for this repository."
+              echo "> This build is **unsigned**: no signing key is configured for this repository."
             fi
             echo
             echo "### Reproducibility"

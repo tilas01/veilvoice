@@ -1422,7 +1422,7 @@ html.demo-locked, html.demo-locked body { overflow: hidden; }
 
 /* ---------- reveal on scroll ---------- */
 /* Scoped to html.js, which theme.js sets from a blocking head script. Without
- * JavaScript these rules never apply and the content is simply visible — the
+ * JavaScript these rules never apply and the content is simply visible, and the
  * one failure mode a reveal effect must not have.
  *
  * Only opacity and transform are animated, so the compositor handles it
@@ -1732,7 +1732,7 @@ progress { width: 100%; height: 6px; margin-top: 12px; }
   border-left: 3px solid var(--accent); background: var(--bg-inset); color: var(--muted);
 }
 
-/* syntax highlighting — deliberately small, applied by js/markdown.js */
+/* syntax highlighting, deliberately small, applied by js/markdown.js */
 .tok-kw   { color: var(--accent-2); }
 .tok-str  { color: var(--ok); }
 .tok-num  { color: var(--warn); }

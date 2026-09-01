@@ -7,7 +7,7 @@ exactly how it was made, tweak the palette, and reproduce byte-identical output.
 That matters for a project whose whole pitch is verifiability: a binary blob in
 the repository is one more thing a reader has to take on trust.
 
-Pure standard library — no Pillow, no build step:
+Pure standard library, with no Pillow and no build step:
     python assets/generate.py
 
 Outputs icon.png, icon.ico and banner.png next to this script.
@@ -71,7 +71,7 @@ def blank(width, height, colour=NONE):
 
 
 def scale(pixels, factor):
-    """Nearest-neighbour upscale — pixel art must stay crisp, never blurred."""
+    """Nearest-neighbour upscale: pixel art must stay crisp, never blurred."""
     out = []
     for row in pixels:
         big = []

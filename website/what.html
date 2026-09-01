@@ -10,7 +10,7 @@
 <title>What VeilVoice does &middot; VeilVoice</title>
 <meta name="description" content="The eight things it does, and the honest scope of each.">
 <link rel="icon" href="assets/icon-32.png" type="image/png">
-<meta property="og:title" content="VeilVoice — irreversible voice de-identification">
+<meta property="og:title" content="VeilVoice: irreversible voice de-identification">
 <meta property="og:description" content="Destroys the voiceprint, not the words. Fully offline. Reproducible, signed builds.">
 <meta property="og:image" content="assets/banner.png">
 <!-- Declarative, so it costs no script and works with JavaScript off.
@@ -79,15 +79,15 @@
     <div class="grid">
       <div class="card">
         <h3>Anonymise a recording</h3>
-        <p>wav, mp3, flac, ogg, m4a in — a clean WAV out, with metadata stripped. Roughly 90× faster than real time.</p>
+        <p>wav, mp3, flac, ogg, m4a in, a clean WAV out, with metadata stripped. Roughly 90× faster than real time.</p>
       </div>
       <div class="card">
         <h3>Scramble a microphone live</h3>
-        <p>Route the veiled voice into a virtual audio cable and every application on the machine — calls, streams, recorders — receives it instead of you.</p>
+        <p>Route the veiled voice into a virtual audio cable and every application on the machine, whether calls, streams or recorders, receives it instead of you.</p>
       </div>
       <div class="card">
         <h3>Encrypt at rest, by default</h3>
-        <p>Every recording is sealed as it is written — <span class="tip-right" data-tip="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard." aria-label="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard.">X25519 + ML-KEM-768 hybrid</span>, so one captured today is not readable by a quantum adversary tomorrow. Turning that off makes you read why first.</p>
+        <p>Every recording is sealed as it is written, using <span class="tip-right" data-tip="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard." aria-label="Two key agreements combined, so the result is safe unless both are broken. X25519 is the long-established one; ML-KEM-768 is the post-quantum standard.">X25519 + ML-KEM-768 hybrid</span>, so one captured today is not readable by a quantum adversary tomorrow. Turning that off makes you read why first.</p>
       </div>
       <div class="card">
         <h3>Lock the app</h3>
@@ -111,7 +111,7 @@
       </div>
       <div class="card">
         <h3>Detect tampering with its own files</h3>
-        <p>A signed manifest of what VeilVoice should be, and a check that reports what changed. Where the system's own auditing allows it, it names the program responsible — and says plainly when it cannot see, rather than implying nothing happened.</p>
+        <p>A signed manifest of what VeilVoice should be, and a check that reports what changed. Where the system's own auditing allows it, it names the program responsible, and says plainly when it cannot see, rather than implying nothing happened.</p>
       </div>
       <div class="card">
         <h3>Erase a recording</h3>
@@ -125,14 +125,14 @@
 
     <div class="note">
       <p><strong>Honest scope.</strong> “Fill the spectrogram with noise” and
-      “stay understandable” are mutually exclusive — noise that covers the voice
+      “stay understandable” are mutually exclusive, because noise that covers the voice
       covers the words. VeilVoice targets the achievable goal: irreversible
       speaker de-identification with intelligibility preserved <em>on purpose</em>.
       If the <em>message</em> must also be secret, encrypt it; that is a separate
       problem with a separate answer.</p>
       <p>The same applies to <strong>accent</strong>. Its melody and colour do not
       survive. What no signal-level transform can change is <em>which phonemes you
-      produced</em> — at that level the accent and the words are the same thing, so
+      produced</em>, and at that level the accent and the words are the same thing, so
       a strong regional accent may still be audible.</p>
     </div>
   </div>
@@ -141,7 +141,7 @@
 <footer>
   <div class="wrap">
     <p>
-      VeilVoice — GPL-3.0-or-later ·
+      VeilVoice &middot; GPL-3.0-or-later ·
       <a href="https://github.com/tilas01/veilvoice" rel="noopener noreferrer">source</a> ·
       <a href="wiki.html">wiki</a> ·
       <a href="user-agreements/LEGAL-WAIVER.txt">legal</a> ·
@@ -152,7 +152,7 @@
     </p>
     <p>
       Virtual audio routing on Windows is usually provided by VB-CABLE, which is
-      proprietary donationware and is not bundled — install it separately if you
+      proprietary donationware and is not bundled: install it separately if you
       want it.
     </p>
   </div>
