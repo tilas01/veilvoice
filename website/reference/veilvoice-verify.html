@@ -86,7 +86,7 @@
 <a href="veilvoice-verify/main.src.html">
 <rect x="20.0" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="74.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main.rs</text>
-<text x="74.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1837 lines</text>
+<text x="74.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1867 lines</text>
 </a>
 <a href="veilvoice-verify/builder.src.html">
 <rect x="154.6" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -121,7 +121,7 @@
 <a href="veilvoice-verify/tests.src.html">
 <rect x="301.3" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="351.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tests.rs</text>
-<text x="351.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">457 lines</text>
+<text x="351.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">497 lines</text>
 </a>
 <text x="20.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">Every arrow is a crate:: or super:: path one module actually uses, read out of</text>
 <text x="20.0" y="328.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the source rather than drawn by hand.</text>
@@ -131,14 +131,14 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_main([&quot;main.rs&lt;br/&gt;1837 lines&quot;])
+    n_main([&quot;main.rs&lt;br/&gt;1867 lines&quot;])
     n_builder[&quot;builder.rs&lt;br/&gt;1148 lines&quot;]
     n_deps[&quot;deps.rs&lt;br/&gt;650 lines&quot;]
     n_discover[&quot;discover.rs&lt;br/&gt;460 lines&quot;]
     n_extracted[&quot;extracted.rs&lt;br/&gt;312 lines&quot;]
     n_fetch[&quot;fetch.rs&lt;br/&gt;329 lines&quot;]
     n_report[&quot;report.rs&lt;br/&gt;385 lines&quot;]
-    n_tests[&quot;tests.rs&lt;br/&gt;457 lines&quot;]
+    n_tests[&quot;tests.rs&lt;br/&gt;497 lines&quot;]
     n_builder --&gt; n_deps
     n_builder --&gt; n_report
     n_main --&gt; n_report
@@ -161,9 +161,9 @@ flowchart TD
 <tr><td><a href="veilvoice-verify/discover.html"><code>discover.rs</code></a></td><td>460</td><td>Finding a release to check, without being told where it is.</td></tr>
 <tr><td><a href="veilvoice-verify/extracted.html"><code>extracted.rs</code></a></td><td>312</td><td>What came out of the archive, and the GnuPG somebody already has.</td></tr>
 <tr><td><a href="veilvoice-verify/fetch.html"><code>fetch.rs</code></a></td><td>329</td><td>Download a release, without putting an HTTP client in the dependency graph.</td></tr>
-<tr><td><a href="veilvoice-verify/main.html"><code>main.rs</code></a></td><td>1837</td><td>The portable verifier: check a VeilVoice release without GnuPG installed.</td></tr>
+<tr><td><a href="veilvoice-verify/main.html"><code>main.rs</code></a></td><td>1867</td><td>The portable verifier: check a VeilVoice release without GnuPG installed.</td></tr>
 <tr><td><a href="veilvoice-verify/report.html"><code>report.rs</code></a></td><td>385</td><td>How much this program says, and what it returns when it says nothing.</td></tr>
-<tr><td><a href="veilvoice-verify/tests.html"><code>tests.rs</code></a></td><td>457</td><td>The verifier&#x27;s own tests.</td></tr>
+<tr><td><a href="veilvoice-verify/tests.html"><code>tests.rs</code></a></td><td>497</td><td>The verifier&#x27;s own tests.</td></tr>
 <tr><td><a href="veilvoice-verify/tests-release_manifest.html"><code>release_manifest.rs</code></a></td><td>208</td><td>Marker 97.</td></tr>
 </tbody></table>
 </section>
