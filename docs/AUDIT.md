@@ -78,6 +78,25 @@ The seventh-round commentary is labelled as seventh-round commentary rather
 than rewritten, because it was accurate about the rounds it named and the only
 false thing about it was the tense.
 
+**What now catches it.** `tools/measured/generate.py` reads the audit's own
+finding headings and records two numbers in `docs/MEASURED.md`: how many
+findings have an entry, and the highest number handed out. They are equal
+exactly when nothing has been skipped. `tools/site-tests/audit.test.js` then
+checks the README's count and range, and the verdict's own count and range,
+against those measured numbers rather than against each other, which is F-71's
+lesson applied to a different pair of claims. It also fails if a per-round
+breakdown reappears in §6.
+
+All four failure modes were tested by reintroducing them: a deleted finding
+heading, a restored breakdown, and a drifted README count each fail the suite
+with a message naming what disagrees.
+
+One thing the guard taught while being written, which is why it is worth
+recording. Its first version searched the whole document for a per-round
+breakdown, and failed on this entry, which quotes the breakdown it is about. A
+guard that cannot tell a quotation from a reintroduction fails honest edits,
+and a guard that fails honest edits gets worked around. It reads §6 alone now.
+
 **What would have caught it earlier:** reading the verdict as a reader reaches
 it, which is last, rather than as an author edits it, which is one number at a
 time. It is the same as F-104 and the release-note sentences after it. Nothing
@@ -1832,7 +1851,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1126 tests across 27 crates, plus doctests and 14 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1126 tests across 27 crates, plus doctests and 15 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
