@@ -40,9 +40,9 @@ longer offered as the explanation for anything.
 
 ## The twenty-first round: the verifier where a person actually stands, and 2.19 billion inputs
 
-One defect (F-107), found by running the verifier the way somebody
-downloading a release runs it, and a coverage-guided campaign at twice the
-length of any before it, which found nothing.
+Two defects (F-107 and F-108), both about which directory the verifier answers
+for, and a coverage-guided campaign at twice the length of any before it, which
+found nothing.
 
 ### F-107 -- the verifier could not find the release it was standing in
 
@@ -87,6 +87,55 @@ because it is the one nobody thinks to describe: the folder you are already
 standing in. This is the third finding in four rounds whose cause was a check
 that had never been run in the shape a person meets it, after F-104 and the
 release notes.
+
+### F-108 -- a mistyped directory was answered with a result about a different one
+
+`veilvoice-verify/src/main.rs`.
+
+Found by running the other paths through the same program after F-107, on the
+grounds that one wrong answer about where to look is rarely the only one.
+
+    $ veilvoice-verify auto /no/such/place
+    ...
+      INTACT. This file is byte-for-byte what was published, signed by
+      8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A.
+    $ echo $?
+    0
+
+`/no/such/place` does not exist. The release it checked and pronounced intact
+was in the current directory, and the path that was actually typed appears
+nowhere in the output.
+
+The search falls back through the current directory, the folder holding the
+program, Downloads and Desktop. That is right when nobody said where to look,
+and it is wrong the moment somebody does: a person who names a directory is
+asking about that directory, and an answer about a different one is an answer
+to a question they did not ask.
+
+**The exit status is the part that makes this more than a nuisance.**
+`veilvoice-verify auto "$DOWNLOAD_DIR" || exit 1` is the obvious way to put
+this in a script, and it passed. A typo in the variable, an unset variable
+expanding to something odd, a path that had not been created yet: each one
+produces a green result about whatever happened to be lying around, and the
+script goes on to install.
+
+A named directory is now checked before anything is searched. If it is not a
+directory the program refuses, names the path, says nothing was checked and
+why, and points at the no-argument form for somebody who wanted the search.
+A file given instead of a folder is refused the same way.
+
+The regression test reads `command_auto` and requires the existence check to
+come before the search, and requires the refusal to name the path. It is a
+source-level test on purpose: reproducing the failure needs a machine with a
+release lying around somewhere findable, which is precisely the condition that
+kept it invisible.
+
+**This is F-107's lesson a second time in one round, and the pair is the
+point.** F-107 was the program not looking where the user was standing; F-108
+is the program looking somewhere else than the user pointed. Both are about
+whose question is being answered, both were found by running it rather than
+reading it, and the second was found only because the first prompted a walk
+through every other way somebody invokes this.
 
 ### The campaign, at twenty minutes a target
 
@@ -2017,7 +2066,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1134 tests across 27 crates, plus doctests and 16 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1135 tests across 27 crates, plus doctests and 16 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and checked against this line, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -3634,7 +3683,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and seven defects found and fixed (F-1 to F-107), across twenty-one
+**One hundred and eight defects found and fixed (F-1 to F-108), across twenty-one
 rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

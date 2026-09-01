@@ -17,9 +17,9 @@ F-77 in `docs/AUDIT.md`.
 
 | What | Measured |
 |---|---:|
-| Tests, measured by running them | 1134 |
+| Tests, measured by running them | 1135 |
 | Crates in the workspace | 27 |
 | Website suites | 16 |
-| Findings written up in the audit | 107 |
-| Highest finding number used | 107 |
+| Findings written up in the audit | 108 |
+| Highest finding number used | 108 |
 | Measured on | `x86_64-unknown-linux-gnu` |
