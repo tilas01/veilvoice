@@ -3,7 +3,7 @@
 # Using VeilVoice as a library
 
 Every part of VeilVoice is an ordinary Rust crate. Nothing here needs the
-desktop app, the command-line tool, or a running VeilVoice process, you can
+desktop app, the command-line tool, or a running VeilVoice process: you can
 take the de-identification engine on its own, or the container format on its
 own, and use it in your own program.
 
