@@ -89,7 +89,7 @@ flowchart TD
     n_dialog["dialog.rs<br/>369 lines"]
     n_group["group.rs<br/>1668 lines"]
     n_integrity["integrity.rs<br/>386 lines"]
-    n_layout["layout.rs<br/>242 lines"]
+    n_layout["layout.rs<br/>247 lines"]
     n_monitor["monitor.rs<br/>414 lines"]
     n_notify["notify.rs<br/>460 lines"]
     n_palettes["palettes.rs<br/>700 lines"]
@@ -198,7 +198,7 @@ flowchart TD
 | [[`dialog.rs`|File-veilvoice-gui-dialog]] | 369 | Asking for a file without stopping the window. |
 | [[`group.rs`|File-veilvoice-gui-group]] | 1668 | Group mode: several people in one recording, each with a name and a colour. |
 | [[`integrity.rs`|File-veilvoice-gui-integrity]] | 386 | The integrity record, taken and checked by the window rather than by hand. |
-| [[`layout.rs`|File-veilvoice-gui-layout]] | 242 | Centring a row of widgets, which egui does not do by nesting. |
+| [[`layout.rs`|File-veilvoice-gui-layout]] | 247 | Centring a row of widgets, which egui does not do by nesting. |
 | [[`lib.rs`|File-veilvoice-gui-lib]] | 86 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [[`main.rs`|File-veilvoice-gui-main]] | 179 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [[`monitor.rs`|File-veilvoice-gui-monitor]] | 414 | The live monitor: what is going in, and what is coming out, wherever you are. |
