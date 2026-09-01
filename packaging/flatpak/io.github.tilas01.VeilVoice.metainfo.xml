@@ -71,6 +71,12 @@
     The version is compared against the workspace version by the site suite.
   -->
   <releases>
+    <release version="0.1.16" date="2026-09-01">
+      <description>
+        <p>A verifier that no longer calls a genuine release unverified, and an
+        interface with no dashes in it.</p>
+      </description>
+    </release>
     <release version="0.1.15" date="2026-08-31">
       <description>
         <p>

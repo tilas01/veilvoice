@@ -1,3 +1,14 @@
+veilvoice (0.1.16-1) unstable; urgency=medium
+
+  * See CHANGELOG.md in the source for what changed in this release.
+    This file exists because dpkg-buildpackage requires it and takes the
+    package's version from it, so it is the one place in packaging/ that
+    decides what version is built. tools/site-tests/packaging.test.js
+    compares it against the workspace version and fails the build if the
+    two disagree.
+
+ -- tilas01 <tilas01@users.noreply.github.com>  Tue, 01 Sep 2026 00:00:00 +0000
+
 veilvoice (0.1.15-1) unstable; urgency=medium
 
   * See CHANGELOG.md in the source for what changed in this release.

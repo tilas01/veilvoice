@@ -232,7 +232,7 @@ it can honestly be made rather than to keep apologising for it.
 | 93 | **Group mode explained where it is used** — how to build a plan, what each field does, and what happens without one | **done** | — |
 | 94 | **Release notes people can actually read** — every release listed newest first, its notes opening in place, and every file one click away | **done** | — |
 | 95 | **One version per release, in order, enforced** — the tag, the workspace and every package definition checked against each other before a release can go out | **done** | — |
-| 96 | **v0.1.15 released** — the audit run over everything since v0.1.14, CI green, and the release published | **next** | — |
+| 96 | **v0.1.15 released** — the audit run over everything since v0.1.14, CI green, and the release published | **done** | — |
 | 97 | **A verifier anybody can use, checking everything** — one press or one command checks the signature, the archive, every file you extracted, and then asks your own GnuPG the same question | **done** | — |
 
 ---
