@@ -44,6 +44,17 @@ instead of by hand.
   before anything is searched, and a refusal names the path and says nothing
   was checked.
 
+- **F-109** `veilvoice anonymise recording.wav` from a script, a scheduled job
+  or anything with its input redirected failed with `No such device or address
+  (os error 6)`. That is the operating system's word for "there is no console",
+  and it names nothing that was wanted and none of the ways on. VeilVoice
+  encrypts at rest by default, so it wants a passphrase and there is nowhere to
+  ask. Both prompts now check for a terminal first and explain: `--encrypt-to`
+  with a public key, which types nothing and is the one that works in a script;
+  a terminal, if somebody is there; or `--encrypt false --yes`, described as
+  what it is. Checking first rather than reporting the failure afterwards keeps
+  the message the same on Windows.
+
 ### Buttons line up with the buttons beside them
 
 The desktop application padded its passphrase labels with trailing spaces to

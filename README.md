@@ -398,7 +398,7 @@ Artwork is **generated, not committed as opaque blobs**:
 
 **v0.1.16: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1,135 tests across 27
+destinations, CLI and GUI are implemented and tested (1,137 tests across 27
 crates plus doctests, and 16 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for nine
@@ -411,7 +411,7 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Twenty-one audit rounds have found and fixed **108 defects** (F-1 to F-108).
+Twenty-one audit rounds have found and fixed **109 defects** (F-1 to F-109).
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a
