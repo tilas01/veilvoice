@@ -89,7 +89,7 @@
 <span class="ln" id="L46"><span class="tok-kw">use</span> veilvoice_crypto::{container, kdf, lock};</span>
 <span class="ln" id="L47"></span>
 <span class="src-item" id="fn-rng">
-<span class="ln" id="L48"><span class="tok-com">/// xorshift32. Deterministic, seeded, and twenty lines &#8212; a dependency here</span></span>
+<span class="ln" id="L48"><span class="tok-com">/// xorshift32. Deterministic, seeded, and twenty lines. A dependency here</span></span>
 <span class="ln" id="L49"><span class="tok-com">/// would be a dependency in the audit surface for no benefit.</span></span>
 <span class="ln" id="L50"><span class="tok-kw">struct</span> <span class="tok-fn">Rng</span>(u32);</span>
 </span>
@@ -156,7 +156,7 @@
 <span class="ln" id="L100">                out[i] = rng.<span class="tok-fn">byte</span>();</span>
 <span class="ln" id="L101">            }</span>
 <span class="ln" id="L102">        }</span>
-<span class="ln" id="L103">        <span class="tok-com">// Truncate &#8212; the classic way a length field outruns the buffer.</span></span>
+<span class="ln" id="L103">        <span class="tok-com">// Truncate, which is the classic way a length field outruns the buffer.</span></span>
 <span class="ln" id="L104">        <span class="tok-num">2</span> =&gt; {</span>
 <span class="ln" id="L105">            <span class="tok-kw">let</span> n = rng.<span class="tok-fn">below</span>(out.<span class="tok-fn">len</span>() + <span class="tok-num">1</span>);</span>
 <span class="ln" id="L106">            out.<span class="tok-fn">truncate</span>(n);</span>
@@ -223,7 +223,7 @@
 <span class="src-item" id="fn-cheap">
 <span class="ln" id="L164"><span class="tok-com">/// Whether it is worth actually running the KDF for these parameters.</span></span>
 <span class="ln" id="L165"><span class="tok-com">///</span></span>
-<span class="ln" id="L166"><span class="tok-com">/// Mutation cheerfully produces costs that are *valid* and enormous &#8212; a</span></span>
+<span class="ln" id="L166"><span class="tok-com">/// Mutation cheerfully produces costs that are *valid* and enormous: a</span></span>
 <span class="ln" id="L167"><span class="tok-com">/// 4 GiB-and-three-passes Argon2 is a perfectly legal header. Executing those</span></span>
 <span class="ln" id="L168"><span class="tok-com">/// turns a campaign into a benchmark, so the KDF-running half of each round is</span></span>
 <span class="ln" id="L169"><span class="tok-com">/// limited to cheap parameters and the expensive ones are covered by the unit</span></span>
@@ -282,7 +282,7 @@
 <span class="ln" id="L220">            <span class="tok-com">// This is the check that stops an absurd cost reaching Argon2.</span></span>
 <span class="ln" id="L221">            <span class="tok-kw">let</span> _ = header.kdf.<span class="tok-fn">checked</span>();</span>
 <span class="ln" id="L222">            <span class="tok-com">// And the full open path, which is what actually faces a hostile</span></span>
-<span class="ln" id="L223">            <span class="tok-com">// file &#8212; only for costs cheap enough to run: see `cheap`.</span></span>
+<span class="ln" id="L223">            <span class="tok-com">// file, only for costs cheap enough to run: see `cheap`.</span></span>
 <span class="ln" id="L224">            <span class="tok-kw">if</span> <span class="tok-fn">cheap</span>(header.kdf) {</span>
 <span class="ln" id="L225">                <span class="tok-kw">let</span> _ = container::<span class="tok-fn">open_with_password</span>(b<span class="tok-str">&quot;pw&quot;</span>, &amp;bytes);</span>
 <span class="ln" id="L226">            }</span>
@@ -313,7 +313,7 @@
 <span class="ln" id="L249">                <span class="tok-str">&quot;seed {seed}: lock file does not round-trip&quot;</span></span>
 <span class="ln" id="L250">            );</span>
 <span class="ln" id="L251">            <span class="tok-com">// The cooldown must be a finite answer whatever the stored counters</span></span>
-<span class="ln" id="L252">            <span class="tok-com">// say &#8212; including a failure count of u32::MAX and a timestamp from</span></span>
+<span class="ln" id="L252">            <span class="tok-com">// say, including a failure count of u32::MAX and a timestamp from</span></span>
 <span class="ln" id="L253">            <span class="tok-com">// the far future, which mutation reaches often.</span></span>
 <span class="ln" id="L254">            <span class="tok-kw">let</span> _ = parsed.<span class="tok-fn">cooldown</span>();</span>
 <span class="ln" id="L255">            assert!(lock::<span class="tok-fn">delay_secs</span>(parsed.<span class="tok-fn">failures</span>()) &lt;= <span class="tok-num">15</span> * <span class="tok-num">60</span>);</span>

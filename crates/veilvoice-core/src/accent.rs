@@ -6,16 +6,16 @@
 //! Accent is carried by two very different kinds of cue, and they have opposite
 //! answers here:
 //!
-//! * **Suprasegmental cues** — intonation contour and pitch range, long-term
+//! * **Suprasegmental cues**, meaning intonation contour and pitch range, long-term
 //!   voice quality and spectral tilt, and the fixed vocal-tract scale behind a
 //!   speaker's vowel space. These are *properties of the signal*, they are
 //!   strongly speaker- and region-identifying, and this module removes them by
 //!   mapping every speaker onto one canonical target.
-//! * **Segmental cues** — *which phonemes the speaker actually produced*:
+//! * **Segmental cues**, meaning *which phonemes the speaker actually produced*:
 //!   rhoticity, vowel mergers, dental-fricative substitution, aspiration
 //!   patterns. These are not a colouration laid over the words; at this level
 //!   they **are** the words. Removing them means deciding a different phoneme
-//!   was said, which no filter can do — it requires recognising the speech and
+//!   was said, which no filter can do: it requires recognising the speech and
 //!   re-synthesising it (see the planned text-to-speech mode, which sidesteps
 //!   this entirely by never carrying the original signal at all).
 //!
@@ -31,7 +31,7 @@
 //! Every step here is *many-to-one*: a whole population of input f0 contours,
 //! spectral tilts and vocal-tract lengths is collapsed onto a single canonical
 //! value. That destroys information rather than displacing it, so it composes
-//! with the phase discard in [`crate::spectral`] — the two are independent
+//! with the phase discard in [`crate::spectral`], because the two are independent
 //! one-way steps, and normalising the speaker's *mean* pitch and vocal-tract
 //! length removes two of the strongest biometric features there are.
 //!
@@ -96,7 +96,7 @@ pub struct AccentConfig {
     /// Master switch. When false the neutraliser is bypassed entirely.
     pub enabled: bool,
     /// How much of the speaker's intonation contour is replaced by a canonical
-    /// one. At 1.0 — the default — the output sits at a steady
+    /// one. At 1.0, which is the default, the output sits at a steady
     /// [`AccentConfig::target_f0_hz`], which removes the intonation pattern
     /// entirely; the melody of an accent is one of its strongest cues, and a
     /// constant carries no speaker information at all.
@@ -110,12 +110,12 @@ pub struct AccentConfig {
     pub target_f0_hz: f32,
     /// How much of the speaker's vocal-tract scale is normalised away.
     pub vtln_strength: f32,
-    /// Canonical long-term envelope centroid, in hertz — the vocal-tract scale
+    /// Canonical long-term envelope centroid, in hertz, which is the vocal-tract scale
     /// every speaker is mapped onto.
     pub target_centroid_hz: f32,
     /// How much of the speaker's long-term spectral tilt is rotated onto the
     /// canonical slope. Deliberately a broad tilt only, never a bin-by-bin
-    /// match — see [`AccentNeutralizer::shape`].
+    /// match. See [`AccentNeutralizer::shape`].
     pub ltas_strength: f32,
     /// Slope of the canonical long-term spectrum, in dB per octave.
     pub target_tilt_db_oct: f32,
@@ -302,9 +302,10 @@ impl AccentNeutralizer {
     /// formant warping applied upstream.
     ///
     /// The correction is renormalised to preserve the frame's energy exactly.
-    /// Centring the ramp only makes it *approximately* level-neutral — the
-    /// centroid is an energy-weighted quantity and a dB-symmetric curve is not
-    /// energy-symmetric — so the level is pinned explicitly rather than assumed.
+    /// Centring the ramp only makes it *approximately* level-neutral, because
+    /// the centroid is an energy-weighted quantity and a dB-symmetric curve is
+    /// not energy-symmetric, so the level is pinned explicitly rather than
+    /// assumed.
     pub fn shape(&mut self, env: &mut [f32]) {
         if !self.cfg.enabled {
             return;
@@ -342,7 +343,7 @@ impl AccentNeutralizer {
     /// more**: the measured long-term spectrum is reduced to a single slope, and
     /// the correction is the rotation that carries that slope onto the canonical
     /// one. This is the strongest form of long-term colour correction that is
-    /// *structurally incapable* of damaging intelligibility — a smooth monotone
+    /// *structurally incapable* of damaging intelligibility, because a smooth monotone
     /// ramp adds the same offset to every speaker's vowels, so formant-scale
     /// contrast passes through untouched. Matching the long-term spectrum
     /// bin-by-bin would remove more speaker colour, but it also flattens the

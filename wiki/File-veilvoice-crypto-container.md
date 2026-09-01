@@ -34,7 +34,7 @@ offset  size  field
 ```
 
 **The entire header is the AEAD's associated data.** Editing any byte of it
-— downgrading the KDF cost, swapping the mode, corrupting the salt — makes
+by downgrading the KDF cost, swapping the mode or corrupting the salt, makes
 decryption fail rather than silently changing behaviour. Unused fields are
 written as zero and are still authenticated, so they cannot be used as a
 covert channel or a downgrade vector.

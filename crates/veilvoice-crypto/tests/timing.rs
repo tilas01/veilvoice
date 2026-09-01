@@ -3,7 +3,7 @@
 //!
 //! `docs/AUDIT.md` listed this as outstanding: Argon2id is inherently
 //! constant-ish, but nobody had measured the code *around* it. The question is
-//! whether the time an attempt takes leaks anything about the password —
+//! whether the time an attempt takes leaks anything about the password,
 //! classically, whether a byte-by-byte comparison returns early and turns
 //! "how long did that take" into "how many characters were right".
 //!
@@ -17,8 +17,8 @@
 //! ```
 //!
 //! The thresholds below are loose on purpose. They are there to catch a
-//! *catastrophic* regression — someone replacing a constant-time comparison
-//! with `==`, which shows up as a difference of orders of magnitude — not to
+//! *catastrophic* regression, such as someone replacing a constant-time
+//! comparison with `==`, which shows up as a difference of orders of magnitude, not to
 //! certify a bound in nanoseconds, which this method cannot honestly do.
 //!
 //! # In plain words
@@ -53,7 +53,7 @@ const SAMPLES: usize = 2_000;
 /// noise on a real machine is one-sided: a scheduler, an interrupt or a cache
 /// miss can only ever make a sample slower, never faster. The fastest sample is
 /// therefore the closest estimate of the work the code actually does, and it is
-/// far more stable across runs than any average — which on the first pass of
+/// far more stable across runs than any average, which on the first pass of
 /// these tests moved the "ratio" by 50% purely from Windows scheduling.
 struct Stats {
     min: Duration,
@@ -100,7 +100,7 @@ fn time_it(runs: usize, mut body: impl FnMut()) -> Stats {
 /// Needed wherever a single measurement would otherwise have to include its own
 /// setup: the app lock counts failures, so timing repeated wrong guesses on one
 /// lock either trips the rate limiter or has to reset it inside the timed
-/// region — which is how the first version of this test ended up comparing two
+/// region, which is how the first version of this test ended up comparing two
 /// derivations against one and reporting a meaningless 2× "leak".
 fn time_each<T>(items: &mut [T], mut body: impl FnMut(&mut T)) -> Stats {
     summarise(
@@ -211,8 +211,8 @@ fn the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right() {
 }
 
 /// The rate limiter returns **before** touching the KDF, so a locked-out
-/// attempt is obviously faster than a real one. That is deliberate — the point
-/// of a rate limit is to refuse to spend the CPU — and it leaks only the state
+/// attempt is obviously faster than a real one. That is deliberate, because the
+/// point of a rate limit is to refuse to spend the CPU, and it leaks only the state
 /// the UI displays on screen anyway. Measured so the trade is a number rather
 /// than an assumption.
 #[test]

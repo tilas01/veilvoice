@@ -30,8 +30,8 @@ complex spectrum in place, keeping the FFT plumbing and the de-identification
 maths cleanly separated.
 
 The closure also receives the raw (unwindowed) analysis frame. Accent
-neutralisation needs a time-domain view to track f0 — the FFT resolution at
-useful frame sizes is far too coarse for that — and handing over the frame
+neutralisation needs a time-domain view to track f0, because the FFT
+resolution at useful frame sizes is far too coarse for that, and handing over the frame
 that produced the spectrum keeps the two perfectly aligned. Its newest `hop`
 samples are the tail.
 

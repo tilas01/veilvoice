@@ -16,7 +16,7 @@ Timing measurement of the password paths.
 
 `docs/AUDIT.md` listed this as outstanding: Argon2id is inherently
 constant-ish, but nobody had measured the code *around* it. The question is
-whether the time an attempt takes leaks anything about the password —
+whether the time an attempt takes leaks anything about the password,
 classically, whether a byte-by-byte comparison returns early and turns
 "how long did that take" into "how many characters were right".
 
@@ -30,8 +30,8 @@ cargo test -p veilvoice-crypto --release --test timing -- --ignored --nocapture
 ```
 
 The thresholds below are loose on purpose. They are there to catch a
-*catastrophic* regression — someone replacing a constant-time comparison
-with `==`, which shows up as a difference of orders of magnitude — not to
+*catastrophic* regression, such as someone replacing a constant-time
+comparison with `==`, which shows up as a difference of orders of magnitude, not to
 certify a bound in nanoseconds, which this method cannot honestly do.
 
 # In plain words

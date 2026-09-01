@@ -51,7 +51,7 @@
 <section id="s-about">
 <p>Streaming short-time Fourier transform with overlap-add resynthesis.</p>
 <p>Structure follows the classic FIFO/overlap-add pipeline (as popularised by Bernsee&#x27;s SMB pitch shifter): samples flow in and out one-for-one with a fixed latency of <code>n - hop</code> samples, and a full frame is analysed/synthesised every <code>hop</code> input samples. The caller supplies a closure that rewrites the complex spectrum in place, keeping the FFT plumbing and the de-identification maths cleanly separated.</p>
-<p>The closure also receives the raw (unwindowed) analysis frame. Accent neutralisation needs a time-domain view to track f0 &#8212; the FFT resolution at useful frame sizes is far too coarse for that &#8212; and handing over the frame that produced the spectrum keeps the two perfectly aligned. Its newest <code>hop</code> samples are the tail.</p>
+<p>The closure also receives the raw (unwindowed) analysis frame. Accent neutralisation needs a time-domain view to track f0, because the FFT resolution at useful frame sizes is far too coarse for that, and handing over the frame that produced the spectrum keeps the two perfectly aligned. Its newest <code>hop</code> samples are the tail.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Sound arrives as a long stream of numbers. To change a voice you have to look at it in terms of pitch and tone rather than raw numbers, and this is the part that converts back and forth.</p>
 <p>It takes a short slice of sound, works out which frequencies are in it, hands that picture to the code that alters it, and turns the result back into sound. The slices overlap and are faded together, so the joins cannot be heard.</p>

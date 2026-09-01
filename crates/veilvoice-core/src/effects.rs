@@ -4,7 +4,7 @@
 //! These run on the continuous output stream (not per FFT frame) and exist to
 //! (a) further decorrelate the signal from the original, and (b) add a few
 //! detuned "voices" so the spectrogram is densely filled rather than showing a
-//! clean harmonic stack — without harming intelligibility, so every mix defaults
+//! clean harmonic stack, without harming intelligibility, so every mix defaults
 //! low. None of them are invertible in a way that recovers the source voice.
 //!
 //! # How little these contribute, said plainly
@@ -132,7 +132,7 @@ pub struct Chorus {
 
 impl Chorus {
     pub fn new(sample_rate: f32, mix: f32) -> Self {
-        // Three voices at different rates/phases — cheap but effective spread.
+        // Three voices at different rates and phases: cheap but effective spread.
         let voices = vec![
             DelayVoice::new(sample_rate, 14.0, 3.0, 0.17, 0.0),
             DelayVoice::new(sample_rate, 21.0, 4.0, 0.23, 2.1),
