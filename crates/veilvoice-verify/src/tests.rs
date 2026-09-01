@@ -455,3 +455,43 @@ fn a_gnupg_that_cannot_run_is_never_counted_against_the_release() {
         );
     }
 }
+
+/// **F-108.** A directory that was named has to exist, or nothing is checked.
+///
+/// The search falls back through the current directory, the folder holding
+/// this program, Downloads and Desktop, which is right when nobody said where
+/// to look and wrong the moment somebody does. Naming a directory that is not
+/// there used to fall through to that list, check whatever it turned up, print
+/// INTACT and exit 0, without the path the person typed appearing anywhere.
+///
+/// Read out of the source rather than by running the binary, because the
+/// failure needs a machine with a release lying around somewhere findable to
+/// reproduce, which is exactly the condition that made it invisible. What has
+/// to stay true is that `command_auto` refuses before it searches.
+#[test]
+fn a_named_directory_that_is_not_there_is_refused_before_anything_is_searched() {
+    let source = include_str!("main.rs").replace("\r\n", "\n");
+    let body = source
+        .split("fn command_auto(")
+        .nth(1)
+        .expect("command_auto has to be findable");
+    let body = body.split("\nfn ").next().unwrap();
+
+    let guard = body
+        .find("is_dir()")
+        .expect("command_auto no longer checks that a named directory exists");
+    let search = body
+        .find("discover::search(")
+        .expect("command_auto no longer searches");
+    assert!(
+        guard < search,
+        "the existence check has to come before the search; otherwise a \
+         mistyped path is answered with a result about somewhere else"
+    );
+
+    assert!(
+        body.contains("named.display()"),
+        "the refusal has to name the directory it was given, or the reader \
+         cannot tell which path was wrong"
+    );
+}

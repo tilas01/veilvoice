@@ -729,6 +729,36 @@ fn command_release(tag: &str, asset: Option<&str>) -> ExitCode {
 /// completed from a hash list found somewhere else -- that would be checking one
 /// release against another release's list, and it would say "verified".
 fn command_auto(explicit: Option<&Path>) -> ExitCode {
+    // F-108. A directory that was named has to exist.
+    //
+    // The search falls back through the current directory, the folder holding
+    // this program, Downloads and Desktop, which is right when nobody said
+    // where to look. It is wrong the moment somebody does. Naming a directory
+    // that is not there used to fall through to the same list and check
+    // whatever it turned up, print INTACT, and exit 0, without the path the
+    // person typed appearing anywhere in the output.
+    //
+    // So somebody who mistypes a path is told a release is genuine, about a
+    // folder they did not ask about, and `veilvoice-verify auto "$DIR" ||
+    // exit 1` in a script passes. A verifier answering a question it was not
+    // asked is the one thing this program must not do.
+    if let Some(named) = explicit {
+        if !named.is_dir() {
+            return incomplete_deny(
+                "that is not a directory this program can look in",
+                &[
+                    &format!("  {}", named.display()),
+                    "",
+                    "It does not exist, or it is a file rather than a folder.",
+                    "Nothing was checked: a check of somewhere else would answer a",
+                    "question you did not ask.",
+                    "",
+                    "Run it with no arguments to search the usual places instead.",
+                ],
+            );
+        }
+    }
+
     let (complete, all) = discover::search(explicit);
 
     if all.is_empty() {

@@ -33,6 +33,17 @@ instead of by hand.
   one that asks. Checked against the published v0.1.15 end to end, including
   341 of 341 extracted files and the machine's own GnuPG.
 
+- **F-108** `veilvoice-verify auto /no/such/place` checked a different
+  directory, printed INTACT and exited 0, without the path that was typed
+  appearing anywhere in the output. The fallback through the current
+  directory, Downloads and Desktop is right when nobody said where to look and
+  wrong the moment somebody does. The exit status is what makes it more than a
+  nuisance: `veilvoice-verify auto "$DIR" || exit 1` is the obvious way to
+  script this, and a typo or an unset variable produced a green result about
+  whatever happened to be lying around. A named directory is now checked
+  before anything is searched, and a refusal names the path and says nothing
+  was checked.
+
 ### Buttons line up with the buttons beside them
 
 The desktop application padded its passphrase labels with trailing spaces to
