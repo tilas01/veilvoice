@@ -177,7 +177,7 @@ it, you keep Tokyo Night and nothing else changes.</p>
 </table>
 
 <h2 id="get">DOWNLOAD</h2>
-<p><a href="https://github.com/tilas01/veilvoice/releases/latest" rel="noopener noreferrer">Latest release</a>,
+<p><a href="https://github.com/tilas01/veilvoice/releases/latest" rel="noopener noreferrer">Latest release</a>, with
 builds for Windows, macOS (Apple Silicon and Intel) and Linux.</p>
 <p>Or build it; a fresh clone needs no secrets:</p>
 <pre><code>git clone https://github.com/tilas01/veilvoice
@@ -199,7 +199,7 @@ tilt are each collapsed onto one canonical value, so a whole population of
 speakers lands on the same output and there is nothing left to invert.</li>
 <li><strong>It is encrypted before it reaches the disk.</strong> The result is
 sealed as it is written, so <code>-o clean.wav</code> produces
-<code>clean.wav.veil</code>. The WAV is built in memory and encrypted there,
+<code>clean.wav.veil</code>. The WAV is built in memory and encrypted there, so
 the plaintext never exists on disk, because a file that is written and then
 deleted cannot be reliably taken back on flash storage.
 <pre><code>veilvoice decrypt clean.wav.veil -o clean.wav</code></pre></li>
