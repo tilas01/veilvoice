@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/tests.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 457 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 497 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
 
 ## Contents
 
@@ -38,11 +38,11 @@ whether it says no.
 
 ## What this file contains
 
-457 lines defining **23 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+497 lines defining **24 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
-_22 of 23 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 24 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **helper** -- private to this file._
 
@@ -134,3 +134,4 @@ flowchart TD
 | `a_contents_list_with_nothing_to_check_it_against_is_unusable` <sub>fn</sub> | [406](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L406) | A contents list with no signed hash list beside it cannot be used, and "cannot be used" is reported rather than quietly skipped. |
 | `matches_name` <sub>fn</sub> | [421](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L421) | A name for a Manifest, for a failing assertion to print. |
 | `a_gnupg_that_cannot_run_is_never_counted_against_the_release` <sub>fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L436) | Marker 97. |
+| `a_named_directory_that_is_not_there_is_refused_before_anything_is_searched` <sub>fn</sub> | [472](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L472) | F-108. |

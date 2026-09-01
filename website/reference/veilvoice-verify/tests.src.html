@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 457 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 497 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -543,6 +543,48 @@
 <span class="ln" id="L455">        );</span>
 <span class="ln" id="L456">    }</span>
 <span class="ln" id="L457">}</span>
+</span>
+<span class="ln" id="L458"></span>
+<span class="src-item" id="fn-a_named_directory_that_is_not_there_is_refused_before_anything_is_searched">
+<span class="ln" id="L459"><span class="tok-com">/// **F-108.** A directory that was named has to exist, or nothing is checked.</span></span>
+<span class="ln" id="L460"><span class="tok-com">///</span></span>
+<span class="ln" id="L461"><span class="tok-com">/// The search falls back through the current directory, the folder holding</span></span>
+<span class="ln" id="L462"><span class="tok-com">/// this program, Downloads and Desktop, which is right when nobody said where</span></span>
+<span class="ln" id="L463"><span class="tok-com">/// to look and wrong the moment somebody does. Naming a directory that is not</span></span>
+<span class="ln" id="L464"><span class="tok-com">/// there used to fall through to that list, check whatever it turned up, print</span></span>
+<span class="ln" id="L465"><span class="tok-com">/// INTACT and exit 0, without the path the person typed appearing anywhere.</span></span>
+<span class="ln" id="L466"><span class="tok-com">///</span></span>
+<span class="ln" id="L467"><span class="tok-com">/// Read out of the source rather than by running the binary, because the</span></span>
+<span class="ln" id="L468"><span class="tok-com">/// failure needs a machine with a release lying around somewhere findable to</span></span>
+<span class="ln" id="L469"><span class="tok-com">/// reproduce, which is exactly the condition that made it invisible. What has</span></span>
+<span class="ln" id="L470"><span class="tok-com">/// to stay true is that `command_auto` refuses before it searches.</span></span>
+<span class="ln" id="L471"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L472"><span class="tok-kw">fn</span> <span class="tok-fn">a_named_directory_that_is_not_there_is_refused_before_anything_is_searched</span>() {</span>
+<span class="ln" id="L473">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L474">    <span class="tok-kw">let</span> body = source</span>
+<span class="ln" id="L475">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn command_auto(&quot;</span>)</span>
+<span class="ln" id="L476">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L477">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;command_auto has to be findable&quot;</span>);</span>
+<span class="ln" id="L478">    <span class="tok-kw">let</span> body = body.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\nfn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L479"></span>
+<span class="ln" id="L480">    <span class="tok-kw">let</span> guard = body</span>
+<span class="ln" id="L481">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;is_dir()&quot;</span>)</span>
+<span class="ln" id="L482">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;command_auto no longer checks that a named directory exists&quot;</span>);</span>
+<span class="ln" id="L483">    <span class="tok-kw">let</span> search = body</span>
+<span class="ln" id="L484">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;discover::search(&quot;</span>)</span>
+<span class="ln" id="L485">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;command_auto no longer searches&quot;</span>);</span>
+<span class="ln" id="L486">    assert!(</span>
+<span class="ln" id="L487">        guard &lt; search,</span>
+<span class="ln" id="L488">        <span class="tok-str">&quot;the existence check has to come before the search; otherwise a \</span></span>
+<span class="ln" id="L489"><span class="tok-str">         mistyped path is answered with a result about somewhere else&quot;</span></span>
+<span class="ln" id="L490">    );</span>
+<span class="ln" id="L491"></span>
+<span class="ln" id="L492">    assert!(</span>
+<span class="ln" id="L493">        body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;named.display()&quot;</span>),</span>
+<span class="ln" id="L494">        <span class="tok-str">&quot;the refusal has to name the directory it was given, or the reader \</span></span>
+<span class="ln" id="L495"><span class="tok-str">         cannot tell which path was wrong&quot;</span></span>
+<span class="ln" id="L496">    );</span>
+<span class="ln" id="L497">}</span>
 </span>
 </code></pre>
 </main>
