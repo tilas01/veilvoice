@@ -60,7 +60,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 
-from crop import read_png, write_png, shots  # noqa: E402
+from crop import read_png, write_png, shots as all_shots  # noqa: E402
 
 # The radius, in pixels, at the size these are captured.
 #
@@ -146,6 +146,23 @@ def rounded(path):
     return [bytes(row) for row in out]
 
 
+def captures():
+    """The window captures, and only those.
+
+    `crop.py` trims every PNG in the screenshot folders, which is right: a
+    capture border is a capture border whatever the picture is of. Rounding is
+    not like that. It says "this is a picture of a rounded window", which is
+    true of the `gui-*.png` captures and is not true of anything else that
+    might be put beside them. A diagram or a photograph rounded on the
+    assumption it was a window would be quietly wrong, and nothing would say
+    so, so the assumption is written down here instead of inherited.
+    """
+    return [
+        path for path in all_shots()
+        if os.path.basename(path).startswith("gui-")
+    ]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--check", action="store_true",
@@ -153,7 +170,7 @@ def main():
     args = parser.parse_args()
 
     pending = []
-    for path in shots():
+    for path in captures():
         want = rounded(path)
         _, _, channels, have = read_png(path)
         if channels != 4 or have != want:
