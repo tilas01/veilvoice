@@ -1288,15 +1288,15 @@ anywhere else was told the application was not there, which was untrue.
 
 It now looks beside this program first (a portable folder holds all three
 together, and somebody who unpacked a release means the one they unpacked),
-then where an install puts it, then on `PATH` — and if it finds nothing it
+then where an install puts it, then on `PATH`, and if it finds nothing it
 lists every place it looked rather than saying "not found".
 
 **It never starts anything by a bare name.** `PATH` on Windows searches the
 current directory first, so `veilvoice gui` run inside a downloads folder
 holding something called `veilvoice-gui.exe` would have started that. This is
 the one command whose entire job is launching another program, which makes it
-a poor place to be relaxed about which. A test reads the module's own code —
-not its comments — and fails the build if a bare name appears.
+a poor place to be relaxed about which. A test reads the module's own code,
+not its comments, and fails the build if a bare name appears.
 
 `veilvoice g` is the same command, and `--quiet` opens the window without
 printing anything.
@@ -1318,19 +1318,19 @@ of you, meters still moving, looking exactly as it did a second earlier.
 Nobody notices that, because there is nothing to notice. It is not
 carelessness; it is a decision the operating system makes on your behalf. So
 Failsafe is **on by default**, and by default it also **closes** the program
-that took the microphone — a warning you have not read yet does not stop
+that took the microphone, a warning you have not read yet does not stop
 your voice going out.
 
 **It notices. It does not prevent, and that difference is printed every time:**
 
 > Failsafe cannot stop your computer handing a microphone to another program.
-> [...] What it does is notice, within about a second, and act — so there
+> [...] What it does is notice, within about a second, and act, so there
 > is a moment between another program taking a real microphone and Failsafe
 > reacting to it. That moment is short and it is not zero, and anything that
 > told you otherwise would be lying to you about how safe you are.
 
 Closing a program is bounded rather than general. Never VeilVoice itself,
-never a system process, and never by name — only the specific process the
+never a system process, and never by name, only the specific process the
 watch feed named, with the protection checked **twice**: once when deciding
 and again inside the only function that acts, because the cost of being wrong
 is ending somebody's desktop session. Every close is written down.
@@ -1345,7 +1345,7 @@ Three distinctions the crate refuses to blur:
   parse must never be the reason the safety catch is off.
 
 A program using VeilVoice's own cable is the arrangement working, not the
-accident, and is not reported — otherwise the alarm fires constantly and
+accident, and is not reported, since otherwise the alarm fires constantly and
 gets ignored.
 
 ### The window no longer freezes while you pick a file
@@ -1366,7 +1366,7 @@ frozen, and dragging the window left a trail of stale pixels. Somebody
 browsing for a recording for thirty seconds had a frozen application for
 thirty seconds.
 
-There were seven of them — the input file, the recording and plan in
+There were seven of them, the input file, the recording and plan in
 group mode, opening and saving a project, the public key, and all three slots
 on the verify tab.
 
@@ -1381,12 +1381,12 @@ versions it does not fail politely either. A frozen window is better than a
 dialog that never appears.
 
 Cancelling is reported as an answer rather than as silence, and a picker thread
-that dies without answering is treated as a cancel — otherwise the button
+that dies without answering is treated as a cancel, since otherwise the button
 that opened it stays disabled with no way back.
 
 ### `veilvoice privilege`: what it is running with, and what that lets it see
 
-Marker 39. Most of VeilVoice needs no special permissions — changing a
+Marker 39. Most of VeilVoice needs no special permissions, because changing a
 voice is something any program can do with your own account. The parts that
 *watch* see further as an administrator, and this says which of those you are
 getting.
@@ -1399,7 +1399,7 @@ a comment.
 
 **The opt-in service is deliberately not shipped.** A service outlives the
 window it was started from, starts itself at boot, and runs whether or not
-anybody is using the program — somebody who tried VeilVoice once should
+anybody is using the program, and somebody who tried VeilVoice once should
 not find it still running next month. Leaving the window open is the honest
 form of continuous monitoring, because then what it can see is exactly what it
 says it can see.
@@ -1410,7 +1410,7 @@ Microsoft's attestation signing; macOS needs an Apple Developer ID and an
 entitlement granted case by case. Both are identity checks on a named legal
 person, and this project is published under a pseudonym on purpose.
 
-"I could not tell" is its own answer and never reported as "not elevated" —
+"I could not tell" is its own answer and never reported as "not elevated", because
 understating what VeilVoice can see sounds like the cautious direction and is
 not, because somebody would conclude a feature is unavailable and stop reading
 its output.
@@ -1418,8 +1418,8 @@ its output.
 Two details that came from measuring. The Windows probe keys on the well-known
 SID `S-1-5-32-544` rather than the group's *name*, which is translated and
 would report every non-English machine as unprivileged. And the "Group used for
-deny only" attribute — what an administrator account looks like when it
-is **not** elevated — sits on the same 236-character line as the SID; a
+deny only" attribute, which is what an administrator account looks like when
+it is **not** elevated, sits on the same 236-character line as the SID; a
 console wraps it so it looks like two rows, and reading it that way would call
 every administrator account elevated. Verified on a machine in exactly that
 state, which reports `your own account`.
@@ -1438,8 +1438,8 @@ enforcement needs a kernel driver or a signed system policy and an application
 identity to sign it with, and this project is published under a pseudonym on
 purpose.
 
-That note is printed by **every** subcommand — not once at setup, not
-behind a flag — because a warning shown once is a warning forgotten by
+That note is printed by **every** subcommand, not once at setup, not
+behind a flag, because a warning shown once is a warning forgotten by
 the second week, and the one thing a reader must not come away believing is
 that this stopped something.
 
@@ -1449,7 +1449,7 @@ Freezing an empty baseline is refused, because a baseline that learned nothing
 calls everything unknown, which is the same as calling nothing unknown.
 
 **Grants expire**, checked against the clock rather than against a sweep that
-may not have run. An expired grant is left on record rather than removed —
+may not have run. An expired grant is left on record rather than removed,
 "this was allowed until Tuesday" is worth more to a reader than a row that
 quietly vanished. Permanent is spelled `--forever` rather than a distant date,
 so choosing it is something somebody typed.
@@ -1460,7 +1460,7 @@ not a control.
 
 Measured on a real machine: 111 programs learned from 313 sightings, then a
 `check` with a stray process running named `timeout.exe` and `smartscreen.exe`
-— the second started by Windows itself, which is exactly the case this
+and the second was started by Windows itself, which is exactly the case this
 is for.
 
 ### `veilvoice-proc` gains a second caller
@@ -1475,20 +1475,20 @@ need no machine to run on.
 Marker 41. Three ways for the application to tell you something, chosen in
 Settings under *interface*:
 
-- **a card in the corner** — rounded, translucent, fades on its own, will
+- **a card in the corner**: rounded, translucent, fades on its own, will
   not take focus or interrupt what you are typing, which also means it can be
   missed;
-- **a message that stops you** — cannot be missed, and cannot be missed
+- **a message that stops you**: cannot be missed, and cannot be missed
   quietly, which is what you want when the thing being reported is that
   something started recording;
-- **nothing** — offered because a monitor that interrupts you every thirty
+- **nothing**: offered because a monitor that interrupts you every thirty
   seconds is one you switch off entirely, and then it is watching for nothing.
 
 **The contrast is computed against the colour that is actually on screen.** A
 translucent card is a colour laid *over* the panel behind it, so measuring the
 card's own tint answers a question nobody asked. VeilVoice blends the two,
 takes the WCAG ratio against the result, and picks the text colour by measuring
-every candidate in the palette rather than assuming black or white — a
+every candidate in the palette rather than assuming black or white, a
 user palette can be anything, and an assumed extreme puts a colour on screen
 that is in no theme.
 
@@ -1518,7 +1518,7 @@ veilvoice anonymise recording.wav --reseed-range 250,1800
 Markers 28 and 48. The modulation seed rolls forward on a ratchet; a fixed
 interval is a fixed thing to observe. The interval is now drawn fresh before
 every roll, from a range that is itself **drawn from the operating system's
-random source at launch** — so it is a property of your run rather
+random source at launch**, so it is a property of your run rather
 than of the binary. `--reseed-range fixed`, or the checkbox in the application,
 restores the old fixed interval by name.
 
@@ -1539,7 +1539,7 @@ cannot see. For a control whose whole purpose is that the interval should not
 be predictable, that is the worst available failure.
 
 What is displayed is the **effective** range, quantised to whole frames, not
-what was asked for — the ratchet can only fire on a frame boundary, and
+what was asked for, the ratchet can only fire on a frame boundary, and
 showing the request would describe a spread that does not exist. Asking for
 `250,1800` reports `251-1803 ms`.
 
@@ -1555,7 +1555,7 @@ definition, that sentence, and one test of itself. Every released copy of
 VeilVoice rolled the modulation seed every two seconds exactly.
 
 What it is worth is small and real. The ratchet is forward secrecy, not
-irreversibility — the many-to-one mapping is what destroys the
+irreversibility, the many-to-one mapping is what destroys the
 voiceprint and does not depend on the ratchet at all, so a predictable period
 never made a voice recoverable. What it gave an observer was a clean segment
 boundary every two seconds in every recording VeilVoice has ever produced, in
@@ -1586,8 +1586,8 @@ veilvoice input known
 ```
 
 Marker 35. It names the programs running right now that are **able** to observe
-keyboard and mouse — remote-support tools, macro recorders, password
-managers, screen readers — and says what each one is and why it can
+keyboard and mouse, such as remote-support tools, macro recorders, password
+managers, screen readers, and says what each one is and why it can
 reach input at all. Nearly all of it is software somebody installed on purpose,
 and the crate says that too.
 
@@ -1596,7 +1596,7 @@ a logger uses are the mechanisms accessibility software uses, and software
 written to hide is written to hide from a process list. So every result, found
 or not, is printed with the sentence that matters:
 
-> a result of nothing found does not mean nothing is watching — it means
+> a result of nothing found does not mean nothing is watching. It means
 > nothing this build recognises is running, which is a much smaller claim
 
 Somebody who reads "nothing found" as "nothing there" has been made *less* safe
@@ -1625,7 +1625,7 @@ do; copying it would have left two parsers to drift apart, which is why
 
 So it is a crate of its own with no dependencies, and it carries the limits of
 its own answer: it sees programs running as you, and it sees that they are
-*open* — never what they are doing.
+*open*, never what they are doing.
 
 ## v0.1.13
 
@@ -1634,7 +1634,7 @@ can see; projects, profiles and a voice limit that was measured rather than
 chosen; and the eighth audit round.
 
 **The headline is `veilvoice-verify reproduce`.** Until now the verifier
-answered one question — *is this download the one that was published*.
+answered one question: *is this download the one that was published*.
 It now answers the harder one: **is the published build the one this source
 produces**. A signature says who made a file. Only a build says what it is made
 of.
@@ -1660,7 +1660,7 @@ one this source produces**. A signature says who made a file. Only a build says
 what it is made of.
 
 **The signature is verified before any hash from the list is read.** Not warned
-about — refused, with nothing built and nothing compared. The comparison
+about, and refused, with nothing built and nothing compared. The comparison
 function takes the hash list as *text* rather than as a path, so there is
 nowhere in it that could read an unverified file by accident; a test reads the
 function's own body and fails the build if `std::fs` appears in it.
@@ -1678,7 +1678,7 @@ you three platforms verified, which is how a reproducible-build claim is
 normally checked.
 
 **`deps` names what a build needs, who ships it, and why VeilVoice wants it**
-— the toolchain, a linker, `pkg-config`, and ALSA's headers, which only live
+namely the toolchain, a linker, `pkg-config`, and ALSA's headers, which only live
 mode needs. Missing pieces are installed **only on an explicit yes**, with the
 exact command line shown before the question, through the package manager the
 system already has. It adds no network client: the claim that this project's
@@ -1698,7 +1698,7 @@ whole exercise is most exposed to.
 
 Several tests read this project's own source with `include_str!` and find a
 function's end by searching for `"\n}\n"`. They passed locally and failed on
-GitHub's Windows runners — not on a different platform, on the *same*
+GitHub's Windows runners, not on a different platform, on the *same*
 one, minutes after being watched to pass. This machine has
 `core.autocrlf=input`; GitHub's Windows runners default to `true`, so the file
 arrives with CRLF and the pattern matches nothing.
@@ -1710,7 +1710,7 @@ contributor's git happened to be set to.
 compared byte for byte by `tools/verify.py`, and every generator writes LF. A
 contributor whose git converts text on checkout would find every `--check`
 failing on files they had never touched, on their first run, with a diff that
-shows nothing — and would reasonably conclude the repository was
+shows nothing, and would reasonably conclude the repository was
 broken.
 
 `.gitattributes` now pins text to LF for everyone and names the binary formats
@@ -1718,8 +1718,8 @@ rather than trusting detection to guess right on a `.wav`. The source-reading
 tests normalise as well: a test that depends on a git setting is one somebody
 will trip over on a machine nobody here owns.
 
-The failure mode is now a test of its own — a search for `"\n}\n"`
-is asserted to succeed against LF and to fail against CRLF — so it is
+The failure mode is now a test of its own, a search for `"\n}\n"`
+is asserted to succeed against LF and to fail against CRLF, so it is
 on record as reachable rather than as a story about it.
 
 ### F-71: the guard against stale claims compared one copy to another
@@ -1729,14 +1729,14 @@ crates". The tree holds 890 tests across 19 crates, and the website runs 11
 suites rather than ten.
 
 A guard existed, and passed. It was written after an earlier round of this
-exact drift — its comment says "this was the one place claims were
-hand-typed with nothing watching them" — and then it compared the
+exact drift, its comment says "this was the one place claims were
+hand-typed with nothing watching them", and then it compared the
 front page against `docs/AUDIT.md`. Both numbers were typed by the same hand at
 the same time, so both drifted together and the check reported success.
 
 The numbers now come from the tree. `tools/measured/generate.py` writes
-`docs/MEASURED.md` — the test count **by running the tests**, the
-crate count from `Cargo.toml`, the suite count from `run.js`'s own list —
+`docs/MEASURED.md`, the test count **by running the tests**, the
+crate count from `Cargo.toml`, the suite count from `run.js`'s own list,
 and every claim on the page and in the audit is compared against it.
 
 Three things that would have let it happen again:
@@ -1764,7 +1764,7 @@ So the answer was decided before the build started. Measured: two builds of this
 tree in two directories produced three binaries with three different hashes.
 
 The severity is in what it would have taught the one reader who took the trouble
-to build from source — that the release does not match its source.
+to build from source, that the release does not match its source.
 **A checker that always answers "not reproducible" is worse than no checker**,
 because the next time it says so for a real reason, that reader has learned to
 ignore it.
@@ -1779,7 +1779,7 @@ prints every setting before building:
     SOURCE_DATE_EPOCH 1787746339
 ```
 
-The remapped path is the one the compiler is actually given — not
+The remapped path is the one the compiler is actually given, not
 `canonicalize`, which on Windows returns a `\\?\` path that cargo never hands
 to rustc, so a remap built from it matches nothing and does nothing silently.
 `RUSTFLAGS` is set rather than appended to, because a value inherited from the
@@ -1806,8 +1806,8 @@ the other fails the build.
 ### F-69: the build succeeded, and then looked for it in the wrong place
 
 Found by running `build` on this machine. After a release build that took
-several minutes and worked, the tool hashed `root/target/release` — a path it
-computed rather than asked for — and ended with:
+several minutes and worked, the tool hashed `root/target/release`, a path it
+computed rather than asked for, and ended with:
 
 ```
   ok    the build finished
@@ -1834,7 +1834,7 @@ None was a logic error, and none would have been found by reading the code.
 
 Found by running `deps` on this machine. The Windows probe looked for `link` on
 `PATH` and reported whatever came back, which was
-`C:\Program Files\Git\usr\bin\link.exe` — GNU coreutils' hardlink utility.
+`C:\Program Files\Git\usr\bin\link.exe`, GNU coreutils' hardlink utility.
 It shares a name with Microsoft's linker and has nothing whatever to do with
 building Rust.
 
@@ -1888,7 +1888,7 @@ a finding to look into and publish. Most causes are boring, and calling it
 tampering would be a claim this program cannot support.
 
 Two tests read the program's own source and fail the build if any line prints
-without asking the level first — one for standard output, one for standard
+without asking the level first, one for standard output, one for standard
 error. A quiet mode is only as good as the last line nobody remembered to gate,
 and that omission is invisible: every other test still passes and the default
 output is still correct.
@@ -1898,8 +1898,8 @@ output is still correct.
 The eighth audit round, over the voice limit, saved projects and profiles, and
 the table of communication programs. Two defects, neither shipped.
 
-Every question the group panel answered about voices — how many speakers it
-would allow, which mode it would let you switch to, and **the render itself** —
+Every question the group panel answered about voices, meaning how many speakers it
+would allow, which mode it would let you switch to, and **the render itself**,
 was computed from the engine's *default* configuration rather than from the
 settings the rest of the window was set to.
 
@@ -1911,7 +1911,7 @@ were on another tab and the panel had never been handed them.
 The quieter half: how many voices stay clearly apart depends on the frame grid,
 because a coarser grid snaps destination pitches onto wider steps. Under a
 configuration where fewer than eight are separable, the panel still printed "8"
-and still let eight people in — and two of them would have shared a voice,
+and still let eight people in, and two of them would have shared a voice,
 discovered by listening to the finished recording.
 
 The panel now carries the configuration, copied from the application before
@@ -1922,14 +1922,14 @@ enforced both follow.
 ### F-66: a saved project could come back different from how it went out
 
 A value that trimmed away to nothing was written as a key with an empty value:
-`Some("   ")` went out as `title  ` and came back as `Some("")` — neither what
+`Some("   ")` went out as `title  ` and came back as `Some("")`, which is neither what
 was saved nor absent. A truncated project file carrying `plan  ` with nothing
 after it yielded a plan path naming no file, which failed later with a message
 about a file called nothing instead of being read as "no plan named".
 
 Writer and reader are symmetric now, in both directions. The fix worth having
 is the test: every shape a project can be in is saved, read, saved and read
-again — empty and whitespace values, no members, the maximum members, no
+again: empty and whitespace values, no members, the maximum members, no
 outputs at all, and names containing the field separator and a line break. The
 old test only ever exercised one tidy project.
 
@@ -1953,8 +1953,8 @@ and gives the exact menu for each one:
 **Nothing has to know VeilVoice exists.** The program asks the operating system
 for a microphone, the operating system hands it the cable, and the cable carries
 a voice that is not yours. That is why the table is *not* a list of what is
-supported — anything that lets you pick a microphone works, including programs
-nobody here has tested and ones that do not exist yet — and the command says so.
+supported, because anything that lets you pick a microphone works, including programs
+nobody here has tested and ones that do not exist yet, and the command says so.
 
 **Two things it does not do, said as plainly as the rest.**
 
@@ -1963,7 +1963,7 @@ nobody here has tested and ones that do not exist yet — and the command says s
   if you record the call, their half is not veiled. Veiling a whole call means
   capturing what the program plays back, which is a different mechanism on every
   operating system and is not built.
-* It **does not reach inside any of those programs** — not their traffic, not
+* It **does not reach inside any of those programs**, not their traffic, not
   their audio, not their processes. That is deliberate rather than missing:
   intercepting an end-to-end encrypted call is the act this project exists to
   make useless, and a privacy tool that shipped a way to do it would be arguing
@@ -2001,7 +2001,7 @@ what they are called, what colour each is, which palette, what gets written.
 Saved beside the recording so opening it next week puts everything back.
 
 **It holds no audio and no passwords**, and the file says so in its own header
-— it is a thing you might send somebody so they can set up the same way, and if
+It is a thing you might send somebody so they can set up the same way, and if
 it carried a passphrase, sending it would hand over the recordings too. It
 *does* hold the speaker names you typed, and it says that as well.
 
@@ -2009,7 +2009,7 @@ Plain text, `VEILWORK1`, the same shape as a plan. An unknown keyword is
 **refused**, not skipped: a project written by a newer build may describe a
 setup this one cannot reproduce, and honouring half of it would render under
 settings nobody chose. A profile or palette this build does not have is
-**reported and left alone** rather than quietly swapped — the whole point of the
+**reported and left alone** rather than quietly swapped, the whole point of the
 file is that it puts things back.
 
 A gap in the speaker slots is refused too, because the slot *is* the voice: a
@@ -2019,7 +2019,7 @@ they were saved with, audible only as "somebody sounds wrong".
 ### Two things caught by tests rather than by reading
 
 The member parser split on the first whitespace character, and the format
-separates fields with **two** spaces — so `member  0  -  Alex` parsed as a
+separates fields with **two** spaces, so `member  0  -  Alex` parsed as a
 colour of `""` and a name of `"-  Alex"`. A round-trip test caught it in the
 first run; reading the line would not have.
 
@@ -2032,7 +2032,7 @@ data now and not the prose about the data.
 ### The screenshot script stopped remembering where the toggle is
 
 Adding the profile section above the group-mode toggle moved it, and the
-capture's measured click landed elsewhere — group mode stayed off and the
+capture's measured click landed elsewhere, so group mode stayed off and the
 picture was of an empty panel with nothing to say it was wrong. The same
 failure as the tab coordinates, and the same answer: the capture now turns
 group mode on through the application's own "always start in group mode"
@@ -2047,8 +2047,8 @@ The engine holds ten destination voices and all ten are *different*. Only
 **eight** are far enough apart that somebody following a conversation can tell
 which is which.
 
-That is a measurement, not a judgement. `separation` expresses both axes —
-rendered pitch and vocal-tract scale — as ratios, because hearing is ratio-based
+That is a measurement, not a judgement. `separation` expresses both axes,
+rendered pitch and vocal-tract scale, as ratios, because hearing is ratio-based
 on both, and `clear_voices` walks the table asking when a new voice first comes
 within three semitones of one already handed out:
 
@@ -2063,7 +2063,7 @@ The ninth is slots 4 and 8: **exactly the same rendered pitch**, vocal tracts
 **The first version of the metric was wrong, and measuring it is what showed
 that.** It took the *smaller* of the two separations, reasoning that two voices
 are only as separable as their closest resemblance. Run, it reported that three
-voices were already indistinguishable — which is plainly false: slots 0 and 4
+voices were already indistinguishable, which is plainly false: slots 0 and 4
 share a pitch and have vocal tracts 45 % apart, so one sounds like a much larger
 person. A listener separates two voices by whichever cue is *strongest*, so the
 measure is the larger of the two.
@@ -2079,14 +2079,14 @@ the subtitles and by which circle lights up in the picture. Two consequences,
 one of each kind, and both are said where the option is offered:
 
 * **It is more private.** In distinct mode the output carries one bit of
-  structure the input had — *this is speaker three* — so anybody holding two
+  structure the input had, as in *this is speaker three*, so anybody holding two
   recordings of the same group can line them up by voice slot. There is nothing
   to line up when everybody sounds the same.
 * **It cannot be followed by ear.** That is the price, and it is why this is
   not the default.
 
 It has **no speaker limit** from voices, because one voice cannot collide with
-itself, so it is also the answer when eight is not enough — and the refusal at
+itself, so it is also the answer when eight is not enough, and the refusal at
 nine says so rather than being a dead end.
 
 Verified by measuring the audio, not by reading the log: rendering the same
@@ -2101,7 +2101,7 @@ else's render sounds like.
 ### The demonstration no longer says "left" and "right"
 
 Below 640 px the three panels stack, so "the bars on the left" named the wrong
-thing on every phone — and it never meant anything to a reader using a screen
+thing on every phone, and it never meant anything to a reader using a screen
 reader at any width. The caption names the labels instead, which is true in
 every layout and to every reader. A site test refuses the directions coming
 back.
@@ -2122,14 +2122,14 @@ there; this is the same thing said to somebody who does not write software, at
 the end of each crate's own `//!` block, so it is reviewed in the same diff as
 the code it describes.
 
-> **`veilvoice-core` — in plain words.** This is the part that actually changes
+> **`veilvoice-core`, in plain words.** This is the part that actually changes
 > the voice. A recording goes in and a recording comes out. The words are the
 > same and you can still understand every one of them; the voice is not yours
 > any more, and there is no setting, no key and no clever program that turns it
 > back.
 
 **Required, not encouraged.** `tools/docs/generate.py` refuses to write a page
-for a crate that has not got one, with the crate named — the same rule
+for a crate that has not got one, with the crate named, the same rule
 `sources.py` already applies to the website's own files, under the same
 heading. "We should document that" does not survive a busy week; a build that
 stops does.
@@ -2138,7 +2138,7 @@ stops does.
 
 `veilvoice-check` and `veilvoice-update` were added to the workspace this cycle
 and to neither of the documentation generator's crate lists. So they had no
-page, no banner, no diagram — **and no entry under "not yet covered" either.**
+page, no banner, no diagram, **and no entry under "not yet covered" either.**
 
 That last part is what makes it a defect. `ALL_CRATES` exists precisely so the
 tool can say what it is *not* covering rather than quietly covering less than
@@ -2146,8 +2146,8 @@ the tree contains. A crate in neither list is invisible rather than uncovered,
 which is the one outcome those lists were written to prevent, and it was
 reached by the ordinary act of adding a crate.
 
-The lists stay written out — a generator that discovers its own inputs cannot
-tell you it is missing one — but they are now checked against the workspace
+The lists stay written out, a generator that discovers its own inputs cannot
+tell you it is missing one, but they are now checked against the workspace
 manifest in both directions, and a mismatch stops the run with the names in it.
 Both crates are documented: 751 files for 19 crates, up from 721 for 17.
 
@@ -2161,23 +2161,23 @@ claiming credit for it.
 
 **Three of the four are the same shape: a comment that had stopped being true.**
 
-* **F-61** — the verify tab's dropped file was read at the *end* of `update`,
+* **F-61**: the verify tab's dropped file was read at the *end* of `update`,
   after the panel that shows it had been painted, so a drop and the highlight
   under a hovering file were a frame late. The comment above the call said
   "before anything is drawn". A wrong thing that agrees with itself survives a
   reading, and this one had survived several.
-* **F-62** — nothing woke the window while a file hovered over it. An idle egui
+* **F-62**: nothing woke the window while a file hovered over it. An idle egui
   window repaints only when asked, and the repaint condition listed every busy
   state and no hovering state, so the drop target lit nothing up and the file
   did not appear until the mouse moved for some other reason. The one moment
   where the user is waiting for the window and the window has decided nothing
   is happening.
-* **F-63** — the stylesheet comment beside the responsive-table rule said
+* **F-63**: the stylesheet comment beside the responsive-table rule said
   "nothing changes on a desktop". Measured: the tables render 820 px wide in an
   860 px column, so the row rules stop forty pixels short. `width: 100%` does
   not restore it, because the shrink happens on the anonymous table box inside
   the block. The trade is still right; the comment now says what it costs.
-* **F-64** — a malformed `SHA256SUMS` line carrying a digest and no name could
+* **F-64**: a malformed `SHA256SUMS` line carrying a digest and no name could
   answer a lookup for `""`, which is what `Path::file_name` gives for a
   directory or `..` once it has been through `unwrap_or_default`. Not reachable
   from either front end, so a hole rather than a live defect. Both halves
@@ -2212,7 +2212,7 @@ software, and the answer changed the plan.
   check passed.
 * **Running it is not free.** One `ollama list` started a background server,
   opened a local UI port, started an hourly update checker and made a network
-  request to GitHub — all in the first two seconds, none of it asked for. For
+  request to GitHub, all in the first two seconds, none of it asked for. For
   most programs that is unremarkable. For this one, "VeilVoice can use ollama"
   would have to be read as "VeilVoice can start a background service that
   phones home on a timer", and that has to be said in those words or not
@@ -2221,8 +2221,8 @@ software, and the answer changed the plan.
 So markers 43 and 64 are **blocked** on a question rather than on effort. Local
 speech-to-text means a Whisper-family program; diarisation means a third thing
 again; and whether starting any of them is acceptable, given what was measured,
-is the maintainer's call. The two honest paths — one microphone per person, or
-a turn list — remain, and remain the default.
+is the maintainer's call. The two honest paths, one microphone per person, or
+a turn list, remain, and remain the default.
 
 Nothing shipped for this. That is the point: the alternative was shipping a
 feature that could not work, and finding out from somebody who trusted it.
@@ -2243,8 +2243,8 @@ gained the rest of it too: a **peak-hold hairline** that decays after a second
 and a half, a clip colour on the same threshold, and a muted bar below -40 dBFS
 so a quiet room does not read as a working microphone.
 
-A test asserts the bar and the number agree — that the fill is exactly the
-affine map of the decibel figure — because the failure this replaces was
+A test asserts the bar and the number agree, that the fill is exactly the
+affine map of the decibel figure, because the failure this replaces was
 precisely the two of them drifting apart while both looked plausible alone.
 
 
@@ -2252,7 +2252,7 @@ precisely the two of them drifting apart while both looked plausible alone.
 
 **In all three places**, as everything else here is: the repository, the
 website, and the GitHub wiki. One generator writes all three from one header
-comment, so they cannot disagree — which is the entire reason any of it is
+comment, so they cannot disagree, which is the entire reason any of it is
 generated.
 
 The wiki is a single flat namespace shared with the crate pages, so these are
@@ -2262,8 +2262,8 @@ and `sources.py` sweeps them. A page about a file that has been deleted fails
 the build in either direction.
 
 
-Ten files the site invites you to open and read — eight scripts and two
-stylesheets — had no page, no picture and no index, while every crate and every
+Ten files the site invites you to open and read, eight scripts and two
+stylesheets, had no page, no picture and no index, while every crate and every
 `.rs` file had all three. `tools/docs/sources.py` gives them the same
 treatment: a banner, a workchart of what calls what, a list of what is in
 there, and an index.
@@ -2278,12 +2278,12 @@ sentence assembled from a filename is padding and a reader can tell, so
 section rather than writing a page without one. All ten have one now, written
 for somebody who does not write software:
 
-> **`website/js/verify.js` — in plain words.** This is the box on the verify
+> **`website/js/verify.js`, in plain words.** This is the box on the verify
 > page where you drop a file you have downloaded, and it tells you whether it
 > is the one that was published. Your file never leaves your computer.
 
-The workchart is a *syntactic* reading — an edge means the callee's name
-appears, called, inside the caller's body — and the page says so, exactly as
+The workchart is a *syntactic* reading, an edge means the callee's name
+appears, called, inside the caller's body, and the page says so, exactly as
 the Rust pages do. A stylesheet has no functions, so its chart is its own
 section comments, in order, which is the structure a stylesheet actually has.
 
@@ -2292,7 +2292,7 @@ about a file that has been deleted fails the build rather than sitting in the
 tree describing something that is gone.
 
 **Found by looking at the page**, not by any test: the first version passed its
-body to the page shell as a joined string, and the shell does `out.extend` — so
+body to the page shell as a joined string, and the shell does `out.extend`, so
 the string was extended one character at a time and the page rendered its own
 markup as spaced-out text. Every check passed.
 
@@ -2300,8 +2300,8 @@ markup as spaced-out text. Every check passed.
 ### Drag a download onto the window and be told what it is
 
 New **verify** tab in the desktop application. Drop the download, the
-`SHA256SUMS` and the `SHA256SUMS.asc` anywhere on the window — whichever tab is
-open — and it says whether the file is the one this key published.
+`SHA256SUMS` and the `SHA256SUMS.asc` anywhere on the window, whichever tab is
+open, and it says whether the file is the one this key published.
 
 All three slots are visible from the start rather than discovered one refusal
 at a time. Dropping one file and getting a verdict would be a lie, and an
@@ -2312,7 +2312,7 @@ The order the check runs in is the whole of its value, and it is asserted
 rather than assumed: **the signature is verified over the bytes of the list
 before any number in that list is read.** A checker that compared the hash
 first would, for the moment between the two, be trusting an unsigned document
-— and anyone who can hand you a file can hand you a `SHA256SUMS` to go with it.
+and anyone who can hand you a file can hand you a `SHA256SUMS` to go with it.
 
 ### One implementation of the checking, not two
 
@@ -2327,7 +2327,7 @@ the one place there is only one of.
 
 **The verifier's own test suite caught a regression during the move.** A
 `?` where the original had a `continue` meant one malformed line near the top
-of a `SHA256SUMS` made every hash below it invisible — and the answer would
+of a `SHA256SUMS` made every hash below it invisible, and the answer would
 have been "not listed", which reads as *wrong release* rather than as *this
 file is unreadable*. Found within a minute of the code moving.
 
@@ -2338,7 +2338,7 @@ grouping the lit columns into runs. It used to remember, and those coordinates
 went stale the first time a tab was inserted: every click still landed on *a*
 tab, so every capture was different, the duplicate check saw nothing wrong, and
 three tabs were quietly photographed under the wrong names. Two guards survive
-from that — an identical consecutive pair stops the run, and after each click
+from that, an identical consecutive pair stops the run, and after each click
 the pixel above the label has to be the raised background a selected tab sits
 on.
 
@@ -2357,8 +2357,8 @@ and only a plan knows *when* each of them speaks. Audio no turn claims is
 silenced rather than passed through, so a render with no plan would produce a
 silent file, not a veiled one.
 
-The names the panel holds win over the names in the plan file — they are what
-was just typed — and the turns are the plan's and are untouched.
+The names the panel holds win over the names in the plan file, because they are what
+was just typed, and the turns are the plan's and are untouched.
 `Conversation::rename_speakers` is new for that, and it **refuses a count that
 does not match** rather than reconciling one: a plan naming three renamed from
 a list of two would put somebody's audio in another person's voice, and since
@@ -2378,8 +2378,8 @@ forever.
 ### The gallery's declared image sizes cannot go stale
 
 `width` and `height` on an `<img>` are what stop the page reflowing as each
-picture loads. Those numbers went stale within an hour of being written — the
-capture window was made taller so the group tab would fit — and a *wrong*
+picture loads. Those numbers went stale within an hour of being written, the
+capture window was made taller so the group tab would fit, and a *wrong*
 declared size is worse than none: the page reserves the wrong box and then
 jumps anyway, under a reader who is mid-sentence. `tools/shots/terminal.py
 --check` now reads each capture's real dimensions out of its PNG header and
@@ -2413,16 +2413,16 @@ warning that has gone before the person looks up was never given. Below -40 the
 bar is drawn muted, so a quiet room does not read as a working microphone.
 
 It says what it is: a **sample peak** meter, not a loudness meter, and not a
-true-peak one. It cannot see an inter-sample peak — a waveform that passes
+true-peak one. It cannot see an inter-sample peak, a waveform that passes
 above full scale between two samples and clips in a converter without any one
-sample exceeding 1.0 — and it says nothing about those rather than implying it
+sample exceeding 1.0, and it says nothing about those rather than implying it
 caught them.
 
 Two things the tests settled rather than assumed. A wrong reading now pins the
 meter **high** rather than low: both are wrong, and a meter stuck at the top is
 noticed in a second while one stuck at the bottom looks exactly like an
 unplugged microphone. And the clip threshold's own test had the numbers
-backwards at first — a *linear* 0.99 is -0.087 dBFS, already inside a tenth of
+backwards at first, a *linear* 0.99 is -0.087 dBFS, already inside a tenth of
 a decibel of full scale. Decibels near the top of the scale are far finer than
 they look in linear terms, which is most of the reason a linear meter is a bad
 meter.
@@ -2437,7 +2437,7 @@ veilvoice conversation preview plan.txt --theme nord
 
 `veilvoice-video` knew one colour scheme. It now carries all nine the website
 declares and the desktop application offers, with the same identifiers, and a
-test reads `website/css/themes.css` and fails if any hex ever disagrees — the
+test reads `website/css/themes.css` and fails if any hex ever disagrees, the
 same arrangement the app has had since the themes existed. A second test fails
 if the stylesheet gains a theme this crate has never heard of, because a picker
 offering nine and a renderer knowing eight is a picker with one entry that
@@ -2453,7 +2453,7 @@ requests are honoured.
 decision rather than an omission.** A palette here has six chromatic tokens;
 ten mutually separable colours cannot be got out of six without inventing four,
 and four invented colours are four whose separation nobody has measured. This
-set *was* measured — the closest pair anywhere in it scores 63, and that pair
+set *was* measured, the closest pair anywhere in it scores 63, and that pair
 is only reached by a recording with nine or ten people. What the palette
 decides is everything around them, so a Gruvbox render is a Gruvbox picture
 with those ten circles in it. The ink drawn on each circle is computed rather
@@ -2476,7 +2476,7 @@ than by hand.
 `gui-*.png` are photographs of the running application, taken by
 `tools/shots/gui.ps1`. It starts the release build, fixes the window to one
 size and position, clicks each tab, and captures the window's real frame bounds
-rather than the extended bounds — which include the invisible resize border and
+rather than the extended bounds, which include the invisible resize border and
 the drop shadow, and put a strip of whatever is behind the window down both
 sides of every picture. It also **fails rather than writing a wrong picture**:
 each capture is compared with the one before it, and an identical pair means a
@@ -2485,7 +2485,7 @@ identical pictures with different names.
 
 `cli-*.svg` are drawings, generated from the command output committed beside
 them in `cli-*.txt`. `python tools/shots/terminal.py --check` regenerates every
-one and compares, and it runs in `tools/verify.py` — so a picture of a command
+one and compares, and it runs in `tools/verify.py`, so a picture of a command
 line that disagrees with the command line fails the build. The `.txt` is the
 file to read in a diff; an SVG diff is unreadable, a diff of what the program
 printed is the review.
@@ -2493,8 +2493,8 @@ printed is the review.
 ### Two of the pictures are redacted, and it says which
 
 A screenshot of a working application is a screenshot of somebody's machine.
-The live tab lists this machine's audio devices — product names, describing the
-maintainer's hardware — and the install tab prints two paths containing the
+The live tab lists this machine's audio devices, meaning product names describing the
+maintainer's hardware, and the install tab prints two paths containing the
 **account name**, which is not the pseudonym this project is published under.
 Both are painted over by the capture script, in the colours the interface draws
 them in, and `assets/screenshots/README.md` names exactly what was covered and
@@ -2503,7 +2503,7 @@ what it says instead. Nothing else is altered.
 ### Two things the repository's own checks caught
 
 The first capture ran `veilvoice` with `text=True`, which decodes with the
-locale encoding — CP1252 on this machine — and the help screens are full of em
+locale encoding, CP1252 on this machine, and the help screens are full of em
 dashes. Every one was written as three wrong characters. The stray-character
 suite, which has been in this repository since long before any of this, is what
 noticed, three checks after the capture ran.
@@ -2522,13 +2522,13 @@ New crate, `veilvoice-update`, and a button on the desktop app's **about** tab.
 background. An update checker that runs by itself is a beacon: it tells a
 server that this machine has VeilVoice on it, roughly how often it is used, and
 from which address. That is what is being refused. A button somebody presses,
-once, when they want to know, is a different act — and it is the only one on
+once, when they want to know, is a different act, and it is the only one on
 offer. A test asserts that a freshly built panel has asked nothing and is
 asking nothing, so a check at startup cannot be added without failing the build.
 
 **There is still no HTTP client in the dependency graph.** The crate has no
 dependencies at all. It runs the transfer tool your operating system already
-ships — as `veilvoice-verify` has fetched releases since it existed — found at
+ships, as `veilvoice-verify` has fetched releases since it existed, found at
 an absolute path and never by bare name, because resolving a program by name on
 Windows searches the current directory first. That is finding F-13, and it does
 not get to happen twice.
@@ -2541,8 +2541,8 @@ signature, and a download should still be checked with `veilvoice-verify`.
 
 Being ahead of the newest release is reported as **ahead**, not as "up to
 date": somebody running an unreleased build should know that is what they are
-running. A version string this build cannot compare — a pre-release suffix, or
-something that is not three numbers — is reported as unreadable rather than
+running. A version string this build cannot compare, a pre-release suffix, or
+something that is not three numbers, is reported as unreadable rather than
 ordered. Getting pre-release precedence subtly wrong is how a checker tells
 people to downgrade.
 
@@ -2550,8 +2550,8 @@ people to downgrade.
 telemetry, no update check". No telemetry is unchanged and nothing here sends
 anything about you. "No update check" has become "no *automatic* update check",
 in the README, on the front page, on the security page, in the app's own
-version screen — where "network access: none, by construction" is now "none,
-except the update check you press" — and in `veilvoice --help`, which can still
+version screen, where "network access: none, by construction" is now "none,
+except the update check you press", and in `veilvoice --help`, which can still
 say it talks to no servers because the button is not in the command line.
 
 ### Found by running it, not by reading it
@@ -2582,7 +2582,7 @@ asked while looking at the tab. The control itself lives in
 nothing else could bring back would be a one-way door.
 
 The check is read once, when the panel is built, and not per frame. It touches
-the filesystem, and the tab row is drawn every frame — a `stat` in the paint
+the filesystem, and the tab row is drawn every frame, a `stat` in the paint
 path is the exact shape of the defect that made this window freeze every couple
 of seconds.
 
@@ -2598,10 +2598,10 @@ under it, and the destination voice each of them becomes.
 
 **Off by default, and the toggle does not persist.** Group mode changes what a
 recording is *treated as*, and a mode that survives a restart is a mode
-somebody eventually forgets is on — which here means a recording of one person
+somebody eventually forgets is on, which here means a recording of one person
 rendered against a plan describing several, silencing everything the plan does
-not claim. So the toggle is per-run, and a **separate, explicit tick** —
-"always start in group mode" — is the only thing written to disk. Two controls
+not claim. So the toggle is per-run, and a **separate, explicit tick**,
+"always start in group mode", is the only thing written to disk. Two controls
 where one would look like enough, deliberately: they answer two different
 questions.
 
@@ -2632,14 +2632,14 @@ floor, because one speaker is not a group.
 ### Two things that were looked at rather than reasoned about
 
 The speaker strip was built at 96 pixels a card, which turned "high register,
-wide tract (234 Hz, 900 Hz)" into five wrapped lines — a row of circles reading
+wide tract (234 Hz, 900 Hz)" into five wrapped lines, a row of circles reading
 as a wall of text. And with the colour picker open the panel is taller than the
 window, so without a scroller the picker was not reachable at all. Both were
 obvious in a capture of the running application and invisible in the source.
 
 **And the freeze that was reported against v0.1.12 is still gone.** Measured on
 the running release build with the group tab open: 220 round trips to the
-window's message loop over 25 seconds — median **0.19 ms**, 95th percentile
+window's message loop over 25 seconds: median **0.19 ms**, 95th percentile
 **15.6 ms**, worst **27.1 ms**, and never once flagged as not responding.
 
 ### Two decisions taken, and written down
@@ -2648,8 +2648,8 @@ The roadmap's two open questions were both answered, and neither quietly.
 
 **Transcription may happen, and what leaves this machine is the veiled audio,
 never the recording.** That is a narrower trade than it looks: the veiled audio
-is the thing this project exists to produce — the words intact, the voiceprint
-gone — so a provider given it receives a transcribable recording of a voice
+is the thing this project exists to produce, the words intact, the voiceprint
+gone, so a provider given it receives a transcribable recording of a voice
 that is nobody's. Sending the original would hand a biometric to a third party,
 and that is what is being refused. Off by default; nothing added to the
 dependency graph, because a local model is reached by running the program the
@@ -2686,7 +2686,7 @@ that the original is gone.
 
 `preview` answers "what will I get" in a second rather than in the length of
 the recording: the layout, the speaker circles, and which destination voice
-each speaker becomes. It needs no recording at all — without one the waveform
+each speaker becomes. It needs no recording at all, and without one the waveform
 is drawn flat, which is honest about there being nothing measured yet.
 
 `--width`, `--height`, `--padding`, `--background` and `--black` shape the
@@ -2702,7 +2702,7 @@ ships no codec and starts no program you did not ask for.
 
 ### The front page now shows what the product actually does
 
-A new section — **what happens to your recording** — between the banner and
+A new section, **what happens to your recording**, between the banner and
 the list of features. A file goes in, the voiceprint is destroyed, a file comes
 out with the same words in a voice that is not yours. One eight-second CSS
 cycle: the input card lights, a packet travels the connector, the engine pulses,
@@ -2710,7 +2710,7 @@ a second packet travels out, the output card lights.
 
 It is text and CSS, for the same three reasons the banner is: it follows the
 reader's palette, every claim in it can be selected and read aloud, and
-`prefers-reduced-motion` reaches it — after which what is left is three labelled
+`prefers-reduced-motion` reaches it, after which what is left is three labelled
 cards side by side, which is the whole point of the picture. The motion is the
 ordering, not the meaning.
 
@@ -2720,15 +2720,15 @@ what *you* do, so it is files and labels.
 
 And it states its own limit in the caption rather than in a footnote: the
 voiceprint goes, **what you said stays**, because the output is meant to be
-listened to and transcribed. If the words themselves identify you — a name, a
-place, a story only you could tell — VeilVoice has not touched that and does
+listened to and transcribed. If the words themselves identify you, a name, a
+place, a story only you could tell. VeilVoice has not touched that and does
 not claim to. Segmental accent cues survive for the same reason.
 
 
 ### The banner: a GIF in the README, and CSS on the site
 
-**The README animates again.** `assets/generate.py` gained a GIF encoder — its
-own LZW, no dependency, no quantiser — so the animated banner is back in the
+**The README animates again.** `assets/generate.py` gained a GIF encoder, its
+own LZW, no dependency, no quantiser, so the animated banner is back in the
 first thing every reader sees, in the one animated format every client draws.
 
 The note beside the APNG had rejected GIF because "GIF is limited to 256
@@ -2736,32 +2736,32 @@ colours, so the palette would have to be quantised". That was right about
 quantising and wrong about this picture, and one measurement settled it: the
 whole banner uses **63** distinct colours, the waveform frames **255** between
 them, and the two together **261**. 261 is over the limit for one palette and
-well under it for the two GIF actually allows — a frame may carry its own
+well under it for the two GIF actually allows, a frame may carry its own
 colour table. Nothing is quantised, nothing is approximated, and the bytes are
 identical on every machine.
 
 The one real loss is the frame delay: GIF counts in hundredths of a second and
 1/60 s is not a hundredth of anything, so the GIF is 50 frames at 2/100 rather
 than the APNG's 60 at 1/60. Same one-second loop, at the fastest rate the
-format can honestly express. The alternative — rounding to 1/100 — would give a
+format can honestly express. The alternative, rounding to 1/100, would give a
 banner that runs at 60 % speed in some viewers and full speed in others.
 
 The encoder was checked against a decoder that is not ours: Windows' own GDI+
 reads the file, reports 50 frames, and reproduces the generator's pixels
-exactly for frames 0, 1, 25 and 49 — including the local colour tables and the
+exactly for frames 0, 1, 25 and 49, including the local colour tables and the
 frame-to-frame composition. That matters because GIF's LZW has one detail every
 implementation gets wrong: the decoder builds its dictionary one entry behind
 the encoder, so the encoder must widen its codes one entry early. The wrong
 rule produces a file this project can read back perfectly and no browser can.
 
 **The website's banner is now drawn in CSS**, and has no soundbar. It is live
-text with a veil drifting across the wordmark — the same letters, unresolvable,
+text with a veil drifting across the wordmark, the same letters, unresolvable,
 which is the one illustration on that page of what the tool does. Three things
 follow from it being text rather than pixels: it follows the reader's palette
 instead of being baked in one of nine; its claims can be selected, searched and
 read aloud; and `prefers-reduced-motion` reaches it, which no rule in a
 stylesheet can do to a PNG. It is also legible on a phone, which the drawn
-banner never was — finding F-37 was this project's own claims rendered
+banner never was, and finding F-37 was this project's own claims rendered
 illegibly inside an image at phone width.
 
 The waveform is gone from it deliberately: the motif appears twice more on the
@@ -2775,7 +2775,7 @@ rules.
 
 **Stated rather than left to be discovered:** `assets/banner-animated.png` now
 has no consumer. It is still generated and still checked, because it is the
-better animation — 60 fps, full alpha, half the bytes — and because deleting a
+better animation: 60 fps, full alpha, half the bytes, and because deleting a
 working generator is the maintainer's call rather than a tidy-up.
 
 
@@ -2785,20 +2785,20 @@ Six separate faults, each found by measuring a rendered page rather than by
 reading the stylesheet, and none of them visible in the source:
 
 * A **grid item defaults to `min-width: auto`**, so the reference pages' content
-  column refused to be narrower than its widest table — 658 px — and took every
+  column refused to be narrower than its widest table, at 658 px, and took every
   heading and paragraph on the page sideways with it, at any viewport.
 * A **table of item names** cannot be made narrow: the names are code. It is now
   its own sideways scroller. Deliberately at every width, not only on a phone:
   the reference pages keep a 200 px contents column until 720 px, so a tablet at
   768 px gives a table *less* room than a phone does.
-* `overflow-wrap: break-word` does **not** shrink an element's intrinsic width —
+* `overflow-wrap: break-word` does **not** shrink an element's intrinsic width,
   only `anywhere` does. With `break-word` alone the items table still scrolled
   inside a 630 px desktop column.
 * A **tooltip** is `position: absolute`, anchored to the left of the word it
   annotates, and a `visibility: hidden` box still takes part in layout. A closed
   tooltip two thirds along a card pushed the **front page** 82 px sideways with
   nobody hovering anything. Below 900 px it is now pinned to the bottom of the
-  viewport — full width, out from under the finger that opened it.
+  viewport: full width, out from under the finger that opened it.
 * The **hero** is the one section not inside `.wrap`, so it had no gutter: on a
   390 px screen the tagline's first and last characters touched both edges.
 * `.search-page` set a `padding` **shorthand** on an element that already had
@@ -2806,7 +2806,7 @@ reading the stylesheet, and none of them visible in the source:
   index's 200 rows ran edge to edge.
 
 With scripts off there were two more, in a combination nothing had ever
-rendered — the site had been checked with scripts off, and separately on a
+rendered, the site had been checked with scripts off, and separately on a
 phone, never both. The switch's "(locked: scripts are not running)" note is
 257 px of `nowrap` beside the colour picker, which pushed every page 90 px
 sideways; it now takes its own line, in full. And the static index's excerpts
@@ -2822,7 +2822,7 @@ engine" stays open rather than being ticked on one engine's word.
 ### Two tools for looking, rather than reasoning
 
 `tools/render/probe.py` is new: it drives the same headless browser
-`shot.py` does and prints *numbers* — which pages scroll sideways, which element
+`shot.py` does and prints *numbers*, which pages scroll sideways, which element
 is to blame, what any expression evaluates to on any page at any width. Every
 fault above came out of it.
 
@@ -2839,7 +2839,7 @@ Every generated flowchart laid one rank out on one line, so the canvas was as
 wide as the busiest rank in the file. `veilvoice-core/chain.rs` reached
 **4490 px**, and the drawing went into the page as `width="100%"` with no size
 of its own, inside a column measured at 630 px. The browser scaled it to
-**0.147** — a 13 px label rendered under two pixels tall. That number is a
+**0.147**, a 13 px label rendered under two pixels tall. That number is a
 measurement of the published page over the DevTools protocol, not an estimate;
 the same measurement on a 390 px viewport reported a `scrollWidth` of 561, so
 the wide drawings were part of what pushed the reference pages sideways on a
@@ -2848,7 +2848,7 @@ phone as well.
 A rank now **wraps** into as many lines as it needs, the canvas is only as wide
 as the widest line actually is, and every drawing carries its own `width` and
 `height` with `max-width: 100%`. So a diagram renders at its own size on a
-desktop and scales *down* on a narrow screen — never up, and never to a fifth
+desktop and scales *down* on a narrow screen, never up, and never to a fifth
 of legible. The widest canvas in the tree is now 649 px.
 
 The repository and the wiki showed the same graph as a Mermaid fence, which
@@ -2866,14 +2866,14 @@ on its own, fails the build.
 
 `veilvoice install` did the work already; it simply had no interface but a
 terminal. The desktop application now has an **install** tab that calls the
-same code — not a second implementation of it. The logic moved out of the
+same code, not a second implementation of it. The logic moved out of the
 `veilvoice-cli` binary into a new library crate, `veilvoice-setup`, because a
 binary crate has no consumers and two programs editing `PATH` independently is
 how a machine gets broken.
 
 The tab states what you already have before it offers to change anything:
 portable is the normal case and is described as one. Beside the button is the
-exact list of what an install touches — a copy into your own program
+exact list of what an install touches, a copy into your own program
 directory, a `PATH` entry appended to the value it first read, an Apps &
 features entry on Windows, and nothing else. No administrator rights, no
 service, no system directory.
@@ -3100,7 +3100,7 @@ first would prove only that a download matches a list which might itself have
 been replaced.
 
 **This program still contains no HTTP client.** VeilVoice has no networking
-crate anywhere in its dependency graph — a property you can check yourself with
+crate anywhere in its dependency graph, a property you can check yourself with
 `cargo tree`, and one CI fails the build over. The download is done by the tool
 your operating system already ships: `curl.exe` on Windows, curl or wget
 elsewhere. Only one host is ever contacted and it is compiled in; there is no
@@ -3122,7 +3122,7 @@ terminal works.
 
 Everything is **per-user**: no administrator, no system directory, no service.
 The PATH entry is appended to the value that is already there and removed
-without touching anything else — an uninstaller that rewrites PATH from a
+without touching anything else, an uninstaller that rewrites PATH from a
 template destroys whatever else you had, at the moment you are least likely to
 check.
 
@@ -3134,8 +3134,8 @@ page, and verify what you download.
 
 Every box in every flowchart is now a link to the exact line it stands for, in
 both the Markdown on GitHub and the SVG on the website. Nodes carry their line
-number, and are coloured by role — a way in, a public function also used
-internally, or a private helper — with a legend saying which is which.
+number, and are coloured by role, a way in, a public function also used
+internally, or a private helper, with a legend saying which is which.
 
 Each page also opens with **what the file contains**: how many functions, types
 and constants; the types it owns; and the ways in, with what calling each one
@@ -3143,8 +3143,8 @@ reaches. All of it read out of the source, so none of it can disagree with the
 code.
 
 The diagrams on the website are painted with the site's own colour tokens, so
-they follow whichever of the nine themes you chose — or one you wrote yourself
-— instead of being Tokyo Night in the middle of somebody's Gruvbox.
+they follow whichever of the nine themes you chose, or one you wrote yourself,
+instead of being Tokyo Night in the middle of somebody's Gruvbox.
 
 ### Fixed
 
@@ -3162,7 +3162,7 @@ a console window and could fail with no message at all.
 
 ### The Windows desktop application
 
-Three separate defects were behind one report — "it flashes a command prompt,
+Three separate defects were behind one report: "it flashes a command prompt,
 loads in an unusable state, and crashes".
 
 **The flashing console was never the application's own window.** `veilvoice-gui`
@@ -3174,14 +3174,14 @@ with `CREATE_NO_WINDOW`, and a test in each crate fails if one is added without
 it.
 
 **A failure used to produce nothing at all.** No console, and the release build
-aborts rather than unwinds, so a crash left no message, no dialog and no log —
+aborts rather than unwinds, so a crash left no message, no dialog and no log,
 nothing to report but "it crashed". VeilVoice now writes a short report beside
 your preferences and tells you about it next time it starts. **It is written on
 your machine and sent nowhere**; there is no network code in this program to
 send it with.
 
 If the window never appears at all, the most likely cause is that the computer
-could not provide an OpenGL context — common in a virtual machine, over a
+could not provide an OpenGL context, which is common in a virtual machine, over a
 remote desktop session, or with hybrid graphics. The report says so, and points
 at `veilvoice`, the command-line tool, which does the same work and needs no
 graphics.
@@ -3191,7 +3191,7 @@ graphics.
 Every executable now carries its icon, on every platform.
 
 - **Windows:** embedded in the binary, at all six sizes. It was previously
-  shipped as a loose `.ico` beside the program — a file Windows never reads —
+  shipped as a loose `.ico` beside the program, a file Windows never reads,
   so Explorer, the taskbar and any pinned shortcut showed the generic
   executable glyph. A release check reads the built binary and fails if the
   icon is missing.
