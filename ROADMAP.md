@@ -4,12 +4,12 @@
 
 **What is built, what is coming, and roughly when.** One marker is one feature:
 written, tested, documented and merged. A marker is not ticked because the code
-compiles — it is ticked when the thing works, has tests, has documentation, and
+compiles. It is ticked when the thing works, has tests, has documentation, and
 survives the checks in CI.
 
 Estimates are in working days and they are estimates. Where a marker depends on
-something outside this project — a platform's rules, a decision that has not
-been taken — that is written down rather than absorbed into a number.
+something outside this project, such as a platform's rules or a decision that
+has not been taken, that is written down rather than absorbed into a number.
 
 **Where we are now:** **v0.1.14 is released**, signed and published for
 eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
@@ -52,13 +52,13 @@ target directories, all three binaries byte for byte identical.
 
 | # | Marker | Status |
 |---:|---|---|
-| 1 | DSP engine — phase discard, many-to-one normalisation, CSPRNG modulation | **done** |
+| 1 | DSP engine: phase discard, many-to-one normalisation, CSPRNG modulation | **done** |
 | 2 | Accent neutralisation, on by default | **done** |
-| 3 | Cryptography — Argon2id, X25519+ML-KEM-768, XChaCha20-Poly1305 | **done** |
+| 3 | Cryptography: Argon2id, X25519+ML-KEM-768, XChaCha20-Poly1305 | **done** |
 | 4 | Encryption at rest, by default, plaintext never touching disk | **done** |
-| 5 | App lock — Argon2id verifier, persisted rate limit | **done** |
-| 6 | Audio — device enumeration, live path, decode, WAV write | **done** |
-| 7 | Metadata stripping — tags, EXIF/GPS, chunk-level RIFF cleaner | **done** |
+| 5 | App lock: Argon2id verifier, persisted rate limit | **done** |
+| 6 | Audio: device enumeration, live path, decode, WAV write | **done** |
+| 7 | Metadata stripping: tags, EXIF/GPS, chunk-level RIFF cleaner | **done** |
 | 8 | Microphone and camera monitor (Windows, Linux) | **done** |
 | 9 | Tamper detection, unprivileged half (`veilvoice-guard`) | **done** |
 | 10 | Secure erase, with an honest account of flash storage | **done** |
@@ -68,26 +68,26 @@ target directories, all three binaries byte for byte identical.
 | 14 | Portable release verifier needing no GnuPG (`veilvoice-verify`) | **done** |
 | 15 | Install scripts for Windows, Linux and macOS | **done** |
 | 16 | Reproducible signed releases on ten platforms | **done** |
-| 17 | Four audit rounds — 47 defects found and fixed | **done** |
+| 17 | Four audit rounds: 47 defects found and fixed | **done** |
 
 ## In progress
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 18 | Documentation generator — a page, flowchart and banner for every crate and **every** `.rs` file, mirrored to the website and the GitHub wiki | **done** | — |
-| 20 | Repository panel no longer shows a README's own markup as text | **done** | — |
-| 21 | Write the missing module documentation for the 14 files that had almost none | **done** | — |
-| 22 | Website split into a page per section, every published link still working | **done** | — |
-| 23 | Motion and polish — smooth loading and scrolling, hover, CSS-first tooltips | **done** | — |
-| 24 | Demonstration animation: a voice going in, the mark lighting up, an unidentifiable wave coming out | **done** | — |
-| 25 | Cycling line of project facts, slow enough to read — CSS rather than an image, so it follows the reader's theme and needs no script | **done** | — |
-| 26 | Every website theme in the app, plus user-defined palettes with contrast computed rather than assumed | **done** | — |
-| 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **done** | — |
-| 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **done** | — |
-| 29 | One single binary — the same executable runs as the desktop app or as the command line, installed or portable | **blocked** | — |
-| 30 | Installer with a window: Tokyo Night, animated, and **portable** described as the normal case rather than as something missing | **done** | — |
-| 31 | Optional companion setup — VB-CABLE on Windows, PipeWire on Linux, BlackHole on macOS, and Audacity everywhere — detected if present, installed only if confirmed | **done** | — |
-| 32 | The site's search presented as an **index**, and animated | **done** | — |
+| 18 | Documentation generator: a page, flowchart and banner for every crate and **every** `.rs` file, mirrored to the website and the GitHub wiki | **done** | - |
+| 20 | Repository panel no longer shows a README's own markup as text | **done** | - |
+| 21 | Write the missing module documentation for the 14 files that had almost none | **done** | - |
+| 22 | Website split into a page per section, every published link still working | **done** | - |
+| 23 | Motion and polish: smooth loading and scrolling, hover, CSS-first tooltips | **done** | - |
+| 24 | Demonstration animation: a voice going in, the mark lighting up, an unidentifiable wave coming out | **done** | - |
+| 25 | Cycling line of project facts, slow enough to read: CSS rather than an image, so it follows the reader's theme and needs no script | **done** | - |
+| 26 | Every website theme in the app, plus user-defined palettes with contrast computed rather than assumed | **done** | - |
+| 27 | Interactive workflow diagrams that open the relevant source, highlighted, in the site's palette | **done** | - |
+| 28 | Randomised, user-configurable ratchet interval, with invalid input refused rather than clamped | **done** | - |
+| 29 | One single binary: the same executable runs as the desktop app or as the command line, installed or portable | **blocked** | - |
+| 30 | Installer with a window: Tokyo Night, animated, and **portable** described as the normal case rather than as something missing | **done** | - |
+| 31 | Optional companion setup: VB-CABLE on Windows, PipeWire on Linux, BlackHole on macOS, and Audacity everywhere, detected if present and installed only if confirmed | **done** | - |
+| 32 | The site's search presented as an **index**, and animated | **done** | - |
 
 ## Security and monitoring features
 
@@ -97,18 +97,18 @@ it cannot do as plainly as what it can.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 33 | Screen-capture detection — which recorders are running, muted per program by an allowlist | **done** | — |
-| 34 | Hide VeilVoice's own window from screen capture and recording | **blocked** | — |
-| 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **done** | — |
-| 36 | `veilvoice-sentry` — ransomware canaries and mass-change rate detection | **done** | — |
-| 37 | `veilvoice-appctl` — learn what runs, then allowlist it, with time-limited grants and a log | **done** | — |
-| 38 | `veilvoice-policy` — settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | — |
-| 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **done** | — |
-| 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | — |
-| 65 | **Failsafe** — on by default: notice the moment another program picks up a *real* microphone while you are being veiled, warn, and close it | **done** | — |
-| 41 | Notification overlay — rounded, translucent, contrast computed, or an alert, or off | **done** | — |
-| 42 | Duress and decoy passwords | **done** | — |
-| 43 | Transcription through your own API key, given **veiled audio only** | **blocked** | — |
+| 33 | Screen-capture detection: which recorders are running, muted per program by an allowlist | **done** | - |
+| 34 | Hide VeilVoice's own window from screen capture and recording | **blocked** | - |
+| 35 | Keyboard and mouse activity monitoring, reported as the heuristic it is | **done** | - |
+| 36 | `veilvoice-sentry`: ransomware canaries and mass-change rate detection | **done** | - |
+| 37 | `veilvoice-appctl`: learn what runs, then allowlist it, with time-limited grants and a log | **done** | - |
+| 38 | `veilvoice-policy`: settings sealed with the existing post-quantum cryptography, and shaped so they can only be tightened | **done** | - |
+| 39 | Privileged mode: an opt-in service, and an elevated no-service mode, with the difference visible to the user | **done** | - |
+| 40 | Alert on driver and kernel-module installation; cross-view checks | **done** | - |
+| 65 | **Failsafe**: on by default: notice the moment another program picks up a *real* microphone while you are being veiled, warn, and close it | **done** | - |
+| 41 | Notification overlay: rounded, translucent, contrast computed, or an alert, or off | **done** | - |
+| 42 | Duress and decoy passwords | **done** | - |
+| 43 | Transcription through your own API key, given **veiled audio only** | **blocked** | - |
 
 ## Conversations, subtitles and video
 
@@ -118,20 +118,20 @@ subtitles; and an optional video of the result.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 46 | **Conversation mode** — tell the engine a recording holds more than one speaker, and give each a distinct voice while destroying every voiceprint | **done** | — |
-| 47 | Up to ten speakers, each with a name, carried into the audio and into subtitles | **done** | — |
-| 48 | A rolling seed **per speaker**, at a randomised interval inside a range the user sets, with no interval hardcoded and a fresh one at every launch | **done** | — |
-| 49 | **Video output** — the waveform, a circle per speaker in their palette colour or their own picture inside a coloured ring, a title, and a black or image background with padding | **done** | — |
-| 50 | A **preview** of the video and of the voices before anything is generated | **done** | — |
-| 51 | An **asynchronous pipeline**, every speaker rendering at once rather than in sequence | **done** | — |
-| 52 | Every crate and every `.rs` file explained: the technical workflow in a paragraph, then the same thing in plain words | **done** | — |
-| 53 | The website on mobile, and on every engine — not only the one it was written in | **done** | — |
-| 54 | **Seventh audit round** across the whole tree, then the production deploy | **done** | — |
+| 46 | **Conversation mode**: tell the engine a recording holds more than one speaker, and give each a distinct voice while destroying every voiceprint | **done** | - |
+| 47 | Up to ten speakers, each with a name, carried into the audio and into subtitles | **done** | - |
+| 48 | A rolling seed **per speaker**, at a randomised interval inside a range the user sets, with no interval hardcoded and a fresh one at every launch | **done** | - |
+| 49 | **Video output**: the waveform, a circle per speaker in their palette colour or their own picture inside a coloured ring, a title, and a black or image background with padding | **done** | - |
+| 50 | A **preview** of the video and of the voices before anything is generated | **done** | - |
+| 51 | An **asynchronous pipeline**, every speaker rendering at once rather than in sequence | **done** | - |
+| 52 | Every crate and every `.rs` file explained: the technical workflow in a paragraph, then the same thing in plain words | **done** | - |
+| 53 | The website on mobile, and on every engine: not only the one it was written in | **done** | - |
+| 54 | **Seventh audit round** across the whole tree, then the production deploy | **done** | - |
 
 ## Building it yourself, and proving the download matches
 
 Asked for after the conversation work. Today `veilvoice-verify` answers one
-question — *is this download the one that was published* — and answers it
+question, *is this download the one that was published*, and answers it
 without GnuPG, without a network client of its own, and without ever holding a
 private key. The request is to make the same program answer the harder
 question: **is the published build the one this source produces**, and to have
@@ -142,12 +142,12 @@ then the smallest thing it does.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 55 | **Build the whole repository from source**, from the tool itself: find or install a toolchain, pin it to `rust-toolchain.toml`, and run the same build the release does | **done** | — |
-| 56 | **Reproducibility check** — build here, hash what came out, and compare it against the published `SHA256SUMS` entry for this platform, saying which files matched and which did not | **done** | — |
-| 57 | **The hashes are trusted only after the signature is** — verify the detached signature over `SHA256SUMS` against the project key *before* any hash from it is compared, and refuse rather than warn if it does not verify | **done** | — |
-| 58 | **Set the machine up per platform** — the build dependencies each operating system actually needs, detected, named with who ships them, and installed only on an explicit yes | **done** | — |
-| 59 | **Custom install** — CLI, desktop app, or both, from a build you just made or from a download you just verified | **done** | — |
-| 60 | **Four verbosity levels** — nothing, minimal, normal (the default) and everything — applied to every one of the above, with the exit status carrying the answer when the output carries nothing | **done** | — |
+| 55 | **Build the whole repository from source**, from the tool itself: find or install a toolchain, pin it to `rust-toolchain.toml`, and run the same build the release does | **done** | - |
+| 56 | **Reproducibility check**: build here, hash what came out, and compare it against the published `SHA256SUMS` entry for this platform, saying which files matched and which did not | **done** | - |
+| 57 | **The hashes are trusted only after the signature is**: verify the detached signature over `SHA256SUMS` against the project key *before* any hash from it is compared, and refuse rather than warn if it does not verify | **done** | - |
+| 58 | **Set the machine up per platform**: the build dependencies each operating system actually needs, detected, named with who ships them, and installed only on an explicit yes | **done** | - |
+| 59 | **Custom install**: CLI, desktop app, or both, from a build you just made or from a download you just verified | **done** | - |
+| 60 | **Four verbosity levels**: nothing, minimal, normal (the default) and everything, applied to every one of the above, with the exit status carrying the answer when the output carries nothing | **done** | - |
 
 ## Group mode, where you can see it
 
@@ -157,11 +157,11 @@ about the signal, which is already done.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **done** | — |
-| 62 | **A name and a colour per speaker in the app** — the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **done** | — |
-| 63 | **Live levels while a recording is running**, in the app and in the terminal | **done** | — |
-| 63b | **A wave per speaker while recording** — the same picture, but split by who is talking | **blocked** | — |
-| 64 | **Speaker detection through software you already have** — detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **blocked** | — |
+| 61 | **Group mode in the desktop app**, shown as a mode rather than hidden in a flag: off by default, a toggle that does not persist, and a separate tick for "always start in group mode" | **done** | - |
+| 62 | **A name and a colour per speaker in the app**: the colour chosen automatically to be as distinct as the number of speakers allows, overridable per speaker, and drawn from every palette the website offers | **done** | - |
+| 63 | **Live levels while a recording is running**, in the app and in the terminal | **done** | - |
+| 63b | **A wave per speaker while recording**: the same picture, but split by who is talking | **blocked** | - |
+| 64 | **Speaker detection through software you already have**: detected exactly as the other companions are, never bundled, and the honest paths kept for a machine without it | **blocked** | - |
 
 ## Seeing it before you install it
 
@@ -171,14 +171,14 @@ being sure it is working. Neither is answered by more features.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 66 | **The live monitor** — what is going in and what is coming out, on every tab, on by default, and a preview that lets you hear yourself veiled before anybody else does | **done** | — |
-| 67 | **An interactive demonstration on the website** — the inside of the application and of the command line, laid out in the site's own colours, that a reader can click through before downloading anything | **done** | — |
-| 68 | **A frequently asked questions page**, answering what gets asked rather than what is convenient to answer | **done** | — |
-| 69 | **A drawn graphic for every workflow chart** — coloured arrows, an explanation inside the picture, and every word wrapped rather than running off the edge | **done** | — |
-| 70 | **This roadmap, published as a page**, with a picture of what is done and what is not, generated from this file so the two cannot disagree | **done** | — |
-| 71 | **A video of the roadmap**, scrolling what is finished, with a short pause and a countdown before it repeats | **done** | — |
-| 72 | **The front page animation, in more depth** — the same picture, saying what the engine actually does to the signal rather than one word | **done** | — |
-| 73 | **A full security and functionality audit, and an optimisation pass, before the next deploy** — the whole tree, both halves, and the last thing that happens | **done** | — |
+| 66 | **The live monitor**: what is going in and what is coming out, on every tab, on by default, and a preview that lets you hear yourself veiled before anybody else does | **done** | - |
+| 67 | **An interactive demonstration on the website**: the inside of the application and of the command line, laid out in the site's own colours, that a reader can click through before downloading anything | **done** | - |
+| 68 | **A frequently asked questions page**, answering what gets asked rather than what is convenient to answer | **done** | - |
+| 69 | **A drawn graphic for every workflow chart**: coloured arrows, an explanation inside the picture, and every word wrapped rather than running off the edge | **done** | - |
+| 70 | **This roadmap, published as a page**, with a picture of what is done and what is not, generated from this file so the two cannot disagree | **done** | - |
+| 71 | **A video of the roadmap**, scrolling what is finished, with a short pause and a countdown before it repeats | **done** | - |
+| 72 | **The front page animation, in more depth**: the same picture, saying what the engine actually does to the signal rather than one word | **done** | - |
+| 73 | **A full security and functionality audit, and an optimisation pass, before the next deploy**: the whole tree, both halves, and the last thing that happens | **done** | - |
 
 ## The lock, the guard, and a window that does not stutter
 
@@ -189,20 +189,20 @@ it can honestly be made rather than to keep apologising for it.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 74 | **The lock screen tells an attacker nothing** — no explanation of what the lock is or is not worth while it is locked, the account of that moved to the documentation and to the unlocked application, and a small animation in its place | **done** | — |
-| 75 | **`veilvoice-guard` inside the desktop application** — the integrity record taken at the first launch and checked at every one after, sealed under the app-lock passphrase where there is one | **done** | — |
-| 76 | **The app lock, hardened as far as it honestly goes** — an authentication tag under the passphrase, two copies with the spare administrator-owned where the platform allows it, restoration when one goes, randomised names and masked contents, and a report that only the passphrase can clear | **done** | — |
-| 77 | **What the lock is worth, written down properly** — one account, in the documentation, separating the parts that are real from the parts that are only obscurity | **done** | — |
-| 78 | **Every website palette in the application, chosen from the interface** | **done** | — |
-| 79 | **A window that does not stutter** — the interface measured rather than described, every task off the drawing thread, and the smallest amount of code that does it | **done** | — |
+| 74 | **The lock screen tells an attacker nothing**: no explanation of what the lock is or is not worth while it is locked, the account of that moved to the documentation and to the unlocked application, and a small animation in its place | **done** | - |
+| 75 | **`veilvoice-guard` inside the desktop application**: the integrity record taken at the first launch and checked at every one after, sealed under the app-lock passphrase where there is one | **done** | - |
+| 76 | **The app lock, hardened as far as it honestly goes**: an authentication tag under the passphrase, two copies with the spare administrator-owned where the platform allows it, restoration when one goes, randomised names and masked contents, and a report that only the passphrase can clear | **done** | - |
+| 77 | **What the lock is worth, written down properly**: one account, in the documentation, separating the parts that are real from the parts that are only obscurity | **done** | - |
+| 78 | **Every website palette in the application, chosen from the interface** | **done** | - |
+| 79 | **A window that does not stutter**: the interface measured rather than described, every task off the drawing thread, and the smallest amount of code that does it | **done** | - |
 
 ## Finally
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 44 | Fifth audit round — every vulnerability class across the tree, twelve findings written up individually (F-48 to F-59) | **done** | — |
-| 45 | **v0.1.10 released** — ten platforms, signed, and verified by hand after publication | **done** | — |
-| 80 | **Ready for the release audit** — the RPM built, `lintian` run and its findings fixed, manual pages generated from the binaries, 32-bit re-run over the new code, and the parser campaign run over all six targets with a seed corpus kept | **done** | — |
+| 44 | Fifth audit round: every vulnerability class across the tree, twelve findings written up individually (F-48 to F-59) | **done** | - |
+| 45 | **v0.1.10 released**: ten platforms, signed, and verified by hand after publication | **done** | - |
+| 80 | **Ready for the release audit**: the RPM built, `lintian` run and its findings fixed, manual pages generated from the binaries, 32-bit re-run over the new code, and the parser campaign run over all six targets with a seed corpus kept | **done** | - |
 
 ---
 
@@ -210,12 +210,12 @@ it can honestly be made rather than to keep apologising for it.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 81 | **Find the encrypted volumes this machine already has** — detect an installed Cryptomator or VeraCrypt, and the vaults and mounted volumes each is offering, without asking either to do anything | **done** | — |
-| 82 | **Write veiled output into a chosen volume** — a destination that is a Cryptomator vault or a mounted VeraCrypt volume, remembered, and used for every export | **done** | — |
-| 83 | **The hidden-volume question, asked properly** — asked before the first write, three answers, and a job that will not start until one is given | **done** | — |
-| 84 | **The guided path, for when detection fails** — plain instructions, a folder chosen by hand, and the same confirmation a detected one gets | **done** | — |
-| 85 | **What full-disk encryption is for, said once and said properly** — BitLocker, FileVault, LUKS and LUKS2, and the OpenBSD and FreeBSD equivalents, single-sourced and shown in both | **done** | — |
-| 86 | **The app lock as a key, not only a verifier** — the app-lock passphrase seals everything VeilVoice veils, automatically, as an option that says what it costs | **done** | — |
+| 81 | **Find the encrypted volumes this machine already has**: detect an installed Cryptomator or VeraCrypt, and the vaults and mounted volumes each is offering, without asking either to do anything | **done** | - |
+| 82 | **Write veiled output into a chosen volume**: a destination that is a Cryptomator vault or a mounted VeraCrypt volume, remembered, and used for every export | **done** | - |
+| 83 | **The hidden-volume question, asked properly**: asked before the first write, three answers, and a job that will not start until one is given | **done** | - |
+| 84 | **The guided path, for when detection fails**: plain instructions, a folder chosen by hand, and the same confirmation a detected one gets | **done** | - |
+| 85 | **What full-disk encryption is for, said once and said properly**: BitLocker, FileVault, LUKS and LUKS2, and the OpenBSD and FreeBSD equivalents, single-sourced and shown in both | **done** | - |
+| 86 | **The app lock as a key, not only a verifier**: the app-lock passphrase seals everything VeilVoice veils, automatically, as an option that says what it costs | **done** | - |
 
 ---
 
@@ -223,17 +223,17 @@ it can honestly be made rather than to keep apologising for it.
 
 | # | Marker | Status | Estimate |
 |---:|---|---|---|
-| 87 | **A video of a veiled recording** — a black frame and the audio, so a recording can be posted where only video is accepted | **done** | — |
-| 88 | **Import from every format OBS writes** — bring in a recording made elsewhere, video or audio, and take the sound out of it | **done** | — |
-| 89 | **Veil the other person afterwards** — the interviewee given their own voice in post, through the group plan that already exists | **done** | — |
-| 90 | **GnuPG verification inside the window** — in the verify tab, beside the hash check, using the GnuPG somebody already has | **done** | — |
-| 91 | **`veilvoice-verify` finds the release itself** — GnuPG arguments where wanted, and an `auto` that looks in Downloads, checks the archive, and checks what came out of it | **done** | — |
-| 92 | **An autolock timeout** — off by default, and when on, from five minutes to forty eight hours, chosen from a list or typed, with the range itself adjustable | **done** | — |
-| 93 | **Group mode explained where it is used** — how to build a plan, what each field does, and what happens without one | **done** | — |
-| 94 | **Release notes people can actually read** — every release listed newest first, its notes opening in place, and every file one click away | **done** | — |
-| 95 | **One version per release, in order, enforced** — the tag, the workspace and every package definition checked against each other before a release can go out | **done** | — |
-| 96 | **v0.1.15 released** — the audit run over everything since v0.1.14, CI green, and the release published | **done** | — |
-| 97 | **A verifier anybody can use, checking everything** — one press or one command checks the signature, the archive, every file you extracted, and then asks your own GnuPG the same question | **done** | — |
+| 87 | **A video of a veiled recording**: a black frame and the audio, so a recording can be posted where only video is accepted | **done** | - |
+| 88 | **Import from every format OBS writes**: bring in a recording made elsewhere, video or audio, and take the sound out of it | **done** | - |
+| 89 | **Veil the other person afterwards**: the interviewee given their own voice in post, through the group plan that already exists | **done** | - |
+| 90 | **GnuPG verification inside the window**: in the verify tab, beside the hash check, using the GnuPG somebody already has | **done** | - |
+| 91 | **`veilvoice-verify` finds the release itself**: GnuPG arguments where wanted, and an `auto` that looks in Downloads, checks the archive, and checks what came out of it | **done** | - |
+| 92 | **An autolock timeout**: off by default, and when on, from five minutes to forty eight hours, chosen from a list or typed, with the range itself adjustable | **done** | - |
+| 93 | **Group mode explained where it is used**: how to build a plan, what each field does, and what happens without one | **done** | - |
+| 94 | **Release notes people can actually read**: every release listed newest first, its notes opening in place, and every file one click away | **done** | - |
+| 95 | **One version per release, in order, enforced**: the tag, the workspace and every package definition checked against each other before a release can go out | **done** | - |
+| 96 | **v0.1.15 released**: the audit run over everything since v0.1.14, CI green, and the release published | **done** | - |
+| 97 | **A verifier anybody can use, checking everything**: one press or one command checks the signature, the archive, every file you extracted, and then asks your own GnuPG the same question | **done** | - |
 
 ---
 
@@ -246,7 +246,7 @@ exactly what happened when the USB work was dropped from this list.
 
 **Transcription: the decision has now been taken, and it is a narrow one.**
 Marker 43 was blocked because VeilVoice talks to no servers at all and CI fails
-the build if a network client appears anywhere in the dependency graph — one of
+the build if a network client appears anywhere in the dependency graph, one of
 the few claims a reader can check in ten seconds, and a large part of why this
 project is worth trusting.
 
@@ -265,7 +265,7 @@ Three rules go with it, and they are what keep the front page true:
 * **The guarantee is kept in the dependency graph.** Nothing here adds an HTTP
   client to VeilVoice: a local model is reached by running the program the user
   already installed, and a provider is reached by shelling out to the system's
-  own transfer tool — the same arrangement the release verifier has used for
+  own transfer tool, the same arrangement the release verifier has used for
   downloads since it existed. The CI job that fails on a network client stays
   exactly as it is.
 * **The claim is reworded where it appears, not quietly kept.** "It talks to no
@@ -276,7 +276,7 @@ Not every provider accepts audio input, and that is not a small caveat: an API
 that takes text and images does not take a WAV, whatever else it can do. Which
 providers actually accept audio is a fact about somebody else's service that
 this machine cannot check offline, so it is checked *from a machine that can*
-before a line of it is written — the same rule that turned marker 64 from
+before a line of it is written, the same rule that turned marker 64 from
 planned into blocked, one paragraph down, and saved a feature that would have
 shipped unable to work.
 
@@ -285,8 +285,8 @@ measurement moved it.**
 
 The decision stands: VeilVoice ships no model, and uses software you already
 have or nothing. What changed is *which* software, and it changed because the
-promise a few paragraphs up — "that gets checked before anything is built
-rather than discovered by a user" — was kept.
+promise a few paragraphs up, "that gets checked before anything is built
+rather than discovered by a user", was kept.
 
 `ollama` was the named candidate. It was checked on a machine that has it:
 
@@ -300,21 +300,21 @@ rather than discovered by a user" — was kept.
   passed.
 * **Running it is not free.** A single `ollama list` started a background
   server, opened a local UI port, started an update checker on an hourly timer,
-  and made a network request to GitHub — all of it in the first two seconds,
+  and made a network request to GitHub, all of it in the first two seconds,
   none of it asked for. For most programs that is unremarkable. For this one it
   means "VeilVoice can use ollama" would have to be read as "VeilVoice can
   start a background service that phones home on a timer", and that has to be
   said in those words or not offered.
 
 So marker 64 is **blocked**, on a question rather than on effort: local
-speech-to-text means a Whisper-family program — `whisper.cpp`, `faster-whisper`
-— and speaker diarisation means a third thing again. Which of those to detect,
+speech-to-text means a Whisper-family program such as `whisper.cpp` or
+`faster-whisper`, and speaker diarisation means a third thing again. Which of those to detect,
 and whether starting any of them is acceptable given what was measured above,
 is the maintainer's call. Marker 43 is blocked behind the same question for its
 local half.
 
-The two honest paths that exist today — one microphone per person, or a turn
-list — remain, and remain the default. A machine with none of this installed
+The two honest paths that exist today, one microphone per person or a turn
+list, remain, and remain the default. A machine with none of this installed
 behaves exactly as it does now.
 
 **Privileged mode and driver alerting cannot reach kernel level on Windows
@@ -323,8 +323,8 @@ kernel driver on 64-bit Windows requires an EV code-signing certificate issued
 to a verified legal entity and then Microsoft's attestation signing. macOS
 requires an Apple Developer ID and an entitlement Apple grants case by case.
 Both are identity checks, and this project is published under a pseudonym on
-purpose. **The decision taken is to ship the administrator version** — which is
-most of the protection and none of the pretence — and to say plainly that
+purpose. **The decision taken is to ship the administrator version**, which is
+most of the protection and none of the pretence, and to say plainly that
 kernel-level enforcement is unavailable on those two platforms and why. Linux
 and OpenBSD have no such gate.
 
@@ -351,8 +351,8 @@ verdict, because "not reproducible" has several causes and most of them are
 boring.
 
 **The one thing marker 55 does not do is install the compiler.** It reports
-the Rust toolchain like any other dependency — found or missing, with the
-version — and points at rustup, which is how the Rust project ships it. It
+the Rust toolchain like any other dependency, found or missing and with the
+version, and points at rustup, which is how the Rust project ships it. It
 does not run that installer. rustup downloads a compiler, writes to the home
 directory and edits the shell profile, and all three belong to the person whose
 machine it is rather than to a program acting for them. Every other dependency
@@ -361,7 +361,7 @@ on Linux is offered through the system package manager under the rule below.
 **A dependency probe can be wrong in the direction that matters, and one was.**
 The Windows linker check looked for `link` on `PATH` and reported whatever it
 found. On the first machine it ran on that was Git for Windows'
-`usr/bin/link.exe` — GNU coreutils' hardlink utility, which shares a name with
+`usr/bin/link.exe`, GNU coreutils' hardlink utility, which shares a name with
 Microsoft's linker and has nothing to do with building Rust. It said the linker
 was present; the build would then have failed. There is no honest probe for it,
 because cargo finds MSVC through the registry rather than `PATH`, so it now says
@@ -378,15 +378,15 @@ would be the overstatement this project's second rule exists to prevent.
 
 **A reproducibility checker that always says no is worse than none.** Marker
 56's first version ran `cargo build --release` and nothing else, so it would
-have reported every user's build as differing from the published one — for
+have reported every user's build as differing from the published one, for
 the dull reason this repository has documented since before the checker
 existed: absolute paths are baked into panic messages and debug info, and
 removing them is the build environment's job. Two builds of this tree in two
 directories on this machine produced three differing binaries out of three,
 measured. It now reproduces the release environment instead of approximating
-it — the same `--remap-path-prefix` for source and `CARGO_HOME`, the same
+it: the same `--remap-path-prefix` for source and `CARGO_HOME`, the same
 `SOURCE_DATE_EPOCH` from the commit, the same per-linker flag, the same
-explicit `--target` — and prints every one of them before building, because a
+explicit `--target`, and prints every one of them before building, because a
 comparison whose settings are invisible cannot be checked by whoever reads the
 result. A test compares the flags against `release.yml` itself, so changing one
 and not the other fails the build. Recorded as F-70.
@@ -450,7 +450,7 @@ the user did not know they were running.
 Marker 34. Excluding a window from capture is `SetWindowDisplayAffinity` on
 Windows, and the equivalents on macOS and under Wayland; all of them are
 foreign-function calls, and every crate in this workspace carries
-`#![forbid(unsafe_code)]` — which is on the front page and is one of the things
+`#![forbid(unsafe_code)]`, which is on the front page and is one of the things
 a reader can check in ten seconds. The trade is the maintainer's: a documented
 `unsafe` shim in one file, or a window that can be recorded. **Until it is
 made, the honest state is written where a user will read it**: VeilVoice does
@@ -459,7 +459,7 @@ pretending otherwise. Nothing about it is hard except the decision.
 
 Worth noting that the same decision would not buy very much. A window
 excluded from capture is still visible to a camera pointed at the screen, and
-the thing VeilVoice protects — the recording — is a file, not a picture of a
+the thing VeilVoice protects, the recording, is a file rather than a picture of a
 window.
 
 **Marker 39 ships the administrator version and reports the difference; it
@@ -472,7 +472,7 @@ so "it only reports" stays true rather than staying a comment.
 
 **The opt-in service is deliberately not shipped**, and the reason is written
 where a reader will meet it: a service outlives the window it was started from,
-starts itself at boot, and runs whether or not anybody is using the program —
+starts itself at boot, and runs whether or not anybody is using the program,
 somebody who tried VeilVoice once should not find it still running next month.
 Leaving the window open is the honest form of continuous monitoring, because
 then what it can see is exactly what it says it can see.
@@ -480,8 +480,8 @@ then what it can see is exactly what it says it can see.
 Two details found by measuring rather than reasoning. The Windows probe keys on
 the well-known SID `S-1-5-32-544` rather than the group's **name**, which is
 translated and would report every non-English machine as unprivileged. And the
-"Group used for deny only" attribute — what an administrator account looks like
-when it is *not* running elevated — is on the same 236-character line as the
+"Group used for deny only" attribute, which is what an administrator account
+looks like when it is *not* running elevated, is on the same 236-character line as the
 SID, not the next one; a console wraps it so it looks like two rows, and
 reading it that way would report every administrator account as elevated
 whether or not it was. Verified on a machine in exactly that state.
@@ -511,15 +511,15 @@ Carrying both under one number meant a finished feature reading as blocked.
 The *levels* are done and have been for some time:
 `veilvoice live` draws them in the terminal and the desktop application draws
 them beside the devices, both with peak-hold. The **wave per speaker** is a
-different thing entirely — it needs the live input separated by who is talking,
+different thing entirely: it needs the live input separated by who is talking,
 which is diarisation, which is markers 43 and 64 and is blocked for the reason
 recorded there: real speaker separation means shipping a trained model, and
 locked decision 5 says this project does not.
 
 Leaving it marked *planned* would imply an estimate exists for work that cannot
 start, which is the same overstatement in the other direction. What could be
-built without diarisation — a wave per speaker in a *rendered* conversation,
-where the plan already says who speaks when — exists, and is what the video
+built without diarisation, a wave per speaker in a *rendered* conversation
+where the plan already says who speaks when, exists, and is what the video
 output and the HTML player draw.
 
 **Marker 29 moves to blocked, because it is a decision rather than a task.**
@@ -981,7 +981,7 @@ deploy to save up for.
 the reason is the shape of the accident it guards against. You are talking
 through VeilVoice, veiled. You plug in a headset. The operating system offers
 the new microphone, the calling program takes it, and from that moment your
-**real voice** is going out — with the veiled window still open in front of
+**real voice** is going out, with the veiled window still open in front of
 you, meters still moving, looking exactly as it did a second earlier. Nobody
 notices that, because there is nothing to notice. It is not carelessness; it
 is a decision the operating system makes on somebody's behalf.
@@ -997,7 +997,7 @@ short and it is not zero, and `CANNOT_PREVENT` says so wherever the feature
 appears.
 
 Closing somebody's program is bounded rather than general: never VeilVoice
-itself, never a system process, never by name — only the specific process
+itself, never a system process and never by name, only the specific process
 the watch feed named, and the check is made twice, once when deciding and
 again in the only function that acts. Every close is written down, because a
 program that vanishes with nothing to explain it is indistinguishable from a
@@ -1010,7 +1010,7 @@ cannot.** Real enforcement needs a kernel driver or a signed system policy and
 an application identity to sign it with, and this project is published under a
 pseudonym on purpose. Shipping something called "app control" that quietly only
 watches would be the exact failure rule 2 exists to prevent, so the scope note
-is printed by **every** subcommand — not once at setup, not behind a flag — and
+is printed by **every** subcommand, not once at setup and not behind a flag, and
 the *unknown* verdict says in so many words that the program is still running.
 
 Three decisions worth recording. **Learning has an end**: a baseline that is
@@ -1019,20 +1019,20 @@ the picture the moment it starts. **Grants expire**, and an expired grant is
 left on record rather than swept, because "this was allowed until Tuesday" is
 worth more to a reader than a row that vanished; permanent is spelled
 `forever` rather than a distant date, so choosing it is something somebody
-typed. And **only the decisions worth reading are logged** — a line for every
+typed. And **only the decisions worth reading are logged**: a line for every
 ordinary program every time it is seen is a log nobody reads, and a log nobody
 reads is not a control.
 
 Measured on this machine: 111 programs learned from 313 sightings, baseline
 closed, and a `check` while a stray process ran named `timeout.exe` and
-`smartscreen.exe` — the second one started by Windows itself, which is exactly
+`smartscreen.exe`, the second one started by Windows itself, which is exactly
 the case this is for.
 
 **Marker 41's contrast is computed against the colour actually on screen.**
 A translucent card is a colour laid *over* the panel behind it, so measuring
 the card's own tint answers a question nobody asked. The blend is computed, the
 WCAG ratio is taken against that, the text colour is chosen by measuring every
-candidate in the palette rather than assuming black or white — and if nothing
+candidate in the palette rather than assuming black or white, and if nothing
 reaches 4.5:1, the card is drawn **opaque** instead of shipped illegible.
 Translucency is a nicety; reading a warning is not. The preferences panel shows
 the measured ratio and says when it had to give translucency up, rather than
@@ -1042,7 +1042,7 @@ The third mode is *off*, and it is offered for a reason: a monitor that
 interrupts somebody every thirty seconds is one they switch off at the
 operating system, and then it is watching for nothing at all. Better a reader
 who chose silence knowingly. What none of the three do is leave VeilVoice's own
-window — a system notification needs a registered application identity on two
+window, because a system notification needs a registered application identity on two
 of the three platforms, and this project is published under a pseudonym on
 purpose. That limit is printed beside the setting.
 
@@ -1051,14 +1051,14 @@ and nothing asked.** The randomised ratchet range was written, documented and
 tested inside `veilvoice-core`, and the doc comment on it said *"the front ends
 call this at launch"*. Neither front end did. It was reached by nothing but its
 own test for two releases, so every shipped copy rolled the modulation seed on
-the same fixed two-second period — a number compiled into the binary,
+the same fixed two-second period, a number compiled into the binary,
 which is exactly what that sentence said was not the case. Recorded as F-73.
 
 Both front ends now draw a range from the operating system's random source at
 launch, and a test reads their source and fails the build if either stops. The
 interval is user-configurable through `--reseed-range 250,1800` and a checkbox
 in the application, and **anything that is not a usable range is refused with
-the reason** — never adjusted to fit, which is marker 28's wording and
+the reason**, never adjusted to fit, which is marker 28's wording and
 the reason the parser returns six distinct refusals rather than a clamp. What
 is displayed is the *effective* range, quantised to whole frames, because the
 ratchet can only fire on a frame boundary and showing the request would
@@ -1165,7 +1165,7 @@ are recorded here rather than edited out of history.
 
 ## How to read the estimates
 
-They assume one person, working days, and no interruptions — so the calendar
+They assume one person, working days, and no interruptions, so the calendar
 will be longer than the sum. They also assume the work is done the way the rest
 of this project is: tests that can express the bug, documentation generated
 from the source rather than written beside it, and a claim in a document only
