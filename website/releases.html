@@ -93,6 +93,10 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <ul>
 <li>The release workflow&#x27;s <code>tag</code> input was declared and ignored. A dry run started from a branch named every archive after that branch and would have tried to publish a release called <code>main</code>. It now checks out the tag it was given, names everything after it, and publishes nothing at all on a manual run, which is what &quot;dry run&quot; was always supposed to mean.</li>
 </ul>
+<h4 id="the-sixteenth-audit-round-run-on-the-manifest-generator">The sixteenth audit round, run on the manifest generator</h4>
+<ul>
+<li><strong>F-102</strong> The generator normalised archive member paths with <code>lstrip(&quot;./&quot;)</code>, which strips a set of characters rather than a prefix. Measured: <code>.hidden/file</code> came out as <code>hidden/file</code>, so a release containing a dotfile would publish it under a name no file on disk has and every verifier would report it missing on a sound release; and <code>../escape</code> came out as <code>escape</code>, quietly rewriting a path that leaves the release into one that looks ordinary. The reader refuses such a path rather than sanitising it, and says why; the writer was doing the opposite. Both ends state the same rule now, and the writer fails the release job rather than publishing something every verifier would reject.</li>
+</ul>
 <h4 id="the-releases-page-and-what-it-was-not-telling-you">The releases page, and what it was not telling you</h4>
 <p><strong>Every version is on it now.</strong> The backlog began at v0.1.6, because <code>CHANGELOG.md</code> keeps one combined section for v0.1.5 and earlier: six published releases with no entry, no summary and no download links. They are listed, each pointing at its own release page for its notes.</p>
 <p><strong>The files are at the end of each release rather than the top</strong>, so opening one shows what changed in it. A short summary sits beside every version while it is closed, so the list stays readable at a glance; the detail is inside.</p>

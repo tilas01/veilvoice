@@ -38,6 +38,57 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The sixteenth round: the manifest generator, an hour after writing it
+
+The same rule as the fourteenth round, applied to the other half of marker 97.
+The generator that writes `CONTENTS.sha256` is the writing end of the seam the
+verifier reads, and it had just been moved out of the release workflow into a
+script so that it could be tested at all.
+
+**One defect found and fixed (F-102)**, by measuring what a line of path
+handling actually does rather than what it reads as.
+
+### F-102 -- `lstrip("./")` strips characters, not a prefix
+
+`tools/release/contents.py`.
+
+Tar members sometimes carry a `./` prefix, so the generator normalised them
+with `name.replace("\\", "/").lstrip("./")`. `str.lstrip` takes a **set of
+characters**, not a prefix, and removes every leading character that is in it.
+
+Measured, not reasoned about:
+
+```text
+'./veilvoice/x'  ->  'veilvoice/x'      as intended
+'.hidden/file'   ->  'hidden/file'      a file renamed
+'../escape'      ->  'escape'           a path silently made acceptable
+'./.config/y'    ->  'config/y'         both at once
+```
+
+The first of those is a correctness failure with an ugly shape: a release
+containing a dotfile would publish it under a name no file on disk has, so
+every verifier would report it **missing** on a release that is perfectly
+sound, and the owner would be told their download had been tampered with.
+
+The second is worse and is the one worth the finding. A member that climbs out
+of the release directory was quietly rewritten into one that looks ordinary.
+The reader's own note says, in as many words, that such a path must be refused
+rather than sanitised, because a manifest containing one is not a manifest with
+a bad line in it: it is a file that did not come from this project's release
+job. The writer was doing the opposite, and the two ends of the seam had been
+written a few hours apart by the same hand.
+
+Both ends state the same rule now, and the writer refuses -- naming the archive
+and the path, and failing the release job -- rather than publishing something
+every verifier would reject. The round-trip test builds a release with a
+dotfile in it, so the renaming half cannot come back.
+
+Beside it, a wrong number: the generator reported the file count by subtracting
+twice the number of archives from the line count, which is off by one per
+archive. It said five files for six. Counted rather than derived now. Not a
+finding, and worth writing down anyway in a document that keeps telling itself
+numbers must be measured.
+
 ## The fifteenth round: the page that says where to get it
 
 The releases page, read after the verifier rather than before it, because a
@@ -3167,7 +3218,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and one defects found and fixed across fifteen audit rounds (F-1 to F-101):**
+**One hundred and two defects found and fixed across sixteen audit rounds (F-1 to F-102):**
 eight in the first two, twenty-eight in the third, eleven in the fourth,
 twelve in the fifth, one in the sixth, five in the seventh.
 
