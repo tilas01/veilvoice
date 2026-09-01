@@ -2101,7 +2101,7 @@ def html_source(colours, model, entry, fingerprint):
     body.append('</code></pre>')
 
     return html_page(colours, 2,
-                     "%s source — VeilVoice reference" % entry["rel"],
+                     "%s source · VeilVoice reference" % entry["rel"],
                      "The source of %s, on this site." % entry["rel"],
                      body, fingerprint)
 
@@ -2547,7 +2547,7 @@ def contains_html(entry, anchor):
             out.append("<li><code>%s %s</code> <span style=\"color:var(--muted)\">"
                        "line %d</span>%s</li>"
                        % (esc(item["kind"]), esc(item["name"]), item["line"],
-                          " &mdash; " + inline_html(summary) if summary else ""))
+                          " &middot; " + inline_html(summary) if summary else ""))
         out.append("</ul>")
 
     if ways_in:
@@ -2561,7 +2561,7 @@ def contains_html(entry, anchor):
             out.append("<li><code>%s</code> <span style=\"color:var(--muted)\">"
                        "line %d</span>%s"
                        % (esc(name), item["line"],
-                          " &mdash; " + inline_html(summary) if summary else ""))
+                          " &middot; " + inline_html(summary) if summary else ""))
             if reaches:
                 out.append("<br><span style=\"color:var(--muted);font-size:12px\">"
                            "reaches %s</span>"
@@ -2629,7 +2629,7 @@ def html_crate(colours, model, fingerprint, links):
     body.append('</tbody></table>')
     body.append('</section>')
     body.append('</div></div>')
-    return html_page(colours, 1, "%s — VeilVoice reference" % crate,
+    return html_page(colours, 1, "%s · VeilVoice reference" % crate,
                      model["description"] or crate, body, fingerprint)
 
 
@@ -2682,7 +2682,7 @@ def html_file(colours, model, entry, fingerprint, links):
     if nodes:
         note = ("The functions this file defines, and the calls between them. An "
                 "edge means the callee's name appears, called, inside the caller's "
-                "body — a syntactic reading, not a type-resolved one.")
+                "body. This is a syntactic reading, not a type-resolved one.")
         if truncated:
             note += (" %d of %d functions are drawn; the diagram is bounded at %d "
                      "so it stays readable." % (len(nodes), total, MAX_DIAGRAM_NODES))
@@ -2714,7 +2714,7 @@ def html_file(colours, model, entry, fingerprint, links):
 
     body.append('</div></div>')
     return html_page(colours, 2,
-                     "%s — VeilVoice reference" % entry["rel"],
+                     "%s · VeilVoice reference" % entry["rel"],
                      entry["summary"] or entry["rel"], body, fingerprint)
 
 
@@ -2734,7 +2734,7 @@ def html_index(colours, models, fingerprint, covered, uncovered):
     # Linked from here because a reader looking for "how does this work" should
     # not have to know which generator wrote which page.
     body.append('<p><a href="source/index.html">The website&rsquo;s own '
-                'source</a> &mdash; every script and stylesheet this site is '
+                'source</a>, every script and stylesheet this site is '
                 'made of, explained technically and then in plain words.</p>')
 
     for model in models:
@@ -2765,7 +2765,7 @@ def html_index(colours, models, fingerprint, covered, uncovered):
         body.append("</ul>")
         body.append('</section>')
 
-    return html_page(colours, 1, "Reference — VeilVoice",
+    return html_page(colours, 1, "Reference · VeilVoice",
                      "Every VeilVoice crate and source file, generated from the "
                      "doc comments in the code.", body, fingerprint)
 
@@ -2912,7 +2912,7 @@ def wiki_index(models):
         out.append("## [[%s|%s]]\n" % (crate, wiki_crate_page(crate)))
         out.append("%s\n" % model["description"])
         for entry in model["files"]:
-            out.append("- [[`%s`|%s]] &mdash; %s"
+            out.append("- [[`%s`|%s]] &middot; %s"
                        % (entry["name"], wiki_file_page(crate, entry["stem"]),
                           entry["summary"] or "no module documentation yet"))
         out.append("")

@@ -1,11 +1,11 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
-# VeilVoice — what it destroys, what it keeps, and why
+# VeilVoice: what it destroys, what it keeps, and why
 
 **Updated 2026-08-16**, covering the tree as it stands including at-rest
 encryption by default and the app lock. This document is the honest version of
 the pitch. It states
-what VeilVoice guarantees, how, and — at least as importantly — what it does
+what VeilVoice guarantees, how, and, at least as importantly, what it does
 not. A privacy tool that overstates its reach is worse than none, because
 someone will rely on the part that was never true.
 
@@ -13,7 +13,7 @@ someone will rely on the part that was never true.
 
 ## 1. The goal, and the contradiction in the obvious version of it
 
-The intuitive ask is "make it impossible to isolate my voice — fill the whole
+The intuitive ask is "make it impossible to isolate my voice, fill the whole
 spectrogram with noise." That cannot be built, because it conflicts with the
 other half of the requirement. Audio that stays **understandable and
 transcribable** must carry the phonemes; noise that covers the phonemes covers
@@ -25,8 +25,8 @@ So VeilVoice targets the achievable and genuinely useful goal:
 > **Irreversible destruction of the speaker's identity, with intelligibility
 > preserved on purpose.**
 
-The *voiceprint* — fundamental pitch, formant structure, timbre, micro-timing,
-and the melody of an accent — is destroyed. The *words* survive. If the message
+The *voiceprint*, meaning fundamental pitch, formant structure, timbre,
+micro-timing and the melody of an accent, is destroyed. The *words* survive. If the message
 also needs to be secret, that is a different problem with a different solution:
 encrypt it.
 
@@ -49,7 +49,7 @@ same speaker.
 - **The words.** Preserved deliberately. See "If the message must be secret
   too" below.
 - **Background content.** Room acoustics, a doorbell, a colleague's voice, a
-  regional siren — VeilVoice processes the whole signal but does not attempt
+  regional siren. VeilVoice processes the whole signal but does not attempt
   scene sanitisation. Check what else is in your recording.
 - **An attacker already on your machine.** If they can read process memory or
   tap the microphone before VeilVoice does, nothing here helps. The app lock
@@ -71,7 +71,7 @@ defeating all three.
 
 For each STFT frame VeilVoice keeps only the magnitude spectrum and throws away
 the measured phase. Phase encodes the precise waveform and the speaker's
-micro-timing — the excitation pattern that makes one glottis distinguishable
+micro-timing, the excitation pattern that makes one glottis distinguishable
 from another.
 
 This is not obfuscation, it is deletion. The information is never written down,
@@ -90,7 +90,7 @@ Three of the strongest biometric features are *normalised*, not randomised:
 | Long-term spectral tilt | Rotated onto one canonical slope |
 
 Each mapping is **many-to-one**. A whole population of speakers lands on the
-same output value, so the original cannot be inferred from the result — there is
+same output value, so the original cannot be inferred from the result: there is
 nothing to invert, only a value that many inputs share. This is strictly
 stronger than randomising those features, which would merely displace them.
 
@@ -119,7 +119,7 @@ recording is therefore not one key stream but a chain of short ones, each sealed
 permanently once it has passed.
 
 The interval is configurable, including off. Rolling is inaudible by
-construction — the smoothed parameters are never reset, only their source of
+construction, because the smoothed parameters are never reset, only their source of
 future targets, and the per-bin phase offsets ease to their new values over
 about half a second rather than stepping. Both properties are asserted in the
 test suite, one of them by comparing the worst sample-to-sample jump against a
@@ -127,7 +127,7 @@ non-rolling run.
 
 The seed is deliberately *not* re-read from the OS CSPRNG on each roll. That
 would put a syscall inside an audio callback every couple of seconds, and it
-would make deterministic runs impossible — which the reproducible-build story
+would make deterministic runs impossible, which the reproducible-build story
 depends on. The OS seeds the chain once; the ratchet carries it forward.
 
 ---
@@ -136,15 +136,15 @@ depends on. The OS seeds the chain once; the ratchet carries it forward.
 
 Accent is carried by two different kinds of cue, and they get different answers.
 
-**Suprasegmental cues — removed.** Intonation contour, pitch range, voice
+**Suprasegmental cues: removed.** Intonation contour, pitch range, voice
 quality, and the vocal-tract scale behind a speaker's vowel space. These are
 properties of the signal, and the normalisation described above collapses all
 of them.
 
-**Segmental cues — cannot be removed.** *Which phonemes the speaker actually
+**Segmental cues: cannot be removed.** *Which phonemes the speaker actually
 produced*: rhoticity, vowel mergers, dental-fricative substitution, aspiration
 patterns. At this level the accent **is** the words. Changing it means deciding
-that a different phoneme was said, which no filter can do — it requires
+that a different phoneme was said, which no filter can do: it requires
 recognising the speech and re-synthesising it.
 
 **Therefore: a strong regional accent may still be audible in the output, even
@@ -185,7 +185,7 @@ Stated so nobody is surprised:
 - **Whether two outputs came from the same *session*.** Within one session the
   seed is fixed. Different sessions are unlinkable; a single long recording is
   internally consistent.
-- **Coarse voice-activity structure** — when you spoke and when you did not.
+- **Coarse voice-activity structure**, meaning when you spoke and when you did not.
 
 ---
 
@@ -199,14 +199,14 @@ think to ask.
 
 So **`veilvoice anonymise` seals its output** into a `.veil` container, and the
 desktop app does the same. Turning that off is possible and prints what is being
-given up first — the CLI waits for the word `UNENCRYPTED` on a terminal; the GUI
+given up first: the CLI waits for the word `UNENCRYPTED` on a terminal; the GUI
 opens a dialogue that must be answered before the tick box changes.
 
 The WAV is encoded **in memory** and sealed there. An encrypted recording never
 exists on disk in the clear, not even briefly. This matters more than it sounds:
 a plaintext file that is written and then deleted cannot be reliably taken back
 on flash storage, because wear levelling leaves the original blocks in cells no
-write can reach — the argument is set out in full in `veilvoice-crypto`'s
+write can reach, and the argument is set out in full in `veilvoice-crypto`'s
 `shred` module.
 
 The primitives:
@@ -218,7 +218,7 @@ The primitives:
   *harvest-now-decrypt-later*: a recording stored today may be attacked
   decades from now.
 - **XChaCha20-Poly1305** for the payload, with random 192-bit nonces, and the
-  full container header authenticated as associated data — so an attacker
+  full container header authenticated as associated data, so an attacker
   cannot downgrade the stored KDF cost to make cracking cheap.
 - **Page-locked, zeroizing secrets**, so keys do not reach the swap file.
   Locking does not survive hibernation and does not stop an attacker who can
@@ -229,7 +229,7 @@ One caveat that is stated rather than engineered around: a passphrase **being
 typed** into a text field or a terminal prompt lives in an ordinary string,
 because something has to receive the keystrokes. It is moved into a page-locked
 `Secret` the moment it is confirmed and the buffer is wiped, so the exposure
-lasts as long as the typing rather than as long as the session — but for those
+lasts as long as the typing rather than as long as the session, but for those
 moments it is ordinary memory and could reach swap. Closing the gap entirely
 needs a custom text widget nobody would audit, which is a worse trade than
 saying so here.
@@ -252,10 +252,10 @@ What it is, concretely:
 
 - **An Argon2id verifier**, not a key. `Argon2id(domain ‖ password, salt)` is
   stored and compared in constant time. It deliberately encrypts nothing,
-  because there is nothing here it could usefully encrypt — and implying
+  because there is nothing here it could usefully encrypt, and implying
   otherwise would be the overclaim this document exists to avoid.
 - **Rate limited, and the limit is persisted.** Three attempts are free; after
-  that the wait doubles — 5 s, 10 s, 20 s … capped at fifteen minutes. The count
+  that the wait doubles: 5 s, 10 s, 20 s … capped at fifteen minutes. The count
   is written to disk after every attempt, so killing the process does not hand
   an attacker a fresh budget.
 - **A separate password from the recording one.** Unlocking the app is not the
@@ -270,7 +270,7 @@ What it is not:
   the stored hash offline. Argon2id at 256 MiB makes each offline guess
   expensive, which helps a good passphrase and does not save a bad one.
 - **Not disk encryption.** If the disk is the threat, use LUKS, BitLocker or
-  FileVault, and encrypt the recordings themselves — which VeilVoice now does by
+  FileVault, and encrypt the recordings themselves, which VeilVoice now does by
   default.
 
 ---
@@ -314,11 +314,11 @@ The code has been **audited by tilas01**, who wrote and reviewed it. That is a
 maintainer audit and is worth exactly what a maintainer audit is worth: it
 catches what the author can see. **No external firm or independent researcher
 has reviewed this code**, and until one has, the strongest verification
-available to you is the source itself — which is why it is written to be read.
+available to you is the source itself, which is why it is written to be read.
 
 How much that caveat is worth is now a measured quantity rather than a modest
-noise. The latest audit round — parser fuzzing, timing measurement, an
-adversarial read of the DSP, and hostile-input testing of the website — found
+noise. The latest audit round, covering parser fuzzing, timing measurement, an
+adversarial read of the DSP and hostile-input testing of the website, found
 **seven defects in code the previous round had called clean**. None broke
 confidentiality; two aborted the process on a crafted file and one silently
 turned every subsequent recording into noise. All are fixed and written up in

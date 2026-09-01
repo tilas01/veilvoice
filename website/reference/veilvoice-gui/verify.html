@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-gui/src/verify.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-gui/src/verify.rs &#183; VeilVoice reference</title>
 <meta name="description" content="The verify tab: drop a download on the window and be told what it is.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -75,21 +75,21 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>1237 lines defining <strong>21 functions</strong> (7 public), <strong>5 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Slot</code> <span style="color:var(--muted)">line 77</span> &mdash; Which of the three files a dropped path is.</li>
-<li><code>struct Report</code> <span style="color:var(--muted)">line 112</span> &mdash; Everything one press of check found out.</li>
-<li><code>struct Contents</code> <span style="color:var(--muted)">line 125</span> &mdash; What the extracted folder turned out to hold.</li>
-<li><code>struct Gnupg</code> <span style="color:var(--muted)">line 140</span> &mdash; What this machine&#x27;s GnuPG said.</li>
-<li><code>struct Verify</code> <span style="color:var(--muted)">line 158</span> &mdash; The tab&#x27;s state.</li>
+<li><code>enum Slot</code> <span style="color:var(--muted)">line 77</span> &middot; Which of the three files a dropped path is.</li>
+<li><code>struct Report</code> <span style="color:var(--muted)">line 112</span> &middot; Everything one press of check found out.</li>
+<li><code>struct Contents</code> <span style="color:var(--muted)">line 125</span> &middot; What the extracted folder turned out to hold.</li>
+<li><code>struct Gnupg</code> <span style="color:var(--muted)">line 140</span> &middot; What this machine&#x27;s GnuPG said.</li>
+<li><code>struct Verify</code> <span style="color:var(--muted)">line 158</span> &middot; The tab&#x27;s state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Verify::wants_repaint</code> <span style="color:var(--muted)">line 192</span> &mdash; Whether the window has to keep drawing for this panel&#x27;s sake.
+<li><code>Verify::wants_repaint</code> <span style="color:var(--muted)">line 192</span> &middot; Whether the window has to keep drawing for this panel&#x27;s sake.
 </li>
-<li><code>Verify::drain</code> <span style="color:var(--muted)">line 197</span> &mdash; Take the worker&#x27;s answer if it has one.
+<li><code>Verify::drain</code> <span style="color:var(--muted)">line 197</span> &middot; Take the worker&#x27;s answer if it has one.
 </li>
-<li><code>Verify::take_dropped</code> <span style="color:var(--muted)">line 289</span> &mdash; Read what the window was given this frame.
+<li><code>Verify::take_dropped</code> <span style="color:var(--muted)">line 289</span> &middot; Read what the window was given this frame.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>accept</code>, <code>fill_from_beside</code>, <code>slot_for</code></span>
 </li>
-<li><code>Verify::tab</code> <span style="color:var(--muted)">line 307</span> &mdash; The whole tab.
+<li><code>Verify::tab</code> <span style="color:var(--muted)">line 307</span> &middot; The whole tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>body</code>, <code>drop_target</code>, <code>found_beside</code>, <code>is_busy</code>, <code>slot_row</code>, <code>start</code>, <code>verdict</code>, <code>gnupg_section</code>, <code>examine</code>, <code>archive_verdict</code>, <code>contents_verdict</code>, <code>gnupg_verdict</code></span>
 </li>
 </ul>
@@ -238,11 +238,11 @@
 <path d="M20.0 956.5 L29.0 956.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="961.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="983.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="998.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading,</text>
-<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
+<text x="20.0" y="998.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

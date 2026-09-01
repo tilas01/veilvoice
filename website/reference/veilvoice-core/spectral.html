@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-core/src/spectral.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-core/src/spectral.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Frequency-domain de-identification transform.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -69,14 +69,14 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>442 lines defining <strong>5 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct SpectralState</code> <span style="color:var(--muted)">line 80</span> &mdash; Persistent per-instance state for the spectral transform.</li>
+<li><code>struct SpectralState</code> <span style="color:var(--muted)">line 80</span> &middot; Persistent per-instance state for the spectral transform.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>SpectralState::new</code> <span style="color:var(--muted)">line 104</span> &mdash; n = FFT size, hop = analysis/synthesis hop, rand_phase = fixed per-bin phase offsets in radians (length n/2+1) drawn from the CSPRNG.
+<li><code>SpectralState::new</code> <span style="color:var(--muted)">line 104</span> &middot; n = FFT size, hop = analysis/synthesis hop, rand_phase = fixed per-bin phase offsets in radians (length n/2+1) drawn from the CSPRNG.
 </li>
-<li><code>SpectralState::retarget_phase_offsets</code> <span style="color:var(--muted)">line 145</span> &mdash; Aim the per-bin phase offsets at fresh values.
+<li><code>SpectralState::retarget_phase_offsets</code> <span style="color:var(--muted)">line 145</span> &middot; Aim the per-bin phase offsets at fresh values.
 </li>
-<li><code>SpectralState::transform</code> <span style="color:var(--muted)">line 159</span> &mdash; Rewrite spec (length n/2+1) in place, given the current modulation.
+<li><code>SpectralState::transform</code> <span style="color:var(--muted)">line 159</span> &middot; Rewrite spec (length n/2+1) in place, given the current modulation.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>box_smooth</code>, <code>resample_linear</code></span>
 </li>
 </ul>
@@ -130,11 +130,11 @@
 <text x="35.0" y="362.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="384.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them.</text>
 <text x="20.0" y="399.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">An edge means the callee&#x27;s name appears, called, inside the</text>
-<text x="20.0" y="414.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">caller&#x27;s body &#8212; a syntactic reading, not a type-resolved</text>
-<text x="20.0" y="429.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">one.</text>
+<text x="20.0" y="414.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">caller&#x27;s body. This is a syntactic reading, not a</text>
+<text x="20.0" y="429.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

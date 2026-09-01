@@ -588,7 +588,7 @@ def render_static(index):
     add('<head>')
     add('<meta charset="utf-8">')
     add('<meta name="viewport" content="width=device-width, initial-scale=1">')
-    add('<title>Search index &mdash; VeilVoice (no JavaScript)</title>')
+    add('<title>Search index &middot; VeilVoice (no JavaScript)</title>')
     add('<meta name="description" content="A complete static index of every '
         'file and section in VeilVoice. No JavaScript required.">')
     # Markup, not script, so it works in this edition exactly as in the other.
@@ -655,8 +655,8 @@ def render_static(index):
     add('<a href="https://github.com/%s">repository</a>' % esc(REPO))
     add('</nav>')
     add('<h1>Search index</h1>')
-    add('<p class="lead">Every file and every section in VeilVoice &mdash; '
-        '%d files, %d sections &mdash; listed in full on this page. '
+    add('<p class="lead">Every file and every section in VeilVoice, '
+        '%d files and %d sections, listed in full on this page. '
         'There is no JavaScript here and nothing to load: use your browser\'s '
         'own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. '
         'Section headings and their opening text are included, so searching for '
@@ -703,7 +703,7 @@ def render_static(index):
             # empty. Expanded costs height, which is free; collapsed costs
             # correctness on browsers a great many people run.
             add('<details open>')
-            add('<summary><code>%s</code> <span class="meta">&mdash; %s, %d lines,'
+            add('<summary><code>%s</code> <span class="meta">&middot; %s, %d lines,'
                 ' %d sections</span></summary>'
                 % (esc(doc["p"]), esc(doc["r"]), doc["n"], len(sections)))
             add('<p class="meta"><a href="%s">open %s</a></p>'

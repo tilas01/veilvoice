@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-gnupg/src/lib.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-gnupg/src/lib.rs &#183; VeilVoice reference</title>
 <meta name="description" content="Run the GnuPG that is already on this machine.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -76,36 +76,36 @@ import:    [GNUPG:] IMPORT_OK &lt;flags&gt; &lt;fingerprint&gt;       exit 0</co
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>816 lines defining <strong>17 functions</strong> (11 public), <strong>6 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Error</code> <span style="color:var(--muted)">line 75</span> &mdash; Something that stopped GnuPG being asked at all.</li>
-<li><code>enum Outcome</code> <span style="color:var(--muted)">line 111</span> &mdash; What GnuPG made of a signature.</li>
-<li><code>struct Run</code> <span style="color:var(--muted)">line 150</span> &mdash; One run of GnuPG, and what it said.</li>
-<li><code>enum Imported</code> <span style="color:var(--muted)">line 173</span> &mdash; Whether the key was already in the keyring.</li>
-<li><code>struct Import</code> <span style="color:var(--muted)">line 182</span> &mdash; The key, in the keyring.</li>
-<li><code>struct Gnupg</code> <span style="color:var(--muted)">line 229</span> &mdash; A GnuPG to run, and the keyring to run it against.</li>
+<li><code>enum Error</code> <span style="color:var(--muted)">line 75</span> &middot; Something that stopped GnuPG being asked at all.</li>
+<li><code>enum Outcome</code> <span style="color:var(--muted)">line 111</span> &middot; What GnuPG made of a signature.</li>
+<li><code>struct Run</code> <span style="color:var(--muted)">line 150</span> &middot; One run of GnuPG, and what it said.</li>
+<li><code>enum Imported</code> <span style="color:var(--muted)">line 173</span> &middot; Whether the key was already in the keyring.</li>
+<li><code>struct Import</code> <span style="color:var(--muted)">line 182</span> &middot; The key, in the keyring.</li>
+<li><code>struct Gnupg</code> <span style="color:var(--muted)">line 229</span> &middot; A GnuPG to run, and the keyring to run it against.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Outcome::is_good</code> <span style="color:var(--muted)">line 129</span> &mdash; Whether this is the one outcome that means the file is as published.
+<li><code>Outcome::is_good</code> <span style="color:var(--muted)">line 129</span> &middot; Whether this is the one outcome that means the file is as published.
 </li>
-<li><code>Outcome::plainly</code> <span style="color:var(--muted)">line 134</span> &mdash; One line saying what happened, in words a reader can act on.
+<li><code>Outcome::plainly</code> <span style="color:var(--muted)">line 134</span> &middot; One line saying what happened, in words a reader can act on.
 </li>
-<li><code>Import::note</code> <span style="color:var(--muted)">line 198</span> &mdash; What was done to the reader&#x27;s keyring, and how to undo it.
+<li><code>Import::note</code> <span style="color:var(--muted)">line 198</span> &middot; What was done to the reader&#x27;s keyring, and how to undo it.
 </li>
-<li><code>Gnupg::found</code> <span style="color:var(--muted)">line 236</span> &mdash; The GnuPG on PATH, if there is one.
+<li><code>Gnupg::found</code> <span style="color:var(--muted)">line 236</span> &middot; The GnuPG on PATH, if there is one.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>on_path</code></span>
 </li>
-<li><code>Gnupg::at</code> <span style="color:var(--muted)">line 241</span> &mdash; A particular GnuPG, using the keyring its owner already has.
+<li><code>Gnupg::at</code> <span style="color:var(--muted)">line 241</span> &middot; A particular GnuPG, using the keyring its owner already has.
 </li>
-<li><code>Gnupg::in_home</code> <span style="color:var(--muted)">line 252</span> &mdash; The same GnuPG, against a keyring of its own.
+<li><code>Gnupg::in_home</code> <span style="color:var(--muted)">line 252</span> &middot; The same GnuPG, against a keyring of its own.
 </li>
-<li><code>Gnupg::program</code> <span style="color:var(--muted)">line 258</span> &mdash; Where this GnuPG is.
+<li><code>Gnupg::program</code> <span style="color:var(--muted)">line 258</span> &middot; Where this GnuPG is.
 </li>
-<li><code>Gnupg::import</code> <span style="color:var(--muted)">line 289</span> &mdash; Put a key into the keyring this GnuPG is using.
+<li><code>Gnupg::import</code> <span style="color:var(--muted)">line 289</span> &middot; Put a key into the keyring this GnuPG is using.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>base</code>, <code>field</code>, <code>same_fingerprint</code>, <code>status_lines</code>, <code>fields</code></span>
 </li>
-<li><code>Gnupg::verify</code> <span style="color:var(--muted)">line 341</span> &mdash; Check a detached signature with this machine&#x27;s GnuPG.
+<li><code>Gnupg::verify</code> <span style="color:var(--muted)">line 341</span> &middot; Check a detached signature with this machine&#x27;s GnuPG.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>base</code>, <code>field</code>, <code>fields</code>, <code>same_fingerprint</code>, <code>status_lines</code></span>
 </li>
-<li><code>commands</code> <span style="color:var(--muted)">line 478</span> &mdash; The commands a reader can type to get this answer without VeilVoice.
+<li><code>commands</code> <span style="color:var(--muted)">line 478</span> &middot; The commands a reader can type to get this answer without VeilVoice.
 </li>
 </ul>
 </section>
@@ -227,11 +227,11 @@ import:    [GNUPG:] IMPORT_OK &lt;flags&gt; &lt;fingerprint&gt;       exit 0</co
 <path d="M20.0 656.5 L29.0 656.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="661.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="683.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="698.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
-<text x="20.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<text x="20.0" y="698.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
+<text x="20.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

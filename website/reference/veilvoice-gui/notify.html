@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-gui/src/notify.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-gui/src/notify.rs &#183; VeilVoice reference</title>
 <meta name="description" content="How the application tells you something, and the three ways to be told.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -75,25 +75,25 @@
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>460 lines defining <strong>12 functions</strong> (10 public), <strong>4 types</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Style</code> <span style="color:var(--muted)">line 85</span> &mdash; How the application shows a notification.</li>
-<li><code>enum Level</code> <span style="color:var(--muted)">line 154</span> &mdash; How serious a notification is.</li>
-<li><code>struct Notice</code> <span style="color:var(--muted)">line 164</span> &mdash; One thing to tell the reader.</li>
-<li><code>struct Card</code> <span style="color:var(--muted)">line 208</span> &mdash; A card&#x27;s measured colours: what it is drawn in, and what its text is drawn in, chosen so the result is legible.</li>
+<li><code>enum Style</code> <span style="color:var(--muted)">line 85</span> &middot; How the application shows a notification.</li>
+<li><code>enum Level</code> <span style="color:var(--muted)">line 154</span> &middot; How serious a notification is.</li>
+<li><code>struct Notice</code> <span style="color:var(--muted)">line 164</span> &middot; One thing to tell the reader.</li>
+<li><code>struct Card</code> <span style="color:var(--muted)">line 208</span> &middot; A card&#x27;s measured colours: what it is drawn in, and what its text is drawn in, chosen so the result is legible.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Style::label</code> <span style="color:var(--muted)">line 97</span> &mdash; A short name, for a picker.
+<li><code>Style::label</code> <span style="color:var(--muted)">line 97</span> &middot; A short name, for a picker.
 </li>
-<li><code>Style::note</code> <span style="color:var(--muted)">line 106</span> &mdash; What this choice costs and buys, in the words a front end should show.
+<li><code>Style::note</code> <span style="color:var(--muted)">line 106</span> &middot; What this choice costs and buys, in the words a front end should show.
 </li>
-<li><code>Style::key</code> <span style="color:var(--muted)">line 131</span> &mdash; The identifier written to the settings file.
+<li><code>Style::key</code> <span style="color:var(--muted)">line 131</span> &middot; The identifier written to the settings file.
 </li>
-<li><code>Style::from_key</code> <span style="color:var(--muted)">line 143</span> &mdash; Read a style back.
+<li><code>Style::from_key</code> <span style="color:var(--muted)">line 143</span> &middot; Read a style back.
 </li>
-<li><code>Notice::note</code> <span style="color:var(--muted)">line 173</span> &mdash; A plain note.
+<li><code>Notice::note</code> <span style="color:var(--muted)">line 173</span> &middot; A plain note.
 </li>
-<li><code>Notice::warn</code> <span style="color:var(--muted)">line 181</span> &mdash; Something worth acting on.
+<li><code>Notice::warn</code> <span style="color:var(--muted)">line 181</span> &middot; Something worth acting on.
 </li>
-<li><code>show</code> <span style="color:var(--muted)">line 275</span> &mdash; Draw a notice, in whichever way was chosen.
+<li><code>show</code> <span style="color:var(--muted)">line 275</span> &middot; Draw a notice, in whichever way was chosen.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>alert</code>, <code>overlay</code>, <code>for_level</code>, <code>blend</code>, <code>readable_text</code></span>
 </li>
 </ul>
@@ -186,11 +186,11 @@
 <path d="M20.0 456.5 L29.0 456.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="461.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="483.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="498.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not a</text>
-<text x="20.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<text x="20.0" y="498.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
+<text x="20.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

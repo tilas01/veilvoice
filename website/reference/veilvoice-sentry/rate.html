@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>crates/veilvoice-sentry/src/rate.rs &#8212; VeilVoice reference</title>
+<title>crates/veilvoice-sentry/src/rate.rs &#183; VeilVoice reference</title>
 <meta name="description" content="How much of a directory tree changed, and how fast.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
@@ -82,45 +82,45 @@ file  4096  1699999000  /home/somebody/Documents/notes.txt</code></pre>
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
 <p>953 lines defining <strong>22 functions</strong> (17 public), <strong>6 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Facts</code> <span style="color:var(--muted)">line 88</span> &mdash; What is recorded about one file.</li>
-<li><code>struct Limits</code> <span style="color:var(--muted)">line 102</span> &mdash; How far a walk is allowed to go.</li>
-<li><code>struct Snapshot</code> <span style="color:var(--muted)">line 120</span> &mdash; What a tree looked like at one moment.</li>
-<li><code>struct Churn</code> <span style="color:var(--muted)">line 137</span> &mdash; The difference between two snapshots.</li>
-<li><code>struct Threshold</code> <span style="color:var(--muted)">line 212</span> &mdash; When to raise the level, set by the user rather than guessed at here.</li>
-<li><code>enum Concern</code> <span style="color:var(--muted)">line 239</span> &mdash; How much of the threshold a Churn met.</li>
+<li><code>struct Facts</code> <span style="color:var(--muted)">line 88</span> &middot; What is recorded about one file.</li>
+<li><code>struct Limits</code> <span style="color:var(--muted)">line 102</span> &middot; How far a walk is allowed to go.</li>
+<li><code>struct Snapshot</code> <span style="color:var(--muted)">line 120</span> &middot; What a tree looked like at one moment.</li>
+<li><code>struct Churn</code> <span style="color:var(--muted)">line 137</span> &middot; The difference between two snapshots.</li>
+<li><code>struct Threshold</code> <span style="color:var(--muted)">line 212</span> &middot; When to raise the level, set by the user rather than guessed at here.</li>
+<li><code>enum Concern</code> <span style="color:var(--muted)">line 239</span> &middot; How much of the threshold a Churn met.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Churn::share</code> <span style="color:var(--muted)">line 175</span> &mdash; The proportion of the earlier snapshot that was touched, from 0.0 to 1.0.
+<li><code>Churn::share</code> <span style="color:var(--muted)">line 175</span> &middot; The proportion of the earlier snapshot that was touched, from 0.0 to 1.0.
 </li>
-<li><code>Churn::describe</code> <span style="color:var(--muted)">line 184</span> &mdash; One line for a terminal or a log.
+<li><code>Churn::describe</code> <span style="color:var(--muted)">line 184</span> &middot; One line for a terminal or a log.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>per_minute</code>, <code>touched</code></span>
 </li>
-<li><code>Concern::describe</code> <span style="color:var(--muted)">line 250</span> &mdash; A line for a front end, phrased as the question it actually is.
+<li><code>Concern::describe</code> <span style="color:var(--muted)">line 250</span> &middot; A line for a front end, phrased as the question it actually is.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>per_minute</code>, <code>touched</code></span>
 </li>
-<li><code>concern</code> <span style="color:var(--muted)">line 272</span> &mdash; Judge a Churn against a Threshold.
+<li><code>concern</code> <span style="color:var(--muted)">line 272</span> &middot; Judge a Churn against a Threshold.
 </li>
-<li><code>Snapshot::take</code> <span style="color:var(--muted)">line 309</span> &mdash; Walk root and record what is there.
+<li><code>Snapshot::take</code> <span style="color:var(--muted)">line 309</span> &middot; Walk root and record what is there.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>normalise</code>, <code>now_seconds</code>, <code>seconds</code></span>
 </li>
-<li><code>Snapshot::len</code> <span style="color:var(--muted)">line 368</span> &mdash; How many files were recorded.
+<li><code>Snapshot::len</code> <span style="color:var(--muted)">line 368</span> &middot; How many files were recorded.
 </li>
-<li><code>Snapshot::is_empty</code> <span style="color:var(--muted)">line 373</span> &mdash; Whether nothing was recorded.
+<li><code>Snapshot::is_empty</code> <span style="color:var(--muted)">line 373</span> &middot; Whether nothing was recorded.
 </li>
-<li><code>Snapshot::files</code> <span style="color:var(--muted)">line 378</span> &mdash; The recorded paths and facts, in a stable order.
+<li><code>Snapshot::files</code> <span style="color:var(--muted)">line 378</span> &middot; The recorded paths and facts, in a stable order.
 </li>
-<li><code>Snapshot::with_taken</code> <span style="color:var(--muted)">line 386</span> &mdash; Replace the recorded time.
+<li><code>Snapshot::with_taken</code> <span style="color:var(--muted)">line 386</span> &middot; Replace the recorded time.
 </li>
-<li><code>Snapshot::save</code> <span style="color:var(--muted)">line 505</span> &mdash; Write the snapshot to path.
+<li><code>Snapshot::save</code> <span style="color:var(--muted)">line 505</span> &middot; Write the snapshot to path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>to_text</code></span>
 </li>
-<li><code>Snapshot::load</code> <span style="color:var(--muted)">line 516</span> &mdash; Read a snapshot written by Snapshot::save.
+<li><code>Snapshot::load</code> <span style="color:var(--muted)">line 516</span> &middot; Read a snapshot written by Snapshot::save.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code></span>
 </li>
-<li><code>baseline_name</code> <span style="color:var(--muted)">line 532</span> &mdash; A stable filename for the saved snapshot of root.
+<li><code>baseline_name</code> <span style="color:var(--muted)">line 532</span> &middot; A stable filename for the saved snapshot of root.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>normalise</code></span>
 </li>
-<li><code>compare</code> <span style="color:var(--muted)">line 551</span> &mdash; Compare two snapshots of the same tree.
+<li><code>compare</code> <span style="color:var(--muted)">line 551</span> &middot; Compare two snapshots of the same tree.
 </li>
 </ul>
 </section>
@@ -265,11 +265,11 @@ file  4096  1699999000  /home/somebody/Documents/notes.txt</code></pre>
 <path d="M20.0 756.5 L29.0 756.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="761.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="783.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body &#8212; a syntactic reading, not</text>
-<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">a type-resolved one.</text>
+<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body — a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD

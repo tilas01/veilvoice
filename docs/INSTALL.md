@@ -23,7 +23,7 @@ release -- the verifier checks that release's actual OpenPGP signature with no
 GnuPG installed -- and the by-hand chain has been checked on the same release.
 They have **not** yet been run by anyone other than the author, nor on a machine
 that did not build them. Until that has happened they should be treated as working but
-unproven — see [What is not finished](#what-is-not-finished).
+unproven. See [What is not finished](#what-is-not-finished).
 
 ---
 
@@ -39,7 +39,7 @@ That is the OpenPGP key VeilVoice releases are signed with. It is published in
 [`README.md`](../README.md), on
 [the website](https://tilas01.github.io/veilvoice/), in the wiki, and in every
 release's notes, and it is **hardcoded in the install scripts** rather than
-fetched — a fingerprint you download alongside the thing it is meant to
+fetched, because a fingerprint you download alongside the thing it is meant to
 authenticate is not a check, it is a formality.
 
 The key's user ID is exactly `tilas01`, with no e-mail address attached.
@@ -106,7 +106,7 @@ gpg: Good signature from "tilas01" [unknown]
 gpg: WARNING: This key is not certified with a trusted signature!
 ```
 
-That says GnuPG has no web-of-trust path to the key — which is true, and is why
+That says GnuPG has no web-of-trust path to the key, which is true, and is why
 you compared the fingerprint yourself in step 1. What matters is
 `Good signature`. `BAD signature` means stop.
 
@@ -146,7 +146,7 @@ powershell -ExecutionPolicy Bypass -File install.ps1
 
 `install.bat` is a wrapper for people who would rather double-click; it passes
 its arguments straight through to `install.ps1` and contains no logic of its
-own, deliberately — two implementations of a verification routine means one of
+own, deliberately, because two implementations of a verification routine means one of
 them is the stale one, and the stale one is the one that will be running when
 it matters.
 
@@ -168,7 +168,7 @@ untrustworthy.
 
 - **VB-CABLE** (Windows) is what lets live mode feed a veiled microphone into a
   call. It is **proprietary donationware** by VB-Audio, not free software. The
-  script only *opens their download page* — it will not silently fetch and run
+  script only *opens their download page*: it will not silently fetch and run
   a third-party installer, which would be a strange thing to do inside a script
   whose whole subject is verifying what you run.
 - **Audacity** is a free audio editor, useful for recording and trimming before
@@ -176,7 +176,7 @@ untrustworthy.
   combined with this project's GPL-3.0-or-later.
 - **GnuPG**, where missing, because without it the signature cannot be checked
   at all. If you decline it, the script stops rather than falling back to
-  "the hash matched" — a hash checked against an unverified list is not a
+  "the hash matched", because a hash checked against an unverified list is not a
   security check.
 
 ### What a refusal looks like
@@ -431,7 +431,7 @@ such limit.
 **`~/.local/bin` may not be on your `PATH`.** The script says so if it is not,
 and prints the line to add.
 
-**macOS Gatekeeper.** The binaries are not notarised — notarisation requires an
+**macOS Gatekeeper.** The binaries are not notarised, because notarisation requires an
 Apple Developer account, which requires a legal identity, which this project
 does not have. macOS will refuse to run them until you allow it explicitly in
 *System Settings → Privacy & Security*. This is stated rather than worked

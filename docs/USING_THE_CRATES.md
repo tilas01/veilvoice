@@ -3,7 +3,7 @@
 # Using VeilVoice as a library
 
 Every part of VeilVoice is an ordinary Rust crate. Nothing here needs the
-desktop app, the command-line tool, or a running VeilVoice process — you can
+desktop app, the command-line tool, or a running VeilVoice process, you can
 take the de-identification engine on its own, or the container format on its
 own, and use it in your own program.
 
@@ -26,8 +26,8 @@ being blunt about, because it is not the licence most Rust crates use:
 
 - If you link any of these crates into a program you **distribute**, that
   program must also be released under the GPL-3.0-or-later, with source.
-- If you only ever run it yourself — internally, on your own machines, not
-  distributed — the GPL places no obligation on you at all.
+- If you only ever run it yourself, internally, on your own machines and not
+  distributed, the GPL places no obligation on you at all.
 - If you need it under different terms, there is no dual licence to fall back
   on.
 
@@ -61,7 +61,7 @@ argument is that you can check what you are running.
 | `veilvoice-drivers` | the loaded kernel drivers, and what changed since you last looked |
 | `veilvoice-capture` | which screen recorders are running, with an allowlist so they stop nagging |
 | `veilvoice-conversation` | several speakers in one recording, a voice each, and subtitles |
-| `veilvoice-verify` | a binary, not a library — see [INSTALL.md](INSTALL.md) |
+| `veilvoice-verify` | a binary, not a library: see [INSTALL.md](INSTALL.md) |
 
 ---
 
@@ -149,7 +149,7 @@ Full runnable version: `cargo run -p veilvoice-crypto --example seal_and_open`.
 Argon2id with the RFC 9106 profile, XChaCha20-Poly1305 payload, and a header
 authenticated as associated data so nobody can downgrade the KDF cost without
 the open failing. The cost parameters travel *in* the file, which is what lets
-an old container still open after the defaults rise — and is why they are
+an old container still open after the defaults rise, and is why they are
 bounded on parse rather than trusted (F-2, F-3, F-20).
 
 For a recipient you cannot share a password with, `seal_to_public_key` uses
@@ -200,7 +200,7 @@ clean_image_file(std::path::Path::new("photo.jpg"))?;   // EXIF, GPS
 
 A de-identified voice is worth little if the file still records who made it,
 where and on what. WAV needs a chunk-level cleaner because `lofty` cannot
-remove ID3v2 from RIFF at all — see `wav.rs`.
+remove ID3v2 from RIFF at all. See `wav.rs`.
 
 ## 6. Check whether files have been tampered with
 
@@ -257,13 +257,13 @@ crates as libraries, your profile is yours: leave the checks on.
 
 **`panic = "abort"` is a choice you inherit if you make it.** VeilVoice sets it
 for its own binaries. A decoder panic in a format VeilVoice does not itself
-parse cannot be caught under it — no wrapper can, short of decoding in a
+parse cannot be caught under it, and no wrapper can, short of decoding in a
 separate process. If your program must survive a hostile input file, do not set
 `panic = "abort"`, or decode out of process.
 
 **Do not construct configurations field by field and skip validation.**
 `DeidConfig::checked()` is the single funnel, and `NaN` compares false against
-every bound — which is exactly how an unvalidated `NaN` sample rate produced a
+every bound, which is exactly how an unvalidated `NaN` sample rate produced a
 whole session of silent `NaN` output.
 
 **One `Deidentifier` per stream.** It is stateful by design; the accent
@@ -288,5 +288,5 @@ other, and never let unlocking an application unseal recordings.
 
 The full argument is in [WHITEPAPER.md](WHITEPAPER.md), and every limit above is
 stated there too, at greater length. If you build something on these crates,
-please do not describe it as doing more than they do — several tests in this
+please do not describe it as doing more than they do. Several tests in this
 repository exist purely to fail the build if that wording softens here.
