@@ -54,12 +54,12 @@
 <section id="s-about">
 <p>Failsafe: nothing leaves this machine in your own voice by accident.</p>
 <h2 id="the-accident-this-exists-to-stop">The accident this exists to stop</h2>
-<p>You set a calling program to VeilVoice&#x27;s virtual cable, you start live mode, and everything is veiled. Then you plug in a headset. Windows offers the new microphone, the calling program takes it, and from that moment your <strong>real voice</strong> is going out &#8212; with the veiled window still open in front of you, still showing meters moving, still looking exactly as it did a second ago.</p>
+<p>You set a calling program to VeilVoice&#x27;s virtual cable, you start live mode, and everything is veiled. Then you plug in a headset. Windows offers the new microphone, the calling program takes it, and from that moment your <strong>real voice</strong> is going out, with the veiled window still open in front of you, still showing meters moving, still looking exactly as it did a second ago.</p>
 <p>Nobody notices that. It is not a mistake somebody makes through carelessness; it is a mistake the operating system makes on their behalf. Failsafe is on by default because the cost of it being off is that the one thing this whole project exists to prevent happens silently.</p>
 <h2 id="what-it-can-do-and-what-it-cannot">What it can do, and what it cannot</h2>
 <p>It <strong>watches</strong> which applications hold a microphone, and it knows which device VeilVoice is veiling. If another program picks up a <em>real</em> microphone while you are veiling, that is the accident, and Failsafe:</p>
-<p>1. says so, loudly, because a silent guard is not a guard; and 2. closes that program, if <code>Posture::CloseIt</code> is set &#8212; which it is by default, because a warning you have not read yet does not stop your voice going out.</p>
-<p>It <strong>cannot stop the operating system handing a microphone to another program in the first place.</strong> Doing that needs exclusive-mode capture of every input device, or a driver, and neither is something this project ships &#8212; see <code>CANNOT_PREVENT</code>, which is the wording a front end must show. What Failsafe does is notice within a second or so and act. That is a real difference from nothing, and it is a real difference from prevention, and both halves have to be said.</p>
+<p>1. says so, loudly, because a silent guard is not a guard; and 2. closes that program, if <code>Posture::CloseIt</code> is set, which it is by default, because a warning you have not read yet does not stop your voice going out.</p>
+<p>It <strong>cannot stop the operating system handing a microphone to another program in the first place.</strong> Doing that needs exclusive-mode capture of every input device, or a driver, and neither is something this project ships. See <code>CANNOT_PREVENT</code>, which is the wording a front end must show. What Failsafe does is notice within a second or so and act. That is a real difference from nothing, and it is a real difference from prevention, and both halves have to be said.</p>
 <h2 id="killing-another-program-is-a-serious-thing">Killing another program is a serious thing</h2>
 <p>So it is bounded rather than general:</p>
 <ul>
@@ -72,7 +72,7 @@
 <p>Failsafe is on by default and it is the safety catch.</p>
 <p>The danger it guards against is this: you are talking through VeilVoice with your voice disguised, you plug in headphones or a headset, and your computer quietly switches the call over to the <em>real</em> microphone. Your actual voice goes out and nothing on screen looks any different.</p>
 <p>Failsafe watches for exactly that. If another program picks up a real microphone while you are being veiled, it tells you straight away and closes that program so your voice stops going out.</p>
-<p>What it cannot do is stop your computer from handing the microphone over in the first place &#8212; that needs a level of access this program does not have, and it says so rather than letting you believe otherwise. It notices, and it acts, within about a second.</p>
+<p>What it cannot do is stop your computer from handing the microphone over in the first place, because that needs a level of access this program does not have, and it says so rather than letting you believe otherwise. It notices, and it acts, within about a second.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>

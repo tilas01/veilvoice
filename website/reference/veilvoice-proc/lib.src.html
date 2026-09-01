@@ -216,7 +216,7 @@
 <span class="ln" id="L166"><span class="tok-com">/// Handles both shapes with one function: `tasklist /FO CSV` quotes its first</span></span>
 <span class="ln" id="L167"><span class="tok-com">/// field, and `ps -Ao comm=` gives a bare path per line. Taking the first</span></span>
 <span class="ln" id="L168"><span class="tok-com">/// comma-separated field, stripping quotes, and then stripping any directory</span></span>
-<span class="ln" id="L169"><span class="tok-com">/// covers both &#8212; and one parser cannot drift from the other.</span></span>
+<span class="ln" id="L169"><span class="tok-com">/// covers both, and one parser cannot drift from the other.</span></span>
 <span class="ln" id="L170"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">any</span>(target_os = <span class="tok-str">&quot;windows&quot;</span>, target_os = <span class="tok-str">&quot;macos&quot;</span>, test))]</span>
 <span class="ln" id="L171"><span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(text: &amp;str) -&gt; Vec&lt;String&gt; {</span>
 <span class="ln" id="L172">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> names = Vec::<span class="tok-fn">new</span>();</span>

@@ -28,10 +28,10 @@ Named profiles and saved projects.
 
 Two things, which sound alike and are not:
 
-* A `Profile` is a **way of working** — a named set of settings you can
+* A `Profile` is a **way of working**, a named set of settings you can
 switch to. "Anonymise one person, as thoroughly as this can." "A group,
 everybody the same voice." Three are built in and you can save your own.
-* A `Workspace` is **one piece of work** — which recording, which plan,
+* A `Workspace` is **one piece of work**: which recording, which plan,
 who is in it and what they are called, and the profile it was done under.
 Saved beside the recording, so opening it a week later puts everything
 back where it was.
@@ -61,7 +61,7 @@ thing you might send somebody so they can set their machine up the same way;
 if it carried a passphrase, sending it would be handing over the recordings
 too, and people would find that out afterwards.
 
-Speaker names *are* in it, because the whole point is to put them back — and
+Speaker names *are* in it, because the whole point is to put them back, and
 a name is a name. The file says so.
 
 # In plain words

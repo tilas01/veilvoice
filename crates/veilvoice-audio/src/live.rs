@@ -21,7 +21,7 @@
 //!
 //! Total latency is the input buffer, plus the ring backlog, plus the engine's
 //! one-frame group delay (~21 ms at the defaults), plus the output buffer. The
-//! ring is intentionally short — enough to absorb jitter between two clocks
+//! ring is intentionally short, enough to absorb jitter between two clocks
 //! that are not synchronised, not enough to accumulate a delay the user would
 //! notice while speaking.
 //!
@@ -61,7 +61,7 @@ pub struct LiveStats {
     /// Peak output level since the last read, in `[0, 1]`.
     pub output_peak: f32,
     /// Samples dropped because the ring overflowed (capture outrunning
-    /// playback) — a non-zero value means audible glitching.
+    /// playback). A non-zero value means audible glitching.
     pub dropped: u64,
     /// Times the output callback found the ring empty and emitted silence.
     pub starved: u64,

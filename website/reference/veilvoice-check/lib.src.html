@@ -51,8 +51,8 @@
 <span class="ln" id="L8"><span class="tok-com">//!</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! `veilvoice-verify` did all of this and did it inside a binary crate, which</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! has no consumers by construction. The desktop application was asked for a</span></span>
-<span class="ln" id="L11"><span class="tok-com">//! **verify tab** &#8212; drag a download onto the window and be told whether it is</span></span>
-<span class="ln" id="L12"><span class="tok-com">//! the published one &#8212; and there were two ways to have that:</span></span>
+<span class="ln" id="L11"><span class="tok-com">//! **verify tab**, where you drag a download onto the window and are told</span></span>
+<span class="ln" id="L12"><span class="tok-com">//! whether it is the published one, and there were two ways to have that:</span></span>
 <span class="ln" id="L13"><span class="tok-com">//!</span></span>
 <span class="ln" id="L14"><span class="tok-com">//! * link `eframe` into the 1.5 MB portable verifier, which is the one binary</span></span>
 <span class="ln" id="L15"><span class="tok-com">//!   in this project whose smallness is a feature: it is what somebody</span></span>
@@ -69,7 +69,7 @@
 <span class="ln" id="L26"><span class="tok-com">//! **the one the holder of this key published**. It does not prove the file is</span></span>
 <span class="ln" id="L27"><span class="tok-com">//! safe, that the source compiles to it, or that the key belongs to anybody in</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! particular. The second of those is the check worth having and it is the one</span></span>
-<span class="ln" id="L29"><span class="tok-com">//! this project cannot perform for you &#8212; it needs somebody other than the</span></span>
+<span class="ln" id="L29"><span class="tok-com">//! this project cannot perform for you, because it needs somebody other than the</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! author to have built the same tag and got the same hash.</span></span>
 <span class="ln" id="L31"><span class="tok-com">//!</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! Every front end that uses this has to say so. The words are here, in</span></span>
@@ -375,7 +375,7 @@
 <span class="ln" id="L301"><span class="tok-com">/// The signature is verified over the **bytes of the list** before any number</span></span>
 <span class="ln" id="L302"><span class="tok-com">/// in that list is read. A checker that compared the hash first and verified</span></span>
 <span class="ln" id="L303"><span class="tok-com">/// afterwards would, for the moment between the two, be trusting an unsigned</span></span>
-<span class="ln" id="L304"><span class="tok-com">/// document &#8212; and an attacker who can hand you a file can hand you a</span></span>
+<span class="ln" id="L304"><span class="tok-com">/// document, and an attacker who can hand you a file can hand you a</span></span>
 <span class="ln" id="L305"><span class="tok-com">/// `SHA256SUMS` to go with it. Getting this order wrong produces a program that</span></span>
 <span class="ln" id="L306"><span class="tok-com">/// passes all its own tests and proves nothing.</span></span>
 <span class="ln" id="L307"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">check_file</span>(file: &amp;Path, sums: &amp;str, signature: &amp;str) -&gt; Result&lt;Checked, Error&gt; {</span>

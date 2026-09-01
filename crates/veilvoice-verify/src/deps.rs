@@ -22,13 +22,13 @@
 //! machine with a message about a missing header rather than about a missing
 //! package:
 //!
-//! * **Linux** — `cpal` reaches ALSA through `alsa-sys`, which is a `-sys`
+//! * **Linux**: `cpal` reaches ALSA through `alsa-sys`, which is a `-sys`
 //!   crate: it compiles against ALSA's C headers and asks `pkg-config` where
 //!   they are. Neither ships with a base install of most distributions.
-//! * **macOS** — CoreAudio comes from Apple's SDK, which arrives with the
+//! * **macOS**: CoreAudio comes from Apple's SDK, which arrives with the
 //!   Xcode command line tools. Apple's licence does not permit redistributing
 //!   it, which is also why this tool cannot build a macOS binary anywhere else.
-//! * **Windows** — the MSVC toolchain needs a linker, which comes with the
+//! * **Windows**: the MSVC toolchain needs a linker, which comes with the
 //!   Visual Studio build tools.
 //!
 //! Everything else -- the engine, the container format, the app lock, the

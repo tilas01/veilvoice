@@ -72,7 +72,7 @@
 <span class="ln" id="L29"><span class="tok-com">//! The default is the recognisable name anyway, for two reasons. Indiscriminate</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! encryption of everything under a directory is the overwhelmingly common</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! case, and it is not fooled either way. And a file the user does not</span></span>
-<span class="ln" id="L32"><span class="tok-com">//! recognise is a file the user eventually deletes &#8212; which reads here as a</span></span>
+<span class="ln" id="L32"><span class="tok-com">//! recognise is a file the user eventually deletes, which reads here as a</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! trip, produces an alarm that was nobody&#x27;s fault, and teaches them to ignore</span></span>
 <span class="ln" id="L34"><span class="tok-com">//! the next one. A warning system whose alarms are usually wrong is worse than</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! no warning system.</span></span>
@@ -84,7 +84,7 @@
 <span class="ln" id="L41"><span class="tok-com">//! # A deletion and an encryption look the same</span></span>
 <span class="ln" id="L42"><span class="tok-com">//!</span></span>
 <span class="ln" id="L43"><span class="tok-com">//! Much ransomware writes a new encrypted file beside the original and deletes</span></span>
-<span class="ln" id="L44"><span class="tok-com">//! the original, so the canary comes back as [`State::Removed`] &#8212; which is</span></span>
+<span class="ln" id="L44"><span class="tok-com">//! the original, so the canary comes back as [`State::Removed`], which is</span></span>
 <span class="ln" id="L45"><span class="tok-com">//! also what a user tidying a folder produces. [`State`] reports which of the</span></span>
 <span class="ln" id="L46"><span class="tok-com">//! two happened to the file, never which of the two happened in the world.</span></span>
 <span class="ln" id="L47"><span class="tok-com">//!</span></span>
@@ -133,7 +133,7 @@
 <span class="ln" id="L85"><span class="tok-com">///</span></span>
 <span class="ln" id="L86"><span class="tok-com">/// Encrypted output sits within a hair of 8.0 bits per byte; English prose is</span></span>
 <span class="ln" id="L87"><span class="tok-com">/// under 5. The threshold is well clear of both, so it says &quot;this is no longer</span></span>
-<span class="ln" id="L88"><span class="tok-com">/// text&quot; rather than &quot;this is encrypted&quot; &#8212; which this crate cannot know and</span></span>
+<span class="ln" id="L88"><span class="tok-com">/// text&quot; rather than &quot;this is encrypted&quot;, which this crate cannot know and</span></span>
 <span class="ln" id="L89"><span class="tok-com">/// does not claim. A `.zip` written over the canary would read the same way.</span></span>
 <span class="ln" id="L90"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> PROSE_CEILING: f32 = <span class="tok-num">6.0</span>;</span>
 </span>
@@ -418,7 +418,7 @@
 <span class="ln" id="L334">    <span class="tok-com">/// Stop watching a canary, and delete it.</span></span>
 <span class="ln" id="L335">    <span class="tok-com">///</span></span>
 <span class="ln" id="L336">    <span class="tok-com">/// The order matters: the record goes first. If the delete fails, the file</span></span>
-<span class="ln" id="L337">    <span class="tok-com">/// is left behind but no longer watched &#8212; an untidy folder. Doing it the</span></span>
+<span class="ln" id="L337">    <span class="tok-com">/// is left behind but no longer watched, which is an untidy folder. Doing it the</span></span>
 <span class="ln" id="L338">    <span class="tok-com">/// other way round and failing leaves a record of a file that is gone,</span></span>
 <span class="ln" id="L339">    <span class="tok-com">/// which is a permanent false alarm.</span></span>
 <span class="ln" id="L340">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">pull_up</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, path: &amp;Path) -&gt; Result&lt;(), Error&gt; {</span>

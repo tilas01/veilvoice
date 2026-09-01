@@ -45,7 +45,7 @@
 <span class="ln" id="L2"><span class="tok-com">//! # veilvoice-policy</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
 <span class="ln" id="L4"><span class="tok-com">//! Settings somebody else decided, sealed so they cannot be edited without a</span></span>
-<span class="ln" id="L5"><span class="tok-com">//! passphrase &#8212; and, more importantly, built so that editing them without one</span></span>
+<span class="ln" id="L5"><span class="tok-com">//! passphrase, and, more importantly, built so that editing them without one</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! buys nothing worth having.</span></span>
 <span class="ln" id="L7"><span class="tok-com">//!</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! ## The design decision this crate turns on</span></span>
@@ -62,12 +62,12 @@
 <span class="ln" id="L19"><span class="tok-com">//! So the constraint is moved into the shape of the data. **A requirement can</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! only make VeilVoice stricter.** There is no requirement that turns</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! encryption off, none that lowers the de-identification floor, none that</span></span>
-<span class="ln" id="L22"><span class="tok-com">//! disables the app lock &#8212; and there is no room in [`Requirement`] to express</span></span>
+<span class="ln" id="L22"><span class="tok-com">//! disables the app lock, and there is no room in [`Requirement`] to express</span></span>
 <span class="ln" id="L23"><span class="tok-com">//! one, because every variant is a tightening and the type has no other kind.</span></span>
 <span class="ln" id="L24"><span class="tok-com">//!</span></span>
 <span class="ln" id="L25"><span class="tok-com">//! Then somebody who edits the plain policy file without the passphrase can do</span></span>
 <span class="ln" id="L26"><span class="tok-com">//! exactly one thing: make this machine&#x27;s VeilVoice **more** restrictive than</span></span>
-<span class="ln" id="L27"><span class="tok-com">//! its owner asked for. That is a nuisance, and it is not a privacy failure &#8212;</span></span>
+<span class="ln" id="L27"><span class="tok-com">//! its owner asked for. That is a nuisance, and it is not a privacy failure:</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! which is the failure this project exists to avoid. The passphrase-sealed</span></span>
 <span class="ln" id="L29"><span class="tok-com">//! copy is what proves the policy is the one the administrator wrote; the</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! shape of the type is what makes the answer survive the seal not having been</span></span>
@@ -75,7 +75,7 @@
 <span class="ln" id="L32"><span class="tok-com">//!</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! ## What the seal is for, and what it is not</span></span>
 <span class="ln" id="L34"><span class="tok-com">//!</span></span>
-<span class="ln" id="L35"><span class="tok-com">//! [`Policy::seal`] uses the same container as everything else here &#8212; Argon2id</span></span>
+<span class="ln" id="L35"><span class="tok-com">//! [`Policy::seal`] uses the same container as everything else here: Argon2id</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! over the passphrase, X25519 with ML-KEM-768 for the hybrid modes,</span></span>
 <span class="ln" id="L37"><span class="tok-com">//! XChaCha20-Poly1305 for the contents. [`verify`] opens the sealed copy and</span></span>
 <span class="ln" id="L38"><span class="tok-com">//! compares it against the plain one, which is how anybody with the passphrase</span></span>

@@ -53,14 +53,14 @@
 <div>
 <section id="s-about">
 <p>The setup tab: install this copy, undo that, and the optional companions.</p>
-<p>This is the graphical front end to <code>veilvoice_setup</code>, and it is a <em>front end</em> in the strict sense &#8212; it holds no installation logic of its own. Every change to the machine goes through the same functions <code>veilvoice install</code> calls, so the careful part (editing <code>PATH</code>, which is the one operation here that can damage a machine) has one implementation and one set of tests.</p>
+<p>This is the graphical front end to <code>veilvoice_setup</code>, and it is a <em>front end</em> in the strict sense: it holds no installation logic of its own. Every change to the machine goes through the same functions <code>veilvoice install</code> calls, so the careful part (editing <code>PATH</code>, which is the one operation here that can damage a machine) has one implementation and one set of tests.</p>
 <h2 id="portable-is-the-default-and-this-tab-says-so-first">Portable is the default, and this tab says so first</h2>
 <p>The screen opens by telling the user what they already have: a portable copy that needs nothing, or an installed one. Installing is offered as a convenience with an exact list of what it will change, not as a step somebody has to complete before the program is usable. A privacy tool that implies it must be installed has trained its user badly.</p>
 <h2 id="nothing-is-ticked-because-there-is-nothing-to-tick">Nothing is ticked, because there is nothing to tick</h2>
 <p>The companions are not a checklist with defaults. Each is a row that states what the software is, who wrote it and under what licence, whether it was found on this machine, and a single button that does one thing to one named program. There is no &quot;install recommended extras&quot;, because that is the control through which unwanted software historically arrived.</p>
 <p>Where the answer is a proprietary driver the button opens the vendor&#x27;s page and nothing else; where it needs root the command is shown and not run. Both of those refusals live in <code>veilvoice_setup::companions</code>, not here, so that a second front end cannot be more permissive than this one.</p>
 <h2 id="nothing-slow-runs-on-the-ui-thread">Nothing slow runs on the UI thread</h2>
-<p>Copying binaries, editing the registry and running a package manager all take real time &#8212; a package manager can take minutes. Each runs on a worker and reports back through an <code>std::sync::mpsc</code> channel, exactly as the file job in <code>crate::VeilVoiceApp</code> does, so the window keeps painting and the progress strip keeps moving.</p>
+<p>Copying binaries, editing the registry and running a package manager all take real time, because a package manager can take minutes. Each runs on a worker and reports back through an <code>std::sync::mpsc</code> channel, exactly as the file job in <code>crate::VeilVoiceApp</code> does, so the window keeps painting and the progress strip keeps moving.</p>
 <p>The strip honours the reduced-motion decision like everything else: with motion off it is a static bar and a word, not a frozen animation.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>The tab that installs this copy, removes it again, and points at the optional extra software.</p>

@@ -48,10 +48,10 @@
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! Two things, which sound alike and are not:</span></span>
 <span class="ln" id="L7"><span class="tok-com">//!</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! * A [`Profile`] is a **way of working** &#8212; a named set of settings you can</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! * A [`Profile`] is a **way of working**, a named set of settings you can</span></span>
 <span class="ln" id="L9"><span class="tok-com">//!   switch to. &quot;Anonymise one person, as thoroughly as this can.&quot; &quot;A group,</span></span>
 <span class="ln" id="L10"><span class="tok-com">//!   everybody the same voice.&quot; Three are built in and you can save your own.</span></span>
-<span class="ln" id="L11"><span class="tok-com">//! * A [`Workspace`] is **one piece of work** &#8212; which recording, which plan,</span></span>
+<span class="ln" id="L11"><span class="tok-com">//! * A [`Workspace`] is **one piece of work**: which recording, which plan,</span></span>
 <span class="ln" id="L12"><span class="tok-com">//!   who is in it and what they are called, and the profile it was done under.</span></span>
 <span class="ln" id="L13"><span class="tok-com">//!   Saved beside the recording, so opening it a week later puts everything</span></span>
 <span class="ln" id="L14"><span class="tok-com">//!   back where it was.</span></span>
@@ -81,7 +81,7 @@
 <span class="ln" id="L38"><span class="tok-com">//! if it carried a passphrase, sending it would be handing over the recordings</span></span>
 <span class="ln" id="L39"><span class="tok-com">//! too, and people would find that out afterwards.</span></span>
 <span class="ln" id="L40"><span class="tok-com">//!</span></span>
-<span class="ln" id="L41"><span class="tok-com">//! Speaker names *are* in it, because the whole point is to put them back &#8212; and</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! Speaker names *are* in it, because the whole point is to put them back, and</span></span>
 <span class="ln" id="L42"><span class="tok-com">//! a name is a name. The file says so.</span></span>
 <span class="ln" id="L43"><span class="tok-com">//!</span></span>
 <span class="ln" id="L44"><span class="tok-com">//! # In plain words</span></span>
@@ -137,7 +137,7 @@
 <span class="ln" id="L88"></span>
 <span class="ln" id="L89"><span class="tok-com">/// A named way of working.</span></span>
 <span class="ln" id="L90"><span class="tok-com">///</span></span>
-<span class="ln" id="L91"><span class="tok-com">/// The settings, and &#8212; as importantly &#8212; a plain sentence about what choosing it</span></span>
+<span class="ln" id="L91"><span class="tok-com">/// The settings, and just as importantly a plain sentence about what choosing it</span></span>
 <span class="ln" id="L92"><span class="tok-com">/// actually means. A profile called &quot;highest security&quot; that does not say what</span></span>
 <span class="ln" id="L93"><span class="tok-com">/// it does and does not do is a name doing the work of an explanation.</span></span>
 <span class="ln" id="L94"><span class="tok-com">// No `Eq`: two of these fields are `f32`, and floats have no total equality.</span></span>
@@ -385,7 +385,7 @@
 <span class="ln" id="L311">    <span class="tok-com">/// An unknown keyword is **refused**, not skipped. A project file written by</span></span>
 <span class="ln" id="L312">    <span class="tok-com">/// a newer build may describe a setup this one cannot reproduce, and quietly</span></span>
 <span class="ln" id="L313">    <span class="tok-com">/// honouring the half it understands would put somebody&#x27;s recording through</span></span>
-<span class="ln" id="L314">    <span class="tok-com">/// settings they did not choose &#8212; which is the same reasoning</span></span>
+<span class="ln" id="L314">    <span class="tok-com">/// settings they did not choose, which is the same reasoning</span></span>
 <span class="ln" id="L315">    <span class="tok-com">/// `veilvoice-conversation` gives for refusing an unknown line in a plan.</span></span>
 <span class="ln" id="L316">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">parse</span>(text: &amp;str) -&gt; Result&lt;Self, Error&gt; {</span>
 <span class="ln" id="L317">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = text.<span class="tok-fn">lines</span>();</span>
@@ -534,7 +534,7 @@
 <span class="ln" id="L450"><span class="tok-com">/// A value with no line break in it.</span></span>
 <span class="ln" id="L451"><span class="tok-com">///</span></span>
 <span class="ln" id="L452"><span class="tok-com">/// A newline inside a name would let one line become two, and the second could</span></span>
-<span class="ln" id="L453"><span class="tok-com">/// claim to be any keyword it liked &#8212; the same forging a plan&#x27;s speaker names</span></span>
+<span class="ln" id="L453"><span class="tok-com">/// claim to be any keyword it liked, the same forging a plan&#x27;s speaker names</span></span>
 <span class="ln" id="L454"><span class="tok-com">/// are already guarded against.</span></span>
 <span class="ln" id="L455"><span class="tok-kw">fn</span> <span class="tok-fn">one_line</span>(value: &amp;str) -&gt; String {</span>
 <span class="ln" id="L456">    value.<span class="tok-fn">replace</span>([<span class="tok-str">&#x27;\n&#x27;</span>, <span class="tok-str">&#x27;\r&#x27;</span>], <span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>()</span>

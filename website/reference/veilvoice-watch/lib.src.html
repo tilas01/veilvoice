@@ -53,15 +53,15 @@
 <span class="ln" id="L10"><span class="tok-com">//! A de-identified voice on a call is worth very little if a second program is</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! recording the raw microphone at the same time.</span></span>
 <span class="ln" id="L12"><span class="tok-com">//!</span></span>
-<span class="ln" id="L13"><span class="tok-com">//! Operating systems have grown indicators for this &#8212; the orange dot, the</span></span>
-<span class="ln" id="L14"><span class="tok-com">//! taskbar icon &#8212; but they are small, easily missed, and tell you only that</span></span>
+<span class="ln" id="L13"><span class="tok-com">//! Operating systems have grown indicators for this, the orange dot and the</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! taskbar icon, but they are small, easily missed, and tell you only that</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! *something* is active, rarely what. This reports the process, its PID and</span></span>
 <span class="ln" id="L16"><span class="tok-com">//! how long it has held the device.</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!</span></span>
 <span class="ln" id="L18"><span class="tok-com">//! ## What it can actually see, per platform</span></span>
 <span class="ln" id="L19"><span class="tok-com">//!</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! Detection is honest about its limits, because a monitor that quietly sees</span></span>
-<span class="ln" id="L21"><span class="tok-com">//! nothing is worse than no monitor at all &#8212; it produces false confidence.</span></span>
+<span class="ln" id="L21"><span class="tok-com">//! nothing is worse than no monitor at all, because it produces false confidence.</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! [`support`] reports what the current platform can do before you rely on it.</span></span>
 <span class="ln" id="L23"><span class="tok-com">//!</span></span>
 <span class="ln" id="L24"><span class="tok-com">//! | Platform | Microphone | Camera | How |</span></span>
@@ -249,7 +249,7 @@
 <span class="src-item" id="fn-scan">
 <span class="ln" id="L184"><span class="tok-com">/// Take one snapshot of what is currently using the microphone and camera.</span></span>
 <span class="ln" id="L185"><span class="tok-com">///</span></span>
-<span class="ln" id="L186"><span class="tok-com">/// Returns an empty list when nothing is active &#8212; which is only meaningful if</span></span>
+<span class="ln" id="L186"><span class="tok-com">/// Returns an empty list when nothing is active, which is only meaningful if</span></span>
 <span class="ln" id="L187"><span class="tok-com">/// [`support`] says this platform can tell.</span></span>
 <span class="ln" id="L188"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">scan</span>() -&gt; Result&lt;Vec&lt;DeviceUse&gt;, Error&gt; {</span>
 <span class="ln" id="L189">    <span class="tok-attr">#[cfg</span>(target_os = <span class="tok-str">&quot;windows&quot;</span>)]</span>

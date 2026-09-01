@@ -54,8 +54,8 @@
 <section id="s-about">
 <p>Linux detection, via open file handles in <code>/proc</code>.</p>
 <h2 id="how-it-works">How it works</h2>
-<p>A process using the microphone has a file descriptor open on an ALSA PCM capture node &#8212; <code>/dev/snd/pcmC0D0c</code>, where the trailing <code>c</code> means capture as opposed to <code>p</code> for playback. A process using the camera has one open on <code>/dev/video*</code>. Walking <code>/proc/*/fd</code> and resolving the symlinks finds them, along with the PID and the process name, with no dependency and no daemon.</p>
-<p>Capture and playback are distinguished deliberately. Treating every open <code>/dev/snd</code> handle as microphone use would report a music player as listening to you, and a monitor that cries wolf gets ignored &#8212; which is the worst possible outcome for this feature.</p>
+<p>A process using the microphone has a file descriptor open on an ALSA PCM capture node, <code>/dev/snd/pcmC0D0c</code>, where the trailing <code>c</code> means capture as opposed to <code>p</code> for playback. A process using the camera has one open on <code>/dev/video*</code>. Walking <code>/proc/*/fd</code> and resolving the symlinks finds them, along with the PID and the process name, with no dependency and no daemon.</p>
+<p>Capture and playback are distinguished deliberately. Treating every open <code>/dev/snd</code> handle as microphone use would report a music player as listening to you, and a monitor that cries wolf gets ignored, which is the worst possible outcome for this feature.</p>
 <h2 id="sound-servers">Sound servers</h2>
 <p>On most desktops PipeWire or PulseAudio owns the hardware, so the process holding the PCM node is the <em>server</em>, not the application behind it. That is reported honestly rather than hidden: the server appearing means something is capturing, and where the client can be identified from the ALSA <code>/proc/asound</code> bookkeeping, it is named too.</p>
 <h2 id="the-permission-boundary">The permission boundary</h2>

@@ -46,7 +46,7 @@ decoy called `quarterly-report.docx` would survive that.
 The default is the recognisable name anyway, for two reasons. Indiscriminate
 encryption of everything under a directory is the overwhelmingly common
 case, and it is not fooled either way. And a file the user does not
-recognise is a file the user eventually deletes — which reads here as a
+recognise is a file the user eventually deletes, which reads here as a
 trip, produces an alarm that was nobody's fault, and teaches them to ignore
 the next one. A warning system whose alarms are usually wrong is worse than
 no warning system.
@@ -58,7 +58,7 @@ them.
 # A deletion and an encryption look the same
 
 Much ransomware writes a new encrypted file beside the original and deletes
-the original, so the canary comes back as `State::Removed` — which is
+the original, so the canary comes back as `State::Removed`, which is
 also what a user tidying a folder produces. `State` reports which of the
 two happened to the file, never which of the two happened in the world.
 

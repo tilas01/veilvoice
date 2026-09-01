@@ -19,8 +19,8 @@ Four programs make VeilVoice easier to live with and none of them is part
 of VeilVoice. A virtual audio cable is what lets live mode feed a veiled
 microphone into a video call; an audio editor is how most people trim a
 recording before veiling it. This module says which are already on the
-machine, who makes each one, under what licence, and — for the ones that
-are not — exactly what command would install it.
+machine, who makes each one, under what licence, and, for the ones that
+are not, exactly what command would install it.
 
 # Three rules, and none of them relaxes
 
@@ -29,7 +29,7 @@ here to leave ticked. `Companion::offer` produces a command; running it
 is a separate deliberate act by the caller, on one named program at a time.
 
 **VeilVoice never runs somebody else's installer.** Where the software is
-proprietary or ships as a driver — VB-CABLE is both — the offer is to open
+proprietary or ships as a driver, and VB-CABLE is both, the offer is to open
 the vendor's page, not to fetch and execute an unverified binary. This
 project's front page is about verifying what you run; downloading a signed
 release, checking its signature, and then silently running an unchecked
@@ -53,7 +53,7 @@ no registry sweep, and nothing that takes long enough to need a spinner.
 
 The probes look where each program installs itself by default. Somebody who
 has put Audacity somewhere unusual will be told it was not detected, which
-is exactly what the words say — `Presence::NotDetected` is not a claim
+is exactly what the words say: `Presence::NotDetected` is not a claim
 that the software is absent from the machine.
 
 # In plain words

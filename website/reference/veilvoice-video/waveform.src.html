@@ -51,7 +51,7 @@
 <span class="ln" id="L8"><span class="tok-com">//! long that renders as a solid block.</span></span>
 <span class="ln" id="L9"><span class="tok-com">//!</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! So the audio is divided into as many buckets as there are columns, and each</span></span>
-<span class="ln" id="L11"><span class="tok-com">//! bucket keeps its **minimum and maximum** &#8212; not its average, and not its</span></span>
+<span class="ln" id="L11"><span class="tok-com">//! bucket keeps its **minimum and maximum**, not its average and not its</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! root-mean-square. The extremes are what a waveform is: they are what makes a</span></span>
 <span class="ln" id="L13"><span class="tok-com">//! plosive look like a plosive, and an average over a bucket of a symmetric</span></span>
 <span class="ln" id="L14"><span class="tok-com">//! waveform is approximately zero however loud it was.</span></span>
@@ -59,8 +59,8 @@
 <span class="ln" id="L16"><span class="tok-com">//! # It is drawn from the veiled audio</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!</span></span>
 <span class="ln" id="L18"><span class="tok-com">//! Worth stating, because the alternative is an easy mistake. The picture is of</span></span>
-<span class="ln" id="L19"><span class="tok-com">//! the **output**, not the input. A waveform is not a voiceprint &#8212; it carries</span></span>
-<span class="ln" id="L20"><span class="tok-com">//! no formants and no phase &#8212; but it does carry timing and loudness, and a</span></span>
+<span class="ln" id="L19"><span class="tok-com">//! the **output**, not the input. A waveform is not a voiceprint, since it carries</span></span>
+<span class="ln" id="L20"><span class="tok-com">//! no formants and no phase, but it does carry timing and loudness, and a</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! picture of the original would show the original&#x27;s timing and loudness beside</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! a recording that had gone to some trouble to replace them.</span></span>
 <span class="ln" id="L23"><span class="tok-com">//!</span></span>
@@ -158,7 +158,7 @@
 <span class="ln" id="L106"><span class="tok-com">/// The envelope as an SVG path, filled, inside a box.</span></span>
 <span class="ln" id="L107"><span class="tok-com">///</span></span>
 <span class="ln" id="L108"><span class="tok-com">/// Traced left to right along the maxima and right to left along the minima,</span></span>
-<span class="ln" id="L109"><span class="tok-com">/// then closed &#8212; one filled shape rather than a thousand rectangles, which is a</span></span>
+<span class="ln" id="L109"><span class="tok-com">/// then closed: one filled shape rather than a thousand rectangles, which is a</span></span>
 <span class="ln" id="L110"><span class="tok-com">/// tenth of the markup and draws in one operation.</span></span>
 <span class="ln" id="L111"><span class="tok-com">///</span></span>
 <span class="ln" id="L112"><span class="tok-com">/// Coordinates are rounded to two decimals. A waveform does not need more, and</span></span>

@@ -3,7 +3,7 @@
 //!
 //! `clean_wav_bytes` exists because `lofty` cannot remove ID3v2 from a WAV, so
 //! VeilVoice walks the chunk list itself. That means it parses a container
-//! somebody else produced, with every length field under their control — the
+//! somebody else produced, with every length field under their control, and the
 //! textbook setting for an overrun or a loop that never ends.
 //!
 //! The properties asserted, for any input at all:
@@ -11,7 +11,7 @@
 //! 1. **It returns.** No panic, and no unbounded loop: every iteration must
 //!    advance `pos`, whatever the chunk sizes claim.
 //! 2. **A success is a valid WAV.** If it hands back bytes, those bytes must
-//!    parse as RIFF/WAVE with a length field that matches what was written —
+//!    parse as RIFF/WAVE with a length field that matches what was written,
 //!    it is not permitted to emit something the next tool chokes on.
 //! 3. **It never invents audio.** Output length is bounded by input length.
 //!
@@ -109,7 +109,7 @@ fn mutate(rng: &mut Rng, seed_bytes: &[u8]) -> Vec<u8> {
                 out.push(rng.byte());
             }
         }
-        // Lie about a chunk size — the whole point of the exercise.
+        // Lie about a chunk size, which is the whole point of the exercise.
         3 | 4 => {
             if out.len() >= 8 {
                 let i = rng.below(out.len() - 3);
@@ -257,7 +257,7 @@ fn every_truncation_of_a_valid_file_is_handled() {
 }
 
 /// The RIFF size field is a `u32` widened to `usize` and then had 8 added to
-/// it. On a 32-bit target — VeilVoice ships an ARMv7 build — `u32::MAX + 8`
+/// it. On a 32-bit target, and VeilVoice ships an ARMv7 build, `u32::MAX + 8`
 /// overflows `usize` and panics under overflow checks. A 64-bit host cannot
 /// reach that, so no amount of fuzzing *here* would have found it; it is
 /// asserted anyway so the saturating arithmetic is not quietly removed later.
@@ -276,7 +276,7 @@ fn a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic() {
 }
 
 /// A chunk that declares a size of zero must still advance the walker. If it
-/// did not, this would never return — which is why it is asserted rather than
+/// did not, this would never return, which is why it is asserted rather than
 /// assumed.
 #[test]
 fn zero_sized_chunks_do_not_stall_the_walker() {

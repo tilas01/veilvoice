@@ -33,7 +33,7 @@ everything that wants to watch a microphone from underneath has to take.
 **This reads a list the operating system hands out.** Anything able to lie
 to that list is not in it. A kernel module that has unlinked itself from the
 module list, or a driver that hooks the enumeration this calls, will be
-invisible here — and would be invisible to any unprivileged program asking
+invisible here, and would be invisible to any unprivileged program asking
 the same question, which is why the answer is "detect carelessness", not
 "detect rootkits". See `SCOPE`.
 
@@ -51,13 +51,13 @@ edit both. A quiet cross-view check is not evidence that nothing is hiding,
 and this crate never says it is.
 
 No other platform here has two independent views to compare, so
-`Report::discrepancies` is empty on them — which is reported as "there was
+`Report::discrepancies` is empty on them, which is reported as "there was
 nothing to cross-check", not as "the check passed".
 
 ## A new driver is not by itself a finding
 
 Plugging in a printer loads a driver. So does a graphics update, a VPN
-client, a virtual audio cable — VeilVoice recommends one — and a game's
+client, a virtual audio cable, which VeilVoice recommends, and a game's
 anti-cheat. `Change::Appeared` is a fact about a list, and the question
 it raises is "did you install something?", which the person at the keyboard
 answers in a second. Nothing here tries to answer it for them.
@@ -69,7 +69,7 @@ answers in a second. Nothing here tries to answer it for them.
 | Linux | `/proc/modules`, cross-checked against `/sys/module` | no |
 | Windows | `driverquery.exe /FO CSV /NH` | no |
 | macOS | `kmutil showloaded`, falling back to `kextstat` | no |
-| others | nothing is read, and `support` says so | — |
+| others | nothing is read, and `support` says so | n/a |
 
 Linux reads two files and spawns nothing. The other two shell out to a tool
 the system already ships, for the same reason the rest of this workspace

@@ -48,8 +48,8 @@
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! **WebVTT** is what a browser plays alongside a `&lt;video&gt;`, and it is the one</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! to use with anything this project renders. **SubRip** (`.srt`) is what every</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! other player on earth reads. They differ in three small ways &#8212; a header, a</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! cue counter, and a comma instead of a full stop in the timestamp &#8212; so both</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! other player on earth reads. They differ in three small ways, being a header,</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! a cue counter, and a comma instead of a full stop in the timestamp, so both</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! come from one function with a flag rather than from two that drift.</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! No library. The workspace carries no subtitle crate and this is forty lines;</span></span>
@@ -60,7 +60,7 @@
 <span class="ln" id="L17"><span class="tok-com">//! # What goes in a cue when nobody wrote down the words</span></span>
 <span class="ln" id="L18"><span class="tok-com">//!</span></span>
 <span class="ln" id="L19"><span class="tok-com">//! VeilVoice does not transcribe. Where a turn has no text, the cue carries the</span></span>
-<span class="ln" id="L20"><span class="tok-com">//! **speaker&#x27;s name and nothing else** &#8212; which is still worth having: after</span></span>
+<span class="ln" id="L20"><span class="tok-com">//! **speaker&#x27;s name and nothing else**, which is still worth having: after</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! every voice has been replaced, a caption track saying who is talking is</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! often the only way to follow a recording at all.</span></span>
 <span class="ln" id="L23"><span class="tok-com">//!</span></span>
@@ -69,7 +69,7 @@
 <span class="ln" id="L26"><span class="tok-com">//! Worth saying twice, because it is the mistake this feature invites. The</span></span>
 <span class="ln" id="L27"><span class="tok-com">//! audio has had its voiceprints destroyed. The subtitle file is a text file</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! containing whatever names were typed into it, sitting next to the recording.</span></span>
-<span class="ln" id="L29"><span class="tok-com">//! If the names matter, use labels rather than names &#8212; the plan does not care</span></span>
+<span class="ln" id="L29"><span class="tok-com">//! If the names matter, use labels rather than names, because the plan does not care</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! which, and [`crate::SCOPE`] says so where a user will read it.</span></span>
 <span class="ln" id="L31"><span class="tok-com">//!</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! # In plain words</span></span>
@@ -115,8 +115,8 @@
 <span class="ln" id="L67"><span class="tok-com">/// A timestamp as the subtitle formats want it: `HH:MM:SS.mmm`.</span></span>
 <span class="ln" id="L68"><span class="tok-com">///</span></span>
 <span class="ln" id="L69"><span class="tok-com">/// Negative and non-finite inputs become zero rather than producing a cue no</span></span>
-<span class="ln" id="L70"><span class="tok-com">/// player will accept. A plan cannot contain either &#8212; [`Conversation::add_turn`]</span></span>
-<span class="ln" id="L71"><span class="tok-com">/// refuses both &#8212; so this is the belt to that braces, and it is here because</span></span>
+<span class="ln" id="L70"><span class="tok-com">/// player will accept. A plan cannot contain either, because</span></span>
+<span class="ln" id="L71"><span class="tok-com">/// [`Conversation::add_turn`] refuses both, so this is the belt to that braces, and it is here because</span></span>
 <span class="ln" id="L72"><span class="tok-com">/// the alternative failure is a subtitle file that silently does not load.</span></span>
 <span class="ln" id="L73"><span class="tok-kw">fn</span> <span class="tok-fn">timestamp</span>(seconds: f64, comma: bool) -&gt; String {</span>
 <span class="ln" id="L74">    <span class="tok-kw">let</span> seconds = <span class="tok-kw">if</span> seconds.<span class="tok-fn">is_finite</span>() &amp;&amp; seconds &gt; <span class="tok-num">0.0</span> {</span>

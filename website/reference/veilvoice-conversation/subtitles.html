@@ -54,12 +54,12 @@
 <section id="s-about">
 <p>Subtitles, from the same plan the audio is rendered from.</p>
 <h2 id="two-formats-both-written-out-here">Two formats, both written out here</h2>
-<p><strong>WebVTT</strong> is what a browser plays alongside a <code>&lt;video&gt;</code>, and it is the one to use with anything this project renders. <strong>SubRip</strong> (<code>.srt</code>) is what every other player on earth reads. They differ in three small ways &#8212; a header, a cue counter, and a comma instead of a full stop in the timestamp &#8212; so both come from one function with a flag rather than from two that drift.</p>
+<p><strong>WebVTT</strong> is what a browser plays alongside a <code>&lt;video&gt;</code>, and it is the one to use with anything this project renders. <strong>SubRip</strong> (<code>.srt</code>) is what every other player on earth reads. They differ in three small ways, being a header, a cue counter, and a comma instead of a full stop in the timestamp, so both come from one function with a flag rather than from two that drift.</p>
 <p>No library. The workspace carries no subtitle crate and this is forty lines; adding a dependency to the graph for it would cost more than it saves, and the <code>offline</code> CI job that checks what is in that graph is one of the things this project is worth trusting for.</p>
 <h2 id="what-goes-in-a-cue-when-nobody-wrote-down-the-words">What goes in a cue when nobody wrote down the words</h2>
-<p>VeilVoice does not transcribe. Where a turn has no text, the cue carries the <strong>speaker&#x27;s name and nothing else</strong> &#8212; which is still worth having: after every voice has been replaced, a caption track saying who is talking is often the only way to follow a recording at all.</p>
+<p>VeilVoice does not transcribe. Where a turn has no text, the cue carries the <strong>speaker&#x27;s name and nothing else</strong>, which is still worth having: after every voice has been replaced, a caption track saying who is talking is often the only way to follow a recording at all.</p>
 <h2 id="a-name-in-a-caption-is-not-veiled">A name in a caption is not veiled</h2>
-<p>Worth saying twice, because it is the mistake this feature invites. The audio has had its voiceprints destroyed. The subtitle file is a text file containing whatever names were typed into it, sitting next to the recording. If the names matter, use labels rather than names &#8212; the plan does not care which, and <code>crate::SCOPE</code> says so where a user will read it.</p>
+<p>Worth saying twice, because it is the mistake this feature invites. The audio has had its voiceprints destroyed. The subtitle file is a text file containing whatever names were typed into it, sitting next to the recording. If the names matter, use labels rather than names, because the plan does not care which, and <code>crate::SCOPE</code> says so where a user will read it.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Writes the subtitles, from the same plan the audio came from.</p>
 <p>Both files come out of one source, so the words on screen and the voice you hear cannot drift apart or disagree about who is speaking.</p>

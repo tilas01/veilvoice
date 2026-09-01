@@ -5,7 +5,7 @@
 //!
 //! Verifying a download used to require naming three files and knowing a tag.
 //! That is fine for somebody who has already read the instructions and is
-//! wrong for everybody else — and "everybody else" is precisely the population
+//! wrong for everybody else, and "everybody else" is precisely the population
 //! a verifier exists to serve. Somebody who has just downloaded an archive and
 //! wants to know whether it is the real one should be able to run this and be
 //! told.
@@ -17,9 +17,9 @@
 //! # Where it looks, and why in that order
 //!
 //! 1. The directory given, if one was.
-//! 2. The current working directory — where somebody who has just `cd`-ed to
+//! 2. The current working directory, where somebody who has just `cd`-ed to
 //!    their downloads will be.
-//! 3. The directory the running binary is in — where somebody who unpacked the
+//! 3. The directory the running binary is in, where somebody who unpacked the
 //!    archive and double-clicked the verifier inside it will be.
 //! 4. The usual download directories for the platform.
 //!
@@ -31,7 +31,7 @@
 //!
 //! A file whose name starts `veilvoice-` and ends in one of the archive
 //! extensions this project publishes. That is a **filename** test and it proves
-//! nothing at all — it is how candidates are found, never how they are judged.
+//! nothing at all: it is how candidates are found, never how they are judged.
 //! Every candidate still has to survive the signature and the hash, and a file
 //! that merely looks the part fails exactly as loudly as one that does not.
 //!
@@ -180,7 +180,7 @@ pub fn places(explicit: Option<&Path>) -> Vec<PathBuf> {
 }
 
 /// Look everywhere worth looking and return the first directory that holds a
-/// complete, checkable set — or, failing that, everything that turned up.
+/// complete, checkable set, or, failing that, everything that turned up.
 ///
 /// "Complete" means an archive, a hash list and a signature in one place, which
 /// is what an offline check needs. A directory with an archive and no hash list

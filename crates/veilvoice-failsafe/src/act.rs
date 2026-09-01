@@ -21,8 +21,8 @@
 //! # In plain words
 //!
 //! This is the part that closes a program that picked up your real microphone.
-//! It checks one last time that the program is safe to close — never VeilVoice
-//! itself, never anything belonging to the operating system — and it says what
+//! It checks one last time that the program is safe to close, meaning never
+//! VeilVoice itself and never anything belonging to the operating system, and it says what
 //! it did either way.
 
 use std::process::Command;

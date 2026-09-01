@@ -53,7 +53,7 @@
 <span class="ln" id="L10"><span class="tok-com">//! **This reads a list the operating system hands out.** Anything able to lie</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! to that list is not in it. A kernel module that has unlinked itself from the</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! module list, or a driver that hooks the enumeration this calls, will be</span></span>
-<span class="ln" id="L13"><span class="tok-com">//! invisible here &#8212; and would be invisible to any unprivileged program asking</span></span>
+<span class="ln" id="L13"><span class="tok-com">//! invisible here, and would be invisible to any unprivileged program asking</span></span>
 <span class="ln" id="L14"><span class="tok-com">//! the same question, which is why the answer is &quot;detect carelessness&quot;, not</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! &quot;detect rootkits&quot;. See [`SCOPE`].</span></span>
 <span class="ln" id="L16"><span class="tok-com">//!</span></span>
@@ -71,13 +71,13 @@
 <span class="ln" id="L28"><span class="tok-com">//! and this crate never says it is.</span></span>
 <span class="ln" id="L29"><span class="tok-com">//!</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! No other platform here has two independent views to compare, so</span></span>
-<span class="ln" id="L31"><span class="tok-com">//! [`Report::discrepancies`] is empty on them &#8212; which is reported as &quot;there was</span></span>
+<span class="ln" id="L31"><span class="tok-com">//! [`Report::discrepancies`] is empty on them, which is reported as &quot;there was</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! nothing to cross-check&quot;, not as &quot;the check passed&quot;.</span></span>
 <span class="ln" id="L33"><span class="tok-com">//!</span></span>
 <span class="ln" id="L34"><span class="tok-com">//! ## A new driver is not by itself a finding</span></span>
 <span class="ln" id="L35"><span class="tok-com">//!</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! Plugging in a printer loads a driver. So does a graphics update, a VPN</span></span>
-<span class="ln" id="L37"><span class="tok-com">//! client, a virtual audio cable &#8212; VeilVoice recommends one &#8212; and a game&#x27;s</span></span>
+<span class="ln" id="L37"><span class="tok-com">//! client, a virtual audio cable, which VeilVoice recommends, and a game&#x27;s</span></span>
 <span class="ln" id="L38"><span class="tok-com">//! anti-cheat. [`Change::Appeared`] is a fact about a list, and the question</span></span>
 <span class="ln" id="L39"><span class="tok-com">//! it raises is &quot;did you install something?&quot;, which the person at the keyboard</span></span>
 <span class="ln" id="L40"><span class="tok-com">//! answers in a second. Nothing here tries to answer it for them.</span></span>
@@ -89,7 +89,7 @@
 <span class="ln" id="L46"><span class="tok-com">//! | Linux | `/proc/modules`, cross-checked against `/sys/module` | no |</span></span>
 <span class="ln" id="L47"><span class="tok-com">//! | Windows | `driverquery.exe /FO CSV /NH` | no |</span></span>
 <span class="ln" id="L48"><span class="tok-com">//! | macOS | `kmutil showloaded`, falling back to `kextstat` | no |</span></span>
-<span class="ln" id="L49"><span class="tok-com">//! | others | nothing is read, and [`support`] says so | &#8212; |</span></span>
+<span class="ln" id="L49"><span class="tok-com">//! | others | nothing is read, and [`support`] says so | n/a |</span></span>
 <span class="ln" id="L50"><span class="tok-com">//!</span></span>
 <span class="ln" id="L51"><span class="tok-com">//! Linux reads two files and spawns nothing. The other two shell out to a tool</span></span>
 <span class="ln" id="L52"><span class="tok-com">//! the system already ships, for the same reason the rest of this workspace</span></span>

@@ -14,7 +14,7 @@
   - [Items](#items)
 
 The VeilVoice desktop application: an egui/eframe front-end, monospace
-throughout — anonymise a file, scramble a microphone live, watch what is
+throughout: anonymise a file, scramble a microphone live, watch what is
 listening, manage the app lock, choose how the app looks, and an about
 panel that states the honest scope.
 

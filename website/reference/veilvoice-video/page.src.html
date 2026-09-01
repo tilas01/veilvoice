@@ -48,7 +48,7 @@
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! It needs nothing installed, it contacts nothing, and it opens on every</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! browser and every phone. A video file needs an encoder this project does not</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! ship &#8212; see [`crate::ffmpeg`] &#8212; so the page is the thing that always exists</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! ship, as [`crate::ffmpeg`] explains, so the page is the thing that always exists</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! and the file is the extra.</span></span>
 <span class="ln" id="L10"><span class="tok-com">//!</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! It is also the honest artefact for this particular job. What is being drawn</span></span>
@@ -58,8 +58,8 @@
 <span class="ln" id="L15"><span class="tok-com">//!</span></span>
 <span class="ln" id="L16"><span class="tok-com">//! # The layout, and why the padding is a setting</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!</span></span>
-<span class="ln" id="L18"><span class="tok-com">//! A title across the top, a row of circles under it &#8212; one per speaker, in</span></span>
-<span class="ln" id="L19"><span class="tok-com">//! their colour, with their name beneath &#8212; and the waveform along the bottom</span></span>
+<span class="ln" id="L18"><span class="tok-com">//! A title across the top, a row of circles under it, one per speaker, in</span></span>
+<span class="ln" id="L19"><span class="tok-com">//! their colour and with their name beneath, and the waveform along the bottom</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! with a line that moves through it. [`Look::padding`] is a setting because</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! the same picture is wanted at very different sizes: a thumbnail wants little</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! and a full-screen render wants a lot, and a fixed margin looks wrong at one</span></span>
@@ -70,14 +70,14 @@
 <span class="ln" id="L27"><span class="tok-com">//! Names and titles are typed by a person and end up inside markup. They are</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! escaped on the way in, every time, through one function. A name containing</span></span>
 <span class="ln" id="L29"><span class="tok-com">//! `&lt;/text&gt;` would otherwise end the element it is in and the rest of the file</span></span>
-<span class="ln" id="L30"><span class="tok-com">//! would be whatever that person wrote &#8212; which is a nuisance in a local file</span></span>
+<span class="ln" id="L30"><span class="tok-com">//! would be whatever that person wrote, which is a nuisance in a local file</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! and a real problem in one that gets sent to somebody.</span></span>
 <span class="ln" id="L32"><span class="tok-com">//!</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! # The script, and what happens without it</span></span>
 <span class="ln" id="L34"><span class="tok-com">//!</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! Lighting the circle of whoever is speaking means knowing where the audio has</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! got to, and only the audio element knows that. There is a small inline</span></span>
-<span class="ln" id="L37"><span class="tok-com">//! script &#8212; no file, no library, no network &#8212; and a `&lt;noscript&gt;` saying what it</span></span>
+<span class="ln" id="L37"><span class="tok-com">//! script, with no file, no library and no network, and a `&lt;noscript&gt;` saying what it</span></span>
 <span class="ln" id="L38"><span class="tok-com">//! does. Without it the audio plays, the subtitles appear, the waveform is</span></span>
 <span class="ln" id="L39"><span class="tok-com">//! drawn and the circles simply stay dim.</span></span>
 <span class="ln" id="L40"><span class="tok-com">//!</span></span>

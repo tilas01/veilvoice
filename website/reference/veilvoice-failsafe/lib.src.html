@@ -51,7 +51,7 @@
 <span class="ln" id="L8"><span class="tok-com">//! You set a calling program to VeilVoice&#x27;s virtual cable, you start live mode,</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! and everything is veiled. Then you plug in a headset. Windows offers the new</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! microphone, the calling program takes it, and from that moment your **real</span></span>
-<span class="ln" id="L11"><span class="tok-com">//! voice** is going out &#8212; with the veiled window still open in front of you,</span></span>
+<span class="ln" id="L11"><span class="tok-com">//! voice** is going out, with the veiled window still open in front of you,</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! still showing meters moving, still looking exactly as it did a second ago.</span></span>
 <span class="ln" id="L13"><span class="tok-com">//!</span></span>
 <span class="ln" id="L14"><span class="tok-com">//! Nobody notices that. It is not a mistake somebody makes through</span></span>
@@ -66,14 +66,14 @@
 <span class="ln" id="L23"><span class="tok-com">//! while you are veiling, that is the accident, and Failsafe:</span></span>
 <span class="ln" id="L24"><span class="tok-com">//!</span></span>
 <span class="ln" id="L25"><span class="tok-com">//! 1. says so, loudly, because a silent guard is not a guard; and</span></span>
-<span class="ln" id="L26"><span class="tok-com">//! 2. closes that program, if [`Posture::CloseIt`] is set &#8212; which it is by</span></span>
+<span class="ln" id="L26"><span class="tok-com">//! 2. closes that program, if [`Posture::CloseIt`] is set, which it is by</span></span>
 <span class="ln" id="L27"><span class="tok-com">//!    default, because a warning you have not read yet does not stop your voice</span></span>
 <span class="ln" id="L28"><span class="tok-com">//!    going out.</span></span>
 <span class="ln" id="L29"><span class="tok-com">//!</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! It **cannot stop the operating system handing a microphone to another</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! program in the first place.** Doing that needs exclusive-mode capture of</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! every input device, or a driver, and neither is something this project</span></span>
-<span class="ln" id="L33"><span class="tok-com">//! ships &#8212; see [`CANNOT_PREVENT`], which is the wording a front end must show.</span></span>
+<span class="ln" id="L33"><span class="tok-com">//! ships. See [`CANNOT_PREVENT`], which is the wording a front end must show.</span></span>
 <span class="ln" id="L34"><span class="tok-com">//! What Failsafe does is notice within a second or so and act. That is a real</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! difference from nothing, and it is a real difference from prevention, and</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! both halves have to be said.</span></span>
@@ -105,7 +105,7 @@
 <span class="ln" id="L62"><span class="tok-com">//! that program so your voice stops going out.</span></span>
 <span class="ln" id="L63"><span class="tok-com">//!</span></span>
 <span class="ln" id="L64"><span class="tok-com">//! What it cannot do is stop your computer from handing the microphone over in</span></span>
-<span class="ln" id="L65"><span class="tok-com">//! the first place &#8212; that needs a level of access this program does not have,</span></span>
+<span class="ln" id="L65"><span class="tok-com">//! the first place, because that needs a level of access this program does not have,</span></span>
 <span class="ln" id="L66"><span class="tok-com">//! and it says so rather than letting you believe otherwise. It notices, and it</span></span>
 <span class="ln" id="L67"><span class="tok-com">//! acts, within about a second.</span></span>
 <span class="ln" id="L68"></span>

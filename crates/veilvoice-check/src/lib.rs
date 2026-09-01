@@ -8,8 +8,8 @@
 //!
 //! `veilvoice-verify` did all of this and did it inside a binary crate, which
 //! has no consumers by construction. The desktop application was asked for a
-//! **verify tab** — drag a download onto the window and be told whether it is
-//! the published one — and there were two ways to have that:
+//! **verify tab**, where you drag a download onto the window and are told
+//! whether it is the published one, and there were two ways to have that:
 //!
 //! * link `eframe` into the 1.5 MB portable verifier, which is the one binary
 //!   in this project whose smallness is a feature: it is what somebody
@@ -26,7 +26,7 @@
 //! **the one the holder of this key published**. It does not prove the file is
 //! safe, that the source compiles to it, or that the key belongs to anybody in
 //! particular. The second of those is the check worth having and it is the one
-//! this project cannot perform for you — it needs somebody other than the
+//! this project cannot perform for you, because it needs somebody other than the
 //! author to have built the same tag and got the same hash.
 //!
 //! Every front end that uses this has to say so. The words are here, in
@@ -301,7 +301,7 @@ pub struct Checked {
 /// The signature is verified over the **bytes of the list** before any number
 /// in that list is read. A checker that compared the hash first and verified
 /// afterwards would, for the moment between the two, be trusting an unsigned
-/// document — and an attacker who can hand you a file can hand you a
+/// document, and an attacker who can hand you a file can hand you a
 /// `SHA256SUMS` to go with it. Getting this order wrong produces a program that
 /// passes all its own tests and proves nothing.
 pub fn check_file(file: &Path, sums: &str, signature: &str) -> Result<Checked, Error> {

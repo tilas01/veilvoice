@@ -168,7 +168,7 @@ flowchart TD
 | `fn looks_like_archive` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Whether a filename looks like one of this project's release archives. |
 | `fn look_in` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Look in one directory, one level deep. |
 | `fn places` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Every place worth looking, in order, without duplicates. |
-| `fn search` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Look everywhere worth looking and return the first directory that holds a complete, checkable set — or, failing that, everything that turned up. |
+| `fn search` | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | Look everywhere worth looking and return the first directory that holds a complete, checkable set, or, failing that, everything that turned up. |
 | `const PROGRAMS` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | The programs a release archive carries. |
 | `struct Program` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | One program found in an extracted directory. |
 | `struct Extracted` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | What an extracted directory turned out to hold. |

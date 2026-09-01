@@ -54,13 +54,13 @@
 <section id="s-about">
 <p>The scale a level meter is drawn on.</p>
 <h2 id="why-this-is-here-rather-than-in-a-front-end">Why this is here rather than in a front end</h2>
-<p><code>crate::live::LiveStats</code> reports a peak, and both front ends draw it. They drew it <em>differently</em>: both were linear, and the desktop one printed a decibel number beside a bar filled linearly &#8212; so the number said -12 dB and the bar showed a quarter. Two meters disagreeing about the same reading is worse than one bad meter, because it makes the reader doubt the number.</p>
+<p><code>crate::live::LiveStats</code> reports a peak, and both front ends draw it. They drew it <em>differently</em>: both were linear, and the desktop one printed a decibel number beside a bar filled linearly, so the number said -12 dB and the bar showed a quarter. Two meters disagreeing about the same reading is worse than one bad meter, because it makes the reader doubt the number.</p>
 <p>The scale belongs with the measurement. This module owns the arithmetic; the front ends own how it looks.</p>
 <h2 id="why-not-linear">Why not linear</h2>
 <p>Loudness is not linear, and a meter that is has almost no useful range. Ordinary speech recorded at a sensible level peaks around <strong>-12 dBFS</strong>, which is 0.25 linear: a quarter of the bar, which reads as near-silence. The only way to fill a linear bar is to be clipping. Every real meter is logarithmic for exactly this reason.</p>
 <h2 id="what-it-measures-and-what-it-does-not">What it measures, and what it does not</h2>
 <p><strong>Sample peak</strong>, since the last read. It is not a loudness meter: RMS, LUFS and anything else that correlates with how loud a thing <em>sounds</em> needs a window and a weighting curve, and answers a different question. This one answers &quot;am I being recorded, and am I clipping&quot;.</p>
-<p>It also cannot see an <strong>inter-sample peak</strong> &#8212; a waveform that passes above full scale between two samples and clips in a converter without any single sample exceeding 1.0. Catching those needs oversampling. A front end may say <code>CLIP</code> when a sample reaches full scale, and must not imply it caught the ones it cannot see.</p>
+<p>It also cannot see an <strong>inter-sample peak</strong>, which is a waveform that passes above full scale between two samples and clips in a converter without any single sample exceeding 1.0. Catching those needs oversampling. A front end may say <code>CLIP</code> when a sample reaches full scale, and must not imply it caught the ones it cannot see.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>This decides how a level meter is drawn, so that the bar and the number beside it always agree.</p>
 <p>They did not, once. Both the window and the terminal drew the bar filling evenly with the signal, while the number beside it was in decibels, which do not rise evenly at all. So the number could read -12 dB while the bar looked a quarter full, and a reader who noticed stopped trusting both.</p>

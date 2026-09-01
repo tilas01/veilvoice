@@ -59,7 +59,7 @@
 <span class="ln" id="L16"><span class="tok-com">//!</span></span>
 <span class="ln" id="L17"><span class="tok-com">//! So the output is numbers plus a [`Concern`] level against a [`Threshold`]</span></span>
 <span class="ln" id="L18"><span class="tok-com">//! **the user sets**, and the front end&#x27;s job is to say &quot;this many files</span></span>
-<span class="ln" id="L19"><span class="tok-com">//! changed in this long, was that you?&quot; &#8212; a question, which the person at the</span></span>
+<span class="ln" id="L19"><span class="tok-com">//! changed in this long, was that you?&quot;, which is a question, and the person at the</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! keyboard can answer instantly and this crate never can.</span></span>
 <span class="ln" id="L21"><span class="tok-com">//!</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! # Modification times can be set by whatever did the modifying</span></span>
@@ -78,7 +78,7 @@
 <span class="ln" id="L35"><span class="tok-com">//!</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! [`Limits`] caps how many files and how deep, and a snapshot that hit a cap</span></span>
 <span class="ln" id="L37"><span class="tok-com">//! is marked [`Snapshot::truncated`]. A truncated snapshot compared against</span></span>
-<span class="ln" id="L38"><span class="tok-com">//! another truncated snapshot is still useful &#8212; both walked in the same order &#8212;</span></span>
+<span class="ln" id="L38"><span class="tok-com">//! another truncated snapshot is still useful, because both walked in the same order,</span></span>
 <span class="ln" id="L39"><span class="tok-com">//! but the count is of what was looked at, not of what is there, and every</span></span>
 <span class="ln" id="L40"><span class="tok-com">//! report carries that flag so a front end cannot present it as complete.</span></span>
 <span class="ln" id="L41"><span class="tok-com">//!</span></span>
@@ -89,7 +89,7 @@
 <span class="ln" id="L46"><span class="tok-com">//! # Format</span></span>
 <span class="ln" id="L47"><span class="tok-com">//!</span></span>
 <span class="ln" id="L48"><span class="tok-com">//! A snapshot has to survive between two runs of the program, or the only</span></span>
-<span class="ln" id="L49"><span class="tok-com">//! comparison possible is one taken inside a single session &#8212; which measures</span></span>
+<span class="ln" id="L49"><span class="tok-com">//! comparison possible is one taken inside a single session, which measures</span></span>
 <span class="ln" id="L50"><span class="tok-com">//! the minute you were looking and nothing else. So it is written to disk, in</span></span>
 <span class="ln" id="L51"><span class="tok-com">//! text, one record per line, for the same reason the tamper manifest is text:</span></span>
 <span class="ln" id="L52"><span class="tok-com">//! the point of the file is to be checkable without this crate.</span></span>
@@ -135,7 +135,7 @@
 <span class="ln" id="L89">    <span class="tok-com">/// Length in bytes.</span></span>
 <span class="ln" id="L90">    <span class="tok-kw">pub</span> len: u64,</span>
 <span class="ln" id="L91">    <span class="tok-com">/// Modification time in seconds since the Unix epoch, where the platform</span></span>
-<span class="ln" id="L92">    <span class="tok-com">/// reports one. `None` is not an error &#8212; some filesystems do not keep it &#8212;</span></span>
+<span class="ln" id="L92">    <span class="tok-com">/// reports one. `None` is not an error, since some filesystems do not keep it,</span></span>
 <span class="ln" id="L93">    <span class="tok-com">/// and a file whose time is unknown is compared on length alone.</span></span>
 <span class="ln" id="L94">    <span class="tok-kw">pub</span> modified: Option&lt;u64&gt;,</span>
 <span class="ln" id="L95">}</span>
@@ -339,7 +339,7 @@
 <span class="ln" id="L267"><span class="tok-com">///</span></span>
 <span class="ln" id="L268"><span class="tok-com">/// A churn whose window is zero cannot meet the rate condition at all, because</span></span>
 <span class="ln" id="L269"><span class="tok-com">/// it has no rate. It can still meet the share condition, so the answer is at</span></span>
-<span class="ln" id="L270"><span class="tok-com">/// most [`Concern::Elevated`] &#8212; which is the honest ceiling for a measurement</span></span>
+<span class="ln" id="L270"><span class="tok-com">/// most [`Concern::Elevated`], which is the honest ceiling for a measurement</span></span>
 <span class="ln" id="L271"><span class="tok-com">/// missing half its inputs.</span></span>
 <span class="ln" id="L272"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">concern</span>(churn: &amp;Churn, threshold: &amp;Threshold) -&gt; Concern {</span>
 <span class="ln" id="L273">    <span class="tok-kw">let</span> fast = churn</span>
@@ -384,7 +384,7 @@
 <span class="ln" id="L304">    <span class="tok-com">/// Opens nothing: only directory entries and their metadata are read, which</span></span>
 <span class="ln" id="L305">    <span class="tok-com">/// is what keeps this cheap enough to run on a timer. Unreadable</span></span>
 <span class="ln" id="L306">    <span class="tok-com">/// directories are recorded in [`Snapshot::unreadable`] rather than failing</span></span>
-<span class="ln" id="L307">    <span class="tok-com">/// the walk &#8212; a snapshot of nine folders out of ten is more useful than</span></span>
+<span class="ln" id="L307">    <span class="tok-com">/// the walk, because a snapshot of nine folders out of ten is more useful than</span></span>
 <span class="ln" id="L308">    <span class="tok-com">/// none, and the tenth is itself reported.</span></span>
 <span class="ln" id="L309">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">take</span>(root: &amp;Path, limits: Limits) -&gt; Result&lt;Self, Error&gt; {</span>
 <span class="ln" id="L310">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> files = BTreeMap::<span class="tok-fn">new</span>();</span>

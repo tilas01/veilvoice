@@ -27,7 +27,7 @@ Audio tag removal and replacement.
 
 Tags are handled through `lofty`, which understands ID3v1/ID3v2, Vorbis
 comments, MP4 atoms and APE, so one code path covers every format VeilVoice
-imports. Only the tag blocks are rewritten — the audio stream is never
+imports. Only the tag blocks are rewritten: the audio stream is never
 re-encoded, so cleaning a file is lossless.
 
 # What tags give away

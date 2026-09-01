@@ -69,7 +69,7 @@
 <span class="ln" id="L26"><span class="tok-com">//! applications have ever asked for that device.</span></span>
 <span class="ln" id="L27"><span class="tok-com">//!</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! Measured on the machine this was found on: 7 packaged and 19 desktop</span></span>
-<span class="ln" id="L29"><span class="tok-com">//! applications for the microphone, 6 packaged for the camera &#8212; **68 process</span></span>
+<span class="ln" id="L29"><span class="tok-com">//! applications for the microphone, 6 packaged for the camera, which is **68 process</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! creations per scan**. One `reg.exe` spawn there costs 6.6 ms at its</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! fastest, so a scan cost **at least 449 ms**, and that is the warm-cache best</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! case rather than the typical one. The desktop application called `scan` on</span></span>
@@ -81,7 +81,7 @@
 <span class="ln" id="L38"><span class="tok-com">//! worst possible place.</span></span>
 <span class="ln" id="L39"><span class="tok-com">//!</span></span>
 <span class="ln" id="L40"><span class="tok-com">//! `reg query &lt;key&gt; /s` prints the **whole subtree**, keys and values together,</span></span>
-<span class="ln" id="L41"><span class="tok-com">//! in one go. So the scan is now two spawns &#8212; one per capability &#8212; and</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! in one go. So the scan is now two spawns, one per capability, and</span></span>
 <span class="ln" id="L42"><span class="tok-com">//! [`parse_consent_dump`] does the rest in memory. Measured on the same</span></span>
 <span class="ln" id="L43"><span class="tok-com">//! machine: 45 ms for the whole scan, against 449 ms, and it no longer grows</span></span>
 <span class="ln" id="L44"><span class="tok-com">//! with the number of applications installed. The parser is a pure function</span></span>
@@ -160,7 +160,7 @@
 <span class="ln" id="L110"><span class="tok-com">/// name through the platform search order, and on Windows that order includes</span></span>
 <span class="ln" id="L111"><span class="tok-com">/// the **current working directory** ahead of most of `PATH`. Running</span></span>
 <span class="ln" id="L112"><span class="tok-com">/// `veilvoice watch` from a directory containing a file named `reg.exe` would</span></span>
-<span class="ln" id="L113"><span class="tok-com">/// have executed it, as the user, with no prompt &#8212; a downloads folder is</span></span>
+<span class="ln" id="L113"><span class="tok-com">/// have executed it, as the user, with no prompt. A downloads folder is</span></span>
 <span class="ln" id="L114"><span class="tok-com">/// enough. Naming the system directory removes the search.</span></span>
 <span class="ln" id="L115"><span class="tok-com">///</span></span>
 <span class="ln" id="L116"><span class="tok-com">/// Returning `None` rather than falling back to a search is deliberate: this</span></span>
@@ -258,7 +258,7 @@
 <span class="ln" id="L200"><span class="tok-com">/// ```</span></span>
 <span class="ln" id="L201"><span class="tok-com">///</span></span>
 <span class="ln" id="L202"><span class="tok-com">/// Only keys that carry a `LastUsedTimeStart` come back, which is exactly the</span></span>
-<span class="ln" id="L203"><span class="tok-com">/// set of application entries &#8212; packaged ones sit directly under the store and</span></span>
+<span class="ln" id="L203"><span class="tok-com">/// set of application entries. Packaged ones sit directly under the store and</span></span>
 <span class="ln" id="L204"><span class="tok-com">/// desktop ones under `NonPackaged`, and this needs to know nothing about that</span></span>
 <span class="ln" id="L205"><span class="tok-com">/// distinction to find both.</span></span>
 <span class="ln" id="L206"><span class="tok-com">///</span></span>
@@ -436,7 +436,7 @@
 <span class="ln" id="L369">    }</span>
 <span class="ln" id="L370"></span>
 <span class="ln" id="L371">    <span class="tok-com">/// Regression: the registry tool must be an absolute path in the system</span></span>
-<span class="ln" id="L372">    <span class="tok-com">/// directory, never a bare name the OS searches for &#8212; the Windows search</span></span>
+<span class="ln" id="L372">    <span class="tok-com">/// directory, never a bare name the OS searches for, because the Windows search</span></span>
 <span class="ln" id="L373">    <span class="tok-com">/// order includes the current working directory, so a planted `reg.exe`</span></span>
 <span class="ln" id="L374">    <span class="tok-com">/// would have been run as the user.</span></span>
 <span class="ln" id="L375">    <span class="tok-attr">#[test</span>]</span>
@@ -573,13 +573,13 @@
 <span class="ln" id="L506">    <span class="tok-com">/// Regression, and the important one. `reg query` echoes subkey paths back</span></span>
 <span class="ln" id="L507">    <span class="tok-com">/// under the **full** hive name, so asking with the `HKCU` abbreviation</span></span>
 <span class="ln" id="L508">    <span class="tok-com">/// matched nothing and the monitor reported an empty machine no matter what</span></span>
-<span class="ln" id="L509">    <span class="tok-com">/// was recording &#8212; the worst possible failure for this feature, because it</span></span>
+<span class="ln" id="L509">    <span class="tok-com">/// was recording, which is the worst possible failure for this feature, because it</span></span>
 <span class="ln" id="L510">    <span class="tok-com">/// looks like good news.</span></span>
 <span class="ln" id="L511">    <span class="tok-com">///</span></span>
 <span class="ln" id="L512">    <span class="tok-com">/// Asked against a key every Windows installation has, rather than against</span></span>
 <span class="ln" id="L513">    <span class="tok-com">/// the consent store. The consent store is populated by *applications</span></span>
 <span class="ln" id="L514">    <span class="tok-com">/// having asked for the microphone*, and a headless CI runner with no audio</span></span>
-<span class="ln" id="L515">    <span class="tok-com">/// hardware has legitimately never had one ask &#8212; so an empty result there</span></span>
+<span class="ln" id="L515">    <span class="tok-com">/// hardware has legitimately never had one ask, so an empty result there</span></span>
 <span class="ln" id="L516">    <span class="tok-com">/// means &quot;nothing has used the microphone on this machine&quot;, which is not the</span></span>
 <span class="ln" id="L517">    <span class="tok-com">/// same claim at all. Conflating the two made CI fail on a machine where the</span></span>
 <span class="ln" id="L518">    <span class="tok-com">/// code was working perfectly, which is its own kind of silently wrong.</span></span>
@@ -603,7 +603,7 @@
 <span class="ln" id="L536">    <span class="tok-com">/// it. Both of those are facts about the machine rather than about the</span></span>
 <span class="ln" id="L537">    <span class="tok-com">/// code, and both have now failed CI for that reason: first the store was</span></span>
 <span class="ln" id="L538">    <span class="tok-com">/// empty on a runner where nothing had ever asked for a microphone, and</span></span>
-<span class="ln" id="L539">    <span class="tok-com">/// then &#8212; after that was allowed for &#8212; a runner had entries but no</span></span>
+<span class="ln" id="L539">    <span class="tok-com">/// then, after that was allowed for, a runner had entries but no</span></span>
 <span class="ln" id="L540">    <span class="tok-com">/// `NonPackaged` subkey, which only appears once a *desktop* application</span></span>
 <span class="ln" id="L541">    <span class="tok-com">/// has asked. A test that fails depending on what software a machine has</span></span>
 <span class="ln" id="L542">    <span class="tok-com">/// happened to run is not testing this crate.</span></span>

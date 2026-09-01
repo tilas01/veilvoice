@@ -54,7 +54,7 @@
 <p>The policy itself: what can be required, and what requiring it does.</p>
 <h2 id="every-requirement-tightens-and-there-is-nowhere-to-write-one-that-does-not">Every requirement tightens, and there is nowhere to write one that does not</h2>
 <p><code>Requirement</code> has five variants and all five move VeilVoice in the same direction. There is no <code>AllowPlaintext</code>, no <code>MaximumIntensity</code>, no <code>SkipMetadataCleaning</code>. That is not an oversight to be filled in later; it is the property the whole crate rests on, and <code>Posture::is_at_least_as_strict_as</code> exists so a test can hold it.</p>
-<p>Anybody adding a variant should read <code>crate</code>&#x27;s documentation first. A loosening variant does not merely add a feature &#8212; it removes the reason the plain file can be read without a passphrase.</p>
+<p>Anybody adding a variant should read <code>crate</code>&#x27;s documentation first. A loosening variant does not merely add a feature: it removes the reason the plain file can be read without a passphrase.</p>
 <h2 id="format">Format</h2>
 <p>Text, one requirement per line, for the same reason the tamper manifest is text: the point of the file is to be readable by the person it constrains.</p>
 <pre><code>VEILPOLICY1

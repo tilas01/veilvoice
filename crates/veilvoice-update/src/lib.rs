@@ -97,7 +97,7 @@ pub enum Verdict {
     UpToDate,
     /// Something newer exists. Carries the published version.
     Newer(String),
-    /// This build is ahead of anything published — an unreleased `main`.
+    /// This build is ahead of anything published, meaning an unreleased `main`.
     Ahead(String),
     /// A version string came back that this build cannot compare.
     ///

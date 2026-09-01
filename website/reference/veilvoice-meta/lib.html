@@ -54,15 +54,15 @@
 <section id="s-about">
 <p>Strip or spoof the identifying metadata that rides along with media files.</p>
 <h3 id="why-this-exists">Why this exists</h3>
-<p>De-identifying a voice accomplishes nothing if the file still says who recorded it. A phone recording routinely carries the device model, the recording software, a precise timestamp and &#8212; for images &#8212; GPS coordinates accurate to a few metres. That is often a far easier way to identify someone than analysing their voice, and it survives every DSP transform because it is not in the audio at all.</p>
+<p>De-identifying a voice accomplishes nothing if the file still says who recorded it. A phone recording routinely carries the device model, the recording software, a precise timestamp and, for images, GPS coordinates accurate to a few metres. That is often a far easier way to identify someone than analysing their voice, and it survives every DSP transform because it is not in the audio at all.</p>
 <h3 id="strip-versus-spoof">Strip versus spoof</h3>
 <p>Removing every tag is not always the least conspicuous choice. A file with <em>no</em> metadata whatsoever is itself a signal: it says the sender was trying to hide something, and it stands out in a set of otherwise ordinary files. <code>Policy</code> therefore offers two approaches:</p>
 <ul>
-<li><code>Policy::Strip</code> &#8212; remove everything. Best when the file is expected to be sanitised anyway, or when any false statement would be worse than an obvious absence.</li>
-<li><code>Policy::Realistic</code> &#8212; replace the tags with plausible, non-identifying values so the file looks unremarkable rather than scrubbed.</li>
+<li><code>Policy::Strip</code> removes everything. Best when the file is expected to be sanitised anyway, or when any false statement would be worse than an obvious absence.</li>
+<li><code>Policy::Realistic</code> replaces the tags with plausible, non-identifying values so the file looks unremarkable rather than scrubbed.</li>
 </ul>
 <h3 id="what-this-crate-cannot-do">What this crate cannot do</h3>
-<p>It removes <em>container</em> metadata. It cannot remove information encoded in the media itself: a photograph still shows the room it was taken in, and audio still carries its room acoustics and background noise. Nor does it touch filesystem timestamps or the filename, both of which are outside the file &#8212; callers that care must handle those separately.</p>
+<p>It removes <em>container</em> metadata. It cannot remove information encoded in the media itself: a photograph still shows the room it was taken in, and audio still carries its room acoustics and background noise. Nor does it touch filesystem timestamps or the filename, both of which are outside the file, callers that care must handle those separately.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>This strips the hidden labels off a file.</p>
 <p>Photographs and recordings carry information you never typed: where the picture was taken, which phone or microphone made it, what the file was called before, sometimes a name. Removing the sound of a voice and leaving that behind would be pointless, so this takes it out -- not by blanking the fields, but by removing the parts of the file that hold them.</p>

@@ -8,7 +8,7 @@
 //! You set a calling program to VeilVoice's virtual cable, you start live mode,
 //! and everything is veiled. Then you plug in a headset. Windows offers the new
 //! microphone, the calling program takes it, and from that moment your **real
-//! voice** is going out — with the veiled window still open in front of you,
+//! voice** is going out, with the veiled window still open in front of you,
 //! still showing meters moving, still looking exactly as it did a second ago.
 //!
 //! Nobody notices that. It is not a mistake somebody makes through
@@ -23,14 +23,14 @@
 //! while you are veiling, that is the accident, and Failsafe:
 //!
 //! 1. says so, loudly, because a silent guard is not a guard; and
-//! 2. closes that program, if [`Posture::CloseIt`] is set — which it is by
+//! 2. closes that program, if [`Posture::CloseIt`] is set, which it is by
 //!    default, because a warning you have not read yet does not stop your voice
 //!    going out.
 //!
 //! It **cannot stop the operating system handing a microphone to another
 //! program in the first place.** Doing that needs exclusive-mode capture of
 //! every input device, or a driver, and neither is something this project
-//! ships — see [`CANNOT_PREVENT`], which is the wording a front end must show.
+//! ships. See [`CANNOT_PREVENT`], which is the wording a front end must show.
 //! What Failsafe does is notice within a second or so and act. That is a real
 //! difference from nothing, and it is a real difference from prevention, and
 //! both halves have to be said.
@@ -62,7 +62,7 @@
 //! that program so your voice stops going out.
 //!
 //! What it cannot do is stop your computer from handing the microphone over in
-//! the first place — that needs a level of access this program does not have,
+//! the first place, because that needs a level of access this program does not have,
 //! and it says so rather than letting you believe otherwise. It notices, and it
 //! acts, within about a second.
 

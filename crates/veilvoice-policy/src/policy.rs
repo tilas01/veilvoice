@@ -10,7 +10,7 @@
 //! [`Posture::is_at_least_as_strict_as`] exists so a test can hold it.
 //!
 //! Anybody adding a variant should read [`crate`]'s documentation first. A
-//! loosening variant does not merely add a feature — it removes the reason the
+//! loosening variant does not merely add a feature: it removes the reason the
 //! plain file can be read without a passphrase.
 //!
 //! # Format
@@ -130,7 +130,7 @@ impl Requirement {
 
 /// The settings a policy can reach, as a front end holds them.
 ///
-/// Deliberately small. This is not a copy of the preferences file — it is the
+/// Deliberately small. This is not a copy of the preferences file. It is the
 /// subset a policy is allowed to constrain, which is the subset where being
 /// *more* strict is never a loss.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -372,7 +372,7 @@ impl Policy {
     /// Seal the policy under a passphrase.
     ///
     /// The sealed copy is what proves the plain one is the policy that was
-    /// written. It is not what makes the policy apply — see [`crate`].
+    /// written. It is not what makes the policy apply. See [`crate`].
     pub fn seal(&self, password: &[u8]) -> Result<Vec<u8>, Error> {
         Ok(veilvoice_crypto::container::seal_with_password(
             password,

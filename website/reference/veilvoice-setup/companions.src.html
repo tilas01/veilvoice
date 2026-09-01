@@ -48,8 +48,8 @@
 <span class="ln" id="L5"><span class="tok-com">//! of VeilVoice. A virtual audio cable is what lets live mode feed a veiled</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! microphone into a video call; an audio editor is how most people trim a</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! recording before veiling it. This module says which are already on the</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! machine, who makes each one, under what licence, and &#8212; for the ones that</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! are not &#8212; exactly what command would install it.</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! machine, who makes each one, under what licence, and, for the ones that</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! are not, exactly what command would install it.</span></span>
 <span class="ln" id="L10"><span class="tok-com">//!</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! # Three rules, and none of them relaxes</span></span>
 <span class="ln" id="L12"><span class="tok-com">//!</span></span>
@@ -58,7 +58,7 @@
 <span class="ln" id="L15"><span class="tok-com">//! is a separate deliberate act by the caller, on one named program at a time.</span></span>
 <span class="ln" id="L16"><span class="tok-com">//!</span></span>
 <span class="ln" id="L17"><span class="tok-com">//! **VeilVoice never runs somebody else&#x27;s installer.** Where the software is</span></span>
-<span class="ln" id="L18"><span class="tok-com">//! proprietary or ships as a driver &#8212; VB-CABLE is both &#8212; the offer is to open</span></span>
+<span class="ln" id="L18"><span class="tok-com">//! proprietary or ships as a driver, and VB-CABLE is both, the offer is to open</span></span>
 <span class="ln" id="L19"><span class="tok-com">//! the vendor&#x27;s page, not to fetch and execute an unverified binary. This</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! project&#x27;s front page is about verifying what you run; downloading a signed</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! release, checking its signature, and then silently running an unchecked</span></span>
@@ -82,7 +82,7 @@
 <span class="ln" id="L39"><span class="tok-com">//!</span></span>
 <span class="ln" id="L40"><span class="tok-com">//! The probes look where each program installs itself by default. Somebody who</span></span>
 <span class="ln" id="L41"><span class="tok-com">//! has put Audacity somewhere unusual will be told it was not detected, which</span></span>
-<span class="ln" id="L42"><span class="tok-com">//! is exactly what the words say &#8212; [`Presence::NotDetected`] is not a claim</span></span>
+<span class="ln" id="L42"><span class="tok-com">//! is exactly what the words say: [`Presence::NotDetected`] is not a claim</span></span>
 <span class="ln" id="L43"><span class="tok-com">//! that the software is absent from the machine.</span></span>
 <span class="ln" id="L44"><span class="tok-com">//!</span></span>
 <span class="ln" id="L45"><span class="tok-com">//! # In plain words</span></span>
@@ -101,7 +101,7 @@
 <span class="ln" id="L57"><span class="tok-com">/// What a probe found.</span></span>
 <span class="ln" id="L58"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq)]</span>
 <span class="ln" id="L59"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Presence {</span>
-<span class="ln" id="L60">    <span class="tok-com">/// Found, with the evidence that found it &#8212; a path, so the user can check.</span></span>
+<span class="ln" id="L60">    <span class="tok-com">/// Found, with the evidence that found it: a path, so the user can check.</span></span>
 <span class="ln" id="L61">    <span class="tok-fn">Present</span>(String),</span>
 <span class="ln" id="L62">    <span class="tok-com">/// The usual locations were readable and it was not in them.</span></span>
 <span class="ln" id="L63">    <span class="tok-com">///</span></span>
@@ -172,7 +172,7 @@
 <span class="ln" id="L120">    <span class="tok-com">/// True when a front end may run this itself.</span></span>
 <span class="ln" id="L121">    <span class="tok-com">///</span></span>
 <span class="ln" id="L122">    <span class="tok-com">/// False for everything that needs privilege, opens a browser, or has no</span></span>
-<span class="ln" id="L123">    <span class="tok-com">/// route &#8212; each of which is a decision for the person at the keyboard.</span></span>
+<span class="ln" id="L123">    <span class="tok-com">/// route, each of which is a decision for the person at the keyboard.</span></span>
 <span class="ln" id="L124">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_runnable</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
 <span class="ln" id="L125">        matches!(</span>
 <span class="ln" id="L126">            <span class="tok-kw">self</span>,</span>
