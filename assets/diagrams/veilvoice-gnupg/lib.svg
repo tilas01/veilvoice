@@ -79,30 +79,30 @@
 <text x="253.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Gnupg::verify</text>
 <text x="253.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 341</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L393" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L419" target="_blank" rel="noopener noreferrer">
 <rect x="99.4" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="161.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status_lines</text>
-<text x="161.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 393</text>
+<text x="161.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 419</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L406" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L432" target="_blank" rel="noopener noreferrer">
 <rect x="250.1" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="296.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
-<text x="296.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 406</text>
+<text x="296.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 432</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L423" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L449" target="_blank" rel="noopener noreferrer">
 <rect x="266.2" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="312.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fields</text>
-<text x="312.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 423</text>
+<text x="312.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 449</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L436" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L462" target="_blank" rel="noopener noreferrer">
 <rect x="368.6" y="420.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="447.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">same_fingerprint</text>
-<text x="447.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 436</text>
+<text x="447.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 462</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L452" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gnupg/src/lib.rs#L478" target="_blank" rel="noopener noreferrer">
 <rect x="345.6" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="391.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">commands</text>
-<text x="391.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 452</text>
+<text x="391.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 478</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>

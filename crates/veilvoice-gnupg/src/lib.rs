@@ -357,8 +357,34 @@ impl Gnupg {
         // F-100: *every* `VALIDSIG`, not the first. A file can carry more than
         // one signature and the expected key's may not be the one GnuPG prints
         // first.
+        // **F-104.** Every fingerprint a `VALIDSIG` names, not only the first.
+        //
+        // The line is
+        //
+        //   VALIDSIG <signing key> <date> <ts> <expire> <version> <reserved>
+        //            <pubkey-algo> <hash-algo> <sig-class> <primary key>
+        //
+        // and the **first** field is the key that made the signature while the
+        // **last** is the primary key it belongs to. Only the first was read.
+        //
+        // For a key that signs with itself those two are the same string and
+        // the mistake is invisible, which is exactly the key this was measured
+        // against while it was being written. This project's release key signs
+        // with a subkey, as most do, so on the real thing they differ: the
+        // published fingerprint is the primary key's and the signature carries
+        // the subkey's.
+        //
+        // The result was a verifier that called a genuine, correctly signed
+        // release **unverified**, in the loudest words it has, for every reader
+        // with GnuPG installed. Found by running it against the published
+        // v0.1.15 rather than against a fixture.
         let signers: Vec<String> = fields(&status, "VALIDSIG")
-            .filter_map(|valid| valid.split_whitespace().next())
+            .flat_map(|valid| {
+                let parts: Vec<&str> = valid.split_whitespace().collect();
+                let first = parts.first().copied();
+                let last = parts.last().copied().filter(|_| parts.len() > 1);
+                [first, last].into_iter().flatten().collect::<Vec<&str>>()
+            })
             .map(str::to_string)
             .collect();
         let outcome = if !signers.is_empty() {
@@ -557,6 +583,56 @@ mod tests {
         );
         let signers: Vec<&str> = fields(&neither, "VALIDSIG")
             .filter_map(|v| v.split_whitespace().next())
+            .collect();
+        assert!(!signers.iter().any(|s| same_fingerprint(s, FINGERPRINT)));
+    }
+
+    /// **F-104.** A signature made by a subkey belongs to its primary key.
+    ///
+    /// `VALIDSIG` names the signing key first and the primary key last, and
+    /// only the first was read. For a key that signs with itself the two are
+    /// the same string and the mistake cannot be seen, which is the shape of
+    /// key this was first measured against. This project's release key signs
+    /// with a subkey, so the real release exercised the case the fixture could
+    /// not, and the verifier called a genuine release unverified.
+    ///
+    /// The line below is the one GnuPG actually printed for v0.1.15.
+    #[test]
+    fn a_signature_made_by_a_subkey_is_the_primary_key_that_owns_it() {
+        let real = status_lines(
+            b"[GNUPG:] VALIDSIG 83ABD67A93772B3FA15D2642BD752A144704C231 2026-09-01 1788263691 0 4 0 1 10 00 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A\n",
+        );
+        let signers: Vec<String> = fields(&real, "VALIDSIG")
+            .flat_map(|valid| {
+                let parts: Vec<&str> = valid.split_whitespace().collect();
+                let first = parts.first().copied();
+                let last = parts.last().copied().filter(|_| parts.len() > 1);
+                [first, last].into_iter().flatten().collect::<Vec<&str>>()
+            })
+            .map(str::to_string)
+            .collect();
+        assert!(
+            signers.iter().any(|s| same_fingerprint(s, FINGERPRINT)),
+            "the primary key is the one published, and it signed this: {signers:?}"
+        );
+        // And the subkey is still reported, so nothing is lost by looking at
+        // both: a caller expecting the subkey's fingerprint also matches.
+        assert!(signers
+            .iter()
+            .any(|s| same_fingerprint(s, "83ABD67A93772B3FA15D2642BD752A144704C231")));
+
+        // A signature by a key that is neither is still refused.
+        let other = status_lines(
+            b"[GNUPG:] VALIDSIG 1111111111111111111111111111111111111111 2026-09-01 1 0 4 0 1 10 00 2222222222222222222222222222222222222222\n",
+        );
+        let signers: Vec<String> = fields(&other, "VALIDSIG")
+            .flat_map(|valid| {
+                let parts: Vec<&str> = valid.split_whitespace().collect();
+                let first = parts.first().copied();
+                let last = parts.last().copied().filter(|_| parts.len() > 1);
+                [first, last].into_iter().flatten().collect::<Vec<&str>>()
+            })
+            .map(str::to_string)
             .collect();
         assert!(!signers.iter().any(|s| same_fingerprint(s, FINGERPRINT)));
     }
