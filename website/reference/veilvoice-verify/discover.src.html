@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/discover.rs</code></h1>
-<p style="color:var(--muted)"><a href="discover.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 364 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="discover.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 460 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/discover.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -83,8 +83,8 @@
 <span class="ln" id="L40"><span class="tok-com">//! Looks for a downloaded release to check, so you can double-click the verifier</span></span>
 <span class="ln" id="L41"><span class="tok-com">//! and have it work.</span></span>
 <span class="ln" id="L42"><span class="tok-com">//!</span></span>
-<span class="ln" id="L43"><span class="tok-com">//! It looks in the folder it is in, the current folder, and your Downloads and</span></span>
-<span class="ln" id="L44"><span class="tok-com">//! Desktop. If it finds nothing it says exactly where it looked, rather than</span></span>
+<span class="ln" id="L43"><span class="tok-com">//! It looks in the folder it is in, the current folder, one level up from each</span></span>
+<span class="ln" id="L44"><span class="tok-com">//! of those, and your Downloads and Desktop. If it finds nothing it says exactly where it looked, rather than</span></span>
 <span class="ln" id="L45"><span class="tok-com">//! reporting a failure that leaves you guessing.</span></span>
 <span class="ln" id="L46"></span>
 <span class="ln" id="L47"><span class="tok-kw">use</span> std::path::{Path, PathBuf};</span>
@@ -221,214 +221,310 @@
 <span class="ln" id="L157">        }</span>
 <span class="ln" id="L158">    };</span>
 <span class="ln" id="L159"></span>
-<span class="ln" id="L160">    <span class="tok-fn">add</span>(explicit.<span class="tok-fn">map</span>(Path::to_path_buf));</span>
-<span class="ln" id="L161">    <span class="tok-fn">add</span>(std::env::<span class="tok-fn">current_dir</span>().<span class="tok-fn">ok</span>());</span>
-<span class="ln" id="L162">    <span class="tok-com">// Where somebody who unpacked the archive and ran the verifier inside it</span></span>
-<span class="ln" id="L163">    <span class="tok-com">// will be. `current_exe` can fail on a deleted or moved binary, which is</span></span>
-<span class="ln" id="L164">    <span class="tok-com">// not worth an error -- it simply means one fewer place to look.</span></span>
-<span class="ln" id="L165">    <span class="tok-fn">add</span>(std::env::<span class="tok-fn">current_exe</span>()</span>
-<span class="ln" id="L166">        .<span class="tok-fn">ok</span>()</span>
-<span class="ln" id="L167">        .<span class="tok-fn">and_then</span>(|exe| exe.<span class="tok-fn">parent</span>().<span class="tok-fn">map</span>(Path::to_path_buf)));</span>
-<span class="ln" id="L168"></span>
-<span class="ln" id="L169">    <span class="tok-kw">for</span> home <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L170">        std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;USERPROFILE&quot;</span>).<span class="tok-fn">map</span>(PathBuf::from),</span>
-<span class="ln" id="L171">        std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;HOME&quot;</span>).<span class="tok-fn">map</span>(PathBuf::from),</span>
-<span class="ln" id="L172">    ]</span>
-<span class="ln" id="L173">    .<span class="tok-fn">into_iter</span>()</span>
-<span class="ln" id="L174">    .<span class="tok-fn">flatten</span>()</span>
-<span class="ln" id="L175">    {</span>
-<span class="ln" id="L176">        <span class="tok-fn">add</span>(<span class="tok-fn">Some</span>(home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;Downloads&quot;</span>)));</span>
-<span class="ln" id="L177">        <span class="tok-fn">add</span>(<span class="tok-fn">Some</span>(home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;Desktop&quot;</span>)));</span>
-<span class="ln" id="L178">    }</span>
-<span class="ln" id="L179">    places</span>
-<span class="ln" id="L180">}</span>
+<span class="ln" id="L160">    <span class="tok-kw">let</span> here = std::env::<span class="tok-fn">current_dir</span>().<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L161">    <span class="tok-com">// Where somebody who unpacked the archive and ran the verifier inside it</span></span>
+<span class="ln" id="L162">    <span class="tok-com">// will be. `current_exe` can fail on a deleted or moved binary, which is</span></span>
+<span class="ln" id="L163">    <span class="tok-com">// not worth an error -- it simply means one fewer place to look.</span></span>
+<span class="ln" id="L164">    <span class="tok-kw">let</span> beside_the_program = std::env::<span class="tok-fn">current_exe</span>()</span>
+<span class="ln" id="L165">        .<span class="tok-fn">ok</span>()</span>
+<span class="ln" id="L166">        .<span class="tok-fn">and_then</span>(|exe| exe.<span class="tok-fn">parent</span>().<span class="tok-fn">map</span>(Path::to_path_buf));</span>
+<span class="ln" id="L167"></span>
+<span class="ln" id="L168">    <span class="tok-fn">add</span>(explicit.<span class="tok-fn">map</span>(Path::to_path_buf));</span>
+<span class="ln" id="L169">    <span class="tok-fn">add</span>(here.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L170">    <span class="tok-fn">add</span>(beside_the_program.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L171"></span>
+<span class="ln" id="L172">    <span class="tok-com">// F-107. One level up from each of those, which is where the download</span></span>
+<span class="ln" id="L173">    <span class="tok-com">// actually is.</span></span>
+<span class="ln" id="L174">    <span class="tok-com">//</span></span>
+<span class="ln" id="L175">    <span class="tok-com">// Every archive tool unpacks `veilvoice-vX.Y.Z-linux-x86_64.tar.gz` into a</span></span>
+<span class="ln" id="L176">    <span class="tok-com">// folder of that name, beside the archive. So somebody who downloads a</span></span>
+<span class="ln" id="L177">    <span class="tok-com">// release, extracts it, opens the new folder and runs the program in it is</span></span>
+<span class="ln" id="L178">    <span class="tok-com">// standing in a directory that holds the binaries and none of the things</span></span>
+<span class="ln" id="L179">    <span class="tok-com">// they are checked against: `SHA256SUMS`, its signature and the archive are</span></span>
+<span class="ln" id="L180">    <span class="tok-com">// all one level above. That is the single most likely way this program is</span></span>
+<span class="ln" id="L181">    <span class="tok-com">// ever run, and it was the one arrangement that reported &quot;no VeilVoice</span></span>
+<span class="ln" id="L182">    <span class="tok-com">// release was found to check&quot;.</span></span>
+<span class="ln" id="L183">    <span class="tok-com">//</span></span>
+<span class="ln" id="L184">    <span class="tok-com">// One level only. Two would start reading directories that have nothing to</span></span>
+<span class="ln" id="L185">    <span class="tok-com">// do with the download, and a verifier that goes wandering through a</span></span>
+<span class="ln" id="L186">    <span class="tok-com">// stranger&#x27;s filesystem looking for something to check is a worse thing</span></span>
+<span class="ln" id="L187">    <span class="tok-com">// than one that asks for a directory.</span></span>
+<span class="ln" id="L188">    <span class="tok-com">// The directory named on the command line gets the same treatment as the</span></span>
+<span class="ln" id="L189">    <span class="tok-com">// one we are standing in. Somebody who types the extracted folder&#x27;s name</span></span>
+<span class="ln" id="L190">    <span class="tok-com">// means the same thing as somebody who walks into it.</span></span>
+<span class="ln" id="L191">    <span class="tok-fn">add</span>(explicit.<span class="tok-fn">and_then</span>(Path::parent).<span class="tok-fn">map</span>(Path::to_path_buf));</span>
+<span class="ln" id="L192">    <span class="tok-fn">add</span>(here</span>
+<span class="ln" id="L193">        .<span class="tok-fn">as_deref</span>()</span>
+<span class="ln" id="L194">        .<span class="tok-fn">and_then</span>(Path::parent)</span>
+<span class="ln" id="L195">        .<span class="tok-fn">map</span>(Path::to_path_buf));</span>
+<span class="ln" id="L196">    <span class="tok-fn">add</span>(beside_the_program</span>
+<span class="ln" id="L197">        .<span class="tok-fn">as_deref</span>()</span>
+<span class="ln" id="L198">        .<span class="tok-fn">and_then</span>(Path::parent)</span>
+<span class="ln" id="L199">        .<span class="tok-fn">map</span>(Path::to_path_buf));</span>
+<span class="ln" id="L200"></span>
+<span class="ln" id="L201">    <span class="tok-kw">for</span> home <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L202">        std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;USERPROFILE&quot;</span>).<span class="tok-fn">map</span>(PathBuf::from),</span>
+<span class="ln" id="L203">        std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;HOME&quot;</span>).<span class="tok-fn">map</span>(PathBuf::from),</span>
+<span class="ln" id="L204">    ]</span>
+<span class="ln" id="L205">    .<span class="tok-fn">into_iter</span>()</span>
+<span class="ln" id="L206">    .<span class="tok-fn">flatten</span>()</span>
+<span class="ln" id="L207">    {</span>
+<span class="ln" id="L208">        <span class="tok-fn">add</span>(<span class="tok-fn">Some</span>(home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;Downloads&quot;</span>)));</span>
+<span class="ln" id="L209">        <span class="tok-fn">add</span>(<span class="tok-fn">Some</span>(home.<span class="tok-fn">join</span>(<span class="tok-str">&quot;Desktop&quot;</span>)));</span>
+<span class="ln" id="L210">    }</span>
+<span class="ln" id="L211">    places</span>
+<span class="ln" id="L212">}</span>
 </span>
-<span class="ln" id="L181"></span>
+<span class="ln" id="L213"></span>
 <span class="src-item" id="fn-search">
-<span class="ln" id="L182"><span class="tok-com">/// Look everywhere worth looking and return the first directory that holds a</span></span>
-<span class="ln" id="L183"><span class="tok-com">/// complete, checkable set, or, failing that, everything that turned up.</span></span>
-<span class="ln" id="L184"><span class="tok-com">///</span></span>
-<span class="ln" id="L185"><span class="tok-com">/// &quot;Complete&quot; means an archive, a hash list and a signature in one place, which</span></span>
-<span class="ln" id="L186"><span class="tok-com">/// is what an offline check needs. A directory with an archive and no hash list</span></span>
-<span class="ln" id="L187"><span class="tok-com">/// is reported rather than used: it is exactly the situation where somebody</span></span>
-<span class="ln" id="L188"><span class="tok-com">/// needs to be told what else to download, and silently reaching for a hash</span></span>
-<span class="ln" id="L189"><span class="tok-com">/// list from a *different* directory would be checking one release against</span></span>
-<span class="ln" id="L190"><span class="tok-com">/// another&#x27;s list.</span></span>
-<span class="ln" id="L191"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">search</span>(explicit: Option&lt;&amp;Path&gt;) -&gt; (Option&lt;Found&gt;, Vec&lt;Found&gt;) {</span>
-<span class="ln" id="L192">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> all = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L193">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> complete = None;</span>
-<span class="ln" id="L194">    <span class="tok-kw">for</span> place <span class="tok-kw">in</span> <span class="tok-fn">places</span>(explicit) {</span>
-<span class="ln" id="L195">        <span class="tok-kw">let</span> found = <span class="tok-fn">look_in</span>(&amp;place);</span>
-<span class="ln" id="L196">        <span class="tok-kw">if</span> found.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L197">            continue;</span>
-<span class="ln" id="L198">        }</span>
-<span class="ln" id="L199">        <span class="tok-kw">if</span> complete.<span class="tok-fn">is_none</span>() &amp;&amp; found.<span class="tok-fn">is_complete</span>() {</span>
-<span class="ln" id="L200">            complete = <span class="tok-fn">Some</span>(found.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L201">        }</span>
-<span class="ln" id="L202">        all.<span class="tok-fn">push</span>(found);</span>
-<span class="ln" id="L203">    }</span>
-<span class="ln" id="L204">    (complete, all)</span>
-<span class="ln" id="L205">}</span>
+<span class="ln" id="L214"><span class="tok-com">/// Look everywhere worth looking and return the first directory that holds a</span></span>
+<span class="ln" id="L215"><span class="tok-com">/// complete, checkable set, or, failing that, everything that turned up.</span></span>
+<span class="ln" id="L216"><span class="tok-com">///</span></span>
+<span class="ln" id="L217"><span class="tok-com">/// &quot;Complete&quot; means an archive, a hash list and a signature in one place, which</span></span>
+<span class="ln" id="L218"><span class="tok-com">/// is what an offline check needs. A directory with an archive and no hash list</span></span>
+<span class="ln" id="L219"><span class="tok-com">/// is reported rather than used: it is exactly the situation where somebody</span></span>
+<span class="ln" id="L220"><span class="tok-com">/// needs to be told what else to download, and silently reaching for a hash</span></span>
+<span class="ln" id="L221"><span class="tok-com">/// list from a *different* directory would be checking one release against</span></span>
+<span class="ln" id="L222"><span class="tok-com">/// another&#x27;s list.</span></span>
+<span class="ln" id="L223"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">search</span>(explicit: Option&lt;&amp;Path&gt;) -&gt; (Option&lt;Found&gt;, Vec&lt;Found&gt;) {</span>
+<span class="ln" id="L224">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> all = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L225">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> complete = None;</span>
+<span class="ln" id="L226">    <span class="tok-kw">for</span> place <span class="tok-kw">in</span> <span class="tok-fn">places</span>(explicit) {</span>
+<span class="ln" id="L227">        <span class="tok-kw">let</span> found = <span class="tok-fn">look_in</span>(&amp;place);</span>
+<span class="ln" id="L228">        <span class="tok-kw">if</span> found.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L229">            continue;</span>
+<span class="ln" id="L230">        }</span>
+<span class="ln" id="L231">        <span class="tok-kw">if</span> complete.<span class="tok-fn">is_none</span>() &amp;&amp; found.<span class="tok-fn">is_complete</span>() {</span>
+<span class="ln" id="L232">            complete = <span class="tok-fn">Some</span>(found.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L233">        }</span>
+<span class="ln" id="L234">        all.<span class="tok-fn">push</span>(found);</span>
+<span class="ln" id="L235">    }</span>
+<span class="ln" id="L236">    (complete, all)</span>
+<span class="ln" id="L237">}</span>
 </span>
-<span class="ln" id="L206"></span>
-<span class="ln" id="L207"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L208"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L209">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L210"></span>
-<span class="ln" id="L211">    <span class="tok-kw">fn</span> <span class="tok-fn">touch</span>(dir: &amp;Path, name: &amp;str) -&gt; PathBuf {</span>
-<span class="ln" id="L212">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(name);</span>
-<span class="ln" id="L213">        std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;x&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L214">        path</span>
-<span class="ln" id="L215">    }</span>
-<span class="ln" id="L216"></span>
-<span class="ln" id="L217">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L218">    <span class="tok-kw">fn</span> <span class="tok-fn">the_published_archive_names_are_recognised</span>() {</span>
-<span class="ln" id="L219">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L220">            <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>,</span>
-<span class="ln" id="L221">            <span class="tok-str">&quot;veilvoice-v0.1.12-linux-x86_64.tar.gz&quot;</span>,</span>
-<span class="ln" id="L222">            <span class="tok-str">&quot;veilvoice-v0.1.11-openbsd-x86_64.tar.gz&quot;</span>,</span>
-<span class="ln" id="L223">            <span class="tok-str">&quot;VeilVoice-v0.1.12-macos-aarch64.tar.xz&quot;</span>,</span>
-<span class="ln" id="L224">        ] {</span>
-<span class="ln" id="L225">            assert!(<span class="tok-fn">looks_like_archive</span>(name), <span class="tok-str">&quot;{name}&quot;</span>);</span>
-<span class="ln" id="L226">        }</span>
-<span class="ln" id="L227">    }</span>
-<span class="ln" id="L228"></span>
-<span class="ln" id="L229">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L230">    <span class="tok-kw">fn</span> <span class="tok-fn">anything_else_is_not_a_candidate</span>() {</span>
-<span class="ln" id="L231">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L232">            <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L233">            <span class="tok-str">&quot;notveilvoice.zip&quot;</span>,</span>
-<span class="ln" id="L234">            <span class="tok-str">&quot;veilvoice.txt&quot;</span>,</span>
-<span class="ln" id="L235">            <span class="tok-str">&quot;veilvoice-v0.1.12.exe&quot;</span>,</span>
-<span class="ln" id="L236">            <span class="tok-str">&quot;SHA256SUMS&quot;</span>,</span>
-<span class="ln" id="L237">            <span class="tok-str">&quot;readme-veilvoice-v1.zip&quot;</span>,</span>
-<span class="ln" id="L238">        ] {</span>
-<span class="ln" id="L239">            assert!(!<span class="tok-fn">looks_like_archive</span>(name), <span class="tok-str">&quot;{name}&quot;</span>);</span>
-<span class="ln" id="L240">        }</span>
-<span class="ln" id="L241">    }</span>
+<span class="ln" id="L238"></span>
+<span class="ln" id="L239"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L240"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L241">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L242"></span>
-<span class="ln" id="L243">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L244">    <span class="tok-kw">fn</span> <span class="tok-fn">a_complete_directory_is_recognised</span>() {</span>
-<span class="ln" id="L245">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L246">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
-<span class="ln" id="L247">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), SUMS);</span>
-<span class="ln" id="L248">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), SUMS_SIG);</span>
-<span class="ln" id="L249">        <span class="tok-kw">let</span> found = <span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L250">        assert!(found.<span class="tok-fn">is_complete</span>());</span>
-<span class="ln" id="L251">        assert!(!found.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L252">        assert!(found.<span class="tok-fn">missing</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L253">        assert_eq!(found.archives.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L254">    }</span>
-<span class="ln" id="L255"></span>
-<span class="ln" id="L256">    <span class="tok-com">/// The case somebody actually hits: the archive downloaded, the hash list</span></span>
-<span class="ln" id="L257">    <span class="tok-com">/// forgotten. They need to be told which, not left with a failure.</span></span>
-<span class="ln" id="L258">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L259">    <span class="tok-kw">fn</span> <span class="tok-fn">a_directory_missing_the_hash_list_says_which_part_is_missing</span>() {</span>
-<span class="ln" id="L260">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L261">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
-<span class="ln" id="L262">        <span class="tok-kw">let</span> found = <span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L263">        assert!(!found.<span class="tok-fn">is_complete</span>());</span>
-<span class="ln" id="L264">        assert!(!found.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L265">        <span class="tok-kw">let</span> missing = found.<span class="tok-fn">missing</span>();</span>
-<span class="ln" id="L266">        assert!(missing.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;no SHA256SUMS&quot;</span>), <span class="tok-str">&quot;{missing:?}&quot;</span>);</span>
-<span class="ln" id="L267">        assert!(missing.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;no SHA256SUMS.asc&quot;</span>), <span class="tok-str">&quot;{missing:?}&quot;</span>);</span>
-<span class="ln" id="L268">        assert!(!missing.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;no release archive&quot;</span>), <span class="tok-str">&quot;{missing:?}&quot;</span>);</span>
-<span class="ln" id="L269">    }</span>
+<span class="ln" id="L243">    <span class="tok-kw">fn</span> <span class="tok-fn">touch</span>(dir: &amp;Path, name: &amp;str) -&gt; PathBuf {</span>
+<span class="ln" id="L244">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(name);</span>
+<span class="ln" id="L245">        std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;x&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L246">        path</span>
+<span class="ln" id="L247">    }</span>
+<span class="ln" id="L248"></span>
+<span class="ln" id="L249">    <span class="tok-com">/// F-107. The download is one level up from the folder you extracted.</span></span>
+<span class="ln" id="L250">    <span class="tok-com">///</span></span>
+<span class="ln" id="L251">    <span class="tok-com">/// Reproduces the arrangement every archive tool produces and every user</span></span>
+<span class="ln" id="L252">    <span class="tok-com">/// therefore has: the archive, `SHA256SUMS` and its signature in one</span></span>
+<span class="ln" id="L253">    <span class="tok-com">/// directory, and the unpacked folder beside them. Standing in that folder</span></span>
+<span class="ln" id="L254">    <span class="tok-com">/// and asking for a check has to find the release, because it is the most</span></span>
+<span class="ln" id="L255">    <span class="tok-com">/// likely way this program is ever run, and it was the one arrangement</span></span>
+<span class="ln" id="L256">    <span class="tok-com">/// that answered &quot;no VeilVoice release was found to check&quot;.</span></span>
+<span class="ln" id="L257">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L258">    <span class="tok-kw">fn</span> <span class="tok-fn">a_release_one_level_up_from_the_extracted_folder_is_found</span>() {</span>
+<span class="ln" id="L259">        <span class="tok-kw">let</span> download = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L260">        <span class="tok-fn">touch</span>(download.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64.tar.gz&quot;</span>);</span>
+<span class="ln" id="L261">        <span class="tok-fn">touch</span>(download.<span class="tok-fn">path</span>(), SUMS);</span>
+<span class="ln" id="L262">        <span class="tok-fn">touch</span>(download.<span class="tok-fn">path</span>(), SUMS_SIG);</span>
+<span class="ln" id="L263"></span>
+<span class="ln" id="L264">        <span class="tok-com">// What `tar` leaves behind: a folder named after the archive, holding</span></span>
+<span class="ln" id="L265">        <span class="tok-com">// the binaries and none of the things they are checked against.</span></span>
+<span class="ln" id="L266">        <span class="tok-kw">let</span> extracted = download.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>);</span>
+<span class="ln" id="L267">        std::fs::<span class="tok-fn">create_dir</span>(&amp;extracted).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L268">        <span class="tok-fn">touch</span>(&amp;extracted, <span class="tok-str">&quot;veilvoice&quot;</span>);</span>
+<span class="ln" id="L269">        <span class="tok-fn">touch</span>(&amp;extracted, <span class="tok-str">&quot;veilvoice-verify&quot;</span>);</span>
 <span class="ln" id="L270"></span>
-<span class="ln" id="L271">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L272">    <span class="tok-kw">fn</span> <span class="tok-fn">several_archives_come_back_in_a_stable_order</span>() {</span>
-<span class="ln" id="L273">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L274">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
-<span class="ln" id="L275">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-linux-x86_64.tar.gz&quot;</span>);</span>
-<span class="ln" id="L276">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-macos-aarch64.tar.gz&quot;</span>);</span>
-<span class="ln" id="L277">        <span class="tok-kw">let</span> first = <span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L278">        <span class="tok-kw">let</span> second = <span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L279">        assert_eq!(first.archives.<span class="tok-fn">len</span>(), <span class="tok-num">3</span>);</span>
-<span class="ln" id="L280">        assert_eq!(first.archives, second.archives);</span>
-<span class="ln" id="L281">    }</span>
-<span class="ln" id="L282"></span>
-<span class="ln" id="L283">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L284">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_or_missing_directory_finds_nothing_rather_than_failing</span>() {</span>
-<span class="ln" id="L285">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L286">        assert!(<span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L287">        assert!(<span class="tok-fn">look_in</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;not-here&quot;</span>)).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L288">    }</span>
-<span class="ln" id="L289"></span>
-<span class="ln" id="L290">    <span class="tok-com">/// A directory of unrelated files must not produce candidates.</span></span>
-<span class="ln" id="L291">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L292">    <span class="tok-kw">fn</span> <span class="tok-fn">unrelated_files_are_not_candidates</span>() {</span>
-<span class="ln" id="L293">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L294">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;holiday.zip&quot;</span>);</span>
-<span class="ln" id="L295">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;notes.txt&quot;</span>);</span>
-<span class="ln" id="L296">        assert!(<span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L297">    }</span>
-<span class="ln" id="L298"></span>
-<span class="ln" id="L299">    <span class="tok-com">/// A directory is only ever searched one level deep. A recursive walk of a</span></span>
-<span class="ln" id="L300">    <span class="tok-com">/// home directory is slow, surprising, and lets a verifier wander into</span></span>
-<span class="ln" id="L301">    <span class="tok-com">/// places nobody asked about.</span></span>
-<span class="ln" id="L302">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L303">    <span class="tok-kw">fn</span> <span class="tok-fn">the_search_does_not_descend</span>() {</span>
-<span class="ln" id="L304">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L305">        <span class="tok-kw">let</span> deeper = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;deeper&quot;</span>);</span>
-<span class="ln" id="L306">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;deeper).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L307">        <span class="tok-fn">touch</span>(&amp;deeper, <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
-<span class="ln" id="L308">        assert!(<span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L309">    }</span>
-<span class="ln" id="L310"></span>
-<span class="ln" id="L311">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L312">    <span class="tok-kw">fn</span> <span class="tok-fn">the_places_list_starts_where_it_was_told_and_has_no_duplicates</span>() {</span>
-<span class="ln" id="L313">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L314">        <span class="tok-kw">let</span> places = <span class="tok-fn">places</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>()));</span>
-<span class="ln" id="L315">        assert_eq!(places[<span class="tok-num">0</span>], dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L316">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sorted = places.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L317">        sorted.<span class="tok-fn">sort</span>();</span>
-<span class="ln" id="L318">        sorted.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L319">        assert_eq!(sorted.<span class="tok-fn">len</span>(), places.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;a place is listed twice&quot;</span>);</span>
-<span class="ln" id="L320">    }</span>
-<span class="ln" id="L321"></span>
-<span class="ln" id="L322">    <span class="tok-com">/// The whole point of the search: it must find a complete set without</span></span>
-<span class="ln" id="L323">    <span class="tok-com">/// being told where anything is.</span></span>
-<span class="ln" id="L324">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L325">    <span class="tok-kw">fn</span> <span class="tok-fn">a_complete_set_is_found_when_it_is_pointed_at</span>() {</span>
-<span class="ln" id="L326">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L327">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
-<span class="ln" id="L328">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), SUMS);</span>
-<span class="ln" id="L329">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), SUMS_SIG);</span>
-<span class="ln" id="L330">        <span class="tok-kw">let</span> (complete, all) = <span class="tok-fn">search</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>()));</span>
-<span class="ln" id="L331">        <span class="tok-kw">let</span> complete = complete.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the set should have been found&quot;</span>);</span>
-<span class="ln" id="L332">        assert_eq!(complete.directory, dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L333">        assert!(!all.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L334">    }</span>
-<span class="ln" id="L335"></span>
-<span class="ln" id="L336">    <span class="tok-com">/// An incomplete directory must be reported rather than silently paired</span></span>
-<span class="ln" id="L337">    <span class="tok-com">/// with a hash list from somewhere else -- which would be checking one</span></span>
-<span class="ln" id="L338">    <span class="tok-com">/// release against another&#x27;s list.</span></span>
+<span class="ln" id="L271">        <span class="tok-com">// Asked about the extracted folder, which is where the user is.</span></span>
+<span class="ln" id="L272">        <span class="tok-kw">let</span> places = <span class="tok-fn">places</span>(<span class="tok-fn">Some</span>(&amp;extracted));</span>
+<span class="ln" id="L273">        assert!(</span>
+<span class="ln" id="L274">            places.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|p| p == download.<span class="tok-fn">path</span>()),</span>
+<span class="ln" id="L275">            <span class="tok-str">&quot;the download directory {:?} is not searched from inside {:?}; \</span></span>
+<span class="ln" id="L276"><span class="tok-str">             searched: {places:?}&quot;</span>,</span>
+<span class="ln" id="L277">            download.<span class="tok-fn">path</span>(),</span>
+<span class="ln" id="L278">            extracted</span>
+<span class="ln" id="L279">        );</span>
+<span class="ln" id="L280"></span>
+<span class="ln" id="L281">        <span class="tok-kw">let</span> (complete, _) = <span class="tok-fn">search</span>(<span class="tok-fn">Some</span>(&amp;extracted));</span>
+<span class="ln" id="L282">        <span class="tok-kw">let</span> complete = complete.<span class="tok-fn">expect</span>(</span>
+<span class="ln" id="L283">            <span class="tok-str">&quot;a complete set sits one level up, and standing in the extracted \</span></span>
+<span class="ln" id="L284"><span class="tok-str">             folder is how this program is normally run&quot;</span>,</span>
+<span class="ln" id="L285">        );</span>
+<span class="ln" id="L286">        assert_eq!(complete.directory, download.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L287">    }</span>
+<span class="ln" id="L288"></span>
+<span class="ln" id="L289">    <span class="tok-com">/// The search stops one level up, and does not go wandering.</span></span>
+<span class="ln" id="L290">    <span class="tok-com">///</span></span>
+<span class="ln" id="L291">    <span class="tok-com">/// A verifier that climbed until it found something to check would read</span></span>
+<span class="ln" id="L292">    <span class="tok-com">/// directories that have nothing to do with the download. One level is the</span></span>
+<span class="ln" id="L293">    <span class="tok-com">/// extract-into-a-subfolder case; anything past it is somebody else&#x27;s</span></span>
+<span class="ln" id="L294">    <span class="tok-com">/// filesystem.</span></span>
+<span class="ln" id="L295">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L296">    <span class="tok-kw">fn</span> <span class="tok-fn">the_search_does_not_climb_past_one_level</span>() {</span>
+<span class="ln" id="L297">        <span class="tok-kw">let</span> root = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L298">        <span class="tok-fn">touch</span>(root.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64.tar.gz&quot;</span>);</span>
+<span class="ln" id="L299">        <span class="tok-fn">touch</span>(root.<span class="tok-fn">path</span>(), SUMS);</span>
+<span class="ln" id="L300">        <span class="tok-fn">touch</span>(root.<span class="tok-fn">path</span>(), SUMS_SIG);</span>
+<span class="ln" id="L301"></span>
+<span class="ln" id="L302">        <span class="tok-kw">let</span> deep = root.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;one&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;two&quot;</span>);</span>
+<span class="ln" id="L303">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;deep).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L304"></span>
+<span class="ln" id="L305">        <span class="tok-kw">let</span> places = <span class="tok-fn">places</span>(<span class="tok-fn">Some</span>(&amp;deep));</span>
+<span class="ln" id="L306">        assert!(</span>
+<span class="ln" id="L307">            !places.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|p| p == root.<span class="tok-fn">path</span>()),</span>
+<span class="ln" id="L308">            <span class="tok-str">&quot;the search reached {:?} from two levels down; searched: {places:?}&quot;</span>,</span>
+<span class="ln" id="L309">            root.<span class="tok-fn">path</span>()</span>
+<span class="ln" id="L310">        );</span>
+<span class="ln" id="L311">    }</span>
+<span class="ln" id="L312"></span>
+<span class="ln" id="L313">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L314">    <span class="tok-kw">fn</span> <span class="tok-fn">the_published_archive_names_are_recognised</span>() {</span>
+<span class="ln" id="L315">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L316">            <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>,</span>
+<span class="ln" id="L317">            <span class="tok-str">&quot;veilvoice-v0.1.12-linux-x86_64.tar.gz&quot;</span>,</span>
+<span class="ln" id="L318">            <span class="tok-str">&quot;veilvoice-v0.1.11-openbsd-x86_64.tar.gz&quot;</span>,</span>
+<span class="ln" id="L319">            <span class="tok-str">&quot;VeilVoice-v0.1.12-macos-aarch64.tar.xz&quot;</span>,</span>
+<span class="ln" id="L320">        ] {</span>
+<span class="ln" id="L321">            assert!(<span class="tok-fn">looks_like_archive</span>(name), <span class="tok-str">&quot;{name}&quot;</span>);</span>
+<span class="ln" id="L322">        }</span>
+<span class="ln" id="L323">    }</span>
+<span class="ln" id="L324"></span>
+<span class="ln" id="L325">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L326">    <span class="tok-kw">fn</span> <span class="tok-fn">anything_else_is_not_a_candidate</span>() {</span>
+<span class="ln" id="L327">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L328">            <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L329">            <span class="tok-str">&quot;notveilvoice.zip&quot;</span>,</span>
+<span class="ln" id="L330">            <span class="tok-str">&quot;veilvoice.txt&quot;</span>,</span>
+<span class="ln" id="L331">            <span class="tok-str">&quot;veilvoice-v0.1.12.exe&quot;</span>,</span>
+<span class="ln" id="L332">            <span class="tok-str">&quot;SHA256SUMS&quot;</span>,</span>
+<span class="ln" id="L333">            <span class="tok-str">&quot;readme-veilvoice-v1.zip&quot;</span>,</span>
+<span class="ln" id="L334">        ] {</span>
+<span class="ln" id="L335">            assert!(!<span class="tok-fn">looks_like_archive</span>(name), <span class="tok-str">&quot;{name}&quot;</span>);</span>
+<span class="ln" id="L336">        }</span>
+<span class="ln" id="L337">    }</span>
+<span class="ln" id="L338"></span>
 <span class="ln" id="L339">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L340">    <span class="tok-kw">fn</span> <span class="tok-fn">an_incomplete_directory_is_reported_and_not_completed_from_elsewhere</span>() {</span>
+<span class="ln" id="L340">    <span class="tok-kw">fn</span> <span class="tok-fn">a_complete_directory_is_recognised</span>() {</span>
 <span class="ln" id="L341">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L342">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
-<span class="ln" id="L343">        <span class="tok-kw">let</span> (complete, all) = <span class="tok-fn">search</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>()));</span>
-<span class="ln" id="L344">        <span class="tok-kw">let</span> ours = all</span>
-<span class="ln" id="L345">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L346">            .<span class="tok-fn">find</span>(|found| found.directory == dir.<span class="tok-fn">path</span>())</span>
-<span class="ln" id="L347">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the directory should be reported&quot;</span>);</span>
-<span class="ln" id="L348">        assert!(!ours.<span class="tok-fn">is_complete</span>());</span>
-<span class="ln" id="L349">        <span class="tok-com">// `complete` may be Some from a real Downloads directory on the machine</span></span>
-<span class="ln" id="L350">        <span class="tok-com">// this runs on, but it must never be *this* directory.</span></span>
-<span class="ln" id="L351">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(complete) = complete {</span>
-<span class="ln" id="L352">            assert_ne!(complete.directory, dir.<span class="tok-fn">path</span>());</span>
-<span class="ln" id="L353">        }</span>
-<span class="ln" id="L354">    }</span>
-<span class="ln" id="L355"></span>
-<span class="ln" id="L356">    <span class="tok-com">/// Searching the real machine must not panic whatever is on it.</span></span>
-<span class="ln" id="L357">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L358">    <span class="tok-kw">fn</span> <span class="tok-fn">searching_this_machine_does_not_panic</span>() {</span>
-<span class="ln" id="L359">        <span class="tok-kw">let</span> (_, all) = <span class="tok-fn">search</span>(None);</span>
-<span class="ln" id="L360">        <span class="tok-kw">for</span> found <span class="tok-kw">in</span> all {</span>
-<span class="ln" id="L361">            assert!(found.directory.<span class="tok-fn">is_absolute</span>() || found.directory.<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L362">        }</span>
-<span class="ln" id="L363">    }</span>
-<span class="ln" id="L364">}</span>
+<span class="ln" id="L343">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), SUMS);</span>
+<span class="ln" id="L344">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), SUMS_SIG);</span>
+<span class="ln" id="L345">        <span class="tok-kw">let</span> found = <span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L346">        assert!(found.<span class="tok-fn">is_complete</span>());</span>
+<span class="ln" id="L347">        assert!(!found.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L348">        assert!(found.<span class="tok-fn">missing</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L349">        assert_eq!(found.archives.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L350">    }</span>
+<span class="ln" id="L351"></span>
+<span class="ln" id="L352">    <span class="tok-com">/// The case somebody actually hits: the archive downloaded, the hash list</span></span>
+<span class="ln" id="L353">    <span class="tok-com">/// forgotten. They need to be told which, not left with a failure.</span></span>
+<span class="ln" id="L354">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L355">    <span class="tok-kw">fn</span> <span class="tok-fn">a_directory_missing_the_hash_list_says_which_part_is_missing</span>() {</span>
+<span class="ln" id="L356">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L357">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
+<span class="ln" id="L358">        <span class="tok-kw">let</span> found = <span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L359">        assert!(!found.<span class="tok-fn">is_complete</span>());</span>
+<span class="ln" id="L360">        assert!(!found.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L361">        <span class="tok-kw">let</span> missing = found.<span class="tok-fn">missing</span>();</span>
+<span class="ln" id="L362">        assert!(missing.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;no SHA256SUMS&quot;</span>), <span class="tok-str">&quot;{missing:?}&quot;</span>);</span>
+<span class="ln" id="L363">        assert!(missing.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;no SHA256SUMS.asc&quot;</span>), <span class="tok-str">&quot;{missing:?}&quot;</span>);</span>
+<span class="ln" id="L364">        assert!(!missing.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;no release archive&quot;</span>), <span class="tok-str">&quot;{missing:?}&quot;</span>);</span>
+<span class="ln" id="L365">    }</span>
+<span class="ln" id="L366"></span>
+<span class="ln" id="L367">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L368">    <span class="tok-kw">fn</span> <span class="tok-fn">several_archives_come_back_in_a_stable_order</span>() {</span>
+<span class="ln" id="L369">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L370">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
+<span class="ln" id="L371">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-linux-x86_64.tar.gz&quot;</span>);</span>
+<span class="ln" id="L372">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-macos-aarch64.tar.gz&quot;</span>);</span>
+<span class="ln" id="L373">        <span class="tok-kw">let</span> first = <span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L374">        <span class="tok-kw">let</span> second = <span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L375">        assert_eq!(first.archives.<span class="tok-fn">len</span>(), <span class="tok-num">3</span>);</span>
+<span class="ln" id="L376">        assert_eq!(first.archives, second.archives);</span>
+<span class="ln" id="L377">    }</span>
+<span class="ln" id="L378"></span>
+<span class="ln" id="L379">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L380">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_or_missing_directory_finds_nothing_rather_than_failing</span>() {</span>
+<span class="ln" id="L381">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L382">        assert!(<span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L383">        assert!(<span class="tok-fn">look_in</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;not-here&quot;</span>)).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L384">    }</span>
+<span class="ln" id="L385"></span>
+<span class="ln" id="L386">    <span class="tok-com">/// A directory of unrelated files must not produce candidates.</span></span>
+<span class="ln" id="L387">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L388">    <span class="tok-kw">fn</span> <span class="tok-fn">unrelated_files_are_not_candidates</span>() {</span>
+<span class="ln" id="L389">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L390">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;holiday.zip&quot;</span>);</span>
+<span class="ln" id="L391">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;notes.txt&quot;</span>);</span>
+<span class="ln" id="L392">        assert!(<span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L393">    }</span>
+<span class="ln" id="L394"></span>
+<span class="ln" id="L395">    <span class="tok-com">/// A directory is only ever searched one level deep. A recursive walk of a</span></span>
+<span class="ln" id="L396">    <span class="tok-com">/// home directory is slow, surprising, and lets a verifier wander into</span></span>
+<span class="ln" id="L397">    <span class="tok-com">/// places nobody asked about.</span></span>
+<span class="ln" id="L398">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L399">    <span class="tok-kw">fn</span> <span class="tok-fn">the_search_does_not_descend</span>() {</span>
+<span class="ln" id="L400">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L401">        <span class="tok-kw">let</span> deeper = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;deeper&quot;</span>);</span>
+<span class="ln" id="L402">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;deeper).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L403">        <span class="tok-fn">touch</span>(&amp;deeper, <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
+<span class="ln" id="L404">        assert!(<span class="tok-fn">look_in</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L405">    }</span>
+<span class="ln" id="L406"></span>
+<span class="ln" id="L407">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L408">    <span class="tok-kw">fn</span> <span class="tok-fn">the_places_list_starts_where_it_was_told_and_has_no_duplicates</span>() {</span>
+<span class="ln" id="L409">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L410">        <span class="tok-kw">let</span> places = <span class="tok-fn">places</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>()));</span>
+<span class="ln" id="L411">        assert_eq!(places[<span class="tok-num">0</span>], dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L412">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sorted = places.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L413">        sorted.<span class="tok-fn">sort</span>();</span>
+<span class="ln" id="L414">        sorted.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L415">        assert_eq!(sorted.<span class="tok-fn">len</span>(), places.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;a place is listed twice&quot;</span>);</span>
+<span class="ln" id="L416">    }</span>
+<span class="ln" id="L417"></span>
+<span class="ln" id="L418">    <span class="tok-com">/// The whole point of the search: it must find a complete set without</span></span>
+<span class="ln" id="L419">    <span class="tok-com">/// being told where anything is.</span></span>
+<span class="ln" id="L420">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L421">    <span class="tok-kw">fn</span> <span class="tok-fn">a_complete_set_is_found_when_it_is_pointed_at</span>() {</span>
+<span class="ln" id="L422">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L423">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
+<span class="ln" id="L424">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), SUMS);</span>
+<span class="ln" id="L425">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), SUMS_SIG);</span>
+<span class="ln" id="L426">        <span class="tok-kw">let</span> (complete, all) = <span class="tok-fn">search</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>()));</span>
+<span class="ln" id="L427">        <span class="tok-kw">let</span> complete = complete.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the set should have been found&quot;</span>);</span>
+<span class="ln" id="L428">        assert_eq!(complete.directory, dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L429">        assert!(!all.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L430">    }</span>
+<span class="ln" id="L431"></span>
+<span class="ln" id="L432">    <span class="tok-com">/// An incomplete directory must be reported rather than silently paired</span></span>
+<span class="ln" id="L433">    <span class="tok-com">/// with a hash list from somewhere else -- which would be checking one</span></span>
+<span class="ln" id="L434">    <span class="tok-com">/// release against another&#x27;s list.</span></span>
+<span class="ln" id="L435">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L436">    <span class="tok-kw">fn</span> <span class="tok-fn">an_incomplete_directory_is_reported_and_not_completed_from_elsewhere</span>() {</span>
+<span class="ln" id="L437">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L438">        <span class="tok-fn">touch</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-str">&quot;veilvoice-v0.1.12-windows-x86_64.zip&quot;</span>);</span>
+<span class="ln" id="L439">        <span class="tok-kw">let</span> (complete, all) = <span class="tok-fn">search</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>()));</span>
+<span class="ln" id="L440">        <span class="tok-kw">let</span> ours = all</span>
+<span class="ln" id="L441">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L442">            .<span class="tok-fn">find</span>(|found| found.directory == dir.<span class="tok-fn">path</span>())</span>
+<span class="ln" id="L443">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the directory should be reported&quot;</span>);</span>
+<span class="ln" id="L444">        assert!(!ours.<span class="tok-fn">is_complete</span>());</span>
+<span class="ln" id="L445">        <span class="tok-com">// `complete` may be Some from a real Downloads directory on the machine</span></span>
+<span class="ln" id="L446">        <span class="tok-com">// this runs on, but it must never be *this* directory.</span></span>
+<span class="ln" id="L447">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(complete) = complete {</span>
+<span class="ln" id="L448">            assert_ne!(complete.directory, dir.<span class="tok-fn">path</span>());</span>
+<span class="ln" id="L449">        }</span>
+<span class="ln" id="L450">    }</span>
+<span class="ln" id="L451"></span>
+<span class="ln" id="L452">    <span class="tok-com">/// Searching the real machine must not panic whatever is on it.</span></span>
+<span class="ln" id="L453">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L454">    <span class="tok-kw">fn</span> <span class="tok-fn">searching_this_machine_does_not_panic</span>() {</span>
+<span class="ln" id="L455">        <span class="tok-kw">let</span> (_, all) = <span class="tok-fn">search</span>(None);</span>
+<span class="ln" id="L456">        <span class="tok-kw">for</span> found <span class="tok-kw">in</span> all {</span>
+<span class="ln" id="L457">            assert!(found.directory.<span class="tok-fn">is_absolute</span>() || found.directory.<span class="tok-fn">exists</span>());</span>
+<span class="ln" id="L458">        }</span>
+<span class="ln" id="L459">    }</span>
+<span class="ln" id="L460">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

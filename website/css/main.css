@@ -946,6 +946,7 @@ html:not(.js) .bn { display: none; }
 .demo-open-row { display: none; }
 html.js .demo-open-row {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 10px;
   margin: 18px 0 0;
@@ -1502,7 +1503,11 @@ html.demo-locked, html.demo-locked body { overflow: hidden; }
 
 /* ---------- buttons ---------- */
 
-.row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 26px; }
+/* `align-items` is declared, not defaulted. A flex row that does not say
+ * leaves it at `stretch`, so one button that wraps to two lines on a narrow
+ * viewport makes every button beside it taller. Buttons in a row are the one
+ * place that shows immediately. */
+.row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 26px; }
 
 .btn {
   display: inline-flex;
