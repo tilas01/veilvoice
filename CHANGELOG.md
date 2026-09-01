@@ -12,9 +12,93 @@ Nothing yet. The next release goes here.
 
 ## v0.1.16
 
-A verifier that no longer calls a genuine release unverified, no em dash left
-anywhere in the repository, and the audit's own arithmetic checked by a
-machine instead of by hand.
+A verifier that finds the release you are standing in and no longer calls a
+genuine one unverified, buttons that line up with the buttons beside them,
+pictures that grow rather than cutting their words, no em dash left anywhere
+in the repository, and the audit's own arithmetic checked by a machine
+instead of by hand.
+
+### The verifier finds the release you are standing in
+
+- **F-107** Running `veilvoice-verify` with no arguments from inside an
+  extracted release answered "no VeilVoice release was found to check". Every
+  archive tool unpacks into a folder beside the archive, so the folder somebody
+  opens holds the binaries and none of what they are checked against:
+  `SHA256SUMS`, its signature and the archive are one level above. The search
+  looked in the current directory, the program's own, Downloads and Desktop,
+  and in the parent of none of them, while the comment above it said "where
+  somebody who unpacked the archive and ran the verifier inside it will be".
+  It now looks one level up from each, and one level only: a verifier that
+  climbs a stranger's filesystem looking for something to check is worse than
+  one that asks. Checked against the published v0.1.15 end to end, including
+  341 of 341 extracted files and the machine's own GnuPG.
+
+### Buttons line up with the buttons beside them
+
+The desktop application padded its passphrase labels with trailing spaces to
+fake a column, which lines nothing up in a proportional font. The screens that
+drifted worst were the ones drawn only after setup, because those carry the
+labels that needed the most padding, and the buttons under them inherited it.
+Each label now gets a real column and every field starts in the same place.
+
+The unlock screen drew its mark and headings centred and its password row hard
+left. Nesting the row in a centred layout does not fix that, because a row
+allocates the whole width and there is nothing left to centre it within, so it
+is measured on one frame and placed on the next.
+
+On the website `.row`, which holds the download buttons on three pages, was a
+flex container that never said how its children line up and so fell back to
+`stretch`: invisible until one label wraps on a narrow screen and makes every
+button beside it taller.
+
+**A suite checks this for new features.** It reads the pages to find what
+actually holds a button, rather than keeping a list that would go stale on the
+next feature, and fails any flex container of buttons that has not decided.
+
+### Pictures grow rather than cutting their words
+
+A crate or file banner whose description ran past two lines used to end in an
+ellipsis, which reads as a summary and is a sentence that stopped: one crate's
+banner said what it notices and not what it does about it. Banners are now
+sized from the lines they need, and banners that already fitted are unchanged
+byte for byte.
+
+The terminal captures had the same cap at 44 lines, so pictures of `--help`
+ended three flags early. The canvas was already sized from the content, so
+removing the cap simply makes them taller. No generated drawing ends in an
+ellipsis now.
+
+### Screenshots are rounded in the file, not in the page
+
+The application draws a rounded window and a capture is a rectangle. The
+corners are now rounded into the alpha channel rather than by CSS, because the
+README is rendered by GitHub, which strips styles from images, and the release
+archives carry the same files: a picture that is round in one of three places
+is not round. Only corner alpha changes, with the arc antialiased from
+coverage, so the picture stays the pixels the application drew.
+
+The page then had to stop drawing them a second time. Three rules rounded these
+images and one painted a background behind them, which showed through the
+corners the file had just made transparent.
+
+**No mouse pointer, established by reading the capture script rather than the
+pixels.** Captures use `PrintWindow`, which asks the window to draw itself; a
+pointer is drawn by the compositor over the screen and is never part of a
+window's own rendering, so such a capture cannot contain one. The suite checks
+the capture method, and fails if it is ever swapped for a screen copy.
+
+### The twenty-first audit round: 2.19 billion inputs
+
+All seven fuzzing targets at twenty minutes each, twice the length of any
+previous run and the first to include `release_contents`. **2,127,796,269
+inputs, no crash, no hang, no out-of-memory.** The one new artefact was a slow
+unit declaring 569 MiB, ten passes and 127 lanes, legal on every axis against
+ceilings of 4 GiB, sixteen and 0x00ffffff, which is the class F-91 bounded.
+
+Doubling the time found nothing new. That is evidence the targets are converged
+on the structure they can reach, and is not evidence the parsers are correct:
+three of the seven have still never found anything, five have no committed
+corpus, and none of it has run on Windows or macOS.
 
 ### The eighteenth audit round, run against the published v0.1.15
 
