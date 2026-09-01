@@ -69,7 +69,7 @@ A gap between turns is a span the plan does not assign to anybody. It is
 
 That is the one decision in this file that is not a trade-off. Passing
 unassigned audio through unveiled would put somebody's real voice into a
-file whose entire purpose is that it contains no real voice — because of a
+file whose entire purpose is that it contains no real voice, because of a
 gap in a text file, silently, in the middle of an otherwise veiled
 recording. Silence loses content and can be seen; a raw voice cannot be
 unheard.
@@ -79,7 +79,7 @@ it is a thing you find out about rather than a thing you notice later.
 
 # Latency is removed, so a turn lands where the plan said
 
-The engine has a fixed algorithmic latency — the STFT cannot emit a sample
+The engine has a fixed algorithmic latency, because the STFT cannot emit a sample
 until it has a frame around it. Each span is therefore processed with a tail
 of silence and the first `latency_samples` of output are dropped, which puts
 the veiled audio back exactly where the original was. Without this every
@@ -96,8 +96,8 @@ long enough to remove the click.
 
 # Every speaker renders at the same time
 
-Speakers are independent by construction — a separate engine, a separate
-seed, a separate destination — so there is nothing to share between them and
+Speakers are independent by construction, with a separate engine, a separate
+seed and a separate destination, so there is nothing to share between them and
 nothing to lock. Each one is given a thread and they all run at once, which
 on an ordinary machine turns a four-person recording into roughly the work
 of one.
@@ -112,7 +112,7 @@ the front page is claiming.
 
 Each thread writes into its own buffer and the merge happens afterwards, in
 slot order. That is what makes the result **identical to the sequential one,
-bit for bit** — floating-point addition is not associative, so a merge in
+bit for bit**, because floating-point addition is not associative, so a merge in
 completion order would give a different file on every run and the render
 would stop being reproducible from its seeds. A test holds it.
 

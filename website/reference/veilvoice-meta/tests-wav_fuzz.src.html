@@ -46,7 +46,7 @@
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
 <span class="ln" id="L4"><span class="tok-com">//! `clean_wav_bytes` exists because `lofty` cannot remove ID3v2 from a WAV, so</span></span>
 <span class="ln" id="L5"><span class="tok-com">//! VeilVoice walks the chunk list itself. That means it parses a container</span></span>
-<span class="ln" id="L6"><span class="tok-com">//! somebody else produced, with every length field under their control &#8212; the</span></span>
+<span class="ln" id="L6"><span class="tok-com">//! somebody else produced, with every length field under their control, and the</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! textbook setting for an overrun or a loop that never ends.</span></span>
 <span class="ln" id="L8"><span class="tok-com">//!</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! The properties asserted, for any input at all:</span></span>
@@ -54,7 +54,7 @@
 <span class="ln" id="L11"><span class="tok-com">//! 1. **It returns.** No panic, and no unbounded loop: every iteration must</span></span>
 <span class="ln" id="L12"><span class="tok-com">//!    advance `pos`, whatever the chunk sizes claim.</span></span>
 <span class="ln" id="L13"><span class="tok-com">//! 2. **A success is a valid WAV.** If it hands back bytes, those bytes must</span></span>
-<span class="ln" id="L14"><span class="tok-com">//!    parse as RIFF/WAVE with a length field that matches what was written &#8212;</span></span>
+<span class="ln" id="L14"><span class="tok-com">//!    parse as RIFF/WAVE with a length field that matches what was written,</span></span>
 <span class="ln" id="L15"><span class="tok-com">//!    it is not permitted to emit something the next tool chokes on.</span></span>
 <span class="ln" id="L16"><span class="tok-com">//! 3. **It never invents audio.** Output length is bounded by input length.</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!</span></span>
@@ -167,7 +167,7 @@
 <span class="ln" id="L109">                out.<span class="tok-fn">push</span>(rng.<span class="tok-fn">byte</span>());</span>
 <span class="ln" id="L110">            }</span>
 <span class="ln" id="L111">        }</span>
-<span class="ln" id="L112">        <span class="tok-com">// Lie about a chunk size &#8212; the whole point of the exercise.</span></span>
+<span class="ln" id="L112">        <span class="tok-com">// Lie about a chunk size, which is the whole point of the exercise.</span></span>
 <span class="ln" id="L113">        <span class="tok-num">3</span> | <span class="tok-num">4</span> =&gt; {</span>
 <span class="ln" id="L114">            <span class="tok-kw">if</span> out.<span class="tok-fn">len</span>() &gt;= <span class="tok-num">8</span> {</span>
 <span class="ln" id="L115">                <span class="tok-kw">let</span> i = rng.<span class="tok-fn">below</span>(out.<span class="tok-fn">len</span>() - <span class="tok-num">3</span>);</span>
@@ -329,7 +329,7 @@
 <span class="ln" id="L258"></span>
 <span class="src-item" id="fn-a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic">
 <span class="ln" id="L259"><span class="tok-com">/// The RIFF size field is a `u32` widened to `usize` and then had 8 added to</span></span>
-<span class="ln" id="L260"><span class="tok-com">/// it. On a 32-bit target &#8212; VeilVoice ships an ARMv7 build &#8212; `u32::MAX + 8`</span></span>
+<span class="ln" id="L260"><span class="tok-com">/// it. On a 32-bit target, and VeilVoice ships an ARMv7 build, `u32::MAX + 8`</span></span>
 <span class="ln" id="L261"><span class="tok-com">/// overflows `usize` and panics under overflow checks. A 64-bit host cannot</span></span>
 <span class="ln" id="L262"><span class="tok-com">/// reach that, so no amount of fuzzing *here* would have found it; it is</span></span>
 <span class="ln" id="L263"><span class="tok-com">/// asserted anyway so the saturating arithmetic is not quietly removed later.</span></span>
@@ -350,7 +350,7 @@
 <span class="ln" id="L277"></span>
 <span class="src-item" id="fn-zero_sized_chunks_do_not_stall_the_walker">
 <span class="ln" id="L278"><span class="tok-com">/// A chunk that declares a size of zero must still advance the walker. If it</span></span>
-<span class="ln" id="L279"><span class="tok-com">/// did not, this would never return &#8212; which is why it is asserted rather than</span></span>
+<span class="ln" id="L279"><span class="tok-com">/// did not, this would never return, which is why it is asserted rather than</span></span>
 <span class="ln" id="L280"><span class="tok-com">/// assumed.</span></span>
 <span class="ln" id="L281"><span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L282"><span class="tok-kw">fn</span> <span class="tok-fn">zero_sized_chunks_do_not_stall_the_walker</span>() {</span>

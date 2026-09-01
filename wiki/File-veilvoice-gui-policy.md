@@ -33,7 +33,7 @@ asking anybody, that it was fixed deliberately and by what.
 Disabling a checkbox is a claim about pixels. The values a job actually uses
 come from `crate::VeilVoiceApp`'s constrained posture, so a policy holds
 even if a control is drawn wrongly, and the tests assert the behaviour
-rather than the layout — the same rule the at-rest dialogue follows.
+rather than the layout, the same rule the at-rest dialogue follows.
 
 # Reading it costs nothing, and proves nothing
 

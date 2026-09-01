@@ -8,7 +8,7 @@
 //! binary so both front ends call the same code.
 //!
 //! The portable verifier is the one program in this project whose *smallness*
-//! is a feature — it is what somebody downloads before they trust anything
+//! is a feature: it is what somebody downloads before they trust anything
 //! else here, and a 1.5 MB single file is part of why it is checkable at all.
 //! Putting a GUI toolkit in it would have cost that for a convenience the
 //! desktop application was already the right place for. So the arithmetic

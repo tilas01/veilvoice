@@ -27,7 +27,7 @@ Chunk-level RIFF/WAVE metadata removal.
 # Why WAV gets its own path
 
 `lofty` handles tags in every other container, but it cannot remove an
-ID3v2 block from a WAV file — the attempt fails with an encoding error and
+ID3v2 block from a WAV file: the attempt fails with an encoding error and
 the tag stays put. Silently leaving metadata in place is exactly the failure
 this crate exists to prevent, and WAV is the format VeilVoice writes itself,
 so it gets a direct implementation rather than a caveat.
@@ -36,7 +36,7 @@ so it gets a direct implementation rather than a caveat.
 
 A RIFF file is a flat list of chunks, and metadata hides in a lot of them:
 `LIST`/`INFO` (artist, software, comments), `id3 ` and `ID3 `, `bext`
-(broadcast extension — originator, date, even a coding history), `iXML`,
+(the broadcast extension, carrying originator, date and even a coding history), `iXML`,
 `_PMX` (XMP), `axml`, `cart`. Enumerating those would leave every chunk
 nobody thought of, and new ones keep being invented.
 

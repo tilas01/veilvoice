@@ -49,7 +49,7 @@
 <span class="ln" id="L6"><span class="tok-com">//! The hexes below are Tokyo Night, and they are the same ones</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! `website/css/themes.css` declares. They are written out here rather than</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! parsed at run time because a crate should not need the website to be on disk</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! to draw a circle &#8212; and a test reads that stylesheet and fails if the two ever</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! to draw a circle, and a test reads that stylesheet and fails if the two ever</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! disagree, which is the same arrangement `veilvoice-gui` has had since the</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! themes existed.</span></span>
 <span class="ln" id="L12"><span class="tok-com">//!</span></span>
@@ -61,13 +61,13 @@
 <span class="ln" id="L18"><span class="tok-com">//! The **order** was first written down by looking at a hue wheel, and it was</span></span>
 <span class="ln" id="L19"><span class="tok-com">//! wrong: a test comparing every pair found a further-apart pair than the one</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! put first. So the order is now computed rather than judged, by</span></span>
-<span class="ln" id="L21"><span class="tok-com">//! [`distance`] &#8212; the &quot;redmean&quot; approximation, which is the cheap standard</span></span>
+<span class="ln" id="L21"><span class="tok-com">//! [`distance`], the &quot;redmean&quot; approximation, which is the cheap standard</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! stand-in for perceptual difference and weights green most because the eye</span></span>
 <span class="ln" id="L23"><span class="tok-com">//! does.</span></span>
 <span class="ln" id="L24"><span class="tok-com">//!</span></span>
 <span class="ln" id="L25"><span class="tok-com">//! Slot 0 and slot 1 are **the** furthest-apart pair in the set, because two</span></span>
 <span class="ln" id="L26"><span class="tok-com">//! speakers is the common case. Every slot after that is the colour whose</span></span>
-<span class="ln" id="L27"><span class="tok-com">//! nearest neighbour among the ones already used is furthest away &#8212; a maximin</span></span>
+<span class="ln" id="L27"><span class="tok-com">//! nearest neighbour among the ones already used is furthest away, which is a maximin</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! order, so the table degrades gracefully: a recording with four people uses</span></span>
 <span class="ln" id="L29"><span class="tok-com">//! four colours chosen to be as separable as four can be, rather than the first</span></span>
 <span class="ln" id="L30"><span class="tok-com">//! four somebody listed.</span></span>
@@ -78,7 +78,7 @@
 <span class="ln" id="L35"><span class="tok-com">//! it.</span></span>
 <span class="ln" id="L36"><span class="tok-com">//!</span></span>
 <span class="ln" id="L37"><span class="tok-com">//! One colour is deliberately not a hue at all: the near-white foreground</span></span>
-<span class="ln" id="L38"><span class="tok-com">//! token, separated from every saturated colour by **lightness** &#8212; the axis</span></span>
+<span class="ln" id="L38"><span class="tok-com">//! token, separated from every saturated colour by **lightness**, the axis</span></span>
 <span class="ln" id="L39"><span class="tok-com">//! that is still free once the wheel is full.</span></span>
 <span class="ln" id="L40"><span class="tok-com">//!</span></span>
 <span class="ln" id="L41"><span class="tok-com">//! # Colour is never the only signal</span></span>
@@ -449,8 +449,8 @@
 <span class="ln" id="L375"><span class="tok-com">/// Relative luminance, as WCAG defines it, from 0.0 to 1.0.</span></span>
 <span class="ln" id="L376"><span class="tok-com">///</span></span>
 <span class="ln" id="L377"><span class="tok-com">/// Used to pick readable text over a speaker&#x27;s colour. The project already</span></span>
-<span class="ln" id="L378"><span class="tok-com">/// computes contrast rather than trusting it &#8212; writing that check for the</span></span>
-<span class="ln" id="L379"><span class="tok-com">/// custom palettes found the default theme&#x27;s `--muted` failing at 2.76:1 &#8212; and</span></span>
+<span class="ln" id="L378"><span class="tok-com">/// computes contrast rather than trusting it. Writing that check for the</span></span>
+<span class="ln" id="L379"><span class="tok-com">/// custom palettes found the default theme&#x27;s `--muted` failing at 2.76:1, and</span></span>
 <span class="ln" id="L380"><span class="tok-com">/// this is the same arithmetic in the same spirit.</span></span>
 <span class="ln" id="L381"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">luminance</span>(hex: &amp;str) -&gt; f32 {</span>
 <span class="ln" id="L382">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((r, g, b)) = <span class="tok-fn">rgb</span>(hex) <span class="tok-kw">else</span> {</span>

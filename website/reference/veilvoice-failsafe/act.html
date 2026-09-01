@@ -57,7 +57,7 @@
 <h2 id="the-check-is-made-twice-on-purpose">The check is made twice, on purpose</h2>
 <p><code>crate::Guard::look</code> already worked out whether a program may be closed, and <code>close</code> checks again before it acts. That is not redundancy for its own sake: the two are reached through different paths, a future caller could compute <code>closeable</code> wrongly or not at all, and the cost of being wrong here is ending somebody&#x27;s desktop session. A guard that refuses at the last step as well as the first is a guard that cannot be talked past by a mistake upstream.</p>
 <h2 id="in-plain-words">In plain words</h2>
-<p>This is the part that closes a program that picked up your real microphone. It checks one last time that the program is safe to close &#8212; never VeilVoice itself, never anything belonging to the operating system &#8212; and it says what it did either way.</p>
+<p>This is the part that closes a program that picked up your real microphone. It checks one last time that the program is safe to close, meaning never VeilVoice itself and never anything belonging to the operating system, and it says what it did either way.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>

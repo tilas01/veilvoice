@@ -50,9 +50,9 @@
 <div>
 <section id="s-about">
 <p>Randomised robustness testing for the RIFF chunk walker.</p>
-<p><code>clean_wav_bytes</code> exists because <code>lofty</code> cannot remove ID3v2 from a WAV, so VeilVoice walks the chunk list itself. That means it parses a container somebody else produced, with every length field under their control &#8212; the textbook setting for an overrun or a loop that never ends.</p>
+<p><code>clean_wav_bytes</code> exists because <code>lofty</code> cannot remove ID3v2 from a WAV, so VeilVoice walks the chunk list itself. That means it parses a container somebody else produced, with every length field under their control, and the textbook setting for an overrun or a loop that never ends.</p>
 <p>The properties asserted, for any input at all:</p>
-<p>1. <strong>It returns.</strong> No panic, and no unbounded loop: every iteration must advance <code>pos</code>, whatever the chunk sizes claim. 2. <strong>A success is a valid WAV.</strong> If it hands back bytes, those bytes must parse as RIFF/WAVE with a length field that matches what was written &#8212; it is not permitted to emit something the next tool chokes on. 3. <strong>It never invents audio.</strong> Output length is bounded by input length.</p>
+<p>1. <strong>It returns.</strong> No panic, and no unbounded loop: every iteration must advance <code>pos</code>, whatever the chunk sizes claim. 2. <strong>A success is a valid WAV.</strong> If it hands back bytes, those bytes must parse as RIFF/WAVE with a length field that matches what was written, it is not permitted to emit something the next tool chokes on. 3. <strong>It never invents audio.</strong> Output length is bounded by input length.</p>
 <p>Set <code>VEILVOICE_FUZZ_ROUNDS</code> to run it longer than the default.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Throws damaged and hostile WAV files at the metadata stripper.</p>

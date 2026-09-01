@@ -5,7 +5,7 @@
 //!
 //! Deciding which person is speaking at each moment is *speaker diarisation*,
 //! and doing it from the audio alone needs a trained model. This project ships
-//! no model, talks to no server, and is not about to start doing either — so
+//! no model, talks to no server, and is not about to start doing either, so
 //! the turns come from the user, and there are exactly two honest ways to get
 //! them:
 //!
@@ -17,7 +17,7 @@
 //!   transcripts.
 //!
 //! What would be worse than either is guessing. A wrong guess maps two people
-//! onto one voice — which is a privacy *improvement* and a usability disaster —
+//! onto one voice, which is a privacy *improvement* and a usability disaster,
 //! or splits one person across two voices, which invites a listener to believe
 //! there was somebody in the room who was not. Neither failure would be visible
 //! in the output, and both would be blamed on the recording rather than on the
@@ -78,7 +78,7 @@ pub struct Speaker {
     /// A picture to show for them in a rendered video, if there is one.
     ///
     /// `None` means a plain filled circle in their colour, which is what most
-    /// people will use — and which reveals nothing, unlike a photograph.
+    /// people will use, and which reveals nothing, unlike a photograph.
     pub picture: Option<PathBuf>,
 }
 
@@ -141,7 +141,7 @@ impl Conversation {
     /// Add a speaker, and return the index they were given.
     ///
     /// The index is also the destination-voice slot, so the first speaker added
-    /// gets [`veilvoice_core::voices::voice`] 0 and the second gets voice 1 —
+    /// gets [`veilvoice_core::voices::voice`] 0 and the second gets voice 1,
     /// which are the two furthest apart in the table, because two people is the
     /// common case.
     pub fn add_speaker(&mut self, speaker: Speaker) -> Result<usize, Error> {
@@ -224,7 +224,7 @@ impl Conversation {
     /// The count has to match exactly. A plan naming three speakers renamed
     /// from a list of two would either leave one person with a stale name or
     /// silently drop a slot, and a dropped slot means somebody's audio comes
-    /// out in another person's voice — the one mistake here that cannot be
+    /// out in another person's voice, which is the one mistake here that cannot be
     /// heard in the result, because both voices are unfamiliar.
     ///
     /// Every name is validated exactly as [`Conversation::add_speaker`]

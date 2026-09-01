@@ -26,7 +26,7 @@
 //! applications have ever asked for that device.
 //!
 //! Measured on the machine this was found on: 7 packaged and 19 desktop
-//! applications for the microphone, 6 packaged for the camera — **68 process
+//! applications for the microphone, 6 packaged for the camera, which is **68 process
 //! creations per scan**. One `reg.exe` spawn there costs 6.6 ms at its
 //! fastest, so a scan cost **at least 449 ms**, and that is the warm-cache best
 //! case rather than the typical one. The desktop application called `scan` on
@@ -38,7 +38,7 @@
 //! worst possible place.
 //!
 //! `reg query <key> /s` prints the **whole subtree**, keys and values together,
-//! in one go. So the scan is now two spawns — one per capability — and
+//! in one go. So the scan is now two spawns, one per capability, and
 //! [`parse_consent_dump`] does the rest in memory. Measured on the same
 //! machine: 45 ms for the whole scan, against 449 ms, and it no longer grows
 //! with the number of applications installed. The parser is a pure function
@@ -110,7 +110,7 @@ const FILETIME_TO_UNIX_SECS: u64 = 11_644_473_600;
 /// name through the platform search order, and on Windows that order includes
 /// the **current working directory** ahead of most of `PATH`. Running
 /// `veilvoice watch` from a directory containing a file named `reg.exe` would
-/// have executed it, as the user, with no prompt — a downloads folder is
+/// have executed it, as the user, with no prompt. A downloads folder is
 /// enough. Naming the system directory removes the search.
 ///
 /// Returning `None` rather than falling back to a search is deliberate: this
@@ -200,7 +200,7 @@ fn query_tree(key: &str) -> Option<String> {
 /// ```
 ///
 /// Only keys that carry a `LastUsedTimeStart` come back, which is exactly the
-/// set of application entries — packaged ones sit directly under the store and
+/// set of application entries. Packaged ones sit directly under the store and
 /// desktop ones under `NonPackaged`, and this needs to know nothing about that
 /// distinction to find both.
 ///
@@ -369,7 +369,7 @@ mod tests {
     }
 
     /// Regression: the registry tool must be an absolute path in the system
-    /// directory, never a bare name the OS searches for — the Windows search
+    /// directory, never a bare name the OS searches for, because the Windows search
     /// order includes the current working directory, so a planted `reg.exe`
     /// would have been run as the user.
     #[test]
@@ -506,13 +506,13 @@ HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAcces
     /// Regression, and the important one. `reg query` echoes subkey paths back
     /// under the **full** hive name, so asking with the `HKCU` abbreviation
     /// matched nothing and the monitor reported an empty machine no matter what
-    /// was recording — the worst possible failure for this feature, because it
+    /// was recording, which is the worst possible failure for this feature, because it
     /// looks like good news.
     ///
     /// Asked against a key every Windows installation has, rather than against
     /// the consent store. The consent store is populated by *applications
     /// having asked for the microphone*, and a headless CI runner with no audio
-    /// hardware has legitimately never had one ask — so an empty result there
+    /// hardware has legitimately never had one ask, so an empty result there
     /// means "nothing has used the microphone on this machine", which is not the
     /// same claim at all. Conflating the two made CI fail on a machine where the
     /// code was working perfectly, which is its own kind of silently wrong.
@@ -536,7 +536,7 @@ HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAcces
     /// it. Both of those are facts about the machine rather than about the
     /// code, and both have now failed CI for that reason: first the store was
     /// empty on a runner where nothing had ever asked for a microphone, and
-    /// then — after that was allowed for — a runner had entries but no
+    /// then, after that was allowed for, a runner had entries but no
     /// `NonPackaged` subkey, which only appears once a *desktop* application
     /// has asked. A test that fails depending on what software a machine has
     /// happened to run is not testing this crate.

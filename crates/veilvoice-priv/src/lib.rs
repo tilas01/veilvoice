@@ -6,14 +6,14 @@
 //!
 //! # Three levels, and the third one this project does not ship
 //!
-//! * [`Level::User`] — VeilVoice as you. Everything the de-identifier does
+//! * [`Level::User`] is VeilVoice as you. Everything the de-identifier does
 //!   happens here, and nothing about the engine, the container format or the
 //!   app lock needs any more than this.
-//! * [`Level::Elevated`] — running as administrator or root. The monitoring
+//! * [`Level::Elevated`] is running as administrator or root. The monitoring
 //!   features see further: processes belonging to other users, service
 //!   accounts, and a few registry and system paths that are unreadable
 //!   otherwise.
-//! * **Kernel level** — not shipped, and not for want of trying. Loading a
+//! * **Kernel level** is not shipped, and not for want of trying. Loading a
 //!   kernel driver on 64-bit Windows needs an EV code-signing certificate
 //!   issued to a verified legal entity plus Microsoft's attestation signing;
 //!   macOS needs an Apple Developer ID and an entitlement granted case by
@@ -30,7 +30,7 @@
 //!
 //! That is not caution for its own sake. A privacy tool that silently acquires
 //! administrator rights is a privacy tool nobody can reason about, and one that
-//! installs a background service without being asked is worse — a service
+//! installs a background service without being asked is worse, because a service
 //! outlives the window it was started from, and somebody who tried VeilVoice
 //! once should not find it still running next month.
 //!
@@ -38,7 +38,7 @@
 //!
 //! There is no `am_i_admin()` in the standard library and reaching the real
 //! answer is FFI on every platform here. So this asks a tool the system already
-//! ships, exactly as `veilvoice-watch` asks the registry — and when the tool
+//! ships, exactly as `veilvoice-watch` asks the registry, and when the tool
 //! cannot be run, the answer is [`Level::Unknown`] rather than a guess.
 //!
 //! **`Unknown` is not `User`.** Reporting "not elevated" when the truth is "I
@@ -48,7 +48,7 @@
 //!
 //! # In plain words
 //!
-//! Most of VeilVoice needs no special permissions at all — changing a voice is
+//! Most of VeilVoice needs no special permissions at all, because changing a voice is
 //! something any program can do with your own account.
 //!
 //! The parts that *watch* your machine can see more when VeilVoice is run as an
@@ -58,8 +58,8 @@
 //!
 //! It will not do that for you. Running as administrator, or installing a
 //! background service, is a change to your computer and it should be one you
-//! made on purpose. And there is a third level — inside the operating system
-//! itself — that VeilVoice does not reach and says so rather than implying it
+//! made on purpose. And there is a third level, inside the operating system
+//! itself, that VeilVoice does not reach and says so rather than implying it
 //! does.
 
 use std::process::Command;
@@ -76,7 +76,7 @@ pub enum Level {
     ///
     /// Deliberately not [`Level::User`]. "I could not tell" and "you are not
     /// elevated" lead to different actions, and reporting the second when the
-    /// first is true understates what VeilVoice can see — which sounds like
+    /// first is true understates what VeilVoice can see, which sounds like
     /// the cautious direction and is not.
     Unknown,
 }

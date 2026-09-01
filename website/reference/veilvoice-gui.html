@@ -51,7 +51,7 @@
 </nav>
 <div>
 <section id="s-about">
-<p>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</p>
+<p>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</p>
 <p>The binary lives in <code>main.rs</code>; this library exists so the UI logic can be unit tested without opening a window.</p>
 <p>That split is worth stating plainly, because it is the reason this crate has tests at all: a binary crate cannot be unit tested, so everything with logic in it -- the app lock&#x27;s state machine, preference loading, palette resolution, the reduced-motion decision -- lives here where a test can reach it without a display server. <code>main.rs</code> holds only what genuinely needs a window.</p>
 <h2 id="the-modules">The modules</h2>
@@ -366,7 +366,7 @@ flowchart TD
 <tr><td><a href="veilvoice-gui/dialog.html"><code>dialog.rs</code></a></td><td>369</td><td>Asking for a file without stopping the window.</td></tr>
 <tr><td><a href="veilvoice-gui/group.html"><code>group.rs</code></a></td><td>1668</td><td>Group mode: several people in one recording, each with a name and a colour.</td></tr>
 <tr><td><a href="veilvoice-gui/integrity.html"><code>integrity.rs</code></a></td><td>386</td><td>The integrity record, taken and checked by the window rather than by hand.</td></tr>
-<tr><td><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a></td><td>85</td><td>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</td></tr>
+<tr><td><a href="veilvoice-gui/lib.html"><code>lib.rs</code></a></td><td>85</td><td>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</td></tr>
 <tr><td><a href="veilvoice-gui/main.html"><code>main.rs</code></a></td><td>179</td><td>Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.</td></tr>
 <tr><td><a href="veilvoice-gui/monitor.html"><code>monitor.rs</code></a></td><td>414</td><td>The live monitor: what is going in, and what is coming out, wherever you are.</td></tr>
 <tr><td><a href="veilvoice-gui/notify.html"><code>notify.rs</code></a></td><td>460</td><td>How the application tells you something, and the three ways to be told.</td></tr>

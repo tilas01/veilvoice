@@ -35,27 +35,27 @@ It does not **prevent** anything. By the time a canary has been encrypted,
 whatever encrypted it has already been running for some number of seconds
 and has already reached some number of real files. What this buys is the
 difference between finding out now and finding out when you next open a
-document — which is a real difference, and it is the whole of what is on
+document, which is a real difference, and it is the whole of what is on
 offer. See `SCOPE`.
 
 Stopping a process mid-run needs an interposition point in the kernel:
 `fanotify` with `FAN_OPEN_PERM` on Linux, a filesystem minifilter on
 Windows. The Windows one requires a code-signing identity issued to a
-verified legal entity, which this project does not have and will not get —
-it is published under a pseudonym on purpose. `ROADMAP.md` records that as
+verified legal entity, which this project does not have and will not get,
+because it is published under a pseudonym on purpose. `ROADMAP.md` records that as
 a decision rather than an omission.
 
 ## The two signals, and what each is worth
 
-**`canary` — decoy files that should never change.** A file nothing
+**`canary`, decoy files that should never change.** A file nothing
 legitimately touches is a clean signal: if its contents differ from what
 was planted, something walked the directory and wrote to everything it
-found. Very few false positives, and one enormous hole — it only fires if
+found. Very few false positives, and one enormous hole: it only fires if
 the attacker *reaches* it. Something that encrypts only `.docx` under one
 folder will never see a canary planted anywhere else, and this crate cannot
 tell you that it did not fire because nothing happened.
 
-**`rate` — how much of a tree changed, and how fast.** No blind spot, and
+**`rate`, how much of a tree changed and how fast.** No blind spot, and
 far weaker evidence: a restore from backup, importing a camera card, a
 compiler, or a synchronisation client catching up all look exactly like a
 mass rewrite, because they are one. `rate::Churn` therefore reports
@@ -71,7 +71,7 @@ to make on the user's behalf.
 ## What it cannot tell you: who
 
 Nothing here names a process. Attribution needs system auditing that is
-normally switched off, and it lives in `veilvoice-guard` rather than here —
+normally switched off, and it lives in `veilvoice-guard` rather than here.
 `veilvoice_guard::who_touched` takes a path and usually, honestly, answers
 that it does not know. This crate deliberately does not depend on that one:
 a project that wants canaries should not have to take a cryptography stack

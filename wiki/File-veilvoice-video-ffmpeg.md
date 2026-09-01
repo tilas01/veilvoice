@@ -26,7 +26,7 @@ dependency graph containing no such thing is a claim on its front page that
 a reader can check with `cargo tree` in ten seconds.
 
 So the honest arrangement is the one the rest of the project already uses
-for exactly this kind of problem — the download in `veilvoice-verify`, the
+for exactly this kind of problem: the download in `veilvoice-verify`, the
 registry in `veilvoice-watch`, the driver list in `veilvoice-drivers`. Find
 the tool the machine already has, prepare the exact command, and let the
 person decide.
@@ -34,7 +34,7 @@ person decide.
 # And VeilVoice will not run it for you
 
 `command` builds the argument list. Running it is the caller's, and a
-front end should print it rather than execute it silently — the same rule
+front end should print it rather than execute it silently, the same rule
 the companion installer follows, for the same reason.
 
 # If the machine has no ffmpeg, nothing has failed

@@ -24,8 +24,8 @@
 //! # A limitation of typing a password into a window
 //!
 //! A text field owns a `String`, so a passphrase exists as ordinary heap bytes
-//! while it is being typed. That window cannot be removed — something has to
-//! receive the keystrokes — but it can be kept short, and it is:
+//! while it is being typed. That window cannot be removed, because something has
+//! to receive the keystrokes, but it can be kept short, and it is:
 //!
 //! - the typing buffer is wiped the moment the passphrase is confirmed;
 //! - the confirmed passphrase is held only as a [`veilvoice_crypto::Secret`],
@@ -1115,7 +1115,7 @@ impl Plan {
     /// `params` is the caller's, rather than being read from
     /// [`kdf::KdfParams::default`] in here. The app passes the default; the
     /// tests pass a cheap profile, because a unit test that allocates 256 MiB
-    /// and runs three passes of Argon2 is not testing the thing it claims to —
+    /// and runs three passes of Argon2 is not testing the thing it claims to,
     /// it is testing the runner's memory, and on a CI machine running several
     /// such tests at once it stops being a test at all.
     pub fn write(
@@ -1151,7 +1151,7 @@ impl Plan {
 }
 
 /// Deliberately opaque about the passphrase, so a plan cannot reach a log line
-/// through `{:?}` — the same rule [`veilvoice_crypto::Secret`] follows.
+/// through `{:?}`, the same rule [`veilvoice_crypto::Secret`] follows.
 impl std::fmt::Debug for Plan {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -48,18 +48,18 @@
 <span class="ln" id="L5"><span class="tok-com">//! [`veilvoice_core`](../veilvoice_core/index.html): device enumeration, file</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</span></span>
 <span class="ln" id="L7"><span class="tok-com">//!</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! - [`io`] &#8212; decode any common audio file to mono `f32`, write 16-bit WAV, or</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! - [`io`], to decode any common audio file to mono `f32`, write 16-bit WAV, or</span></span>
 <span class="ln" id="L9"><span class="tok-com">//!   encode one in memory so it can be encrypted without ever landing on disk</span></span>
 <span class="ln" id="L10"><span class="tok-com">//!   in the clear.</span></span>
-<span class="ln" id="L11"><span class="tok-com">//! - `devices` &#8212; enumerate inputs and outputs, and spot a virtual audio cable.</span></span>
-<span class="ln" id="L12"><span class="tok-com">//! - `live` &#8212; run the engine live between two devices.</span></span>
+<span class="ln" id="L11"><span class="tok-com">//! - `devices`, to enumerate inputs and outputs and spot a virtual audio cable.</span></span>
+<span class="ln" id="L12"><span class="tok-com">//! - `live`, to run the engine live between two devices.</span></span>
 <span class="ln" id="L13"><span class="tok-com">//!</span></span>
 <span class="ln" id="L14"><span class="tok-com">//! ## The `live` feature</span></span>
 <span class="ln" id="L15"><span class="tok-com">//!</span></span>
 <span class="ln" id="L16"><span class="tok-com">//! `devices` and `live` sit behind the default-on `live` feature. They are the</span></span>
 <span class="ln" id="L17"><span class="tok-com">//! only part of this crate that needs `cpal`, and `cpal` has no backend for the</span></span>
-<span class="ln" id="L18"><span class="tok-com">//! BSDs. Everything else &#8212; decoding, encoding, and running the engine over a</span></span>
-<span class="ln" id="L19"><span class="tok-com">//! buffer &#8212; is pure Rust and builds anywhere, so turning the feature off keeps</span></span>
+<span class="ln" id="L18"><span class="tok-com">//! BSDs. Everything else, meaning decoding, encoding and running the engine over</span></span>
+<span class="ln" id="L19"><span class="tok-com">//! a buffer, is pure Rust and builds anywhere, so turning the feature off keeps</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! file processing working on platforms that cannot do live capture rather than</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! failing to build at all.</span></span>
 <span class="ln" id="L22"><span class="tok-com">//!</span></span>

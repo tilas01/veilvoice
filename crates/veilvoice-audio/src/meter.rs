@@ -5,7 +5,7 @@
 //!
 //! [`crate::live::LiveStats`] reports a peak, and both front ends draw it. They
 //! drew it *differently*: both were linear, and the desktop one printed a
-//! decibel number beside a bar filled linearly — so the number said -12 dB and
+//! decibel number beside a bar filled linearly, so the number said -12 dB and
 //! the bar showed a quarter. Two meters disagreeing about the same reading is
 //! worse than one bad meter, because it makes the reader doubt the number.
 //!
@@ -27,7 +27,7 @@
 //! window and a weighting curve, and answers a different question. This one
 //! answers "am I being recorded, and am I clipping".
 //!
-//! It also cannot see an **inter-sample peak** — a waveform that passes above
+//! It also cannot see an **inter-sample peak**, which is a waveform that passes above
 //! full scale between two samples and clips in a converter without any single
 //! sample exceeding 1.0. Catching those needs oversampling. A front end may say
 //! `CLIP` when a sample reaches full scale, and must not imply it caught the
@@ -70,7 +70,7 @@ pub const CLIP_DB: f32 = -0.1;
 ///
 /// # The two ways a reading can be nonsense, answered differently
 ///
-/// **NaN** is not a level at all, and is read as silence — nothing can be
+/// **NaN** is not a level at all, and is read as silence, because nothing can be
 /// inferred from it.
 ///
 /// **Positive infinity** is read as **full scale**. Both are wrong readings,

@@ -24,7 +24,7 @@ Randomised robustness testing for the RIFF chunk walker.
 
 `clean_wav_bytes` exists because `lofty` cannot remove ID3v2 from a WAV, so
 VeilVoice walks the chunk list itself. That means it parses a container
-somebody else produced, with every length field under their control — the
+somebody else produced, with every length field under their control, and the
 textbook setting for an overrun or a loop that never ends.
 
 The properties asserted, for any input at all:
@@ -32,7 +32,7 @@ The properties asserted, for any input at all:
 1. **It returns.** No panic, and no unbounded loop: every iteration must
 advance `pos`, whatever the chunk sizes claim.
 2. **A success is a valid WAV.** If it hands back bytes, those bytes must
-parse as RIFF/WAVE with a length field that matches what was written —
+parse as RIFF/WAVE with a length field that matches what was written,
 it is not permitted to emit something the next tool chokes on.
 3. **It never invents audio.** Output length is bounded by input length.
 

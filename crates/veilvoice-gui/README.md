@@ -24,7 +24,7 @@
   - [Reading it elsewhere](#reading-it-elsewhere)
 
 The VeilVoice desktop application: an egui/eframe front-end, monospace
-throughout — anonymise a file, scramble a microphone live, watch what is
+throughout: anonymise a file, scramble a microphone live, watch what is
 listening, manage the app lock, choose how the app looks, and an about
 panel that states the honest scope.
 
@@ -208,7 +208,7 @@ flowchart TD
 | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 369 | Asking for a file without stopping the window. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 1668 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 85 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 85 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 179 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 414 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |

@@ -50,7 +50,7 @@
 <span class="ln" id="L7"><span class="tok-com">//!</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! De-identifying a voice accomplishes nothing if the file still says who</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! recorded it. A phone recording routinely carries the device model, the</span></span>
-<span class="ln" id="L10"><span class="tok-com">//! recording software, a precise timestamp and &#8212; for images &#8212; GPS coordinates</span></span>
+<span class="ln" id="L10"><span class="tok-com">//! recording software, a precise timestamp and, for images, GPS coordinates</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! accurate to a few metres. That is often a far easier way to identify someone</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! than analysing their voice, and it survives every DSP transform because it</span></span>
 <span class="ln" id="L13"><span class="tok-com">//! is not in the audio at all.</span></span>
@@ -62,10 +62,10 @@
 <span class="ln" id="L19"><span class="tok-com">//! hide something, and it stands out in a set of otherwise ordinary files.</span></span>
 <span class="ln" id="L20"><span class="tok-com">//! [`Policy`] therefore offers two approaches:</span></span>
 <span class="ln" id="L21"><span class="tok-com">//!</span></span>
-<span class="ln" id="L22"><span class="tok-com">//! - [`Policy::Strip`] &#8212; remove everything. Best when the file is expected to</span></span>
+<span class="ln" id="L22"><span class="tok-com">//! - [`Policy::Strip`] removes everything. Best when the file is expected to</span></span>
 <span class="ln" id="L23"><span class="tok-com">//!   be sanitised anyway, or when any false statement would be worse than an</span></span>
 <span class="ln" id="L24"><span class="tok-com">//!   obvious absence.</span></span>
-<span class="ln" id="L25"><span class="tok-com">//! - [`Policy::Realistic`] &#8212; replace the tags with plausible, non-identifying</span></span>
+<span class="ln" id="L25"><span class="tok-com">//! - [`Policy::Realistic`] replaces the tags with plausible, non-identifying</span></span>
 <span class="ln" id="L26"><span class="tok-com">//!   values so the file looks unremarkable rather than scrubbed.</span></span>
 <span class="ln" id="L27"><span class="tok-com">//!</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! ## What this crate cannot do</span></span>
@@ -73,7 +73,7 @@
 <span class="ln" id="L30"><span class="tok-com">//! It removes *container* metadata. It cannot remove information encoded in the</span></span>
 <span class="ln" id="L31"><span class="tok-com">//! media itself: a photograph still shows the room it was taken in, and audio</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! still carries its room acoustics and background noise. Nor does it touch</span></span>
-<span class="ln" id="L33"><span class="tok-com">//! filesystem timestamps or the filename, both of which are outside the file &#8212;</span></span>
+<span class="ln" id="L33"><span class="tok-com">//! filesystem timestamps or the filename, both of which are outside the file,</span></span>
 <span class="ln" id="L34"><span class="tok-com">//! callers that care must handle those separately.</span></span>
 <span class="ln" id="L35"><span class="tok-com">//!</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! # In plain words</span></span>

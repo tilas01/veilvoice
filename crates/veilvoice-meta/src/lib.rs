@@ -7,7 +7,7 @@
 //!
 //! De-identifying a voice accomplishes nothing if the file still says who
 //! recorded it. A phone recording routinely carries the device model, the
-//! recording software, a precise timestamp and — for images — GPS coordinates
+//! recording software, a precise timestamp and, for images, GPS coordinates
 //! accurate to a few metres. That is often a far easier way to identify someone
 //! than analysing their voice, and it survives every DSP transform because it
 //! is not in the audio at all.
@@ -19,10 +19,10 @@
 //! hide something, and it stands out in a set of otherwise ordinary files.
 //! [`Policy`] therefore offers two approaches:
 //!
-//! - [`Policy::Strip`] — remove everything. Best when the file is expected to
+//! - [`Policy::Strip`] removes everything. Best when the file is expected to
 //!   be sanitised anyway, or when any false statement would be worse than an
 //!   obvious absence.
-//! - [`Policy::Realistic`] — replace the tags with plausible, non-identifying
+//! - [`Policy::Realistic`] replaces the tags with plausible, non-identifying
 //!   values so the file looks unremarkable rather than scrubbed.
 //!
 //! ## What this crate cannot do
@@ -30,7 +30,7 @@
 //! It removes *container* metadata. It cannot remove information encoded in the
 //! media itself: a photograph still shows the room it was taken in, and audio
 //! still carries its room acoustics and background noise. Nor does it touch
-//! filesystem timestamps or the filename, both of which are outside the file —
+//! filesystem timestamps or the filename, both of which are outside the file,
 //! callers that care must handle those separately.
 //!
 //! # In plain words

@@ -29,7 +29,7 @@
 //! The default is the recognisable name anyway, for two reasons. Indiscriminate
 //! encryption of everything under a directory is the overwhelmingly common
 //! case, and it is not fooled either way. And a file the user does not
-//! recognise is a file the user eventually deletes — which reads here as a
+//! recognise is a file the user eventually deletes, which reads here as a
 //! trip, produces an alarm that was nobody's fault, and teaches them to ignore
 //! the next one. A warning system whose alarms are usually wrong is worse than
 //! no warning system.
@@ -41,7 +41,7 @@
 //! # A deletion and an encryption look the same
 //!
 //! Much ransomware writes a new encrypted file beside the original and deletes
-//! the original, so the canary comes back as [`State::Removed`] — which is
+//! the original, so the canary comes back as [`State::Removed`], which is
 //! also what a user tidying a folder produces. [`State`] reports which of the
 //! two happened to the file, never which of the two happened in the world.
 //!
@@ -85,7 +85,7 @@ pub const DEFAULT_NAME: &str = "veilvoice-canary.txt";
 ///
 /// Encrypted output sits within a hair of 8.0 bits per byte; English prose is
 /// under 5. The threshold is well clear of both, so it says "this is no longer
-/// text" rather than "this is encrypted" — which this crate cannot know and
+/// text" rather than "this is encrypted", which this crate cannot know and
 /// does not claim. A `.zip` written over the canary would read the same way.
 pub const PROSE_CEILING: f32 = 6.0;
 
@@ -334,7 +334,7 @@ impl Nest {
     /// Stop watching a canary, and delete it.
     ///
     /// The order matters: the record goes first. If the delete fails, the file
-    /// is left behind but no longer watched — an untidy folder. Doing it the
+    /// is left behind but no longer watched, which is an untidy folder. Doing it the
     /// other way round and failing leaves a record of a file that is gone,
     /// which is a permanent false alarm.
     pub fn pull_up(&mut self, path: &Path) -> Result<(), Error> {

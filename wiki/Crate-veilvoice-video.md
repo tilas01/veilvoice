@@ -41,8 +41,8 @@ never installs any other companion.
 ## The page needs a little JavaScript, and says so
 
 Lighting the right circle means knowing where the audio has got to, and only
-the audio element knows that. There is a small inline script — no file, no
-network, no library — and a `<noscript>` that says what it does. Without it
+the audio element knows that. There is a small inline script, with no file,
+no network and no library, and a `<noscript>` that says what it does. Without it
 the audio still plays, the subtitles still appear and the waveform is still
 drawn; the circles simply do not light up.
 

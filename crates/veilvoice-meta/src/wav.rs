@@ -4,7 +4,7 @@
 //! # Why WAV gets its own path
 //!
 //! `lofty` handles tags in every other container, but it cannot remove an
-//! ID3v2 block from a WAV file — the attempt fails with an encoding error and
+//! ID3v2 block from a WAV file: the attempt fails with an encoding error and
 //! the tag stays put. Silently leaving metadata in place is exactly the failure
 //! this crate exists to prevent, and WAV is the format VeilVoice writes itself,
 //! so it gets a direct implementation rather than a caveat.
@@ -13,7 +13,7 @@
 //!
 //! A RIFF file is a flat list of chunks, and metadata hides in a lot of them:
 //! `LIST`/`INFO` (artist, software, comments), `id3 ` and `ID3 `, `bext`
-//! (broadcast extension — originator, date, even a coding history), `iXML`,
+//! (the broadcast extension, carrying originator, date and even a coding history), `iXML`,
 //! `_PMX` (XMP), `axml`, `cart`. Enumerating those would leave every chunk
 //! nobody thought of, and new ones keep being invented.
 //!
@@ -38,8 +38,8 @@ use crate::{Error, Policy, Report};
 
 /// Chunks required to interpret the audio. Everything else goes.
 const KEEP: &[&[u8; 4]] = &[
-    b"fmt ", // sample format — mandatory
-    b"data", // the samples themselves — mandatory
+    b"fmt ", // sample format, mandatory
+    b"data", // the samples themselves, mandatory
     b"fact", // sample count, required for non-PCM encodings
 ];
 
@@ -64,8 +64,8 @@ pub fn clean_wav_bytes(bytes: &[u8], policy: Policy) -> Result<(Vec<u8>, Report)
     // Trust the file's actual length over the header, which is routinely wrong
     // in streamed or truncated recordings.
     //
-    // `saturating_add` rather than `+`: on a 32-bit target — and VeilVoice
-    // ships an ARMv7 build — `declared` can be `u32::MAX`, where `declared + 8`
+    // `saturating_add` rather than `+`: on a 32-bit target, and VeilVoice
+    // ships an ARMv7 build, `declared` can be `u32::MAX`, where `declared + 8`
     // overflows `usize` and panics under overflow checks. A 64-bit host cannot
     // reach it, which is exactly why the fuzzer in `tests/wav_fuzz.rs` never
     // will either; this one had to be found by reading. Saturating is also the
@@ -117,7 +117,7 @@ pub fn clean_wav_bytes(bytes: &[u8], policy: Policy) -> Result<(Vec<u8>, Report)
 
     // The RIFF size field is a `u32`, so a body that does not fit in one cannot
     // be described by the format at all. `as u32` would have wrapped and
-    // written a size that does not match the file — a silently corrupt WAV
+    // written a size that does not match the file, which is a silently corrupt WAV
     // handed back as if it were clean, which for a *metadata cleaner* means
     // the user believes a file is safe when it will not even open. Refuse
     // instead. Only reachable for a body at or above 4 GiB, which is past what

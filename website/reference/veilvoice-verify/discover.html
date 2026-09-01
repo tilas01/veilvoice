@@ -54,13 +54,13 @@
 <section id="s-about">
 <p>Finding a release to check, without being told where it is.</p>
 <h2 id="why-this-exists">Why this exists</h2>
-<p>Verifying a download used to require naming three files and knowing a tag. That is fine for somebody who has already read the instructions and is wrong for everybody else &#8212; and &quot;everybody else&quot; is precisely the population a verifier exists to serve. Somebody who has just downloaded an archive and wants to know whether it is the real one should be able to run this and be told.</p>
+<p>Verifying a download used to require naming three files and knowing a tag. That is fine for somebody who has already read the instructions and is wrong for everybody else, and &quot;everybody else&quot; is precisely the population a verifier exists to serve. Somebody who has just downloaded an archive and wants to know whether it is the real one should be able to run this and be told.</p>
 <p>So: look in the obvious places, in an obvious order, and say what was found. Nothing here downloads, nothing here guesses at a hash, and nothing here reports &quot;verified&quot; on the strength of a filename.</p>
 <h2 id="where-it-looks-and-why-in-that-order">Where it looks, and why in that order</h2>
-<p>1. The directory given, if one was. 2. The current working directory &#8212; where somebody who has just <code>cd</code>-ed to their downloads will be. 3. The directory the running binary is in &#8212; where somebody who unpacked the archive and double-clicked the verifier inside it will be. 4. The usual download directories for the platform.</p>
+<p>1. The directory given, if one was. 2. The current working directory, where somebody who has just <code>cd</code>-ed to their downloads will be. 3. The directory the running binary is in, where somebody who unpacked the archive and double-clicked the verifier inside it will be. 4. The usual download directories for the platform.</p>
 <p>Each is searched one level deep only. A recursive walk of a home directory is slow, surprising, and would let a verifier wander into places nobody asked it to look at.</p>
 <h2 id="what-counts-as-a-release-archive">What counts as a release archive</h2>
-<p>A file whose name starts <code>veilvoice-</code> and ends in one of the archive extensions this project publishes. That is a <strong>filename</strong> test and it proves nothing at all &#8212; it is how candidates are found, never how they are judged. Every candidate still has to survive the signature and the hash, and a file that merely looks the part fails exactly as loudly as one that does not.</p>
+<p>A file whose name starts <code>veilvoice-</code> and ends in one of the archive extensions this project publishes. That is a <strong>filename</strong> test and it proves nothing at all: it is how candidates are found, never how they are judged. Every candidate still has to survive the signature and the hash, and a file that merely looks the part fails exactly as loudly as one that does not.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Looks for a downloaded release to check, so you can double-click the verifier and have it work.</p>
 <p>It looks in the folder it is in, the current folder, and your Downloads and Desktop. If it finds nothing it says exactly where it looked, rather than reporting a failure that leaves you guessing.</p>
@@ -78,7 +78,7 @@
 </li>
 <li><code>Found::missing</code> <span style="color:var(--muted)">line 90</span> &mdash; What is missing, in words, for a message to the user.
 </li>
-<li><code>search</code> <span style="color:var(--muted)">line 191</span> &mdash; Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.
+<li><code>search</code> <span style="color:var(--muted)">line 191</span> &mdash; Look everywhere worth looking and return the first directory that holds a complete, checkable set, or, failing that, everything that turned up.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>look_in</code>, <code>places</code>, <code>looks_like_archive</code></span>
 </li>
 </ul>
@@ -187,7 +187,7 @@ flowchart TD
 <tr><td><code>looks_like_archive</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-looks_like_archive">108</a></td><td>Whether a filename looks like one of this project&#x27;s release archives.</td></tr>
 <tr><td><code>look_in</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-look_in">114</a></td><td>Look in one directory, one level deep.</td></tr>
 <tr><td><code>places</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-places">150</a></td><td>Every place worth looking, in order, without duplicates.</td></tr>
-<tr><td><code>search</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-search">191</a></td><td>Look everywhere worth looking and return the first directory that holds a complete, checkable set &#8212; or, failing that, everything that turned up.</td></tr>
+<tr><td><code>search</code> <sub>pub fn</sub></td><td><a href="discover.src.html#fn-search">191</a></td><td>Look everywhere worth looking and return the first directory that holds a complete, checkable set, or, failing that, everything that turned up.</td></tr>
 </tbody></table>
 </section>
 </div></div>
