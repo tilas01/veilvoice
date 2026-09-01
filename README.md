@@ -411,9 +411,8 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Eighteen numbered audit rounds have found and fixed **104 defects** (F-1 to
-F-104). Among them: a four-kilobyte file that killed the process, a
-configuration value that made every output sample silent, a secure erase that
+Nineteen audit rounds have found and fixed **105 defects** (F-1 to F-105).
+Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a
 reader's browser tab. **None in any round was a confidentiality failure** in
