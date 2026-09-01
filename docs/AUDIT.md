@@ -38,6 +38,53 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The nineteenth round: the summary that stopped keeping up
+
+One defect (F-105), in the paragraph a reader is most likely to quote.
+
+### F-105 -- the verdict had been current for seven rounds and stale for eleven
+
+`docs/AUDIT.md`, the opening of §6.
+
+The verdict began: "One hundred and four defects found and fixed across
+eighteen audit rounds (F-1 to F-104): eight in the first two, twenty-eight in
+the third, eleven in the fourth, twelve in the fifth, one in the sixth, five in
+the seventh."
+
+Those figures sum to sixty-five. The sentence they are attached to says one
+hundred and four. A reader who adds them up finds the document's headline
+number contradicted by its own breakdown, one line below it.
+
+The rest of the section was in the same state. "None of the seventh round's
+five had shipped, which is the first round that can say so" was written when
+seven rounds existed. "Of this round's twelve, two had shipped" refers to the
+fifth round, eleven rounds before "this" one. Every conclusion in the verdict
+was a seventh-round conclusion wearing the present tense.
+
+The mechanism is the one this project has recorded before, and it is worth
+saying which part is new. F-71 was a hand-typed number drifting from a measured
+one, and the fix was to measure it. Here the headline number *was* maintained,
+round after round, and the breakdown underneath it was not: someone updating
+"one hundred and three" to "one hundred and four" reads the number they came
+to change and stops. The count and its explanation were two numbers with one
+of them being kept.
+
+The fix is not a corrected breakdown, because a corrected breakdown would drift
+again for exactly the same reason, and because the document cannot support one:
+sixty of the findings sit in a shared §2 rather than under a round each, so
+there is nothing to derive the split from. The breakdown is gone, replaced by
+the total, the number of rounds, and a sentence saying why no split is kept.
+The seventh-round commentary is labelled as seventh-round commentary rather
+than rewritten, because it was accurate about the rounds it named and the only
+false thing about it was the tense.
+
+**What would have caught it earlier:** reading the verdict as a reader reaches
+it, which is last, rather than as an author edits it, which is one number at a
+time. It is the same as F-104 and the release-note sentences after it. Nothing
+in this project has been caught by a check that ran over a document a reader
+never sees; several have been caught by looking at the thing the reader is
+handed.
+
 ## The eighteenth round: running the verifier against a real release
 
 v0.1.15 was published, downloaded, extracted and checked with the verifier that
@@ -3363,32 +3410,51 @@ the top of this document now says.
     through a different `man` implementation, and `mandoc -Tlint` has not been
     run.
 
-11. **The interface text is clean; the doc comments are not.** The fifty em
-    dashes in `veilvoice-cli` are gone, and so are the four elsewhere in the
-    workspace that reach a user: two error messages in `veilvoice-crypto`, one
-    in `veilvoice-guard` and one test assertion. Every sentence was rewritten
-    rather than having its punctuation swapped, and the ten committed CLI
-    drawings were re-captured from the built binary, so what the gallery shows
-    is what the program prints.
+11. **Closed: no em dash remains in any tracked file, in any encoding.** The
+    entry used to report the interface text clean with 349 left in doc
+    comments. Those are gone, along with the rest of the tree: the Markdown,
+    the workflows, the site tests, the build files, the generators, and the
+    hand-written website pages.
 
-    **349 remain, all of them in `//!` and `///` doc comments.** The rule
-    covers those too, and they are not user-facing text: they are read on the
-    generated documentation pages and by anybody in the source. This is a
-    stated remainder rather than a claim of completion, and the number is
-    measured rather than estimated.
+    **The stated remainder had been measured with the wrong instrument.** A
+    grep for the character does not find `&mdash;` or `&#8212;`, and the
+    website carried roughly 2,800 of them in those two encodings. "349
+    remain", offered here as measured rather than estimated, was measured
+    accurately over the files a `grep -r "—"` reaches and silently excluded
+    the largest population in the repository. A number is only as honest as
+    the search that produced it, and this one was not wrong so much as
+    unaware of its own scope.
 
-    The entry used to say the re-capture was a manual pass needing a build, a
-    machine and somebody deciding the new output is right. That was true, and
-    it was also the whole problem: see F-103.
+    Three sites keep the character deliberately, because all three read it as
+    input rather than writing it: the roff translation table in
+    `tools/release/manpage.py`, the empty-estimate spelling accepted by
+    `tools/site/roadmap.py`, and the entity decoder in `tools/docs/generate.py`.
+
+    **What the sweep itself cost is recorded rather than omitted.** Removing a
+    dash that was joining two independent clauses and leaving a comma produces
+    a comma splice, and eight of those shipped into the working tree before
+    being caught: seven in the website, found by reading the rendered pages,
+    and one in `docs/USING_THE_CRATES.md`, found afterwards by grepping every
+    added line for a comma followed by a new independent clause. The cheap
+    mechanical check found what careful reading had missed, an hour after
+    careful reading found what the passing site suites had missed.
 
 ## 6. Verdict
 
-**One hundred and four defects found and fixed across eighteen audit rounds (F-1 to F-104):**
-eight in the first two, twenty-eight in the third, eleven in the fourth,
-twelve in the fifth, one in the sixth, five in the seventh.
+**One hundred and five defects found and fixed (F-1 to F-105), across nineteen
+rounds.** Sixty of them, from the earliest rounds, are written up together in
+§2 rather than each under a round of its own, which is why no per-round
+breakdown is kept here: the document's structure cannot support one, and the
+breakdown that used to stand in this place was written when there were seven
+rounds and was still saying so eleven rounds later (F-105).
 
-**None of the seventh round's five had shipped**, which is the first round that
-can say so, and it is worth being careful about why: `main` has not been
+**The commentary in the rest of this section was written at the seventh round
+and is kept as it was.** It is accurate about the rounds it names, and it is
+not a summary of the eleven rounds that followed; those are written up in
+their own sections above, newest first.
+
+**None of the seventh round's five had shipped**, which was then the first round
+that could say so, and it is worth being careful about why: `main` has not been
 released since v0.1.12, so "had not shipped" and "was written this cycle" are
 the same sentence. It is not evidence that the code is getting better. The
 pattern that *is* worth noting is that three of the four were **comments that
@@ -3396,13 +3462,13 @@ had stopped being true** -- about where a call sits, about what a stylesheet
 costs -- rather than logic that was wrong. A wrong thing that agrees with
 itself survives every reading.
 
-Of this round's twelve, **two had shipped** and ten were caught in code written
-during the round. Keeping those apart matters: a round that counts
+Of the fifth round's twelve, **two had shipped** and ten were caught in code
+written during that round. Keeping those apart matters: a round that counts
 just-written-and-immediately-fixed defects alongside ones that were live on the
 published site is flattering itself.
 
-Neither of this round's shipped defects was a confidentiality failure either,
-and both are worth naming for what they were. One rendered this project's own
+Neither of that round's two shipped defects was a confidentiality failure
+either, and both are worth naming for what they were. One rendered this project's own
 README as tag soup at the top of its front page. The other made the secondary
 text of the default theme too low-contrast to meet the accessibility floor --
 on the website, in the desktop application, in the terminal, and inside the
