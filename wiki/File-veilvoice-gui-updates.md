@@ -16,14 +16,14 @@
 The manual update check, as the window shows it.
 
 `veilvoice_update` does the asking and states what the answer is worth.
-This is the button, the spinner and the result — and the rule that the
+This is the button, the spinner and the result, and the rule that the
 button is the only thing that ever starts it.
 
 # It runs on a thread, and the window never waits for it
 
 The check runs a subprocess and waits for a network round trip. On a captive
 portal that is the full ten-second timeout. `update()` may read, paint and
-*start* work; it may never wait for any — locked decision 15, and the reason
+*start* work; it may never wait for any. That is locked decision 15, and the reason
 this application was reported as freezing every couple of seconds once
 already. So the button spawns a thread, the thread sends one message down a
 channel, and the window drains that channel once a frame and moves on.

@@ -5,8 +5,8 @@
 //!
 //! **WebVTT** is what a browser plays alongside a `<video>`, and it is the one
 //! to use with anything this project renders. **SubRip** (`.srt`) is what every
-//! other player on earth reads. They differ in three small ways — a header, a
-//! cue counter, and a comma instead of a full stop in the timestamp — so both
+//! other player on earth reads. They differ in three small ways, being a header,
+//! a cue counter, and a comma instead of a full stop in the timestamp, so both
 //! come from one function with a flag rather than from two that drift.
 //!
 //! No library. The workspace carries no subtitle crate and this is forty lines;
@@ -17,7 +17,7 @@
 //! # What goes in a cue when nobody wrote down the words
 //!
 //! VeilVoice does not transcribe. Where a turn has no text, the cue carries the
-//! **speaker's name and nothing else** — which is still worth having: after
+//! **speaker's name and nothing else**, which is still worth having: after
 //! every voice has been replaced, a caption track saying who is talking is
 //! often the only way to follow a recording at all.
 //!
@@ -26,7 +26,7 @@
 //! Worth saying twice, because it is the mistake this feature invites. The
 //! audio has had its voiceprints destroyed. The subtitle file is a text file
 //! containing whatever names were typed into it, sitting next to the recording.
-//! If the names matter, use labels rather than names — the plan does not care
+//! If the names matter, use labels rather than names, because the plan does not care
 //! which, and [`crate::SCOPE`] says so where a user will read it.
 //!
 //! # In plain words
@@ -67,8 +67,8 @@ impl Format {
 /// A timestamp as the subtitle formats want it: `HH:MM:SS.mmm`.
 ///
 /// Negative and non-finite inputs become zero rather than producing a cue no
-/// player will accept. A plan cannot contain either — [`Conversation::add_turn`]
-/// refuses both — so this is the belt to that braces, and it is here because
+/// player will accept. A plan cannot contain either, because
+/// [`Conversation::add_turn`] refuses both, so this is the belt to that braces, and it is here because
 /// the alternative failure is a subtitle file that silently does not load.
 fn timestamp(seconds: f64, comma: bool) -> String {
     let seconds = if seconds.is_finite() && seconds > 0.0 {

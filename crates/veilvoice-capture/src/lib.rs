@@ -14,7 +14,7 @@
 //!
 //! That is not only a choice, it is also a limit. Excluding a window from
 //! capture means `SetWindowDisplayAffinity` on Windows and the equivalent
-//! elsewhere, which is FFI — and every crate in this workspace carries
+//! elsewhere, which is FFI, and every crate in this workspace carries
 //! `#![forbid(unsafe_code)]`, which is a front-page claim. So the exclusion is
 //! **not built**, and `ROADMAP.md` records it as a decision waiting on the
 //! maintainer rather than as an oversight. Anybody who needs a window that

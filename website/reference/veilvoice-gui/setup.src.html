@@ -45,7 +45,7 @@
 <span class="ln" id="L2"><span class="tok-com">//! The setup tab: install this copy, undo that, and the optional companions.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
 <span class="ln" id="L4"><span class="tok-com">//! This is the graphical front end to [`veilvoice_setup`], and it is a *front</span></span>
-<span class="ln" id="L5"><span class="tok-com">//! end* in the strict sense &#8212; it holds no installation logic of its own. Every</span></span>
+<span class="ln" id="L5"><span class="tok-com">//! end* in the strict sense: it holds no installation logic of its own. Every</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! change to the machine goes through the same functions `veilvoice install`</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! calls, so the careful part (editing `PATH`, which is the one operation here</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! that can damage a machine) has one implementation and one set of tests.</span></span>
@@ -74,7 +74,7 @@
 <span class="ln" id="L31"><span class="tok-com">//! # Nothing slow runs on the UI thread</span></span>
 <span class="ln" id="L32"><span class="tok-com">//!</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! Copying binaries, editing the registry and running a package manager all</span></span>
-<span class="ln" id="L34"><span class="tok-com">//! take real time &#8212; a package manager can take minutes. Each runs on a worker</span></span>
+<span class="ln" id="L34"><span class="tok-com">//! take real time, because a package manager can take minutes. Each runs on a worker</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! and reports back through an [`std::sync::mpsc`] channel, exactly as the file</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! job in [`crate::VeilVoiceApp`] does, so the window keeps painting and the</span></span>
 <span class="ln" id="L37"><span class="tok-com">//! progress strip keeps moving.</span></span>
@@ -793,7 +793,7 @@
 <span class="ln" id="L714">    }</span>
 <span class="ln" id="L715"></span>
 <span class="ln" id="L716">    <span class="tok-com">/// The list of changes is what the user consents to, so it must name the</span></span>
-<span class="ln" id="L717">    <span class="tok-com">/// three things `veilvoice_setup::install` actually does &#8212; and must not</span></span>
+<span class="ln" id="L717">    <span class="tok-com">/// three things `veilvoice_setup::install` actually does, and must not</span></span>
 <span class="ln" id="L718">    <span class="tok-com">/// stop mentioning that it asks for no administrator rights.</span></span>
 <span class="ln" id="L719">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L720">    <span class="tok-kw">fn</span> <span class="tok-fn">the_consent_text_names_what_install_changes</span>() {</span>

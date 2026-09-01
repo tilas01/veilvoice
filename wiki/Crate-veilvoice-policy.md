@@ -17,7 +17,7 @@
   - [The files](#the-files)
 
 Settings somebody else decided, sealed so they cannot be edited without a
-passphrase — and, more importantly, built so that editing them without one
+passphrase, and, more importantly, built so that editing them without one
 buys nothing worth having.
 
 ## The design decision this crate turns on
@@ -34,12 +34,12 @@ and a key in a binary anybody can download is not a key.
 So the constraint is moved into the shape of the data. **A requirement can
 only make VeilVoice stricter.** There is no requirement that turns
 encryption off, none that lowers the de-identification floor, none that
-disables the app lock — and there is no room in `Requirement` to express
+disables the app lock, and there is no room in `Requirement` to express
 one, because every variant is a tightening and the type has no other kind.
 
 Then somebody who edits the plain policy file without the passphrase can do
 exactly one thing: make this machine's VeilVoice **more** restrictive than
-its owner asked for. That is a nuisance, and it is not a privacy failure —
+its owner asked for. That is a nuisance, and it is not a privacy failure:
 which is the failure this project exists to avoid. The passphrase-sealed
 copy is what proves the policy is the one the administrator wrote; the
 shape of the type is what makes the answer survive the seal not having been
@@ -47,7 +47,7 @@ checked yet.
 
 ## What the seal is for, and what it is not
 
-`Policy::seal` uses the same container as everything else here — Argon2id
+`Policy::seal` uses the same container as everything else here: Argon2id
 over the passphrase, X25519 with ML-KEM-768 for the hybrid modes,
 XChaCha20-Poly1305 for the contents. `verify` opens the sealed copy and
 compares it against the plain one, which is how anybody with the passphrase
@@ -103,5 +103,5 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`lib.rs`|File-veilvoice-policy-lib]] | 165 | Settings somebody else decided, sealed so they cannot be edited without a passphrase — and, more importantly, built so that editing them without one buys nothing worth having. |
+| [[`lib.rs`|File-veilvoice-policy-lib]] | 165 | Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having. |
 | [[`policy.rs`|File-veilvoice-policy-policy]] | 922 | The policy itself: what can be required, and what requiring it does. |

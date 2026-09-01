@@ -41,7 +41,7 @@ timestamps. The count is `2 + 2n` per capability, where `n` is how many
 applications have ever asked for that device.
 
 Measured on the machine this was found on: 7 packaged and 19 desktop
-applications for the microphone, 6 packaged for the camera — **68 process
+applications for the microphone, 6 packaged for the camera, which is **68 process
 creations per scan**. One `reg.exe` spawn there costs 6.6 ms at its
 fastest, so a scan cost **at least 449 ms**, and that is the warm-cache best
 case rather than the typical one. The desktop application called `scan` on
@@ -53,7 +53,7 @@ leaking and nothing was deadlocked: it was doing a great deal of work in the
 worst possible place.
 
 `reg query <key> /s` prints the **whole subtree**, keys and values together,
-in one go. So the scan is now two spawns — one per capability — and
+in one go. So the scan is now two spawns, one per capability, and
 `parse_consent_dump` does the rest in memory. Measured on the same
 machine: 45 ms for the whole scan, against 449 ms, and it no longer grows
 with the number of applications installed. The parser is a pure function

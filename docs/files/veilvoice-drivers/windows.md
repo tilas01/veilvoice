@@ -30,7 +30,7 @@ Windows: `driverquery.exe`, which the system already ships.
 The native answer is `EnumDeviceDrivers` or a service-control enumeration,
 and both are FFI. `#![forbid(unsafe_code)]` holds in this crate as it does
 everywhere else in the workspace, so this shells out to a tool Windows
-installs by default — the same trade `veilvoice-watch` makes for the
+installs by default, the same trade `veilvoice-watch` makes for the
 registry and `veilvoice-verify` makes for downloading.
 
 `driverquery.exe` is resolved by absolute path under `%SystemRoot%`. Never
@@ -47,7 +47,7 @@ the kernel; it is a poor place to be relaxed about which program answers.
 "ACPI","Microsoft ACPI Driver","Kernel ","1/1/1970 12:00:00 AM"
 ```
 
-Module name, display name, driver type, link date. The link date is kept —
+Module name, display name, driver type, link date. The link date is kept,
 unlike the Linux load address it is a property of the file rather than of
 this boot, so it does not change under a machine that has not changed.
 
@@ -55,7 +55,7 @@ this boot, so it does not change under a machine that has not changed.
 
 Installed drivers, which is a superset of what is loaded right now. A driver
 appearing here is therefore "something installed a driver", not "something
-is running in the kernel" — a real distinction, and the front end wording
+is running in the kernel", which is a real distinction, and the front end wording
 keeps it.
 
 # In plain words

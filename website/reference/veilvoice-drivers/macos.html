@@ -53,14 +53,14 @@
 <section id="s-about">
 <p>macOS: <code>kmutil showloaded</code>, falling back to <code>kextstat</code>.</p>
 <h2 id="two-tools-because-apple-is-mid-transition">Two tools, because Apple is mid-transition</h2>
-<p><code>kextstat</code> is the old one and is deprecated; <code>kmutil</code> is the replacement and does not exist on older systems. Both are tried, newest first, and if neither answers the reason is reported rather than an empty list being passed off as &quot;no kernel extensions&quot; &#8212; which would be false on every Mac ever made.</p>
+<p><code>kextstat</code> is the old one and is deprecated; <code>kmutil</code> is the replacement and does not exist on older systems. Both are tried, newest first, and if neither answers the reason is reported rather than an empty list being passed off as &quot;no kernel extensions&quot;, which would be false on every Mac ever made.</p>
 <p>Both print the same shape, which is why one parser handles both:</p>
 <pre><code>Index Refs Address            Size       Wired      Name (Version) UUID &lt;Linked Against&gt;
 1   88 0                  0          0          com.apple.kpi.bsd (20.6.0)
 134    0 0xffffff7f8312d000 0x9000     0x9000     com.example.driver (1.2.3) &lt;7 5 4 1&gt;</code></pre>
 <p>The <strong>address is deliberately dropped</strong>, for the same reason as on Linux: it is zeroed for an unprivileged reader on a machine with kernel-pointer restriction, and changes at every boot on one without. Recording it would make every extension look altered after a restart, and a report that is entirely false positives after every reboot is a report nobody opens twice.</p>
 <h2 id="why-a-subprocess">Why a subprocess</h2>
-<p>The native answer is IOKit, which is FFI. <code>#![forbid(unsafe_code)]</code> holds here as everywhere else in the workspace, so this asks a tool the system already ships &#8212; the same trade the Windows and Linux readers make.</p>
+<p>The native answer is IOKit, which is FFI. <code>#![forbid(unsafe_code)]</code> holds here as everywhere else in the workspace, so this asks a tool the system already ships, the same trade the Windows and Linux readers make.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Asks macOS which system extensions are loaded.</p>
 <p>There are two tools depending on how new the machine is, because Apple is part way through replacing one with the other. The newer one is tried first and the older is the fallback, so this works on both without being told which you have.</p>

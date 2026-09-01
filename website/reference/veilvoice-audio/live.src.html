@@ -64,7 +64,7 @@
 <span class="ln" id="L21"><span class="tok-com">//!</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! Total latency is the input buffer, plus the ring backlog, plus the engine&#x27;s</span></span>
 <span class="ln" id="L23"><span class="tok-com">//! one-frame group delay (~21 ms at the defaults), plus the output buffer. The</span></span>
-<span class="ln" id="L24"><span class="tok-com">//! ring is intentionally short &#8212; enough to absorb jitter between two clocks</span></span>
+<span class="ln" id="L24"><span class="tok-com">//! ring is intentionally short, enough to absorb jitter between two clocks</span></span>
 <span class="ln" id="L25"><span class="tok-com">//! that are not synchronised, not enough to accumulate a delay the user would</span></span>
 <span class="ln" id="L26"><span class="tok-com">//! notice while speaking.</span></span>
 <span class="ln" id="L27"><span class="tok-com">//!</span></span>
@@ -107,7 +107,7 @@
 <span class="ln" id="L61">    <span class="tok-com">/// Peak output level since the last read, in `[0, 1]`.</span></span>
 <span class="ln" id="L62">    <span class="tok-kw">pub</span> output_peak: f32,</span>
 <span class="ln" id="L63">    <span class="tok-com">/// Samples dropped because the ring overflowed (capture outrunning</span></span>
-<span class="ln" id="L64">    <span class="tok-com">/// playback) &#8212; a non-zero value means audible glitching.</span></span>
+<span class="ln" id="L64">    <span class="tok-com">/// playback). A non-zero value means audible glitching.</span></span>
 <span class="ln" id="L65">    <span class="tok-kw">pub</span> dropped: u64,</span>
 <span class="ln" id="L66">    <span class="tok-com">/// Times the output callback found the ring empty and emitted silence.</span></span>
 <span class="ln" id="L67">    <span class="tok-kw">pub</span> starved: u64,</span>

@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>crates/veilvoice-gui/src/lib.rs &#8212; VeilVoice reference</title>
-<meta name="description" content="The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.">
+<meta name="description" content="The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.">
 <link rel="icon" href="../../assets/icon-32.png" type="image/png">
 <link rel="prefetch" href="../../index.html">
 <link rel="prefetch" href="../../wiki.html">
@@ -50,7 +50,7 @@
 </nav>
 <div>
 <section id="s-about">
-<p>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout &#8212; anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</p>
+<p>The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.</p>
 <p>The binary lives in <code>main.rs</code>; this library exists so the UI logic can be unit tested without opening a window.</p>
 <p>That split is worth stating plainly, because it is the reason this crate has tests at all: a binary crate cannot be unit tested, so everything with logic in it -- the app lock&#x27;s state machine, preference loading, palette resolution, the reduced-motion decision -- lives here where a test can reach it without a display server. <code>main.rs</code> holds only what genuinely needs a window.</p>
 <h2 id="the-modules">The modules</h2>

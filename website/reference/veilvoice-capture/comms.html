@@ -55,7 +55,7 @@
 <p>Communication programs, and how to put VeilVoice between you and them.</p>
 <h2 id="what-this-does-and-the-one-thing-it-deliberately-does-not">What this does, and the one thing it deliberately does not</h2>
 <p>It finds the calling and messaging programs on this machine and tells you, for each one, exactly where to point it so your voice goes through VeilVoice before it goes to anybody else.</p>
-<p>It does <strong>not</strong> reach inside any of them. It does not read Signal&#x27;s or Matrix&#x27;s traffic, hook their audio, inject into their processes or decrypt anything. That is not a limitation being apologised for &#8212; it is the same act this whole project exists to make useless, and a privacy tool that shipped a way to intercept an end-to-end encrypted call would be arguing against itself.</p>
+<p>It does <strong>not</strong> reach inside any of them. It does not read Signal&#x27;s or Matrix&#x27;s traffic, hook their audio, inject into their processes or decrypt anything. That is not a limitation being apologised for: it is the same act this whole project exists to make useless, and a privacy tool that shipped a way to intercept an end-to-end encrypted call would be arguing against itself.</p>
 <h2 id="the-route-and-why-it-is-a-virtual-cable">The route, and why it is a virtual cable</h2>
 <p>Every program here lets you choose which microphone it uses. So:</p>
 <pre><code>your microphone  -&gt;  VeilVoice  -&gt;  a virtual audio cable
@@ -66,7 +66,7 @@ with the cable chosen as its &quot;microphone&quot;</code></pre>
 <p>Nothing has to know VeilVoice exists. The program asks the operating system for a microphone, the operating system hands it the cable, and the cable carries a voice that is not yours. That is why this works with programs nobody here has ever tested, including ones that do not exist yet.</p>
 <h2 id="your-voice-not-theirs">Your voice, not theirs</h2>
 <p>This route veils <strong>what you send</strong>. It does nothing to what you receive: the other people on the call are not going through VeilVoice, and their voices arrive as they always did.</p>
-<p>Veiling a whole call &#8212; everybody, including the people at the other end &#8212; means capturing what the program <em>plays</em>, which is a different mechanism on every platform and is not built. <code>INCOMING</code> says so in the words a front end should show, rather than letting somebody assume a recording of a call is veiled on both sides.</p>
+<p>Veiling a whole call, meaning everybody including the people at the other end, means capturing what the program <em>plays</em>, which is a different mechanism on every platform and is not built. <code>INCOMING</code> says so in the words a front end should show, rather than letting somebody assume a recording of a call is veiled on both sides.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>If you want to talk to people through Discord, Signal, Telegram or anything like them without your real voice going out, this tells you how: send your microphone through VeilVoice, out to a virtual cable, and then tell the chat program that the cable <em>is</em> your microphone. It never knows the difference.</p>
 <p>It only changes what <strong>you</strong> send. Everybody else on the call still sounds like themselves, and this does not record or read anything they send you.</p>

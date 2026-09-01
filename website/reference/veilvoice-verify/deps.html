@@ -59,9 +59,9 @@
 <h2 id="why-there-is-a-table-at-all">Why there is a table at all</h2>
 <p>Almost all of VeilVoice is pure Rust and needs nothing but a compiler. The exceptions are real and they are the reason a build fails on a fresh machine with a message about a missing header rather than about a missing package:</p>
 <ul>
-<li><strong>Linux</strong> &#8212; <code>cpal</code> reaches ALSA through <code>alsa-sys</code>, which is a <code>-sys</code> crate: it compiles against ALSA&#x27;s C headers and asks <code>pkg-config</code> where they are. Neither ships with a base install of most distributions.</li>
-<li><strong>macOS</strong> &#8212; CoreAudio comes from Apple&#x27;s SDK, which arrives with the Xcode command line tools. Apple&#x27;s licence does not permit redistributing it, which is also why this tool cannot build a macOS binary anywhere else.</li>
-<li><strong>Windows</strong> &#8212; the MSVC toolchain needs a linker, which comes with the Visual Studio build tools.</li>
+<li><strong>Linux</strong>: <code>cpal</code> reaches ALSA through <code>alsa-sys</code>, which is a <code>-sys</code> crate: it compiles against ALSA&#x27;s C headers and asks <code>pkg-config</code> where they are. Neither ships with a base install of most distributions.</li>
+<li><strong>macOS</strong>: CoreAudio comes from Apple&#x27;s SDK, which arrives with the Xcode command line tools. Apple&#x27;s licence does not permit redistributing it, which is also why this tool cannot build a macOS binary anywhere else.</li>
+<li><strong>Windows</strong>: the MSVC toolchain needs a linker, which comes with the Visual Studio build tools.</li>
 </ul>
 <p>Everything else -- the engine, the container format, the app lock, the website generators -- has no system dependency at all.</p>
 <h2 id="what-detected-means-and-what-it-does-not">What &quot;detected&quot; means, and what it does not</h2>

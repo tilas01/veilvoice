@@ -33,7 +33,7 @@ is the property the whole crate rests on, and
 `Posture::is_at_least_as_strict_as` exists so a test can hold it.
 
 Anybody adding a variant should read `crate`'s documentation first. A
-loosening variant does not merely add a feature — it removes the reason the
+loosening variant does not merely add a feature: it removes the reason the
 plain file can be read without a passphrase.
 
 # Format

@@ -53,7 +53,7 @@
 <span class="ln" id="L10"><span class="tok-com">//!</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! It was part of the command line. `install.rs` lived inside the</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! `veilvoice-cli` **binary** crate, which meant the desktop application could</span></span>
-<span class="ln" id="L13"><span class="tok-com">//! not call a single line of it &#8212; a binary crate has no consumers. The choice</span></span>
+<span class="ln" id="L13"><span class="tok-com">//! not call a single line of it, because a binary crate has no consumers. The choice</span></span>
 <span class="ln" id="L14"><span class="tok-com">//! was to reimplement the installer behind the graphical front end, or to move</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! the logic somewhere both front ends can reach. Reimplementing it would have</span></span>
 <span class="ln" id="L16"><span class="tok-com">//! produced two programs that edit `PATH`, drifting apart at whatever rate</span></span>
@@ -74,23 +74,23 @@
 <span class="ln" id="L31"><span class="tok-com">//! is verifying what you run has no business being casual about that.</span></span>
 <span class="ln" id="L32"><span class="tok-com">//!</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! **It never asks for administrator rights.** Everything [`install`] does is</span></span>
-<span class="ln" id="L34"><span class="tok-com">//! inside the user&#x27;s own account. Where a companion genuinely needs privilege</span></span>
-<span class="ln" id="L35"><span class="tok-com">//! &#8212; a system package manager, an audio driver &#8212; that fact is reported and the</span></span>
+<span class="ln" id="L34"><span class="tok-com">//! inside the user&#x27;s own account. Where a companion genuinely needs privilege,</span></span>
+<span class="ln" id="L35"><span class="tok-com">//! such as a system package manager or an audio driver, that fact is reported and the</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! command is handed over rather than run, because a graphical program cannot</span></span>
 <span class="ln" id="L37"><span class="tok-com">//! honestly collect a `sudo` password and this one does not try.</span></span>
 <span class="ln" id="L38"><span class="tok-com">//!</span></span>
 <span class="ln" id="L39"><span class="tok-com">//! **Nothing is ticked by default.** There are no checkboxes at all: each</span></span>
 <span class="ln" id="L40"><span class="tok-com">//! companion is a separate, deliberate action. The rule that predates this</span></span>
-<span class="ln" id="L41"><span class="tok-com">//! crate &#8212; detect, say what it is and who makes it, act only on an explicit</span></span>
-<span class="ln" id="L42"><span class="tok-com">//! yes &#8212; is unchanged by the interface getting prettier.</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! crate, which is to detect, say what it is and who makes it, and act only on</span></span>
+<span class="ln" id="L42"><span class="tok-com">//! an explicit yes, is unchanged by the interface getting prettier.</span></span>
 <span class="ln" id="L43"><span class="tok-com">//!</span></span>
 <span class="ln" id="L44"><span class="tok-com">//! # No `unsafe`, and therefore some subprocesses</span></span>
 <span class="ln" id="L45"><span class="tok-com">//!</span></span>
 <span class="ln" id="L46"><span class="tok-com">//! `#![forbid(unsafe_code)]` holds here as everywhere else in the workspace,</span></span>
 <span class="ln" id="L47"><span class="tok-com">//! so the Windows registry is reached through `reg.exe` rather than the Win32</span></span>
 <span class="ln" id="L48"><span class="tok-com">//! API. [`command`] wraps every spawn so that none of them flashes a console</span></span>
-<span class="ln" id="L49"><span class="tok-com">//! window when the desktop application is the caller &#8212; the defect that shipped</span></span>
-<span class="ln" id="L50"><span class="tok-com">//! in v0.1.10 &#8212; and a test reads this crate&#x27;s own source to catch a spawn that</span></span>
+<span class="ln" id="L49"><span class="tok-com">//! window when the desktop application is the caller, which is the defect that</span></span>
+<span class="ln" id="L50"><span class="tok-com">//! shipped in v0.1.10, and a test reads this crate&#x27;s own source to catch a spawn that</span></span>
 <span class="ln" id="L51"><span class="tok-com">//! forgets.</span></span>
 <span class="ln" id="L52"><span class="tok-com">//!</span></span>
 <span class="ln" id="L53"><span class="tok-com">//! # In plain words</span></span>

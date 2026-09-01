@@ -23,7 +23,7 @@ a thousand pixels wide. Drawing every sample would produce a path megabytes
 long that renders as a solid block.
 
 So the audio is divided into as many buckets as there are columns, and each
-bucket keeps its **minimum and maximum** — not its average, and not its
+bucket keeps its **minimum and maximum**, not its average and not its
 root-mean-square. The extremes are what a waveform is: they are what makes a
 plosive look like a plosive, and an average over a bucket of a symmetric
 waveform is approximately zero however loud it was.
@@ -31,8 +31,8 @@ waveform is approximately zero however loud it was.
 # It is drawn from the veiled audio
 
 Worth stating, because the alternative is an easy mistake. The picture is of
-the **output**, not the input. A waveform is not a voiceprint — it carries
-no formants and no phase — but it does carry timing and loudness, and a
+the **output**, not the input. A waveform is not a voiceprint, since it carries
+no formants and no phase, but it does carry timing and loudness, and a
 picture of the original would show the original's timing and loudness beside
 a recording that had gone to some trouble to replace them.
 

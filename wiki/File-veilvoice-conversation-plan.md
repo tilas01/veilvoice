@@ -19,7 +19,7 @@ Who is in the recording, and who is speaking when.
 
 Deciding which person is speaking at each moment is *speaker diarisation*,
 and doing it from the audio alone needs a trained model. This project ships
-no model, talks to no server, and is not about to start doing either — so
+no model, talks to no server, and is not about to start doing either, so
 the turns come from the user, and there are exactly two honest ways to get
 them:
 
@@ -31,7 +31,7 @@ whoever was there or produced by whatever tool they already use for
 transcripts.
 
 What would be worse than either is guessing. A wrong guess maps two people
-onto one voice — which is a privacy *improvement* and a usability disaster —
+onto one voice, which is a privacy *improvement* and a usability disaster,
 or splits one person across two voices, which invites a listener to believe
 there was somebody in the room who was not. Neither failure would be visible
 in the output, and both would be blamed on the recording rather than on the

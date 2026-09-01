@@ -33,7 +33,7 @@ before it goes to anybody else.
 
 It does **not** reach inside any of them. It does not read Signal's or
 Matrix's traffic, hook their audio, inject into their processes or decrypt
-anything. That is not a limitation being apologised for — it is the same
+anything. That is not a limitation being apologised for: it is the same
 act this whole project exists to make useless, and a privacy tool that
 shipped a way to intercept an end-to-end encrypted call would be arguing
 against itself.
@@ -61,7 +61,7 @@ This route veils **what you send**. It does nothing to what you receive:
 the other people on the call are not going through VeilVoice, and their
 voices arrive as they always did.
 
-Veiling a whole call — everybody, including the people at the other end —
+Veiling a whole call, meaning everybody including the people at the other end,
 means capturing what the program *plays*, which is a different mechanism on
 every platform and is not built. `INCOMING` says so in the words a front
 end should show, rather than letting somebody assume a recording of a call

@@ -52,9 +52,9 @@
 <div>
 <section id="s-about">
 <p>The manual update check, as the window shows it.</p>
-<p><code>veilvoice_update</code> does the asking and states what the answer is worth. This is the button, the spinner and the result &#8212; and the rule that the button is the only thing that ever starts it.</p>
+<p><code>veilvoice_update</code> does the asking and states what the answer is worth. This is the button, the spinner and the result, and the rule that the button is the only thing that ever starts it.</p>
 <h2 id="it-runs-on-a-thread-and-the-window-never-waits-for-it">It runs on a thread, and the window never waits for it</h2>
-<p>The check runs a subprocess and waits for a network round trip. On a captive portal that is the full ten-second timeout. <code>update()</code> may read, paint and <em>start</em> work; it may never wait for any &#8212; locked decision 15, and the reason this application was reported as freezing every couple of seconds once already. So the button spawns a thread, the thread sends one message down a channel, and the window drains that channel once a frame and moves on.</p>
+<p>The check runs a subprocess and waits for a network round trip. On a captive portal that is the full ten-second timeout. <code>update()</code> may read, paint and <em>start</em> work; it may never wait for any. That is locked decision 15, and the reason this application was reported as freezing every couple of seconds once already. So the button spawns a thread, the thread sends one message down a channel, and the window drains that channel once a frame and moves on.</p>
 <h2 id="nothing-here-is-automatic">Nothing here is automatic</h2>
 <p>There is no timer, no check at startup, and no &quot;check again&quot; on a schedule. <code>Updates</code> holds no clock. The only path into <code>veilvoice_update::check</code> is a click, and a test asserts the state a freshly built panel is in.</p>
 <h2 id="in-plain-words">In plain words</h2>

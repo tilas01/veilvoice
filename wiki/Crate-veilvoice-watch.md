@@ -24,15 +24,15 @@ and more basic question: *is something listening that you did not choose?*
 A de-identified voice on a call is worth very little if a second program is
 recording the raw microphone at the same time.
 
-Operating systems have grown indicators for this — the orange dot, the
-taskbar icon — but they are small, easily missed, and tell you only that
+Operating systems have grown indicators for this, the orange dot and the
+taskbar icon, but they are small, easily missed, and tell you only that
 *something* is active, rarely what. This reports the process, its PID and
 how long it has held the device.
 
 ## What it can actually see, per platform
 
 Detection is honest about its limits, because a monitor that quietly sees
-nothing is worse than no monitor at all — it produces false confidence.
+nothing is worse than no monitor at all, because it produces false confidence.
 `support` reports what the current platform can do before you rely on it.
 
 | Platform | Microphone | Camera | How |

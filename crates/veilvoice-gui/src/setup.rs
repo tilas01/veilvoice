@@ -2,7 +2,7 @@
 //! The setup tab: install this copy, undo that, and the optional companions.
 //!
 //! This is the graphical front end to [`veilvoice_setup`], and it is a *front
-//! end* in the strict sense — it holds no installation logic of its own. Every
+//! end* in the strict sense: it holds no installation logic of its own. Every
 //! change to the machine goes through the same functions `veilvoice install`
 //! calls, so the careful part (editing `PATH`, which is the one operation here
 //! that can damage a machine) has one implementation and one set of tests.
@@ -31,7 +31,7 @@
 //! # Nothing slow runs on the UI thread
 //!
 //! Copying binaries, editing the registry and running a package manager all
-//! take real time — a package manager can take minutes. Each runs on a worker
+//! take real time, because a package manager can take minutes. Each runs on a worker
 //! and reports back through an [`std::sync::mpsc`] channel, exactly as the file
 //! job in [`crate::VeilVoiceApp`] does, so the window keeps painting and the
 //! progress strip keeps moving.
@@ -714,7 +714,7 @@ mod tests {
     }
 
     /// The list of changes is what the user consents to, so it must name the
-    /// three things `veilvoice_setup::install` actually does — and must not
+    /// three things `veilvoice_setup::install` actually does, and must not
     /// stop mentioning that it asks for no administrator rights.
     #[test]
     fn the_consent_text_names_what_install_changes() {

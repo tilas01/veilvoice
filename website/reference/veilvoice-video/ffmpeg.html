@@ -55,9 +55,9 @@
 <p>The video file, which needs a codec this project does not ship.</p>
 <h2 id="why-there-is-no-encoder-here">Why there is no encoder here</h2>
 <p>A conversation an hour long is about 108,000 frames at 30 per second. Turning those into something a phone will play means H.264 or AV1, and writing either is not a sensible thing for a voice de-identifier to do. Pulling one in is worse: every usable encoder is a large C library, and this project&#x27;s dependency graph containing no such thing is a claim on its front page that a reader can check with <code>cargo tree</code> in ten seconds.</p>
-<p>So the honest arrangement is the one the rest of the project already uses for exactly this kind of problem &#8212; the download in <code>veilvoice-verify</code>, the registry in <code>veilvoice-watch</code>, the driver list in <code>veilvoice-drivers</code>. Find the tool the machine already has, prepare the exact command, and let the person decide.</p>
+<p>So the honest arrangement is the one the rest of the project already uses for exactly this kind of problem: the download in <code>veilvoice-verify</code>, the registry in <code>veilvoice-watch</code>, the driver list in <code>veilvoice-drivers</code>. Find the tool the machine already has, prepare the exact command, and let the person decide.</p>
 <h2 id="and-veilvoice-will-not-run-it-for-you">And VeilVoice will not run it for you</h2>
-<p><code>command</code> builds the argument list. Running it is the caller&#x27;s, and a front end should print it rather than execute it silently &#8212; the same rule the companion installer follows, for the same reason.</p>
+<p><code>command</code> builds the argument list. Running it is the caller&#x27;s, and a front end should print it rather than execute it silently, the same rule the companion installer follows, for the same reason.</p>
 <h2 id="if-the-machine-has-no-ffmpeg-nothing-has-failed">If the machine has no ffmpeg, nothing has failed</h2>
 <p><code>crate::page::player</code> has already written a file that plays everywhere and needs nothing installed. The video file is the extra, not the product.</p>
 <h2 id="in-plain-words">In plain words</h2>

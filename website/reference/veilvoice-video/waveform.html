@@ -55,9 +55,9 @@
 <p>The shape of the audio, reduced to something a page can draw.</p>
 <h2 id="peaks-not-samples">Peaks, not samples</h2>
 <p>A minute of audio at 48 kHz is 2.88 million samples and a waveform is about a thousand pixels wide. Drawing every sample would produce a path megabytes long that renders as a solid block.</p>
-<p>So the audio is divided into as many buckets as there are columns, and each bucket keeps its <strong>minimum and maximum</strong> &#8212; not its average, and not its root-mean-square. The extremes are what a waveform is: they are what makes a plosive look like a plosive, and an average over a bucket of a symmetric waveform is approximately zero however loud it was.</p>
+<p>So the audio is divided into as many buckets as there are columns, and each bucket keeps its <strong>minimum and maximum</strong>, not its average and not its root-mean-square. The extremes are what a waveform is: they are what makes a plosive look like a plosive, and an average over a bucket of a symmetric waveform is approximately zero however loud it was.</p>
 <h2 id="it-is-drawn-from-the-veiled-audio">It is drawn from the veiled audio</h2>
-<p>Worth stating, because the alternative is an easy mistake. The picture is of the <strong>output</strong>, not the input. A waveform is not a voiceprint &#8212; it carries no formants and no phase &#8212; but it does carry timing and loudness, and a picture of the original would show the original&#x27;s timing and loudness beside a recording that had gone to some trouble to replace them.</p>
+<p>Worth stating, because the alternative is an easy mistake. The picture is of the <strong>output</strong>, not the input. A waveform is not a voiceprint, since it carries no formants and no phase, but it does carry timing and loudness, and a picture of the original would show the original&#x27;s timing and loudness beside a recording that had gone to some trouble to replace them.</p>
 <h2 id="what-a-waveform-still-shows">What a waveform still shows</h2>
 <p>Silences, the rhythm of speech, how loud somebody was, and roughly where a sentence ends. That is the same turn-taking structure a conversation render keeps on purpose, drawn rather than heard, and it is not additional exposure beyond what the audio already carries.</p>
 <h2 id="in-plain-words">In plain words</h2>

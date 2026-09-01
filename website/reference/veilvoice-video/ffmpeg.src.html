@@ -54,7 +54,7 @@
 <span class="ln" id="L11"><span class="tok-com">//! a reader can check with `cargo tree` in ten seconds.</span></span>
 <span class="ln" id="L12"><span class="tok-com">//!</span></span>
 <span class="ln" id="L13"><span class="tok-com">//! So the honest arrangement is the one the rest of the project already uses</span></span>
-<span class="ln" id="L14"><span class="tok-com">//! for exactly this kind of problem &#8212; the download in `veilvoice-verify`, the</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! for exactly this kind of problem: the download in `veilvoice-verify`, the</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! registry in `veilvoice-watch`, the driver list in `veilvoice-drivers`. Find</span></span>
 <span class="ln" id="L16"><span class="tok-com">//! the tool the machine already has, prepare the exact command, and let the</span></span>
 <span class="ln" id="L17"><span class="tok-com">//! person decide.</span></span>
@@ -62,7 +62,7 @@
 <span class="ln" id="L19"><span class="tok-com">//! # And VeilVoice will not run it for you</span></span>
 <span class="ln" id="L20"><span class="tok-com">//!</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! [`command`] builds the argument list. Running it is the caller&#x27;s, and a</span></span>
-<span class="ln" id="L22"><span class="tok-com">//! front end should print it rather than execute it silently &#8212; the same rule</span></span>
+<span class="ln" id="L22"><span class="tok-com">//! front end should print it rather than execute it silently, the same rule</span></span>
 <span class="ln" id="L23"><span class="tok-com">//! the companion installer follows, for the same reason.</span></span>
 <span class="ln" id="L24"><span class="tok-com">//!</span></span>
 <span class="ln" id="L25"><span class="tok-com">//! # If the machine has no ffmpeg, nothing has failed</span></span>
@@ -328,7 +328,7 @@
 <span class="ln" id="L268"><span class="tok-com">/// The command as one line, for printing.</span></span>
 <span class="ln" id="L269"><span class="tok-com">///</span></span>
 <span class="ln" id="L270"><span class="tok-com">/// Quoted where a part contains a space. For a person to read and paste, not</span></span>
-<span class="ln" id="L271"><span class="tok-com">/// for a shell this program runs &#8212; nothing here runs it.</span></span>
+<span class="ln" id="L271"><span class="tok-com">/// for a shell this program runs. Nothing here runs it.</span></span>
 <span class="ln" id="L272"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">command_line</span>(argv: &amp;[String]) -&gt; String {</span>
 <span class="ln" id="L273">    argv.<span class="tok-fn">iter</span>()</span>
 <span class="ln" id="L274">        .<span class="tok-fn">map</span>(|part| {</span>

@@ -74,7 +74,7 @@ fn no_window(mut command: std::process::Command) -> std::process::Command {
 /// `Command` resolves a bare name through the platform's search order, and on
 /// Windows that order includes the **current working directory** before most of
 /// `PATH`. Running `veilvoice guard check` inside a directory that happens to
-/// contain a file called `wevtutil.exe` therefore ran that file — as the user,
+/// contain a file called `wevtutil.exe` therefore ran that file, as the user,
 /// with no prompt. A downloads folder is enough. The same applies to `reg.exe`
 /// in `veilvoice-watch`, and to `ausearch` on a Unix box with a writable
 /// directory early in `PATH`.
@@ -179,7 +179,7 @@ mod linux {
     use std::process::Command;
 
     /// Where a distribution puts `ausearch`. Searched in order, and nowhere
-    /// else — see [`super::system_tool`] for why `PATH` is not consulted.
+    /// else. See [`super::system_tool`] for why `PATH` is not consulted.
     const AUSEARCH_DIRS: &[&str] = &["/sbin", "/usr/sbin", "/bin", "/usr/bin", "/usr/local/sbin"];
 
     /// Ask `ausearch` what touched the path, if the audit tools are present at
@@ -263,7 +263,7 @@ mod windows {
     /// audit policy is on, which is off by default; and reading the Security
     /// log needs elevation. All three are ordinary reasons to get nothing.
     /// `wevtutil.exe` lives in the system directory and nowhere else. Resolved
-    /// absolutely rather than searched — see [`super::system_tool`].
+    /// absolutely rather than searched. See [`super::system_tool`].
     fn wevtutil() -> Option<std::path::PathBuf> {
         let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".to_string());
         super::system_tool(
@@ -275,7 +275,7 @@ mod windows {
     pub fn who_touched(path: &Path) -> Blame {
         let target = path.to_string_lossy();
 
-        // XPath 1.0 — which is what `wevtutil`'s structured queries speak — has
+        // XPath 1.0, which is what `wevtutil`'s structured queries speak, has
         // **no escape at all** for a quote inside a string literal. The
         // previous code doubled the apostrophe, which is the SQL and XQuery
         // rule, not this one; the result was a syntactically broken query that

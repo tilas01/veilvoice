@@ -120,7 +120,7 @@
 <span class="ln" id="L74"><span class="tok-com">/// `Command` resolves a bare name through the platform&#x27;s search order, and on</span></span>
 <span class="ln" id="L75"><span class="tok-com">/// Windows that order includes the **current working directory** before most of</span></span>
 <span class="ln" id="L76"><span class="tok-com">/// `PATH`. Running `veilvoice guard check` inside a directory that happens to</span></span>
-<span class="ln" id="L77"><span class="tok-com">/// contain a file called `wevtutil.exe` therefore ran that file &#8212; as the user,</span></span>
+<span class="ln" id="L77"><span class="tok-com">/// contain a file called `wevtutil.exe` therefore ran that file, as the user,</span></span>
 <span class="ln" id="L78"><span class="tok-com">/// with no prompt. A downloads folder is enough. The same applies to `reg.exe`</span></span>
 <span class="ln" id="L79"><span class="tok-com">/// in `veilvoice-watch`, and to `ausearch` on a Unix box with a writable</span></span>
 <span class="ln" id="L80"><span class="tok-com">/// directory early in `PATH`.</span></span>
@@ -237,7 +237,7 @@
 <span class="ln" id="L179">    <span class="tok-kw">use</span> std::process::Command;</span>
 <span class="ln" id="L180"></span>
 <span class="ln" id="L181">    <span class="tok-com">/// Where a distribution puts `ausearch`. Searched in order, and nowhere</span></span>
-<span class="ln" id="L182">    <span class="tok-com">/// else &#8212; see [`super::system_tool`] for why `PATH` is not consulted.</span></span>
+<span class="ln" id="L182">    <span class="tok-com">/// else. See [`super::system_tool`] for why `PATH` is not consulted.</span></span>
 <span class="ln" id="L183">    <span class="tok-kw">const</span> AUSEARCH_DIRS: &amp;[&amp;str] = &amp;[<span class="tok-str">&quot;/sbin&quot;</span>, <span class="tok-str">&quot;/usr/sbin&quot;</span>, <span class="tok-str">&quot;/bin&quot;</span>, <span class="tok-str">&quot;/usr/bin&quot;</span>, <span class="tok-str">&quot;/usr/local/sbin&quot;</span>];</span>
 <span class="ln" id="L184"></span>
 <span class="ln" id="L185">    <span class="tok-com">/// Ask `ausearch` what touched the path, if the audit tools are present at</span></span>
@@ -323,7 +323,7 @@
 <span class="ln" id="L263">    <span class="tok-com">/// audit policy is on, which is off by default; and reading the Security</span></span>
 <span class="ln" id="L264">    <span class="tok-com">/// log needs elevation. All three are ordinary reasons to get nothing.</span></span>
 <span class="ln" id="L265">    <span class="tok-com">/// `wevtutil.exe` lives in the system directory and nowhere else. Resolved</span></span>
-<span class="ln" id="L266">    <span class="tok-com">/// absolutely rather than searched &#8212; see [`super::system_tool`].</span></span>
+<span class="ln" id="L266">    <span class="tok-com">/// absolutely rather than searched. See [`super::system_tool`].</span></span>
 <span class="ln" id="L267">    <span class="tok-kw">fn</span> <span class="tok-fn">wevtutil</span>() -&gt; Option&lt;std::path::PathBuf&gt; {</span>
 <span class="ln" id="L268">        <span class="tok-kw">let</span> root = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">r&quot;C:\Windows&quot;</span>.<span class="tok-fn">to_string</span>());</span>
 <span class="ln" id="L269">        <span class="tok-kw">super</span>::<span class="tok-fn">system_tool</span>(</span>
@@ -335,7 +335,7 @@
 <span class="ln" id="L275">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">who_touched</span>(path: &amp;Path) -&gt; Blame {</span>
 <span class="ln" id="L276">        <span class="tok-kw">let</span> target = path.<span class="tok-fn">to_string_lossy</span>();</span>
 <span class="ln" id="L277"></span>
-<span class="ln" id="L278">        <span class="tok-com">// XPath 1.0 &#8212; which is what `wevtutil`&#x27;s structured queries speak &#8212; has</span></span>
+<span class="ln" id="L278">        <span class="tok-com">// XPath 1.0, which is what `wevtutil`&#x27;s structured queries speak, has</span></span>
 <span class="ln" id="L279">        <span class="tok-com">// **no escape at all** for a quote inside a string literal. The</span></span>
 <span class="ln" id="L280">        <span class="tok-com">// previous code doubled the apostrophe, which is the SQL and XQuery</span></span>
 <span class="ln" id="L281">        <span class="tok-com">// rule, not this one; the result was a syntactically broken query that</span></span>

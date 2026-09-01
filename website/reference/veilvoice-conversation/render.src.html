@@ -93,7 +93,7 @@
 <span class="ln" id="L50"><span class="tok-com">//!</span></span>
 <span class="ln" id="L51"><span class="tok-com">//! That is the one decision in this file that is not a trade-off. Passing</span></span>
 <span class="ln" id="L52"><span class="tok-com">//! unassigned audio through unveiled would put somebody&#x27;s real voice into a</span></span>
-<span class="ln" id="L53"><span class="tok-com">//! file whose entire purpose is that it contains no real voice &#8212; because of a</span></span>
+<span class="ln" id="L53"><span class="tok-com">//! file whose entire purpose is that it contains no real voice, because of a</span></span>
 <span class="ln" id="L54"><span class="tok-com">//! gap in a text file, silently, in the middle of an otherwise veiled</span></span>
 <span class="ln" id="L55"><span class="tok-com">//! recording. Silence loses content and can be seen; a raw voice cannot be</span></span>
 <span class="ln" id="L56"><span class="tok-com">//! unheard.</span></span>
@@ -103,7 +103,7 @@
 <span class="ln" id="L60"><span class="tok-com">//!</span></span>
 <span class="ln" id="L61"><span class="tok-com">//! # Latency is removed, so a turn lands where the plan said</span></span>
 <span class="ln" id="L62"><span class="tok-com">//!</span></span>
-<span class="ln" id="L63"><span class="tok-com">//! The engine has a fixed algorithmic latency &#8212; the STFT cannot emit a sample</span></span>
+<span class="ln" id="L63"><span class="tok-com">//! The engine has a fixed algorithmic latency, because the STFT cannot emit a sample</span></span>
 <span class="ln" id="L64"><span class="tok-com">//! until it has a frame around it. Each span is therefore processed with a tail</span></span>
 <span class="ln" id="L65"><span class="tok-com">//! of silence and the first `latency_samples` of output are dropped, which puts</span></span>
 <span class="ln" id="L66"><span class="tok-com">//! the veiled audio back exactly where the original was. Without this every</span></span>
@@ -120,8 +120,8 @@
 <span class="ln" id="L77"><span class="tok-com">//!</span></span>
 <span class="ln" id="L78"><span class="tok-com">//! # Every speaker renders at the same time</span></span>
 <span class="ln" id="L79"><span class="tok-com">//!</span></span>
-<span class="ln" id="L80"><span class="tok-com">//! Speakers are independent by construction &#8212; a separate engine, a separate</span></span>
-<span class="ln" id="L81"><span class="tok-com">//! seed, a separate destination &#8212; so there is nothing to share between them and</span></span>
+<span class="ln" id="L80"><span class="tok-com">//! Speakers are independent by construction, with a separate engine, a separate</span></span>
+<span class="ln" id="L81"><span class="tok-com">//! seed and a separate destination, so there is nothing to share between them and</span></span>
 <span class="ln" id="L82"><span class="tok-com">//! nothing to lock. Each one is given a thread and they all run at once, which</span></span>
 <span class="ln" id="L83"><span class="tok-com">//! on an ordinary machine turns a four-person recording into roughly the work</span></span>
 <span class="ln" id="L84"><span class="tok-com">//! of one.</span></span>
@@ -136,7 +136,7 @@
 <span class="ln" id="L93"><span class="tok-com">//!</span></span>
 <span class="ln" id="L94"><span class="tok-com">//! Each thread writes into its own buffer and the merge happens afterwards, in</span></span>
 <span class="ln" id="L95"><span class="tok-com">//! slot order. That is what makes the result **identical to the sequential one,</span></span>
-<span class="ln" id="L96"><span class="tok-com">//! bit for bit** &#8212; floating-point addition is not associative, so a merge in</span></span>
+<span class="ln" id="L96"><span class="tok-com">//! bit for bit**, because floating-point addition is not associative, so a merge in</span></span>
 <span class="ln" id="L97"><span class="tok-com">//! completion order would give a different file on every run and the render</span></span>
 <span class="ln" id="L98"><span class="tok-com">//! would stop being reproducible from its seeds. A test holds it.</span></span>
 <span class="ln" id="L99"><span class="tok-com">//!</span></span>
@@ -243,7 +243,7 @@
 <span class="ln" id="L189"><span class="tok-com">///</span></span>
 <span class="ln" id="L190"><span class="tok-com">/// `seeds` supplies one seed per speaker for a deterministic render; `None`</span></span>
 <span class="ln" id="L191"><span class="tok-com">/// draws each from the OS CSPRNG, which is what a front end should do. The</span></span>
-<span class="ln" id="L192"><span class="tok-com">/// deterministic form exists so this can be tested at all &#8212; a de-identifier</span></span>
+<span class="ln" id="L192"><span class="tok-com">/// deterministic form exists so this can be tested at all, because a de-identifier</span></span>
 <span class="ln" id="L193"><span class="tok-com">/// whose output cannot be reproduced cannot be checked.</span></span>
 <span class="ln" id="L194"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">render</span>(</span>
 <span class="ln" id="L195">    plan: &amp;Conversation,</span>

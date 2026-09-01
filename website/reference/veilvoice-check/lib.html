@@ -54,14 +54,14 @@
 <section id="s-about">
 <p>Check a VeilVoice release: a file&#x27;s SHA-256, its line in a <code>SHA256SUMS</code>, and the detached OpenPGP signature over that list.</p>
 <h2 id="why-this-is-a-library-and-not-only-a-program">Why this is a library and not only a program</h2>
-<p><code>veilvoice-verify</code> did all of this and did it inside a binary crate, which has no consumers by construction. The desktop application was asked for a <strong>verify tab</strong> &#8212; drag a download onto the window and be told whether it is the published one &#8212; and there were two ways to have that:</p>
+<p><code>veilvoice-verify</code> did all of this and did it inside a binary crate, which has no consumers by construction. The desktop application was asked for a <strong>verify tab</strong>, where you drag a download onto the window and are told whether it is the published one, and there were two ways to have that:</p>
 <ul>
 <li>link <code>eframe</code> into the 1.5 MB portable verifier, which is the one binary in this project whose smallness is a feature: it is what somebody downloads <em>before</em> they trust anything else here;</li>
 <li>or move the checking out of the binary, so both front ends call the same code rather than two implementations of it.</li>
 </ul>
 <p>This is the second. The verifier is unchanged in what it does and prints; it just no longer owns the arithmetic.</p>
 <h2 id="what-a-pass-actually-proves-and-what-it-does-not">What a pass actually proves, and what it does not</h2>
-<p>A good signature over <code>SHA256SUMS</code>, plus a matching hash, proves the file is <strong>the one the holder of this key published</strong>. It does not prove the file is safe, that the source compiles to it, or that the key belongs to anybody in particular. The second of those is the check worth having and it is the one this project cannot perform for you &#8212; it needs somebody other than the author to have built the same tag and got the same hash.</p>
+<p>A good signature over <code>SHA256SUMS</code>, plus a matching hash, proves the file is <strong>the one the holder of this key published</strong>. It does not prove the file is safe, that the source compiles to it, or that the key belongs to anybody in particular. The second of those is the check worth having and it is the one this project cannot perform for you, because it needs somebody other than the author to have built the same tag and got the same hash.</p>
 <p>Every front end that uses this has to say so. The words are here, in <code>SCOPE</code>, rather than in whichever interface happens to be showing the answer, so a second front end cannot show a pass without them.</p>
 <h2 id="no-network-and-no-gnupg">No network, and no GnuPG</h2>
 <p>Nothing in this crate opens a socket or runs a program. It is given bytes and it reports on them. Downloading is the caller&#x27;s problem, and the two callers that do it shell out to the system&#x27;s own transfer tool.</p>

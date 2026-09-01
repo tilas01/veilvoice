@@ -39,8 +39,8 @@ laptop. It does not stop someone who takes the drive.
 # A limitation of typing a password into a window
 
 A text field owns a `String`, so a passphrase exists as ordinary heap bytes
-while it is being typed. That window cannot be removed — something has to
-receive the keystrokes — but it can be kept short, and it is:
+while it is being typed. That window cannot be removed, because something has
+to receive the keystrokes, but it can be kept short, and it is:
 
 - the typing buffer is wiped the moment the passphrase is confirmed;
 - the confirmed passphrase is held only as a `veilvoice_crypto::Secret`,

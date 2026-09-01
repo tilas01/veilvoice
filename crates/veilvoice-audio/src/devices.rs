@@ -82,7 +82,7 @@ pub struct DeviceInfo {
 /// Name fragments used by the common virtual audio cables.
 ///
 /// Routing the veiled voice into one of these is what lets any other
-/// application — a call, a stream, a recorder — receive it as if it were a
+/// application, whether a call, a stream or a recorder, receive it as if it were a
 /// microphone. Matching on the name is crude, but there is no portable way to
 /// ask an audio device whether it is virtual, and the alternative is making the
 /// user hunt through a list of identically-named endpoints.

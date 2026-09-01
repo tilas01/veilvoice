@@ -49,7 +49,7 @@
 <span class="ln" id="L6"><span class="tok-com">//! The native answer is `EnumDeviceDrivers` or a service-control enumeration,</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! and both are FFI. `#![forbid(unsafe_code)]` holds in this crate as it does</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! everywhere else in the workspace, so this shells out to a tool Windows</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! installs by default &#8212; the same trade `veilvoice-watch` makes for the</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! installs by default, the same trade `veilvoice-watch` makes for the</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! registry and `veilvoice-verify` makes for downloading.</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!</span></span>
 <span class="ln" id="L12"><span class="tok-com">//! `driverquery.exe` is resolved by absolute path under `%SystemRoot%`. Never</span></span>
@@ -66,7 +66,7 @@
 <span class="ln" id="L23"><span class="tok-com">//! &quot;ACPI&quot;,&quot;Microsoft ACPI Driver&quot;,&quot;Kernel &quot;,&quot;1/1/1970 12:00:00 AM&quot;</span></span>
 <span class="ln" id="L24"><span class="tok-com">//! ```</span></span>
 <span class="ln" id="L25"><span class="tok-com">//!</span></span>
-<span class="ln" id="L26"><span class="tok-com">//! Module name, display name, driver type, link date. The link date is kept &#8212;</span></span>
+<span class="ln" id="L26"><span class="tok-com">//! Module name, display name, driver type, link date. The link date is kept,</span></span>
 <span class="ln" id="L27"><span class="tok-com">//! unlike the Linux load address it is a property of the file rather than of</span></span>
 <span class="ln" id="L28"><span class="tok-com">//! this boot, so it does not change under a machine that has not changed.</span></span>
 <span class="ln" id="L29"><span class="tok-com">//!</span></span>
@@ -74,7 +74,7 @@
 <span class="ln" id="L31"><span class="tok-com">//!</span></span>
 <span class="ln" id="L32"><span class="tok-com">//! Installed drivers, which is a superset of what is loaded right now. A driver</span></span>
 <span class="ln" id="L33"><span class="tok-com">//! appearing here is therefore &quot;something installed a driver&quot;, not &quot;something</span></span>
-<span class="ln" id="L34"><span class="tok-com">//! is running in the kernel&quot; &#8212; a real distinction, and the front end wording</span></span>
+<span class="ln" id="L34"><span class="tok-com">//! is running in the kernel&quot;, which is a real distinction, and the front end wording</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! keeps it.</span></span>
 <span class="ln" id="L36"><span class="tok-com">//!</span></span>
 <span class="ln" id="L37"><span class="tok-com">//! # In plain words</span></span>

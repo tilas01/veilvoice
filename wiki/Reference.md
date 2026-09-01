@@ -170,7 +170,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`dialog.rs`|File-veilvoice-gui-dialog]] &mdash; Asking for a file without stopping the window.
 - [[`group.rs`|File-veilvoice-gui-group]] &mdash; Group mode: several people in one recording, each with a name and a colour.
 - [[`integrity.rs`|File-veilvoice-gui-integrity]] &mdash; The integrity record, taken and checked by the window rather than by hand.
-- [[`lib.rs`|File-veilvoice-gui-lib]] &mdash; The VeilVoice desktop application: an egui/eframe front-end, monospace throughout — anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.
+- [[`lib.rs`|File-veilvoice-gui-lib]] &mdash; The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope.
 - [[`main.rs`|File-veilvoice-gui-main]] &mdash; Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.
 - [[`monitor.rs`|File-veilvoice-gui-monitor]] &mdash; The live monitor: what is going in, and what is coming out, wherever you are.
 - [[`notify.rs`|File-veilvoice-gui-notify]] &mdash; How the application tells you something, and the three ways to be told.
@@ -202,7 +202,7 @@ Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.
 
 Settings that can only be tightened, sealed with the project's own post-quantum cryptography.
 
-- [[`lib.rs`|File-veilvoice-policy-lib]] &mdash; Settings somebody else decided, sealed so they cannot be edited without a passphrase — and, more importantly, built so that editing them without one buys nothing worth having.
+- [[`lib.rs`|File-veilvoice-policy-lib]] &mdash; Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having.
 - [[`policy.rs`|File-veilvoice-policy-policy]] &mdash; The policy itself: what can be required, and what requiring it does.
 
 ## [[veilvoice-priv|Crate-veilvoice-priv]]

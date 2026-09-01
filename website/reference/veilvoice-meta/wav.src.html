@@ -47,7 +47,7 @@
 <span class="ln" id="L4"><span class="tok-com">//! # Why WAV gets its own path</span></span>
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! `lofty` handles tags in every other container, but it cannot remove an</span></span>
-<span class="ln" id="L7"><span class="tok-com">//! ID3v2 block from a WAV file &#8212; the attempt fails with an encoding error and</span></span>
+<span class="ln" id="L7"><span class="tok-com">//! ID3v2 block from a WAV file: the attempt fails with an encoding error and</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! the tag stays put. Silently leaving metadata in place is exactly the failure</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! this crate exists to prevent, and WAV is the format VeilVoice writes itself,</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! so it gets a direct implementation rather than a caveat.</span></span>
@@ -56,7 +56,7 @@
 <span class="ln" id="L13"><span class="tok-com">//!</span></span>
 <span class="ln" id="L14"><span class="tok-com">//! A RIFF file is a flat list of chunks, and metadata hides in a lot of them:</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! `LIST`/`INFO` (artist, software, comments), `id3 ` and `ID3 `, `bext`</span></span>
-<span class="ln" id="L16"><span class="tok-com">//! (broadcast extension &#8212; originator, date, even a coding history), `iXML`,</span></span>
+<span class="ln" id="L16"><span class="tok-com">//! (the broadcast extension, carrying originator, date and even a coding history), `iXML`,</span></span>
 <span class="ln" id="L17"><span class="tok-com">//! `_PMX` (XMP), `axml`, `cart`. Enumerating those would leave every chunk</span></span>
 <span class="ln" id="L18"><span class="tok-com">//! nobody thought of, and new ones keep being invented.</span></span>
 <span class="ln" id="L19"><span class="tok-com">//!</span></span>
@@ -83,8 +83,8 @@
 <span class="ln" id="L39"><span class="tok-com">/// Chunks required to interpret the audio. Everything else goes.</span></span>
 <span class="ln" id="L40"><span class="tok-kw">const</span> KEEP: &amp;[&amp;[u8; <span class="tok-num">4</span>]] = &amp;[</span>
 </span>
-<span class="ln" id="L41">    b<span class="tok-str">&quot;fmt &quot;</span>, <span class="tok-com">// sample format &#8212; mandatory</span></span>
-<span class="ln" id="L42">    b<span class="tok-str">&quot;data&quot;</span>, <span class="tok-com">// the samples themselves &#8212; mandatory</span></span>
+<span class="ln" id="L41">    b<span class="tok-str">&quot;fmt &quot;</span>, <span class="tok-com">// sample format, mandatory</span></span>
+<span class="ln" id="L42">    b<span class="tok-str">&quot;data&quot;</span>, <span class="tok-com">// the samples themselves, mandatory</span></span>
 <span class="ln" id="L43">    b<span class="tok-str">&quot;fact&quot;</span>, <span class="tok-com">// sample count, required for non-PCM encodings</span></span>
 <span class="ln" id="L44">];</span>
 <span class="ln" id="L45"></span>
@@ -114,8 +114,8 @@
 <span class="ln" id="L64">    <span class="tok-com">// Trust the file&#x27;s actual length over the header, which is routinely wrong</span></span>
 <span class="ln" id="L65">    <span class="tok-com">// in streamed or truncated recordings.</span></span>
 <span class="ln" id="L66">    <span class="tok-com">//</span></span>
-<span class="ln" id="L67">    <span class="tok-com">// `saturating_add` rather than `+`: on a 32-bit target &#8212; and VeilVoice</span></span>
-<span class="ln" id="L68">    <span class="tok-com">// ships an ARMv7 build &#8212; `declared` can be `u32::MAX`, where `declared + 8`</span></span>
+<span class="ln" id="L67">    <span class="tok-com">// `saturating_add` rather than `+`: on a 32-bit target, and VeilVoice</span></span>
+<span class="ln" id="L68">    <span class="tok-com">// ships an ARMv7 build, `declared` can be `u32::MAX`, where `declared + 8`</span></span>
 <span class="ln" id="L69">    <span class="tok-com">// overflows `usize` and panics under overflow checks. A 64-bit host cannot</span></span>
 <span class="ln" id="L70">    <span class="tok-com">// reach it, which is exactly why the fuzzer in `tests/wav_fuzz.rs` never</span></span>
 <span class="ln" id="L71">    <span class="tok-com">// will either; this one had to be found by reading. Saturating is also the</span></span>
@@ -167,7 +167,7 @@
 <span class="ln" id="L117"></span>
 <span class="ln" id="L118">    <span class="tok-com">// The RIFF size field is a `u32`, so a body that does not fit in one cannot</span></span>
 <span class="ln" id="L119">    <span class="tok-com">// be described by the format at all. `as u32` would have wrapped and</span></span>
-<span class="ln" id="L120">    <span class="tok-com">// written a size that does not match the file &#8212; a silently corrupt WAV</span></span>
+<span class="ln" id="L120">    <span class="tok-com">// written a size that does not match the file, which is a silently corrupt WAV</span></span>
 <span class="ln" id="L121">    <span class="tok-com">// handed back as if it were clean, which for a *metadata cleaner* means</span></span>
 <span class="ln" id="L122">    <span class="tok-com">// the user believes a file is safe when it will not even open. Refuse</span></span>
 <span class="ln" id="L123">    <span class="tok-com">// instead. Only reachable for a body at or above 4 GiB, which is past what</span></span>

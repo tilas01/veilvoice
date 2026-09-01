@@ -32,7 +32,7 @@ destination voice for each of them, and subtitles that carry their names.
 VeilVoice's whole argument is that every speaker is mapped onto **one**
 canonical voice, so many inputs give one output and there is no inverse to
 compute. Run an interview through it and both people come out as the same
-voice — which is perfectly private and completely unusable, because a
+voice, which is perfectly private and completely unusable, because a
 listener cannot tell a question from its answer.
 
 This crate keeps the property and fixes the usability. Each speaker is
@@ -48,7 +48,7 @@ many-to-one.
 three people were in the room.
 * **The turn-taking survives.** Who spoke when, for how long, who
 interrupted whom, the rhythm of the exchange. That is preserved on
-purpose — it is what makes the result worth listening to — and it is
+purpose, since it is what makes the result worth listening to, and it is
 information about the conversation.
 * **Names are whatever you type.** A subtitle saying "Alex" contains the
 string "Alex". The audio is veiled; a caption is not, and this crate
@@ -62,7 +62,7 @@ Working that out from audio alone is speaker diarisation and needs a trained
 model. There is no model here, there is no server to ask, and guessing would
 be worse than not offering it: a wrong guess either merges two people or
 invents a third, and neither would be visible in the output. So the plan
-comes from the user — a channel per person, or a list of turns. See
+comes from the user, as a channel per person or a list of turns. See
 `plan`.
 
 ## The modules

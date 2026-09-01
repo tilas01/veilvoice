@@ -5,10 +5,10 @@
 //!
 //! Two things, which sound alike and are not:
 //!
-//! * A [`Profile`] is a **way of working** — a named set of settings you can
+//! * A [`Profile`] is a **way of working**, a named set of settings you can
 //!   switch to. "Anonymise one person, as thoroughly as this can." "A group,
 //!   everybody the same voice." Three are built in and you can save your own.
-//! * A [`Workspace`] is **one piece of work** — which recording, which plan,
+//! * A [`Workspace`] is **one piece of work**: which recording, which plan,
 //!   who is in it and what they are called, and the profile it was done under.
 //!   Saved beside the recording, so opening it a week later puts everything
 //!   back where it was.
@@ -38,7 +38,7 @@
 //! if it carried a passphrase, sending it would be handing over the recordings
 //! too, and people would find that out afterwards.
 //!
-//! Speaker names *are* in it, because the whole point is to put them back — and
+//! Speaker names *are* in it, because the whole point is to put them back, and
 //! a name is a name. The file says so.
 //!
 //! # In plain words
@@ -88,7 +88,7 @@ impl std::error::Error for Error {}
 
 /// A named way of working.
 ///
-/// The settings, and — as importantly — a plain sentence about what choosing it
+/// The settings, and just as importantly a plain sentence about what choosing it
 /// actually means. A profile called "highest security" that does not say what
 /// it does and does not do is a name doing the work of an explanation.
 // No `Eq`: two of these fields are `f32`, and floats have no total equality.
@@ -311,7 +311,7 @@ impl Workspace {
     /// An unknown keyword is **refused**, not skipped. A project file written by
     /// a newer build may describe a setup this one cannot reproduce, and quietly
     /// honouring the half it understands would put somebody's recording through
-    /// settings they did not choose — which is the same reasoning
+    /// settings they did not choose, which is the same reasoning
     /// `veilvoice-conversation` gives for refusing an unknown line in a plan.
     pub fn parse(text: &str) -> Result<Self, Error> {
         let mut lines = text.lines();
@@ -450,7 +450,7 @@ fn take_token(line: &str) -> (&str, &str) {
 /// A value with no line break in it.
 ///
 /// A newline inside a name would let one line become two, and the second could
-/// claim to be any keyword it liked — the same forging a plan's speaker names
+/// claim to be any keyword it liked, the same forging a plan's speaker names
 /// are already guarded against.
 fn one_line(value: &str) -> String {
     value.replace(['\n', '\r'], " ").trim().to_string()

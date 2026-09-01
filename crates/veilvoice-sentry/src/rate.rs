@@ -16,7 +16,7 @@
 //!
 //! So the output is numbers plus a [`Concern`] level against a [`Threshold`]
 //! **the user sets**, and the front end's job is to say "this many files
-//! changed in this long, was that you?" — a question, which the person at the
+//! changed in this long, was that you?", which is a question, and the person at the
 //! keyboard can answer instantly and this crate never can.
 //!
 //! # Modification times can be set by whatever did the modifying
@@ -35,7 +35,7 @@
 //!
 //! [`Limits`] caps how many files and how deep, and a snapshot that hit a cap
 //! is marked [`Snapshot::truncated`]. A truncated snapshot compared against
-//! another truncated snapshot is still useful — both walked in the same order —
+//! another truncated snapshot is still useful, because both walked in the same order,
 //! but the count is of what was looked at, not of what is there, and every
 //! report carries that flag so a front end cannot present it as complete.
 //!
@@ -46,7 +46,7 @@
 //! # Format
 //!
 //! A snapshot has to survive between two runs of the program, or the only
-//! comparison possible is one taken inside a single session — which measures
+//! comparison possible is one taken inside a single session, which measures
 //! the minute you were looking and nothing else. So it is written to disk, in
 //! text, one record per line, for the same reason the tamper manifest is text:
 //! the point of the file is to be checkable without this crate.
@@ -89,7 +89,7 @@ pub struct Facts {
     /// Length in bytes.
     pub len: u64,
     /// Modification time in seconds since the Unix epoch, where the platform
-    /// reports one. `None` is not an error — some filesystems do not keep it —
+    /// reports one. `None` is not an error, since some filesystems do not keep it,
     /// and a file whose time is unknown is compared on length alone.
     pub modified: Option<u64>,
 }
@@ -267,7 +267,7 @@ impl Concern {
 ///
 /// A churn whose window is zero cannot meet the rate condition at all, because
 /// it has no rate. It can still meet the share condition, so the answer is at
-/// most [`Concern::Elevated`] — which is the honest ceiling for a measurement
+/// most [`Concern::Elevated`], which is the honest ceiling for a measurement
 /// missing half its inputs.
 pub fn concern(churn: &Churn, threshold: &Threshold) -> Concern {
     let fast = churn
@@ -304,7 +304,7 @@ impl Snapshot {
     /// Opens nothing: only directory entries and their metadata are read, which
     /// is what keeps this cheap enough to run on a timer. Unreadable
     /// directories are recorded in [`Snapshot::unreadable`] rather than failing
-    /// the walk — a snapshot of nine folders out of ten is more useful than
+    /// the walk, because a snapshot of nine folders out of ten is more useful than
     /// none, and the tenth is itself reported.
     pub fn take(root: &Path, limits: Limits) -> Result<Self, Error> {
         let mut files = BTreeMap::new();
