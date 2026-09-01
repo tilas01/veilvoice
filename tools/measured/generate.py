@@ -132,6 +132,35 @@ def measured_tests() -> int:
     return sum(totals)
 
 
+def audit_findings() -> tuple[int, int]:
+    """How many findings the audit writes up, and the highest number it uses.
+
+    A finding "exists" here when it has an entry of its own: a line beginning
+    `### F-n`, or one beginning `**F-n` followed by a colon or a ` --`. Those
+    are the three shapes this document has used for a finding heading over
+    nineteen rounds. Anything else that names a finding is a mention, and
+    `**F-73 had**: ...` is the one line that reads like a heading and is a
+    sentence, so the separator is part of the pattern rather than optional. That distinction is the whole point of the measurement, because
+    F-93 and F-94 were fixed in code, described in their commit, referred to by
+    a later round, and never given an entry -- so every count taken by grepping
+    for `F-\d+` said they were documented and none of them was.
+
+    Two numbers rather than one. The count is what the verdict claims; the
+    highest is the last number handed out. They agree only when no number has
+    been skipped, so a reader comparing them can see a gap without reading the
+    document, and the suite fails when one opens.
+    """
+    text = (ROOT / "docs" / "AUDIT.md").read_text(encoding="utf-8")
+    entries = set()
+    for line in text.split("\n"):
+        found = re.match(r"^(?:### F-(\d+)\b|\*\*F-(\d+)(?::| --))", line)
+        if found:
+            entries.add(int(found.group(1) or found.group(2)))
+    if not entries:
+        raise SystemExit("docs/AUDIT.md has no finding entries; the pattern must have moved")
+    return len(entries), max(entries)
+
+
 def host_triple() -> str:
     """The target this machine builds for, as rustc names it.
 
@@ -151,10 +180,13 @@ def host_triple() -> str:
 
 
 def render() -> str:
+    written_up, highest = audit_findings()
     rows = [
         ("Tests, measured by running them", measured_tests()),
         ("Crates in the workspace", workspace_crates()),
         ("Website suites", site_suites()),
+        ("Findings written up in the audit", written_up),
+        ("Highest finding number used", highest),
     ]
     body = "".join(f"| {name} | {value} |\n" for name, value in rows)
     body += f"| Measured on | `{host_triple()}` |\n"
