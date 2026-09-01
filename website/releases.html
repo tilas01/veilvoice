@@ -75,28 +75,10 @@
 <p style="color:var(--muted)">The same notes as <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
 <section id="releases">
 <p class="muted">
-Every release, newest first. Open one to read what changed in it and to reach its files. The notes are <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md">CHANGELOG.md</a>, which is where they are written.
+Every release, newest first. Open one to read what changed in it; its files are at the end of the notes. The notes are <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md">CHANGELOG.md</a>, which is where they are written.
 </p>
-<details class="release">
-<summary><strong>Unreleased</strong> <span class="muted">finished and waiting for the next version</span></summary>
-<p>Nothing yet. The next release goes here.</p>
-</details>
 <details class="release" id="v0.1.15" open>
 <summary><strong>v0.1.15</strong> <span class="muted">Encrypted volumes, one password if you want one, a window that locks...</span></summary>
-<div class="release-files">
-<h4>Files</h4>
-<ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.15-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.15-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.15-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.15-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.15-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
-</ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.15" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
-</div>
 <p>Encrypted volumes, one password if you want one, a window that locks itself, and an interview from an OBS recording through to a video.</p>
 <h4 id="a-verifier-anybody-can-use-checking-everything">A verifier anybody can use, checking everything</h4>
 <p><strong>One press, or one command, and it checks the lot.</strong> <code>veilvoice-verify</code> and the desktop application&#x27;s verify tab now check the signature over the hash list, then the archive against that list, then <strong>every file you extracted out of the archive</strong>, and then ask the GnuPG on your own machine the same question and show you what it said.</p>
@@ -110,6 +92,13 @@ Every release, newest first. Open one to read what changed in it and to reach it
 <h4 id="smaller-things">Smaller things</h4>
 <ul>
 <li>The release workflow&#x27;s <code>tag</code> input was declared and ignored. A dry run started from a branch named every archive after that branch and would have tried to publish a release called <code>main</code>. It now checks out the tag it was given, names everything after it, and publishes nothing at all on a manual run, which is what &quot;dry run&quot; was always supposed to mean.</li>
+</ul>
+<h4 id="the-releases-page-and-what-it-was-not-telling-you">The releases page, and what it was not telling you</h4>
+<p><strong>Every version is on it now.</strong> The backlog began at v0.1.6, because <code>CHANGELOG.md</code> keeps one combined section for v0.1.5 and earlier: six published releases with no entry, no summary and no download links. They are listed, each pointing at its own release page for its notes.</p>
+<p><strong>The files are at the end of each release rather than the top</strong>, so opening one shows what changed in it. A short summary sits beside every version while it is closed, so the list stays readable at a glance; the detail is inside.</p>
+<h4 id="the-fifteenth-audit-round-run-on-that-page">The fifteenth audit round, run on that page</h4>
+<ul>
+<li><strong>F-101</strong> The page listed five archives per release and the release workflow builds eleven. Two of the five names had never existed: it said <code>macos-aarch64</code> and <code>linux-aarch64</code> where every release has published <code>macos-arm64</code> and <code>linux-arm64</code>. So every entry carried two links that answer with a not-found, and six published platforms -- the Raspberry Pi build, the two static builds, FreeBSD, OpenBSD and NetBSD -- had no link at all. Measured against the assets GitHub actually holds for v0.1.14 rather than argued. The list is derived from the release workflow now, so a platform added there appears here and a label renamed there cannot leave a dead link; CI checks that every archive the workflow builds is linked.</li>
 </ul>
 <h4 id="the-fourteenth-audit-round-run-on-the-verifier-written-an-hour-earlier">The fourteenth audit round, run on the verifier written an hour earlier</h4>
 <p>New code in the one program whose entire job is not to be fooled is exactly the code an audit exists for. Three defects, all found by reading, and all three the same mistake: a check that could not see, answering as though it had.</p>
@@ -337,23 +326,30 @@ curl: (22) The requested URL returned error: 403
 <p><strong>Finding a device is not proof it can be used</strong>, and that is printed beside every result: hardware encoding also needs a working driver and a copy of ffmpeg built with that encoder, neither of which can be determined by reading a device name.</p>
 <p>Threads are reported too, and documented as being for <strong>batches</strong>. One recording cannot be split across cores: the ratchet and the phase state run forward in time, so two halves veiled in parallel would not produce the file the whole of it would.</p>
 <p>Measured on the machine this was written on: one NVIDIA GeForce RTX 4060, driver 32.0.16.1062, NVENC, 28 threads.</p>
-</details>
-<details class="release" id="v0.1.14">
-<summary><strong>v0.1.14</strong> <span class="muted">The safety catch, an interface that reads like English, and a window...</span></summary>
 <div class="release-files">
 <h4>Files</h4>
 <ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.14-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.14-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.14-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.14-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.14-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.15-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.15-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.15-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.15-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.15-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.15-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.15-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.15-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.15-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.15-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.15-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/CONTENTS.sha256" rel="noopener noreferrer">CONTENTS.sha256</a> <span class="muted">the hash of every file inside those archives</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
 </ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.14" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.15" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
+</details>
+<details class="release" id="v0.1.14">
+<summary><strong>v0.1.14</strong> <span class="muted">The safety catch, an interface that reads like English, and a window...</span></summary>
 <p>The safety catch, an interface that reads like English, and a window that does not stop when you open a file.</p>
 <p><strong>Failsafe is the headline, and it is on by default.</strong> It watches for the one accident this whole project is powerless against once it has happened: you are talking through VeilVoice with your voice veiled, you plug in a headset, and your computer quietly switches the call to the real microphone. Your own voice goes out and nothing on screen looks any different. Failsafe notices within about a second and closes the program that took it. It says plainly that it notices rather than prevents, because the gap is short and it is not zero.</p>
 <p><strong>Seven file pickers used to freeze the entire window</strong> until you chose a file. That is the answer to &quot;it lags when I select things&quot;, and it was an accurate report.</p>
@@ -464,23 +460,29 @@ veilvoice input known</code></pre>
 <h4 id="veilvoice-proc--one-process-listing-not-two"><code>veilvoice-proc</code> &#8212; one process listing, not two</h4>
 <p>Screen-capture detection and input-monitor detection need the same answer: which programs are running. It was private to <code>veilvoice-capture</code>. Depending on that crate for it would have meant a keyboard feature pulling in a table of screen recorders, which is exactly what <code>ROADMAP.md</code> says these crates must not do; copying it would have left two parsers to drift apart, which is why <code>veilvoice-check</code> was extracted out of the verifier in the first place.</p>
 <p>So it is a crate of its own with no dependencies, and it carries the limits of its own answer: it sees programs running as you, and it sees that they are <em>open</em> &#8212; never what they are doing.</p>
-</details>
-<details class="release" id="v0.1.13">
-<summary><strong>v0.1.13</strong> <span class="muted">Build it yourself and check the release against what you built; group...</span></summary>
 <div class="release-files">
 <h4>Files</h4>
 <ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.13-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.13-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.13-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.13-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.13-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.14-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.14-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.14-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.14-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.14-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.14-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.14-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.14-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.14-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.14-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.14-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
 </ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.13" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.14" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
+</details>
+<details class="release" id="v0.1.13">
+<summary><strong>v0.1.13</strong> <span class="muted">Build it yourself and check the release against what you built; group...</span></summary>
 <p>Build it yourself and check the release against what you built; group mode you can see; projects, profiles and a voice limit that was measured rather than chosen; and the eighth audit round.</p>
 <p><strong>The headline is <code>veilvoice-verify reproduce</code>.</strong> Until now the verifier answered one question &#8212; <em>is this download the one that was published</em>. It now answers the harder one: <strong>is the published build the one this source produces</strong>. A signature says who made a file. Only a build says what it is made of.</p>
 <p><strong>The eighth audit round found seven defects (F-66 to F-72), none of them shipped.</strong> Two were found by continuous integration rather than by anybody&#x27;s judgement, and both had been watched to pass on the machine they failed on. Three more were found by running a command and reading what it printed. Not one would have been found by reading the code, which is the round&#x27;s whole lesson and the third time this project has had to learn it.</p>
@@ -842,23 +844,29 @@ veilvoice capture check          exits non-zero if something unallowed is runnin
 <li><code>veilvoice-setup</code> is usable on its own: no dependencies, no <code>unsafe</code>, and the Windows registry reached through <code>reg.exe</code> as everywhere else.</li>
 <li>The setup tab&#x27;s progress strip claims no percentage. <code>reg.exe</code> and a package manager report no progress, and a bar that fills to 90% and waits is a lie with a shape.</li>
 </ul>
-</details>
-<details class="release" id="v0.1.12">
-<summary><strong>v0.1.12</strong> <span class="muted">Fetching and checking a release in one command, installing without an...</span></summary>
 <div class="release-files">
 <h4>Files</h4>
 <ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.12-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.12-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.12-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.12-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.12-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.13-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.13-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.13-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.13-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.13-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.13-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.13-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.13-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.13-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.13-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.13-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
 </ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.12" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.13" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
+</details>
+<details class="release" id="v0.1.12">
+<summary><strong>v0.1.12</strong> <span class="muted">Fetching and checking a release in one command, installing without an...</span></summary>
 <p>Fetching and checking a release in one command, installing without an installer, and diagrams that open the code.</p>
 <h4 id="verify-a-release-without-downloading-it-yourself">Verify a release without downloading it yourself</h4>
 <pre><code>veilvoice-verify release v0.1.12
@@ -883,23 +891,29 @@ veilvoice gui              # open the desktop application</code></pre>
 <li>The generated pages&#x27; navigation still said &quot;search&quot; after the site renamed it to &quot;index&quot;.</li>
 <li>The website was missing a section the Markdown had, while both claimed parity.</li>
 </ul>
-</details>
-<details class="release" id="v0.1.11">
-<summary><strong>v0.1.11</strong> <span class="muted">If you have v0.1.10 on Windows, replace it.</span></summary>
 <div class="release-files">
 <h4>Files</h4>
 <ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.11-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.11-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.11-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.11-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.11-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.12-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.12-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.12-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.12-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.12-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.12-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.12-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.12-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.12-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.12-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.12-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
 </ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.11" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.12" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
+</details>
+<details class="release" id="v0.1.11">
+<summary><strong>v0.1.11</strong> <span class="muted">If you have v0.1.10 on Windows, replace it.</span></summary>
 <p><strong>If you have v0.1.10 on Windows, replace it.</strong> The desktop application flashed a console window and could fail with no message at all.</p>
 <h4 id="the-windows-desktop-application">The Windows desktop application</h4>
 <p>Three separate defects were behind one report &#8212; &quot;it flashes a command prompt, loads in an unusable state, and crashes&quot;.</p>
@@ -916,23 +930,29 @@ veilvoice gui              # open the desktop application</code></pre>
 <p>All of it comes from <code>assets/generate.py</code>, from the same pixels as everything else, and <code>--check</code> verifies it.</p>
 <h4 id="licence">Licence</h4>
 <p><strong>VeilVoice is GPL-3.0-or-later.</strong> v0.1.10 was briefly published under a different licence; that is reverted, and this and every future release are GPL-3.0-or-later, as every release before v0.1.10 was.</p>
-</details>
-<details class="release" id="v0.1.10">
-<summary><strong>v0.1.10</strong> <span class="muted">Documentation you cannot outrun.</span></summary>
 <div class="release-files">
 <h4>Files</h4>
 <ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.10-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.10-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.10-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.10-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.10-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.11-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.11-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.11-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.11-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.11-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.11-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.11-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.11-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.11-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.11-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.11-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
 </ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.10" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.11" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
+</details>
+<details class="release" id="v0.1.10">
+<summary><strong>v0.1.10</strong> <span class="muted">Documentation you cannot outrun.</span></summary>
 <p>Documentation you cannot outrun.</p>
 <p>Every crate and <strong>every one of the 63 <code>.rs</code> files</strong> in this repository now has a page, a flowchart and a banner, generated from the doc comments in the source and mirrored to the website and the GitHub wiki. A fifth audit round found twelve defects (<code>docs/AUDIT.md</code>(docs/AUDIT.md)); two of them had shipped.</p>
 <h4 id="a-page-for-every-file">A page for every file</h4>
@@ -953,23 +973,29 @@ veilvoice gui              # open the desktop application</code></pre>
 <li><code>tools/render/shot.py</code> drives headless Edge over the DevTools protocol, with no dependency, so pages can be rendered and looked at before being believed.</li>
 <li><code>ROADMAP.md</code> is the public answer to &quot;what is coming&quot;, with 45 markers and what each depends on.</li>
 </ul>
-</details>
-<details class="release" id="v0.1.9">
-<summary><strong>v0.1.9</strong> <span class="muted">Getting a genuine copy, and finding your way around one.</span></summary>
 <div class="release-files">
 <h4>Files</h4>
 <ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.9-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.9-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.9-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.9-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.9-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.10-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.10-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.10-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.10-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.10-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.10-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.10-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.10-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.10-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.10-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.10-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
 </ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.9" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.10" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
+</details>
+<details class="release" id="v0.1.9">
+<summary><strong>v0.1.9</strong> <span class="muted">Getting a genuine copy, and finding your way around one.</span></summary>
 <p>Getting a genuine copy, and finding your way around one.</p>
 <p>This release adds a search index over the whole repository and website, a portable verifier that checks a release <strong>without GnuPG installed</strong>, install scripts that refuse rather than continue, package definitions for six formats, and OpenBSD and NetBSD builds. A fourth audit round found ten defects (<code>docs/AUDIT.md</code>(docs/AUDIT.md)); three of them had shipped.</p>
 <h4 id="verify-a-download-without-installing-anything">Verify a download without installing anything</h4>
@@ -1012,23 +1038,29 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li>The <code>fuzz/</code> targets still have not been run to convergence, and 32-bit targets are still not in CI. Both unchanged from v0.1.8.</li>
 </ul>
 <p>336 tests, ten website suites, no <code>unsafe</code>, no networking crates.</p>
-</details>
-<details class="release" id="v0.1.8">
-<summary><strong>v0.1.8</strong> <span class="muted">A security release. A third audit round, run against the classes of...</span></summary>
 <div class="release-files">
 <h4>Files</h4>
 <ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.8-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.8-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.8-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.8-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.8-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.9-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.9-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.9-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.9-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.9-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.9-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.9-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.9-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.9-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.9-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.9-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
 </ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.8" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.9" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
+</details>
+<details class="release" id="v0.1.8">
+<summary><strong>v0.1.8</strong> <span class="muted">A security release. A third audit round, run against the classes of...</span></summary>
 <p>A security release. A third audit round, run against the <em>classes</em> of defect rather than against a list of things that seemed worth checking, found and fixed <strong>twenty-eight</strong> of them -- thirteen in the Rust, fifteen in the website.</p>
 <p>Nothing here is a confidentiality failure: no finding let anyone recover a voiceprint, read a sealed recording or bypass a password. Several are worse than that sounds anyway, because they are failures of the thing being relied on. Full write-ups, one per finding, are in <code>docs/AUDIT.md</code>(docs/AUDIT.md).</p>
 <h4 id="security-fixes----the-engine-and-the-tools">Security fixes -- the engine and the tools</h4>
@@ -1064,23 +1096,29 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><strong><code>tools/site-tests/repo.test.js</code></strong> drives the repository panel against scripted hostile API responses through the real DOM path.</li>
 <li><strong><code>tools/site-tests/css.test.js</code></strong> checks the cross-engine invariants that have no build step to enforce them: a <code>-webkit-</code> prefix beside every <code>backdrop-filter</code>, a plain colour before every <code>color-mix()</code>, a <code>:focus</code> fallback beside every <code>:focus-visible</code>, a <code>color-scheme</code> on every theme matching its own background, and a <code>dvh</code> upgrade after every <code>vh</code>.</li>
 </ul>
-</details>
-<details class="release" id="v0.1.7">
-<summary><strong>v0.1.7</strong> <span class="muted">Tamper detection (veilvoice-guard, veilvoice guard).</span></summary>
 <div class="release-files">
 <h4>Files</h4>
 <ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.7-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.7-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.7-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.7-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.7-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.8-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.8-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.8-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.8-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.8-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.8-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.8-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.8-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.8-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.8-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.8-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
 </ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.7" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.8" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
+</details>
+<details class="release" id="v0.1.7">
+<summary><strong>v0.1.7</strong> <span class="muted">Tamper detection (veilvoice-guard, veilvoice guard).</span></summary>
 <h4 id="added-1">Added</h4>
 <ul>
 <li><strong>Tamper detection</strong> (<code>veilvoice-guard</code>, <code>veilvoice guard</code>). Records a SHA-256 manifest of VeilVoice&#x27;s own files and reports what was modified, removed or added since. <code>--sealed</code> encrypts the record under a passphrase, so rewriting it to match a tampered file needs the passphrase as well as write access -- keep that passphrase somewhere other than beside the record.</li>
@@ -1092,23 +1130,29 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <ul>
 <li><strong>Typed passphrases are moved into page-locked memory immediately.</strong> The GUI used to keep the confirmed session passphrase as a plain <code>String</code> for the whole session, and the CLI passed copies around after the prompt. Both now convert to a zeroizing <code>Secret</code> the moment the passphrase is confirmed and wipe the buffer it arrived in, narrowing the exposure from &quot;until the app closes&quot; to &quot;while the user is typing&quot;. Audit A-5 is updated to separate the part that was fixed from the part that remains accepted: the typing window itself cannot be removed, and none of this helps against an attacker who can read the process&#x27;s memory.</li>
 </ul>
-</details>
-<details class="release" id="v0.1.6">
-<summary><strong>v0.1.6</strong> <span class="muted">veilvoice anonymise now writes an encrypted .veil container.</span></summary>
 <div class="release-files">
 <h4>Files</h4>
 <ul>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.6-windows-x86_64.zip</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-macos-aarch64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.6-macos-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.6-macos-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.6-linux-x86_64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-aarch64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.6-linux-aarch64.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.7-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.7-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.7-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.7-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.7-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.7-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.7-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.7-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.7-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.7-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.7-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
 </ul>
-<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.6" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.7" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
+</details>
+<details class="release" id="v0.1.6">
+<summary><strong>v0.1.6</strong> <span class="muted">veilvoice anonymise now writes an encrypted .veil container.</span></summary>
 <h4 id="breaking">Breaking</h4>
 <ul>
 <li><strong><code>veilvoice anonymise</code> now writes an encrypted <code>.veil</code> container.</strong> <code>-o clean.wav</code> produces <code>clean.wav.veil</code>. Open it with <code>veilvoice decrypt clean.wav.veil -o clean.wav</code>, or pass <code>--encrypt false</code> for the old behaviour, which prints what you are giving up and waits for you to type <code>UNENCRYPTED</code>.</li>
@@ -1155,6 +1199,170 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><code>docs/AUDIT.md</code> rewritten: every finding written up individually, the completed scope, measured timing figures, and a verdict that says plainly the previous revision called this code clean while it contained at least four of these.</li>
 <li><code>docs/WHITEPAPER.md</code>: a new section on the app lock and exactly what it is worth, at-rest encryption by default, and the honest note that better tools found what careful reading had not.</li>
 </ul>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.6-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.6-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.6-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.6-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.6-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.6-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.6-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.6-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.6-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.6-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.6-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.6" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+</details>
+<details class="release" id="v0.1.5">
+<summary><strong>v0.1.5</strong> <span class="muted">notes on its own release page</span></summary>
+<p class="muted">CHANGELOG.md keeps one section for v0.1.5 and earlier, and it says to read the notes for each tag rather than repeating them. This entry is here so the list is the whole list and the files are reachable; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.5" rel="noopener noreferrer">the release page for v0.1.5</a> is where its notes are.</p>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.5-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.5-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.5-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.5-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.5-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.5-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.5-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.5-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.5-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.5-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.5-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.5" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+</details>
+<details class="release" id="v0.1.4">
+<summary><strong>v0.1.4</strong> <span class="muted">notes on its own release page</span></summary>
+<p class="muted">CHANGELOG.md keeps one section for v0.1.5 and earlier, and it says to read the notes for each tag rather than repeating them. This entry is here so the list is the whole list and the files are reachable; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.4" rel="noopener noreferrer">the release page for v0.1.4</a> is where its notes are.</p>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.4-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.4-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.4-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.4-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.4-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.4-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.4-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.4-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.4-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.4-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.4-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.4" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+</details>
+<details class="release" id="v0.1.3">
+<summary><strong>v0.1.3</strong> <span class="muted">notes on its own release page</span></summary>
+<p class="muted">CHANGELOG.md keeps one section for v0.1.5 and earlier, and it says to read the notes for each tag rather than repeating them. This entry is here so the list is the whole list and the files are reachable; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.3" rel="noopener noreferrer">the release page for v0.1.3</a> is where its notes are.</p>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.3-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.3-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.3-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.3-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.3-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.3-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.3-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.3-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.3-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.3-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.3-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.3" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+</details>
+<details class="release" id="v0.1.2">
+<summary><strong>v0.1.2</strong> <span class="muted">notes on its own release page</span></summary>
+<p class="muted">CHANGELOG.md keeps one section for v0.1.5 and earlier, and it says to read the notes for each tag rather than repeating them. This entry is here so the list is the whole list and the files are reachable; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.2" rel="noopener noreferrer">the release page for v0.1.2</a> is where its notes are.</p>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.2-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.2-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.2-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.2-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.2-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.2-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.2-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.2-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.2-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.2-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.2-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.2" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+</details>
+<details class="release" id="v0.1.1">
+<summary><strong>v0.1.1</strong> <span class="muted">notes on its own release page</span></summary>
+<p class="muted">CHANGELOG.md keeps one section for v0.1.5 and earlier, and it says to read the notes for each tag rather than repeating them. This entry is here so the list is the whole list and the files are reachable; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.1" rel="noopener noreferrer">the release page for v0.1.1</a> is where its notes are.</p>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.1-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.1-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.1-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.1-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.1-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.1-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.1-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.1-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.1-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.1-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.1-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.1" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+</details>
+<details class="release" id="v0.1.0">
+<summary><strong>v0.1.0</strong> <span class="muted">notes on its own release page</span></summary>
+<p class="muted">CHANGELOG.md keeps one section for v0.1.5 and earlier, and it says to read the notes for each tag rather than repeating them. This entry is here so the list is the whole list and the files are reachable; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.0" rel="noopener noreferrer">the release page for v0.1.0</a> is where its notes are.</p>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.0-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.0-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.0-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.0-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.0-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.0-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.0-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.0-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.0-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.0-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.0-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.0" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
 </details>
 </section>
 </main>
