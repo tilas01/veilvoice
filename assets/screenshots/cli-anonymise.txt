@@ -1,26 +1,54 @@
 De-identify an audio file and write a WAV
 
-Usage: veilvoice.exe anonymise [OPTIONS] <INPUT>
+Usage: veilvoice anonymise [OPTIONS] <INPUT>
 
 Arguments:
-  <INPUT>  Audio file to read (wav, mp3, flac, ogg, m4a, ...)
+  <INPUT>
+          Audio file to read (wav, mp3, flac, ogg, m4a, ...)
 
 Options:
   -o, --output <OUTPUT>
           Where to write the result. Defaults to `<input>.veiled.wav`
+
       --intensity <INTENSITY>
-          How far pitch and formants are pushed from the original, 0.0–1.0 [default: 1]
+          How far pitch and formants are pushed from the original, 0.0–1.0
+          
+          [default: 1]
+
       --keep-accent
           Keep the speaker's accent and intonation intact
+
       --reseed-secs <RESEED_SECS>
-          Seconds between rolls of the modulation seed. 0 keeps one stream for the whole session [default: 2]
+          Seconds between rolls of the modulation seed. 0 keeps one stream for the whole session
+          
+          [default: 2]
+
+      --reseed-range <RESEED_RANGE>
+          Draw each gap from a range instead, in milliseconds: `250,1800`.
+          
+          A fixed interval is a fixed thing to observe. With a range, the gap before every roll is drawn fresh from the modulation stream, so the ratchet has no period at all.
+          
+          Without this, the range is **drawn from the operating system's random source at launch**, so it is a property of this run rather than a number compiled into every copy of VeilVoice. Pass `--reseed-range fixed` to use `--reseed-secs` instead.
+          
+          A value that is not a usable range is **refused with the reason**, never adjusted to fit.
+
       --clean-metadata <CLEAN_METADATA>
-          Also strip metadata from the written file [default: true] [possible values: true, false]
+          Also strip metadata from the written file
+          
+          [default: true]
+          [possible values: true, false]
+
       --encrypt <ENCRYPT>
-          Encrypt the result at rest. On by default: the words survive de-identification on purpose, so an unencrypted result is still a recording of everything that was said [default: true] [possible values: true, false]
+          Encrypt the result at rest. On by default: the words survive de-identification on purpose, so an unencrypted result is still a recording of everything that was said
+          
+          [default: true]
+          [possible values: true, false]
+
       --encrypt-to <PUBKEY>
           Seal to a recipient's public key file instead of a passphrase
+
       --yes
           Skip the confirmation when writing an unencrypted recording
+
   -h, --help
-          Print help
+          Print help (see a summary with '-h')

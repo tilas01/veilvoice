@@ -1,6 +1,6 @@
 Strip identifying metadata from an audio or image file, in place
 
-Usage: veilvoice.exe clean [OPTIONS] <FILE>
+Usage: veilvoice clean [OPTIONS] <FILE>
 
 Arguments:
   <FILE>

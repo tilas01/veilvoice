@@ -10,7 +10,7 @@
 <circle cx="50" cy="15" r="4.5" fill="#9ece6a"/>
 <text x="400" y="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#737aa2" text-anchor="middle">veilvoice guard --help</text>
 <text x="18.0" y="46.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#c0caf5" xml:space="preserve">Record and check the integrity of VeilVoice's own files</text>
-<text x="18.0" y="84.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#7aa2f7" xml:space="preserve">Usage: veilvoice.exe guard [OPTIONS] &lt;COMMAND&gt;</text>
+<text x="18.0" y="84.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#7aa2f7" xml:space="preserve">Usage: veilvoice guard [OPTIONS] &lt;COMMAND&gt;</text>
 <text x="18.0" y="122.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#c0caf5" xml:space="preserve">Commands:</text>
 <text x="18.0" y="141.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#c0caf5" xml:space="preserve">  init    Record the current state of the watched files</text>
 <text x="18.0" y="160.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#c0caf5" xml:space="preserve">  check   Compare the watched files against the record</text>

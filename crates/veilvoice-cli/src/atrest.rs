@@ -10,8 +10,8 @@
 //! in the clear by default would quietly leave the second problem unsolved for
 //! everyone who did not think to ask.
 //!
-//! So the result is sealed into a [`container`] — Argon2id or the X25519 +
-//! ML-KEM-768 hybrid — unless the user asks for plaintext, and asking for
+//! So the result is sealed into a [`container`], with Argon2id or the X25519
+//! plus ML-KEM-768 hybrid, unless the user asks for plaintext, and asking for
 //! plaintext prints [`PLAINTEXT_WARNING`] and, on a terminal, waits for an
 //! answer.
 //!
@@ -47,15 +47,15 @@ pub const PLAINTEXT_WARNING: &[&str] = &[
     "The de-identified recording will be written to disk unencrypted.",
     "",
     "VeilVoice destroys the voiceprint, not the words. Anyone who can read",
-    "this file — another user, a backup, a sync client, anyone who later",
-    "gets the disk — can still hear everything that was said.",
+    "this file can still hear everything that was said: another user, a",
+    "backup, a sync client, anyone who later gets the disk.",
     "",
     "Deleting it afterwards is not a fix: on an SSD, SD card or USB stick",
     "the original blocks can survive every overwrite. That is why at-rest",
     "encryption is the default rather than an option you have to find.",
     "",
     "The file will be created readable only by your account. That is a file",
-    "permission and nothing more — it does not survive a copy, a backup, or",
+    "permission and nothing more. It does not survive a copy, a backup, or",
     "anyone who has the disk.",
 ];
 
@@ -116,7 +116,7 @@ pub fn seal_to_disk(
 /// Print the plaintext warning and, on an interactive terminal, require an
 /// explicit answer before continuing.
 ///
-/// Non-interactive callers — scripts, pipelines, CI — still see the warning on
+/// Non-interactive callers, meaning scripts, pipelines and CI, still see it on
 /// stderr but are not blocked on a prompt nobody is there to answer. They asked
 /// for plaintext on the command line, which is as explicit as it gets.
 pub fn confirm_plaintext(assume_yes: bool) -> Result<(), String> {
@@ -143,7 +143,7 @@ pub fn confirm_plaintext(assume_yes: bool) -> Result<(), String> {
         .read_line(&mut answer)
         .map_err(|e| e.to_string())?;
     if answer.trim() != "UNENCRYPTED" {
-        return Err("cancelled — nothing was written".into());
+        return Err("cancelled, and nothing was written".into());
     }
     Ok(())
 }
@@ -153,8 +153,8 @@ pub fn confirm_plaintext(assume_yes: bool) -> Result<(), String> {
 ///
 /// `rpassword` hands back an ordinary `String`, which is an ordinary heap
 /// allocation that can be paged out and is not wiped when it is dropped. That
-/// is a window this crate cannot remove — something has to receive the
-/// keystrokes — but it can be made as short as possible, which is what this
+/// is a window this crate cannot remove, because something has to receive the
+/// keystrokes. It can be made as short as possible, which is what this
 /// does: copy into a [`Secret`], wipe the copy, wipe the original, and hand
 /// back the only remaining version.
 ///

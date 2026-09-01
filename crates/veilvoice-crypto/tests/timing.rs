@@ -152,7 +152,7 @@ fn opening_a_container_does_not_leak_how_much_of_the_password_was_right() {
     // here as a large factor rather than a few percent.
     assert!(
         (0.8..1.25).contains(&prefix),
-        "prefix length changed the time by {prefix:.3}x — early-exit comparison?"
+        "prefix length changed the time by {prefix:.3}x, so an early-exit comparison?"
     );
     // Success versus failure is a weaker property, and is not an oracle in any
     // case: an attacker holding the container learns whether a guess worked

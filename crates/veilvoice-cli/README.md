@@ -25,7 +25,7 @@
   - [Public items](#public-items)
   - [Reading it elsewhere](#reading-it-elsewhere)
 
-`veilvoice` — the command-line interface.
+`veilvoice`, the command-line interface.
 
 Everything VeilVoice does, available without a desktop: it runs over SSH, in
 a container, and on machines that have no GUI toolkit at all. The same
@@ -182,21 +182,21 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`accel.rs`](../../docs/files/veilvoice-cli/accel.md) | 90 | veilvoice accel — the graphics hardware here, and what it is good for. |
-| [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | 286 | veilvoice appctl — learn what normally runs, then notice what does not. |
+| [`accel.rs`](../../docs/files/veilvoice-cli/accel.md) | 90 | veilvoice accel reports the graphics hardware here, and what it is good for. |
+| [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | 286 | veilvoice appctl learns what normally runs, so it can notice what does not. |
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 286 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | 330 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 797 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
-| [`decoy.rs`](../../docs/files/veilvoice-cli/decoy.md) | 58 | veilvoice decoy — what a second passphrase is worth, and what it is not. |
-| [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | 112 | veilvoice failsafe — the safety catch, and what it can and cannot do. |
+| [`decoy.rs`](../../docs/files/veilvoice-cli/decoy.md) | 58 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
+| [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | 112 | veilvoice failsafe is the safety catch. |
 | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 346 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
-| [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | 247 | veilvoice gui — open the desktop application from the command line. |
-| [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 117 | veilvoice input — what running programs can see your keyboard and mouse. |
-| [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 329 | veilvoice lock — manage the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2554 | veilvoice — the command-line interface. |
+| [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | 247 | veilvoice gui opens the desktop application from the command line. |
+| [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 117 | veilvoice input shows which running programs can see your keyboard and mouse. |
+| [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 329 | veilvoice lock manages the application lock from the command line. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 2554 | veilvoice, the command-line interface. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 259 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 243 | veilvoice policy -- settings that can only be tightened. |
-| [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | 46 | veilvoice privilege — what VeilVoice is running with, and what it can see. |
+| [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | 46 | veilvoice privilege shows what VeilVoice runs with, and what it can see. |
 | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 384 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 144 | Tokyo Night colouring for the terminal. |
 

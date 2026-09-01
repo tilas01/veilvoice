@@ -17,7 +17,7 @@
 <text x="18.0" y="179.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#c0caf5" xml:space="preserve">at a time, and even then VeilVoice will not run somebody else's installer: for proprietary</text>
 <text x="18.0" y="198.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#c0caf5" xml:space="preserve">software it prints the vendor's page, and for anything needing root it prints the command rather</text>
 <text x="18.0" y="217.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#c0caf5" xml:space="preserve">than asking for a password.</text>
-<text x="18.0" y="255.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#7aa2f7" xml:space="preserve">Usage: veilvoice.exe companions [OPTIONS]</text>
+<text x="18.0" y="255.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#7aa2f7" xml:space="preserve">Usage: veilvoice companions [OPTIONS]</text>
 <text x="18.0" y="293.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#c0caf5" xml:space="preserve">Options:</text>
 <text x="18.0" y="312.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#9ece6a" xml:space="preserve">      --install &lt;NAME&gt;</text>
 <text x="18.0" y="331.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13.4" fill="#c0caf5" xml:space="preserve">          Install one, by name. Without this, nothing is installed</text>

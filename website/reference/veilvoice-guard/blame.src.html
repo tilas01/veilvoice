@@ -347,7 +347,7 @@
 <span class="ln" id="L287">        <span class="tok-kw">if</span> target.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\&#x27;&#x27;</span>) {</span>
 <span class="ln" id="L288">            <span class="tok-kw">return</span> Blame::Unknown {</span>
 <span class="ln" id="L289">                why: <span class="tok-str">&quot;this path contains an apostrophe, which the Windows event-log query \</span></span>
-<span class="ln" id="L290"><span class="tok-str">                      language cannot express &#8212; so the Security log cannot be searched for it&quot;</span></span>
+<span class="ln" id="L290"><span class="tok-str">                      language cannot express, so the Security log cannot be searched for it&quot;</span></span>
 <span class="ln" id="L291">                    .<span class="tok-fn">to_string</span>(),</span>
 <span class="ln" id="L292">                remedy: <span class="tok-str">&quot;read Security event 4663 for this path directly in Event Viewer&quot;</span>,</span>
 <span class="ln" id="L293">            };</span>

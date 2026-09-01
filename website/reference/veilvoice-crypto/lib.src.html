@@ -227,12 +227,12 @@
 <span class="ln" id="L179">            Self::WrongMode =&gt; <span class="tok-str">&quot;container is locked with a different method&quot;</span>,</span>
 <span class="ln" id="L180">            Self::Shred =&gt; <span class="tok-str">&quot;could not securely erase the file&quot;</span>,</span>
 <span class="ln" id="L181">            Self::ShredSymlink =&gt; {</span>
-<span class="ln" id="L182">                <span class="tok-str">&quot;that path is a symbolic link &#8212; erasing it would destroy whatever it points at \</span></span>
-<span class="ln" id="L183"><span class="tok-str">                 and delete only the link; name the real file instead&quot;</span></span>
+<span class="ln" id="L182">                <span class="tok-str">&quot;that path is a symbolic link, so erasing it would destroy whatever it \</span></span>
+<span class="ln" id="L183"><span class="tok-str">                 points at and delete only the link; name the real file instead&quot;</span></span>
 <span class="ln" id="L184">            }</span>
 <span class="ln" id="L185">            Self::AppLockRejected =&gt; <span class="tok-str">&quot;wrong app-lock password&quot;</span>,</span>
 <span class="ln" id="L186">            Self::<span class="tok-fn">AppLockCooldown</span>(secs) =&gt; {</span>
-<span class="ln" id="L187">                <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;too many attempts &#8212; wait {secs}s before trying again&quot;</span>)</span>
+<span class="ln" id="L187">                <span class="tok-kw">return</span> write!(f, <span class="tok-str">&quot;too many attempts, so wait {secs}s before trying again&quot;</span>)</span>
 <span class="ln" id="L188">            }</span>
 <span class="ln" id="L189">            Self::AppLockStore =&gt; <span class="tok-str">&quot;could not read or write the app-lock file&quot;</span>,</span>
 <span class="ln" id="L190">            Self::AppLockSpareStale =&gt; {</span>

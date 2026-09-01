@@ -24,7 +24,7 @@
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
-`veilvoice` — the command-line interface.
+`veilvoice`, the command-line interface.
 
 Everything VeilVoice does, available without a desktop: it runs over SSH, in
 a container, and on machines that have no GUI toolkit at all. The same

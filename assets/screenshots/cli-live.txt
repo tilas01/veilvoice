@@ -1,11 +1,47 @@
 Scramble a microphone live, into a device or a virtual cable
 
-Usage: veilvoice.exe live [OPTIONS]
+Usage: veilvoice live [OPTIONS]
 
 Options:
-  -i, --input <INPUT>              Input device name. Defaults to the system default
-  -o, --output <OUTPUT>            Output device name. Defaults to a virtual cable if one is found
-      --intensity <INTENSITY>      How far pitch and formants are pushed from the original, 0.0–1.0 [default: 1]
-      --keep-accent                Keep the speaker's accent and intonation intact
-      --reseed-secs <RESEED_SECS>  Seconds between rolls of the modulation seed. 0 keeps one stream for the whole session [default: 2]
-  -h, --help                       Print help
+  -i, --input <INPUT>
+          Input device name. Defaults to the system default
+
+  -o, --output <OUTPUT>
+          Output device name. Defaults to a virtual cable if one is found
+
+      --intensity <INTENSITY>
+          How far pitch and formants are pushed from the original, 0.0–1.0
+          
+          [default: 1]
+
+      --keep-accent
+          Keep the speaker's accent and intonation intact
+
+      --reseed-secs <RESEED_SECS>
+          Seconds between rolls of the modulation seed. 0 keeps one stream for the whole session
+          
+          [default: 2]
+
+      --reseed-range <RESEED_RANGE>
+          Draw each gap from a range instead, in milliseconds: `250,1800`.
+          
+          A fixed interval is a fixed thing to observe. With a range, the gap before every roll is drawn fresh from the modulation stream, so the ratchet has no period at all.
+          
+          Without this, the range is **drawn from the operating system's random source at launch**, so it is a property of this run rather than a number compiled into every copy of VeilVoice. Pass `--reseed-range fixed` to use `--reseed-secs` instead.
+          
+          A value that is not a usable range is **refused with the reason**, never adjusted to fit.
+
+      --preview
+          Listen to yourself veiled, instead of sending it anywhere.
+          
+          Routes the veiled voice to this machine's **default output** rather than to a virtual cable, so it goes to your headphones and to nothing else. This is the way to find out what you sound like, and that the microphone is the one you meant, before an interview starts rather than during it.
+          
+          Use headphones. Speakers plus a microphone is a feedback loop.
+
+      --no-monitor
+          Do not draw the level meters.
+          
+          The meters are on by default because the two questions in a live session are "is it hearing me" and "is anything coming out", and a bar answers both at a glance. This turns them off for a terminal that is being logged or read by something other than a person.
+
+  -h, --help
+          Print help (see a summary with '-h')

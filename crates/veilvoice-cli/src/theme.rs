@@ -41,25 +41,25 @@ use std::sync::OnceLock;
 /// Tokyo Night, as 24-bit foreground escape sequences.
 ///
 /// The whole palette is defined even though a given build may not use every
-/// entry — the device listing is behind the `live` feature, so its colour goes
+/// entry, because the device listing is behind the `live` feature, so its colour goes
 /// unused on platforms without an audio backend. Keeping the set complete means
 /// it stays a straight mirror of the GUI's palette and of `css/themes.css`,
 /// which is what makes the three front-ends look like one program.
 #[allow(dead_code)]
 pub mod colour {
-    /// Muted comment grey — secondary text.
+    /// Muted comment grey, for secondary text.
     pub const MUTED: &str = "\x1b[38;2;115;122;162m";
-    /// Foreground blue — headings and prompts.
+    /// Foreground blue, for headings and prompts.
     pub const BLUE: &str = "\x1b[38;2;122;162;247m";
-    /// Cyan — values and figures.
+    /// Cyan, for values and figures.
     pub const CYAN: &str = "\x1b[38;2;125;207;255m";
-    /// Green — success.
+    /// Green, for success.
     pub const GREEN: &str = "\x1b[38;2;158;206;106m";
-    /// Yellow — warnings.
+    /// Yellow, for warnings.
     pub const YELLOW: &str = "\x1b[38;2;224;175;104m";
-    /// Red — errors.
+    /// Red, for errors.
     pub const RED: &str = "\x1b[38;2;247;118;142m";
-    /// Purple — accents.
+    /// Purple, for accents.
     pub const PURPLE: &str = "\x1b[38;2;187;154;247m";
     /// Reset to the terminal default.
     pub const RESET: &str = "\x1b[0m";
@@ -120,7 +120,7 @@ pub fn field(label: &str, value: &str) -> String {
 mod tests {
     use super::*;
 
-    /// Tests capture stdout, so colour is off and `paint` must be a no-op —
+    /// Tests capture stdout, so colour is off and `paint` must be a no-op,
     /// which is exactly the property that keeps escape codes out of pipes.
     #[test]
     fn colour_is_disabled_when_not_a_terminal() {
