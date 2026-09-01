@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/tests/release_manifest.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 198 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 208 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs)
 
 ## Contents
 
@@ -46,7 +46,7 @@ where its absence would actually matter and where it cannot be absent.
 
 ## What this file contains
 
-198 lines defining **6 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+208 lines defining **6 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -66,8 +66,8 @@ flowchart TD
     n_python["python<br/>line 49"]
     n_room["room<br/>line 56"]
     n_stage["stage<br/>line 71"]
-    n_have["have<br/>line 82"]
-    n_what_the_release_job_writes_is_what_the_verifier_reads["what_the_release_job_writes_is_what_<br/>the_verifier_reads<br/>line 96"]
+    n_have["have<br/>line 88"]
+    n_what_the_release_job_writes_is_what_the_verifier_reads["what_the_release_job_writes_is_what_<br/>the_verifier_reads<br/>line 102"]
     n_what_the_release_job_writes_is_what_the_verifier_reads --> n_have
     n_what_the_release_job_writes_is_what_the_verifier_reads --> n_python
     n_what_the_release_job_writes_is_what_the_verifier_reads --> n_repository
@@ -77,8 +77,8 @@ flowchart TD
     click n_python href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L49" "open the source"
     click n_room href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L56" "open the source"
     click n_stage href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L71" "open the source"
-    click n_have href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L82" "open the source"
-    click n_what_the_release_job_writes_is_what_the_verifier_reads href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L96" "open the source"
+    click n_have href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L88" "open the source"
+    click n_what_the_release_job_writes_is_what_the_verifier_reads href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L102" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_repository,n_python,n_room,n_stage,n_have,n_what_the_release_job_writes_is_what_the_verifier_reads helper
 ```
@@ -93,5 +93,5 @@ flowchart TD
 | `python` <sub>fn</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L49) | A Python to run, if this machine has one. |
 | `room` <sub>fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L56) | Somewhere to build a release, removed by the caller. |
 | `stage` <sub>fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L71) | Build one release directory, the shape the release job stages. |
-| `have` <sub>fn</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L82) | Whether a program is on this machine at all. |
-| `what_the_release_job_writes_is_what_the_verifier_reads` <sub>fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L96) | The whole seam: stage, archive, generate, parse, extract, check. |
+| `have` <sub>fn</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L88) | Whether a program is on this machine at all. |
+| `what_the_release_job_writes_is_what_the_verifier_reads` <sub>fn</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L102) | The whole seam: stage, archive, generate, parse, extract, check. |

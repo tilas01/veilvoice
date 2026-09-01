@@ -38,7 +38,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/tests/release_manifest.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests-release_manifest.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 198 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests-release_manifest.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 208 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -125,131 +125,141 @@
 <span class="ln" id="L75">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-verify&quot;</span>), b<span class="tok-str">&quot;the verifier&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L76">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;README.md&quot;</span>), b<span class="tok-str">&quot;# VeilVoice\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L77">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs/INSTALL.md&quot;</span>), b<span class="tok-str">&quot;install this\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L78">    release</span>
-<span class="ln" id="L79">}</span>
+<span class="ln" id="L78">    <span class="tok-com">// **F-102.** A name beginning with a dot. The generator used to normalise</span></span>
+<span class="ln" id="L79">    <span class="tok-com">// member paths with `lstrip(&quot;./&quot;)`, which takes a set of characters rather</span></span>
+<span class="ln" id="L80">    <span class="tok-com">// than a prefix, so this file was published as `hidden` and every verifier</span></span>
+<span class="ln" id="L81">    <span class="tok-com">// reported it missing on a release that was perfectly sound. One file here</span></span>
+<span class="ln" id="L82">    <span class="tok-com">// is cheaper than the round trip that found it.</span></span>
+<span class="ln" id="L83">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;.hidden&quot;</span>), b<span class="tok-str">&quot;a dotfile\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L84">    release</span>
+<span class="ln" id="L85">}</span>
 </span>
-<span class="ln" id="L80"></span>
+<span class="ln" id="L86"></span>
 <span class="src-item" id="fn-have">
-<span class="ln" id="L81"><span class="tok-com">/// Whether a program is on this machine at all.</span></span>
-<span class="ln" id="L82"><span class="tok-kw">fn</span> <span class="tok-fn">have</span>(program: &amp;str) -&gt; bool {</span>
-<span class="ln" id="L83">    Command::<span class="tok-fn">new</span>(program)</span>
-<span class="ln" id="L84">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--help&quot;</span>)</span>
-<span class="ln" id="L85">        .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L86">        .<span class="tok-fn">map</span>(|out| out.status.<span class="tok-fn">success</span>() || !out.stdout.<span class="tok-fn">is_empty</span>() || !out.stderr.<span class="tok-fn">is_empty</span>())</span>
-<span class="ln" id="L87">        .<span class="tok-fn">unwrap_or</span>(false)</span>
-<span class="ln" id="L88">}</span>
+<span class="ln" id="L87"><span class="tok-com">/// Whether a program is on this machine at all.</span></span>
+<span class="ln" id="L88"><span class="tok-kw">fn</span> <span class="tok-fn">have</span>(program: &amp;str) -&gt; bool {</span>
+<span class="ln" id="L89">    Command::<span class="tok-fn">new</span>(program)</span>
+<span class="ln" id="L90">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--help&quot;</span>)</span>
+<span class="ln" id="L91">        .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L92">        .<span class="tok-fn">map</span>(|out| out.status.<span class="tok-fn">success</span>() || !out.stdout.<span class="tok-fn">is_empty</span>() || !out.stderr.<span class="tok-fn">is_empty</span>())</span>
+<span class="ln" id="L93">        .<span class="tok-fn">unwrap_or</span>(false)</span>
+<span class="ln" id="L94">}</span>
 </span>
-<span class="ln" id="L89"></span>
+<span class="ln" id="L95"></span>
 <span class="src-item" id="fn-what_the_release_job_writes_is_what_the_verifier_reads">
-<span class="ln" id="L90"><span class="tok-com">/// The whole seam: stage, archive, generate, parse, extract, check.</span></span>
-<span class="ln" id="L91"><span class="tok-com">///</span></span>
-<span class="ln" id="L92"><span class="tok-com">/// The one test in this file, deliberately. Splitting it would mean staging a</span></span>
-<span class="ln" id="L93"><span class="tok-com">/// release three times to assert three things about the same run, and the</span></span>
-<span class="ln" id="L94"><span class="tok-com">/// property being tested is that the whole sequence agrees with itself.</span></span>
-<span class="ln" id="L95"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L96"><span class="tok-kw">fn</span> <span class="tok-fn">what_the_release_job_writes_is_what_the_verifier_reads</span>() {</span>
-<span class="ln" id="L97">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L98">        <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L99">    };</span>
-<span class="ln" id="L100">    <span class="tok-kw">if</span> !<span class="tok-fn">have</span>(<span class="tok-str">&quot;tar&quot;</span>) {</span>
-<span class="ln" id="L101">        <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L102">    }</span>
-<span class="ln" id="L103"></span>
-<span class="ln" id="L104">    <span class="tok-kw">let</span> repo = <span class="tok-fn">repository</span>();</span>
-<span class="ln" id="L105">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;release-manifest&quot;</span>);</span>
-<span class="ln" id="L106">    <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
-<span class="ln" id="L107">    <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
-<span class="ln" id="L108">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L109">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L110"></span>
-<span class="ln" id="L111">    <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>;</span>
-<span class="ln" id="L112">    <span class="tok-fn">stage</span>(&amp;dist, name);</span>
-<span class="ln" id="L113"></span>
-<span class="ln" id="L114">    <span class="tok-com">// Archived exactly as the release job does it: from the parent, naming the</span></span>
-<span class="ln" id="L115">    <span class="tok-com">// release directory, so the archive carries that directory at its root.</span></span>
-<span class="ln" id="L116">    <span class="tok-kw">let</span> tarball = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
-<span class="ln" id="L117">    <span class="tok-kw">let</span> made = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
-<span class="ln" id="L118">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
-<span class="ln" id="L119">        .<span class="tok-fn">arg</span>(&amp;dist)</span>
-<span class="ln" id="L120">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
-<span class="ln" id="L121">        .<span class="tok-fn">arg</span>(&amp;tarball)</span>
-<span class="ln" id="L122">        .<span class="tok-fn">arg</span>(name)</span>
-<span class="ln" id="L123">        .<span class="tok-fn">status</span>()</span>
-<span class="ln" id="L124">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
-<span class="ln" id="L125">    assert!(made.<span class="tok-fn">success</span>(), <span class="tok-str">&quot;the archive could not be built&quot;</span>);</span>
-<span class="ln" id="L126"></span>
-<span class="ln" id="L127">    <span class="tok-com">// The generator the release job runs. Not a copy of it.</span></span>
-<span class="ln" id="L128">    <span class="tok-kw">let</span> generator = repo.<span class="tok-fn">join</span>(<span class="tok-str">&quot;tools/release/contents.py&quot;</span>);</span>
-<span class="ln" id="L129">    assert!(generator.<span class="tok-fn">is_file</span>(), <span class="tok-str">&quot;{} is missing&quot;</span>, generator.<span class="tok-fn">display</span>());</span>
-<span class="ln" id="L130">    <span class="tok-kw">let</span> list = staging.<span class="tok-fn">join</span>(contents::CONTENTS);</span>
-<span class="ln" id="L131">    <span class="tok-kw">let</span> ran = Command::<span class="tok-fn">new</span>(python)</span>
-<span class="ln" id="L132">        .<span class="tok-fn">arg</span>(&amp;generator)</span>
-<span class="ln" id="L133">        .<span class="tok-fn">arg</span>(&amp;staging)</span>
-<span class="ln" id="L134">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-o&quot;</span>)</span>
-<span class="ln" id="L135">        .<span class="tok-fn">arg</span>(&amp;list)</span>
-<span class="ln" id="L136">        .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L137">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the generator runs&quot;</span>);</span>
-<span class="ln" id="L138">    assert!(</span>
-<span class="ln" id="L139">        ran.status.<span class="tok-fn">success</span>(),</span>
-<span class="ln" id="L140">        <span class="tok-str">&quot;the generator failed: {}&quot;</span>,</span>
-<span class="ln" id="L141">        String::<span class="tok-fn">from_utf8_lossy</span>(&amp;ran.stderr)</span>
-<span class="ln" id="L142">    );</span>
-<span class="ln" id="L143"></span>
-<span class="ln" id="L144">    <span class="tok-com">// The reader the verifier uses. Not a stand-in for it either.</span></span>
-<span class="ln" id="L145">    <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;list).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the generator wrote something&quot;</span>);</span>
-<span class="ln" id="L146">    <span class="tok-kw">let</span> all = contents::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap_or_else</span>(|why| {</span>
-<span class="ln" id="L147">        panic!(<span class="tok-str">&quot;the verifier cannot read what the release job wrote: {why}\n{text}&quot;</span>)</span>
-<span class="ln" id="L148">    });</span>
-<span class="ln" id="L149">    <span class="tok-kw">let</span> section = contents::<span class="tok-fn">for_archive</span>(&amp;all, &amp;format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>)).<span class="tok-fn">unwrap_or_else</span>(|| {</span>
-<span class="ln" id="L150">        panic!(<span class="tok-str">&quot;the manifest does not mention the archive it was made from:\n{text}&quot;</span>)</span>
-<span class="ln" id="L151">    });</span>
-<span class="ln" id="L152">    assert_eq!(</span>
-<span class="ln" id="L153">        section.members.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L154">        <span class="tok-num">4</span>,</span>
-<span class="ln" id="L155">        <span class="tok-str">&quot;every file, including the one in a subdirectory:\n{text}&quot;</span></span>
-<span class="ln" id="L156">    );</span>
-<span class="ln" id="L157"></span>
-<span class="ln" id="L158">    <span class="tok-com">// Extracted the way somebody extracts a download, beside the archive, and</span></span>
-<span class="ln" id="L159">    <span class="tok-com">// then checked file by file. This is the assertion the whole file is for:</span></span>
-<span class="ln" id="L160">    <span class="tok-com">// the paths the generator wrote line up with the paths the reader looks</span></span>
-<span class="ln" id="L161">    <span class="tok-com">// for, on this platform, without anybody having agreed on them by hand.</span></span>
-<span class="ln" id="L162">    <span class="tok-kw">let</span> out = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
-<span class="ln" id="L163">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
-<span class="ln" id="L164">        .<span class="tok-fn">arg</span>(&amp;staging)</span>
-<span class="ln" id="L165">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-xzf&quot;</span>)</span>
-<span class="ln" id="L166">        .<span class="tok-fn">arg</span>(&amp;tarball)</span>
-<span class="ln" id="L167">        .<span class="tok-fn">status</span>()</span>
-<span class="ln" id="L168">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
-<span class="ln" id="L169">    assert!(out.<span class="tok-fn">success</span>(), <span class="tok-str">&quot;the archive could not be extracted&quot;</span>);</span>
-<span class="ln" id="L170"></span>
-<span class="ln" id="L171">    <span class="tok-kw">let</span> outcomes = contents::<span class="tok-fn">check</span>(&amp;staging, section);</span>
-<span class="ln" id="L172">    <span class="tok-kw">for</span> outcome <span class="tok-kw">in</span> &amp;outcomes {</span>
-<span class="ln" id="L173">        assert!(</span>
-<span class="ln" id="L174">            outcome.<span class="tok-fn">is_good</span>(),</span>
-<span class="ln" id="L175">            <span class="tok-str">&quot;{}: {:?}\n{text}&quot;</span>,</span>
-<span class="ln" id="L176">            outcome.path,</span>
-<span class="ln" id="L177">            outcome.verdict</span>
-<span class="ln" id="L178">        );</span>
-<span class="ln" id="L179">    }</span>
+<span class="ln" id="L96"><span class="tok-com">/// The whole seam: stage, archive, generate, parse, extract, check.</span></span>
+<span class="ln" id="L97"><span class="tok-com">///</span></span>
+<span class="ln" id="L98"><span class="tok-com">/// The one test in this file, deliberately. Splitting it would mean staging a</span></span>
+<span class="ln" id="L99"><span class="tok-com">/// release three times to assert three things about the same run, and the</span></span>
+<span class="ln" id="L100"><span class="tok-com">/// property being tested is that the whole sequence agrees with itself.</span></span>
+<span class="ln" id="L101"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L102"><span class="tok-kw">fn</span> <span class="tok-fn">what_the_release_job_writes_is_what_the_verifier_reads</span>() {</span>
+<span class="ln" id="L103">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L104">        <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L105">    };</span>
+<span class="ln" id="L106">    <span class="tok-kw">if</span> !<span class="tok-fn">have</span>(<span class="tok-str">&quot;tar&quot;</span>) {</span>
+<span class="ln" id="L107">        <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L108">    }</span>
+<span class="ln" id="L109"></span>
+<span class="ln" id="L110">    <span class="tok-kw">let</span> repo = <span class="tok-fn">repository</span>();</span>
+<span class="ln" id="L111">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;release-manifest&quot;</span>);</span>
+<span class="ln" id="L112">    <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
+<span class="ln" id="L113">    <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
+<span class="ln" id="L114">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L115">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L116"></span>
+<span class="ln" id="L117">    <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.15-linux-x86_64&quot;</span>;</span>
+<span class="ln" id="L118">    <span class="tok-fn">stage</span>(&amp;dist, name);</span>
+<span class="ln" id="L119"></span>
+<span class="ln" id="L120">    <span class="tok-com">// Archived exactly as the release job does it: from the parent, naming the</span></span>
+<span class="ln" id="L121">    <span class="tok-com">// release directory, so the archive carries that directory at its root.</span></span>
+<span class="ln" id="L122">    <span class="tok-kw">let</span> tarball = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
+<span class="ln" id="L123">    <span class="tok-kw">let</span> made = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
+<span class="ln" id="L124">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
+<span class="ln" id="L125">        .<span class="tok-fn">arg</span>(&amp;dist)</span>
+<span class="ln" id="L126">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
+<span class="ln" id="L127">        .<span class="tok-fn">arg</span>(&amp;tarball)</span>
+<span class="ln" id="L128">        .<span class="tok-fn">arg</span>(name)</span>
+<span class="ln" id="L129">        .<span class="tok-fn">status</span>()</span>
+<span class="ln" id="L130">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
+<span class="ln" id="L131">    assert!(made.<span class="tok-fn">success</span>(), <span class="tok-str">&quot;the archive could not be built&quot;</span>);</span>
+<span class="ln" id="L132"></span>
+<span class="ln" id="L133">    <span class="tok-com">// The generator the release job runs. Not a copy of it.</span></span>
+<span class="ln" id="L134">    <span class="tok-kw">let</span> generator = repo.<span class="tok-fn">join</span>(<span class="tok-str">&quot;tools/release/contents.py&quot;</span>);</span>
+<span class="ln" id="L135">    assert!(generator.<span class="tok-fn">is_file</span>(), <span class="tok-str">&quot;{} is missing&quot;</span>, generator.<span class="tok-fn">display</span>());</span>
+<span class="ln" id="L136">    <span class="tok-kw">let</span> list = staging.<span class="tok-fn">join</span>(contents::CONTENTS);</span>
+<span class="ln" id="L137">    <span class="tok-kw">let</span> ran = Command::<span class="tok-fn">new</span>(python)</span>
+<span class="ln" id="L138">        .<span class="tok-fn">arg</span>(&amp;generator)</span>
+<span class="ln" id="L139">        .<span class="tok-fn">arg</span>(&amp;staging)</span>
+<span class="ln" id="L140">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-o&quot;</span>)</span>
+<span class="ln" id="L141">        .<span class="tok-fn">arg</span>(&amp;list)</span>
+<span class="ln" id="L142">        .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L143">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the generator runs&quot;</span>);</span>
+<span class="ln" id="L144">    assert!(</span>
+<span class="ln" id="L145">        ran.status.<span class="tok-fn">success</span>(),</span>
+<span class="ln" id="L146">        <span class="tok-str">&quot;the generator failed: {}&quot;</span>,</span>
+<span class="ln" id="L147">        String::<span class="tok-fn">from_utf8_lossy</span>(&amp;ran.stderr)</span>
+<span class="ln" id="L148">    );</span>
+<span class="ln" id="L149"></span>
+<span class="ln" id="L150">    <span class="tok-com">// The reader the verifier uses. Not a stand-in for it either.</span></span>
+<span class="ln" id="L151">    <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(&amp;list).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the generator wrote something&quot;</span>);</span>
+<span class="ln" id="L152">    <span class="tok-kw">let</span> all = contents::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap_or_else</span>(|why| {</span>
+<span class="ln" id="L153">        panic!(<span class="tok-str">&quot;the verifier cannot read what the release job wrote: {why}\n{text}&quot;</span>)</span>
+<span class="ln" id="L154">    });</span>
+<span class="ln" id="L155">    <span class="tok-kw">let</span> section = contents::<span class="tok-fn">for_archive</span>(&amp;all, &amp;format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>)).<span class="tok-fn">unwrap_or_else</span>(|| {</span>
+<span class="ln" id="L156">        panic!(<span class="tok-str">&quot;the manifest does not mention the archive it was made from:\n{text}&quot;</span>)</span>
+<span class="ln" id="L157">    });</span>
+<span class="ln" id="L158">    assert_eq!(</span>
+<span class="ln" id="L159">        section.members.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L160">        <span class="tok-num">5</span>,</span>
+<span class="ln" id="L161">        <span class="tok-str">&quot;every file, including the one in a subdirectory and the dotfile:\n{text}&quot;</span></span>
+<span class="ln" id="L162">    );</span>
+<span class="ln" id="L163">    assert!(</span>
+<span class="ln" id="L164">        section.members.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|m| m.path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;/.hidden&quot;</span>)),</span>
+<span class="ln" id="L165">        <span class="tok-str">&quot;F-102: the dotfile kept its name:\n{text}&quot;</span></span>
+<span class="ln" id="L166">    );</span>
+<span class="ln" id="L167"></span>
+<span class="ln" id="L168">    <span class="tok-com">// Extracted the way somebody extracts a download, beside the archive, and</span></span>
+<span class="ln" id="L169">    <span class="tok-com">// then checked file by file. This is the assertion the whole file is for:</span></span>
+<span class="ln" id="L170">    <span class="tok-com">// the paths the generator wrote line up with the paths the reader looks</span></span>
+<span class="ln" id="L171">    <span class="tok-com">// for, on this platform, without anybody having agreed on them by hand.</span></span>
+<span class="ln" id="L172">    <span class="tok-kw">let</span> out = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
+<span class="ln" id="L173">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
+<span class="ln" id="L174">        .<span class="tok-fn">arg</span>(&amp;staging)</span>
+<span class="ln" id="L175">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-xzf&quot;</span>)</span>
+<span class="ln" id="L176">        .<span class="tok-fn">arg</span>(&amp;tarball)</span>
+<span class="ln" id="L177">        .<span class="tok-fn">status</span>()</span>
+<span class="ln" id="L178">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
+<span class="ln" id="L179">    assert!(out.<span class="tok-fn">success</span>(), <span class="tok-str">&quot;the archive could not be extracted&quot;</span>);</span>
 <span class="ln" id="L180"></span>
-<span class="ln" id="L181">    <span class="tok-kw">let</span> sweep = contents::<span class="tok-fn">extras</span>(&amp;staging, section);</span>
-<span class="ln" id="L182">    assert!(</span>
-<span class="ln" id="L183">        sweep.<span class="tok-fn">is_clean</span>(),</span>
-<span class="ln" id="L184">        <span class="tok-str">&quot;an untouched extraction is not the release: {sweep:?}&quot;</span></span>
-<span class="ln" id="L185">    );</span>
-<span class="ln" id="L186"></span>
-<span class="ln" id="L187">    <span class="tok-com">// And a changed file is caught, so the pass above is not the check being</span></span>
-<span class="ln" id="L188">    <span class="tok-com">// asleep. Written after the clean run rather than instead of it: a test</span></span>
-<span class="ln" id="L189">    <span class="tok-com">// that only proves failure cannot tell a working verifier from one that</span></span>
-<span class="ln" id="L190">    <span class="tok-com">// refuses everything.</span></span>
-<span class="ln" id="L191">    std::fs::<span class="tok-fn">write</span>(staging.<span class="tok-fn">join</span>(name).<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;something else&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L192">    <span class="tok-kw">let</span> after = contents::<span class="tok-fn">check</span>(&amp;staging, section);</span>
-<span class="ln" id="L193">    <span class="tok-kw">let</span> changed: Vec&lt;&amp;contents::Outcome&gt; = after.<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|o| !o.<span class="tok-fn">is_good</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L194">    assert_eq!(changed.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;exactly the file that was changed&quot;</span>);</span>
-<span class="ln" id="L195">    assert!(changed[<span class="tok-num">0</span>].path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), <span class="tok-str">&quot;{:?}&quot;</span>, changed[<span class="tok-num">0</span>]);</span>
+<span class="ln" id="L181">    <span class="tok-kw">let</span> outcomes = contents::<span class="tok-fn">check</span>(&amp;staging, section);</span>
+<span class="ln" id="L182">    <span class="tok-kw">for</span> outcome <span class="tok-kw">in</span> &amp;outcomes {</span>
+<span class="ln" id="L183">        assert!(</span>
+<span class="ln" id="L184">            outcome.<span class="tok-fn">is_good</span>(),</span>
+<span class="ln" id="L185">            <span class="tok-str">&quot;{}: {:?}\n{text}&quot;</span>,</span>
+<span class="ln" id="L186">            outcome.path,</span>
+<span class="ln" id="L187">            outcome.verdict</span>
+<span class="ln" id="L188">        );</span>
+<span class="ln" id="L189">    }</span>
+<span class="ln" id="L190"></span>
+<span class="ln" id="L191">    <span class="tok-kw">let</span> sweep = contents::<span class="tok-fn">extras</span>(&amp;staging, section);</span>
+<span class="ln" id="L192">    assert!(</span>
+<span class="ln" id="L193">        sweep.<span class="tok-fn">is_clean</span>(),</span>
+<span class="ln" id="L194">        <span class="tok-str">&quot;an untouched extraction is not the release: {sweep:?}&quot;</span></span>
+<span class="ln" id="L195">    );</span>
 <span class="ln" id="L196"></span>
-<span class="ln" id="L197">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L198">}</span>
+<span class="ln" id="L197">    <span class="tok-com">// And a changed file is caught, so the pass above is not the check being</span></span>
+<span class="ln" id="L198">    <span class="tok-com">// asleep. Written after the clean run rather than instead of it: a test</span></span>
+<span class="ln" id="L199">    <span class="tok-com">// that only proves failure cannot tell a working verifier from one that</span></span>
+<span class="ln" id="L200">    <span class="tok-com">// refuses everything.</span></span>
+<span class="ln" id="L201">    std::fs::<span class="tok-fn">write</span>(staging.<span class="tok-fn">join</span>(name).<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;something else&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L202">    <span class="tok-kw">let</span> after = contents::<span class="tok-fn">check</span>(&amp;staging, section);</span>
+<span class="ln" id="L203">    <span class="tok-kw">let</span> changed: Vec&lt;&amp;contents::Outcome&gt; = after.<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|o| !o.<span class="tok-fn">is_good</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L204">    assert_eq!(changed.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;exactly the file that was changed&quot;</span>);</span>
+<span class="ln" id="L205">    assert!(changed[<span class="tok-num">0</span>].path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), <span class="tok-str">&quot;{:?}&quot;</span>, changed[<span class="tok-num">0</span>]);</span>
+<span class="ln" id="L206"></span>
+<span class="ln" id="L207">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L208">}</span>
 </span>
 </code></pre>
 </main>

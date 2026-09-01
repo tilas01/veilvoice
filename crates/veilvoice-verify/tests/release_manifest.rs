@@ -75,6 +75,12 @@ fn stage(root: &Path, name: &str) -> PathBuf {
     std::fs::write(release.join("veilvoice-verify"), b"the verifier").unwrap();
     std::fs::write(release.join("README.md"), b"# VeilVoice\n").unwrap();
     std::fs::write(release.join("docs/INSTALL.md"), b"install this\n").unwrap();
+    // **F-102.** A name beginning with a dot. The generator used to normalise
+    // member paths with `lstrip("./")`, which takes a set of characters rather
+    // than a prefix, so this file was published as `hidden` and every verifier
+    // reported it missing on a release that was perfectly sound. One file here
+    // is cheaper than the round trip that found it.
+    std::fs::write(release.join(".hidden"), b"a dotfile\n").unwrap();
     release
 }
 
@@ -151,8 +157,12 @@ fn what_the_release_job_writes_is_what_the_verifier_reads() {
     });
     assert_eq!(
         section.members.len(),
-        4,
-        "every file, including the one in a subdirectory:\n{text}"
+        5,
+        "every file, including the one in a subdirectory and the dotfile:\n{text}"
+    );
+    assert!(
+        section.members.iter().any(|m| m.path.ends_with("/.hidden")),
+        "F-102: the dotfile kept its name:\n{text}"
     );
 
     // Extracted the way somebody extracts a download, beside the archive, and

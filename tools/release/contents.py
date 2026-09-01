@@ -79,6 +79,46 @@ def digest(stream):
     return hasher.hexdigest()
 
 
+class Refused(Exception):
+    """A member path this will not write down."""
+
+
+def member_path(raw, archive):
+    """One archive member's path, as the manifest records it.
+
+    **F-102.** This was `name.replace("\\", "/").lstrip("./")`, and `lstrip`
+    takes a *set of characters* rather than a prefix. Measured: `.hidden/file`
+    came out as `hidden/file` and `../escape` came out as `escape`.
+
+    Both are bad and the second is worse. A dotfile in a release would be
+    published under a name no file on disk has, so every verifier would report
+    it missing on a release that is perfectly sound. And a member that climbs
+    out of the release directory would be quietly rewritten into one that looks
+    ordinary -- sanitised into acceptability, which is exactly what the reader's
+    own note says must never happen, because a manifest with such a path in it
+    is not a manifest with one bad line: it is a file that did not come from
+    this project's release job.
+
+    So: exactly one leading `./` is removed, which is a thing `tar` genuinely
+    writes, and anything else that would not survive the reader is refused here
+    rather than published. The rule is the reader's rule
+    (`veilvoice_check::contents::parse`), stated on this side too, so the two
+    ends of this seam agree by construction rather than by attention.
+    """
+    name = raw.replace("\\", "/")
+    if name.startswith("./"):
+        name = name[2:]
+    if not name or name.endswith("/"):
+        raise Refused("%s: a member with no name" % archive)
+    if name.startswith("/"):
+        raise Refused("%s: an absolute path, %r" % (archive, raw))
+    if len(name) > 1 and name[1] == ":":
+        raise Refused("%s: a drive letter, %r" % (archive, raw))
+    if any(part in ("..", ".") for part in name.split("/")):
+        raise Refused("%s: a path that leaves the release, %r" % (archive, raw))
+    return name
+
+
 def members_of_zip(path):
     """Every file inside a zip, as `(path, sha256)`, sorted by path.
 
@@ -91,9 +131,7 @@ def members_of_zip(path):
         for info in archive.infolist():
             if info.is_dir():
                 continue
-            name = info.filename.replace("\\", "/").strip()
-            if not name:
-                continue
+            name = member_path(info.filename, path.name)
             with archive.open(info) as member:
                 out.append((name, digest(member)))
     return sorted(out)
@@ -112,9 +150,7 @@ def members_of_tar(path):
         for info in archive:
             if not info.isfile():
                 continue
-            name = info.name.replace("\\", "/").lstrip("./").strip()
-            if not name:
-                continue
+            name = member_path(info.name, path.name)
             member = archive.extractfile(info)
             if member is None:
                 continue
@@ -180,13 +216,21 @@ def main(argv):
         print(f"no release archives in {directory}", file=sys.stderr)
         return 1
 
-    text = manifest(directory)
+    try:
+        text = manifest(directory)
+    except Refused as why:
+        # The release job stops here. An archive holding a path like that was
+        # not built by this project, and publishing a manifest that every
+        # verifier will refuse is worse than not publishing one.
+        print("refusing to write a contents list: %s" % why, file=sys.stderr)
+        return 1
     if args.output:
         Path(args.output).write_text(text, encoding="utf-8", newline="\n")
-        print(
-            f"  {len(found)} archive(s), {text.count(chr(10)) - 2 * len(found)} files",
-            file=sys.stderr,
-        )
+        # Counted from the lines that are files, not derived from the line
+        # count and the number of archives. The derivation was off by one per
+        # archive: measured, it reported five files for six.
+        files = sum(1 for line in text.splitlines() if line and not line.startswith("# "))
+        print(f"  {len(found)} archive(s), {files} files", file=sys.stderr)
     else:
         sys.stdout.write(text)
     return 0
