@@ -77,7 +77,44 @@
 <p class="muted">
 Every release, newest first. Open one to read what changed in it; its files are at the end of the notes. The notes are <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md">CHANGELOG.md</a>, which is where they are written.
 </p>
-<details class="release" id="v0.1.15" open>
+<details class="release" id="v0.1.16" open>
+<summary><strong>v0.1.16</strong> <span class="muted">A verifier that no longer calls a genuine release unverified, and an...</span></summary>
+<p>A verifier that no longer calls a genuine release unverified, and an interface with no dashes in it.</p>
+<h4 id="the-eighteenth-audit-round-run-against-the-published-v0115">The eighteenth audit round, run against the published v0.1.15</h4>
+<p>v0.1.15 was downloaded, extracted and checked with the verifier that ships inside it. Not a fixture: the artefacts on the release page.</p>
+<ul>
+<li><strong>F-104</strong> The GnuPG half called a correctly signed release <strong>unverified</strong>, in the strongest words the program has, for every reader with GnuPG installed. The release is signed by the signing subkey of the VeilVoice key, as most keys sign; GnuPG names the signing key first and the primary key last, and only the first was read. The key it had been measured against signs with itself, so the two fingerprints were the same string and the mistake was invisible in every test. Both are compared now, and the test carries the line GnuPG actually printed for v0.1.15. The same run proved the rest: all 341 files in the extracted release matched the signed contents list, with nothing else in the folder.</li>
+</ul>
+<h4 id="the-interface-text-no-longer-uses-dashes">The interface text no longer uses dashes</h4>
+<p>Fifty em dashes in <code>veilvoice-cli</code> and four elsewhere that reach a user are gone, from <code>--help</code> output, warnings, errors and printed results. Every sentence was rewritten rather than having its punctuation swapped, and the ten committed CLI screenshots were re-captured from the built binary, so the gallery shows what the program prints.</p>
+<p>349 remain in <code>//!</code> and <code>///</code> doc comments, which the rule covers and which nobody sees while using VeilVoice. That is a stated remainder, not a claim of completion.</p>
+<h4 id="the-seventeenth-audit-round-run-on-the-screenshots">The seventeenth audit round, run on the screenshots</h4>
+<ul>
+<li><strong>F-103</strong> Nothing said when a committed screenshot had gone stale. The check compared each drawing against the text file beside it and compared that file against nothing: it is written by a separate <code>--capture</code> command that the verification run does not call, so a string could be rewritten and every check in the repository would pass while the website went on showing the old wording. Found the only way this kind of thing is: the interface text was rewritten, everything passed, and the help screenshot still contained a dash the program no longer prints. The check now runs the commands and compares what they print against what is committed. Every capture is a <code>--help</code> screen, so its output depends on the binary and not on the machine.</li>
+</ul>
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.16-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.16-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.16-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.16-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.16-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.16-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.16-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.16-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.16-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.16-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.16-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/CONTENTS.sha256" rel="noopener noreferrer">CONTENTS.sha256</a> <span class="muted">the hash of every file inside those archives</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.16" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+</details>
+<details class="release" id="v0.1.15">
 <summary><strong>v0.1.15</strong> <span class="muted">Encrypted volumes, one password if you want one, a window that locks...</span></summary>
 <p>Encrypted volumes, one password if you want one, a window that locks itself, and an interview from an OBS recording through to a video.</p>
 <h4 id="a-verifier-anybody-can-use-checking-everything">A verifier anybody can use, checking everything</h4>
@@ -92,13 +129,6 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <h4 id="smaller-things">Smaller things</h4>
 <ul>
 <li>The release workflow&#x27;s <code>tag</code> input was declared and ignored. A dry run started from a branch named every archive after that branch and would have tried to publish a release called <code>main</code>. It now checks out the tag it was given, names everything after it, and publishes nothing at all on a manual run, which is what &quot;dry run&quot; was always supposed to mean.</li>
-</ul>
-<h4 id="the-interface-text-no-longer-uses-dashes">The interface text no longer uses dashes</h4>
-<p>Fifty em dashes in <code>veilvoice-cli</code> and four elsewhere that reach a user are gone, from <code>--help</code> output, warnings, errors and printed results. Every sentence was rewritten rather than having its punctuation swapped, and the ten committed CLI screenshots were re-captured from the built binary, so the gallery shows what the program prints.</p>
-<p>349 remain in <code>//!</code> and <code>///</code> doc comments, which the rule covers and which nobody sees while using VeilVoice. That is a stated remainder, not a claim of completion.</p>
-<h4 id="the-seventeenth-audit-round-run-on-the-screenshots">The seventeenth audit round, run on the screenshots</h4>
-<ul>
-<li><strong>F-103</strong> Nothing said when a committed screenshot had gone stale. The check compared each drawing against the text file beside it and compared that file against nothing: it is written by a separate <code>--capture</code> command that the verification run does not call, so a string could be rewritten and every check in the repository would pass while the website went on showing the old wording. Found the only way this kind of thing is: the interface text was rewritten, everything passed, and the help screenshot still contained a dash the program no longer prints. The check now runs the commands and compares what they print against what is committed. Every capture is a <code>--help</code> screen, so its output depends on the binary and not on the machine.</li>
 </ul>
 <h4 id="the-sixteenth-audit-round-run-on-the-manifest-generator">The sixteenth audit round, run on the manifest generator</h4>
 <ul>
