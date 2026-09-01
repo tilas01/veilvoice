@@ -66,6 +66,19 @@ them makes the *invocation* independent.
   given, names everything after it, and publishes nothing at all on a manual
   run, which is what "dry run" was always supposed to mean.
 
+### The sixteenth audit round, run on the manifest generator
+
+- **F-102** The generator normalised archive member paths with
+  `lstrip("./")`, which strips a set of characters rather than a prefix.
+  Measured: `.hidden/file` came out as `hidden/file`, so a release containing a
+  dotfile would publish it under a name no file on disk has and every verifier
+  would report it missing on a sound release; and `../escape` came out as
+  `escape`, quietly rewriting a path that leaves the release into one that
+  looks ordinary. The reader refuses such a path rather than sanitising it, and
+  says why; the writer was doing the opposite. Both ends state the same rule
+  now, and the writer fails the release job rather than publishing something
+  every verifier would reject.
+
 ### The releases page, and what it was not telling you
 
 **Every version is on it now.** The backlog began at v0.1.6, because

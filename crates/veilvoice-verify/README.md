@@ -128,7 +128,7 @@ flowchart TD
 | [`main.rs`](../../docs/files/veilvoice-verify/main.md) | 1837 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 457 | The verifier's own tests. |
-| [`release_manifest.rs`](../../docs/files/veilvoice-verify/tests-release_manifest.md) | 198 | Marker 97. |
+| [`release_manifest.rs`](../../docs/files/veilvoice-verify/tests-release_manifest.md) | 208 | Marker 97. |
 
 ## Public items
 
