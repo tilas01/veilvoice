@@ -3,8 +3,8 @@
 //!
 //! # No `unsafe`, even here
 //!
-//! Locking pages out of the swap file is a raw syscall — `VirtualLock` on
-//! Windows, `mlock` on Unix — and it is the one place a project like this
+//! Locking pages out of the swap file is a raw syscall, `VirtualLock` on
+//! Windows and `mlock` on Unix, and it is the one place a project like this
 //! usually has to reach for `unsafe`. It does not here: the `region` crate
 //! exposes a safe, cross-platform wrapper. VeilVoice therefore contains **no
 //! `unsafe` code at all**, and every crate keeps `#![forbid(unsafe_code)]`.
@@ -15,8 +15,9 @@
 //! recovered later by reading swap off the disk. It does **not** protect against
 //! an attacker who can already read this process's memory, and it does not
 //! survive hibernation, which writes RAM to disk wholesale. Locking can also
-//! fail outright — unprivileged Linux users get a small `RLIMIT_MEMLOCK` budget
-//! — so it is best-effort hardening and never a precondition.
+//! fail outright, because unprivileged Linux users get a small
+//! `RLIMIT_MEMLOCK` budget, so it is best-effort hardening and never a
+//! precondition.
 //! [`Secret::is_locked`] reports what actually happened, so the UI can tell the
 //! user the truth rather than imply a guarantee that was not obtained.
 //!
@@ -26,7 +27,7 @@
 //!
 //! Locking has *page* granularity, not byte granularity. If two secrets share a
 //! 4 KiB page, both lock it, and the first one dropped unlocks the page out from
-//! under the second — which is still live and now swappable.
+//! under the second, which is still live and now swappable.
 //!
 //! Each [`Secret`] therefore over-allocates and locks a page-aligned,
 //! page-sized span lying entirely within its own allocation. No other allocation
@@ -36,7 +37,7 @@
 //!
 //! # Why the lock is not held by an RAII guard
 //!
-//! `region::lock` hands back a guard that unlocks on drop — but its destructor
+//! `region::lock` hands back a guard that unlocks on drop, but its destructor
 //! **panics** if unlocking fails, and unlocking can fail for reasons that are
 //! nobody's fault: Windows does not reference-count `VirtualLock` and may drop
 //! pages from a process working set on its own, after which `VirtualUnlock`
@@ -131,7 +132,7 @@ impl Secret {
 
     /// Whether the pages were successfully locked out of swap.
     ///
-    /// False is not an error — see the module documentation — but it is worth
+    /// False is not an error, as the module documentation says, but it is worth
     /// surfacing to the user rather than claiming a guarantee that was not
     /// actually obtained.
     pub fn is_locked(&self) -> bool {
@@ -263,7 +264,7 @@ mod tests {
     }
 
     /// Locking is best-effort, so this asserts only that it is reported and
-    /// never panics — not that it succeeded, which depends on privileges.
+    /// never panics, not that it succeeded, which depends on privileges.
     #[test]
     fn locking_is_reported_and_never_panics() {
         let s = Secret::zeroed(4096);

@@ -10,7 +10,8 @@
 //! local lock *is*.
 //!
 //! What it does buy is real and worth having: someone who picks up your unlocked
-//! computer — a flatmate, a colleague, a border officer with your session open —
+//! computer, such as a flatmate, a colleague or a border officer with your
+//! session open,
 //! cannot open VeilVoice, see which files you have processed, or start a live
 //! scramble. That is the threat this defends against, and [`SCOPE`] says so in
 //! the words the user sees.
@@ -49,14 +50,14 @@
 //! Every record carries a 16-byte authentication tag over all the bytes before
 //! it, keyed by a value that exists only while a correct passphrase is in
 //! memory. The tag key is the second half of one Argon2id run, split from the
-//! verifier by HKDF, so publishing the verifier — which the file does, by
-//! sitting on disk — says nothing about the tag key.
+//! verifier by HKDF, so publishing the verifier, which the file does by
+//! sitting on disk, says nothing about the tag key.
 //!
 //! That buys exactly one thing, and it is worth naming precisely. Somebody who
 //! edits this file without knowing the passphrase cannot leave the edit
 //! looking authentic. Resetting the failure counter to zero, winding the
 //! last-failure timestamp back to escape a wait, or dropping the Argon2id cost
-//! so that a guess is cheap — all three are edits, and all three are caught at
+//! so that a guess is cheap. All three are edits, and all three are caught at
 //! the next successful unlock, because that is the moment the tag key exists.
 //!
 //! It buys nothing at all against the two attacks people expect it to stop.
@@ -73,7 +74,7 @@
 //!
 //! Wrong attempts are counted and the count is **persisted**, so killing the
 //! process does not hand an attacker a fresh budget. After three free attempts
-//! the wait doubles — 5 s, 10 s, 20 s … capped at fifteen minutes.
+//! the wait doubles: 5 s, 10 s, 20 s … capped at fifteen minutes.
 //!
 //! The counter is stored in the same unauthenticated file as the verifier, and
 //! the wait is measured against the system clock. Someone who can edit the file
@@ -181,7 +182,7 @@ pub struct AppLock {
     params: kdf::KdfParams,
     salt: [u8; kdf::SALT_LEN],
     /// Held in a [`Secret`] for the constant-time comparison and the wipe on
-    /// drop. Page-locking it is over-caution — the same bytes are on disk — but
+    /// drop. Page-locking it is over-caution, since the same bytes are on disk, but
     /// costs nothing and keeps one type for key-shaped material.
     verifier: Secret,
     failures: u32,
@@ -233,7 +234,7 @@ impl AppLock {
     /// Check `password`, recording the outcome.
     ///
     /// Returns [`Error::AppLockCooldown`] while the rate limit is in force,
-    /// without touching the KDF — an attacker should not be able to spend our
+    /// without touching the KDF. An attacker should not be able to spend our
     /// CPU either.
     pub fn verify(&mut self, password: &[u8]) -> Result<(), Error> {
         self.verify_at(password, unix_now())
@@ -679,7 +680,7 @@ impl LockStore {
     /// Check `password` and persist the outcome.
     ///
     /// A failure to write the updated attempt count does not change the verdict
-    /// — the attempt really did succeed or fail — so the write is best-effort
+    /// because the attempt really did succeed or fail, so the write is best-effort
     /// here. The consequence of losing it is a rate limit that resets, which is
     /// already true of anyone who can delete the file.
     pub fn unlock(&mut self, password: &[u8]) -> Result<(), Error> {
@@ -861,8 +862,8 @@ pub fn create_default(password: &[u8], params: kdf::KdfParams) -> Result<LockSto
 
 /// Write the lock file so it is owner-only from the moment it exists.
 ///
-/// The previous version used `fs::write` — which creates with the process
-/// umask, usually world-readable — and chmod'd afterwards, so the stored
+/// The previous version used `fs::write`, which creates with the process
+/// umask, usually world-readable, and chmod'd afterwards, so the stored
 /// password verifier was readable by every other local user for the window
 /// between the two calls. That window reopened on **every save**, and a save
 /// happens after every failed unlock attempt.
@@ -1056,7 +1057,7 @@ mod tests {
 
     /// Regression: the verifier used to be written with the process umask and
     /// only chmod'd afterwards, so it was world-readable for a window on every
-    /// single save — and a save happens after every failed attempt.
+    /// single save, and a save happens after every failed attempt.
     #[cfg(unix)]
     #[test]
     fn the_lock_file_is_owner_only_from_the_moment_it_exists() {

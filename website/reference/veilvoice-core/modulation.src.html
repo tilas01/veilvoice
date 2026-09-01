@@ -48,7 +48,7 @@
 <span class="ln" id="L5"><span class="tok-com">//! new random target every `frames_per_target` STFT frames, and a one-pole</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! filter glides continuously toward it. Because the transform is therefore</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! non-stationary and unpredictable, an attacker cannot &quot;undo&quot; it by assuming a</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! single fixed shift &#8212; there is no single shift to undo, and the target</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! single fixed shift: there is no single shift to undo, and the target</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! sequence is unknowable without the seed (which never leaves the process and</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! is zeroized on drop).</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!</span></span>
@@ -173,7 +173,7 @@
 <span class="ln" id="L113">    <span class="tok-com">/// # Why a ratchet rather than fresh OS entropy</span></span>
 <span class="ln" id="L114">    <span class="tok-com">///</span></span>
 <span class="ln" id="L115">    <span class="tok-com">/// The new seed is 32 bytes of ChaCha20 output from the stream being</span></span>
-<span class="ln" id="L116">    <span class="tok-com">/// replaced. That buys the property that matters &#8212; **forward secrecy**.</span></span>
+<span class="ln" id="L116">    <span class="tok-com">/// replaced. That buys the property that matters, **forward secrecy**.</span></span>
 <span class="ln" id="L117">    <span class="tok-com">/// ChaCha20 is not invertible, so an adversary who somehow learned the</span></span>
 <span class="ln" id="L118">    <span class="tok-com">/// current seed could generate everything from this moment on but could not</span></span>
 <span class="ln" id="L119">    <span class="tok-com">/// walk backwards to recover any earlier one. Each roll permanently closes</span></span>
@@ -182,7 +182,7 @@
 <span class="ln" id="L122">    <span class="tok-com">/// Reading fresh entropy from the OS instead would mean a syscall inside an</span></span>
 <span class="ln" id="L123">    <span class="tok-com">/// audio callback every couple of seconds, which is exactly the kind of</span></span>
 <span class="ln" id="L124">    <span class="tok-com">/// thing that causes a dropout, and it would make</span></span>
-<span class="ln" id="L125">    <span class="tok-com">/// [`crate::Deidentifier::from_seed`] non-deterministic &#8212; losing the</span></span>
+<span class="ln" id="L125">    <span class="tok-com">/// [`crate::Deidentifier::from_seed`] non-deterministic, and losing the</span></span>
 <span class="ln" id="L126">    <span class="tok-com">/// reproducibility the test suite depends on. The chain is seeded from the</span></span>
 <span class="ln" id="L127">    <span class="tok-com">/// OS CSPRNG once at construction; the ratchet carries that unpredictability</span></span>
 <span class="ln" id="L128">    <span class="tok-com">/// forward without ever going back to the kernel.</span></span>

@@ -51,7 +51,7 @@
 <section id="s-about">
 <p>The engine against input that is not well-behaved audio.</p>
 <p>A realistic use of VeilVoice is &quot;someone sent me a recording and I want to veil it before passing it on&quot;, so the input file is not necessarily friendly. A 32-bit-float WAV can legally contain NaN and infinity, and <code>symphonia</code> decodes those faithfully rather than sanitising them.</p>
-<p>That matters more than it might sound, because the engine keeps <em>persistent</em> state: the accent neutraliser&#x27;s long-term spectrum is an exponential moving average, so a single non-finite sample folded into it never washes out. The audit found exactly that &#8212; one NaN, and every output sample for the rest of the session was NaN, silently.</p>
+<p>That matters more than it might sound, because the engine keeps <em>persistent</em> state: the accent neutraliser&#x27;s long-term spectrum is an exponential moving average, so a single non-finite sample folded into it never washes out. The audit found exactly that: one NaN, and every output sample for the rest of the session was NaN, silently.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Feeds the engine audio designed to break it: silence, deafening noise, values that are not numbers, files that lie about their own length.</p>
 <p>The question is not whether it sounds good. It is whether anything can make the engine stop, hang, or quietly produce silence while reporting success. A de-identifier that fails by outputting nothing is one somebody might not notice had failed.</p>

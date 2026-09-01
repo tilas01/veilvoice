@@ -46,7 +46,7 @@
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
 <span class="ln" id="L4"><span class="tok-com">//! `docs/AUDIT.md` listed this as outstanding: Argon2id is inherently</span></span>
 <span class="ln" id="L5"><span class="tok-com">//! constant-ish, but nobody had measured the code *around* it. The question is</span></span>
-<span class="ln" id="L6"><span class="tok-com">//! whether the time an attempt takes leaks anything about the password &#8212;</span></span>
+<span class="ln" id="L6"><span class="tok-com">//! whether the time an attempt takes leaks anything about the password,</span></span>
 <span class="ln" id="L7"><span class="tok-com">//! classically, whether a byte-by-byte comparison returns early and turns</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! &quot;how long did that take&quot; into &quot;how many characters were right&quot;.</span></span>
 <span class="ln" id="L9"><span class="tok-com">//!</span></span>
@@ -60,8 +60,8 @@
 <span class="ln" id="L17"><span class="tok-com">//! ```</span></span>
 <span class="ln" id="L18"><span class="tok-com">//!</span></span>
 <span class="ln" id="L19"><span class="tok-com">//! The thresholds below are loose on purpose. They are there to catch a</span></span>
-<span class="ln" id="L20"><span class="tok-com">//! *catastrophic* regression &#8212; someone replacing a constant-time comparison</span></span>
-<span class="ln" id="L21"><span class="tok-com">//! with `==`, which shows up as a difference of orders of magnitude &#8212; not to</span></span>
+<span class="ln" id="L20"><span class="tok-com">//! *catastrophic* regression, such as someone replacing a constant-time</span></span>
+<span class="ln" id="L21"><span class="tok-com">//! comparison with `==`, which shows up as a difference of orders of magnitude, not to</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! certify a bound in nanoseconds, which this method cannot honestly do.</span></span>
 <span class="ln" id="L23"><span class="tok-com">//!</span></span>
 <span class="ln" id="L24"><span class="tok-com">//! # In plain words</span></span>
@@ -101,7 +101,7 @@
 <span class="ln" id="L53"><span class="tok-com">/// noise on a real machine is one-sided: a scheduler, an interrupt or a cache</span></span>
 <span class="ln" id="L54"><span class="tok-com">/// miss can only ever make a sample slower, never faster. The fastest sample is</span></span>
 <span class="ln" id="L55"><span class="tok-com">/// therefore the closest estimate of the work the code actually does, and it is</span></span>
-<span class="ln" id="L56"><span class="tok-com">/// far more stable across runs than any average &#8212; which on the first pass of</span></span>
+<span class="ln" id="L56"><span class="tok-com">/// far more stable across runs than any average, which on the first pass of</span></span>
 <span class="ln" id="L57"><span class="tok-com">/// these tests moved the &quot;ratio&quot; by 50% purely from Windows scheduling.</span></span>
 <span class="ln" id="L58"><span class="tok-kw">struct</span> Stats {</span>
 <span class="ln" id="L59">    min: Duration,</span>
@@ -156,7 +156,7 @@
 <span class="ln" id="L100"><span class="tok-com">/// Needed wherever a single measurement would otherwise have to include its own</span></span>
 <span class="ln" id="L101"><span class="tok-com">/// setup: the app lock counts failures, so timing repeated wrong guesses on one</span></span>
 <span class="ln" id="L102"><span class="tok-com">/// lock either trips the rate limiter or has to reset it inside the timed</span></span>
-<span class="ln" id="L103"><span class="tok-com">/// region &#8212; which is how the first version of this test ended up comparing two</span></span>
+<span class="ln" id="L103"><span class="tok-com">/// region, which is how the first version of this test ended up comparing two</span></span>
 <span class="ln" id="L104"><span class="tok-com">/// derivations against one and reporting a meaningless 2&#215; &quot;leak&quot;.</span></span>
 <span class="ln" id="L105"><span class="tok-kw">fn</span> time_each&lt;T&gt;(items: &amp;<span class="tok-kw">mut</span> [T], <span class="tok-kw">mut</span> body: <span class="tok-kw">impl</span> <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> T)) -&gt; Stats {</span>
 <span class="ln" id="L106">    <span class="tok-fn">summarise</span>(</span>
@@ -275,8 +275,8 @@
 <span class="ln" id="L212"></span>
 <span class="src-item" id="fn-a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended">
 <span class="ln" id="L213"><span class="tok-com">/// The rate limiter returns **before** touching the KDF, so a locked-out</span></span>
-<span class="ln" id="L214"><span class="tok-com">/// attempt is obviously faster than a real one. That is deliberate &#8212; the point</span></span>
-<span class="ln" id="L215"><span class="tok-com">/// of a rate limit is to refuse to spend the CPU &#8212; and it leaks only the state</span></span>
+<span class="ln" id="L214"><span class="tok-com">/// attempt is obviously faster than a real one. That is deliberate, because the</span></span>
+<span class="ln" id="L215"><span class="tok-com">/// point of a rate limit is to refuse to spend the CPU, and it leaks only the state</span></span>
 <span class="ln" id="L216"><span class="tok-com">/// the UI displays on screen anyway. Measured so the trade is a number rather</span></span>
 <span class="ln" id="L217"><span class="tok-com">/// than an assumption.</span></span>
 <span class="ln" id="L218"><span class="tok-attr">#[test</span>]</span>

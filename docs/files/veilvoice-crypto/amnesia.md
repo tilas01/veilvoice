@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/amnesia.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 326 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 327 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs)
 
 ## Contents
 
@@ -28,8 +28,8 @@ Amnesic secret storage: page-locked, zeroized, and never printed.
 
 # No `unsafe`, even here
 
-Locking pages out of the swap file is a raw syscall — `VirtualLock` on
-Windows, `mlock` on Unix — and it is the one place a project like this
+Locking pages out of the swap file is a raw syscall, `VirtualLock` on
+Windows and `mlock` on Unix, and it is the one place a project like this
 usually has to reach for `unsafe`. It does not here: the `region` crate
 exposes a safe, cross-platform wrapper. VeilVoice therefore contains **no
 `unsafe` code at all**, and every crate keeps `#![forbid(unsafe_code)]`.
@@ -40,8 +40,9 @@ Locking keeps key material out of the page file, so a secret cannot be
 recovered later by reading swap off the disk. It does **not** protect against
 an attacker who can already read this process's memory, and it does not
 survive hibernation, which writes RAM to disk wholesale. Locking can also
-fail outright — unprivileged Linux users get a small `RLIMIT_MEMLOCK` budget
-— so it is best-effort hardening and never a precondition.
+fail outright, because unprivileged Linux users get a small
+`RLIMIT_MEMLOCK` budget, so it is best-effort hardening and never a
+precondition.
 `Secret::is_locked` reports what actually happened, so the UI can tell the
 user the truth rather than imply a guarantee that was not obtained.
 
@@ -51,7 +52,7 @@ Zeroization, by contrast, always happens.
 
 Locking has *page* granularity, not byte granularity. If two secrets share a
 4 KiB page, both lock it, and the first one dropped unlocks the page out from
-under the second — which is still live and now swappable.
+under the second, which is still live and now swappable.
 
 Each `Secret` therefore over-allocates and locks a page-aligned,
 page-sized span lying entirely within its own allocation. No other allocation
@@ -61,7 +62,7 @@ memory alongside it.
 
 # Why the lock is not held by an RAII guard
 
-`region::lock` hands back a guard that unlocks on drop — but its destructor
+`region::lock` hands back a guard that unlocks on drop, but its destructor
 **panics** if unlocking fails, and unlocking can fail for reasons that are
 nobody's fault: Windows does not reference-count `VirtualLock` and may drop
 pages from a process working set on its own, after which `VirtualUnlock`
@@ -85,23 +86,23 @@ is given away by how long an answer took.
 
 ## What this file contains
 
-326 lines defining **13 functions** (9 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+327 lines defining **13 functions** (9 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Secret` (line 70) -- A byte buffer holding key material.
+- `struct Secret` (line 71) -- A byte buffer holding key material.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Secret::new` (line 82) -- Wrap bytes, taking ownership and wiping the caller's copy.
+- `Secret::new` (line 83) -- Wrap bytes, taking ownership and wiping the caller's copy.
   - reaches: `zeroed`
-- `Secret::random` (line 126) -- Fill len bytes from the operating-system CSPRNG.
+- `Secret::random` (line 127) -- Fill len bytes from the operating-system CSPRNG.
   - reaches: `zeroed`
-- `Secret::is_locked` (line 137) -- Whether the pages were successfully locked out of swap.
-- `Secret::len` (line 142) -- Length in bytes.
-- `Secret::is_empty` (line 147) -- Whether the secret is empty.
-- `Secret::expose_mut` (line 158) -- Borrow mutably, for filling in place.
-- `Secret::wipe` (line 166) -- Wipe the contents now, before the value goes out of scope.
+- `Secret::is_locked` (line 138) -- Whether the pages were successfully locked out of swap.
+- `Secret::len` (line 143) -- Length in bytes.
+- `Secret::is_empty` (line 148) -- Whether the secret is empty.
+- `Secret::expose_mut` (line 159) -- Borrow mutably, for filling in place.
+- `Secret::wipe` (line 167) -- Wipe the contents now, before the value goes out of scope.
 
 ## What calls what
 
@@ -123,37 +124,37 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new(["Secret::new<br/>line 82"])
-    n_zeroed["Secret::zeroed<br/>line 90"]
-    n_random(["Secret::random<br/>line 126"])
-    n_is_locked(["Secret::is_locked<br/>line 137"])
-    n_len(["Secret::len<br/>line 142"])
-    n_is_empty(["Secret::is_empty<br/>line 147"])
-    n_expose["Secret::expose<br/>line 153"]
-    n_expose_mut(["Secret::expose_mut<br/>line 158"])
-    n_wipe(["Secret::wipe<br/>line 166"])
-    n_drop["Secret::drop<br/>line 172"]
-    n_clone["Secret::clone<br/>line 183"]
-    n_eq["Secret::eq<br/>line 193"]
-    n_fmt["Secret::fmt<br/>line 202"]
+    n_new(["Secret::new<br/>line 83"])
+    n_zeroed["Secret::zeroed<br/>line 91"]
+    n_random(["Secret::random<br/>line 127"])
+    n_is_locked(["Secret::is_locked<br/>line 138"])
+    n_len(["Secret::len<br/>line 143"])
+    n_is_empty(["Secret::is_empty<br/>line 148"])
+    n_expose["Secret::expose<br/>line 154"]
+    n_expose_mut(["Secret::expose_mut<br/>line 159"])
+    n_wipe(["Secret::wipe<br/>line 167"])
+    n_drop["Secret::drop<br/>line 173"]
+    n_clone["Secret::clone<br/>line 184"]
+    n_eq["Secret::eq<br/>line 194"]
+    n_fmt["Secret::fmt<br/>line 203"]
     n_clone --> n_expose
     n_clone --> n_zeroed
     n_eq --> n_expose
     n_new --> n_zeroed
     n_random --> n_zeroed
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L82" "open the source"
-    click n_zeroed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L90" "open the source"
-    click n_random href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L126" "open the source"
-    click n_is_locked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L137" "open the source"
-    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L142" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L147" "open the source"
-    click n_expose href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L153" "open the source"
-    click n_expose_mut href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L158" "open the source"
-    click n_wipe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L166" "open the source"
-    click n_drop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L172" "open the source"
-    click n_clone href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L183" "open the source"
-    click n_eq href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L193" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L202" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L83" "open the source"
+    click n_zeroed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L91" "open the source"
+    click n_random href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L127" "open the source"
+    click n_is_locked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L138" "open the source"
+    click n_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L143" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L148" "open the source"
+    click n_expose href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L154" "open the source"
+    click n_expose_mut href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L159" "open the source"
+    click n_wipe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L167" "open the source"
+    click n_drop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L173" "open the source"
+    click n_clone href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L184" "open the source"
+    click n_eq href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L194" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L203" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_random,n_is_locked,n_len,n_is_empty,n_expose_mut,n_wipe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -168,20 +169,20 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Secret` <sub>pub struct</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L70) | A byte buffer holding key material. |
-| `Secret::new` <sub>pub fn</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L82) | Wrap bytes, taking ownership and wiping the caller's copy. |
-| `Secret::zeroed` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L90) | Allocate len zero bytes, ready to be filled in place. |
-| `Secret::random` <sub>pub fn</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L126) | Fill len bytes from the operating-system CSPRNG. |
-| `Secret::is_locked` <sub>pub fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L137) | Whether the pages were successfully locked out of swap. |
-| `Secret::len` <sub>pub fn</sub> | [142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L142) | Length in bytes. |
-| `Secret::is_empty` <sub>pub fn</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L147) | Whether the secret is empty. |
-| `Secret::expose` <sub>pub fn</sub> | [153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L153) | Borrow the raw bytes. |
-| `Secret::expose_mut` <sub>pub fn</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L158) | Borrow mutably, for filling in place. |
-| `Secret::wipe` <sub>pub fn</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L166) | Wipe the contents now, before the value goes out of scope. |
-| `Secret::drop` <sub>fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L172) |  |
-| `Secret::clone` <sub>fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L183) |  |
-| `Secret::eq` <sub>fn</sub> | [193](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L193) |  |
-| `Secret::fmt` <sub>fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L202) |  |
+| `Secret` <sub>pub struct</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L71) | A byte buffer holding key material. |
+| `Secret::new` <sub>pub fn</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L83) | Wrap bytes, taking ownership and wiping the caller's copy. |
+| `Secret::zeroed` <sub>pub fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L91) | Allocate len zero bytes, ready to be filled in place. |
+| `Secret::random` <sub>pub fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L127) | Fill len bytes from the operating-system CSPRNG. |
+| `Secret::is_locked` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L138) | Whether the pages were successfully locked out of swap. |
+| `Secret::len` <sub>pub fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L143) | Length in bytes. |
+| `Secret::is_empty` <sub>pub fn</sub> | [148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L148) | Whether the secret is empty. |
+| `Secret::expose` <sub>pub fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L154) | Borrow the raw bytes. |
+| `Secret::expose_mut` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L159) | Borrow mutably, for filling in place. |
+| `Secret::wipe` <sub>pub fn</sub> | [167](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L167) | Wipe the contents now, before the value goes out of scope. |
+| `Secret::drop` <sub>fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L173) |  |
+| `Secret::clone` <sub>fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L184) |  |
+| `Secret::eq` <sub>fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L194) |  |
+| `Secret::fmt` <sub>fn</sub> | [203](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L203) |  |
 
 ---
 

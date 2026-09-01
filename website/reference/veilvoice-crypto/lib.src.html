@@ -51,21 +51,21 @@
 <span class="ln" id="L8"><span class="tok-com">//!</span></span>
 <span class="ln" id="L9"><span class="tok-com">//! [`veilvoice_core`](../veilvoice_core/index.html) makes a voice</span></span>
 <span class="ln" id="L10"><span class="tok-com">//! unrecognisable; it does not hide the *words*, and it is not meant to. When a</span></span>
-<span class="ln" id="L11"><span class="tok-com">//! recording needs to stay secret as well &#8212; at rest on disk, or in transit to</span></span>
-<span class="ln" id="L12"><span class="tok-com">//! someone else &#8212; that is this crate&#x27;s job.</span></span>
+<span class="ln" id="L11"><span class="tok-com">//! recording needs to stay secret as well, at rest on disk or in transit to</span></span>
+<span class="ln" id="L12"><span class="tok-com">//! someone else, that is this crate&#x27;s job.</span></span>
 <span class="ln" id="L13"><span class="tok-com">//!</span></span>
-<span class="ln" id="L14"><span class="tok-com">//! - [`kdf`] &#8212; Argon2id, for turning a password into a key.</span></span>
-<span class="ln" id="L15"><span class="tok-com">//! - [`hybrid`] &#8212; X25519 + ML-KEM-768, so a recording captured today is not</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! - [`kdf`], Argon2id, for turning a password into a key.</span></span>
+<span class="ln" id="L15"><span class="tok-com">//! - [`hybrid`], X25519 + ML-KEM-768, so a recording captured today is not</span></span>
 <span class="ln" id="L16"><span class="tok-com">//!   readable by a quantum adversary tomorrow.</span></span>
-<span class="ln" id="L17"><span class="tok-com">//! - [`aead`] &#8212; XChaCha20-Poly1305, with random nonces and authenticated</span></span>
+<span class="ln" id="L17"><span class="tok-com">//! - [`aead`], XChaCha20-Poly1305, with random nonces and authenticated</span></span>
 <span class="ln" id="L18"><span class="tok-com">//!   associated data.</span></span>
-<span class="ln" id="L19"><span class="tok-com">//! - [`container`] &#8212; the `.veil` file format that ties the three together.</span></span>
-<span class="ln" id="L20"><span class="tok-com">//! - [`amnesia`] &#8212; page-locked, zeroizing, constant-time-comparable secrets.</span></span>
-<span class="ln" id="L21"><span class="tok-com">//! - [`shred`] &#8212; secure erasure, and an honest account of what that is worth</span></span>
+<span class="ln" id="L19"><span class="tok-com">//! - [`container`], the `.veil` file format that ties the three together.</span></span>
+<span class="ln" id="L20"><span class="tok-com">//! - [`amnesia`], page-locked, zeroizing, constant-time-comparable secrets.</span></span>
+<span class="ln" id="L21"><span class="tok-com">//! - [`shred`], secure erasure, and an honest account of what that is worth</span></span>
 <span class="ln" id="L22"><span class="tok-com">//!   on flash storage.</span></span>
-<span class="ln" id="L23"><span class="tok-com">//! - [`privatefile`] &#8212; writing a file that is owner-only from the moment it</span></span>
+<span class="ln" id="L23"><span class="tok-com">//! - [`privatefile`], writing a file that is owner-only from the moment it</span></span>
 <span class="ln" id="L24"><span class="tok-com">//!   exists, rather than world-readable until a second syscall tightens it.</span></span>
-<span class="ln" id="L25"><span class="tok-com">//! - [`lock`] &#8212; the application lock: an Argon2id verifier with a rate limit,</span></span>
+<span class="ln" id="L25"><span class="tok-com">//! - [`lock`], the application lock: an Argon2id verifier with a rate limit,</span></span>
 <span class="ln" id="L26"><span class="tok-com">//!   which protects against casual access and says so rather than pretending to</span></span>
 <span class="ln" id="L27"><span class="tok-com">//!   be tamper-proof.</span></span>
 <span class="ln" id="L28"><span class="tok-com">//!</span></span>
@@ -93,7 +93,7 @@
 <span class="ln" id="L50"><span class="tok-com">//! # }</span></span>
 <span class="ln" id="L51"><span class="tok-com">//! ```</span></span>
 <span class="ln" id="L52"><span class="tok-com">//!</span></span>
-<span class="ln" id="L53"><span class="tok-com">//! VeilVoice contains **no `unsafe` code at all** &#8212; including the page-locking</span></span>
+<span class="ln" id="L53"><span class="tok-com">//! VeilVoice contains **no `unsafe` code at all**, including the page-locking</span></span>
 <span class="ln" id="L54"><span class="tok-com">//! in [`amnesia`], which goes through a safe wrapper.</span></span>
 <span class="ln" id="L55"><span class="tok-com">//!</span></span>
 <span class="ln" id="L56"><span class="tok-com">//! # In plain words</span></span>

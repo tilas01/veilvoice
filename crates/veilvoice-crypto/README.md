@@ -31,21 +31,21 @@ and amnesic secret storage for VeilVoice.
 
 [`veilvoice_core`](../veilvoice-core/README.md) makes a voice
 unrecognisable; it does not hide the *words*, and it is not meant to. When a
-recording needs to stay secret as well — at rest on disk, or in transit to
-someone else — that is this crate's job.
+recording needs to stay secret as well, at rest on disk or in transit to
+someone else, that is this crate's job.
 
-- `kdf` — Argon2id, for turning a password into a key.
-- `hybrid` — X25519 + ML-KEM-768, so a recording captured today is not
+- `kdf`, Argon2id, for turning a password into a key.
+- `hybrid`, X25519 + ML-KEM-768, so a recording captured today is not
 readable by a quantum adversary tomorrow.
-- `aead` — XChaCha20-Poly1305, with random nonces and authenticated
+- `aead`, XChaCha20-Poly1305, with random nonces and authenticated
 associated data.
-- `container` — the `.veil` file format that ties the three together.
-- `amnesia` — page-locked, zeroizing, constant-time-comparable secrets.
-- `shred` — secure erasure, and an honest account of what that is worth
+- `container`, the `.veil` file format that ties the three together.
+- `amnesia`, page-locked, zeroizing, constant-time-comparable secrets.
+- `shred`, secure erasure, and an honest account of what that is worth
 on flash storage.
-- `privatefile` — writing a file that is owner-only from the moment it
+- `privatefile`, writing a file that is owner-only from the moment it
 exists, rather than world-readable until a second syscall tightens it.
-- `lock` — the application lock: an Argon2id verifier with a rate limit,
+- `lock`, the application lock: an Argon2id verifier with a rate limit,
 which protects against casual access and says so rather than pretending to
 be tamper-proof.
 
@@ -73,7 +73,7 @@ assert!(container::open_with_password(b"wrong", &sealed).is_err());
 # }
 ```
 
-VeilVoice contains **no `unsafe` code at all** — including the page-locking
+VeilVoice contains **no `unsafe` code at all**, including the page-locking
 in `amnesia`, which goes through a safe wrapper.
 
 # In plain words
@@ -110,11 +110,11 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>200 lines"])
     n_aead["aead.rs<br/>178 lines"]
-    n_amnesia["amnesia.rs<br/>326 lines"]
+    n_amnesia["amnesia.rs<br/>327 lines"]
     n_container["container.rs<br/>491 lines"]
     n_hybrid["hybrid.rs<br/>448 lines"]
     n_kdf["kdf.rs<br/>525 lines"]
-    n_lock["lock.rs<br/>1436 lines"]
+    n_lock["lock.rs<br/>1437 lines"]
     n_privatefile["privatefile.rs<br/>251 lines"]
     n_shred["shred.rs<br/>415 lines"]
     n_vault["vault.rs<br/>615 lines"]
@@ -142,14 +142,14 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`aead.rs`](../../docs/files/veilvoice-crypto/aead.md) | 178 | Authenticated encryption with XChaCha20-Poly1305. |
-| [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 326 | Amnesic secret storage: page-locked, zeroized, and never printed. |
+| [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 327 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 491 | The .veil encrypted container format. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 448 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 525 | Password-based key derivation with Argon2id. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 200 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1436 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 1437 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 251 | Writing a file that only its owner can read. |
-| [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure — the self-destruct. |
+| [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 415 | Secure erasure, the self-destruct. |
 | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 615 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |

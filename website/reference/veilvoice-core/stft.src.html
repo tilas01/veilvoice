@@ -52,8 +52,8 @@
 <span class="ln" id="L9"><span class="tok-com">//! maths cleanly separated.</span></span>
 <span class="ln" id="L10"><span class="tok-com">//!</span></span>
 <span class="ln" id="L11"><span class="tok-com">//! The closure also receives the raw (unwindowed) analysis frame. Accent</span></span>
-<span class="ln" id="L12"><span class="tok-com">//! neutralisation needs a time-domain view to track f0 &#8212; the FFT resolution at</span></span>
-<span class="ln" id="L13"><span class="tok-com">//! useful frame sizes is far too coarse for that &#8212; and handing over the frame</span></span>
+<span class="ln" id="L12"><span class="tok-com">//! neutralisation needs a time-domain view to track f0, because the FFT</span></span>
+<span class="ln" id="L13"><span class="tok-com">//! resolution at useful frame sizes is far too coarse for that, and handing over the frame</span></span>
 <span class="ln" id="L14"><span class="tok-com">//! that produced the spectrum keeps the two perfectly aligned. Its newest `hop`</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! samples are the tail.</span></span>
 <span class="ln" id="L16"><span class="tok-com">//!</span></span>
@@ -139,7 +139,7 @@
 <span class="src-item" id="fn-stftengine-latency_samples">
 <span class="ln" id="L92">    <span class="tok-com">/// End-to-end algorithmic latency (group delay) in samples.</span></span>
 <span class="ln" id="L93">    <span class="tok-com">///</span></span>
-<span class="ln" id="L94">    <span class="tok-com">/// Empirically &#8212; and as the identity-reconstruction test asserts &#8212; the</span></span>
+<span class="ln" id="L94">    <span class="tok-com">/// Empirically, and as the identity-reconstruction test asserts, the</span></span>
 <span class="ln" id="L95">    <span class="tok-com">/// FIFO/overlap-add path delays the signal by exactly one frame (`n`), which</span></span>
 <span class="ln" id="L96">    <span class="tok-com">/// is what the UI reports to the user. (`self.latency = n - hop` is the</span></span>
 <span class="ln" id="L97">    <span class="tok-com">/// separate *internal* FIFO offset used for indexing.)</span></span>
@@ -167,8 +167,8 @@
 <span class="ln" id="L117">            <span class="tok-com">// every sample passes through, because the engine downstream keeps</span></span>
 <span class="ln" id="L118">            <span class="tok-com">// persistent state and a single bad sample poisons it permanently.</span></span>
 <span class="ln" id="L119">            <span class="tok-com">//</span></span>
-<span class="ln" id="L120">            <span class="tok-com">// Found by the audit: one NaN &#8212; which a 32-bit-float WAV can</span></span>
-<span class="ln" id="L121">            <span class="tok-com">// legally contain, and which `symphonia` faithfully decodes &#8212;</span></span>
+<span class="ln" id="L120">            <span class="tok-com">// Found by the audit: one NaN, which a 32-bit-float WAV can</span></span>
+<span class="ln" id="L121">            <span class="tok-com">// legally contain and which `symphonia` faithfully decodes,</span></span>
 <span class="ln" id="L122">            <span class="tok-com">// reached the accent neutraliser&#x27;s long-term average, which is an</span></span>
 <span class="ln" id="L123">            <span class="tok-com">// exponential moving average and therefore never recovers. Every</span></span>
 <span class="ln" id="L124">            <span class="tok-com">// subsequent output sample was NaN, for the rest of the session,</span></span>
@@ -220,7 +220,7 @@
 <span class="ln" id="L168">        <span class="tok-com">// it was computed from (disjoint field borrows).</span></span>
 <span class="ln" id="L169">        <span class="tok-fn">transform</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.spectrum, &amp;<span class="tok-kw">self</span>.in_fifo);</span>
 <span class="ln" id="L170"></span>
-<span class="ln" id="L171">        <span class="tok-com">// inverse FFT (destroys spectrum contents &#8212; fine, rebuilt each frame)</span></span>
+<span class="ln" id="L171">        <span class="tok-com">// inverse FFT (destroys spectrum contents, which is fine: rebuilt each frame)</span></span>
 <span class="ln" id="L172">        <span class="tok-kw">self</span>.c2r</span>
 <span class="ln" id="L173">            .<span class="tok-fn">process_with_scratch</span>(</span>
 <span class="ln" id="L174">                &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.spectrum,</span>
@@ -251,7 +251,7 @@
 <span class="ln" id="L198">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L199"></span>
 <span class="ln" id="L200">    <span class="tok-com">/// With an identity spectral transform the engine must reconstruct its input</span></span>
-<span class="ln" id="L201">    <span class="tok-com">/// (delayed by the algorithmic latency) to high accuracy &#8212; this validates</span></span>
+<span class="ln" id="L201">    <span class="tok-com">/// (delayed by the algorithmic latency) to high accuracy. This validates</span></span>
 <span class="ln" id="L202">    <span class="tok-com">/// the windowing/overlap-add/normalisation maths.</span></span>
 <span class="ln" id="L203">    <span class="tok-attr">#[test</span>]</span>
 <span class="ln" id="L204">    <span class="tok-kw">fn</span> <span class="tok-fn">identity_reconstructs_input</span>() {</span>

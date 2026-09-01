@@ -52,8 +52,8 @@
 <p>Where do the output partials actually land?</p>
 <p>Prints the strongest partials of a synthetic speaker before and after processing, as multiples of the STFT bin grid. It is the quickest way to see the two synthesis modes described in <code>spectral.rs</code>:</p>
 <ul>
-<li><strong>accent off</strong> &#8212; the legacy channel-vocoder path. Each harmonic smears into a cluster of neighbouring grid frequencies (187.5 <em>and</em> 234.4 Hz around one partial), which is what makes it sound metallic.</li>
-<li><strong>accent on</strong> &#8212; an exact harmonic series at the canonical register (140.6 Hz and its multiples), whatever pitch went in.</li>
+<li><strong>accent off</strong>, the legacy channel-vocoder path. Each harmonic smears into a cluster of neighbouring grid frequencies (187.5 <em>and</em> 234.4 Hz around one partial), which is what makes it sound metallic.</li>
+<li><strong>accent on</strong>, an exact harmonic series at the canonical register (140.6 Hz and its multiples), whatever pitch went in.</li>
 </ul>
 <p>Run with <code>cargo run -p veilvoice-core --example diag_spectrum</code>.</p>
 <h2 id="in-plain-words">In plain words</h2>

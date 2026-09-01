@@ -183,10 +183,10 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>KdfParams</code> <sub>pub struct</sub></td><td><a href="kdf.src.html#fn-kdfparams">63</a></td><td>Argon2id cost parameters.</td></tr>
-<tr><td><code>KdfParams::default</code> <sub>fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-default">77</a></td><td>RFC 9106&#x27;s &quot;first recommended&quot; profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock &#8212; strong against offline cracking while still opening a file in well under a second on ordinary hardware.</td></tr>
+<tr><td><code>KdfParams::default</code> <sub>fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-default">77</a></td><td>RFC 9106&#x27;s &quot;first recommended&quot; profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock: strong against offline cracking while still opening a file in well under a second on ordinary hardware.</td></tr>
 <tr><td><code>KdfParams::weak_for_tests</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-weak_for_tests">90</a></td><td>A deliberately cheap profile for tests and low-memory devices.</td></tr>
 <tr><td><code>KdfParams::MAX_P_COST</code> <sub>const</sub></td><td><a href="kdf.src.html#fn-kdfparams-max_p_cost">99</a></td><td>Argon2&#x27;s own documented ceiling on parallelism: 2^24 - 1.</td></tr>
-<tr><td><code>KdfParams::MAX_M_COST</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-kdfparams-max_m_cost">120</a></td><td>The largest memory cost this build will attempt, in KiB &#8212; 4 GiB.</td></tr>
+<tr><td><code>KdfParams::MAX_M_COST</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-kdfparams-max_m_cost">120</a></td><td>The largest memory cost this build will attempt, in KiB, which is 4 GiB.</td></tr>
 <tr><td><code>KdfParams::MAX_T_COST</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-kdfparams-max_t_cost">160</a></td><td>The largest number of passes this build will attempt.</td></tr>
 <tr><td><code>KdfParams::UNATTENDED_MAX_M_COST</code> <sub>pub const</sub></td><td><a href="kdf.src.html#fn-kdfparams-unattended_max_m_cost">176</a></td><td>A ceiling for a caller with nobody watching.</td></tr>
 <tr><td><code>KdfParams::within</code> <sub>pub fn</sub></td><td><a href="kdf.src.html#fn-kdfparams-within">196</a></td><td>Check the costs against a caller-chosen memory ceiling as well as the built-in one.</td></tr>

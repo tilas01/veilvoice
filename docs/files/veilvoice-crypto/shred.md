@@ -22,7 +22,7 @@
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
-Secure erasure — the self-destruct.
+Secure erasure, the self-destruct.
 
 # Read this before relying on it
 
@@ -34,7 +34,7 @@ your storage, and points at the thing that actually works.
 **On a spinning disk**, overwriting is genuinely effective. The write goes to
 the same physical sectors, and the belief that a scanning-microscope recovery
 of overwritten magnetic media is practical does not survive contact with the
-literature — Gutmann's 1996 paper, whose 35-pass pattern is still cited, says
+literature. Gutmann's 1996 paper, whose 35-pass pattern is still cited, says
 so himself in its own epilogue about modern drives.
 
 **On an SSD, or any flash media**, it is not reliable and cannot be made so.
@@ -54,8 +54,8 @@ this. Use it, and treat this module as a second line rather than a first.
 
 Because passes stopped being the interesting variable decades ago. Against a
 drive that honours writes, one pass is enough; against one that does not, no
-number of passes reaches the retained cells. The default here is three —
-random, complement, random — which satisfies the common
+number of passes reaches the retained cells. The default here is three,
+random then complement then random, which satisfies the common
 three-pass expectation without pretending that thirty-five would be stronger.
 Time is better spent enabling disk encryption than on passes 4 through 35.
 

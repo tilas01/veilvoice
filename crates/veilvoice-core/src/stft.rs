@@ -9,8 +9,8 @@
 //! maths cleanly separated.
 //!
 //! The closure also receives the raw (unwindowed) analysis frame. Accent
-//! neutralisation needs a time-domain view to track f0 — the FFT resolution at
-//! useful frame sizes is far too coarse for that — and handing over the frame
+//! neutralisation needs a time-domain view to track f0, because the FFT
+//! resolution at useful frame sizes is far too coarse for that, and handing over the frame
 //! that produced the spectrum keeps the two perfectly aligned. Its newest `hop`
 //! samples are the tail.
 //!
@@ -91,7 +91,7 @@ impl StftEngine {
 
     /// End-to-end algorithmic latency (group delay) in samples.
     ///
-    /// Empirically — and as the identity-reconstruction test asserts — the
+    /// Empirically, and as the identity-reconstruction test asserts, the
     /// FIFO/overlap-add path delays the signal by exactly one frame (`n`), which
     /// is what the UI reports to the user. (`self.latency = n - hop` is the
     /// separate *internal* FIFO offset used for indexing.)
@@ -117,8 +117,8 @@ impl StftEngine {
             // every sample passes through, because the engine downstream keeps
             // persistent state and a single bad sample poisons it permanently.
             //
-            // Found by the audit: one NaN — which a 32-bit-float WAV can
-            // legally contain, and which `symphonia` faithfully decodes —
+            // Found by the audit: one NaN, which a 32-bit-float WAV can
+            // legally contain and which `symphonia` faithfully decodes,
             // reached the accent neutraliser's long-term average, which is an
             // exponential moving average and therefore never recovers. Every
             // subsequent output sample was NaN, for the rest of the session,
@@ -168,7 +168,7 @@ impl StftEngine {
         // it was computed from (disjoint field borrows).
         transform(&mut self.spectrum, &self.in_fifo);
 
-        // inverse FFT (destroys spectrum contents — fine, rebuilt each frame)
+        // inverse FFT (destroys spectrum contents, which is fine: rebuilt each frame)
         self.c2r
             .process_with_scratch(
                 &mut self.spectrum,
@@ -198,7 +198,7 @@ mod tests {
     use super::*;
 
     /// With an identity spectral transform the engine must reconstruct its input
-    /// (delayed by the algorithmic latency) to high accuracy — this validates
+    /// (delayed by the algorithmic latency) to high accuracy. This validates
     /// the windowing/overlap-add/normalisation maths.
     #[test]
     fn identity_reconstructs_input() {

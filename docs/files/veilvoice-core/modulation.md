@@ -26,7 +26,7 @@ The pitch and formant ratios are never constant: a ChaCha20 CSPRNG picks a
 new random target every `frames_per_target` STFT frames, and a one-pole
 filter glides continuously toward it. Because the transform is therefore
 non-stationary and unpredictable, an attacker cannot "undo" it by assuming a
-single fixed shift — there is no single shift to undo, and the target
+single fixed shift: there is no single shift to undo, and the target
 sequence is unknowable without the seed (which never leaves the process and
 is zeroized on drop).
 

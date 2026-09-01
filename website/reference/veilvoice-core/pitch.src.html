@@ -53,13 +53,13 @@
 <span class="ln" id="L10"><span class="tok-com">//!   1024-point FFT / 48 kHz the bin spacing is ~47 Hz, so a spectral peak-pick</span></span>
 <span class="ln" id="L11"><span class="tok-com">//!   cannot tell 100 Hz from 140 Hz. This tracker therefore works in the time</span></span>
 <span class="ln" id="L12"><span class="tok-com">//!   domain over its own rolling history, which may be longer than one STFT</span></span>
-<span class="ln" id="L13"><span class="tok-com">//!   frame without adding any output latency &#8212; the window still *ends* at the</span></span>
+<span class="ln" id="L13"><span class="tok-com">//!   frame without adding any output latency, because the window still *ends* at the</span></span>
 <span class="ln" id="L14"><span class="tok-com">//!   current frame, so it stays causal.</span></span>
 <span class="ln" id="L15"><span class="tok-com">//! * **It must be cheap enough for an audio callback.** The signal is decimated</span></span>
 <span class="ln" id="L16"><span class="tok-com">//!   to ~8 kHz first (pitch lives in the low harmonics), which cuts the</span></span>
 <span class="ln" id="L17"><span class="tok-com">//!   difference-function cost by the square of the decimation factor. At the</span></span>
-<span class="ln" id="L18"><span class="tok-com">//!   default settings it costs on the order of 8 M flops/s &#8212; well under 1 % of</span></span>
-<span class="ln" id="L19"><span class="tok-com">//!   one core &#8212; and allocates nothing after construction.</span></span>
+<span class="ln" id="L18"><span class="tok-com">//!   default settings it costs on the order of 8 M flops/s, well under 1 % of</span></span>
+<span class="ln" id="L19"><span class="tok-com">//!   one core, and allocates nothing after construction.</span></span>
 <span class="ln" id="L20"><span class="tok-com">//!</span></span>
 <span class="ln" id="L21"><span class="tok-com">//! The algorithm is YIN&#x27;s cumulative mean normalised difference function</span></span>
 <span class="ln" id="L22"><span class="tok-com">//! (de Cheveign&#233; &amp; Kawahara, 2002) with parabolic interpolation, minus the</span></span>
@@ -90,7 +90,7 @@
 <span class="ln" id="L42"><span class="tok-kw">const</span> DECIMATED_HZ: f32 = <span class="tok-num">8_000.0</span>;</span>
 </span>
 <span class="src-item" id="fn-window">
-<span class="ln" id="L43"><span class="tok-com">/// Analysis window length in decimated samples (~40 ms at 8 kHz &#8212; at least two</span></span>
+<span class="ln" id="L43"><span class="tok-com">/// Analysis window length in decimated samples (~40 ms at 8 kHz, at least two</span></span>
 <span class="ln" id="L44"><span class="tok-com">/// periods of the lowest supported f0).</span></span>
 <span class="ln" id="L45"><span class="tok-kw">const</span> WINDOW: usize = <span class="tok-num">320</span>;</span>
 </span>

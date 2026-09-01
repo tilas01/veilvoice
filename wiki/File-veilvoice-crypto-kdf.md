@@ -130,10 +130,10 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `KdfParams` <sub>pub struct</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L63) | Argon2id cost parameters. |
-| `KdfParams::default` <sub>fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L77) | RFC 9106's "first recommended" profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock — strong against offline cracking while still opening a file in well under a second on ordinary hardware. |
+| `KdfParams::default` <sub>fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L77) | RFC 9106's "first recommended" profile: 2 GiB is the second option, but 256 MiB with three passes is the sweet spot for an interactive desktop unlock: strong against offline cracking while still opening a file in well under a second on ordinary hardware. |
 | `KdfParams::weak_for_tests` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L90) | A deliberately cheap profile for tests and low-memory devices. |
 | `KdfParams::MAX_P_COST` <sub>const</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L99) | Argon2's own documented ceiling on parallelism: 2^24 - 1. |
-| `KdfParams::MAX_M_COST` <sub>pub const</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L120) | The largest memory cost this build will attempt, in KiB — 4 GiB. |
+| `KdfParams::MAX_M_COST` <sub>pub const</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L120) | The largest memory cost this build will attempt, in KiB, which is 4 GiB. |
 | `KdfParams::MAX_T_COST` <sub>pub const</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L160) | The largest number of passes this build will attempt. |
 | `KdfParams::UNATTENDED_MAX_M_COST` <sub>pub const</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L176) | A ceiling for a caller with nobody watching. |
 | `KdfParams::within` <sub>pub fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs#L196) | Check the costs against a caller-chosen memory ceiling as well as the built-in one. |

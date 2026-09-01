@@ -53,8 +53,8 @@
 <p>Accent neutralisation needs to know the speaker&#x27;s <em>current</em> f0 so the intonation contour can be replaced with a canonical one (see <code>crate::accent</code>).</p>
 <p>Two constraints shape this implementation:</p>
 <ul>
-<li><strong>The STFT frame is too short to resolve f0 directly.</strong> At the default 1024-point FFT / 48 kHz the bin spacing is ~47 Hz, so a spectral peak-pick cannot tell 100 Hz from 140 Hz. This tracker therefore works in the time domain over its own rolling history, which may be longer than one STFT frame without adding any output latency &#8212; the window still <em>ends</em> at the current frame, so it stays causal.</li>
-<li><strong>It must be cheap enough for an audio callback.</strong> The signal is decimated to ~8 kHz first (pitch lives in the low harmonics), which cuts the difference-function cost by the square of the decimation factor. At the default settings it costs on the order of 8 M flops/s &#8212; well under 1 % of one core &#8212; and allocates nothing after construction.</li>
+<li><strong>The STFT frame is too short to resolve f0 directly.</strong> At the default 1024-point FFT / 48 kHz the bin spacing is ~47 Hz, so a spectral peak-pick cannot tell 100 Hz from 140 Hz. This tracker therefore works in the time domain over its own rolling history, which may be longer than one STFT frame without adding any output latency, because the window still <em>ends</em> at the current frame, so it stays causal.</li>
+<li><strong>It must be cheap enough for an audio callback.</strong> The signal is decimated to ~8 kHz first (pitch lives in the low harmonics), which cuts the difference-function cost by the square of the decimation factor. At the default settings it costs on the order of 8 M flops/s, well under 1 % of one core, and allocates nothing after construction.</li>
 </ul>
 <p>The algorithm is YIN&#x27;s cumulative mean normalised difference function (de Cheveign&#233; &amp; Kawahara, 2002) with parabolic interpolation, minus the optimisations that only matter for offline accuracy.</p>
 <h2 id="in-plain-words">In plain words</h2>
@@ -150,7 +150,7 @@ flowchart TD
 <tr><td><code>F0_MIN_HZ</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-f0_min_hz">38</a></td><td>Lowest fundamental the tracker will report, in hertz.</td></tr>
 <tr><td><code>F0_MAX_HZ</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-f0_max_hz">40</a></td><td>Highest fundamental the tracker will report, in hertz.</td></tr>
 <tr><td><code>DECIMATED_HZ</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-decimated_hz">42</a></td><td>Target sample rate after decimation, in hertz.</td></tr>
-<tr><td><code>WINDOW</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-window">45</a></td><td>Analysis window length in decimated samples (~40 ms at 8 kHz &#8212; at least two periods of the lowest supported f0).</td></tr>
+<tr><td><code>WINDOW</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-window">45</a></td><td>Analysis window length in decimated samples (~40 ms at 8 kHz, at least two periods of the lowest supported f0).</td></tr>
 <tr><td><code>YIN_THRESHOLD</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-yin_threshold">47</a></td><td>d&#x27;(tau) below this counts as a confident voiced period.</td></tr>
 <tr><td><code>SILENCE_RMS</code> <sub>const</sub></td><td><a href="pitch.src.html#fn-silence_rms">49</a></td><td>Frames quieter than this (RMS) are treated as unvoiced regardless.</td></tr>
 <tr><td><code>PitchEstimate</code> <sub>pub struct</sub></td><td><a href="pitch.src.html#fn-pitchestimate">53</a></td><td>One f0 measurement.</td></tr>

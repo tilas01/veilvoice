@@ -72,7 +72,7 @@ pub struct KdfParams {
 impl Default for KdfParams {
     /// RFC 9106's "first recommended" profile: 2 GiB is the second option, but
     /// 256 MiB with three passes is the sweet spot for an interactive desktop
-    /// unlock — strong against offline cracking while still opening a file in
+    /// unlock: strong against offline cracking while still opening a file in
     /// well under a second on ordinary hardware.
     fn default() -> Self {
         Self {
@@ -98,14 +98,14 @@ impl KdfParams {
     /// Argon2's own documented ceiling on parallelism: 2^24 - 1.
     const MAX_P_COST: u32 = 0x00ff_ffff;
 
-    /// The largest memory cost this build will attempt, in KiB — 4 GiB.
+    /// The largest memory cost this build will attempt, in KiB, which is 4 GiB.
     ///
     /// A ceiling is necessary because `m_cost` arrives from the file. Argon2
     /// allocates that much memory before it does anything else, so a header
     /// claiming `u32::MAX` asks for four *terabytes*: the allocation fails, and
     /// a failed allocation in Rust aborts the process. Merely *attempting to
     /// open* a hostile `.veil` would kill the program, and for the app lock it
-    /// is worse — that file is read before anyone has authenticated, so
+    /// is worse, because that file is read before anyone has authenticated, so
     /// anything that can write it can stop VeilVoice from starting at all.
     ///
     /// 4 GiB is chosen to sit well above every parameter set anyone would
@@ -170,7 +170,7 @@ impl KdfParams {
     /// four times this crate's default and still opens in a few seconds, while
     /// refusing a header that asks for four gigabytes of someone else's memory.
     ///
-    /// This is a *policy*, not a security boundary — the honest framing is that
+    /// This is a *policy*, not a security boundary. The honest framing is that
     /// it bounds the cost of being handed a hostile file, not that it makes one
     /// safe.
     pub const UNATTENDED_MAX_M_COST: u32 = 1024 * 1024;
@@ -180,8 +180,8 @@ impl KdfParams {
     ///
     /// Opening a container whose declared cost is legitimate but large is slow
     /// by design, and that is the price of shipping the cost with the file so
-    /// old files keep opening. A caller running without a human present — a
-    /// batch job, a service, anything processing files it did not choose — can
+    /// old files keep opening. A caller running without a human present, such
+    /// as a batch job, a service or anything processing files it did not choose, can
     /// use this to decline instead of spending the memory. Pass
     /// [`UNATTENDED_MAX_M_COST`](Self::UNATTENDED_MAX_M_COST) unless there is a
     /// reason for something else.
@@ -210,14 +210,14 @@ impl KdfParams {
     /// This is not belt-and-braces, it is a fix. `argon2` 0.5.3 validates in
     /// the wrong order: `Params::new` evaluates `m_cost < p_cost * 8` before it
     /// checks `p_cost > MAX_P_COST`, so a `p_cost` above `u32::MAX / 8`
-    /// overflows the multiplication. With overflow checks on — every debug
-    /// build, and any consumer of this crate as a library — that is a **panic
+    /// overflows the multiplication. With overflow checks on, which is every
+    /// debug build and any consumer of this crate as a library, that is a **panic
     /// on attacker-controlled input**, since `p_cost` is read verbatim from a
     /// `.veil` header or an app-lock file. Found by the campaign in
     /// `tests/parser_fuzz.rs`.
     ///
     /// VeilVoice's own release profile disables overflow checks, where the
-    /// multiplication wraps and the `MAX_P_COST` test then rejects it anyway —
+    /// multiplication wraps and the `MAX_P_COST` test then rejects it anyway,
     /// but "our release profile happens to make the panic unreachable" is not a
     /// property to rely on, and it is not true for anyone building against
     /// these crates. So the bound is enforced here, in the one place every
@@ -457,7 +457,7 @@ mod tests {
 
     /// The other half of the same finding: `m_cost` is the number of KiB
     /// Argon2 allocates up front, so `u32::MAX` asks for 4 TiB. The allocation
-    /// fails, and a failed allocation aborts the process — so simply *trying to
+    /// fails, and a failed allocation aborts the process, so simply *trying to
     /// open* a hostile file would kill the program.
     #[test]
     fn an_absurd_memory_cost_is_rejected_rather_than_allocated() {

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-core/src/accent.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 696 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs)
+[[veilvoice-core|Crate-veilvoice-core]] &middot; 697 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs)
 
 ## Contents
 
@@ -21,16 +21,16 @@ Accent and speaker-trait neutralisation.
 Accent is carried by two very different kinds of cue, and they have opposite
 answers here:
 
-* **Suprasegmental cues** — intonation contour and pitch range, long-term
+* **Suprasegmental cues**, meaning intonation contour and pitch range, long-term
 voice quality and spectral tilt, and the fixed vocal-tract scale behind a
 speaker's vowel space. These are *properties of the signal*, they are
 strongly speaker- and region-identifying, and this module removes them by
 mapping every speaker onto one canonical target.
-* **Segmental cues** — *which phonemes the speaker actually produced*:
+* **Segmental cues**, meaning *which phonemes the speaker actually produced*:
 rhoticity, vowel mergers, dental-fricative substitution, aspiration
 patterns. These are not a colouration laid over the words; at this level
 they **are** the words. Removing them means deciding a different phoneme
-was said, which no filter can do — it requires recognising the speech and
+was said, which no filter can do: it requires recognising the speech and
 re-synthesising it (see the planned text-to-speech mode, which sidesteps
 this entirely by never carrying the original signal at all).
 
@@ -46,7 +46,7 @@ removal is total.
 Every step here is *many-to-one*: a whole population of input f0 contours,
 spectral tilts and vocal-tract lengths is collapsed onto a single canonical
 value. That destroys information rather than displacing it, so it composes
-with the phase discard in `crate::spectral` — the two are independent
+with the phase discard in `crate::spectral`, because the two are independent
 one-way steps, and normalising the speaker's *mean* pitch and vocal-tract
 length removes two of the strongest biometric features there are.
 
@@ -73,7 +73,7 @@ the sound. So VeilVoice says accent removal is **partial**, and means it.
 
 ## What this file contains
 
-696 lines defining **13 functions** (8 public), **3 types** and **10 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+697 lines defining **13 functions** (8 public), **3 types** and **10 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -91,7 +91,7 @@ the sound. So VeilVoice says accent removal is **partial**, and means it.
 - `AccentNeutralizer::measure_envelope` (line 269) -- Measure the speaker's vocal-tract scale from the *unwarped* envelope and update the VTLN ratio.
   - reaches: `log_centroid`
 - `AccentNeutralizer::vtln_ratio` (line 288) -- Formant ratio to apply to the envelope this frame.
-- `AccentNeutralizer::shape` (line 308) -- Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average.
+- `AccentNeutralizer::shape` (line 309) -- Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average.
   - reaches: `db_to_gain`, `gain_to_db`, `recompute_shape`
 
 ## What calls what
@@ -116,11 +116,11 @@ flowchart TD
     n_prosody_ratio(["AccentNeutralizer::<br/>prosody_ratio<br/>line 258"])
     n_measure_envelope(["AccentNeutralizer::<br/>measure_envelope<br/>line 269"])
     n_vtln_ratio(["AccentNeutralizer::vtln_ratio<br/>line 288"])
-    n_shape(["AccentNeutralizer::shape<br/>line 308"])
-    n_recompute_shape["AccentNeutralizer::<br/>recompute_shape<br/>line 351"]
-    n_log_centroid["log_centroid<br/>line 403"]
-    n_gain_to_db["gain_to_db<br/>line 422"]
-    n_db_to_gain["db_to_gain<br/>line 426"]
+    n_shape(["AccentNeutralizer::shape<br/>line 309"])
+    n_recompute_shape["AccentNeutralizer::<br/>recompute_shape<br/>line 352"]
+    n_log_centroid["log_centroid<br/>line 404"]
+    n_gain_to_db["gain_to_db<br/>line 423"]
+    n_db_to_gain["db_to_gain<br/>line 427"]
     n_measure_envelope --> n_log_centroid
     n_shape --> n_db_to_gain
     n_shape --> n_gain_to_db
@@ -133,11 +133,11 @@ flowchart TD
     click n_prosody_ratio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L258" "open the source"
     click n_measure_envelope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L269" "open the source"
     click n_vtln_ratio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L288" "open the source"
-    click n_shape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L308" "open the source"
-    click n_recompute_shape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L351" "open the source"
-    click n_log_centroid href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L403" "open the source"
-    click n_gain_to_db href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L422" "open the source"
-    click n_db_to_gain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L426" "open the source"
+    click n_shape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L309" "open the source"
+    click n_recompute_shape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L352" "open the source"
+    click n_log_centroid href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L404" "open the source"
+    click n_gain_to_db href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L423" "open the source"
+    click n_db_to_gain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L427" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_enabled,n_stats,n_observe,n_prosody_ratio,n_measure_envelope,n_vtln_ratio,n_shape entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -171,8 +171,8 @@ flowchart TD
 | `AccentNeutralizer::prosody_ratio` <sub>pub fn</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L258) | Pitch ratio to apply to the excitation this frame. |
 | `AccentNeutralizer::measure_envelope` <sub>pub fn</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L269) | Measure the speaker's vocal-tract scale from the *unwarped* envelope and update the VTLN ratio. |
 | `AccentNeutralizer::vtln_ratio` <sub>pub fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L288) | Formant ratio to apply to the envelope this frame. |
-| `AccentNeutralizer::shape` <sub>pub fn</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L308) | Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average. |
-| `AccentNeutralizer::recompute_shape` <sub>fn</sub> | [351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L351) | Rebuild the correction curve from the current long-term average. |
-| `log_centroid` <sub>fn</sub> | [403](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L403) | Energy-weighted geometric-mean frequency of env over lo, hi bins. |
-| `gain_to_db` <sub>fn</sub> | [422](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L422) |  |
-| `db_to_gain` <sub>fn</sub> | [426](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L426) |  |
+| `AccentNeutralizer::shape` <sub>pub fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L309) | Rotate the already-warped envelope toward the canonical spectral tilt, then fold the result back into the running average. |
+| `AccentNeutralizer::recompute_shape` <sub>fn</sub> | [352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L352) | Rebuild the correction curve from the current long-term average. |
+| `log_centroid` <sub>fn</sub> | [404](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L404) | Energy-weighted geometric-mean frequency of env over lo, hi bins. |
+| `gain_to_db` <sub>fn</sub> | [423](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L423) |  |
+| `db_to_gain` <sub>fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/accent.rs#L427) |  |

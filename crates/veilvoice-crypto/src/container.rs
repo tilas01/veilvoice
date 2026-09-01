@@ -22,7 +22,7 @@
 //! ```
 //!
 //! **The entire header is the AEAD's associated data.** Editing any byte of it
-//! — downgrading the KDF cost, swapping the mode, corrupting the salt — makes
+//! by downgrading the KDF cost, swapping the mode or corrupting the salt, makes
 //! decryption fail rather than silently changing behaviour. Unused fields are
 //! written as zero and are still authenticated, so they cannot be used as a
 //! covert channel or a downgrade vector.
@@ -159,8 +159,8 @@ impl Header {
 /// The conventional path of the sealed form of `path`.
 ///
 /// `.veil` is *appended* rather than substituted, so `recording.veiled.wav`
-/// becomes `recording.veiled.wav.veil` and the original name — including what
-/// kind of file it is — survives decryption without being guessed at.
+/// becomes `recording.veiled.wav.veil` and the original name, including what
+/// kind of file it is, survives decryption without being guessed at.
 pub fn veil_path(path: &std::path::Path) -> std::path::PathBuf {
     let mut name = path.as_os_str().to_os_string();
     name.push(".veil");
@@ -223,10 +223,10 @@ pub fn open_with_password(password: &[u8], container: &[u8]) -> Result<Vec<u8>, 
 /// The cost travels with the file so that a container written years ago still
 /// opens after the defaults are raised. The price is that a *hostile* file can
 /// declare a legitimate-but-large cost and make itself slow and expensive to
-/// open — see F-3's residual in `docs/AUDIT.md`. When a person chose the file
+/// open. See F-3's residual in `docs/AUDIT.md`. When a person chose the file
 /// and can stop waiting, that is an acceptable price and
-/// [`open_with_password`] pays it. When nothing human is present — a batch
-/// job, a service, anything handed files it did not choose — pass
+/// [`open_with_password`] pays it. When nothing human is present, such as a
+/// batch job, a service or anything handed files it did not choose, pass
 /// [`kdf::KdfParams::UNATTENDED_MAX_M_COST`] here and get
 /// [`Error::KdfCostRefused`] instead of the memory.
 pub fn open_with_password_within(
@@ -440,7 +440,7 @@ mod tests {
     #[test]
     fn an_unattended_caller_can_refuse_an_expensive_container() {
         let expensive = kdf::KdfParams {
-            m_cost: 64 * 1024, // 64 MiB — legal, and more than we will allow
+            m_cost: 64 * 1024, // 64 MiB, legal and more than we will allow
             t_cost: 1,
             p_cost: 1,
         };

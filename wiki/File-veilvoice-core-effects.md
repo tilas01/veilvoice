@@ -19,7 +19,7 @@ Light time-domain effects applied after resynthesis.
 These run on the continuous output stream (not per FFT frame) and exist to
 (a) further decorrelate the signal from the original, and (b) add a few
 detuned "voices" so the spectrogram is densely filled rather than showing a
-clean harmonic stack — without harming intelligibility, so every mix defaults
+clean harmonic stack, without harming intelligibility, so every mix defaults
 low. None of them are invertible in a way that recovers the source voice.
 
 # How little these contribute, said plainly
