@@ -25,7 +25,7 @@
 //!
 //! It exits zero when the listing itself failed, and says so on the way past.
 //! A check that cannot see is not a check that passed, but neither is it a
-//! reason to fail a script — the difference is in the words, and the words are
+//! reason to fail a script. The difference is in the words, and the words are
 //! printed.
 //!
 //! # In plain words

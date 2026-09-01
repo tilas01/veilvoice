@@ -11,7 +11,7 @@
   - [What calls what](#what-calls-what)
   - [Items](#items)
 
-`veilvoice appctl` — learn what normally runs, then notice what does not.
+`veilvoice appctl` learns what normally runs, so it can notice what does not.
 
 Every subcommand prints the scope note. Not once at setup, not behind a
 flag: **every time**, because the one thing a reader must not come away

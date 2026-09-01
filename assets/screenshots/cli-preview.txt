@@ -2,7 +2,7 @@ Draw a still of the page, without rendering any audio.
 
 The layout, the speaker circles and which voice each speaker becomes -- answered in a second rather than in the length of the recording. With `--ffmpeg` it also prints the command that would turn frames into a video file, and whether `ffmpeg` is on this machine. **It never runs it**: this project ships no codec and starts no program you did not.
 
-Usage: veilvoice.exe conversation preview [OPTIONS] <PLAN>
+Usage: veilvoice conversation preview [OPTIONS] <PLAN>
 
 Arguments:
   <PLAN>

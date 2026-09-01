@@ -42,7 +42,7 @@
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
-<span class="ln" id="L2"><span class="tok-com">//! `veilvoice lock` &#8212; manage the application lock from the command line.</span></span>
+<span class="ln" id="L2"><span class="tok-com">//! `veilvoice lock` manages the application lock from the command line.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
 <span class="ln" id="L4"><span class="tok-com">//! The lock guards the desktop app: with one set, VeilVoice asks for a password</span></span>
 <span class="ln" id="L5"><span class="tok-com">//! before it will show anything or start a live scramble. Managing it from here</span></span>
@@ -107,7 +107,7 @@
 <span class="ln" id="L59">            None =&gt; {</span>
 <span class="ln" id="L60">                lock::<span class="tok-fn">default_dir</span>().<span class="tok-fn">ok_or_else</span>(|| {</span>
 <span class="ln" id="L61">                    <span class="tok-str">&quot;cannot work out where this platform keeps configuration \</span></span>
-<span class="ln" id="L62"><span class="tok-str">                     (no APPDATA, XDG_CONFIG_HOME or HOME) &#8212; pass --path&quot;</span></span>
+<span class="ln" id="L62"><span class="tok-str">                     (no APPDATA, XDG_CONFIG_HOME or HOME), so pass --path&quot;</span></span>
 <span class="ln" id="L63">                        .<span class="tok-fn">to_string</span>()</span>
 <span class="ln" id="L64">                })?;</span>
 <span class="ln" id="L65">                <span class="tok-fn">Ok</span>(Self::Default)</span>
@@ -223,7 +223,7 @@
 <span class="ln" id="L161">                <span class="tok-fn">Some</span>(wait) =&gt; println!(</span>
 <span class="ln" id="L162">                    <span class="tok-str">&quot;{}&quot;</span>,</span>
 <span class="ln" id="L163">                    <span class="tok-fn">warn</span>(&amp;format!(</span>
-<span class="ln" id="L164">                        <span class="tok-str">&quot;rate limited &#8212; {} s before the next attempt&quot;</span>,</span>
+<span class="ln" id="L164">                        <span class="tok-str">&quot;rate limited, {} s before the next attempt&quot;</span>,</span>
 <span class="ln" id="L165">                        wait.<span class="tok-fn">as_secs</span>()</span>
 <span class="ln" id="L166">                    ))</span>
 <span class="ln" id="L167">                ),</span>
@@ -257,7 +257,7 @@
 <span class="src-item" id="fn-set">
 <span class="ln" id="L194"><span class="tok-kw">fn</span> <span class="tok-fn">set</span>(site: &amp;Site) -&gt; Result&lt;(), String&gt; {</span>
 <span class="ln" id="L195">    <span class="tok-kw">if</span> site.<span class="tok-fn">open</span>()?.<span class="tok-num">0</span>.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L196">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;a lock is already set here &#8212; use `veilvoice lock change`&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L196">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;a lock is already set here, so use `veilvoice lock change`&quot;</span>.<span class="tok-fn">into</span>());</span>
 <span class="ln" id="L197">    }</span>
 <span class="ln" id="L198">    println!();</span>
 <span class="ln" id="L199">    <span class="tok-fn">print_scope</span>();</span>
@@ -273,7 +273,7 @@
 <span class="ln" id="L209">        <span class="tok-str">&quot;{}&quot;</span>,</span>
 <span class="ln" id="L210">        <span class="tok-fn">paint</span>(</span>
 <span class="ln" id="L211">            colour::MUTED,</span>
-<span class="ln" id="L212">            <span class="tok-str">&quot;  use for encrypted recordings &#8212; they are deliberately separate,&quot;</span></span>
+<span class="ln" id="L212">            <span class="tok-str">&quot;  use for encrypted recordings. They are deliberately separate,&quot;</span></span>
 <span class="ln" id="L213">        )</span>
 <span class="ln" id="L214">    );</span>
 <span class="ln" id="L215">    println!(</span>
@@ -319,7 +319,7 @@
 <span class="ln" id="L251">    store.<span class="tok-fn">remove</span>(current.<span class="tok-fn">expose</span>()).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
 <span class="ln" id="L252">    println!(</span>
 <span class="ln" id="L253">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L254">        <span class="tok-fn">ok</span>(<span class="tok-str">&quot;app lock removed &#8212; VeilVoice will open freely again&quot;</span>)</span>
+<span class="ln" id="L254">        <span class="tok-fn">ok</span>(<span class="tok-str">&quot;app lock removed, and VeilVoice will open freely again&quot;</span>)</span>
 <span class="ln" id="L255">    );</span>
 <span class="ln" id="L256">    <span class="tok-fn">Ok</span>(())</span>
 <span class="ln" id="L257">}</span>
@@ -329,7 +329,7 @@
 <span class="ln" id="L259"><span class="tok-kw">fn</span> <span class="tok-fn">open_or_explain</span>(site: &amp;Site) -&gt; Result&lt;LockStore, String&gt; {</span>
 <span class="ln" id="L260">    site.<span class="tok-fn">open</span>()?</span>
 <span class="ln" id="L261">        .<span class="tok-num">0</span></span>
-<span class="ln" id="L262">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;no lock is set here &#8212; use `veilvoice lock set`&quot;</span>.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L262">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;no lock is set here, so use `veilvoice lock set`&quot;</span>.<span class="tok-fn">to_string</span>())</span>
 <span class="ln" id="L263">}</span>
 </span>
 <span class="ln" id="L264"></span>

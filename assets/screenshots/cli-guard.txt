@@ -1,6 +1,6 @@
 Record and check the integrity of VeilVoice's own files
 
-Usage: veilvoice.exe guard [OPTIONS] <COMMAND>
+Usage: veilvoice guard [OPTIONS] <COMMAND>
 
 Commands:
   init    Record the current state of the watched files

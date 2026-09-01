@@ -24,8 +24,8 @@ sitting on disk is still a recording of everything that was said. Writing it
 in the clear by default would quietly leave the second problem unsolved for
 everyone who did not think to ask.
 
-So the result is sealed into a `container` — Argon2id or the X25519 +
-ML-KEM-768 hybrid — unless the user asks for plaintext, and asking for
+So the result is sealed into a `container`, with Argon2id or the X25519
+plus ML-KEM-768 hybrid, unless the user asks for plaintext, and asking for
 plaintext prints `PLAINTEXT_WARNING` and, on a terminal, waits for an
 answer.
 

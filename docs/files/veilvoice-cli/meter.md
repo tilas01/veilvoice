@@ -30,7 +30,7 @@ Level meters for `veilvoice live`, on a scale that means something.
 The first meter was linear: a peak of 0.5 filled half the bar. That is
 arithmetically fine and useless as a meter, because loudness is not linear.
 Ordinary speech recorded at a sensible level peaks around **-12 dBFS**,
-which is 0.25 linear — three of twelve blocks. Somebody speaking normally
+which is 0.25 linear, so three of twelve blocks. Somebody speaking normally
 saw a meter that looked like near-silence, and the only way to fill the bar
 was to be clipping.
 
@@ -49,7 +49,7 @@ correlates with how loud a thing *sounds* need a window and a weighting
 curve, and they answer a different question: this one is for "am I being
 recorded, and am I clipping", which is a peak question.
 
-It also cannot see an **inter-sample peak** — a waveform that passes above
+It also cannot see an **inter-sample peak**, a waveform that passes above
 full scale between two samples and clips in a converter or an encoder
 without any single sample exceeding 1.0. Catching those needs oversampling.
 The meter says `CLIP` when a sample actually reaches full scale, and says

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-//! `veilvoice input` — what running programs can see your keyboard and mouse.
+//! `veilvoice input` shows which running programs can see your keyboard and mouse.
 //!
 //! The whole command is arranged around one risk: that somebody runs it, sees
 //! nothing listed, and concludes their machine is clean. That conclusion is
@@ -11,7 +11,7 @@
 //!
 //! This tells you which of the programs currently open on your computer are
 //! able to see what you type or where you click. Most of them will be things
-//! you installed on purpose — a password manager, a screen reader, remote
+//! you installed on purpose, such as a password manager, a screen reader, remote
 //! support software you use for work.
 //!
 //! It cannot tell you whether anything is actually recording your typing. No

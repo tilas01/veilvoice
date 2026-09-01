@@ -42,7 +42,7 @@
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
-<span class="ln" id="L2"><span class="tok-com">//! `veilvoice` &#8212; the command-line interface.</span></span>
+<span class="ln" id="L2"><span class="tok-com">//! `veilvoice`, the command-line interface.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
 <span class="ln" id="L4"><span class="tok-com">//! Everything VeilVoice does, available without a desktop: it runs over SSH, in</span></span>
 <span class="ln" id="L5"><span class="tok-com">//! a container, and on machines that have no GUI toolkit at all. The same</span></span>
@@ -150,9 +150,9 @@
 <span class="ln" id="L107"><span class="tok-attr">#[command</span>(</span>
 <span class="ln" id="L108">    name = <span class="tok-str">&quot;veilvoice&quot;</span>,</span>
 <span class="ln" id="L109">    version,</span>
-<span class="ln" id="L110">    about = <span class="tok-str">&quot;Irreversible voice de-identification &#8212; fully offline.&quot;</span>,</span>
-<span class="ln" id="L111">    long_about = <span class="tok-str">&quot;VeilVoice destroys the biometric voiceprint of a speaker &#8212; pitch, \</span></span>
-<span class="ln" id="L112"><span class="tok-str">formants, timbre and the melody of an accent &#8212; while keeping the words clean and \</span></span>
+<span class="ln" id="L110">    about = <span class="tok-str">&quot;Irreversible voice de-identification, fully offline.&quot;</span>,</span>
+<span class="ln" id="L111">    long_about = <span class="tok-str">&quot;VeilVoice destroys the biometric voiceprint of a speaker: the \</span></span>
+<span class="ln" id="L112"><span class="tok-str">pitch, the formants, the timbre and the melody of an accent. It keeps the words clean and \</span></span>
 <span class="ln" id="L113"><span class="tok-str">transcribable. This command line talks to no servers, ever: the one thing in VeilVoice that reaches the network is the desktop app&#x27;s check-for-updates button, and it is not here.&quot;</span></span>
 <span class="ln" id="L114">)]</span>
 <span class="src-item" id="fn-cli">
@@ -1758,7 +1758,7 @@
 <span class="ln" id="L1672"><span class="tok-com">/// How the seed-rolling setting reads in the output.</span></span>
 <span class="ln" id="L1673"><span class="tok-kw">fn</span> <span class="tok-fn">describe_reseed</span>(secs: f32) -&gt; String {</span>
 <span class="ln" id="L1674">    <span class="tok-kw">if</span> secs &lt;= <span class="tok-num">0.0</span> {</span>
-<span class="ln" id="L1675">        <span class="tok-str">&quot;off &#8212; one stream for the whole session&quot;</span>.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L1675">        <span class="tok-str">&quot;off, so one stream for the whole session&quot;</span>.<span class="tok-fn">to_string</span>()</span>
 <span class="ln" id="L1676">    } <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L1677">        format!(<span class="tok-str">&quot;every {secs}s&quot;</span>)</span>
 <span class="ln" id="L1678">    }</span>
@@ -1838,7 +1838,7 @@
 <span class="ln" id="L1748">    } <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L1749">        atrest::<span class="tok-fn">confirm_plaintext</span>(at_rest.yes)?;</span>
 <span class="ln" id="L1750">        <span class="tok-com">// An unencrypted recording is still a recording of everything that was</span></span>
-<span class="ln" id="L1751">        <span class="tok-com">// said &#8212; the warning just above says exactly that &#8212; so at minimum it is</span></span>
+<span class="ln" id="L1751">        <span class="tok-com">// said, which the warning just above says exactly, so at minimum it is</span></span>
 <span class="ln" id="L1752">        <span class="tok-com">// not left readable by every other account on the machine. A file</span></span>
 <span class="ln" id="L1753">        <span class="tok-com">// permission is a much weaker thing than the encryption being declined</span></span>
 <span class="ln" id="L1754">        <span class="tok-com">// here, and the summary below says so rather than letting it read as a</span></span>
@@ -1887,7 +1887,7 @@
 <span class="ln" id="L1797">    println!();</span>
 <span class="ln" id="L1798">    println!(</span>
 <span class="ln" id="L1799">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1800">        <span class="tok-fn">ok</span>(<span class="tok-str">&quot;done &#8212; the voiceprint in this file is not recoverable&quot;</span>)</span>
+<span class="ln" id="L1800">        <span class="tok-fn">ok</span>(<span class="tok-str">&quot;done, and the voiceprint in this file is not recoverable&quot;</span>)</span>
 <span class="ln" id="L1801">    );</span>
 <span class="ln" id="L1802">    <span class="tok-kw">if</span> at_rest.encrypt {</span>
 <span class="ln" id="L1803">        println!(</span>
@@ -2028,7 +2028,7 @@
 <span class="ln" id="L1936">    <span class="tok-kw">if</span> out_name.<span class="tok-fn">is_none</span>() &amp;&amp; !preview {</span>
 <span class="ln" id="L1937">        println!(</span>
 <span class="ln" id="L1938">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L1939">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;no virtual audio cable found &#8212; routing to the default output&quot;</span>)</span>
+<span class="ln" id="L1939">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;no virtual audio cable found, so routing to the default output&quot;</span>)</span>
 <span class="ln" id="L1940">        );</span>
 <span class="ln" id="L1941">        println!(</span>
 <span class="ln" id="L1942">            <span class="tok-str">&quot;{}&quot;</span>,</span>
@@ -2272,13 +2272,13 @@
 <span class="ln" id="L2168"><span class="tok-kw">fn</span> <span class="tok-fn">keygen</span>(public: PathBuf, secret: PathBuf) -&gt; Result&lt;(), String&gt; {</span>
 <span class="ln" id="L2169">    <span class="tok-com">// Reported early so the user is not asked for a passphrase before being</span></span>
 <span class="ln" id="L2170">    <span class="tok-com">// told the file is in the way. The *refusal* that matters is not this one</span></span>
-<span class="ln" id="L2171">    <span class="tok-com">// though &#8212; it is `write_owner_only_new` below, which asks the kernel to</span></span>
+<span class="ln" id="L2171">    <span class="tok-com">// though. It is `write_owner_only_new` below, which asks the kernel to</span></span>
 <span class="ln" id="L2172">    <span class="tok-com">// fail if anything is already there. Checking `exists()` and then writing</span></span>
 <span class="ln" id="L2173">    <span class="tok-com">// is a race, and it follows a symbolic link planted at the path.</span></span>
 <span class="ln" id="L2174">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> [&amp;public, &amp;secret] {</span>
 <span class="ln" id="L2175">        <span class="tok-kw">if</span> path.<span class="tok-fn">exists</span>() {</span>
 <span class="ln" id="L2176">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L2177">                <span class="tok-str">&quot;{} already exists &#8212; refusing to overwrite a key file&quot;</span>,</span>
+<span class="ln" id="L2177">                <span class="tok-str">&quot;{} already exists, so refusing to overwrite a key file&quot;</span>,</span>
 <span class="ln" id="L2178">                path.<span class="tok-fn">display</span>()</span>
 <span class="ln" id="L2179">            ));</span>
 <span class="ln" id="L2180">        }</span>
@@ -2463,7 +2463,7 @@
 <span class="ln" id="L2355">            colour::MUTED,</span>
 <span class="ln" id="L2356">            <span class="tok-str">&quot;  On an SSD, SD card or USB stick, wear levelling may leave the</span></span>
 <span class="ln" id="L2357"><span class="tok-str">               original blocks in flash where no software can reach them.</span></span>
-<span class="ln" id="L2358"><span class="tok-str">               Full-disk encryption is the reliable answer &#8212; destroy the key</span></span>
+<span class="ln" id="L2358"><span class="tok-str">               Full-disk encryption is the reliable answer. Destroy the key</span></span>
 <span class="ln" id="L2359"><span class="tok-str">               and the data goes with it, wherever the drive put it.&quot;</span></span>
 <span class="ln" id="L2360">        )</span>
 <span class="ln" id="L2361">    );</span>
@@ -2478,7 +2478,7 @@
 <span class="ln" id="L2370">            .<span class="tok-fn">read_line</span>(&amp;<span class="tok-kw">mut</span> answer)</span>
 <span class="ln" id="L2371">            .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
 <span class="ln" id="L2372">        <span class="tok-kw">if</span> answer.<span class="tok-fn">trim</span>() != <span class="tok-str">&quot;DESTROY&quot;</span> {</span>
-<span class="ln" id="L2373">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;cancelled &#8212; nothing was touched&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L2373">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;cancelled, and nothing was touched&quot;</span>.<span class="tok-fn">into</span>());</span>
 <span class="ln" id="L2374">        }</span>
 <span class="ln" id="L2375">    }</span>
 <span class="ln" id="L2376"></span>

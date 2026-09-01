@@ -6,7 +6,7 @@ What this does is tell you a recorder is running, once, and then stop telling yo
 
 Two things it cannot do. It only knows the programs in its table, so an empty report is not evidence that nothing is recording. And it cannot tell whether a program that is running is actually capturing anything -- a meeting application being open is not somebody watching your screen.
 
-Usage: veilvoice.exe capture <COMMAND>
+Usage: veilvoice capture <COMMAND>
 
 Commands:
   status  What is running, what is allowed, and what this cannot see

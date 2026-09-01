@@ -58,7 +58,7 @@
 <p>Beside everything else this program keeps. Plain text, nothing secret in it: an allowlist is a note to yourself about which notifications you have already read.</p>
 <h2 id="the-exit-code">The exit code</h2>
 <p><code>veilvoice capture check</code> exits non-zero when something <strong>not allowed</strong> is running, so it can be a step in a script that refuses to start recording something sensitive while a recorder is open. Allowing a program is precisely how you tell that script you meant it.</p>
-<p>It exits zero when the listing itself failed, and says so on the way past. A check that cannot see is not a check that passed, but neither is it a reason to fail a script &#8212; the difference is in the words, and the words are printed.</p>
+<p>It exits zero when the listing itself failed, and says so on the way past. A check that cannot see is not a check that passed, but neither is it a reason to fail a script. The difference is in the words, and the words are printed.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Tells you which screen recorders are running, and lets you say you meant to start one so it stops being mentioned.</p>
 <p>It cannot tell whether a program is actually recording, only that it is open, and it says so. A meeting application being open is not somebody watching your screen.</p>
